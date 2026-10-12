@@ -4,6 +4,8 @@ name: release-mac
 # the GitHub Release for the tag. No Apple signing secrets exist, so the app is
 # ad-hoc signed only; the README documents the first-launch steps.
 # Not a pull_request workflow: it runs only on version tags or by hand.
+# The build job holds a read-only token; only the publish job can write, and it
+# runs no repository code or dependencies.
 
 on:
   push:
@@ -17,7 +19,7 @@ on:
         required: true
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-mac-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
@@ -25,23 +27,39 @@ concurrency:
 
 jobs:
   build:
-    name: Build and publish macOS arm64
+    name: Build macOS arm64
     runs-on: macos-latest
     timeout-minutes: 90
+    permissions:
+      contents: read
     env:
       RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
-      GH_TOKEN: ${{ github.token }}
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     steps:
+      - name: Validate tag
+        id: tag
+        run: |
+          set -euo pipefail
+          # Stable tags only: vMAJOR.MINOR.PATCH. The build uses the stable app identity.
+          if [[ ! "$RELEASE_TAG" =~ ^v([0-9]+\.[0-9]+\.[0-9]+)$ ]]; then
+            echo "Tag must look like v1.2.3 (stable only); got: $RELEASE_TAG" >&2
+            exit 1
+          fi
+          echo "tag=$RELEASE_TAG" >> "$GITHUB_OUTPUT"
+          echo "APP_VERSION=${BASH_REMATCH[1]}" >> "$GITHUB_ENV"
+
       - name: Checkout
         uses: actions/checkout@v6.0.2
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
+          ref: refs/tags/${{ steps.tag.outputs.tag }}
+          persist-credentials: false
 
       - name: Setup workspace
         uses: ./.github/actions/setup-workspace
 
       - name: Build portable dmg and zip
-        run: pnpm tools-pack mac build --to all --portable --json | tee "$RUNNER_TEMP/build.json"
+        run: pnpm tools-pack mac build --to all --portable --app-version "$APP_VERSION" --json | tee "$RUNNER_TEMP/build.json"
 
       - name: Collect release files
         run: |
@@ -50,10 +68,33 @@ jobs:
           out=.tmp/tools-pack/out/mac/namespaces/default
           cp "$out/dmg/Mish-default.dmg" "release-out/Mish-${RELEASE_TAG}-mac-arm64.dmg"
           cp "$out/zip/Mish-default.zip" "release-out/Mish-${RELEASE_TAG}-mac-arm64.zip"
-          ls -la release-out
-          test -n "$(ls release-out/*.dmg 2>/dev/null)" || { echo "no dmg produced" >&2; exit 1; }
           (cd release-out && shasum -a 256 -- ./* > SHA256SUMS)
           cat release-out/SHA256SUMS
+
+      - name: Upload build output
+        uses: actions/upload-artifact@v7
+        with:
+          name: mac-release
+          path: release-out/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ needs.build.outputs.tag }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Download build output
+        uses: actions/download-artifact@v4
+        with:
+          name: mac-release
+          path: release-out
 
       - name: Create or update the GitHub Release
         run: |
@@ -61,6 +102,6 @@ jobs:
           if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
             gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
               --title "$RELEASE_TAG" --verify-tag \
-              --notes "Unsigned macOS build (Apple Silicon). Open the dmg, drag Mish to Applications, then right-click and choose Open on first launch. Verify downloads against SHA256SUMS."
+              --notes "Unsigned macOS build (Apple Silicon). Open the dmg, drag the app to Applications, then right-click and choose Open on first launch. Verify downloads against SHA256SUMS."
           fi
           gh release upload "$RELEASE_TAG" release-out/* --repo "$GITHUB_REPOSITORY" --clobber
