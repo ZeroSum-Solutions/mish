@@ -92,7 +92,12 @@ export type FakeCollabHub = {
   commandLog: CommandLog[];
   eventLog: HubEvent[];
   requestLog: RequestLog[];
-  writeVelaBin: (path: string) => Promise<string>;
+  /**
+   * Write the fake Vela CLI. The daemon spawns Vela with an env allowlist that
+   * drops VELA_CONTROL_KEY, so pass `controlKey` to embed the caller identity
+   * in the executable; one bin per client keeps identities apart.
+   */
+  writeVelaBin: (path: string, controlKey?: string) => Promise<string>;
   waitForCommand: (
     predicate: (entry: CommandLog) => boolean,
     timeoutMs?: number,
@@ -374,8 +379,8 @@ export async function startFakeCollabHub(options: {
     commandLog,
     eventLog,
     requestLog,
-    writeVelaBin: async (path) => {
-      await writeFile(path, fakeVelaScript(), 'utf8');
+    writeVelaBin: async (path, controlKey) => {
+      await writeFile(path, fakeVelaScript(controlKey), 'utf8');
       await chmod(path, 0o755);
       return path;
     },
@@ -1054,8 +1059,9 @@ function personalWorkspaceDirectoryItem(identity: ClientIdentity) {
   };
 }
 
-function fakeVelaScript(): string {
+function fakeVelaScript(controlKey?: string): string {
   return `#!/usr/bin/env node
+const embeddedControlKey = ${JSON.stringify(controlKey ?? '')};
 const args = process.argv.slice(2);
 let stdin = '';
 const requestsFileIndex = args.indexOf('--requests-file');
@@ -1065,7 +1071,7 @@ if (requestsFileIndex >= 0 && args[requestsFileIndex + 1] === '-') {
 const response = await fetch(new URL('/__e2e/command', process.env.VELA_API_URL), {
   method: 'POST',
   headers: {
-    authorization: 'Bearer ' + process.env.VELA_CONTROL_KEY,
+    authorization: 'Bearer ' + (process.env.VELA_CONTROL_KEY || embeddedControlKey),
     'content-type': 'application/json',
     'x-vela-workspace-id': process.env.VELA_WORKSPACE_ID || process.env.MISH_WORKSPACE_ID || '',
   },
