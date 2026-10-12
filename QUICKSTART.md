@@ -164,6 +164,24 @@ od pack list
 How to write `pack.json`, install from a private GitHub repository and remove a pack:
 [`docs/packs.md`](docs/packs.md).
 
+### 8. Restore the private content with a team packet
+
+The public repository does not carry licensed kits, catalogues, studies, extra design
+systems, skills or MCP connections. Your team lead gives you one `.zip` (a Mish pack) that does.
+Start the app, then install it once:
+
+```bash
+od packs install ~/Downloads/team-packet.zip
+od packs list
+```
+
+Or open **Settings → Packs** and choose the `.zip`. The list shows what the packet restored
+and which environment variables its MCP servers need; set those in the shell that starts the
+app (for example `CULT_PRO_TOKEN`), then restart it. Sign in to OAuth servers such as Refero
+and Mobbin from the app. To remove everything the packet added, run `od packs remove <id>`.
+Team leads build the packet with `node scripts/build-pack.mjs`; see
+[`docs/packs.md`](docs/packs.md#mish-packs-a-team-packet).
+
 ## Docker Setup
 
 Run Mishh Mashh in a fully containerised environment without installing Node.js or pnpm locally.

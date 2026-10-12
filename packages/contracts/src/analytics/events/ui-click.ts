@@ -1559,6 +1559,7 @@ export type TrackingSettingsArea =
   | 'privacy'
   | 'labs'
   | 'licensed_packs'
+  | 'packs'
   | 'about';
 
 export interface SettingsSidebarClickProps {

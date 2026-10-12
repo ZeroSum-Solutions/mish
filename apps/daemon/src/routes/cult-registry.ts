@@ -23,10 +23,10 @@
 import type { Express, Request, Response } from 'express';
 import type { CultCopyResponse } from '@mish/contracts';
 import { cultLocalOnlyRefusal } from '@mish/contracts';
-import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
-import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
 
+import { cultInventoryData, cultSlugData } from '../cult-data.js';
 import { CultRegistry, CultRegistryError, resolveCultKitDir, type CultRegistryRow } from '../cult-registry.js';
+import { mishPackGeneration } from '../mish-packs/overlay.js';
 import type { RouteDeps } from '../server-context.js';
 
 export interface RegisterCultRegistryRoutesDeps extends RouteDeps<'http'> {}
@@ -34,22 +34,30 @@ export interface RegisterCultRegistryRoutesDeps extends RouteDeps<'http'> {}
 export interface CultRegistryRouteOptions {
   /** Defaults to the shipped inventory. */
   rows?: readonly CultRegistryRow[];
-  /** The server supplies its validated bundled-kit fallback; a bare registrar defaults to `CULT_KIT_DIR`. */
-  kitDir?: string | null;
+  /** The server supplies its validated bundled-kit fallback; a bare registrar defaults to `CULT_KIT_DIR`. A function is read per request, so an installed pack takes effect without a restart. */
+  kitDir?: string | null | (() => string | null);
   /** Row id → public slug. Defaults to the catalog package's `generated/slugs.json`. */
   slugs?: ReadonlyMap<string, string>;
 }
 
-/** The shipped public slugs (`generated/slugs.json`), by row id. */
+/** The public slugs (`generated/slugs.json`, or an installed pack's), by row id. */
 export function cultSlugs(): Map<string, string> {
-  return new Map(Object.entries((cultSlugsJson as unknown as { items: Record<string, string> }).items));
+  return new Map(Object.entries((cultSlugData() as unknown as { items: Record<string, string> }).items));
 }
 
 export function registerCultRegistryRoutes(app: Express, ctx: RegisterCultRegistryRoutesDeps, options: CultRegistryRouteOptions = {}): void {
   const { sendApiError } = ctx.http;
-  const rows = options.rows ?? (cultInventoryJson as unknown as { rows: CultRegistryRow[] }).rows;
-  const kitDir = options.kitDir === undefined ? resolveCultKitDir() : options.kitDir;
-  const registry = new CultRegistry(rows, kitDir, options.slugs ?? cultSlugs());
+  // Rows, slugs and the kit are read through the pack overlay and rebuilt when the set of packs changes.
+  let built: { generation: number; kitDir: string | null; registry: CultRegistry } | null = null;
+  const current = (): CultRegistry => {
+    const generation = mishPackGeneration();
+    const kitDir = typeof options.kitDir === 'function' ? options.kitDir() : options.kitDir === undefined ? resolveCultKitDir() : options.kitDir;
+    if (!built || built.generation !== generation || built.kitDir !== kitDir) {
+      const rows = options.rows ?? (cultInventoryData() as unknown as { rows: CultRegistryRow[] }).rows;
+      built = { generation, kitDir, registry: new CultRegistry(rows, kitDir, options.slugs ?? cultSlugs()) };
+    }
+    return built.registry;
+  };
 
   /** The loopback base the served item's own URLs use: the port this request reached. */
   const baseUrl = (req: Request): string => `http://127.0.0.1:${req.socket.localPort}`;
@@ -75,7 +83,7 @@ export function registerCultRegistryRoutes(app: Express, ctx: RegisterCultRegist
     try {
       const file = String(req.params.file ?? '');
       if (!file.endsWith('.json')) return sendApiError(res, 404, 'NOT_FOUND', 'registry items end in .json');
-      res.json(registry.item(file.slice(0, -'.json'.length), baseUrl(req)));
+      res.json(current().item(file.slice(0, -'.json'.length), baseUrl(req)));
     } catch (err) {
       fail(res, err);
     }
@@ -85,7 +93,7 @@ export function registerCultRegistryRoutes(app: Express, ctx: RegisterCultRegist
     if (!localOnly(req, res)) return;
     try {
       const file = typeof req.query.file === 'string' && req.query.file.length > 0 ? req.query.file : undefined;
-      res.json({ copy: registry.copyInfo(String(req.params.id ?? ''), baseUrl(req), file) } satisfies CultCopyResponse);
+      res.json({ copy: current().copyInfo(String(req.params.id ?? ''), baseUrl(req), file) } satisfies CultCopyResponse);
     } catch (err) {
       fail(res, err);
     }

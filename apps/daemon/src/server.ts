@@ -1043,6 +1043,10 @@ import { registerCultRegistryRoutes } from './routes/cult-registry.js';
 import { registerCultLivePreviewRoutes } from './routes/cult-live-preview.js';
 import { createPackRegistry, packsDirForDataDir } from './packs/registry.js';
 import { createPackService } from './packs/service.js';
+import { createMishPackStore } from './mish-packs/store.js';
+import { installFastLanePackOverlay } from './mish-packs/fast-lane-bridge.js';
+import { readMcpConfigForSpawn } from './mish-packs/mcp.js';
+import { registerMishPackRoutes } from './routes/mish-packs.js';
 import { createPluginsPackHandler } from './plugins/pack-plugins.js';
 import { createGithubPackFetcher } from './packs/github-fetcher.js';
 import { createPackGithubAccess } from './integrations/github-auth.js';
@@ -1467,7 +1471,8 @@ const BUNDLED_PLUGINS_DIR = resolveDaemonResourceDir(
 /** AC-R07 compiled-section previews: bundled read-only resources, never daemon data. */
 const SECTION_PREVIEW_ROOTS = {
   hyperuiRoot: path.join(BUNDLED_PLUGINS_DIR, 'shared', 'ui-kits', 'hyperui'),
-  cultKitDir: resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT),
+  // A function: an installed Mish pack can provide the kit after this module loads.
+  cultKitDir: () => resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT),
 };
 const PLUGIN_REGISTRY_DIR = resolveDaemonResourceDir(
   DAEMON_RESOURCE_ROOT,
@@ -1594,6 +1599,25 @@ const packService = createPackService({
   registry: packRegistry,
   githubFetcher: createGithubPackFetcher({ access: packGithubAccess }),
   handlers: [createPluginsPackHandler({ db: () => packPluginsDb, roots: PLUGIN_REGISTRY_ROOTS })],
+});
+// Mish packs: private packets (a folder or .zip) that restore content and connections the public
+// repository does not carry. Installed under `<RUNTIME_DATA_DIR>/mish-packs/`; MISH_PACKS_DIR may
+// name an extra read-only folder of packs. Loaders ask the overlay (`mish-packs/overlay.ts`) per
+// request, so an install or removal takes effect without a restart. See docs/packs.md.
+installFastLanePackOverlay();
+const MISH_PACKS_EXTERNAL_DIR = (() => {
+  const raw = process.env.MISH_PACKS_DIR?.trim();
+  if (!raw) return null;
+  if (!path.isAbsolute(raw)) {
+    console.warn('[mish-packs] MISH_PACKS_DIR must be an absolute path; it is ignored');
+    return null;
+  }
+  return raw;
+})();
+const mishPackStore = createMishPackStore({
+  dataDir: RUNTIME_DATA_DIR,
+  externalDir: MISH_PACKS_EXTERNAL_DIR,
+  userRoots: { skills: USER_SKILLS_DIR, designSystems: USER_DESIGN_SYSTEMS_DIR },
 });
 fs.mkdirSync(PROJECTS_DIR, { recursive: true });
 for (const dir of [USER_SKILLS_DIR, USER_DESIGN_SYSTEMS_DIR, BRANDS_DIR, USER_DESIGN_TEMPLATES_DIR, PLUGIN_REGISTRY_ROOTS.userPluginsRoot, LIBRARY_DIR, DESIGN_INDEX_DIR, AGENCY_BUILDS_DIR]) {
@@ -3461,6 +3485,13 @@ export async function startServer({
     await packRegistry.reconcile();
   } catch (error) {
     console.warn('[packs] startup reconciliation failed', String((error as { code?: unknown })?.code ?? 'unknown'));
+  }
+  // Mish packs: scan, copy skill and design-system folders into the user roots, apply the
+  // allow-listed environment. A failure leaves the app running without the pack content.
+  try {
+    await mishPackStore.start();
+  } catch (error) {
+    console.warn('[mish-packs] startup failed', String((error as { code?: unknown })?.code ?? 'unknown'));
   }
 
   const app = express();
@@ -8613,11 +8644,12 @@ export async function startServer({
   }, { previewRoots: SECTION_PREVIEW_ROOTS });
 
   registerCultCatalogRoutes(app, { http: httpDeps });
-  registerCultRegistryRoutes(app, { http: httpDeps }, { kitDir: resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT) });
-  registerCultLivePreviewRoutes(app, { http: httpDeps }, { kitDir: resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT) });
+  registerCultRegistryRoutes(app, { http: httpDeps }, { kitDir: () => resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT) });
+  registerCultLivePreviewRoutes(app, { http: httpDeps }, { kitDir: () => resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT) });
   registerTwenty1stRoutes(app, { http: httpDeps }, { resourceRoot: DAEMON_RESOURCE_ROOT });
   // Licensed packs install surface (Settings → Licensed packs and `od pack`).
   registerPackRoutes(app, { http: httpDeps, packs: packService, githubAccess: packGithubAccess });
+  registerMishPackRoutes(app, { http: httpDeps, packs: mishPackStore, uploadDir: path.join(RUNTIME_DATA_DIR, 'mish-packs', '.staging', 'uploads') });
   registerComponentLedgerRoutes(app, { http: httpDeps }, packRegistry);
 
   registerPluginEventRoutes(app, {
@@ -12095,7 +12127,7 @@ export async function startServer({
     let externalMcpConfig = { servers: [] };
     if (!SANDBOX_RUNTIME.enabled) {
       try {
-        externalMcpConfig = await readMcpConfig(RUNTIME_DATA_DIR);
+        externalMcpConfig = await readMcpConfigForSpawn(RUNTIME_DATA_DIR);
       } catch (err) {
         if (err instanceof McpCredentialFileError) throw err;
         console.warn(

@@ -59,6 +59,7 @@ export * from './api/version.js';
 export * from './api/whats-new.js';
 export * from './api/workspaces.js';
 export * from './api/workspace-invites.js';
+export * from './api/mish-packs.js';
 export * from './api/packs.js';
 export * from './api/pack-github-access.js';
 export * from './examples.js';

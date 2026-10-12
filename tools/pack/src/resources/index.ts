@@ -89,7 +89,8 @@ const BUNDLED_RESOURCE_TREES = [
   { from: join("plugins", "_official"), to: join("plugins", "_official") },
   { from: join("plugins", "registry"), to: join("plugins", "registry") },
   { from: join("assets", "frames"), to: "frames" },
-  { from: join("assets", "community-pets"), to: "community-pets" },
+  // The public repository carries no community pets (a Mish pack can add them at run time).
+  { from: join("assets", "community-pets"), to: "community-pets", optional: true },
   // The curated prompt registry is optional and absent from fresh checkouts.
   { from: "prompt-templates", to: "prompt-templates", optional: true },
   // Baked plugin-preview manifest. The gallery's pre-rendered hover-pan clips

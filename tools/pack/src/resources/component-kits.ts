@@ -5,6 +5,15 @@ import { join } from 'node:path';
 
 export async function verifyBundledComponentKit(workspaceRoot: string): Promise<void> {
   const root = join(workspaceRoot, 'data', 'component-kits', 'cult-ui-pro');
+  // The public repository carries no licensed kit: a checkout without a manifest packages without
+  // one, and the installed app gets the kit from a Mish pack. A manifest that is present is still
+  // verified file by file below, so a private build cannot ship a damaged or partial kit.
+  try {
+    await lstat(join(root, 'manifest.json'));
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
+    throw error;
+  }
   const manifest = JSON.parse(await readFile(join(root, 'manifest.json'), 'utf8')) as {
     schemaVersion?: unknown; files?: Array<{ file: string; bytes: number; sha256: string }>;
   };

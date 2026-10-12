@@ -20,6 +20,7 @@ export type SettingsSection =
   | 'memory'
   | 'privacy'
   | 'licensedPacks'
+  | 'packs'
   // 'library' is consumed by the EntryShell library route — App opens it
   // via this same openSettings entry point, so SettingsSection must
   // accept the token even though SettingsDialog itself has no Library
@@ -58,7 +59,7 @@ export function normalizeSettingsSection(section: SettingsSection): SettingsSect
   }
 }
 
-const SETTINGS_SECTIONS: readonly SettingsSection[] = ["general", "labs", "execution", "workspace", "instructions", "media", "composio", "orbit", "routines", "integrations", "mcpClient", "language", "appearance", "critiqueTheater", "notifications", "pet", "designSystems", "projectLocations", "memory", "privacy", "licensedPacks", "library", "about"];
+const SETTINGS_SECTIONS: readonly SettingsSection[] = ["general", "labs", "execution", "workspace", "instructions", "media", "composio", "orbit", "routines", "integrations", "mcpClient", "language", "appearance", "critiqueTheater", "notifications", "pet", "designSystems", "projectLocations", "memory", "privacy", "licensedPacks", "packs", "library", "about"];
 
 export function parseSettingsSection(value: string | undefined): SettingsSection | undefined {
   // Library is a separate view, not a SettingsDialog section.

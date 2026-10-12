@@ -85,6 +85,7 @@ import { ComponentLedgerSection } from './ComponentLedgerSection';
 import { LabsStagedRow } from './LabsStagedRow';
 import { LabsImprovePromptRow } from './LabsImprovePromptRow';
 import { LicensedPacksSection } from './LicensedPacksSection';
+import { MishPacksSection } from './MishPacksSection';
 import { defaultAgentModelId, effectiveAgentModelChoice } from './agentModelSelection';
 import {
   CUSTOM_MODEL_SENTINEL,
@@ -3854,6 +3855,7 @@ export function SettingsDialog({
     notifications: { title: t('settings.notifications'), subtitle: t('settings.notificationsHint') },
     privacy: { title: t('settings.privacy'), subtitle: t('settings.privacyHint') },
     licensedPacks: { title: t('settings.licensedPacks'), subtitle: t('settings.licensedPacksHint') },
+    packs: { title: t('settings.packs'), subtitle: t('settings.packsHint') },
     pet: { title: t('pet.title'), subtitle: t('pet.subtitle') },
     designSystems: {
       title: t('settings.designSystems'),
@@ -4393,6 +4395,18 @@ export function SettingsDialog({
               <span>
                 <strong>{t('settings.licensedPacks')}</strong>
                 <small>{t('settings.licensedPacksHint')}</small>
+              </span>
+            </NavigationItem>
+            <NavigationItem
+              active={activeSection === 'packs'}
+              activeClassName="active"
+              className="settings-nav-item"
+              onClick={() => selectSection('packs')}
+            >
+              <Icon name="blocks" size={18} />
+              <span>
+                <strong>{t('settings.packs')}</strong>
+                <small>{t('settings.packsHint')}</small>
               </span>
             </NavigationItem>
             <NavigationItem
@@ -5998,6 +6012,7 @@ export function SettingsDialog({
           ) : null}
 
           {activeSection === 'licensedPacks' ? <><LicensedPacksSection /><ComponentLedgerSection /></> : null}
+          {activeSection === 'packs' ? <MishPacksSection /> : null}
 
           {activeSection === 'privacy' ? (
             <PrivacySection cfg={cfg} setCfg={setCfg} />

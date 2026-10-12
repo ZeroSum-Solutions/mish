@@ -164,7 +164,7 @@ async function scanRoot(
 }
 
 export async function listCodexPets(
-  options: { baseUrl?: string; bundledRoot?: string } = {},
+  options: { baseUrl?: string; bundledRoot?: string; extraBundledRoots?: readonly string[] } = {},
 ): Promise<CodexPetListResult> {
   const baseUrl = options.baseUrl ?? '';
   const userRoot = resolveCodexPetsRoot();
@@ -174,14 +174,21 @@ export async function listCodexPets(
   // can stamp `bundled: true` on any local re-bake, and so the
   // bundled-root scan only adds the curated pets the user has not
   // already shadowed.
+  // Installed Mish packs can add pet folders next to the bundled ones (`extraBundledRoots`).
   const bundledIds = options.bundledRoot
     ? await readBundledIds(options.bundledRoot)
     : new Set<string>();
+  for (const extra of options.extraBundledRoots ?? []) {
+    for (const id of await readBundledIds(extra)) bundledIds.add(id);
+  }
   // User pets first so a locally re-baked copy preempts the bundled
   // one (same id ⇒ user wins for sprite content).
   await scanRoot(userRoot, baseUrl, false, bundledIds, out, seen);
   if (options.bundledRoot) {
     await scanRoot(options.bundledRoot, baseUrl, true, bundledIds, out, seen);
+  }
+  for (const extra of options.extraBundledRoots ?? []) {
+    await scanRoot(extra, baseUrl, true, bundledIds, out, seen);
   }
   // Newest-first across both origins. Sorting by mtime keeps the
   // "recently hatched" framing in the UI honest — a bundled pet from
@@ -197,12 +204,13 @@ export async function listCodexPets(
 // arbitrary folders under their home directory or the bundled assets.
 export async function readCodexPetSpritesheet(
   id: string,
-  options: { bundledRoot?: string } = {},
+  options: { bundledRoot?: string; extraBundledRoots?: readonly string[] } = {},
 ): Promise<SpritesheetPick | null> {
   const safeId = sanitizeId(id);
   if (!safeId) return null;
   const roots: string[] = [resolveCodexPetsRoot()];
   if (options.bundledRoot) roots.push(options.bundledRoot);
+  roots.push(...(options.extraBundledRoots ?? []));
   for (const root of roots) {
     const dir = path.join(root, safeId);
     // Re-resolve the manifest so a manifest-declared spritesheetPath wins
