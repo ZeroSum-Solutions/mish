@@ -64,6 +64,15 @@ composioConnectorProvider.configureCatalogCache(process.env.OD_DATA_DIR);
 // Keep unit tests from reading a developer's stored Vela profile and routing
 // Langfuse-shaped telemetry through the authenticated Vela sink by accident.
 process.env.MISH_VELA_TELEMETRY ??= 'off';
+// The daemon forwards the user's Claude endpoint/auth env to spawned Claude
+// processes and the Claude diagnostics branch on it (a custom ANTHROPIC_BASE_URL
+// switches auth guidance from `/login` to "check your custom endpoint"). The
+// suites assume a plain shell, so scrub whatever the developer's shell exports
+// (e.g. running the tests from inside a Claude Code session, which sets
+// ANTHROPIC_BASE_URL). A test that needs one of these sets it explicitly.
+for (const key of ['ANTHROPIC_BASE_URL', 'ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'CLAUDE_CONFIG_DIR']) {
+  delete process.env[key];
+}
 
 // Publish/share endpoints shell out through OD_NODE_BIN + OD_BIN (dist/cli.js).
 // Build the CLI artifact once per vitest process so package tests do not depend

@@ -76,6 +76,7 @@ import { loadWorkspaceLocalEnv } from "./local-env.js";
 import { resolveSharedPortsFromRunningState } from "./shared-ports.js";
 import { desktopLaunchArgs } from "./desktop-profile.js";
 import { assertDesktopProfileStartAllowed, startDesktopRuntime } from "./desktop-start.js";
+import { stabilizeWebNextEnv } from "./web-next-env.js";
 
 type CliOptions = ToolDevOptions & PlacementOwnerOptions & PlacementAdoptionOptions & {
   envFile?: string | string[];
@@ -901,7 +902,11 @@ function formatStopAppResult(appName: ToolDevAppName, stop: Awaited<ReturnType<t
 }
 
 async function stopApp(config: ToolDevConfig, appName: ToolDevAppName) {
-  return formatStopAppResult(appName, await stopSidecar(createConvergedAppStamp(config, appName)));
+  const result = formatStopAppResult(appName, await stopSidecar(createConvergedAppStamp(config, appName)));
+  // A web sidecar stopped mid-prepare never ran its own next-env.d.ts repair;
+  // never leave the tracked file pointing at this namespace's distDir.
+  if (appName === APP_KEYS.WEB) await stabilizeWebNextEnv(config.workspaceRoot).catch(() => false);
+  return result;
 }
 
 async function inspectAppStatus(config: ToolDevConfig, appName: ToolDevAppName) {

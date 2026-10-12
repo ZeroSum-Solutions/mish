@@ -240,7 +240,7 @@
           <circle cx="2.5" cy="13" r="1.4"/><circle cx="7.5" cy="13" r="1.4"/>
         </svg>
       </div>
-      <a class="brand" href="https://github.com/ZeroSum-Solutions/Mishh-Mashh-2" target="_blank" rel="noopener noreferrer" data-tip="${esc(t('toolbarHomeTip'))}" aria-label="${esc(t('toolbarHomeLabel'))}">
+      <a class="brand" href="https://github.com/ZeroSum-Solutions/mish" target="_blank" rel="noopener noreferrer" data-tip="${esc(t('toolbarHomeTip'))}" aria-label="${esc(t('toolbarHomeLabel'))}">
         <svg viewBox="0 0 93 93" fill="#fff" xmlns="http://www.w3.org/2000/svg">
           <path d="M75.98 22.86C76.49 23.14 78.99 25.38 79.57 25.88C82.3 28.3 85.07 30.69 87.86 33.04C86.94 34.36 85.6 36.02 84.6 37.3L79.89 43.36L69.7 56.68C66.35 61.03 62.85 65.47 59.61 69.89C59.59 69.91 59.5 69.96 59.47 69.97C58.34 68.83 56.33 67.19 55.06 66.1L47.91 59.98C48.23 59.39 48.82 58.63 49.23 58.07C49.98 57.03 50.74 55.99 51.52 54.97L56.93 47.78L75.98 22.86Z"/>
           <path d="M53.99 23.14C54.34 23.28 57.24 25.89 57.72 26.3L65.89 33.39C64.99 34.75 63.74 36.29 62.73 37.59L57.95 43.77L43.78 62.3C41.9 64.79 39.74 67.42 37.95 69.94L37.82 70.04C37.3 69.85 27.52 61.23 26.29 60.11C27.08 58.9 28.18 57.48 29.04 56.31L34.73 48.66C41.08 40.1 47.5 31.59 53.99 23.14Z"/>

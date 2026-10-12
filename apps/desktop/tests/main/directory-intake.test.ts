@@ -1,7 +1,8 @@
 // AC-R01.1: "Directory intake reports each discovered file and does not follow
 // symlinks outside the selected tree." Real filesystem fixtures under the OS
 // temp directory; the physical Finder drop stays a separate native gate.
-import { chmod, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { access, chmod, mkdir, mkdtemp, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -99,14 +100,22 @@ describe("listDroppedDirectory", () => {
     await chmod(join(root, "locked"), 0o000);
     await writeFile(join(root, "ok.txt"), "ok");
 
+    // A privileged process (root, CAP_DAC_OVERRIDE) can still traverse a 000
+    // directory, so the expected outcome follows the OS's actual access
+    // decision rather than the mode bits.
+    const lockedRefused = await access(join(root, "locked"), constants.R_OK | constants.X_OK).then(
+      () => false,
+      () => true,
+    );
+
     const listing = await listDroppedDirectory(root);
 
-    expect(listing.files.map((file) => file.relativePath)).toEqual(["ok.txt"]);
+    expect(listing.files.map((file) => file.relativePath)).toEqual(
+      lockedRefused ? ["ok.txt"] : ["locked/hidden.txt", "ok.txt"],
+    );
     const reasons = Object.fromEntries(listing.refused.map((entry) => [entry.relativePath, entry.reason]));
     expect(reasons["Tool.app"]).toBe("bundle");
-    // Root can read a 000 directory; only assert the permission state when the
-    // process is genuinely refused.
-    if (process.getuid?.() !== 0) expect(reasons.locked).toBe("permission");
+    expect(reasons.locked).toBe(lockedRefused ? "permission" : undefined);
   });
 
   it("says so explicitly when discovery stops at its bound", async () => {

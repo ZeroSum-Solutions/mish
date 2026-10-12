@@ -100,7 +100,7 @@ export async function runExampleGenerator(opts: ExampleGeneratorOptions): Promis
       description: typeof fm.description === 'string' ? fm.description.trim() : '',
       license: 'MIT',
       author: { name: 'Mishh Mashh', url: 'https://github.com/ZeroSum-Solutions' },
-      homepage: `https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/${TIER_EXAMPLES}/${id}`,
+      homepage: `https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/${TIER_EXAMPLES}/${id}`,
       tags: dedupeTags([
         'example',
         'first-party',

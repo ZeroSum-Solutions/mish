@@ -2,11 +2,11 @@
 // Copy the one canonical Agency Site compiler into every copy of it, and check that no copy has
 // drifted from it.
 //
-// There are seventeen copies of the same compiler. The sixteen family packages under
+// There are thirteen copies of the same compiler. The twelve family packages under
 // `plugins/_official/examples/agency-*/` need theirs: the daemon packs an installed plugin
 // without `node_modules` (`apps/daemon/src/plugins/pack.ts`) and the fast lane loads a package by
 // path (`packages/agency-fast-lane/src/family.ts`), so a package runs outside the workspace and
-// cannot import a shared workspace package. The seventeenth, `design-templates/agency-site/scripts/`,
+// cannot import a shared workspace package. The thirteenth, `design-templates/agency-site/scripts/`,
 // is the production "New Project -> Prototype -> Agency Site" template the daemon loads at
 // runtime (`apps/daemon/src/artifacts/agency-recipe.ts`, `docs/agency-site.md`). Left alone, the
 // copies drift — a fix landed in one never reaches the others.
@@ -26,13 +26,12 @@
 //
 //   1. The SHARED compiler files (`assets.ts`, `compose.ts`, `family.ts`, `render.ts`,
 //      `schema.ts`, `sections.ts`, `styles.ts`) come from the canonical folder and go to all
-//      seventeen copies.
+//      thirteen copies.
 //   2. A FAMILY MODULE a copy carries but does not own comes FROM THE PACKAGE NAMED AFTER IT
 //      (`families/<family>/**` comes from `agency-<family>`) and goes to every copy that carries
-//      it without owning it — the template (`families/emmpo/**` from `agency-emmpo`,
-//      `families/watson/**` from `agency-watson`) and any example package that holds another
-//      family's module as a leftover copy (for example `agency-maren`'s `families/watson/**`,
-//      copied from `agency-watson`). The owning package is the source of truth for its family
+//      it without owning it — the template, for any family listed in `TEMPLATE_MIRRORS` (empty in
+//      the public repository: the families the template carried ship in private packs), and any
+//      example package that holds another family's module as a leftover copy. The owning package is the source of truth for its family
 //      module: it is where that family's fixes land (#19, #23, #27) and where its reference
 //      fixture and preview are verified. Mirroring is one-way and additive — every file the owner
 //      ships must be byte-identical in a carrier, and a file only the carrier has (the template's

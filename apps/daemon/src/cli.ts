@@ -5626,7 +5626,8 @@ async function runPluginMishPr(rest) {
   od plugin mish-pr <folder> [--host github.com] [--owner github-login-or-fork-owner] [--dry-run] [--json]
 
 Copies a local plugin folder into plugins/community/<name>/ on the author's
-fork of the upstream repository, pushes a branch, and opens the PR form with --web.`);
+fork of the public catalog repository, pushes a branch to that fork, and opens
+the PR form with --web.`);
     process.exit(rest.length === 0 ? 2 : 0);
   }
   const folder = rest.find((a) => !a.startsWith('-') && a !== flags.host && a !== flags.owner);
@@ -5681,9 +5682,19 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
     return result;
   };
 
-  // Mishh Mashh is a private org repository: contributors push a branch to it
-  // directly instead of forking.
-  await run('clone fork', 'git', [
+  // The catalog lives in the public repository, where outside contributors
+  // cannot push branches: fork it under the author (or --owner org), push the
+  // branch to that fork, and open the PR from `<owner>:<branch>`.
+  // GitHub logins are case-insensitive. A maintainer passing --owner as the
+  // catalog's own org already has the repository and pushes there directly.
+  const [catalogOwner, catalogRepoName] = MISHH_MASHH_PLUGIN_REPO.split('/');
+  const ownerKey = String(target.owner ?? '').toLowerCase();
+  if (ownerKey !== catalogOwner.toLowerCase()) {
+    const forkArgs = ['repo', 'fork', MISHH_MASHH_PLUGIN_REPO, '--clone=false'];
+    if (target.login && ownerKey !== String(target.login).toLowerCase()) forkArgs.push('--org', target.owner);
+    await run('fork catalog repository', 'gh', forkArgs, { timeout: 120_000 });
+  }
+  await run('clone catalog', 'git', [
     'clone',
     '--depth', '1',
     '--single-branch',
@@ -5694,6 +5705,7 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
     checkout,
   ], { timeout: 240_000 });
   await run('sparse checkout', 'git', ['sparse-checkout', 'set', 'plugins/community'], { cwd: checkout });
+  await run('add fork remote', 'git', ['remote', 'add', 'fork', `https://github.com/${target.owner}/${catalogRepoName}.git`], { cwd: checkout });
   await run('checkout branch', 'git', ['checkout', '-b', branch], { cwd: checkout });
   const dest = join(checkout, 'plugins', 'community', name);
   if (!flags['dry-run']) {
@@ -5703,7 +5715,7 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
   }
   await run('git add', 'git', ['add', `plugins/community/${name}`], { cwd: checkout });
   await run('git commit', 'git', ['commit', '-m', `Add ${title} plugin`], { cwd: checkout });
-  await run('git push branch', 'git', ['push', '-u', 'origin', branch], { cwd: checkout });
+  await run('git push branch', 'git', ['push', '-u', 'fork', branch], { cwd: checkout });
   const body = [
     `Add ${title} (${name}) plugin.`,
     '',
@@ -5713,13 +5725,13 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
   const pr = await run('open PR form', 'gh', [
     'pr', 'create',
     '--repo', MISHH_MASHH_PLUGIN_REPO,
-    '--head', branch,
+    '--head', `${target.owner}:${branch}`,
     '--base', 'main',
     '--title', `Add ${title} plugin`,
     '--body', body,
     '--web',
   ], { cwd: checkout });
-  const prUrl = extractFirstUrl(pr.stdout || pr.stderr) ?? `https://github.com/${MISHH_MASHH_PLUGIN_REPO}/pull/new/${branch}`;
+  const prUrl = extractFirstUrl(pr.stdout || pr.stderr) ?? `https://github.com/${MISHH_MASHH_PLUGIN_REPO}/compare/main...${target.owner}:${branch}?expand=1`;
   emitPluginWorkflowResult(flags, {
     ok: true,
     action: 'mish-pr',
