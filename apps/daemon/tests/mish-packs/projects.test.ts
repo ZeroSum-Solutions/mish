@@ -7,7 +7,7 @@ import { existsSync, readFileSync, readdirSync, renameSync } from 'node:fs';
 import { promises as fsp } from 'node:fs';
 import path from 'node:path';
 
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { closeDatabase, getProject, insertConversation, insertProject, openDatabase } from '../../src/db.js';
 import { readMcpConfig } from '../../src/mcp-config.js';
@@ -63,13 +63,34 @@ function writeProjectsPack(root: string, options: { extraProjects?: boolean } = 
   if (options.extraProjects) writeFile(root, 'projects/proj-two/index.html', '<h1>Two</h1>');
 }
 
-/** Version 2 of the fixture: other skill text, one more skill, one more project, another MCP url. */
+/** Version 2 of the fixture: other skill text, one more skill, one more project, another MCP url, one more MCP server. */
 function writeVersionTwo(source: string): void {
   writeProjectsPack(source, { extraProjects: true });
   const file = path.join(source, 'mish-pack.json');
-  writeFile(source, 'mish-pack.json', readFileSync(file, 'utf8').replace('"version": "1.0.0"', '"version": "2.0.0"').replace('https://mcp.example.test/mcp', 'https://mcp-v2.example.test/mcp'));
+  const manifest = JSON.parse(readFileSync(file, 'utf8').replace('https://mcp.example.test/mcp', 'https://mcp-v2.example.test/mcp')) as {
+    version: string; provides: { mcpServers: Array<Record<string, unknown>> };
+  };
+  manifest.version = '2.0.0';
+  manifest.provides.mcpServers.push({ id: 'pack-new', transport: 'http', url: 'https://new.example.test/mcp', authMode: 'oauth' });
+  writeFile(source, 'mish-pack.json', JSON.stringify(manifest, null, 2));
   writeFile(source, 'skills/pack-skill-a/SKILL.md', '---\nname: pack-skill-a\ndescription: v2\n---\nVersion two\n');
   writeFile(source, 'skills/pack-skill-c/SKILL.md', '---\nname: pack-skill-c\ndescription: v2\n---\nNew in two\n');
+}
+
+/** Version 3: version 2 plus a skill only version 3 has. */
+function writeVersionThree(source: string): void {
+  writeVersionTwo(source);
+  const file = path.join(source, 'mish-pack.json');
+  writeFile(source, 'mish-pack.json', readFileSync(file, 'utf8').replace('"version": "2.0.0"', '"version": "3.0.0"'));
+  writeFile(source, 'skills/pack-skill-d/SKILL.md', '---\nname: pack-skill-d\ndescription: v3\n---\nOnly in three\n');
+}
+
+function serverIds(): Promise<string[]> {
+  return readMcpConfig(dataDir).then((config) => config.servers.map((server) => server.id).sort());
+}
+
+function receiptOf(id = 'team-kit'): { version: string; seededMcp: Array<{ id: string }>; mcpApplied?: boolean; copied: { skills: string[] } } {
+  return JSON.parse(readFileSync(path.join(dataDir, 'mish-packs', '.receipts', `${id}.json`), 'utf8'));
 }
 
 async function expectPackError(promise: Promise<unknown>, code: string): Promise<void> {
@@ -100,7 +121,9 @@ function leftovers(): string[] {
     const abs = path.join(dataDir, 'mish-packs', dir);
     if (existsSync(abs) && readdirSync(abs).length > 0) out.push(dir);
   }
-  for (const userRoot of [skillsRoot, dsRoot]) if (existsSync(path.join(userRoot, '.mish-pack-staging'))) out.push(`${path.basename(userRoot)}/.mish-pack-staging`);
+  for (const userRoot of [skillsRoot, dsRoot]) {
+    for (const dir of ['.mish-pack-staging', '.mish-pack-retiring']) if (existsSync(path.join(userRoot, dir))) out.push(`${path.basename(userRoot)}/${dir}`);
+  }
   return out;
 }
 
@@ -223,6 +246,7 @@ describe('replacing a pack', () => {
     expect(state.skillA).toContain('Version two');
     expect(state.projects).toEqual(['Pack design system', 'Project one', 'Empty project', 'Project two']);
     expect(state.servers.join(' ')).toContain('mcp-v2.example.test');
+    expect(state.servers.join(' ')).toContain('pack-new');
     expect(state.servers.join(' ')).not.toContain('https://mcp.example.test');
   }
 
@@ -236,16 +260,26 @@ describe('replacing a pack', () => {
     expect((await makeStore().list()).packs.map((pack) => `${pack.id}@${pack.version}`)).toEqual(['team-kit@1.0.0']);
   });
 
-  it('installs over an unreadable MCP settings file without touching the installed version first', async () => {
+  it('installs over an unreadable MCP settings file, keeps the journal, and finishes MCP once the file is readable', async () => {
     await installVersionOne();
     await fsp.rm(path.join(dataDir, 'mcp-config.json'), { force: true });
     await fsp.mkdir(path.join(dataDir, 'mcp-config.json'));
     const v2 = tempDir('mish-src-');
     writeVersionTwo(v2);
-    const { pack } = await makeStore().install(v2);
+    const store = makeStore();
+    const { pack } = await store.install(v2);
     expect(pack.version).toBe('2.0.0');
-    expect(pack.warnings.join(' ')).toMatch(/MCP settings file could not be updated/);
+    expect(pack.warnings.join(' ')).toMatch(/MCP settings file could not be updated; the earlier ones were kept/);
     expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toContain('Version two');
+    expect(receiptOf().mcpApplied).toBeFalsy();
+    expect(leftovers()).toContain('.journal');
+    // Not settled: a removal waits for it.
+    await expectPackError(store.remove('team-kit'), 'BUSY');
+
+    await fsp.rmdir(path.join(dataDir, 'mcp-config.json'));
+    resetMishPacksForTests();
+    await makeStore().start();
+    expectVersionTwo(await activeState());
     expect(leftovers()).toEqual([]);
   });
 
@@ -335,6 +369,72 @@ describe('replacing a pack', () => {
     expect(leftovers()).toEqual([]);
   });
 
+  it('puts the earlier MCP servers back when writing the new ones fails, and retries at the next start', async () => {
+    const before = await installVersionOne();
+    const v2 = tempDir('mish-src-');
+    writeVersionTwo(v2);
+    const store = makeStore({ onInstallStep: at('mcp-unseeded', 'fail') });
+    const { pack } = await store.install(v2);
+    expect(pack.version).toBe('2.0.0');
+    expect(pack.warnings.join(' ')).toMatch(/MCP servers were not added/);
+    // The earlier version's servers are back, exactly; nothing of version 2 is there yet.
+    expect((await activeState()).servers).toEqual(before.servers);
+    expect(receiptOf().mcpApplied).toBeFalsy();
+    expect(leftovers()).toContain('.journal');
+    await expectPackError(store.remove('team-kit'), 'BUSY');
+
+    resetMishPacksForTests();
+    await makeStore().start();
+    expectVersionTwo(await activeState());
+    expect(receiptOf().seededMcp.map((entry) => entry.id).sort()).toEqual(['pack-http', 'pack-new', 'pack-stdio']);
+    expect(leftovers()).toEqual([]);
+  });
+
+  it('owns MCP servers an interrupted install wrote but did not record, so removal takes them away', async () => {
+    await installVersionOne();
+    let reached!: () => void;
+    const stopped = new Promise<void>((resolve) => { reached = resolve; });
+    const v2 = tempDir('mish-src-');
+    writeVersionTwo(v2);
+    void makeStore({ onInstallStep: at('mcp-written', 'crash', reached) }).install(v2);
+    await stopped;
+    expect(await serverIds()).toContain('pack-new');
+    expect(receiptOf().seededMcp.map((entry) => entry.id)).not.toContain('pack-new');
+
+    resetMishPacksForTests();
+    const restarted = makeStore();
+    await restarted.start();
+    expect(receiptOf().seededMcp.map((entry) => entry.id).sort()).toEqual(['pack-http', 'pack-new', 'pack-stdio']);
+    await restarted.remove('team-kit');
+    expect(await serverIds()).toEqual([]);
+  });
+
+  it('refuses a new install while an earlier one is not settled, so it is never replayed over the newer one', async () => {
+    await installVersionOne();
+    const failingCleanup = makeStore({ onInstallStep: at('cleanup', 'fail') });
+    const v2 = tempDir('mish-src-');
+    writeVersionTwo(v2);
+    await failingCleanup.install(v2);
+    const v3 = tempDir('mish-src-');
+    writeVersionThree(v3);
+    // The version 2 journal still cannot settle: version 3 waits.
+    await expectPackError(failingCleanup.install(v3), 'BUSY');
+    expect(receiptOf().version).toBe('2.0.0');
+    expect(existsSync(path.join(skillsRoot, 'pack-skill-d'))).toBe(false);
+
+    // Once it settles, version 3 goes in, and a restart does not bring version 2 back.
+    const store = makeStore();
+    expect((await store.install(v3)).pack.version).toBe('3.0.0');
+    resetMishPacksForTests();
+    const restarted = makeStore();
+    await restarted.start();
+    expect(receiptOf()).toMatchObject({ version: '3.0.0' });
+    expect(receiptOf().copied.skills).toContain('pack-skill-d');
+    await restarted.remove('team-kit');
+    expect(existsSync(path.join(skillsRoot, 'pack-skill-d'))).toBe(false);
+    expect(leftovers()).toEqual([]);
+  });
+
   it('leaves nothing behind when a first install fails before the commit', async () => {
     const source = tempDir('mish-src-');
     writeProjectsPack(source);
@@ -344,5 +444,60 @@ describe('replacing a pack', () => {
     expect(getProject(db, 'ds-pack-ds')).toBeNull();
     expect((await readMcpConfig(dataDir)).servers).toEqual([]);
     expect(leftovers()).toEqual([]);
+  });
+});
+
+describe('retiring a copy', () => {
+  it('moves the copy aside before comparing it, so an edit saved meanwhile is kept', async () => {
+    const source = tempDir('mish-src-');
+    writeProjectsPack(source);
+    await makeStore().install(source);
+    const store = makeStore({
+      now: () => new Date('2026-10-12T10:00:00.000Z'),
+      onRetireHeld: async (held, original) => {
+        if (path.basename(original) !== 'pack-skill-a') return;
+        // An editor with the file open saves into the moved folder...
+        await fsp.writeFile(path.join(held, 'SKILL.md'), 'late edit');
+        // ...and another save by path recreates the old place.
+        writeFile(original, 'NEW.md', 'saved by path after the move');
+      },
+    });
+    const result = await store.remove('team-kit');
+    const backup = path.join(skillsRoot, '.mish-pack-backups', 'team-kit-2026-10-12T10-00-00-000Z', 'pack-skill-a');
+    expect(result.backups).toEqual([{ resource: 'skills', name: 'pack-skill-a', path: backup }]);
+    expect(readFileSync(path.join(backup, 'SKILL.md'), 'utf8')).toBe('late edit');
+    expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'NEW.md'), 'utf8')).toBe('saved by path after the move');
+    // The untouched copy is deleted, and nothing is left in the holding folder.
+    expect(existsSync(path.join(skillsRoot, 'pack-skill-b'))).toBe(false);
+    expect(existsSync(path.join(skillsRoot, '.mish-pack-retiring'))).toBe(false);
+  });
+});
+
+describe('start', () => {
+  it('leaves work folders it cannot match to an install in place, and says so', async () => {
+    const packs = path.join(dataDir, 'mish-packs');
+    // An interrupted install from an earlier build, and leftovers no journal names.
+    writeFile(packs, '.previous/old-token/mish-pack.json', '{"id":"team-kit"}');
+    writeFile(packs, '.previous/old-token.json', '{"token":"old-token"}');
+    writeFile(packs, '.incoming/stray/mish-pack.json', '{}');
+    writeFile(skillsRoot, '.mish-pack-staging/stray/pack-skill-a/SKILL.md', 'staged');
+    writeFile(skillsRoot, '.mish-pack-retiring/team-kit-x/pack-skill-a/SKILL.md', 'held');
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      resetMishPacksForTests();
+      await makeStore().start();
+      for (const file of [
+        path.join(packs, '.previous', 'old-token', 'mish-pack.json'),
+        path.join(packs, '.previous', 'old-token.json'),
+        path.join(packs, '.incoming', 'stray', 'mish-pack.json'),
+        path.join(skillsRoot, '.mish-pack-staging', 'stray', 'pack-skill-a', 'SKILL.md'),
+        path.join(skillsRoot, '.mish-pack-retiring', 'team-kit-x', 'pack-skill-a', 'SKILL.md'),
+      ]) expect(existsSync(file), file).toBe(true);
+      const logged = warn.mock.calls.map((call) => String(call[0])).join('\n');
+      expect(logged).toMatch(/left in place, not matched to an install/);
+      expect(logged).toContain(path.join(packs, '.previous', 'old-token'));
+    } finally {
+      warn.mockRestore();
+    }
   });
 });

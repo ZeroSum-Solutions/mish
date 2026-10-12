@@ -75,6 +75,27 @@ export async function unseedPackMcpServers(dataDir: string, seeded: readonly See
   return removed;
 }
 
+/**
+ * Puts back entries a failed update took away, each only when its id is still free. Returns the
+ * ids restored.
+ */
+export async function restorePackMcpServers(dataDir: string, configs: readonly McpServerConfig[]): Promise<string[]> {
+  if (configs.length === 0) return [];
+  const restored: string[] = [];
+  await writeMcpConfig(dataDir, { servers: [] }, (_next, previous) => {
+    const taken = new Set(previous.servers.map((server) => server.id));
+    const merged = [...previous.servers];
+    for (const config of configs) {
+      if (taken.has(config.id)) continue;
+      taken.add(config.id);
+      merged.push(config);
+      restored.push(config.id);
+    }
+    return { servers: merged };
+  });
+  return restored;
+}
+
 /** `${NAME}` references in one server, as variable names. */
 export function mcpServerEnvRefs(server: Pick<MishPackMcpServer, 'args' | 'env' | 'headers'>): string[] {
   const names = new Set<string>();
