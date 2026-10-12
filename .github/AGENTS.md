@@ -116,3 +116,14 @@ chain from changed path to match, effect, workload, job command, and concrete
 test cases. Prefer naming or removing implicit joins before making them finer.
 Changes under `.github/` must also follow `.github/AGENTS.md` and the current
 confidence methodology in `specs/current/ci.md`.
+
+## Upstream automation model (context)
+
+The atomic capability workflows below belong to the upstream topology and are not published here; do not wire a handoff, dispatch or doc instruction to them as if they existed. The rules still apply if they are reintroduced.
+
+CI-related GitHub automation uses a two-layer architecture:
+
+- Business layer workflows own product or validation decisions. `ci.yml` is the low-privilege PR, merge-queue, and manual validation workflow. It detects scope, runs checks, and produces typed handoff artifacts (the merge-blocking label gate and the merge-queue failure notice write `handoff/comment` artifacts); with no atomic workflow published here, nothing consumes them, so they stay downloadable diagnostics.
+- Atomic capability workflows own reusable trusted operations. `comment.atom.yml` publishes pure text PR comments, `autofix.atom.yml` applies same-repository patches, and `report.atom.yml` materializes advanced comments that need trusted dependencies, secrets, or report generation before upsert.
+
+Do not add a new business-named follow-on workflow such as `foo.comment.atom.yml` or `bar.autofix.atom.yml` without first trying to express the flow as a `ci.yml` producer plus the existing `comment`, `autofix`, or `report` capability. Keep artifact naming, storage layout, and parser behavior centralized in `.github/scripts/handoff.py`; do not let individual workflows invent parallel handoff conventions.

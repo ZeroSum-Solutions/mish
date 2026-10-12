@@ -18,6 +18,7 @@ The single source of truth for agents in this repository. It holds only cross-re
 | Packaged updater, release-channel identity, installer, updater UI | `tools/pack/AGENTS.md` → "Packaged auto-update architecture and harness" |
 | A packaged build-cache node key | `tools/pack/CACHE.md` |
 | Release channels and promotion | `tools/release/AGENTS.md` |
+| Adding or restyling web UI (`apps/web`, `packages/components`) | `docs/design/ui-system.md`, `apps/web/AGENTS.md` |
 
 ## Workspace map
 
@@ -25,8 +26,8 @@ The single source of truth for agents in this repository. It holds only cross-re
 - `apps/web`: Next.js 16 App Router + React 18 web runtime. `apps/daemon`: local privileged daemon and `od` bin; owns `/api/*`, agent spawning, skills, design systems, artifacts and static serving. `apps/desktop`: Electron shell, reads web/daemon status through the sidecar client. `apps/packaged`: thin packaged Electron entry and `od://` glue. `apps/closure`: distributable Closure content only.
 - `packages/contracts`: pure TypeScript web/daemon contract layer. `packages/sidecar-proto`: business DTOs and action names. `packages/sidecar`: business-agnostic sidecar client and protocol. `packages/platform`: generic OS process primitives. `packages/standalone`: shell-neutral metadata, verification, materialization and launcher contract. `shells/terminal`: the Node carrier; shells must not import Closure app source.
 - `tools/dev` (local lifecycle), `tools/pack` (packaged build/start/stop/logs, updater harness, installer identity, mac beta artifacts), `tools/serve` (fixture services, e.g. `tools-serve start updater`), `tools/release` (release metadata, publishing, reports). `e2e`: end-to-end smoke tests and Playwright UI automation.
-- Content: `skills/` (functional skills the agent calls mid-task), `design-templates/` (rendering catalogue), `design-systems/` (`neutral-product` only; `docs/design-systems/QUALITY-STANDARD.md`), `craft/` (brand-agnostic craft rules opted into via `od.craft.requires`), `mocks/` (replay mock CLIs for every supported agent; `mocks/README.md`).
-- Removed: `apps/nextjs`, `packages/shared`, `apps/landing-page`, `tools/pr` (moved to the standalone `PerishCode/duty` project). Do not recreate or reference them.
+- Content: `skills/` (functional skills the agent calls mid-task), `design-templates/` (rendering catalogue), `design-systems/` (`neutral-product` only; `docs/design-systems/QUALITY-STANDARD.md`), `craft/` (brand-agnostic craft rules opted into via `od.craft.requires`), `mocks/` (replay-based mock CLIs for a selected, non-exhaustive set of agent CLIs, built from anonymized traces; check `mocks/bin/` covers your agent before a PATH-overlay replay, or the real CLI runs; `mocks/README.md`).
+- Removed: `apps/nextjs`, `packages/shared`, `apps/landing-page`. Do not recreate or reference them. PR-duty tooling moved to the standalone `PerishCode/duty` project; do not recreate `tools/pr`, `@mish/tools-pr` or a root `pnpm tools-pr` script without a new explicit maintainer decision.
 - Runtime data, `.tmp/`, Playwright reports and agent scratch directories stay out of git.
 
 # Development workflow
@@ -66,17 +67,17 @@ Known escape patterns, which must not be copied or extended: module defaults poi
 ## Root commands and CI
 
 - Root scripts are reserved for `pnpm guard`, `pnpm typecheck`, `pnpm tools-dev`, `pnpm tools-pack` and `pnpm tools-serve`. Build, test and e2e commands stay package-scoped (`pnpm --filter <package> …`) or tool-scoped; do not add root `build`, `test` or e2e aliases.
-- This repository ships `.github/workflows/ci.yml` (validation) and `.github/workflows/release-mac.yml` (unsigned macOS package on a `v*` tag). Read `.github/AGENTS.md` before editing anything under `.github/`; it also holds the CI test-set orchestration guidance.
+- This repository ships `.github/workflows/ci.yml` (validation) and `.github/workflows/release-mac.yml` (unsigned macOS package on a `v*` tag). Read `.github/AGENTS.md` before editing anything under `.github/`, CI handoff artifacts, or the workflow topology checks that guard those surfaces wherever they live (for example `e2e/tests/packaged-smoke-workflow.test.ts`). It also holds the CI test-set orchestration guidance.
 - The repository is public. CI runs on GitHub-hosted runners with only the read-only `github.token`: no self-hosted runners, no `pull_request_target`, no secrets in workflows.
 - Never commit licensed, paid or scraped third-party content without a licence that allows public redistribution; it belongs in a private pack (`docs/packs.md`).
 
 ## CodeGraph
 
-Each checkout can carry a git-ignored CodeGraph index in `.codegraph/`. A worktree is its own checkout, so build one from each worktree's root.
+Each checkout can carry a git-ignored CodeGraph index in `.codegraph/`. A worktree is its own checkout, so build one from each worktree's root with `codegraph init .`, and refresh it with `codegraph sync .` after a pull or a large merge.
 
-- Build: `CODEGRAPH_NO_DAEMON=1 codegraph init .` (or `index .` to rebuild). Without the variable, the build starts a background daemon that competes with it for the database: a worktree build took about 10 minutes instead of 2. Do not set the variable for MCP servers; the shared daemon is what lets several sessions use one index.
-- Refresh after a pull or a large merge: `codegraph sync .`.
-- To find code, text search (`rg`) plus this file is usually faster. To understand code, use `codegraph explore "<symbols or question>"` or the `codegraph_explore` MCP tool when it is registered: it follows call paths, including dynamic dispatch, that text search cannot. Before changing a symbol, run `codegraph impact <symbol>` or `codegraph callers <symbol>` to see what depends on it and which tests cover it.
+- Before `grep`, `find` or reading files to locate or understand code, run `codegraph explore "<symbol names or question>"` or the `codegraph_explore` MCP tool when it is registered: it returns the symbols' source and the call paths between them, including dynamic-dispatch hops text search cannot follow. Name a file or symbol in the query to read its current source. If it misses, fall back to `rg`.
+- Before changing a symbol, run `codegraph impact <symbol>` or `codegraph callers <symbol>` to see what depends on it and which tests cover it.
+- Build a worktree's index before agents start using CodeGraph there. An agent's CodeGraph MCP server starts a background daemon for the checkout, and a daemon attached to a half-built index keeps retrying the writer lock: a 2-minute build took about 10. Do not stop a daemon another session may be using.
 
 ## Boundary constraints
 
@@ -108,7 +109,7 @@ Every user-facing capability ships in both the web UI and the `od` CLI (`apps/da
 
 ## Prompt variants (two implementations, one switch)
 
-A generation run is composed by one of two independent prompt implementations. `composeSystemPrompt` returns early at `apps/daemon/src/prompts/system.ts:905` when the run carries an OD Next recipe, skipping the whole legacy stack; the API/BYOK mirror at `packages/contracts/src/prompts/system.ts:318` forks the same way. A rule added to one side holds only for runs on that side.
+A generation run is composed by one of two independent prompt implementations. `composeSystemPrompt` returns early at `apps/daemon/src/prompts/system.ts:962` when the run carries an OD Next recipe, skipping the whole legacy stack; the API/BYOK mirror at `packages/contracts/src/prompts/system.ts:334` forks the same way. A rule added to one side holds only for runs on that side.
 
 - **Legacy:** `apps/daemon/src/prompts/`, mirrored for API/BYOK in `packages/contracts/src/prompts/`.
 - **OD Next:** `plugins/_official/scenarios/od-next-strategy/assets/**` (sent to the model verbatim) plus `packages/contracts/src/prompts/od-next-strategy.ts`, which carries host contracts such as `<question-form>` and the deck framework.
@@ -122,11 +123,11 @@ The only clarification mechanism is the inline `<question-form>` artifact, valid
 
 ## Validation strategy
 
-- Before adding or repairing tests, follow `docs/testing/test-efficiency.zh-CN.md` (completion signals, virtual clocks, isolation).
+- Before adding, repairing or optimizing tests, follow `docs/testing/test-efficiency.zh-CN.md` (completion signals, virtual clocks, isolation).
 - Before marking work ready: `pnpm guard`, `pnpm typecheck`, and the package-scoped tests and builds for the files changed.
 - Agent-stream and parser changes: replay a recorded session through `mocks/` instead of spending provider budget: `export PATH="$PWD/mocks/bin:$PATH" OD_MOCKS_TRACE=<8-char-id> OD_MOCKS_NO_DELAY=1`.
 - E2E tests use the shared harness in `e2e/lib/tools-dev/` and the suite adapters; Playwright tests import `test`/`expect` from `@/playwright/suite`. Details: `e2e/AGENTS.md`.
-- Desktop: `pnpm tools-dev`, then `pnpm tools-dev inspect desktop status`. Stamp or namespace changes: validate two concurrent namespaces with `inspect eval` and `inspect screenshot` each. Path or log changes: confirm `pnpm tools-dev logs --namespace <name> --json` paths sit under `.tmp/tools-dev/<namespace>/`.
+- Desktop, on a GUI-capable machine: `pnpm tools-dev`, then `pnpm tools-dev inspect desktop status`. Stamp or namespace changes: validate two concurrent namespaces with `inspect eval` and `inspect screenshot` each. Path or log changes: confirm `pnpm tools-dev logs --namespace <name> --json` paths sit under `.tmp/tools-dev/<namespace>/`.
 - The Docker image is outside CI. Publish by hand with `deploy/scripts/publish-images.sh --image_namespace zerosum-solutions`.
 
 ## Bug follow-up workflow

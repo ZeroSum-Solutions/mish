@@ -7,7 +7,7 @@
 
 执行记录的动词与状态词(读取 / 新建 / 改写 / 搜索 / 执行 / 失败 / 进行中 / 思考中 /
 已完成 / 运行失败 / N 处 / 执行计划 · N 步)已经建成 `chat.record.*` 这一组 key,
-`types.ts` 与 `locales/en.ts` 都已补齐。产品只有英文(根 `AGENTS.md` 的 "i18n keys",
+`types.ts` 与 `locales/en.ts` 都已补齐。产品只有英文(`apps/web/AGENTS.md` 的 "i18n keys",
 owner 决定 2026-10-10),只有 `en.ts` 一个 locale。**新增任何用户可见的字,先加 `types.ts`
 再补 `en.ts`** —— `types.ts` 里没有的 key 过不了 typecheck,这是这条规约的强制点。
 
@@ -63,7 +63,7 @@ its existing system. Change the root mapping rather than individual components.
 
 新增 `--chat-*` 变量必须在 chat 根 Module 的**亮暗两个作用域都定义**,即使暂时同值。
 
-其他硬约束(继承自根 `AGENTS.md`):
+其他硬约束(继承自 `apps/web/AGENTS.md`):
 
 - 不新增裸 primitive 类(`primary` / `ghost` / `subtle` / `icon-btn` / `sr-only`)
 - 按钮用 `@mish/components` 的 `Button`,隐藏文本用 `VisuallyHidden`
