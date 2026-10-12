@@ -9,7 +9,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import JSZip from 'jszip';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
 import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
@@ -275,7 +275,14 @@ describe('saved reference preview images', () => {
     mkdirSync(path.join(generatedDir, '21st-thumbnails'), { recursive: true });
     // Owned artwork stands in for bytes only; this makes no source-fidelity claim.
     writeFileSync(path.join(generatedDir, '21st-thumbnails', `${row.slug}.webp`), ownedImage);
-    registerTwenty1stRoutes(app, { http: { sendApiError } } as never, { generatedDir });
+    // The shipped thumbnail manifest is empty, so give this one test a private module copy whose
+    // manifest lists the owned fixture for the MIT row.
+    vi.resetModules();
+    vi.doMock('@mish/21st-catalog/generated/21st-thumbnails.json', () => ({
+      default: { schema: '21st-thumbnails/1', byteLimit: 20480, items: { [row.id]: { file: `${row.slug}.webp` } } },
+    }));
+    const { registerTwenty1stRoutes: registerWithOwnedManifest } = await import('../src/routes/twenty1st.js');
+    registerWithOwnedManifest(app, { http: { sendApiError } } as never, { generatedDir });
     const local = app.listen(0, '127.0.0.1');
     await new Promise<void>(resolve => local.once('listening', resolve));
     try {
@@ -284,6 +291,8 @@ describe('saved reference preview images', () => {
       expect(response.headers.get('content-type')).toBe('image/webp');
       expect(Buffer.from(await response.arrayBuffer())).toEqual(ownedImage);
     } finally {
+      vi.doUnmock('@mish/21st-catalog/generated/21st-thumbnails.json');
+      vi.resetModules();
       await new Promise<void>(resolve => local.close(() => resolve()));
       rmSync(scratch, { recursive: true, force: true });
     }

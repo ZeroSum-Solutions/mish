@@ -184,8 +184,7 @@ function runWrite(): void {
   for (const row of catalog.rows) {
     if (!twenty1stMayShipLocalImage(row.rights)) continue;
     const kept = previous.items[row.id];
-    if (!kept) fail(`No previous thumbnail entry for ${row.id}; run --fetch`, []);
-    items[row.id] = kept!;
+    if (kept) items[row.id] = kept; // no previous entry: the row has no preview image
   }
   writeManifest(items);
   runCheck();
@@ -203,7 +202,8 @@ function runCheck(): void {
       if (entry) errors.push(`${row.id}: rights is ${row.rights}; must not carry a local 21st-thumbnails entry`);
       continue;
     }
-    if (!entry) { errors.push(`${row.id}: no thumbnail entry`); continue; }
+    // A mit row with no entry simply has no preview image (its card shows the neutral placeholder).
+    if (!entry) continue;
     if (!/^https:\/\/cdn\.21st\.dev\//.test(entry.sourceUrl)) errors.push(`${row.id}: sourceUrl must be an https://cdn.21st.dev/ URL, got ${entry.sourceUrl}`);
     const file = join(imagesDir, entry.file);
     if (!existsSync(file)) { errors.push(`${row.id}: ${entry.file} is missing on disk`); continue; }

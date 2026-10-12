@@ -1,20 +1,5 @@
 {
   "schema": "21st-thumbnails/1",
   "byteLimit": 20480,
-  "items": {
-    "21st:moumensoliman-glassmorphism-listen-app": {
-      "file": "moumensoliman-glassmorphism-listen-app.webp",
-      "bytes": 7678,
-      "sourceUrl": "https://cdn.21st.dev/larsen66/glassmorphism-listen-app-block-shadcnui/default/preview.1773289124465.png",
-      "kitFile": "registry/moumensoliman__glassmorphism-listen-app__10612.json",
-      "fetchedAt": "2026-09-28T10:16:50.782Z"
-    },
-    "21st:moumensoliman-glassmorphism-portfolio": {
-      "file": "moumensoliman-glassmorphism-portfolio.webp",
-      "bytes": 7910,
-      "sourceUrl": "https://cdn.21st.dev/larsen66/glassmorphism-portfolio-block-shadcnui/default/preview.1773289414205.png",
-      "kitFile": "registry/moumensoliman__glassmorphism-portfolio__10616.json",
-      "fetchedAt": "2026-09-28T10:16:50.782Z"
-    }
-  }
+  "items": {}
 }

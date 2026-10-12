@@ -42,11 +42,14 @@ function runCheck(): { status: number; output: string } {
   }
 }
 
-test('the committed manifest has one image entry per mit row, and none for a reference-only row', () => {
+test('the committed manifest has an image entry only for mit rows (a mit row may have none), and none for a reference-only row', () => {
   const eligibleIds = new Set(catalog.rows.filter((r) => twenty1stMayShipLocalImage(r.rights)).map((r) => r.id));
   const ineligibleIds = new Set(catalog.rows.filter((r) => !twenty1stMayShipLocalImage(r.rights)).map((r) => r.id));
   const entryIds = new Set(Object.keys(manifest.items));
-  assert.deepEqual([...entryIds].sort(), [...eligibleIds].sort());
+  for (const id of entryIds) assert.ok(eligibleIds.has(id), `${id}: only a mit row may carry a local 21st-thumbnails entry`);
+  // Portraits were removed from the public repo: these rows ship without a preview image.
+  const withoutImage = [...eligibleIds].filter((id) => !entryIds.has(id)).sort();
+  assert.deepEqual(withoutImage, ['21st:moumensoliman-glassmorphism-listen-app', '21st:moumensoliman-glassmorphism-portfolio']);
   for (const id of ineligibleIds) assert.ok(!entryIds.has(id), `${id}: reference-only row must not carry a local 21st-thumbnails entry`);
 });
 
@@ -69,5 +72,5 @@ test('every referenced image file exists, matches its recorded byte size and sta
 test('--check passes offline against the committed manifest', () => {
   const { status, output } = runCheck();
   assert.equal(status, 0, output);
-  assert.match(output, /21st-thumbnails\.json: 2 images/);
+  assert.match(output, /21st-thumbnails\.json: \d+ images/);
 });
