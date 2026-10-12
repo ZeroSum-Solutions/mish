@@ -11,7 +11,8 @@
 //
 // Rules the builder enforces:
 //   - the output must be outside the source checkout, and must not exist yet;
-//   - symbolic links are skipped, never followed;
+//   - symbolic links are skipped, never followed; a file reached through a linked folder, or one that
+//     resolves outside the source checkout, is left out and reported;
 //   - metadata, `.git`, `node_modules` and anything that looks like a credential file are left out
 //     and reported;
 //   - names the daemon would refuse at install time are left out and reported;
@@ -19,7 +20,7 @@
 //     `packages/contracts` is built), so a pack that would be refused is not written.
 
 import { existsSync, realpathSync } from 'node:fs';
-import { lstat, mkdtemp, readFile, readdir, rm, stat } from 'node:fs/promises';
+import { lstat, mkdtemp, readFile, readdir, realpath, rm, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -100,6 +101,8 @@ class Plan {
   entries = [];
   warnings = [];
   skipped = new Map();
+  /** Folder path -> whether it is a symbolic link, so each ancestor is checked once. */
+  linkCache = new Map();
 
   warn(message) {
     this.warnings.push(message);
@@ -121,8 +124,34 @@ class Plan {
   }
 }
 
-/** Walks a folder (or takes one file) and plans every regular file under `zipPrefix`. */
-async function planPath(plan, absolute, zipPrefix, resource) {
+/**
+ * Why `file` may not be packed from `root`, or null when it may. `root` must already be a real path.
+ * The path check alone is lexical, so it also requires that no folder between `root` and `file` is a
+ * symbolic link and that the file's real path stays inside `root`.
+ */
+async function containmentProblem(plan, root, file) {
+  if (!isInside(root, file)) return 'outside the source checkout';
+  let current = root;
+  for (const part of path.relative(root, file).split(path.sep).slice(0, -1)) {
+    current = path.join(current, part);
+    let linked = plan.linkCache.get(current);
+    if (linked === undefined) {
+      linked = (await lstat(current)).isSymbolicLink();
+      plan.linkCache.set(current, linked);
+    }
+    if (linked) return 'reached through a symbolic link';
+  }
+  let real;
+  try {
+    real = await realpath(file);
+  } catch {
+    return 'could not be resolved';
+  }
+  return isInside(root, real) ? null : 'resolves outside the source checkout';
+}
+
+/** Walks a folder (or takes one file) under the real folder `root` and plans every regular file under `zipPrefix`. */
+async function planPath(plan, root, absolute, zipPrefix, resource) {
   const info = await lstat(absolute);
   if (info.isSymbolicLink()) return plan.skip('symbolic link', zipPrefix);
   if (info.isFile()) {
@@ -130,12 +159,14 @@ async function planPath(plan, absolute, zipPrefix, resource) {
     if (SKIP_NAMES.has(name) || name.startsWith('._')) return;
     if (SECRET_NAME.some((pattern) => pattern.test(name))) return plan.skip('looks like a credential file', zipPrefix);
     if (!readableName(name)) return plan.skip('name the daemon refuses', zipPrefix);
+    const problem = await containmentProblem(plan, root, absolute);
+    if (problem) return plan.skip(problem, zipPrefix);
     return plan.addFile(zipPrefix, absolute, info.size, resource);
   }
   if (!info.isDirectory()) return plan.skip('not a regular file', zipPrefix);
   for (const entry of (await readdir(absolute)).sort()) {
     if (SKIP_NAMES.has(entry) || entry.startsWith('._')) continue;
-    await planPath(plan, path.join(absolute, entry), `${zipPrefix}/${entry}`, resource);
+    await planPath(plan, root, path.join(absolute, entry), `${zipPrefix}/${entry}`, resource);
   }
 }
 
@@ -175,7 +206,7 @@ const handlers = {
   async dir(ctx, resource) {
     const from = sourcePath(ctx.source, requireString(resource.from, `"from" for ${resource.provides}`), resource.provides);
     if (!(await exists(from))) return ctx.missing(resource, resource.from);
-    await planPath(ctx.plan, from, resource.to, resource.provides);
+    await planPath(ctx.plan, ctx.source, from, resource.to, resource.provides);
     ctx.provided(resource);
   },
 
@@ -188,7 +219,7 @@ const handlers = {
         if (!file.optional) ctx.missing(resource, file.from, true);
         continue;
       }
-      await planPath(ctx.plan, from, `${resource.to}/${requireString(file.to, `"to" in ${resource.provides}`)}`, resource.provides);
+      await planPath(ctx.plan, ctx.source, from, `${resource.to}/${requireString(file.to, `"to" in ${resource.provides}`)}`, resource.provides);
       any = true;
     }
     if (any) ctx.provided(resource);
@@ -213,7 +244,7 @@ const handlers = {
           ctx.plan.skip('folder name the daemon refuses to copy', `${source.from}/${entry.name}`);
           continue;
         }
-        await planPath(ctx.plan, path.join(base, entry.name), `${resource.to}/${entry.name}`, resource.provides);
+        await planPath(ctx.plan, ctx.source, path.join(base, entry.name), `${resource.to}/${entry.name}`, resource.provides);
         any = true;
       }
     }
@@ -247,7 +278,8 @@ const handlers = {
       absWorkingDir: ctx.source,
     });
     const folder = path.posix.dirname(resource.to);
-    await planPath(ctx.plan, out, folder, resource.provides);
+    const realOut = await realpath(out);
+    await planPath(ctx.plan, realOut, realOut, folder, resource.provides);
     ctx.provided(resource);
   },
 
@@ -255,13 +287,14 @@ const handlers = {
   async 'genui-overlay'(ctx, resource) {
     const catalogFile = sourcePath(ctx.source, requireString(resource.catalog, `"catalog" for ${resource.provides}`), resource.provides);
     if (!(await exists(catalogFile))) return ctx.missing(resource, resource.catalog);
+    if (await ctx.uncontained(catalogFile, resource.catalog)) return;
     const catalog = await jsonFile(catalogFile);
     const entries = (catalog.components ?? []).filter((entry) => entry?.source?.name === resource.sourceName);
     if (entries.length === 0) return ctx.missing(resource, `(no component from ${resource.sourceName})`);
     ctx.plan.addBuffer(`${resource.to}/overlay.json`, Buffer.from(`${JSON.stringify({ entries }, null, 2)}\n`), resource.provides);
     const dist = resource.dist ? sourcePath(ctx.source, resource.dist, resource.provides) : null;
     let demos = 0;
-    if (dist && (await exists(dist))) {
+    if (dist && (await exists(dist)) && !(await ctx.uncontained(dist, resource.dist))) {
       const data = await import(pathToFileURL(dist).href);
       for (const entry of entries) {
         const html = data.demoDocument?.(entry.id);
@@ -279,6 +312,7 @@ const handlers = {
   async 'catalog-delta'(ctx, resource) {
     const privateFile = sourcePath(ctx.source, requireString(resource.from, `"from" for ${resource.provides}`), resource.provides);
     if (!(await exists(privateFile))) return ctx.missing(resource, resource.from);
+    if (await ctx.uncontained(privateFile, resource.from)) return;
     const publicFile = sourcePath(repoRoot, requireString(resource.againstPublic, `"againstPublic" for ${resource.provides}`), resource.provides);
     const known = new Set(((await jsonFile(publicFile)).entries ?? []).map((entry) => entry.id));
     const entries = ((await jsonFile(privateFile)).entries ?? []).filter((entry) => !known.has(entry.id));
@@ -324,6 +358,12 @@ async function main() {
       const value = resource.to;
       setProvides(provides, resource.provides, value);
       report.push({ resource: resource.provides, status: 'packed' });
+    },
+    /** True (and reported as left out) when `file` may not be read into the pack; see containmentProblem. */
+    async uncontained(file, label) {
+      const problem = await containmentProblem(plan, source, file);
+      if (problem) plan.skip(problem, label);
+      return problem !== null;
     },
     missing(resource, what, quiet = false) {
       if (resource.optional === false) fail(`${resource.provides}: ${what} not found in ${source}`);

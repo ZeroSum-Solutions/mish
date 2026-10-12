@@ -147,8 +147,27 @@ describe('install and list', () => {
     writeFile(source, 'skills/pack-skill-b/SKILL.md', 'Body B2');
     const second = await store.install(source);
     expect(second.replaced).toBe(true);
+    expect(second.backups).toEqual([]);
     expect(readFileSync(path.join(skillsRoot, 'pack-skill-b', 'SKILL.md'), 'utf8')).toBe('Body B2');
     expect((await store.list()).packs).toHaveLength(1);
+  });
+
+  it('keeps a copy the user changed when the pack is installed again, and says where', async () => {
+    const source = tempDir('mish-src-');
+    writeFixturePack(source);
+    await store.install(source);
+    await fsp.writeFile(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'edited by the user');
+
+    const second = await store.install(source);
+    expect(second.backups).toHaveLength(1);
+    const [backup] = second.backups;
+    expect(backup).toMatchObject({ resource: 'skills', name: 'pack-skill-a' });
+    expect(path.dirname(path.dirname(backup!.path))).toBe(path.join(skillsRoot, '.mish-pack-backups'));
+    expect(path.basename(path.dirname(backup!.path))).toMatch(/^team-kit-\d{4}-\d\d-\d\dT[\d-]+Z$/);
+    expect(readFileSync(path.join(backup!.path, 'SKILL.md'), 'utf8')).toBe('edited by the user');
+    expect(second.pack.warnings.join(' ')).toContain(`skills/pack-skill-a had changed since the pack added it and was moved to ${backup!.path}`);
+    // The pack's own copy is back in place.
+    expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toContain('Body A');
   });
 
   it('serves a cult kit from the pack when CULT_KIT_DIR is not set', async () => {
@@ -201,6 +220,17 @@ describe('refusals', () => {
     await fsp.writeFile(file, await zip.generateAsync({ type: 'nodebuffer' }));
     await expectPackError(store.install(file), 'UNSAFE_PATH');
     expect(existsSync(path.join(path.dirname(file), 'escaped.txt'))).toBe(false);
+    expect((await store.list()).packs).toEqual([]);
+  });
+
+  it('rejects a zip entry whose written name climbs, even though the zip reader resolves it', async () => {
+    // The reader turns "nested/../../mish-pack.json" into "mish-pack.json"; the check must see the name as written.
+    const zip = new JSZip();
+    zip.file('nested/../../mish-pack.json', JSON.stringify({ schemaVersion: 1, id: 'evil', name: 'Evil', version: '1', provides: {} }), { createFolders: false });
+    const file = path.join(tempDir('mish-zip-'), 'resolved.zip');
+    await fsp.writeFile(file, await zip.generateAsync({ type: 'nodebuffer' }));
+    expect((await JSZip.loadAsync(await fsp.readFile(file))).files['mish-pack.json']?.unsafeOriginalName).toBe('nested/../../mish-pack.json');
+    await expectPackError(store.install(file), 'UNSAFE_PATH', /nested\/\.\.\/\.\.\/mish-pack\.json/);
     expect((await store.list()).packs).toEqual([]);
   });
 
@@ -281,7 +311,7 @@ describe('remove', () => {
     expect(existsSync(path.join(dsRoot, 'pack-ds'))).toBe(true);
     expect((await readMcpConfig(dataDir)).servers.map((server) => server.id)).toEqual(['mine', 'pack-http', 'pack-stdio']);
 
-    expect(await store.remove('team-kit')).toEqual({ removed: 'team-kit' });
+    expect(await store.remove('team-kit')).toEqual({ removed: 'team-kit', backups: [] });
     expect(existsSync(path.join(dsRoot, 'pack-ds'))).toBe(false);
     expect(existsSync(path.join(skillsRoot, 'pack-skill-a'))).toBe(false);
     expect(existsSync(path.join(dsRoot, 'mine', 'DESIGN.md'))).toBe(true);
@@ -290,6 +320,47 @@ describe('remove', () => {
     expect(activeMishPacks()).toEqual([]);
     expect(overlayCultJson('catalog.json', 'bundled')).toBe('bundled');
     expect(packSectionEntries()).toEqual([]);
+  });
+
+  it('moves a copy the user changed to a backup folder instead of deleting it, and reports it', async () => {
+    const source = tempDir('mish-src-');
+    writeFixturePack(source);
+    await store.install(source);
+    await fsp.writeFile(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'edited by the user');
+    writeFile(dsRoot, 'pack-ds/notes.md', 'added by the user');
+
+    const timed = createMishPackStore({ dataDir, userRoots: { skills: skillsRoot, designSystems: dsRoot }, env, now: () => new Date('2026-10-12T08:30:00.000Z') });
+    const skillBackup = path.join(skillsRoot, '.mish-pack-backups', 'team-kit-2026-10-12T08-30-00-000Z', 'pack-skill-a');
+    const dsBackup = path.join(dsRoot, '.mish-pack-backups', 'team-kit-2026-10-12T08-30-00-000Z', 'pack-ds');
+    expect(await timed.remove('team-kit')).toEqual({
+      removed: 'team-kit',
+      backups: [
+        { resource: 'skills', name: 'pack-skill-a', path: skillBackup },
+        { resource: 'designSystems', name: 'pack-ds', path: dsBackup },
+      ],
+    });
+    expect(readFileSync(path.join(skillBackup, 'SKILL.md'), 'utf8')).toBe('edited by the user');
+    expect(readFileSync(path.join(dsBackup, 'notes.md'), 'utf8')).toBe('added by the user');
+    // Unchanged copies are removed; changed ones no longer sit where the scanners look.
+    for (const gone of [path.join(skillsRoot, 'pack-skill-a'), path.join(skillsRoot, 'pack-skill-b'), path.join(dsRoot, 'pack-ds'), path.join(dsRoot, 'study-one')]) {
+      expect(existsSync(gone), gone).toBe(false);
+    }
+  });
+
+  it('backs up every copy of a pack whose receipt predates the digests', async () => {
+    const source = tempDir('mish-src-');
+    writeFixturePack(source);
+    await store.install(source);
+    const receiptPath = path.join(dataDir, 'mish-packs', '.receipts', 'team-kit.json');
+    const receipt = JSON.parse(readFileSync(receiptPath, 'utf8')) as Record<string, unknown>;
+    expect(receipt.digests).toBeDefined();
+    delete receipt.digests;
+    await fsp.writeFile(receiptPath, JSON.stringify(receipt));
+
+    const { backups } = await store.remove('team-kit');
+    expect(backups.map((backup) => `${backup.resource}/${backup.name}`).sort()).toEqual(['designSystems/pack-ds', 'designSystems/study-one', 'skills/pack-skill-a', 'skills/pack-skill-b']);
+    for (const backup of backups) expect(existsSync(backup.path), backup.path).toBe(true);
+    expect(existsSync(path.join(skillsRoot, 'pack-skill-b'))).toBe(false);
   });
 
   it('refuses an unknown id and an id that is not a pack id', async () => {
@@ -443,6 +514,30 @@ describe('start', () => {
     expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toContain('Body A');
     await store.install(source);
     expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toBe('version two');
+  });
+
+  it('moves a changed copy aside before a new version found at start replaces it', async () => {
+    const external = tempDir('mish-external-');
+    const packDir = path.join(external, 'team-kit');
+    writeFixturePack(packDir);
+    resetMishPacksForTests();
+    await makeStore(external).start();
+    await fsp.writeFile(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'edited by the user');
+    writeFile(packDir, 'skills/pack-skill-a/SKILL.md', 'version two');
+    writeFile(packDir, 'mish-pack.json', readFileSync(path.join(packDir, 'mish-pack.json'), 'utf8').replace('"version": "1.0.0"', '"version": "2.0.0"'));
+
+    resetMishPacksForTests();
+    const restarted = makeStore(external);
+    await restarted.start();
+    expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toBe('version two');
+    const backupRoot = path.join(skillsRoot, '.mish-pack-backups');
+    const stamps = await fsp.readdir(backupRoot);
+    expect(stamps).toHaveLength(1);
+    expect(readFileSync(path.join(backupRoot, stamps[0]!, 'pack-skill-a', 'SKILL.md'), 'utf8')).toBe('edited by the user');
+    // The unchanged copy is replaced without a backup.
+    expect(existsSync(path.join(backupRoot, stamps[0]!, 'pack-skill-b'))).toBe(false);
+    const [summary] = (await restarted.list()).packs;
+    expect(summary!.warnings.join(' ')).toMatch(/skills\/pack-skill-a had changed since the pack added it and was moved to /);
   });
 
   it('reports an MCP settings file it cannot update instead of failing the install', async () => {

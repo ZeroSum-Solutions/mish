@@ -123,7 +123,9 @@ export async function extractMishPackZip(zipFile: string, stagingDir: string, li
   const budget = new ByteBudget(limits);
   const seen = new Set<string>();
   const root = path.resolve(stagingDir);
-  for (const [rawName, entry] of Object.entries(zip.files)) {
+  for (const [resolvedName, entry] of Object.entries(zip.files)) {
+    // JSZip keys `zip.files` by a resolved name ("nested/../../x" becomes "x"); check the name as written.
+    const rawName = entry.unsafeOriginalName ?? resolvedName;
     const probe = rawName.endsWith('/') ? rawName.slice(0, -1) : rawName;
     if (probe === '__MACOSX' || probe.startsWith('__MACOSX/')) continue;
     const name = checkArchiveEntryPath(rawName);

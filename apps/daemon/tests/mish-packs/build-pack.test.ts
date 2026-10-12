@@ -193,6 +193,32 @@ describe('build-pack', () => {
     expect(build([source, out(), '--map', unknown]).stderr).toMatch(/unknown resource type/);
   });
 
+  it('leaves out files reached through a linked folder or resolving outside the checkout', async () => {
+    const outside = tempDir('mish-outside-');
+    writeFile(outside, 'skills/stolen/SKILL.md', 'outside');
+    writeFile(outside, 'catalog.json', JSON.stringify({ entries: [{ id: 'outside-section' }] }));
+    // A linked ancestor of a mapped folder, and a mapped parent that is itself a link.
+    symlinkSync(path.join(outside, 'skills'), path.join(source, 'linked-skills'));
+    await fsp.mkdir(path.join(source, 'nested'), { recursive: true });
+    symlinkSync(outside, path.join(source, 'nested', 'mapped'));
+    const file = path.join(tempDir('mish-map-'), 'map.json');
+    await fsp.writeFile(file, JSON.stringify({
+      schemaVersion: 1,
+      resources: [
+        { provides: 'skills', type: 'dir', from: 'linked-skills/stolen', to: 'skills' },
+        { provides: 'studies', type: 'files', to: 'studies', files: [{ from: 'nested/mapped/skills/stolen/SKILL.md', to: 'SKILL.md' }] },
+        { provides: 'catalogs.sections', type: 'catalog-delta', from: 'nested/mapped/catalog.json', againstPublic: 'packages/section-catalog/catalog.json', to: 'catalogs/sections.json' },
+      ],
+    }));
+    const out = path.join(tempDir('mish-out-'), 'p.zip');
+    const result = build([source, out, '--map', file, '--json']);
+    expect(result.status, result.stderr).toBe(0);
+    const summary = JSON.parse(result.stdout) as { skipped: Record<string, string[]> };
+    expect(summary.skipped['reached through a symbolic link']).toEqual(expect.arrayContaining(['skills/SKILL.md', 'studies/SKILL.md', 'nested/mapped/catalog.json']));
+    const names = Object.keys((await JSZip.loadAsync(await fsp.readFile(out))).files);
+    expect(names).toEqual(['mish-pack.json']);
+  });
+
   it('refuses to write a manifest the daemon would refuse', async () => {
     const file = path.join(tempDir('mish-map-'), 'map.json');
     await fsp.writeFile(file, JSON.stringify({

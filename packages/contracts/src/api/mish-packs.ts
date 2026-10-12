@@ -82,6 +82,39 @@ const mcpValue = z.string().max(2048).superRefine((value, ctx) => {
   if (SECRET_SHAPES.some((shape) => shape.test(stripped))) ctx.addIssue({ code: 'custom', message: 'looks like a literal credential; reference an environment variable as ${NAME}' });
 });
 
+/** Query names that carry a credential, compared after lowercasing and dropping `-` and `_`. */
+const SECRET_QUERY_NAME = /(?:key|token|secret|passw(?:or)?d|pwd|credential|signature)|^(?:auth|sig)$/u;
+
+function decodeUrlPart(value: string): string {
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return value;
+  }
+}
+
+function looksLikeSecret(value: string): boolean {
+  const stripped = value.replace(ENV_REF, '');
+  return SECRET_SHAPES.some((shape) => shape.test(stripped));
+}
+
+/**
+ * Why an MCP server URL carries a credential, or null. Query names are decoded and normalised
+ * (`api-key`, `API_KEY` and `apikey` are one name); a credential-like name with a literal value is
+ * refused, and every query value, path segment, the user info and the fragment are checked against
+ * the credential shapes.
+ */
+function mcpUrlCredentialProblem(url: URL): string | null {
+  for (const [name, value] of url.searchParams) {
+    const normalized = name.toLowerCase().replace(/[-_]/gu, '');
+    if (value !== '' && value.replace(ENV_REF, '') !== '' && SECRET_QUERY_NAME.test(normalized)) return 'the url cannot carry a credential in its query';
+    if (looksLikeSecret(name) || looksLikeSecret(value)) return 'the url cannot carry a credential in its query';
+  }
+  const parts = [...url.pathname.split('/'), url.username, url.password, url.hash.slice(1)].map(decodeUrlPart);
+  if (parts.some(looksLikeSecret)) return 'the url looks like it carries a literal credential';
+  return null;
+}
+
 const mcpServerSchema = z.object({
   id: z.string().regex(SERVER_ID),
   label: z.string().min(1).max(120).optional(),
@@ -110,7 +143,8 @@ const mcpServerSchema = z.object({
     const parsed = new URL(server.url);
     if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') ctx.addIssue({ code: 'custom', path: ['url'], message: 'the url must be http or https' });
     if (parsed.username || parsed.password) ctx.addIssue({ code: 'custom', path: ['url'], message: 'the url cannot carry credentials' });
-    if (/[?&](?:[a-z_]*(?:key|token|secret|password)[a-z_]*)=/iu.test(parsed.search)) ctx.addIssue({ code: 'custom', path: ['url'], message: 'the url cannot carry a credential in its query' });
+    const problem = mcpUrlCredentialProblem(parsed);
+    if (problem) ctx.addIssue({ code: 'custom', path: ['url'], message: problem });
   } catch {
     ctx.addIssue({ code: 'custom', path: ['url'], message: 'the url is not valid' });
   }

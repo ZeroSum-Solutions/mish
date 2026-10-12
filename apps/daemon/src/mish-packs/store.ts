@@ -8,10 +8,13 @@
 // Resources the daemon reads in place (catalogues, kits, assets) are not copied: the overlay reads
 // them from the pack folder. Folders that scanners expect inside a user root (skills, design
 // systems, studies) are copied there on install and removed again on remove; the receipt records
-// exactly which folders the pack added so nothing else is touched.
+// exactly which folders the pack added so nothing else is touched, and a digest of each as placed.
+// On remove, reinstall or a new version, a copy whose digest no longer matches (the user changed
+// it) is moved to `<user root>/.mish-pack-backups/<id>-<time>/<name>` instead of being deleted, and
+// the result names it. A receipt without digests (written before they existed) backs up every copy.
 
-import { randomUUID } from 'node:crypto';
-import { promises as fsp, existsSync } from 'node:fs';
+import { createHash, randomUUID } from 'node:crypto';
+import { createReadStream, promises as fsp, existsSync } from 'node:fs';
 import path from 'node:path';
 
 import {
@@ -60,19 +63,40 @@ export interface MishPackStoreOptions {
   now?: () => Date;
 }
 
+type CopyBucket = 'skills' | 'designSystems';
+
 interface Receipt {
   id: string;
   version: string;
   installedAt: string;
-  copied: { skills: string[]; designSystems: string[] };
+  copied: Record<CopyBucket, string[]>;
+  /** `folderDigest` of each copied folder as placed. Absent in receipts written before digests. */
+  digests?: Record<CopyBucket, Record<string, string>>;
   seededMcp: SeededMcpServer[];
   warnings: string[];
 }
 
+/** A copied folder the user changed after install: moved aside instead of deleted. */
+export interface MishPackBackup {
+  /** The user root it was in: `skills`, or `designSystems` (design systems and studies). */
+  resource: CopyBucket;
+  name: string;
+  /** Absolute path the folder now lives at. */
+  path: string;
+}
+
+export interface MishPackStoreInstallResult extends MishPackInstallResponse {
+  backups: MishPackBackup[];
+}
+
+export interface MishPackStoreRemoveResult extends MishPackRemoveResponse {
+  backups: MishPackBackup[];
+}
+
 export interface MishPackStore {
   list(): Promise<MishPacksListResponse>;
-  install(source: string): Promise<MishPackInstallResponse>;
-  remove(id: string): Promise<MishPackRemoveResponse>;
+  install(source: string): Promise<MishPackStoreInstallResult>;
+  remove(id: string): Promise<MishPackStoreRemoveResult>;
   /** Boot: repair crash residue, scan, activate every pack, apply allow-listed environment. */
   start(): Promise<void>;
   isBusy(): boolean;
@@ -85,6 +109,7 @@ const DIR_KEYS: readonly MishPackResourceKey[] = ['cultKit', 'cultCatalog', 'gen
 const FILE_KEYS: readonly MishPackResourceKey[] = ['cultAdapters', 'sections'];
 const ALL_KEYS: readonly MishPackResourceKey[] = [...DIR_KEYS, ...FILE_KEYS];
 const COPIED_KEYS = new Set<MishPackResourceKey>(['designSystems', 'skills', 'studies']);
+const BACKUP_DIRNAME = '.mish-pack-backups';
 
 export function isMishPackId(value: string): boolean {
   return ID_RE.test(value);
@@ -105,6 +130,67 @@ async function childDirs(dir: string): Promise<string[]> {
     if (entry.isDirectory() && !entry.name.startsWith('.') && CHILD_RE.test(entry.name)) out.push(entry.name);
   }
   return out.sort();
+}
+
+async function fileDigest(file: string): Promise<string> {
+  const hash = createHash('sha256');
+  for await (const chunk of createReadStream(file)) hash.update(chunk as Buffer);
+  return hash.digest('hex');
+}
+
+/**
+ * sha256 over a folder's contents: every entry's relative path in sorted order, with each file's
+ * own sha256 and each link's target. It does not depend on where the folder sits, so a copy hashed
+ * in its temp folder matches itself after the rename. Null when `dir` is not a folder.
+ */
+export async function folderDigest(dir: string): Promise<string | null> {
+  try {
+    if (!(await fsp.lstat(dir)).isDirectory()) return null;
+  } catch {
+    return null;
+  }
+  const lines: string[] = [];
+  const walk = async (abs: string, rel: string): Promise<void> => {
+    for (const entry of await fsp.readdir(abs, { withFileTypes: true })) {
+      const childRel = rel === '' ? entry.name : `${rel}/${entry.name}`;
+      const childAbs = path.join(abs, entry.name);
+      if (entry.isDirectory()) {
+        lines.push(JSON.stringify(['dir', childRel]));
+        await walk(childAbs, childRel);
+      } else if (entry.isFile()) {
+        lines.push(JSON.stringify(['file', childRel, await fileDigest(childAbs)]));
+      } else if (entry.isSymbolicLink()) {
+        lines.push(JSON.stringify(['link', childRel, await fsp.readlink(childAbs)]));
+      } else {
+        lines.push(JSON.stringify(['other', childRel]));
+      }
+    }
+  };
+  await walk(dir, '');
+  const hash = createHash('sha256');
+  for (const line of lines.sort()) hash.update(`${line}\n`);
+  return hash.digest('hex');
+}
+
+function recordedDigest(receipt: Receipt, bucket: CopyBucket, name: string): string | undefined {
+  const map = receipt.digests?.[bucket];
+  if (!map || typeof map !== 'object' || !Object.hasOwn(map, name)) return undefined;
+  const value = map[name];
+  return typeof value === 'string' ? value : undefined;
+}
+
+function recordDigest(receipt: Receipt, bucket: CopyBucket, name: string, digest: string): void {
+  const digests = receipt.digests ?? { skills: {}, designSystems: {} };
+  receipt.digests = { ...digests, [bucket]: { ...(digests[bucket] ?? {}), [name]: digest } };
+}
+
+/** Filesystem-safe timestamp for a backup folder name. */
+function backupStamp(date: Date): string {
+  return date.toISOString().replace(/[:.]/gu, '-');
+}
+
+function backupWarning(backup: MishPackBackup): string {
+  return `${backup.resource}/${backup.name} had changed since the pack added it and was moved to ${backup.path}`;
 }
 
 function issueText(error: { issues: Array<{ path: Array<string | number>; message: string }> }): string {
@@ -173,6 +259,12 @@ function emptyReceipt(pack: { id: string; manifest: MishPackManifest }, now: Dat
   return { id: pack.id, version: pack.manifest.version, installedAt: now.toISOString(), copied: { skills: [], designSystems: [] }, seededMcp: [], warnings: [] };
 }
 
+/** Digests a new version's receipt starts from: empty for a first install, none from a receipt that predates them. */
+function carriedDigests(previous: Receipt | null): Pick<Receipt, 'digests'> {
+  if (!previous) return { digests: { skills: {}, designSystems: {} } };
+  return previous.digests ? { digests: previous.digests } : {};
+}
+
 export function createMishPackStore(options: MishPackStoreOptions): MishPackStore {
   const env = options.env ?? process.env;
   const limits = options.limits ?? DEFAULT_MISH_PACK_LIMITS;
@@ -202,16 +294,43 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     await fsp.rename(tmp, receiptFile(receipt.id));
   }
 
+  const bucketRoot = (bucket: CopyBucket) => (bucket === 'skills' ? options.userRoots.skills : options.userRoots.designSystems);
+
+  /**
+   * Takes away a folder this pack copied: deleted when it still matches the digest recorded at
+   * install, otherwise moved to `<root>/.mish-pack-backups/<packId>-<stamp>/<name>`. Returns the
+   * backup, or null when the folder was deleted or is already gone.
+   */
+  async function retireCopy(receipt: Receipt, bucket: CopyBucket, name: string, stamp: string): Promise<MishPackBackup | null> {
+    const destRoot = bucketRoot(bucket);
+    const dest = path.join(destRoot, name);
+    if (!(await exists(dest))) return null;
+    const recorded = recordedDigest(receipt, bucket, name);
+    if (recorded !== undefined && (await folderDigest(dest)) === recorded) {
+      await fsp.rm(dest, { recursive: true, force: true });
+      return null;
+    }
+    const backupDir = path.join(destRoot, BACKUP_DIRNAME, `${receipt.id}-${stamp}`);
+    await fsp.mkdir(backupDir, { recursive: true });
+    let target = path.join(backupDir, name);
+    for (let n = 2; await exists(target); n += 1) target = path.join(backupDir, `${name}-${n}`);
+    await fsp.rename(dest, target);
+    return { resource: bucket, name, path: target };
+  }
+
   /** Copies the pack's skill, design-system and study folders into the user roots. Idempotent. */
-  async function copyIntoUserRoots(pack: ActiveMishPack, receipt: Receipt, refresh: boolean): Promise<void> {
-    const targets: Array<{ key: MishPackResourceKey; destRoot: string; list: string[] }> = [
-      { key: 'skills', destRoot: options.userRoots.skills, list: receipt.copied.skills },
-      { key: 'designSystems', destRoot: options.userRoots.designSystems, list: receipt.copied.designSystems },
-      { key: 'studies', destRoot: options.userRoots.designSystems, list: receipt.copied.designSystems },
+  async function copyIntoUserRoots(pack: ActiveMishPack, receipt: Receipt, refresh: boolean, backups: MishPackBackup[]): Promise<void> {
+    const targets: Array<{ key: MishPackResourceKey; bucket: CopyBucket }> = [
+      { key: 'skills', bucket: 'skills' },
+      { key: 'designSystems', bucket: 'designSystems' },
+      { key: 'studies', bucket: 'designSystems' },
     ];
-    for (const { key, destRoot, list } of targets) {
+    const stamp = backupStamp(now());
+    for (const { key, bucket } of targets) {
       const source = packResourcePath(pack, key);
       if (!source) continue;
+      const destRoot = bucketRoot(bucket);
+      const list = receipt.copied[bucket];
       await fsp.mkdir(destRoot, { recursive: true });
       for (const child of await childDirs(source)) {
         const dest = path.join(destRoot, child);
@@ -223,34 +342,62 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
           }
           // Already copied by this pack at this version: a restart does not copy it again.
           if (!refresh) continue;
-          await fsp.rm(dest, { recursive: true, force: true });
+          // A new version replaces the copy; one the user changed is moved aside, never deleted.
+          const backup = await retireCopy(receipt, bucket, child, stamp);
+          if (backup) {
+            backups.push(backup);
+            receipt.warnings.push(backupWarning(backup));
+          }
         }
         const tmp = path.join(destRoot, `.mish-pack-${randomUUID()}`);
+        let digest: string | null;
         try {
           await copyTreeNoLinks(path.join(source, child), tmp);
+          digest = await folderDigest(tmp);
           await fsp.rename(tmp, dest);
         } catch (error) {
           await fsp.rm(tmp, { recursive: true, force: true });
           throw error;
         }
         if (!mine) list.push(child);
+        if (digest !== null) recordDigest(receipt, bucket, child, digest);
       }
     }
   }
 
-  async function removeUserRootCopies(receipt: Receipt): Promise<void> {
-    for (const child of receipt.copied.skills) if (CHILD_RE.test(child)) await fsp.rm(path.join(options.userRoots.skills, child), { recursive: true, force: true });
-    for (const child of receipt.copied.designSystems) if (CHILD_RE.test(child)) await fsp.rm(path.join(options.userRoots.designSystems, child), { recursive: true, force: true });
+  async function removeUserRootCopies(receipt: Receipt): Promise<MishPackBackup[]> {
+    const stamp = backupStamp(now());
+    const backups: MishPackBackup[] = [];
+    for (const bucket of ['skills', 'designSystems'] as const) {
+      for (const child of receipt.copied[bucket]) {
+        if (!CHILD_RE.test(child)) continue;
+        const backup = await retireCopy(receipt, bucket, child, stamp);
+        if (backup) backups.push(backup);
+      }
+    }
+    return backups;
   }
 
-  /** Activation outside the pack folder. `fresh` seeds MCP entries (only on a new version). */
-  async function activate(pack: ActiveMishPack): Promise<Receipt> {
+  /**
+   * Activation outside the pack folder; MCP entries are seeded only on a new version. `carried`
+   * are backups an earlier step of the same operation made (a reinstall's removal): they are
+   * reported with this receipt's warnings and in the returned list.
+   */
+  async function activate(pack: ActiveMishPack, carried: MishPackBackup[] = []): Promise<{ receipt: Receipt; backups: MishPackBackup[] }> {
     const previous = await readReceipt(pack.id);
     const receipt: Receipt = previous && previous.version === pack.manifest.version
       ? { ...previous, warnings: [] }
-      : { ...emptyReceipt(pack, now()), installedAt: previous?.installedAt ?? now().toISOString(), copied: previous?.copied ?? { skills: [], designSystems: [] }, seededMcp: previous?.seededMcp ?? [] };
+      : {
+          ...emptyReceipt(pack, now()),
+          installedAt: previous?.installedAt ?? now().toISOString(),
+          copied: previous?.copied ?? { skills: [], designSystems: [] },
+          ...carriedDigests(previous),
+          seededMcp: previous?.seededMcp ?? [],
+        };
     const isNewVersion = !previous || previous.version !== pack.manifest.version;
-    await copyIntoUserRoots(pack, receipt, isNewVersion);
+    const backups = [...carried];
+    receipt.warnings.push(...carried.map(backupWarning));
+    await copyIntoUserRoots(pack, receipt, isNewVersion, backups);
     if (isNewVersion && (pack.manifest.provides.mcpServers?.length ?? 0) > 0) {
       try {
         const known = new Set(receipt.seededMcp.map((entry) => entry.id));
@@ -263,15 +410,17 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       }
     }
     await writeReceipt(receipt);
-    return receipt;
+    return { receipt, backups };
   }
 
-  async function deactivate(id: string): Promise<void> {
+  /** Reverses activation; returns the copies that were moved aside because the user changed them. */
+  async function deactivate(id: string): Promise<MishPackBackup[]> {
     const receipt = await readReceipt(id);
-    if (!receipt) return;
+    if (!receipt) return [];
     await unseedPackMcpServers(options.dataDir, receipt.seededMcp);
-    await removeUserRootCopies(receipt);
+    const backups = await removeUserRootCopies(receipt);
     await fsp.rm(receiptFile(id), { force: true });
+    return backups;
   }
 
   async function summarize(pack: ActiveMishPack, receipt: Receipt | null): Promise<MishPackSummary> {
@@ -366,7 +515,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
 
           const final = path.join(root, manifest.id);
           const replaced = await exists(final);
-          if (replaced) await deactivate(manifest.id);
+          const removalBackups = replaced ? await deactivate(manifest.id) : [];
           await fsp.mkdir(trashRoot, { recursive: true });
           if (replaced) await fsp.rename(final, path.join(trashRoot, randomUUID()));
           await fsp.rename(packRoot, final);
@@ -375,8 +524,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
           const packs = reload();
           const pack = packs.find((entry) => entry.id === manifest.id && entry.origin === 'installed');
           if (!pack) throw new MishPackError('INTERNAL_ERROR', 'the pack was placed but could not be read back');
-          const receipt = await activate(pack);
-          return { pack: await summarize(pack, receipt), replaced };
+          const { receipt, backups } = await activate(pack, removalBackups);
+          return { pack: await summarize(pack, receipt), replaced, backups };
         } finally {
           await fsp.rm(staging, { recursive: true, force: true });
         }
@@ -392,12 +541,12 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
           if (external) throw new MishPackError('READ_ONLY', 'this pack comes from MISH_PACKS_DIR; remove it from that folder');
           throw new MishPackError('NOT_FOUND', 'no installed pack has that id');
         }
-        await deactivate(id);
+        const backups = await deactivate(id);
         await fsp.mkdir(trashRoot, { recursive: true });
         await fsp.rename(final, path.join(trashRoot, randomUUID()));
         await fsp.rm(trashRoot, { recursive: true, force: true });
         reload();
-        return { removed: id };
+        return { removed: id, backups };
       });
     },
   };
