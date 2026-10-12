@@ -718,6 +718,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       await fsp.rmdir(path.join(holdRoot, HOLD_DIRNAME)).catch(() => undefined);
     }
     await fsp.rm(journalFile(journal.token), { force: true });
+    await fsp.rmdir(previousRoot).catch(() => undefined);
     await fsp.rm(trashRoot, { recursive: true, force: true });
   }
 
