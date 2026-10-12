@@ -8,7 +8,7 @@
 // directory to prevent path traversal — see resolveSafe().
 
 import { constants as fsConstants, createReadStream } from 'node:fs';
-import { link, lstat, mkdir, readdir, readFile, realpath, rename, rm, stat, unlink, writeFile } from 'node:fs/promises';
+import { chmod, link, lstat, mkdir, readdir, readFile, realpath, rename, rm, stat, unlink, writeFile } from 'node:fs/promises';
 import { PlacementCoordinationError } from './workbench/placement/write-coordinator.js';
 import path from 'node:path';
 import { Readable } from 'node:stream';
@@ -915,6 +915,14 @@ async function commitProjectFile(target, body, overwrite) {
   try {
     await writeFile(tmp, body);
     if (overwrite) {
+      // rename() replaces the target inode, so carry over the existing file's
+      // permission bits (an executable stays executable, a 0600 file stays
+      // private) instead of falling back to the umask default.
+      const existing = await stat(target).catch((err) => {
+        if (err && err.code === 'ENOENT') return null;
+        throw err;
+      });
+      if (existing) await chmod(tmp, existing.mode & 0o7777);
       await rename(tmp, target);
       return;
     }
