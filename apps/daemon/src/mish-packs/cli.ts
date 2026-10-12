@@ -33,12 +33,12 @@ export const MISH_PACKS_USAGE = `Usage:
       Install a Mish pack from a folder or a .zip on this machine. The pack
       restores private catalogues, kits, skills, design systems, saved projects,
       design-index profiles and MCP server entries. Installing the same pack id
-      again replaces it; if the new version fails, the old one is put back.
+      again replaces it; until the new version is in, the old one is untouched.
   od packs list [--json]
       List installed packs and what each one provides.
   od packs remove <id> [--json]
       Remove an installed pack and what its install added. A copy you changed
-      is moved to a backup folder; a saved project you used stays yours.
+      is moved to a backup folder. Saved projects it added stay yours.
 
 Options:
   --json                Machine-readable output.
@@ -163,7 +163,12 @@ export async function runMishPacksCli(args: string[], options: MishPacksCliOptio
     const response = await fetchImpl(`${base}/api/mish-packs/${encodeURIComponent(id!)}`, { method: 'DELETE' });
     if (!response.ok) return out(1, '', await readError(response));
     const body = (await response.json()) as MishPackRemoveResponse;
-    return out(0, flags.json ? json(body) : `Removed pack ${body.removed}\n`);
+    if (flags.json) return out(0, json(body));
+    const kept = body.keptProjects ?? [];
+    const keptLine = kept.length > 0
+      ? `Kept the ${kept.length} saved project(s) it added; they stay in your project list: ${kept.slice(0, 5).join(', ')}${kept.length > 5 ? ', ...' : ''}\n`
+      : '';
+    return out(0, `Removed pack ${body.removed}\n${keptLine}`);
   } catch {
     return out(1, '', '[packs] error: could not reach the Mish daemon\n');
   }

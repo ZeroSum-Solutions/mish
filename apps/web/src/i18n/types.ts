@@ -7556,6 +7556,7 @@ export interface Dict {
   'packs.removeConfirmAction': string;
   'packs.cancel': string;
   'packs.removed': string;
+  'packs.removedKeptProjects': string;
   'packs.error.INVALID_MANIFEST': string;
   'packs.error.INVALID_ARCHIVE': string;
   'packs.error.UNSAFE_PATH': string;

@@ -34,7 +34,7 @@ interface Call {
   headers: Record<string, string>;
 }
 
-function stubFetch(options: { packs?: MishPackSummary[]; installError?: string } = {}) {
+function stubFetch(options: { packs?: MishPackSummary[]; installError?: string; keptProjects?: string[] } = {}) {
   let packs = options.packs ?? [];
   const calls: Call[] = [];
   vi.stubGlobal('fetch', vi.fn(async (input: string | URL | Request, init?: RequestInit) => {
@@ -52,7 +52,7 @@ function stubFetch(options: { packs?: MishPackSummary[]; installError?: string }
     }
     if (url.startsWith('/api/mish-packs/') && method === 'DELETE') {
       packs = [];
-      return json({ removed: 'team-kit' });
+      return json({ removed: 'team-kit', ...(options.keptProjects ? { keptProjects: options.keptProjects } : {}) });
     }
     throw new Error(`unexpected fetch: ${method} ${url}`);
   }));
@@ -129,6 +129,16 @@ describe('MishPacksSection', () => {
     fireEvent.click(screen.getByRole('button', { name: en['packs.removeConfirmAction'] }));
     await screen.findByTestId('mish-packs-empty');
     expect(calls.some((call) => call.method === 'DELETE' && call.url === '/api/mish-packs/team-kit')).toBe(true);
+  });
+
+  it('says the saved projects a removed pack added stay', async () => {
+    stubFetch({ packs: [PACK], keptProjects: ['ds-one', 'proj-two', 'proj-three'] });
+    renderSection();
+    const row = await screen.findByTestId('mish-pack-team-kit');
+    fireEvent.click(row.querySelector('button')!);
+    await screen.findByTestId('mish-packs-remove-dialog');
+    fireEvent.click(screen.getByRole('button', { name: en['packs.removeConfirmAction'] }));
+    await waitFor(() => expect(document.body.textContent).toContain('Team kit is removed. The 3 saved projects it added stay in your project list.'));
   });
 
   it('does not offer Remove for a pack that comes from MISH_PACKS_DIR', async () => {

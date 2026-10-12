@@ -152,7 +152,14 @@ export function MishPacksSection() {
     if (!mounted.current) return;
     setRemoving(false);
     setConfirming(null);
-    setListNotice(result.ok ? { kind: 'ok', text: t('packs.removed', { name: pack.name }) } : { kind: 'error', code: result.code });
+    if (result.ok) {
+      // Saved projects a pack imported are never removed with it; say so, with how many.
+      const kept = result.value.keptProjects?.length ?? 0;
+      const text = kept > 0 ? t('packs.removedKeptProjects', { name: pack.name, count: kept }) : t('packs.removed', { name: pack.name });
+      setListNotice({ kind: 'ok', text });
+    } else {
+      setListNotice({ kind: 'error', code: result.code });
+    }
     await reload();
     void applyMishPackRuntime();
   }

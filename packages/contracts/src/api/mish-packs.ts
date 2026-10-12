@@ -354,6 +354,11 @@ export interface MishPackInstallResponse {
 
 export interface MishPackRemoveResponse {
   removed: string;
+  /**
+   * Ids of the saved projects the pack had imported. A pack never deletes a project: they stay in
+   * the project list as the person's own. Absent when the pack imported none.
+   */
+  keptProjects?: string[];
 }
 
 export interface MishPackRuntimeResponse {

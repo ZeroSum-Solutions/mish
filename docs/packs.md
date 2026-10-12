@@ -95,7 +95,7 @@ nothing is installed. The schema is `mishPackManifestSchema` in
 | `catalogs.sections` | A file with `entries`. Rows are added to the section catalogue; a bundled row is never replaced. |
 | `catalogs.twentyFirst` | `21st-thumbnails.json` and `21st-thumbnails/`. Fills thumbnails the bundle lacks. |
 | `designSystems`, `studies`, `skills` | Each child folder is copied into the user design-systems or skills folder of the data directory. A folder you already have is left as it is and reported. |
-| `projects` | `projects.json` lists project rows (`mish-pack-projects/1`: id, name, skill, design system, prompt, metadata, instructions, times) and `<id>/` holds each project's files. Each is copied into the projects folder under its own id and added to the project list. A project id you already have is left as it is and reported. A row may have no folder: it is a project with no files. A row that points at a folder outside the pack (`baseDir`) is not added; links to folders on another computer (`linkedDirs`) are dropped. |
+| `projects` | `projects.json` lists project rows (`mish-pack-projects/1`: id, name, skill, design system, prompt, metadata, instructions, times) and `<id>/` holds each project's files. Each is copied into the projects folder under its own id and added to the project list, once. A project id you already have is left as it is and reported. The pack never deletes a project (below). A row may have no folder: it is a project with no files. A row that points at a folder outside the pack (`baseDir`) is not added; links to folders on another computer (`linkedDirs`) are dropped. |
 | `designIndex` | A folder with `index.json` (`design-index/1`). Its profiles are listed in the Design index and on Home next to your own, read from the pack; your own profile wins when both have the same digest. They are never written into your index and cannot be deleted from it. |
 | `assets.pets`, `assets.promptTemplates` | Scanned next to the bundled pets and prompt templates. |
 | `assets.styleCatalog` | Images served for the style picker at `/api/mish-packs/assets/style-catalog/v1/`. |
@@ -109,14 +109,13 @@ place, per request. An install or removal takes effect without a restart.
 
 The design-system previews on the Design systems page are projects too: a
 design system names its preview project (`ds-<slug>`), so a pack keeps every
-project's original id. On remove, or when a new version replaces it, a project
-the pack added is:
+project's original id.
 
-- deleted when it is exactly as the pack placed it;
-- moved to `.mish-pack-backups/<pack>-<time>/<id>` in the projects folder when
-  only its files changed;
-- kept, as your own project, when you renamed it, chatted in it or moved it
-  into a workspace. The result says which projects were kept.
+A pack imports each project once and never deletes one. Removing the pack, or
+installing a new version, leaves every project it imported in your project
+list as your own, with its files, conversations and deployments; the result
+lists them (`keptProjects`). A new version imports only the projects you do not
+have yet, and does not bring back a project you deleted.
 
 ### Install
 
@@ -133,11 +132,14 @@ which environment variables its MCP servers still need.
 Installing a pack with the same id replaces it. The install is staged and
 checked first; a pack that fails a check installs nothing.
 
-A replacement can be undone. The installed version's pack folder, its copied
-folders and projects, and the MCP entries and project rows it added are set
-aside, not deleted, until the new version is active. If the new version fails
-to activate, it is taken out again and the old version is put back as it was.
-If the app stops during an install, the next start finishes that rollback.
+An install has a commit point. Before it, the new version waits in work
+folders and nothing the installed version owns is touched: a failure, or the
+app stopping, only deletes those work folders, and the installed version stays
+as it was. At the commit the new version becomes the installed one. After it
+the install only moves forward (the pack folders are swapped, copies and MCP
+entries replaced, projects imported, the old version deleted); if something
+fails or the app stops there, the next start finishes it. The journal that
+drives this is written before each change.
 
 #### Large packets
 
@@ -231,7 +233,8 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packs --split
 - Keep a map with real private names outside this repository and pass it with
   `--map`. The committed map is a template.
 - The builder leaves out links, `node_modules`, credential-looking files
-  (`.env`, `mcp-tokens.json`, `.mcp.json` and other MCP client configs,
+  (`.env`, `mcp-tokens.json`, `.mcp.json` and other MCP client configs with
+  their temporary and backup copies such as `.mcp.json.<hex>.tmp`,
   `settings.local.json`, `auth.json`, key files) and names the daemon would
   refuse, and prints what it left out. It validates the manifest with the
   daemon's schema before it writes anything, never writes inside the checkout
