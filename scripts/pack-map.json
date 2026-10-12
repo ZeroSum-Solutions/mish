@@ -1,0 +1,132 @@
+{
+  "schemaVersion": 1,
+  "pack": {
+    "id": "team-packet",
+    "name": "Team packet",
+    "description": "Private content and connections for the team build."
+  },
+  "resources": [
+    {
+      "provides": "catalogs.cultKit",
+      "type": "dir",
+      "from": "data/component-kits/cult-ui-pro",
+      "to": "catalogs/cult-kit",
+      "optional": false
+    },
+    {
+      "provides": "catalogs.cultCatalog",
+      "type": "files",
+      "to": "catalogs/cult-catalog",
+      "files": [
+        { "from": "packages/cult-ui-catalog/catalog.json", "to": "catalog.json" },
+        { "from": "packages/cult-ui-catalog/catalog-curation.json", "to": "catalog-curation.json", "optional": true },
+        { "from": "packages/cult-ui-catalog/catalog-copy-refinements.json", "to": "catalog-copy-refinements.json", "optional": true },
+        { "from": "packages/cult-ui-catalog/generated/slugs.json", "to": "generated/slugs.json", "optional": true },
+        { "from": "packages/cult-ui-catalog/generated/public-names.json", "to": "generated/public-names.json", "optional": true },
+        { "from": "packages/cult-ui-catalog/generated/thumbnails.json", "to": "generated/thumbnails.json", "optional": true },
+        { "from": "packages/cult-ui-catalog/generated/previews", "to": "generated/previews", "optional": true },
+        { "from": "packages/cult-ui-catalog/generated/thumbnails", "to": "generated/thumbnails", "optional": true }
+      ]
+    },
+    {
+      "provides": "catalogs.cultAdapters",
+      "type": "bundle",
+      "entry": "packages/cult-ui-catalog/generated/index.ts",
+      "to": "catalogs/cult-adapters/index.mjs"
+    },
+    {
+      "provides": "catalogs.genui",
+      "type": "genui-overlay",
+      "catalog": "packages/genui-catalog/catalog.json",
+      "sourceName": "cult-ui-pro",
+      "dist": "packages/genui-catalog/dist/data.js",
+      "to": "catalogs/genui"
+    },
+    {
+      "provides": "catalogs.sections",
+      "type": "catalog-delta",
+      "from": "packages/section-catalog/catalog.json",
+      "againstPublic": "packages/section-catalog/catalog.json",
+      "to": "catalogs/sections.json"
+    },
+    {
+      "provides": "catalogs.twentyFirst",
+      "type": "files",
+      "to": "catalogs/twenty-first",
+      "files": [
+        { "from": "packages/21st-catalog/generated/21st-thumbnails.json", "to": "21st-thumbnails.json" },
+        { "from": "packages/21st-catalog/generated/21st-thumbnails", "to": "21st-thumbnails", "optional": true }
+      ]
+    },
+    {
+      "provides": "designSystems",
+      "type": "children",
+      "to": "design-systems",
+      "sources": [{ "from": ".od/design-systems", "include": ["atlas-*"] }]
+    },
+    {
+      "provides": "studies",
+      "type": "children",
+      "to": "studies",
+      "sources": [{ "from": ".od/design-systems", "include": ["study-*"] }]
+    },
+    {
+      "provides": "skills",
+      "type": "children",
+      "to": "skills",
+      "sources": [
+        { "from": ".od/skills", "include": ["*"] },
+        { "from": "skills", "include": ["agency-*"] }
+      ]
+    },
+    {
+      "provides": "assets.pets",
+      "type": "dir",
+      "from": "assets/community-pets",
+      "to": "assets/pets"
+    },
+    {
+      "provides": "assets.promptTemplates",
+      "type": "dir",
+      "from": "prompt-templates",
+      "to": "assets/prompt-templates"
+    }
+  ],
+  "env": {},
+  "mcpServers": [
+    {
+      "id": "refero",
+      "label": "Refero",
+      "transport": "http",
+      "url": "https://api.refero.design/mcp",
+      "authMode": "oauth",
+      "enabled": true
+    },
+    {
+      "id": "mobbin",
+      "label": "Mobbin",
+      "transport": "http",
+      "url": "https://api.mobbin.com/mcp",
+      "authMode": "oauth",
+      "enabled": true
+    },
+    {
+      "id": "21st-dev",
+      "label": "21st.dev",
+      "transport": "http",
+      "url": "https://21st.dev/api/mcp",
+      "authMode": "none",
+      "headers": { "x-api-key": "${TWENTY_FIRST_API_KEY}" },
+      "enabled": false
+    },
+    {
+      "id": "shadcn",
+      "label": "shadcn registry",
+      "transport": "stdio",
+      "command": "npx",
+      "args": ["-y", "shadcn@latest", "mcp"],
+      "env": { "CULT_PRO_TOKEN": "${CULT_PRO_TOKEN}" },
+      "enabled": false
+    }
+  ]
+}

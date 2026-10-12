@@ -17,8 +17,8 @@ export const MISH_PACK_ID_PATTERN = '^[a-z0-9][a-z0-9-]{0,62}$';
 
 /** Archive and extraction budgets. They hold while bytes are written, not afterwards. */
 export const MISH_PACK_LIMITS = Object.freeze({
-  archiveMaxBytes: 4 * 1024 * 1024 * 1024,
-  extractedMaxBytes: 8 * 1024 * 1024 * 1024,
+  archiveMaxBytes: 2 * 1024 * 1024 * 1024,
+  extractedMaxBytes: 6 * 1024 * 1024 * 1024,
   maxEntries: 200_000,
   fileMaxBytes: 512 * 1024 * 1024,
   manifestMaxBytes: 256 * 1024,
@@ -273,8 +273,10 @@ export interface MishPackRemoveResponse {
 }
 
 export interface MishPackRuntimeResponse {
-  /** Origin the web app passes to `setStyleCatalogAssetOrigin`; a path the daemon serves, or null. */
+  /** Path on the daemon that serves a pack's style previews, or null. */
   styleCatalogPath: string | null;
+  /** Absolute origin from MISH_STYLE_PREVIEW_ORIGIN (a pack's `env` or the person's own), or null. It wins over the path. */
+  styleCatalogOrigin: string | null;
 }
 
 export interface MishPackErrorBody {

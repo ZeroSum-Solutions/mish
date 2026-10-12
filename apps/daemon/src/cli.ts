@@ -42,6 +42,7 @@ import { runCultAddCli, runCultShowCli } from './cult-add-cli.js';
 import { runCultPreviewCli } from './cult-preview-cli.js';
 import { COMPONENTS_SEARCH_HELP, COMPONENTS_USAGE, runComponentsCli, runComponentsSearchCli } from './components-cli.js';
 import { runPackCli } from './packs/pack-cli.js';
+import { runMishPacksCli } from './mish-packs/cli.js';
 import { runConnectorsToolCli } from './tools-connectors-cli.js';
 import { runDesignSystemsToolCli } from './tools-design-systems-cli.js';
 import {
@@ -511,6 +512,7 @@ const SUBCOMMAND_MAP = {
   '21st': runTwentyFirst,
   cult: runCult,
   pack: runPack,
+  packs: runMishPacks,
   components: runComponents,
   memory: runMemory,
   run: runRun,
@@ -1182,6 +1184,9 @@ function printRootHelp() {
       Read the per-component-ID ledger, including installed packs.
   od pack <install|digest|list|remove|auth> [args]
       Install and manage licensed packs (same as Settings → Licensed packs).
+  od packs <install|list|remove> [args]
+      Install and manage Mish packs: a private folder or .zip that restores
+      catalogues, kits, skills, design systems and MCP servers (Settings → Packs).
 
   od automation <list|get|create|update|run|runs|pause|resume|delete> [args]
       Drive the Automations surface headlessly. Same store as the UI's
@@ -12966,6 +12971,20 @@ async function runComponents(args) {
   if (result.stdout) process.stdout.write(result.stdout);
   if (result.stderr) process.stderr.write(result.stderr);
   process.exitCode = result.code;
+}
+
+/**
+ * `od packs …` — Mish packs (private packets: catalogues, kits, skills, MCP servers). Thin adapter
+ * over `mish-packs/cli.ts`, unit-tested there. Function declaration so the top-of-file
+ * SUBCOMMAND_MAP dispatch can reach it.
+ */
+async function runMishPacks(args, run = runMishPacksCli) {
+  const result = await run(args, {
+    resolveBaseUrl: (daemonUrl) => cliDaemonBaseUrl(daemonUrl ? { 'daemon-url': daemonUrl } : {}),
+  });
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  if (result.code !== 0) process.exit(result.code);
 }
 
 async function runPack(args, run = runPackCli) {

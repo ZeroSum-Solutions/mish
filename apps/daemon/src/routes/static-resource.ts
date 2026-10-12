@@ -1,4 +1,5 @@
 import { sendInternalError } from '../http/api-errors.js';
+import { packResourcePaths } from '../mish-packs/overlay.js';
 import { designSystemSelectability } from '../design-systems/selectability.js';
 import type { Express, Response } from 'express';
 import type Database from 'better-sqlite3';
@@ -753,6 +754,7 @@ export function registerStaticResourceRoutes(app: Express, ctx: RegisterStaticRe
       const result = await listCodexPets({
         baseUrl: '',
         bundledRoot: BUNDLED_PETS_DIR,
+        extraBundledRoots: packResourcePaths('pets'),
       });
       res.json(result);
     } catch (err: any) {
@@ -788,6 +790,7 @@ export function registerStaticResourceRoutes(app: Express, ctx: RegisterStaticRe
     try {
       const sheet = await readCodexPetSpritesheet(req.params.id, {
         bundledRoot: BUNDLED_PETS_DIR,
+        extraBundledRoots: packResourcePaths('pets'),
       });
       if (!sheet) {
         return res
@@ -879,7 +882,17 @@ export function registerStaticResourceRoutes(app: Express, ctx: RegisterStaticRe
 
   app.get('/api/prompt-templates', async (_req, res) => {
     try {
-      const templates = await listPromptTemplates(PROMPT_TEMPLATES_DIR);
+      // The bundled folder first, then any installed Mish pack's; the first template with an id wins.
+      const templates: Awaited<ReturnType<typeof listPromptTemplates>> = [];
+      const seen = new Set<string>();
+      for (const root of [PROMPT_TEMPLATES_DIR, ...packResourcePaths('promptTemplates')]) {
+        for (const template of await listPromptTemplates(root)) {
+          const key = `${template.surface}/${template.id}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+          templates.push(template);
+        }
+      }
       res.json({
         promptTemplates: templates.map(({ prompt: _prompt, ...rest }) => rest),
       });
@@ -890,11 +903,11 @@ export function registerStaticResourceRoutes(app: Express, ctx: RegisterStaticRe
 
   app.get('/api/prompt-templates/:surface/:id', async (req, res) => {
     try {
-      const tpl = await readPromptTemplate(
-        PROMPT_TEMPLATES_DIR,
-        req.params.surface,
-        req.params.id,
-      );
+      let tpl = null;
+      for (const root of [PROMPT_TEMPLATES_DIR, ...packResourcePaths('promptTemplates')]) {
+        tpl = await readPromptTemplate(root, req.params.surface, req.params.id);
+        if (tpl) break;
+      }
       if (!tpl)
         return res.status(404).json({ error: 'prompt template not found' });
       res.json({ promptTemplate: tpl });

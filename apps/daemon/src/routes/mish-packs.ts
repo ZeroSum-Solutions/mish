@@ -20,6 +20,7 @@ import multer from 'multer';
 
 import {
   MISH_PACK_LIMITS,
+  mishPackEnvProblem,
   type MishPackErrorCode,
   type MishPackRuntimeResponse,
 } from '@mish/contracts';
@@ -98,7 +99,11 @@ export function registerMishPackRoutes(app: Express, ctx: RegisterMishPackRoutes
   });
 
   app.get('/api/mish-packs/runtime', (_req, res) => {
-    const body: MishPackRuntimeResponse = { styleCatalogPath: packStyleCatalogDir() ? '/api/mish-packs/assets' : null };
+    const origin = process.env.MISH_STYLE_PREVIEW_ORIGIN?.trim();
+    const body: MishPackRuntimeResponse = {
+      styleCatalogPath: packStyleCatalogDir() ? '/api/mish-packs/assets' : null,
+      styleCatalogOrigin: origin && mishPackEnvProblem('MISH_STYLE_PREVIEW_ORIGIN', origin) === null ? origin : null,
+    };
     res.json(body);
   });
 
