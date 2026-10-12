@@ -117,7 +117,10 @@ echo "  mount: $mount_dir"
 hdiutil attach "$download_path" -mountpoint "$mount_dir" -nobrowse -quiet
 mounted=1
 
-mapfile -t apps < <(find "$mount_dir" -maxdepth 1 -type d -name "*.app" -print | sort)
+apps=()
+while IFS= read -r app_path; do
+  apps+=("$app_path")
+done < <(find "$mount_dir" -maxdepth 1 -type d -name "*.app" -print | sort)
 if [[ "${#apps[@]}" -eq 0 ]]; then
   fail "no .app bundle found at DMG root"
 fi
