@@ -50,10 +50,12 @@ const SECRET_NAME = [
   /^(mcp-tokens|mcp-oauth-clients|credentials?|secrets?)(\..*)?$/i,
   // MCP client configs. The app writes `.mcp.json` into a project for each agent run, with the
   // live Authorization headers of the connected servers in it; the next run writes it again.
-  /^\.?mcp(-config)?\.json$/i,
+  // The name may carry a prefix (`agent.mcp.json`) and a suffix: the app writes the file through
+  // `.mcp.json.<hex>.tmp`, and editors leave `.bak` and `~` copies.
+  /(^|\.)mcp(-config)?\.json([.~].*)?$/i,
   // Per-machine agent settings (`.claude/settings.local.json` can hold an `env` block) and auth stores.
-  /^settings\.local\.json$/i,
-  /^auth\.json$/i,
+  /^settings\.local\.json([.~].*)?$/i,
+  /^auth\.json([.~].*)?$/i,
   /\.(pem|key|p12|pfx|keystore)$/i,
   /^id_(rsa|dsa|ecdsa|ed25519)(\.pub)?$/i,
 ];
@@ -71,7 +73,7 @@ const CREDENTIAL_SHAPES = [
   /\bxox[abprs]-[A-Za-z0-9-]{10,}/u,
   /\bAKIA[0-9A-Z]{16}\b/u,
 ];
-const SCANNED_TEXT = /\.(json|jsonl|md|txt|html?|m?[jt]sx?|cjs|ya?ml|toml|ini|cfg|conf|sh|env\w*)$/iu;
+const SCANNED_TEXT = /\.(json|jsonl|md|txt|html?|m?[jt]sx?|cjs|ya?ml|toml|ini|cfg|conf|sh|env\w*|tmp|temp|bak|old|orig|log)$/iu;
 const SCAN_MAX_BYTES = 2 * 1024 * 1024;
 /** The daemon refuses an entry path longer than this. */
 const MAX_ENTRY_PATH = 1024;
