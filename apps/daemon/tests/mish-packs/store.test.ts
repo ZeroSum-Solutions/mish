@@ -423,4 +423,34 @@ describe('start', () => {
     expect((await readMcpConfig(dataDir)).servers.map((server) => server.id)).toEqual(['pack-http', 'pack-stdio']);
     expect(overlayCultJson('catalog.json', null)).not.toBeNull();
   });
+
+  it('does not copy the folders again on a restart, and keeps a change made to a copy', async () => {
+    const source = tempDir('mish-src-');
+    writeFixturePack(source);
+    await store.install(source);
+    await fsp.writeFile(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'edited by the user');
+    resetMishPacksForTests();
+    await makeStore().start();
+    expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toBe('edited by the user');
+  });
+
+  it('copies a new version over the old copies', async () => {
+    const source = tempDir('mish-src-');
+    writeFixturePack(source);
+    await store.install(source);
+    writeFile(source, 'skills/pack-skill-a/SKILL.md', 'version two');
+    writeFile(source, 'mish-pack.json', readFileSync(path.join(source, 'mish-pack.json'), 'utf8').replace('"version": "1.0.0"', '"version": "2.0.0"'));
+    expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toContain('Body A');
+    await store.install(source);
+    expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toBe('version two');
+  });
+
+  it('reports an MCP settings file it cannot update instead of failing the install', async () => {
+    await fsp.mkdir(path.join(dataDir, 'mcp-config.json'));
+    const source = tempDir('mish-src-');
+    writeFixturePack(source);
+    const { pack } = await store.install(source);
+    expect(pack.warnings.join(' ')).toMatch(/MCP servers were not added/);
+    expect(existsSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'))).toBe(true);
+  });
 });

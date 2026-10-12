@@ -203,7 +203,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   }
 
   /** Copies the pack's skill, design-system and study folders into the user roots. Idempotent. */
-  async function copyIntoUserRoots(pack: ActiveMishPack, receipt: Receipt): Promise<void> {
+  async function copyIntoUserRoots(pack: ActiveMishPack, receipt: Receipt, refresh: boolean): Promise<void> {
     const targets: Array<{ key: MishPackResourceKey; destRoot: string; list: string[] }> = [
       { key: 'skills', destRoot: options.userRoots.skills, list: receipt.copied.skills },
       { key: 'designSystems', destRoot: options.userRoots.designSystems, list: receipt.copied.designSystems },
@@ -221,6 +221,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
             receipt.warnings.push(`${key}/${child} already exists and was left as it is`);
             continue;
           }
+          // Already copied by this pack at this version: a restart does not copy it again.
+          if (!refresh) continue;
           await fsp.rm(dest, { recursive: true, force: true });
         }
         const tmp = path.join(destRoot, `.mish-pack-${randomUUID()}`);
@@ -247,13 +249,18 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     const receipt: Receipt = previous && previous.version === pack.manifest.version
       ? { ...previous, warnings: [] }
       : { ...emptyReceipt(pack, now()), installedAt: previous?.installedAt ?? now().toISOString(), copied: previous?.copied ?? { skills: [], designSystems: [] }, seededMcp: previous?.seededMcp ?? [] };
-    await copyIntoUserRoots(pack, receipt);
     const isNewVersion = !previous || previous.version !== pack.manifest.version;
+    await copyIntoUserRoots(pack, receipt, isNewVersion);
     if (isNewVersion && (pack.manifest.provides.mcpServers?.length ?? 0) > 0) {
-      const known = new Set(receipt.seededMcp.map((entry) => entry.id));
-      const { seeded, skipped } = await seedPackMcpServers(options.dataDir, pack.manifest.provides.mcpServers ?? []);
-      receipt.seededMcp.push(...seeded.filter((entry) => !known.has(entry.id)));
-      for (const id of skipped) receipt.warnings.push(`MCP server ${id} already exists and was left as it is`);
+      try {
+        const known = new Set(receipt.seededMcp.map((entry) => entry.id));
+        const { seeded, skipped } = await seedPackMcpServers(options.dataDir, pack.manifest.provides.mcpServers ?? []);
+        receipt.seededMcp.push(...seeded.filter((entry) => !known.has(entry.id)));
+        for (const id of skipped) receipt.warnings.push(`MCP server ${id} already exists and was left as it is`);
+      } catch {
+        // An unreadable MCP file must not undo the rest of the install; say so and carry on.
+        receipt.warnings.push('MCP servers were not added because the MCP settings file could not be updated');
+      }
     }
     await writeReceipt(receipt);
     return receipt;
@@ -346,8 +353,13 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         const staging = path.join(stagingRoot, randomUUID());
         await fsp.mkdir(staging, { recursive: true });
         try {
-          if (info.isDirectory()) await copyMishPackFolder(source, staging, limits);
-          else await extractMishPackZip(source, staging, limits);
+          try {
+            if (info.isDirectory()) await copyMishPackFolder(source, staging, limits);
+            else await extractMishPackZip(source, staging, limits);
+          } catch (error) {
+            if (error instanceof MishPackError) throw error;
+            throw new MishPackError('INVALID_ARCHIVE', 'the pack could not be unpacked; check that the archive is complete');
+          }
           const packRoot = await locatePackRoot(staging);
           const manifest = await readManifest(packRoot);
           await verifyProvides(packRoot, manifest);
