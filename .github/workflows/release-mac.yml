@@ -52,7 +52,7 @@ jobs:
           cp "$out/zip/Mish-default.zip" "release-out/Mish-${RELEASE_TAG}-mac-arm64.zip"
           ls -la release-out
           test -n "$(ls release-out/*.dmg 2>/dev/null)" || { echo "no dmg produced" >&2; exit 1; }
-          (cd release-out && shasum -a 256 * > SHA256SUMS)
+          (cd release-out && shasum -a 256 -- ./* > SHA256SUMS)
           cat release-out/SHA256SUMS
 
       - name: Create or update the GitHub Release
