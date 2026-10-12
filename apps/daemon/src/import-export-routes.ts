@@ -1028,6 +1028,10 @@ export function registerProjectExportRoutes(app: Express, ctx: RegisterProjectEx
             return res.send(buffer);
           } finally {
             await fs.promises.rm(result.path, { force: true }).catch(() => {});
+            const exportDir = nodePath.dirname(result.path);
+            if (nodePath.basename(exportDir).startsWith('od-export-')) {
+              await fs.promises.rm(exportDir, { recursive: true, force: true }).catch(() => {});
+            }
           }
         }
         return sendApiError(

@@ -1,5 +1,6 @@
 import { isAbsolute, join, resolve } from "node:path";
 
+import { isSecureUpdateUrl } from "./secure-url.js";
 import {
   DESKTOP_UPDATE_CHANNELS,
   DESKTOP_UPDATE_MODES,
@@ -165,7 +166,9 @@ export function resolveDesktopUpdaterConfig(input: DesktopUpdaterConfigInput): D
   // This fork publishes no update feed, and the upstream default feed would
   // install the upstream app over this app. Updates stay off, even under
   // OD_UPDATE_ENABLED, until OD_UPDATE_METADATA_URL names a feed this fork owns.
-  const hasOwnedFeed = Boolean(env[DESKTOP_UPDATE_ENV.METADATA_URL]?.trim());
+  // A feed that is not https (loopback http aside) is refused: updates stay off.
+  const feedUrl = env[DESKTOP_UPDATE_ENV.METADATA_URL]?.trim() ?? "";
+  const hasOwnedFeed = feedUrl.length > 0 && isSecureUpdateUrl(feedUrl);
   const defaultEnabled = input.source === SIDECAR_SOURCES.PACKAGED;
   const enabled = hasOwnedFeed && (isTruthyEnv(env[DESKTOP_UPDATE_ENV.ENABLED]) ?? defaultEnabled);
   const runtimeBase = resolve(input.runtimeBase == null ? process.cwd() : input.runtimeBase);
