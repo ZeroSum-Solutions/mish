@@ -95,8 +95,12 @@ describe('scripts/pack-map.json', () => {
       env: Record<string, string>;
       mcpServers: unknown[];
     };
-    const types = new Set(['dir', 'files', 'children', 'bundle', 'genui-overlay', 'catalog-delta']);
+    const types = new Set(['dir', 'files', 'children', 'bundle', 'genui-overlay', 'catalog-delta', 'projects']);
     expect(map.resources.every((resource) => types.has(resource.type))).toBe(true);
+    // --split: every resource belongs to a module the map lists, and module ids are pack ids.
+    const modules = (map as unknown as { modules: Array<{ id: string }> }).modules.map((module) => module.id);
+    expect(modules.every((id) => /^[a-z0-9][a-z0-9-]{0,52}$/u.test(id))).toBe(true);
+    expect(map.resources.every((resource) => modules.includes((resource as unknown as { module: string }).module))).toBe(true);
     expect(new Set(map.resources.map((resource) => resource.provides)).size).toBe(map.resources.length);
     expect(new Set(map.resources.map((resource) => resource.to)).size).toBe(map.resources.length);
     const provides: Record<string, unknown> = { mcpServers: map.mcpServers, env: map.env };

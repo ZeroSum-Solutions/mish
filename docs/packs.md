@@ -14,9 +14,13 @@ a pack and shows the features that need one as unavailable.
 
 ## Mish packs: a team packet
 
-A Mish pack is one private `.zip` you give your team. They install it once and
+A Mish pack is a private `.zip` you give your team. They install it once and
 the app behaves like the private build. Remove it and the app goes back to the
 public build. While no pack is installed, nothing changes.
+
+A team packet can be one pack, or several smaller packs built with `--split`
+(catalogues, design systems, studies, skills, saved projects, design index).
+Each installs and removes on its own.
 
 ### What a pack looks like
 
@@ -33,6 +37,9 @@ team-packet/
   design-systems/<id>/        design system packages
   studies/<id>/               study packages
   skills/<id>/SKILL.md        skills
+  projects/projects.json      saved project rows
+  projects/<id>/              saved project folders
+  design-index/index.json     stored design-index profiles
   assets/pets/<id>/           pets
   assets/prompt-templates/    image/ and video/ prompt templates
   assets/style-catalog/       style picker preview images
@@ -59,6 +66,8 @@ the pack root:
     "designSystems": "design-systems",
     "skills": "skills",
     "studies": "studies",
+    "projects": "projects",
+    "designIndex": "design-index",
     "assets": { "pets": "assets/pets", "promptTemplates": "assets/prompt-templates", "styleCatalog": "assets/style-catalog" },
     "env": { "MISH_AMR_CONSOLE_URL": "https://console.example.test" },
     "mcpServers": [
@@ -86,13 +95,28 @@ nothing is installed. The schema is `mishPackManifestSchema` in
 | `catalogs.sections` | A file with `entries`. Rows are added to the section catalogue; a bundled row is never replaced. |
 | `catalogs.twentyFirst` | `21st-thumbnails.json` and `21st-thumbnails/`. Fills thumbnails the bundle lacks. |
 | `designSystems`, `studies`, `skills` | Each child folder is copied into the user design-systems or skills folder of the data directory. A folder you already have is left as it is and reported. |
+| `projects` | `projects.json` lists project rows (`mish-pack-projects/1`: id, name, skill, design system, prompt, metadata, instructions, times) and `<id>/` holds each project's files. Each is copied into the projects folder under its own id and added to the project list. A project id you already have is left as it is and reported. A row may have no folder: it is a project with no files. A row that points at a folder outside the pack (`baseDir`) is not added; links to folders on another computer (`linkedDirs`) are dropped. |
+| `designIndex` | A folder with `index.json` (`design-index/1`). Its profiles are listed in the Design index and on Home next to your own, read from the pack; your own profile wins when both have the same digest. They are never written into your index and cannot be deleted from it. |
 | `assets.pets`, `assets.promptTemplates` | Scanned next to the bundled pets and prompt templates. |
 | `assets.styleCatalog` | Images served for the style picker at `/api/mish-packs/assets/style-catalog/v1/`. |
 | `env` | Sets allow-listed service settings (below). |
 | `mcpServers` | Merged into the MCP server list (below). |
 
-Everything except the copied folders is read from the pack in place, per
-request. An install or removal takes effect without a restart.
+Everything except the copied folders and projects is read from the pack in
+place, per request. An install or removal takes effect without a restart.
+
+### Saved projects
+
+The design-system previews on the Design systems page are projects too: a
+design system names its preview project (`ds-<slug>`), so a pack keeps every
+project's original id. On remove, or when a new version replaces it, a project
+the pack added is:
+
+- deleted when it is exactly as the pack placed it;
+- moved to `.mish-pack-backups/<pack>-<time>/<id>` in the projects folder when
+  only its files changed;
+- kept, as your own project, when you renamed it, chatted in it or moved it
+  into a workspace. The result says which projects were kept.
 
 ### Install
 
@@ -108,6 +132,20 @@ which environment variables its MCP servers still need.
 
 Installing a pack with the same id replaces it. The install is staged and
 checked first; a pack that fails a check installs nothing.
+
+A replacement can be undone. The installed version's pack folder, its copied
+folders and projects, and the MCP entries and project rows it added are set
+aside, not deleted, until the new version is active. If the new version fails
+to activate, it is taken out again and the old version is put back as it was.
+If the app stops during an install, the next start finishes that rollback.
+
+#### Large packets
+
+A `.zip` is read as a stream, one file at a time, so a packet of several
+gigabytes never sits in memory. To skip the extra copy, unzip the packet and
+install the folder instead: `od packs install ~/Downloads/team-projects-1`, or
+enter that folder's path in Settings -> Packs. For a packet of several
+gigabytes, enter the path; do not upload it through the file picker.
 
 To load packs without installing them, set `MISH_PACKS_DIR` to a folder that
 holds pack folders (or one pack folder) before the app starts. They load at
@@ -145,8 +183,9 @@ and removing the pack takes its values away again.
 
 ### Limits and safety
 
-- Archive up to 2 GiB, 6 GiB extracted, 200,000 files, 512 MiB per file. They are
-  enforced while bytes are written.
+- Archive up to 12 GiB, 24 GiB extracted, 200,000 files, 2 GiB per file. They
+  are enforced while bytes are written, and each file must have the size its
+  archive entry declares.
 - Links, devices and every non-regular entry are refused. So are absolute
   paths, `..`, backslashes, drive letters, control characters and two names that
   differ only by letter case. `__MACOSX`, `.DS_Store` and `.git` are skipped.
@@ -164,12 +203,27 @@ reads the checkout. What goes in is decided by a mapping file:
 ```bash
 node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packet.zip --dry-run
 node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packet.zip --version 2026.10.12
+node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packs --split
 ```
 
 - Each map resource names a `provides` key, a `type` (`dir`, `files`,
-  `children`, `bundle`, `genui-overlay` or `catalog-delta`), where it lands in
-  the pack (`to`), and where it comes from in the checkout. `optional: false`
-  makes a missing source an error.
+  `children`, `bundle`, `genui-overlay`, `catalog-delta` or `projects`), where
+  it lands in the pack (`to`), and where it comes from in the checkout.
+  `optional: false` makes a missing source an error.
+- `projects` takes the projects folder (`from`) and the app database
+  (`database`). Each project folder with a database row is packed with its row.
+  The database is copied to a temporary folder and opened read-only there, so
+  nothing is written next to the checkout. A project whose files live outside
+  the checkout is left out and reported.
+- `--split` builds one pack per `module` of the map (each resource names its
+  module; `modules` lists them, and the module marked `env` / `mcpServers`
+  carries those). A module larger than `--max-bytes` (1.5 GiB by default,
+  counted before compression, so each file fits a GitHub release asset) is cut
+  into numbered parts (`team-projects-1`, `team-projects-2`, ...) along whole
+  design systems and projects. The output folder gets `<id>-<version>.zip` for
+  each pack, `SHA256SUMS` (check with `shasum -a 256 -c SHA256SUMS`) and
+  `inventory.json` (`mish-pack-inventory/1`: id, version, file, bytes, sha256,
+  resources).
 - `bundle` compiles a TypeScript adapter registry into the prebuilt module a
   pack carries. `genui-overlay` takes the catalogue rows of one licensed source
   and the demo documents. `catalog-delta` keeps the rows the public catalogue
@@ -189,6 +243,10 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packet.zip --vers
   (`plugins` content, below).
 - It does not carry OAuth tokens or API keys. Teammates sign in and set their
   own variables.
+- It does not carry conversations. A saved project arrives with its files and
+  settings, without its chat history.
+- It does not install plugins, so agency family generators (the website cards
+  on Home) are not restored by a Mish pack.
 
 ## Licensed packs
 
