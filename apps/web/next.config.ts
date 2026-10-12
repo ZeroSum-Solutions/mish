@@ -162,8 +162,10 @@ const nextConfig: NextConfig = {
   // Emit browser sourcemaps so packaged-runtime exceptions can be symbolicated
   // by PostHog. `tools/pack/src/web-sourcemaps.ts` runs after `next build`
   // to inject chunk IDs, upload to PostHog, and ALWAYS delete the .map files
-  // before packaging so source never ships inside an installer.
-  productionBrowserSourceMaps: true,
+  // before packaging so source never ships inside an installer. A Vercel
+  // build (VERCEL=1) has no such post-step, so it would publish every map
+  // (~70 MB) as a public static file; skip them there.
+  productionBrowserSourceMaps: process.env.VERCEL !== '1',
   transpilePackages: ['@mish/components'],
   turbopack: {
     root: WORKSPACE_ROOT,

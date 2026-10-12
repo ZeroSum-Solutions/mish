@@ -7,8 +7,7 @@ on:
   # to a ready PR (synchronize) is a new head and runs again, so push only a real fix
   # or a forced conflict resolution. Converting a PR back to draft starts no run.
   # Every workload below is gated on the same draft condition; `Validate workspace`
-  # alone runs one short step and reports failure, so a draft is never green
-  # (docs/ci/RUNNERS.md).
+  # alone runs one short step and reports failure, so a draft is never green.
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
   # A push to main re-validates the pushed range at pull-request strength; an
@@ -345,7 +344,7 @@ jobs:
         run: pnpm --filter @mish/daemon test --shard=${{ matrix.shard }}/4
 
   render_tests:
-    name: Design-templates render tests
+    name: Design-templates tests
     needs: [plan, runners]
     # render_tests_required is its own scopes.json effect (design-templates/
     # prefix), separate from daemon_tests_required/web_tests_required: an
@@ -358,16 +357,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
-      # A workspace install, not a bare Node setup: emmpo's render.test.ts
-      # requires `jsdom` through apps/daemon/package.json for its hover-copy
-      # test, so the plain node --test run needs the daemon's dev dependencies.
+      # A workspace install, not a bare Node setup: it pins Node 24 (type
+      # stripping), and family render tests resolve `jsdom` through
+      # apps/daemon/package.json when a private family pack is checked out.
       - name: Setup workspace
         uses: ./.github/actions/setup-workspace
         with:
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).workspace_unit) }}
 
-      - name: Run family render tests
-        run: node --experimental-strip-types --test design-templates/agency-site/scripts/families/*/render.test.ts
+      # Every node:test suite under design-templates/, quoted so node expands the glob: the
+      # public template ships no family module (those live in a private pack), and a shell
+      # glob over families/*/render.test.ts would match nothing and pass vacuously.
+      - name: Run design-templates tests
+        run: node --experimental-strip-types --test "design-templates/**/*.test.ts"
 
   agency_tests:
     name: Agency fast-lane and family package tests
@@ -767,9 +769,10 @@ jobs:
           else
             # An ejection is invisible from the PR: this failure runs on the queue's transient
             # ref, the PR's own checks stay green, and `mergeQueueEntry` just goes null. Leave a
-            # visible trace by producing a `handoff/comment` artifact for the labeled PR; the
-            # trusted `comment.atom.yml` consumer upserts it as a PR comment after this run
-            # completes. Best-effort: a handoff failure must never soften the block itself.
+            # visible trace by producing a `handoff/comment` artifact for the labeled PR. The
+            # trusted `comment.atom.yml` consumer that upserts it as a PR comment is not
+            # published in this repository, so for now the artifact on the run is the trace.
+            # Best-effort: a handoff failure must never soften the block itself.
             emit_ejection_notice() {
               local pr="$1"
               local blocking_label="$2"
@@ -924,7 +927,7 @@ jobs:
     # always() keeps the gate reporting when a workload fails. On a draft PR every
     # other job is skipped, and GitHub counts a skipped job as a passing check, so
     # this gate runs anyway and fails closed: a draft's skipped run can never stand
-    # in for validation once the PR is marked ready (docs/ci/RUNNERS.md).
+    # in for validation once the PR is marked ready.
     if: ${{ always() }}
     # The draft path has no runner profile (runners was skipped), so it falls back
     # to the same hosted image the bootstrap job uses.

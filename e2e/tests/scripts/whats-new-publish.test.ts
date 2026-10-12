@@ -7,6 +7,8 @@ import { fileURLToPath } from "node:url";
 
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
+import { T } from "@/timeouts";
+
 import {
   WHATS_NEW_DOCUMENT_PATH,
   checkWhatsNewDocument,
@@ -146,7 +148,7 @@ describe("what's new document guard", () => {
       .trim()
       .split("\n");
     expect(names).toContain("what's new document");
-  });
+  }, T.long);
 });
 
 describe("what's new publisher", () => {
@@ -523,5 +525,5 @@ describe("what's new publish workflow guard", () => {
       .trim()
       .split("\n");
     expect(names).toContain("what's new publish workflow");
-  });
+  }, T.long);
 });

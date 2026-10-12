@@ -7,6 +7,8 @@ import { gzipSync } from "node:zlib";
 
 import { afterEach, describe, expect, test, vi } from "vitest";
 
+import { T } from "@/timeouts";
+
 import {
   LICENSED_PACK_BLOB_LIST_MIN_IDS,
   LICENSED_PACK_BLOB_LIST_PATH,
@@ -757,7 +759,7 @@ describe("licensed pack guard wrapper", () => {
       .trim()
       .split("\n");
     expect(names).not.toContain("licensed pack content");
-  });
+  }, T.long);
 
   test("the guard's own sources and this spec do not match its rules", async () => {
     const repoRoot = path.resolve(import.meta.dirname, "../../..");

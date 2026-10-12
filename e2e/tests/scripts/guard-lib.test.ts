@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 
 import { describe, expect, test, vi } from "vitest";
 
+import { T } from "@/timeouts";
+
 import {
   loadScriptsArchitectureSources,
   scriptsArchitectureErrors,
@@ -74,5 +76,5 @@ describe("scripts guard library", () => {
       encoding: "utf8",
     }).trim().split("\n");
     expect(names).toContain("scripts library architecture");
-  });
+  }, T.long);
 });

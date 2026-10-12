@@ -16,10 +16,9 @@
  *   the document is either a complete, parser-valid highlight, or the
  *   explicit empty retirement document `{}` — never something in between.
  *
- * It runs in `pnpm guard`, which CI invokes from the `preflight` job. That
- * job is declared `inputs: ["*"]` / `reusable: false` in
- * `.github/config/convergence.json` and its guard step carries no `if`, so it
- * runs on every pull request. That matters here: the document lives under
+ * It runs in `pnpm guard`, which CI invokes from the `preflight` job. The
+ * scope planner enables that job for every plan and its guard step carries
+ * no `if`, so it runs on every pull request. That matters here: the document lives under
  * `docs/`, which `.github/config/scopes.json` treats as `certain-exempt` — a
  * change to it selects no scoped validation workload at all, so a lane-routed
  * test would simply never run for the one edit it exists to check.
