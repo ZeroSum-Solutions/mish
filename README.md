@@ -23,6 +23,7 @@ Licensed and third-party content (paid component kits, reference studies, scrape
 - [What it does](#what-it-does)
 - [Status](#status)
 - [How an agency build works](#how-an-agency-build-works)
+- [Download for Mac](#download-for-mac)
 - [Run it locally](#run-it-locally)
 - [Repository map](#repository-map)
 - [Documentation](#documentation)
@@ -90,6 +91,20 @@ pnpm exec od agency build --from "$BUILD_ID"                                # re
 ```
 
 Routing and verification need a Jev key: `od agency config set --key-stdin`. `od agency --help` lists every flag and exit code. Details: [`packages/agency-fast-lane/README.md`](packages/agency-fast-lane/README.md) and [`docs/agency-site.md`](docs/agency-site.md).
+
+## Download for Mac
+
+Apple Silicon Macs can install a ready-made build. No clone or Node needed.
+
+1. Open the [latest release](https://github.com/ZeroSum-Solutions/mish/releases/latest) and download `Mish-<version>-mac-arm64.dmg`. Check it against `SHA256SUMS` if you like.
+2. Open the dmg and drag the app to Applications.
+3. The build is not signed by Apple, so macOS blocks the first launch. Right-click the app, choose **Open**, then **Open** again. Or run:
+
+   ```bash
+   xattr -dr com.apple.quarantine "/Applications/Mishh Mashh.app"
+   ```
+
+Requirement: an agent CLI such as `claude` or `codex` on your `PATH`. The app uses it to run builds. Apps started from Finder do not always see your shell `PATH`; if the app cannot find your CLI, start it from Terminal with `open -a "Mishh Mashh"`. A `.zip` of the same build is on the release page too. Releases are cut by tagging `v*` (workflow `release-mac`).
 
 ## Run it locally
 

@@ -38,6 +38,16 @@ Use this path to put Mishh Mashh and its agency fast lane on a new team machine.
 clean clone to a first published and deployed page. Nothing here depends on one person's
 machine: keys come from the environment or from Settings.
 
+### Fastest path on a Mac: the packaged app
+
+On Apple Silicon you can skip the clone. Download the `.dmg` from the
+[latest release](https://github.com/ZeroSum-Solutions/mish/releases/latest), drag the app to
+Applications, then right-click it and choose **Open** (the build is unsigned). Or clear the
+quarantine flag: `xattr -dr com.apple.quarantine "/Applications/Mishh Mashh.app"`. You still
+need an agent CLI (`claude` or `codex`) on your `PATH`; see
+[Local agent CLI and PATH](#local-agent-cli-and-path). Steps 1 to 7 below are for the
+source checkout.
+
 ### 1. Clone and install
 
 ```bash
