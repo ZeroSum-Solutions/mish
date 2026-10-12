@@ -79,7 +79,7 @@ describe('renderMarkdown', () => {
     const windowsPath = html('Open [Dockerfile](C:/Users/me/project/Dockerfile).');
     expect(windowsPath).toContain('href="C:/Users/me/project/Dockerfile"');
 
-    for (const href of ['javascript:alert(1)', 'vbscript:msgbox(1)', 'file:///tmp/secret']) {
+    for (const href of ['javascript:alert(1)', 'vbscript:msgbox(1)', 'file:///tmp/secret', '\u0001javascript:alert(1)', '\u0001vbscript:msgbox(1)']) {
       const out = html(`[unsafe](${href})`);
       expect(out).not.toContain('<a');
       expect(out).not.toContain('href=');

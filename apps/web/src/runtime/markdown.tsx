@@ -535,7 +535,12 @@ function isSafeMarkdownImageSrc(src: string): boolean {
  * and is handed to the caller's normal link-routing policy.
  */
 function isSafeMarkdownHref(href: string): boolean {
-  const value = href.trim();
+  // Browsers strip leading C0 controls/spaces and tab/CR/LF when parsing a
+  // URL, so test the scheme on the same normalized form and refuse any href
+  // carrying control characters.
+  // eslint-disable-next-line no-control-regex
+  if (/[\u0000-\u001f\u007f]/.test(href.trim())) return false;
+  const value = href.replace(/^[\u0000-\u0020]+/, '').replace(/[\t\r\n]/g, '');
   if (!value || value.startsWith('//')) return false;
   // A Windows drive path satisfies the URI scheme grammar (`C:`), but it is
   // still a local path that the chat click router must inspect and swallow or

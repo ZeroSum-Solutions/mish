@@ -351,3 +351,29 @@ function userMessage(
     attachments,
   };
 }
+
+describe('streamProxyEndpoint EOF without end event', () => {
+  afterEach(() => vi.unstubAllGlobals());
+
+  it('reports an error instead of success', async () => {
+    const enc = new TextEncoder();
+    const body = new ReadableStream({
+      start(c) {
+        c.enqueue(enc.encode('event: delta\ndata: {"delta":"par"}\n\n'));
+        c.close();
+      },
+    });
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, status: 200, body }));
+    const handlers = { onDelta: vi.fn(), onDone: vi.fn(), onError: vi.fn() };
+    await streamProxyEndpoint(
+      '/api/proxy/openai/stream',
+      { apiKey: 'k', baseUrl: 'https://x.example', model: 'm' } as any,
+      'sys',
+      [userMessage('hi', [])],
+      new AbortController().signal,
+      handlers,
+    );
+    expect(handlers.onDone).not.toHaveBeenCalled();
+    expect(handlers.onError).toHaveBeenCalledTimes(1);
+  });
+});
