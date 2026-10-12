@@ -5,7 +5,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ReviewRun } from '@open-design/contracts';
+import type { ReviewRun } from '@mish/contracts';
 
 const reads = vi.hoisted(() => ({ count: 0 }));
 vi.mock('../../src/workbench/review/preview-files.js', async original => {

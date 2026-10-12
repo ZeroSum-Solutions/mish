@@ -1,7 +1,7 @@
-export const PRODUCT_NAME = "Open Design";
+export const PRODUCT_NAME = "Mish";
 export const DESKTOP_LOG_ECHO_ENV = "OD_DESKTOP_LOG_ECHO";
 export const WEB_STANDALONE_HOOK_CONFIG_ENV = "OD_TOOLS_PACK_WEB_STANDALONE_HOOK_CONFIG";
-export const WEB_STANDALONE_RESOURCE_NAME = "open-design-web-standalone";
+export const WEB_STANDALONE_RESOURCE_NAME = "mish-web-standalone";
 export const ELECTRON_BUILDER_ASAR = false;
 export const ELECTRON_BUILDER_BUILD_DEPENDENCIES_FROM_SOURCE = false;
 export const ELECTRON_BUILDER_NODE_GYP_REBUILD = false;
@@ -26,26 +26,26 @@ export const NSIS_INSTALLER_LANGUAGE_BY_WEB_LOCALE = {
 
 } as const;
 export const INTERNAL_PACKAGES = [
-  { directory: "packages/release", name: "@open-design/release" },
-  { directory: "packages/components", name: "@open-design/components" },
-  { directory: "packages/contracts", name: "@open-design/contracts" },
-  { directory: "packages/registry-protocol", name: "@open-design/registry-protocol" },
-  { directory: "packages/sidecar-proto", name: "@open-design/sidecar-proto" },
-  { directory: "packages/launcher-proto", name: "@open-design/launcher-proto" },
-  { directory: "packages/platform", name: "@open-design/platform" },
-  { directory: "packages/sidecar", name: "@open-design/sidecar" },
-  { directory: "packages/download", name: "@open-design/download" },
-  { directory: "packages/host", name: "@open-design/host" },
-  { directory: "packages/agui-adapter", name: "@open-design/agui-adapter" },
-  { directory: "packages/plugin-runtime", name: "@open-design/plugin-runtime" },
-  { directory: "packages/diagnostics", name: "@open-design/diagnostics" },
-  { directory: "packages/cult-ui-catalog", name: "@open-design/cult-ui-catalog" },
-  { directory: "packages/21st-catalog", name: "@open-design/21st-catalog" },
-  { directory: "packages/agency-fast-lane", name: "@open-design/agency-fast-lane" },
-  { directory: "packages/genui-catalog", name: "@open-design/genui-catalog" },
-  { directory: "packages/section-catalog", name: "@open-design/section-catalog" },
-  { directory: "apps/daemon", name: "@open-design/daemon" },
-  { directory: "apps/web", name: "@open-design/web" },
-  { directory: "apps/desktop", name: "@open-design/desktop" },
-  { directory: "apps/packaged", name: "@open-design/packaged" },
+  { directory: "packages/release", name: "@mish/release" },
+  { directory: "packages/components", name: "@mish/components" },
+  { directory: "packages/contracts", name: "@mish/contracts" },
+  { directory: "packages/registry-protocol", name: "@mish/registry-protocol" },
+  { directory: "packages/sidecar-proto", name: "@mish/sidecar-proto" },
+  { directory: "packages/launcher-proto", name: "@mish/launcher-proto" },
+  { directory: "packages/platform", name: "@mish/platform" },
+  { directory: "packages/sidecar", name: "@mish/sidecar" },
+  { directory: "packages/download", name: "@mish/download" },
+  { directory: "packages/host", name: "@mish/host" },
+  { directory: "packages/agui-adapter", name: "@mish/agui-adapter" },
+  { directory: "packages/plugin-runtime", name: "@mish/plugin-runtime" },
+  { directory: "packages/diagnostics", name: "@mish/diagnostics" },
+  { directory: "packages/cult-ui-catalog", name: "@mish/cult-ui-catalog" },
+  { directory: "packages/21st-catalog", name: "@mish/21st-catalog" },
+  { directory: "packages/agency-fast-lane", name: "@mish/agency-fast-lane" },
+  { directory: "packages/genui-catalog", name: "@mish/genui-catalog" },
+  { directory: "packages/section-catalog", name: "@mish/section-catalog" },
+  { directory: "apps/daemon", name: "@mish/daemon" },
+  { directory: "apps/web", name: "@mish/web" },
+  { directory: "apps/desktop", name: "@mish/desktop" },
+  { directory: "apps/packaged", name: "@mish/packaged" },
 ] as const;

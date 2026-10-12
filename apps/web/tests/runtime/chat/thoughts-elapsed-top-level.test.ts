@@ -39,7 +39,7 @@
  *    的 `elapsedMs` 注释和 `build-turn-blocks.ts` 的 `closeThink`。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { groupThinking, type ThoughtsGroup } from '../../../src/runtime/chat/group-thinking';
 import { formatElapsed } from '../../../src/runtime/chat/format';

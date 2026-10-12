@@ -4,7 +4,7 @@ Mishh Mashh plugins are intentionally shaped so one folder can travel across mul
 
 1. Keep the source of truth in a public GitHub repository or in a Mishh Mashh PR.
 2. Keep `SKILL.md` portable and registry-friendly.
-3. Add `open-design.json` as the Mishh Mashh sidecar.
+3. Add `mish.json` as the Mishh Mashh sidecar.
 4. Publish or list the same source in external registries only after local validation passes.
 
 Registry rules can change, so always check the target registry docs before running a publish command.
@@ -22,7 +22,7 @@ Registry rules can change, so always check the target registry docs before runni
 
 | Target | Best for | Source shape | Publish strategy |
 | --- | --- | --- | --- |
-| Mishh Mashh | OD marketplace, composer chips, pipelines, GenUI, artifact provenance | `SKILL.md` + `open-design.json` | Open a PR to Mishh Mashh or publish a marketplace index entry pointing to the plugin repo. |
+| Mishh Mashh | OD marketplace, composer chips, pipelines, GenUI, artifact provenance | `SKILL.md` + `mish.json` | Open a PR to Mishh Mashh or publish a marketplace index entry pointing to the plugin repo. |
 | skills.sh | Agent Skills discovery across many coding agents | Public Git repo or subpath containing `SKILL.md` | Make `npx skills add owner/repo` work, add the skills.sh badge, and keep the README clear. |
 | ClawHub | OpenClaw users who install skills or OpenClaw plugins from a registry | `SKILL.md` folder for skills; OpenClaw package metadata for plugins | Use `clawhub skill publish ./my-skill` for skill folders. Use `clawhub package publish ... --family code-plugin` only when you also ship OpenClaw plugin metadata. |
 | Standalone GitHub | Source of truth and broad agent compatibility | Portable folder or mono-repo subpath | Tag releases, document install commands, and keep changelogs. |
@@ -40,7 +40,7 @@ npx skills add ./my-local-skills
 For Mishh Mashh plugin authors:
 
 - Ensure the repo or subpath contains a valid `SKILL.md`.
-- Keep `open-design.json` additive; generic skill clients should be able to ignore it.
+- Keep `mish.json` additive; generic skill clients should be able to ignore it.
 - Put a short install block in your README:
 
 ```bash
@@ -54,7 +54,7 @@ od plugin install https://github.com/owner/repo
 [![skills.sh](https://skills.sh/b/owner/repo)](https://skills.sh/owner/repo)
 ```
 
-- Use a GitHub topic and README keywords that match the plugin's lane, such as `open-design-plugin`, `agent-skill`, `prototype`, `deck`, `hyperframes`, or `design-system`.
+- Use a GitHub topic and README keywords that match the plugin's lane, such as `mish-plugin`, `agent-skill`, `prototype`, `deck`, `hyperframes`, or `design-system`.
 
 Do not assume skills.sh is the canonical storage location. Treat GitHub as source of truth and skills.sh as a discovery and install surface.
 
@@ -89,7 +89,7 @@ For ClawHub-ready skills:
 - Run the dry run or inspect command before making a listing public.
 - Link back to the canonical GitHub repo and Mishh Mashh PR.
 - Keep changelog text honest and versioned.
-- Keep `open-design.json` `specVersion` fixed to the spec kit version and bump plugin `version` for every publishable behavior change.
+- Keep `mish.json` `specVersion` fixed to the spec kit version and bump plugin `version` for every publishable behavior change.
 
 ## Safety Checklist
 
@@ -120,7 +120,7 @@ Public skill registries are supply-chain surfaces. Before publishing:
 ## Registry validation
 
 - `pnpm guard`:
-- `pnpm --filter @open-design/plugin-runtime typecheck`:
+- `pnpm --filter @mish/plugin-runtime typecheck`:
 - `od plugin validate ./path/to/plugin`:
 - `npx skills add ... --list`:
 - `clawhub skill publish ./path --dry-run` or equivalent:

@@ -54,7 +54,7 @@ describe('codex-cli default runner', () => {
     Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' });
 
     const invocation = createCodexCliInvocation(
-      ['mcp', 'get', 'open-design'],
+      ['mcp', 'get', 'mish'],
       { ComSpec: 'C:\\Windows\\System32\\cmd.exe' },
       {},
       () => 'C:\\Users\\Amy\\AppData\\Roaming\\npm\\codex.cmd',
@@ -66,7 +66,7 @@ describe('codex-cli default runner', () => {
         '/d',
         '/s',
         '/c',
-        '"C:\\Users\\Amy\\AppData\\Roaming\\npm\\codex.cmd mcp get open-design"',
+        '"C:\\Users\\Amy\\AppData\\Roaming\\npm\\codex.cmd mcp get mish"',
       ],
       windowsVerbatimArguments: true,
     });
@@ -84,7 +84,7 @@ describe('codex-cli default runner', () => {
       vi.stubEnv('PATHEXT', '.CMD');
       vi.stubEnv('OD_AGENT_HOME', shimDir);
 
-      await expect(probeCodexInstall('open-design')).resolves.toEqual({
+      await expect(probeCodexInstall('mish')).resolves.toEqual({
         available: true,
         installed: true,
       });
@@ -103,44 +103,44 @@ describe('codex-cli probe', () => {
     });
     setCodexRunner(runner);
 
-    const status = await probeCodexInstall('open-design');
+    const status = await probeCodexInstall('mish');
     expect(status).toEqual({ available: false, installed: false });
     expect(runner.calls).toHaveLength(1);
-    expect(runner.calls[0]?.args).toEqual(['mcp', 'get', 'open-design']);
+    expect(runner.calls[0]?.args).toEqual(['mcp', 'get', 'mish']);
   });
 
   it('reports available:true installed:false when `codex mcp get` says no such server', async () => {
     const runner = makeStubRunner(async () => ({
       exitCode: 1,
       stdout: '',
-      stderr: "Error: No MCP server named 'open-design' found.\n",
+      stderr: "Error: No MCP server named 'mish' found.\n",
     }));
     setCodexRunner(runner);
 
-    const status = await probeCodexInstall('open-design');
+    const status = await probeCodexInstall('mish');
     expect(status).toEqual({ available: true, installed: false });
   });
 
   it('reports available:true installed:true when `codex mcp get` returns the server entry', async () => {
     const runner = makeStubRunner(async () => ({
       exitCode: 0,
-      stdout: 'open-design\n  enabled: true\n  transport: stdio\n',
+      stdout: 'mish\n  enabled: true\n  transport: stdio\n',
       stderr: '',
     }));
     setCodexRunner(runner);
 
-    const status = await probeCodexInstall('open-design');
+    const status = await probeCodexInstall('mish');
     expect(status).toEqual({ available: true, installed: true });
   });
 });
 
 describe('codex-cli install', () => {
   it('shells out `codex mcp add` with --env pairs and -- before the command', async () => {
-    const runner = makeStubRunner(async () => ({ exitCode: 0, stdout: "Added global MCP server 'open-design'.\n", stderr: '' }));
+    const runner = makeStubRunner(async () => ({ exitCode: 0, stdout: "Added global MCP server 'mish'.\n", stderr: '' }));
     setCodexRunner(runner);
 
     await installCodexMcp({
-      name: 'open-design',
+      name: 'mish',
       command: '/path/to/node',
       args: ['/path/to/cli.js', 'mcp'],
       env: { OD_DATA_DIR: '/tmp/od', OD_TEST_CLIENT_CAPABILITY: 'opaque' },
@@ -150,7 +150,7 @@ describe('codex-cli install', () => {
     expect(runner.calls[0]?.args).toEqual([
       'mcp',
       'add',
-      'open-design',
+      'mish',
       '--env',
       'OD_DATA_DIR=/tmp/od',
       '--env',
@@ -163,11 +163,11 @@ describe('codex-cli install', () => {
   });
 
   it('rejects when codex exits non-zero, surfacing stderr', async () => {
-    const runner = makeStubRunner(async () => ({ exitCode: 1, stdout: '', stderr: "Error: 'open-design' already exists\n" }));
+    const runner = makeStubRunner(async () => ({ exitCode: 1, stdout: '', stderr: "Error: 'mish' already exists\n" }));
     setCodexRunner(runner);
 
     await expect(
-      installCodexMcp({ name: 'open-design', command: 'node', args: ['cli.js', 'mcp'], env: {} }),
+      installCodexMcp({ name: 'mish', command: 'node', args: ['cli.js', 'mcp'], env: {} }),
     ).rejects.toThrow(/already exists/);
   });
 
@@ -175,8 +175,8 @@ describe('codex-cli install', () => {
     const runner = makeStubRunner(async () => ({ exitCode: 0, stdout: '', stderr: '' }));
     setCodexRunner(runner);
 
-    await installCodexMcp({ name: 'open-design', command: '/n', args: ['cli'], env: {} });
-    expect(runner.calls[0]?.args).toEqual(['mcp', 'add', 'open-design', '--', '/n', 'cli']);
+    await installCodexMcp({ name: 'mish', command: '/n', args: ['cli'], env: {} });
+    expect(runner.calls[0]?.args).toEqual(['mcp', 'add', 'mish', '--', '/n', 'cli']);
   });
 });
 
@@ -185,13 +185,13 @@ describe('codex-cli uninstall', () => {
     const runner = makeStubRunner(async () => ({ exitCode: 0, stdout: '', stderr: '' }));
     setCodexRunner(runner);
 
-    await uninstallCodexMcp('open-design');
-    expect(runner.calls[0]?.args).toEqual(['mcp', 'remove', 'open-design']);
+    await uninstallCodexMcp('mish');
+    expect(runner.calls[0]?.args).toEqual(['mcp', 'remove', 'mish']);
   });
 
   it('rejects when codex exits non-zero', async () => {
     const runner = makeStubRunner(async () => ({ exitCode: 1, stdout: '', stderr: 'Error: not found\n' }));
     setCodexRunner(runner);
-    await expect(uninstallCodexMcp('open-design')).rejects.toThrow(/not found/);
+    await expect(uninstallCodexMcp('mish')).rejects.toThrow(/not found/);
   });
 });

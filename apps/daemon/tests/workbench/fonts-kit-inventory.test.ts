@@ -5,7 +5,7 @@ import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { FONT_KIT_REASONS, fontKitInventorySchema, parseResourceSearchRequest, type FontKitDeclaration, type FontKitInventory, type ResourceSearchResponse } from '@open-design/contracts';
+import { FONT_KIT_REASONS, fontKitInventorySchema, parseResourceSearchRequest, type FontKitDeclaration, type FontKitInventory, type ResourceSearchResponse } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';

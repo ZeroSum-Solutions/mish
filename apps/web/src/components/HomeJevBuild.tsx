@@ -11,7 +11,7 @@
 // fabrication — the only verify mode a composed build accepts).
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { AgencyBuildRequest, AgencyBuildSnapshot } from '@open-design/contracts';
+import type { AgencyBuildRequest, AgencyBuildSnapshot } from '@mish/contracts';
 
 import { useT } from '../i18n';
 import { useAgencyBuildAgui } from '../hooks/useAgencyBuildAgui';

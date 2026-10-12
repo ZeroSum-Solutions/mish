@@ -26,10 +26,10 @@ committed converter previews.
 Run the pinned workspace runtime:
 
 ```sh
-mise exec -- corepack pnpm --filter @open-design/cult-ui-catalog thumbnails
-mise exec -- corepack pnpm --filter @open-design/cult-ui-catalog thumbnails --only=globe-demo
-mise exec -- corepack pnpm --filter @open-design/cult-ui-catalog thumbnails --check
-mise exec -- corepack pnpm --filter @open-design/cult-ui-catalog typecheck
+mise exec -- corepack pnpm --filter @mish/cult-ui-catalog thumbnails
+mise exec -- corepack pnpm --filter @mish/cult-ui-catalog thumbnails --only=globe-demo
+mise exec -- corepack pnpm --filter @mish/cult-ui-catalog thumbnails --check
+mise exec -- corepack pnpm --filter @mish/cult-ui-catalog typecheck
 ```
 
 Do not run committed-thumbnail consistency tests while regeneration is writing assets. The

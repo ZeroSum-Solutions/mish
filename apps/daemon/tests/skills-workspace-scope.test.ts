@@ -29,7 +29,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createOpenDesignToolEnv, startServer } from '../src/server.js';
+import { createMishToolEnv, startServer } from '../src/server.js';
 import {
   deleteWorkspaceResourceByResourceId,
   ensureWorkspaceResource,
@@ -141,7 +141,7 @@ describe('GET /api/skills — workspace visibility scope', () => {
     const runWrapper = (memberId: string | null) => {
       const env = {
         ...process.env,
-        ...createOpenDesignToolEnv({
+        ...createMishToolEnv({
           daemonUrl: baseUrl,
           projectId: 'project-media',
           workspaceScope: memberId ? {

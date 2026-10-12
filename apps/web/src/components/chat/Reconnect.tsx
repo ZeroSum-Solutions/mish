@@ -19,7 +19,7 @@
  * 这里只**读**那个 Module,不往里加东西(见 components/chat/AGENTS.md §1b)。
  */
 import type { ReactElement } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { useT } from '../../i18n';
 import type { ChatSelfHealReason } from '../../runtime/chat/reconnect-state';
 import { ChevronIcon } from './primitives/icons';

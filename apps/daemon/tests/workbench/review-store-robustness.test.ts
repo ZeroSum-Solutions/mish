@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseReviewRun, parseStartReviewRunRequest, type ReviewRun } from '@open-design/contracts';
+import { parseReviewRun, parseStartReviewRunRequest, type ReviewRun } from '@mish/contracts';
 import { createReviewRunStore } from '../../src/workbench/review/run-store.js';
 import { createReviewRunService } from '../../src/workbench/review/run-service.js';
 

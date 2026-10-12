@@ -8,7 +8,7 @@
 //
 // This runs the real sidecar handler in front of a real `next({ dev: true })` server that carries
 // apps/web's own dev rewrites, both bound to a LAN interface. The daemon stand-in decides with
-// `cultLocalOnlyRefusal` from @open-design/contracts, the exact rule the daemon's cult routes use.
+// `cultLocalOnlyRefusal` from @mish/contracts, the exact rule the daemon's cult routes use.
 
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer as createHttpServer, request as httpRequest, type IncomingHttpHeaders, type Server as HttpServer } from 'node:http';
@@ -18,7 +18,7 @@ import { networkInterfaces } from 'node:os';
 import path from 'node:path';
 
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
-import { cultLocalOnlyRefusal } from '@open-design/contracts';
+import { cultLocalOnlyRefusal } from '@mish/contracts';
 
 import { createDaemonProxyHandler } from '../sidecar/server';
 

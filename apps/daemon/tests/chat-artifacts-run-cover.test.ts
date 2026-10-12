@@ -26,7 +26,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type {
   DesktopExportArtifactInput,
   DesktopExportArtifactResult,
-} from '@open-design/sidecar-proto';
+} from '@mish/sidecar-proto';
 
 import { startServer } from '../src/server.js';
 import { projectChatArtifactRefs } from '../src/chat-artifacts/refs.js';

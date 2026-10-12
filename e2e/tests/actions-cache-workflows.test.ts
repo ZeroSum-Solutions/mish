@@ -40,16 +40,16 @@ describe("GitHub Actions cache workflows", () => {
       expect(job.indexOf("uses: ./.github/actions/setup-workspace")).toBeLessThan(
         job.indexOf("- name: Prebuild workspace type declarations"),
       );
-      expect(job).not.toContain("pnpm --filter @open-design/daemon build");
-      expect(prebuild).toContain("pnpm --filter @open-design/desktop build");
-      expect(prebuild).toContain("pnpm --filter @open-design/web build:sidecar");
+      expect(job).not.toContain("pnpm --filter @mish/daemon build");
+      expect(prebuild).toContain("pnpm --filter @mish/desktop build");
+      expect(prebuild).toContain("pnpm --filter @mish/web build:sidecar");
     }
   });
 
   it("[P1] uses preseeded Playwright only for a ready self-hosted runner image", async () => {
     const action = await readFile(setupPlaywrightAction, "utf8");
 
-    expect(action).toContain("*'\"nexu-runners-'*");
+    expect(action).toContain("*'\"mish-runners-'*");
     expect(action).toContain("PLAYWRIGHT_BROWSERS_PATH");
     expect(action).toContain("steps.preinstalled-playwright.outputs.enabled == 'true'");
     expect(action).toContain("steps.preinstalled-playwright.outputs.enabled != 'true'");

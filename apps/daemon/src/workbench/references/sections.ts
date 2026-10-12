@@ -1,5 +1,5 @@
-import { shapeAtlas } from '@open-design/agency-fast-lane/data';
-import { type ReferenceFanoutRequest, type ReferenceSection } from '@open-design/contracts';
+import { shapeAtlas } from '@mish/agency-fast-lane/data';
+import { type ReferenceFanoutRequest, type ReferenceSection } from '@mish/contracts';
 
 /** A deterministic suggestion from the existing nine-spine atlas, never generated business facts. */
 export function referenceSections(request: ReferenceFanoutRequest) {

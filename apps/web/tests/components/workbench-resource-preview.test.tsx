@@ -5,7 +5,7 @@ import { I18nProvider } from '../../src/i18n';
 import { WorkbenchPreviewShell } from '../../src/components/workbench/WorkbenchPreviewShell';
 import { ComposerPluginPreview } from '../../src/components/ComposerPluginPreview';
 import { registerNavigationGuard } from '../../src/router';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 afterEach(() => { cleanup(); vi.clearAllMocks(); window.history.replaceState(null, '', '/'); });
 

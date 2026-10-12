@@ -52,7 +52,7 @@ function recordingHandler(behaviour: { failActivate?: boolean; failRetract?: boo
       record('activate', ctx);
       for (const entry of ctx.entries) {
         for (const id of entry.ids) {
-          if (!existsSync(path.join(entry.absPath, id, 'open-design.json'))) throw new Error('fixture plugin missing');
+          if (!existsSync(path.join(entry.absPath, id, 'mish.json'))) throw new Error('fixture plugin missing');
         }
       }
       if (behaviour.failActivate) throw Object.assign(new Error('activate failed'), { code: 'PLUGIN_REFUSED' });
@@ -70,9 +70,9 @@ function pluginPack(options: FixturePackOptions = {}): FixturePackOptions {
     ...options,
     files: [
       ...fixtureKitFiles(),
-      { path: 'plugins/alpha/open-design.json', content: '{"id":"alpha"}\n' },
+      { path: 'plugins/alpha/mish.json', content: '{"id":"alpha"}\n' },
       { path: 'plugins/alpha/SKILL.md', content: '# alpha\n' },
-      { path: 'more-plugins/beta/open-design.json', content: '{"id":"beta"}\n' },
+      { path: 'more-plugins/beta/mish.json', content: '{"id":"beta"}\n' },
     ],
     contents: [
       { kind: 'component-kit', schema: 'od-cult-kit/1', id: 'demo-kit', path: 'kits/demo' },
@@ -141,7 +141,7 @@ describe('content handlers (P1-1 spec 5)', () => {
     expect(error).toBeInstanceOf(PackError);
     expect((error as PackError).code).toBe('RETRACT_FAILED');
     expect(second.registry.get(FIXTURE_PACK_ID)?.status).toBe('ready');
-    expect(existsSync(path.join(second.packsDir, FIXTURE_PACK_ID, 'plugins', 'alpha', 'open-design.json'))).toBe(true);
+    expect(existsSync(path.join(second.packsDir, FIXTURE_PACK_ID, 'plugins', 'alpha', 'mish.json'))).toBe(true);
     expect(existsSync(path.join(second.packsDir, '.receipts', `${FIXTURE_PACK_ID}.json`))).toBe(true);
     // The content was registered again after the failed retract, and the receipt says so.
     expect(stuck.calls.map((call) => call.op)).toEqual(['activate', 'retract', 'activate']);

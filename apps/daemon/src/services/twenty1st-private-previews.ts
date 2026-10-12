@@ -4,8 +4,8 @@ import { createHash } from 'node:crypto';
 import { readFileSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import artwork from '@open-design/21st-catalog/generated/preview-artwork/manifest.json' with { type: 'json' };
-import { parseTwenty1stSourceResponse, type Twenty1stItem, type Twenty1stSourceResponse } from '@open-design/contracts';
+import artwork from '@mish/21st-catalog/generated/preview-artwork/manifest.json' with { type: 'json' };
+import { parseTwenty1stSourceResponse, type Twenty1stItem, type Twenty1stSourceResponse } from '@mish/contracts';
 import { inspectTwenty1stLocalImports } from './twenty1st-local-import-closure.js';
 
 interface PrivateEntry {
@@ -71,7 +71,7 @@ function replaceReviewedLiteral(content: string, from: string, to: string): stri
 function reviewedArtwork(id: 'studio' | 'glass' | 'landscape' | 'portrait-one'): string {
   const item = artwork.items.find(item => item.id === id);
   if (!item || artwork.schema !== 'catalog-preview-artwork/1' || item.file !== `${id}.webp`) throw new Error('Invalid reviewed artwork manifest');
-  const directory = realpathSync(path.dirname(fileURLToPath(import.meta.resolve('@open-design/21st-catalog/generated/preview-artwork/manifest.json'))));
+  const directory = realpathSync(path.dirname(fileURLToPath(import.meta.resolve('@mish/21st-catalog/generated/preview-artwork/manifest.json'))));
   const target = realpathSync(path.join(directory, item.file));
   if (path.dirname(target) !== directory) throw new Error('Reviewed artwork escapes its root');
   const bytes = readFileSync(target);

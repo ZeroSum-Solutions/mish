@@ -27,7 +27,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { FileViewer } from '../../src/components/FileViewer';
 import { resetConsumedActionRequestsForTests } from '../../src/runtime/action-request';
 import type { ProjectFile } from '../../src/types';
-import { buildWorkspacePermissions, buildWorkspaceSeatSummary, type WorkspaceCollabContext } from '@open-design/contracts';
+import { buildWorkspacePermissions, buildWorkspaceSeatSummary, type WorkspaceCollabContext } from '@mish/contracts';
 import { CollabProvider, type CollabContextValue } from '../../src/collab/collab-context';
 import { WorkspaceProjectMoveError } from '../../src/state/projects';
 

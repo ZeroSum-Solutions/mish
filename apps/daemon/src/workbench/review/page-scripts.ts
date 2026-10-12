@@ -2,7 +2,7 @@
 // strings (never Function#toString of compiled TypeScript) so the code that
 // runs in the page is exactly what is reviewed here. They only read the DOM,
 // except the click probe, which fills forms with inert test values.
-import { REVIEW_TAG_NAMES } from '@open-design/contracts';
+import { REVIEW_TAG_NAMES } from '@mish/contracts';
 import type { TargetRequest } from './types.js';
 
 /** Raw result of PAGE_PROBE before the worker resolves link destinations. */

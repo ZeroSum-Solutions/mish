@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 // New / edit automation modal. The persistence layer is /api/routines; the
 // user-facing model is a scheduled agent conversation that can start in a new
 // project or append a new conversation to an existing project.
@@ -13,7 +13,7 @@ import type {
   RoutineProjectTarget,
   RoutineSchedule,
   Weekday,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { Icon, type IconName } from './Icon';
 import type { SkillSummary } from '../types';

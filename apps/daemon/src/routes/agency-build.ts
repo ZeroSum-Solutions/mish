@@ -33,7 +33,7 @@ import type {
   AgencySectionSelectionInput,
   ApiErrorCode,
   PageKind,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   AGENCY_BUILD_HISTORY_LIMIT,
   AGENCY_BUILD_MAX_SECTION_HINTS,
@@ -43,10 +43,10 @@ import {
   parseAgencyEffectsInput,
   parseAgencyEffectsResult,
   parseAgencyFamilyEffectsResponse,
-} from '@open-design/contracts';
-import type { FamilyRegistry, ShapeAtlas } from '@open-design/agency-fast-lane/atlas';
-import { outputScopeOf } from '@open-design/agency-fast-lane/atlas';
-import type { FamilyPackage } from '@open-design/agency-fast-lane/family';
+} from '@mish/contracts';
+import type { FamilyRegistry, ShapeAtlas } from '@mish/agency-fast-lane/atlas';
+import { outputScopeOf } from '@mish/agency-fast-lane/atlas';
+import type { FamilyPackage } from '@mish/agency-fast-lane/family';
 import type {
   BuildDeps,
   BuildEvent,
@@ -54,19 +54,19 @@ import type {
   EffectCatalog,
   SectionSelection,
   buildSite as buildSiteFn,
-} from '@open-design/agency-fast-lane/build';
-import { familyEffectsResponse } from '@open-design/agency-fast-lane/build';
-import type { BuildDesignKit } from '@open-design/agency-fast-lane/build';
-import { buildProvenanceOf, DaemonHttpError, failedUnitOf, JevCredentialError, RenderQualityError, PageTooLargeError, REPAIR_REASON_TEXT, UnitDeadlineError, UnitRefusedError } from '@open-design/agency-fast-lane/build';
-import { ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError, type ProviderName } from '@open-design/agency-fast-lane/deepseek';
-import { ProviderFailoverError } from '@open-design/agency-fast-lane/failover';
-import { repairLockPaths } from '@open-design/agency-fast-lane/jev';
-import { optionalSectionsOf } from '@open-design/agency-fast-lane/sections';
-import { listComposableAdapterIds, resolveDesignDirection, resolveSectionAdapter, SectionSelectionRefusedError } from '@open-design/agency-fast-lane/section-overlay';
-import { BlockPlanReplayError, blockCatalogFrom, COMPOSED_FAMILY, COMPOSITION_FALLBACKS, COMPOSITION_MODES, type BlockCatalog } from '@open-design/agency-fast-lane/block-plan';
-import { ComposedPageTooLargeError, CompositionVerifyError, type CompositionResult } from '@open-design/agency-fast-lane/block-compose';
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
+} from '@mish/agency-fast-lane/build';
+import { familyEffectsResponse } from '@mish/agency-fast-lane/build';
+import type { BuildDesignKit } from '@mish/agency-fast-lane/build';
+import { buildProvenanceOf, DaemonHttpError, failedUnitOf, JevCredentialError, RenderQualityError, PageTooLargeError, REPAIR_REASON_TEXT, UnitDeadlineError, UnitRefusedError } from '@mish/agency-fast-lane/build';
+import { ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError, type ProviderName } from '@mish/agency-fast-lane/deepseek';
+import { ProviderFailoverError } from '@mish/agency-fast-lane/failover';
+import { repairLockPaths } from '@mish/agency-fast-lane/jev';
+import { optionalSectionsOf } from '@mish/agency-fast-lane/sections';
+import { listComposableAdapterIds, resolveDesignDirection, resolveSectionAdapter, SectionSelectionRefusedError } from '@mish/agency-fast-lane/section-overlay';
+import { BlockPlanReplayError, blockCatalogFrom, COMPOSED_FAMILY, COMPOSITION_FALLBACKS, COMPOSITION_MODES, type BlockCatalog } from '@mish/agency-fast-lane/block-plan';
+import { ComposedPageTooLargeError, CompositionVerifyError, type CompositionResult } from '@mish/agency-fast-lane/block-compose';
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
 import { AgencyJevConfigUnreadableError, AgencyModelKeyUnavailableError, type AgencyJevKeyStore } from '../storage/agency-config.js';
 import { cultInternalId, cultPublicId } from '../cult-public-ids.js';
 import type { RouteDeps } from '../server-context.js';
@@ -81,7 +81,7 @@ import {
   type AgencyBuildAguiCursor,
   type AgencyBuildAguiMeta,
   type AguiEvent,
-} from '@open-design/agui-adapter';
+} from '@mish/agui-adapter';
 
 /**
  * The fast-lane build job (`docs/plans/2026-09-20-follow-ups-design.md` §6.4, and §8 "6b").
@@ -184,7 +184,7 @@ export interface AgencyBuildDeps {
   /** Loads the routed family's package, as `prepare` hands it over. */
   loadPackage: (family: string) => Promise<FamilyPackage>;
   /**
-   * The GenUI catalog manifest (`genuiCatalog.manifest` from `@open-design/genui-catalog/data`,
+   * The GenUI catalog manifest (`genuiCatalog.manifest` from `@mish/genui-catalog/data`,
    * bundle-safe literals) that effect kinds, names and bytes are read from. Threaded to every build
    * as `BuildInput.effectCatalog`, and read by `familyEffectsResponse` for
    * `GET /api/agency/families/:family/effects` and for checking a request's explicit ids. Omitted
@@ -617,7 +617,7 @@ function parseHintValues(value: unknown, allowAuto: boolean): { hints?: Record<s
  * `agency-build-section-selection.ts` — also used by `agency-build-store.ts` to validate a
  * persisted fork seed) and then resolves its `entryId`/`directionId` against the fast lane's own
  * closed v1 roster (`resolveSectionAdapter`/`resolveDesignDirection`,
- * `@open-design/agency-fast-lane/section-overlay`) — the same check `runFastLane` itself makes,
+ * `@mish/agency-fast-lane/section-overlay`) — the same check `runFastLane` itself makes,
  * run here first so an unknown entry or direction is a 400 before any build starts, rather than a
  * mid-build failure. The placement's anchor (whether the resolved family actually declares the
  * named section id) is NOT checked here — the family may still be `auto` at this point, and
@@ -2322,7 +2322,7 @@ export function registerAgencyBuildRoutes(app: Express, ctx: RegisterAgencyBuild
 
   /**
    * The same build as AG-UI spec events (`RUN_STARTED`, `STEP_*`, `STATE_SNAPSHOT`, `STATE_DELTA`
-   * as JSON Patch, `CUSTOM`, `RUN_FINISHED` / `RUN_ERROR`), encoded by `@open-design/agui-adapter`.
+   * as JSON Patch, `CUSTOM`, `RUN_FINISHED` / `RUN_ERROR`), encoded by `@mish/agui-adapter`.
    * A watch-only stream: it observes a build `POST /api/agency/build` already started.
    *
    * Same hand-over as `/events` — fold, replay and listener registration in ONE synchronous

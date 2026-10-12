@@ -12,10 +12,10 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import type { DesignSystemSummary, WorkspaceCollabContext } from '@open-design/contracts';
-import { Button } from '@open-design/components';
+import type { DesignSystemSummary, WorkspaceCollabContext } from '@mish/contracts';
+import { Button } from '@mish/components';
 import { setDesignSystemApproval } from '../providers/registry';
-import { isApprovedDesignSystem, matchesDesignSystemQuery } from '@open-design/contracts';
+import { isApprovedDesignSystem, matchesDesignSystemQuery } from '@mish/contracts';
 import { designSystemIdentity } from '../runtime/design-system-identity';
 import identityStyles from './DesignSystemIdentity.module.css';
 import { isSelectableDesignSystem } from '../runtime/design-system-selection';

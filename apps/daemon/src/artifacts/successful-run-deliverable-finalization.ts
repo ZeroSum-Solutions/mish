@@ -2,7 +2,7 @@ import type {
   DeliverableSyntaxMetrics,
   DeliverableSyntaxRepairState,
   ProjectMetadata,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { resolveProjectDir } from '../projects.js';
 import type { PlacementFinalIO } from '../workbench/placement/project-writes.js';

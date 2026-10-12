@@ -94,7 +94,7 @@ export function byokChoiceCompletenessIssues(value: Pick<ChoiceFields, 'agentId'
   const issues: Array<{ path: 'modelId' | 'byokBinding'; message: string }> = [];
   if (!/^[A-Za-z0-9][A-Za-z0-9._/:@-]*$/u.test(value.modelId)) issues.push({ path: 'modelId', message: 'BYOK requires a safe concrete raw model ID' });
   if (!value.byokBinding) issues.push({ path: 'byokBinding', message: 'BYOK session choices require a complete public binding' });
-  if (value.modelId.toLowerCase() === 'default' || value.modelId.startsWith('open-design-byok/')) issues.push({ path: 'modelId', message: 'BYOK session choices require a concrete raw model ID without the OpenCode provider prefix' });
+  if (value.modelId.toLowerCase() === 'default' || value.modelId.startsWith('mish-byok/')) issues.push({ path: 'modelId', message: 'BYOK session choices require a concrete raw model ID without the OpenCode provider prefix' });
   return issues;
 }
 function validateCompleteChoice(value: ChoiceFields, ctx: z.RefinementCtx): void {

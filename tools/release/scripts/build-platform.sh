@@ -67,7 +67,7 @@ notarize_mac_dmg_once() {
   local auth_args=()
   local s3_arg="--no-s3-acceleration"
   local status
-  if [ "${OPEN_DESIGN_NOTARIZE_S3_ACCELERATION:-false}" = "true" ]; then
+  if [ "${MISH_NOTARIZE_S3_ACCELERATION:-false}" = "true" ]; then
     s3_arg="--s3-acceleration"
   fi
   while IFS= read -r -d '' arg; do
@@ -89,8 +89,8 @@ notarize_mac_dmg_once() {
 
 notarize_mac_dmg() {
   local dmg_path="$1"
-  local attempts="${OPEN_DESIGN_NOTARIZE_ATTEMPTS:-8}"
-  local retry_delay_ms="${OPEN_DESIGN_NOTARIZE_RETRY_DELAY_MS:-15000}"
+  local attempts="${MISH_NOTARIZE_ATTEMPTS:-8}"
+  local retry_delay_ms="${MISH_NOTARIZE_RETRY_DELAY_MS:-15000}"
   local attempt output status
   if [ ! -f "$dmg_path" ]; then
     echo "expected dmg not found for notarization: $dmg_path" >&2
@@ -124,7 +124,7 @@ prepare_mac_signing() {
   required APPLE_SIGNING_CERTIFICATE_BASE64
   required APPLE_SIGNING_CERTIFICATE_PASSWORD
 
-  local cert_path="$RELEASE_WORK_DIR/open-design-signing.p12"
+  local cert_path="$RELEASE_WORK_DIR/mish-signing.p12"
   if ! printf '%s' "$APPLE_SIGNING_CERTIFICATE_BASE64" | base64 --decode > "$cert_path" 2>/dev/null; then
     printf '%s' "$APPLE_SIGNING_CERTIFICATE_BASE64" | base64 -D > "$cert_path"
   fi
@@ -320,7 +320,7 @@ elif [ "$RELEASE_TARGET" = "linux_x64" ]; then
   mkdir -p "$RELEASE_REPORT_DIR/screenshots"
   OD_PACKAGED_E2E_LINUX_APPIMAGE=1 \
   OD_PACKAGED_E2E_NAMESPACE="$RELEASE_NAMESPACE" \
-  OD_PACKAGED_E2E_SCREENSHOT_PATH="$RELEASE_REPORT_DIR/screenshots/open-design-linux-smoke.png" \
+  OD_PACKAGED_E2E_SCREENSHOT_PATH="$RELEASE_REPORT_DIR/screenshots/mish-linux-smoke.png" \
   OD_PACKAGED_E2E_TOOLS_PACK_DIR="$TOOLS_PACK_DIR" \
   pnpm --dir e2e test specs/linux.spec.ts 2>&1 | tee "$RELEASE_REPORT_DIR/vitest.log"
 else

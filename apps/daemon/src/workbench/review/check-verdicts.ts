@@ -1,7 +1,7 @@
 import {
   isIndependentReviewerCompletion, WORKBENCH_BLOCKING_VERDICT_STATUSES,
   type MechanicalCheckResult, type ObservedBehavior, type ObservedBehaviorRecord, type ReviewCheckVerdict, type ReviewerRecord, type ReviewEvidenceMessage, type ReviewFinding,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { ev, list, PageText, rubricKey, vocab, type EvidenceText } from './evidence.js';
 import type { JudgmentContract } from './judgment-seeds.js';
 import type { MandatoryCriterionId } from './plan.js';

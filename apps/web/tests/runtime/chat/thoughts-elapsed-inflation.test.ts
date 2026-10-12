@@ -22,7 +22,7 @@
  *    「全都不给数」也能让上面两条断言变绿,那是错的修法。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { groupThinking, type ThoughtsGroup } from '../../../src/runtime/chat/group-thinking';
 import type { BuildTurnInput, ExecutionShell } from '../../../src/runtime/chat/contract';

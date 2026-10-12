@@ -135,7 +135,7 @@ describe("renderer crash-loop breaker wiring", () => {
     // the prefilled GitHub issue / mailto report builders; the support address
     // stays allowlisted so the crash screen can still hand off to mail.
     expect(runtimeSource).toContain("openExternal");
-    expect(runtimeSource).toContain("window.openDesignDesktop");
+    expect(runtimeSource).toContain("window.mishDesktop");
     expect(runtimeSource).toContain("exportDiagnostics");
     expect(runtimeSource).toContain("devin@zerosumsolutions.com");
   });
@@ -152,7 +152,7 @@ describe("isSupportMailtoUrl", () => {
   test("rejects any other address or scheme so widening open-external can't be abused", () => {
     expect(isSupportMailtoUrl("mailto:attacker@evil.com")).toBe(false);
     expect(isSupportMailtoUrl("mailto:support@evil.com")).toBe(false);
-    expect(isSupportMailtoUrl("https://open-design.ai")).toBe(false);
+    expect(isSupportMailtoUrl("https://github.com/ZeroSum-Solutions/mish")).toBe(false);
     expect(isSupportMailtoUrl("javascript:alert(1)")).toBe(false);
     expect(isSupportMailtoUrl("file:///etc/passwd")).toBe(false);
     expect(isSupportMailtoUrl("not a url")).toBe(false);
@@ -186,14 +186,14 @@ describe("isFirstPartyMailtoUrl", () => {
     expect(isFirstPartyMailtoUrl("mailto:devin@zerosumsolutions.com?subject=Hi&body=there")).toBe(true);
     expect(isFirstPartyMailtoUrl("mailto:Devin@ZeroSumSolutions.com")).toBe(true);
     // The retired upstream addresses are no longer first-party.
-    expect(isFirstPartyMailtoUrl("mailto:support@open-design.ai")).toBe(false);
+    expect(isFirstPartyMailtoUrl("mailto:devin@zerosumsolutions.com")).toBe(false);
   });
 
   test("keeps the support predicate narrow so the open-external bridge does not widen", () => {
     // `shell:open-external` is renderer-reachable and still gates on the
     // support address only; the retired upstream contact address is rejected.
-    expect(isSupportMailtoUrl("mailto:contact@open.design")).toBe(false);
-    expect(isFirstPartyMailtoUrl("mailto:contact@open.design")).toBe(false);
+    expect(isSupportMailtoUrl("mailto:contact@example.test")).toBe(false);
+    expect(isFirstPartyMailtoUrl("mailto:contact@example.test")).toBe(false);
   });
 
   test("applies the same recipient/header hardening as the support predicate", () => {
@@ -204,7 +204,7 @@ describe("isFirstPartyMailtoUrl", () => {
     expect(
       isFirstPartyMailtoUrl("mailto:devin@zerosumsolutions.com?subject=ok%0D%0ABcc:attacker@example.com"),
     ).toBe(false);
-    expect(isFirstPartyMailtoUrl("https://open-design.ai")).toBe(false);
+    expect(isFirstPartyMailtoUrl("https://github.com/ZeroSum-Solutions/mish")).toBe(false);
     expect(isFirstPartyMailtoUrl("javascript:alert(1)")).toBe(false);
     expect(isFirstPartyMailtoUrl("not a url")).toBe(false);
   });

@@ -1,12 +1,12 @@
 import { lstat, rm } from "node:fs/promises";
 import { createConnection } from "node:net";
 
-import type { ProcessSnapshot, StopProcessesOptions, StopProcessesResult } from "@open-design/platform";
+import type { ProcessSnapshot, StopProcessesOptions, StopProcessesResult } from "@mish/platform";
 import {
   captureProcessSnapshot,
   isProcessAlive,
   matchesStampedProcess,
-} from "@open-design/platform";
+} from "@mish/platform";
 
 import { type SidecarDescription, sidecarProtocol } from "./client.js";
 import { requestJsonIpc } from "./json-ipc.js";

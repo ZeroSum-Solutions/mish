@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { PassThrough, Readable } from 'node:stream';
 import { migrateLibrary, deleteLibraryAsset } from '../../src/library-store.js';
-import { parseAttachIntakeResponse } from '@open-design/contracts';
+import { parseAttachIntakeResponse } from '@mish/contracts';
 import { IntakeService } from '../../src/workbench/intake.js';
 import { ordinaryIntakeAuthority } from './intake-placement-fixture.js';
 const roots: string[] = [];

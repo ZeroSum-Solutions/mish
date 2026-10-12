@@ -1,6 +1,6 @@
-import { ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError } from '@open-design/agency-fast-lane/deepseek';
+import { ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError } from '@mish/agency-fast-lane/deepseek';
 import { STATUS_CODES } from 'node:http';
-import type { ApiError, ApiErrorCode, ApiErrorResponse } from '@open-design/contracts';
+import type { ApiError, ApiErrorCode, ApiErrorResponse } from '@mish/contracts';
 import type { NextFunction, Request, Response } from 'express';
 
 import { recordApiFailure } from './api-failure-journal.js';

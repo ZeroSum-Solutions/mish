@@ -9,7 +9,7 @@ import {
   type MediaSurface,
   type MediaTaskLineage,
   type MediaTaskStatus,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { redactMediaErrorJson } from './redact.js';
 import { normalizeMediaTaskError, type MediaTaskError } from './tasks.js';

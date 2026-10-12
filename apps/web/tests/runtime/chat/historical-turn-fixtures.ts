@@ -14,7 +14,7 @@
  *  · 标记写在代码块 / 行内代码里(不算信号)
  *  · 一条 done 都没有、也没有清单的纯聊天轮
  */
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import type { BuildTurnInput } from '../../../src/runtime/chat/contract';
 
 const todos = (id: string, items: Array<[string, string]>): PersistedAgentEvent => ({

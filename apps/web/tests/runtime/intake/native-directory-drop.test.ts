@@ -3,7 +3,7 @@
 // File objects of the drop gesture, and intake shows at most 20 per batch with
 // explicit continuation. Synthetic entries here; the Finder drop is a native gate.
 import { describe, expect, it, vi } from 'vitest';
-import type { OpenDesignHostDroppedDirectoryListing } from '@open-design/host';
+import type { MishHostDroppedDirectoryListing } from '@mish/host';
 import { expandDroppedDirectory, type DirectoryEntryLike } from '../../../src/runtime/intake/native-directory-drop';
 import { IntakeStore } from '../../../src/runtime/intake/intake-store';
 
@@ -25,7 +25,7 @@ function entryTree(name: string, tree: Tree, parent = '', reads: string[] = []):
   };
 }
 
-const listingOf = (files: string[], refused: OpenDesignHostDroppedDirectoryListing['refused'] = [], truncated = false): OpenDesignHostDroppedDirectoryListing => ({
+const listingOf = (files: string[], refused: MishHostDroppedDirectoryListing['refused'] = [], truncated = false): MishHostDroppedDirectoryListing => ({
   rootName: 'Brand Kit', files: files.map(relativePath => ({ relativePath, size: 1 })), refused, truncated,
 });
 

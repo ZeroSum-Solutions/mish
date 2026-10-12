@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { createHash } from 'node:crypto';
 import { afterEach, expect, it } from 'vitest';
-import { composeOdNextStrategyContinuationV2, parseOdNextRequestTurnV1, serializeOdNextPromptBundleV1 } from '@open-design/contracts';
+import { composeOdNextStrategyContinuationV2, parseOdNextRequestTurnV1, serializeOdNextPromptBundleV1 } from '@mish/contracts';
 import { closeDatabase, openDatabase, insertConversation, insertProject, upsertMessage } from '../../src/db.js';
 import { claimSessionAdmission, readConversationCursor, type PreparedAdmission } from '../../src/workbench/admission.js';
 import { readSessionModel } from '../../src/workbench/session-model.js';

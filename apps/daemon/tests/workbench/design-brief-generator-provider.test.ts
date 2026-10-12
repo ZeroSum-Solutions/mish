@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { ModelCall } from '@open-design/agency-fast-lane/deepseek';
+import type { ModelCall } from '@mish/agency-fast-lane/deepseek';
 import { createProviderBriefGenerator } from '../../src/workbench/brief/generator-provider.js';
 
 describe('metered provider brief generator (no live calls)', () => {

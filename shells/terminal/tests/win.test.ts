@@ -30,10 +30,10 @@ describe("Terminal Windows carrier", () => {
       writeDistributionRequest(distributionRequest, { target, sceneDirectory: scene, sceneManifestSha256: sceneSha, releaseDocumentsDirectory: directories.documents, trustFile: releases.trustFile, release: releases.beta1.release, outputDirectory: directories.output });
       const distributionReceipt = join(work, "distribution-receipt.json");
       powershell(join(terminalRoot, "ps1/distribution.ps1"), ["-Request", distributionRequest, "-Receipt", distributionReceipt]);
-      const distribution = join(directories.output, `nexu-terminal-${target}-0.1.0-somechan.1.zip`);
+      const distribution = join(directories.output, `mish-terminal-${target}-0.1.0-somechan.1.zip`);
       expect(JSON.parse(readFileSync(distributionReceipt, "utf8"))).toMatchObject({ operation: "terminal.distribution.build", target, archive: { file: distribution } });
       run("powershell.exe", ["-NoProfile", "-Command", "Expand-Archive -LiteralPath $args[0] -DestinationPath $args[1]", distribution, directories.unpacked]);
-      const root = join(directories.unpacked, "nexu-terminal");
+      const root = join(directories.unpacked, "mish-terminal");
       const terminal = (installRoot: string, storeRoot: string, channel: string, namespace: string, operation: string, options: TerminalOptions = {}) => {
         const result = powershell(join(installRoot, "ps1/terminal.ps1"), ["-Root", installRoot, "-StoreRoot", storeRoot, "-Channel", channel, "-Namespace", namespace, "-Operation", operation,
           ...(options.attachmentId == null ? [] : ["-AttachmentId", options.attachmentId]),

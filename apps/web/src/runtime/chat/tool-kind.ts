@@ -1,4 +1,4 @@
-import { isTodoWriteToolName } from '@open-design/contracts';
+import { isTodoWriteToolName } from '@mish/contracts';
 /**
  * 工具行的语义:这一次调用到底在干什么。
  *

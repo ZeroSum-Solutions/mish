@@ -1,4 +1,4 @@
-import { WORKBENCH_OBSERVED_BEHAVIORS, type ObservedBehavior, type ObservedBehaviorRecord, type VerificationEvidence } from '@open-design/contracts';
+import { WORKBENCH_OBSERVED_BEHAVIORS, type ObservedBehavior, type ObservedBehaviorRecord, type VerificationEvidence } from '@mish/contracts';
 import type { CaptureAtWidth } from './evaluate.js';
 import { ev, evidenceKey, evidenceSelector, list, PageText, readPageText, vocab, type EvidenceParam } from './evidence.js';
 import type { ViewportCapture } from './types.js';

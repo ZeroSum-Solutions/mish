@@ -12,7 +12,7 @@ import type {
   StagedRunRecord,
   StagedStageKind,
   StagedStageRecord,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /** Fast draft model on the Claude CLI. */
 export const STAGED_CLAUDE_DRAFT_MODEL = 'claude-haiku-5-5';

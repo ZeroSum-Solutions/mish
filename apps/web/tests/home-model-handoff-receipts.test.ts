@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { AttachIntakeRequest, AttachIntakeResponse, IntakeBatchSnapshot } from '@open-design/contracts';
+import type { AttachIntakeRequest, AttachIntakeResponse, IntakeBatchSnapshot } from '@mish/contracts';
 import { IntakeStore } from '../src/runtime/intake/intake-store';
 import { materializeHomeModelHandoff, type HomeModelHandoff } from '../src/runtime/workbench/home-model-handoff';
 

@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useState, type FormEvent } from 'react';
-import { Button, Chip, Select, Textarea } from '@open-design/components';
-import type { ProjectFile, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button, Chip, Select, Textarea } from '@mish/components';
+import type { ProjectFile, WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { mediaApi, MediaRequestError, type MediaCatalog, type MediaCatalogModel, type MediaCreateRequest } from './media-api';
 import styles from './MediaWorkbench.module.css';

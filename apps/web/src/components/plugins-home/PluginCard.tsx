@@ -13,11 +13,11 @@
 // needs to commit.
 
 import { useMemo, useRef, useState } from 'react';
-import { VisuallyHidden } from '@open-design/components';
+import { VisuallyHidden } from '@mish/components';
 import type {
   InstalledPluginRecord,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useI18n } from '../../i18n';
 import { useDeckPreviewScale } from '../../lib/use-deck-preview-scale';
 import { Icon } from '../Icon';

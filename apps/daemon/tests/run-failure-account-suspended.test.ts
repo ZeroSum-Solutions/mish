@@ -11,7 +11,7 @@
 // 分类正则只认 "account_suspended" / "account temporarily suspended" /
 // "temporarily suspended account access"(见 `run-failure-classification.ts`
 // 附近的匹配代码),不认联系邮箱那一段,所以下面把上游原文里那个已退役的
-// open-design.ai 联系邮箱换成了 ZeroSum 的支持邮箱,不影响分类断言。
+// mish.invalid 联系邮箱换成了 ZeroSum 的支持邮箱,不影响分类断言。
 //
 // 没有这条分类,客户端的映射表就没有可挂的钩子 —— 报错卡上会挂一颗必然白点的
 // 〔重试〕(违反设计原则四)。

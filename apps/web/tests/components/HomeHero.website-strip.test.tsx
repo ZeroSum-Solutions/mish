@@ -5,7 +5,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 import { HomeHero } from '../../src/components/HomeHero';
 import { setHomeHeroPrompt } from '../helpers/home-hero-lexical';

@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { forwardRef, useImperativeHandle } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AppliedPluginSnapshot, SkillSummary } from '@open-design/contracts';
+import type { AppliedPluginSnapshot, SkillSummary } from '@mish/contracts';
 import { ChatPane, buildRunErrorDiagnosticText, retryableAssistantMessage } from '../../src/components/ChatPane';
 import { DESIGN_SYSTEM_WORKSPACE_PROMPT_PREFIX } from '../../src/design-system-auto-prompt';
 import { readExpandedIndexCss } from '../helpers/read-expanded-css';
@@ -82,7 +82,7 @@ function odNextStrategySnapshot(): AppliedPluginSnapshot {
     status: 'fresh',
     pluginTitle: 'OD Next Strategy V2',
     strategy: {
-      schema: 'open-design.applied-strategy/v2',
+      schema: 'mish.applied-strategy/v2',
       id: 'od-next-strategy',
       version: '2.0.0',
       packageHash: digest,
@@ -113,8 +113,8 @@ vi.mock('../../src/components/AssistantMessage', () => ({
     streaming,
     message,
     isLast,
-    onShareToOpenDesign,
-    shareToOpenDesignBusy,
+    onShareToMish,
+    shareToMishBusy,
     showConversationTodoCard,
     conversationTodoInput,
     showRole,
@@ -122,8 +122,8 @@ vi.mock('../../src/components/AssistantMessage', () => ({
     streaming: boolean;
     message: ChatMessage;
     isLast?: boolean;
-    onShareToOpenDesign?: () => void;
-    shareToOpenDesignBusy?: boolean;
+    onShareToMish?: () => void;
+    shareToMishBusy?: boolean;
     showConversationTodoCard?: boolean;
     conversationTodoInput?: {
       todos?: Array<{ content: string; status?: string }>;
@@ -147,14 +147,14 @@ vi.mock('../../src/components/AssistantMessage', () => ({
           })}
         </div>
       ) : null}
-      {onShareToOpenDesign ? (
+      {onShareToMish ? (
         <button
           type="button"
           data-testid={`share-to-od-${message.id}`}
-          disabled={shareToOpenDesignBusy}
-          onClick={onShareToOpenDesign}
+          disabled={shareToMishBusy}
+          onClick={onShareToMish}
         >
-          {shareToOpenDesignBusy ? 'Preparing package…' : 'Share to Mishh Mashh'}
+          {shareToMishBusy ? 'Preparing package…' : 'Share to Mishh Mashh'}
         </button>
       ) : null}
     </>
@@ -1257,7 +1257,7 @@ Expected output:
   });
 
   it('keeps Share to Mishh Mashh busy on the assistant turn that started packaging', () => {
-    const onShareToOpenDesign = vi.fn();
+    const onShareToMish = vi.fn();
     const completedAssistant: ChatMessage = {
       id: 'assistant-1',
       role: 'assistant',
@@ -1285,19 +1285,19 @@ Expected output:
       onSelectConversation: vi.fn(),
       onDeleteConversation: vi.fn(),
       projectMetadata,
-      onShareToOpenDesign,
+      onShareToMish,
     };
 
     const { rerender } = render(
       <ChatPane
         {...commonProps}
         messages={initialMessages}
-        shareToOpenDesignBusyMessageId={null}
+        shareToMishBusyMessageId={null}
       />,
     );
 
     fireEvent.click(screen.getByTestId('share-to-od-assistant-1'));
-    expect(onShareToOpenDesign).toHaveBeenCalledWith('assistant-1');
+    expect(onShareToMish).toHaveBeenCalledWith('assistant-1');
 
     rerender(
       <ChatPane
@@ -1314,7 +1314,7 @@ Expected output:
             runStatus: 'running',
           },
         ]}
-        shareToOpenDesignBusyMessageId="assistant-1"
+        shareToMishBusyMessageId="assistant-1"
       />,
     );
 
@@ -1635,8 +1635,8 @@ const DSH_STDERR_TAIL = `    at boot (file:///Users/tester/.nvm/versions/node/v2
           at parseCredentialsDocument (file:///Users/tester/.nvm/versions/node/v24.18.0/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-credentials-local/lib/index.js:132:40)
           at LocalCredentialProvider.loadInitial (file:///Users/tester/.nvm/versions/node/v24.18.0/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-credentials-local/lib/index.js:344:17)
           at async [cordis.init] (file:///Users/tester/.nvm/versions/node/v24.18.0/lib/node_modules/@deepseek-ai/dsh/node_modules/@deepseek-ai/dsh-credentials-local/lib/index.js:207:3)
-          at file:///Users/tester/.dsh/profiles/open-design/#credentials
-          at file:///Users/tester/.dsh/profiles/open-design/#include
+          at file:///Users/tester/.dsh/profiles/mish/#credentials
+          at file:///Users/tester/.dsh/profiles/mish/#include
     }
   }
 }

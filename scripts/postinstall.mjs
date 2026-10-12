@@ -151,12 +151,12 @@ function buildDependencyMap(targets) {
 }
 
 function postinstallConcurrency() {
-  const raw = process.env.OPEN_DESIGN_POSTINSTALL_CONCURRENCY;
+  const raw = process.env.MISH_POSTINSTALL_CONCURRENCY;
   if (raw == null || raw.trim() === "") return 1;
 
   const value = Number.parseInt(raw, 10);
   if (!Number.isFinite(value) || value < 1) {
-    throw new Error(`OPEN_DESIGN_POSTINSTALL_CONCURRENCY must be a positive integer, got: ${raw}`);
+    throw new Error(`MISH_POSTINSTALL_CONCURRENCY must be a positive integer, got: ${raw}`);
   }
   return value;
 }
@@ -237,7 +237,7 @@ if (needsRebuild) {
   );
   const rebuild = spawnSync(
     packageManager.command,
-    [...packageManager.argsPrefix, "--filter", "@open-design/daemon", "rebuild", "better-sqlite3"],
+    [...packageManager.argsPrefix, "--filter", "@mish/daemon", "rebuild", "better-sqlite3"],
     { cwd: repoRoot, stdio: "inherit" },
   );
   if (rebuild.error != null) throw rebuild.error;

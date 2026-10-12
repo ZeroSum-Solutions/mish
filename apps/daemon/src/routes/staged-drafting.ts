@@ -1,5 +1,5 @@
 import type { Express, RequestHandler } from 'express';
-import type { StagedDraftingResponse } from '@open-design/contracts';
+import type { StagedDraftingResponse } from '@mish/contracts';
 
 import { stagedDraftingStatus, type StagedAgentAvailability } from '../staged-routing.js';
 

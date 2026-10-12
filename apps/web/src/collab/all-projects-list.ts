@@ -1,4 +1,4 @@
-import type { TeamProject, WorkspaceCollabContext } from '@open-design/contracts';
+import type { TeamProject, WorkspaceCollabContext } from '@mish/contracts';
 import type { Project } from '../types';
 import { asTeamProjectRows } from './team-projects-catalog';
 

@@ -1,4 +1,4 @@
-import { Button, EmptyState } from '@open-design/components';
+import { Button, EmptyState } from '@mish/components';
 import { useCallback, useEffect, useId, useRef, useState, type RefObject } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -383,9 +383,9 @@ function safeExternalUrl(value: string | null): string | null {
     if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return null;
     const host = parsed.hostname.toLowerCase();
     const path = parsed.pathname.toLowerCase();
-    if (host === 'open-design.ai' || host.endsWith('.open-design.ai')) return null;
-    if (host === 'github.com' && path.startsWith('/nexu-io/open-design')) return null;
-    if ((host === 'x.com' || host === 'twitter.com') && path.startsWith('/opendesignhq')) return null;
+    if (host === 'mish.invalid' || host.endsWith('.mish.invalid')) return null;
+    if (host === 'github.com' && path.startsWith('/ZeroSum-Solutions/mish')) return null;
+    if ((host === 'x.com' || host === 'twitter.com') && path.startsWith('/mishhq')) return null;
     return parsed.toString();
   } catch {
     return null;

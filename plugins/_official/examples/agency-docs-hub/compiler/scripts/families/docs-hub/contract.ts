@@ -167,7 +167,7 @@ function sectionSchema(spec: SectionSpec): Schema {
 export function recipeSchema(): Schema {
   return {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
-    $id: `https://open-design.ai/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
+    $id: `https://github.com/ZeroSum-Solutions/mish/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
     title: `${FAMILY_ID} recipe`,
     description: 'A static developer documentation hub or knowledge base page kind (atlas CS.02): header with a labelled search field, hero, quick-start steps, a guides grid, optional API/reference entry points, one static code sample, an optional changelog, optional community/support links and a footer. Derived from compiler/scripts/families/docs-hub/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.',
     $comment: 'contract.ts additionally enforces markup-free plain text, an email format on the nullable email atoms, and that a null appears only on an x-atom string leaf or in an x-optional section’s own slot.',

@@ -2,7 +2,7 @@ import express from 'express';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseFontCheckResponse, type ResourceDetailResponse, type ResourceSearchResponse } from '@open-design/contracts';
+import { parseFontCheckResponse, type ResourceDetailResponse, type ResourceSearchResponse } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { registerWorkbenchFontRoutes } from '../../src/routes/workbench-fonts.js';

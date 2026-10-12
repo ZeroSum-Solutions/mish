@@ -1,9 +1,9 @@
-import type { UpdateLifecycleObservation } from "@open-design/desktop/main";
+import type { UpdateLifecycleObservation } from "@mish/desktop/main";
 import { appendFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 
-import { stopProcesses, waitForProcessExit, type StopProcessesResult } from "@open-design/platform";
-import { compareLauncherVersions, type LauncherAfterQuitRequest } from "@open-design/launcher-proto";
+import { stopProcesses, waitForProcessExit, type StopProcessesResult } from "@mish/platform";
+import { compareLauncherVersions, type LauncherAfterQuitRequest } from "@mish/launcher-proto";
 import {
   APP_KEYS,
   SIDECAR_MESSAGES,
@@ -11,13 +11,13 @@ import {
   SIDECAR_SOURCES,
   type AppKey,
   type DesktopStatusSnapshot,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   getSidecarStatus,
   invokeSidecar,
   stopSidecar,
   type SidecarStamp,
-} from "@open-design/sidecar";
+} from "@mish/sidecar";
 
 import type { PackagedNamespacePaths } from "./paths.js";
 
@@ -137,7 +137,7 @@ async function forceStopLingeringDesktop(
   const outcome = !gone ? "survived" : result.forcedPids.includes(pid) ? "sigkill" : "sigterm";
   const message = `force-stop ${context} pid=${pid} outcome=${outcome}`;
   await writeLauncherAfterQuitLog(paths, message);
-  if (!gone) logger.warn(`[open-design launcher] ${message}`);
+  if (!gone) logger.warn(`[mish launcher] ${message}`);
   return gone;
 }
 
@@ -163,7 +163,7 @@ async function restartExistingDesktop(
   } catch (error) {
     const message = `inspect-found-existing namespace=${input.namespace} shutdown=failed reason=${input.reason} error=${error instanceof Error ? error.message : String(error)}`;
     await writeLauncherAfterQuitLog(input.paths, message);
-    input.logger.warn(`[open-design launcher] ${message}`);
+    input.logger.warn(`[mish launcher] ${message}`);
     return false;
   }
 }
@@ -208,7 +208,7 @@ export async function waitForLauncherAfterQuit(
   // Force it off so the relaunched app binds cleanly instead of skewing.
   const message = `timed-out targetPid=${request.targetPid}; forcing stop`;
   await writeLauncherAfterQuitLog(paths, message);
-  logger.warn(`[open-design launcher] ${message}`);
+  logger.warn(`[mish launcher] ${message}`);
   const stopped = await forceStopLingeringDesktop(request.targetPid, "after-quit-timeout", paths, logger, stop);
   await report(stopped ? "forced" : "failed");
   return stopped;
@@ -247,7 +247,7 @@ export async function inspectExistingDesktopForLauncher(
     }
     const message = `inspect-unavailable namespace=${namespace} action=continue error=${lastError instanceof Error ? lastError.message : String(lastError)}`;
     await writeLauncherAfterQuitLog(options.paths, message);
-    logger.info?.(`[open-design launcher] ${message}`);
+    logger.info?.(`[mish launcher] ${message}`);
     return { action: "continue", reason: "inspect-failed" };
   }
   const { stamp: inspectedStamp, status } = ownerInspection.running;
@@ -340,7 +340,7 @@ export async function inspectExistingDesktopForLauncher(
   } catch (error) {
     const message = `inspect-found-existing namespace=${namespace} focus=failed error=${error instanceof Error ? error.message : String(error)}`;
     await writeLauncherAfterQuitLog(options.paths, message);
-    logger.warn(`[open-design launcher] ${message}`);
+    logger.warn(`[mish launcher] ${message}`);
     return { action: "exit", reason: "existing-focus-failed" };
   }
 }

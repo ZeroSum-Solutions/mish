@@ -14,7 +14,7 @@ Status: proposed · Parent: #3408 · Sibling: agent-startup-latency-profiling.md
 
 - **Repo / checkout**: this repository (main) + the upstream vela repository.
   - `gh repo clone ZeroSum-Solutions/Mishh-Mashh-2 && git checkout main`.
-  - ⚠️ **External-evidence caveat (refresh before implementation)**: the vela line citations below were read against a **local checkout at HEAD `fe8266e` (2026-05-21)**, which has since drifted from `nexu-io/vela@main` (`c35dae2a`, 2026-06-18). The broad facts re-verified as still true on `main` (`loadSession:false`, no `session/load`, single-session-per-process, temp-home-per-turn), but **exact line numbers will have moved** — re-run `git -C <vela> fetch && git grep` against current `main` to re-anchor before coding. Treat `:NNN` references as "approximate, in this file" not "stable line".
+  - ⚠️ **External-evidence caveat (refresh before implementation)**: the vela line citations below were read against a **local checkout at HEAD `fe8266e` (2026-05-21)**, which has since drifted from `ZeroSum-Solutions/vela@main` (`c35dae2a`, 2026-06-18). The broad facts re-verified as still true on `main` (`loadSession:false`, no `session/load`, single-session-per-process, temp-home-per-turn), but **exact line numbers will have moved** — re-run `git -C <vela> fetch && git grep` against current `main` to re-anchor before coding. Treat `:NNN` references as "approximate, in this file" not "stable line".
 - **vela side (root cause, verified)**: `~/Documents/vela/apps/cli/internal/agent/acp_runtime.go`
   - `:248` `"loadSession": false` — vela reports that loading/resuming sessions is unsupported.
   - In `newSession`, `if runtime.sessionID != "" { return ... "only one ACP session is supported" }` — only one session per process.
@@ -79,7 +79,7 @@ A counter-intuitive fact to pre-empt: AMR's per-turn cache rate can look healthy
 
 ### Production measurement (vela `link.usage_events`, the proof)
 
-vela's Link gateway persists **one row per upstream model call** to Postgres `link.usage_events` (`input_tokens`, `cache_read_tokens`, `cache_write_tokens`, `latency_ms`, `created_at`, and `metadata` carrying `openDesignSessionId` / `openDesignRunId`). `uncached = input − cache_read − cache_write` (`pricing.go:89`). Querying DeepSeek calls (the AMR lead model; note `provider='openai'`, filter on `model ILIKE '%deepseek%'`), taking the **first upstream call of each run** and bucketing by run ordinal within the session:
+vela's Link gateway persists **one row per upstream model call** to Postgres `link.usage_events` (`input_tokens`, `cache_read_tokens`, `cache_write_tokens`, `latency_ms`, `created_at`, and `metadata` carrying `mishSessionId` / `mishRunId`). `uncached = input − cache_read − cache_write` (`pricing.go:89`). Querying DeepSeek calls (the AMR lead model; note `provider='openai'`, filter on `model ILIKE '%deepseek%'`), taking the **first upstream call of each run** and bucketing by run ordinal within the session:
 
 | First call of… | n | cache hit | input | uncached | latency |
 |---|---|---|---|---|---|
@@ -90,7 +90,7 @@ For contrast, the **within-turn agentic-loop calls** hit **~79%** (this is what 
 
 **Reading**: the prior turn's conversation history is **not** reused on the next turn's first call — the ~21% that does hit is the static `[system + tools]` prefix (and possibly cross-user shared static), while the history re-pays uncached. This is the data behind the headline: turn-2+ first call ≈ 21% hit, ~24.5k uncached, ~12s, and it is the TTFT-critical call.
 
-*(Method note: measured read-only against production `link.usage_events` via an ephemeral in-cluster psql pod, statement-timeout + read-only transaction guarded. Turn ordinal uses `openDesignSessionId`/`openDesignRunId` from `metadata`; sessions straddling the query window's start can mislabel a mid-conversation run as turn-1, adding minor noise that does not change the picture.)*
+*(Method note: measured read-only against production `link.usage_events` via an ephemeral in-cluster psql pod, statement-timeout + read-only transaction guarded. Turn ordinal uses `mishSessionId`/`mishRunId` from `metadata`; sessions straddling the query window's start can mislabel a mid-conversation run as turn-1, adding minor noise that does not change the picture.)*
 
 ## Proposed design
 

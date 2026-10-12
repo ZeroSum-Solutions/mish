@@ -30,7 +30,7 @@ export interface RunTelemetryDeliveryResult {
 
 export function runTelemetryDeliveryIdempotencyKey(runId: string): string {
   const digest = createHash('sha256')
-    .update(`open-design/run-telemetry/v1\n${runId}`, 'utf8')
+    .update(`mish/run-telemetry/v1\n${runId}`, 'utf8')
     .digest('hex');
   return `od-run-telemetry-v1-${digest}`;
 }

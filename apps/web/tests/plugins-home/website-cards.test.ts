@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 import {
   buildWebsiteCards,
   familyCardLine,

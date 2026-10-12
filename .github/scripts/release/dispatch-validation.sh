@@ -3,7 +3,7 @@
 # progressive Feishu card) as a workflow run of its own.
 #
 # Why a dispatch and not a job: release-prerelease.yml holds a single
-# repository-wide concurrency group (`open-design-release-prerelease`,
+# repository-wide concurrency group (`mish-release-prerelease`,
 # cancel-in-progress: false). Anything that outlives `publish` inside that
 # workflow keeps the group held, which stops the NEXT prerelease from starting.
 # Validation is exactly that kind of work, so it has to leave the workflow.

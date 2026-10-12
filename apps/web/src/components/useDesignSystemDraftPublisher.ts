@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { DesignSystemSummary } from '@open-design/contracts';
+import type { DesignSystemSummary } from '@mish/contracts';
 import { useWorkspaceContext } from '../collab/useWorkspaceContext';
 import { updateDesignSystemDraft } from '../providers/registry';
 

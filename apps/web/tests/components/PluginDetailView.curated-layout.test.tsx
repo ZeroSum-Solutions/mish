@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { act, cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { InstalledPluginRecordSchema } from '@open-design/contracts';
+import { InstalledPluginRecordSchema } from '@mish/contracts';
 
 import { PluginDetailView } from '../../src/components/PluginDetailView';
 import { I18nProvider } from '../../src/i18n';
@@ -31,7 +31,7 @@ const PLUGIN = InstalledPluginRecordSchema.parse({
   sourceKind: 'bundled',
   source: '/plugins/research-suite',
   sourceMarketplaceId: 'official',
-  sourceMarketplaceEntryName: 'open-design/research-suite',
+  sourceMarketplaceEntryName: 'mish/research-suite',
   trust: 'bundled',
   capabilitiesGranted: ['prompt:inject'],
   manifest: {
@@ -84,7 +84,7 @@ function knowledgePlugin(
     sourceKind: 'bundled',
     source: `/plugins/${id}`,
     sourceMarketplaceId: 'official',
-    sourceMarketplaceEntryName: `open-design/${id}`,
+    sourceMarketplaceEntryName: `mish/${id}`,
     trust: 'bundled',
     capabilitiesGranted: ['prompt:inject'],
     manifest: {
@@ -190,7 +190,7 @@ describe('PluginDetailView curated installed-extension layout', () => {
     const advanced = screen.getByTestId('plugin-meta-advanced');
     expect(advanced).not.toHaveAttribute('open');
     expect(within(advanced).getByText('MIT')).toBeTruthy();
-    expect(within(advanced).getByText('od plugin install open-design/research-suite')).toBeTruthy();
+    expect(within(advanced).getByText('od plugin install mish/research-suite')).toBeTruthy();
 
     expect(screen.getByTestId('plugin-detail-preview-iframe').getAttribute('src'))
       .toBe('/api/plugins/research-suite/preview');

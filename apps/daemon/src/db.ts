@@ -14,7 +14,7 @@ import type {
   OdNextDevicePlatformV1,
   ProjectBrowserWorkspaceTab,
   ProjectTabsState,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   eventsEndedWithUnfinishedWork,
   isTodoWriteToolName,
@@ -23,7 +23,7 @@ import {
   stripDoneMarkers,
   stripNextStepMarkers,
   parseSessionRunAdmission,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { migrateCollabSyncSnapshots } from './collab/sync-snapshot-store.js';
 import { migrateCommentRelayOutbox } from './collab/comment-relay-outbox.js';
 import { migratePublicFilePublications } from './collab/public-file-publication-store.js';

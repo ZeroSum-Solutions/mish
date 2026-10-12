@@ -71,7 +71,7 @@ describe('AmrBalanceDialog', () => {
             planId: null,
             billingState: 'free',
             permissions: { canManageBilling: true },
-            workspaceSettingsUrl: 'https://open-design.ai/console/settings?workspaceId=ws-1',
+            workspaceSettingsUrl: 'https://github.com/ZeroSum-Solutions/mish/console/settings?workspaceId=ws-1',
           },
         }), { status: 200, headers: { 'content-type': 'application/json' } }));
       }
@@ -101,7 +101,7 @@ describe('AmrBalanceDialog', () => {
       expect(open).toHaveBeenCalled();
       const target = new URL(String(open.mock.calls.at(-1)?.[0]));
       expect(`${target.origin}${target.pathname}`).toBe(
-        'https://open-design.ai/amr/dashboard',
+        'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
       );
       expect(target.searchParams.get('billing')).toBe('plan');
     });
@@ -123,7 +123,7 @@ describe('AmrBalanceDialog', () => {
             planId: 'team_pro',
             billingState: 'active',
             permissions: { canManageBilling: true },
-            workspaceSettingsUrl: 'https://open-design.ai/console/settings?workspaceId=ws-1',
+            workspaceSettingsUrl: 'https://github.com/ZeroSum-Solutions/mish/console/settings?workspaceId=ws-1',
           },
         }), { status: 200, headers: { 'content-type': 'application/json' } }));
       }
@@ -153,7 +153,7 @@ describe('AmrBalanceDialog', () => {
       expect(open).toHaveBeenCalled();
       const target = new URL(String(open.mock.calls.at(-1)?.[0]));
       expect(`${target.origin}${target.pathname}`).toBe(
-        'https://open-design.ai/amr/dashboard',
+        'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
       );
       expect(target.searchParams.get('billing')).toBe('plan');
     });
@@ -175,7 +175,7 @@ describe('AmrBalanceDialog', () => {
             planId: null,
             billingState: 'free',
             permissions: { canManageBilling: true },
-            workspaceSettingsUrl: 'https://open-design.ai/console/settings?workspaceId=ws-p',
+            workspaceSettingsUrl: 'https://github.com/ZeroSum-Solutions/mish/console/settings?workspaceId=ws-p',
           },
         }), { status: 200, headers: { 'content-type': 'application/json' } }));
       }
@@ -205,7 +205,7 @@ describe('AmrBalanceDialog', () => {
       expect(open).toHaveBeenCalled();
       const target = new URL(String(open.mock.calls.at(-1)?.[0]));
       expect(`${target.origin}${target.pathname}`).toBe(
-        'https://open-design.ai/amr/dashboard',
+        'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
       );
       expect(target.searchParams.get('billing')).toBe('plan');
     });
@@ -241,7 +241,7 @@ describe('AmrBalanceDialog', () => {
             billingState: 'active',
             // 真机上 daemon 就是这么回的:个人工作区,却没有账单权限。
             permissions: { canManageBilling: false },
-            workspaceSettingsUrl: 'https://open-design.ai/console/settings?workspaceId=ws-p',
+            workspaceSettingsUrl: 'https://github.com/ZeroSum-Solutions/mish/console/settings?workspaceId=ws-p',
           },
         }), { status: 200, headers: { 'content-type': 'application/json' } }));
       }
@@ -271,7 +271,7 @@ describe('AmrBalanceDialog', () => {
     expect(open).toHaveBeenCalled();
     const target = new URL(String(open.mock.calls.at(-1)?.[0]));
     expect(`${target.origin}${target.pathname}`).toBe(
-      'https://open-design.ai/amr/dashboard',
+      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
     );
     expect(target.searchParams.get('billing')).toBe('plan');
   });
@@ -297,7 +297,7 @@ describe('AmrBalanceDialog', () => {
               planId: 'team_pro',
               billingState: 'active',
               permissions: { canManageBilling: false },
-              workspaceSettingsUrl: 'https://open-design.ai/console/settings?workspaceId=ws-1',
+              workspaceSettingsUrl: 'https://github.com/ZeroSum-Solutions/mish/console/settings?workspaceId=ws-1',
             },
           }), { status: 200, headers: { 'content-type': 'application/json' } }));
         }
@@ -352,7 +352,7 @@ describe('AmrBalanceDialog', () => {
 
     const target = new URL(String(open.mock.calls.at(-1)?.[0]));
     expect(`${target.origin}${target.pathname}`).toBe(
-      'https://open-design.ai/amr/dashboard',
+      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
     );
     expect(target.searchParams.get('billing')).toBe('plan');
   });

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { realpath } from 'node:fs/promises';
-import type { FontKitInventory, FontProfile, ResourceCandidate, ResourceSourceSnapshot } from '@open-design/contracts';
+import type { FontKitInventory, FontProfile, ResourceCandidate, ResourceSourceSnapshot } from '@mish/contracts';
 import { bundledFontCatalogue, validateFontCatalogue, type FontCatalogue, type FontCatalogueLocalFile } from '../fonts/catalogue.js';
 import { federateFontFamilies, type FontEntrySource, type FontFamilyEntry } from '../fonts/federation.js';
 import { buildFontKitInventory } from '../fonts/kit-inventory.js';

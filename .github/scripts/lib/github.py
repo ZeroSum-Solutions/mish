@@ -12,7 +12,7 @@ from typing import Any
 
 API_ROOT = "https://api.github.com"
 API_VERSION = "2022-11-28"
-USER_AGENT = "open-design-actions/1"
+USER_AGENT = "mish-actions/1"
 
 
 class GitHubError(RuntimeError):

@@ -8,7 +8,7 @@
 
 import http from 'node:http';
 import { createHash } from 'node:crypto';
-import { parseSessionRunAdmission } from '@open-design/contracts';
+import { parseSessionRunAdmission } from '@mish/contracts';
 import { ProjectDeletionInProgressError } from '../src/runtimes/runs.js';
 import { getAgentDef } from '../src/agents.js';
 import { writeAppConfig } from '../src/app-config.js';
@@ -46,7 +46,7 @@ import { workspaceContextFromDirectoryItem } from '../src/collab/vela-workspace-
 import { registerRunRoutes } from '../src/routes/runs.js';
 import { connectorService } from '../src/connectors/service.js';
 import { upsertInstalledPlugin } from '../src/plugins/registry.js';
-import { strategyPackageHashFromDigests } from '@open-design/plugin-runtime';
+import { strategyPackageHashFromDigests } from '@mish/plugin-runtime';
 import {
   finalizeStrategyPlanningTurn,
   prepareStrategyRequest,
@@ -151,7 +151,7 @@ function seedAwaitingClarificationTask() {
     pluginVersion: '2.0.0',
     manifestSourceDigest: 'strategy-manifest',
     strategy: {
-      schema: 'open-design.applied-strategy/v2',
+      schema: 'mish.applied-strategy/v2',
       id: 'od-next-strategy',
       version: '2.0.0',
       packageHash: strategyPackageHashFromDigests(assetDigests),
@@ -221,16 +221,16 @@ function seedAwaitingClarificationTask() {
   const protocol = new OdNextMachineProtocolStream();
   protocol.push([
     '<question-form id="scope">{"questions":[{"id":"surface","label":"Surface?"}]}</question-form>',
-    '<open-design-runtime-state>',
+    '<mish-runtime-state>',
     JSON.stringify({
-      schema: 'open-design.strategy-state/v2',
+      schema: 'mish.strategy-state/v2',
       route: 'full_plan',
       inputStage: 'request',
       outcome: 'clarification_required',
       executionMode: null,
       reasonCodes: [],
     }),
-    '</open-design-runtime-state>',
+    '</mish-runtime-state>',
   ].join('\n'));
   finalizeStrategyPlanningTurn(db, {
     taskExecutionId: 'task-strategy-clarification',
@@ -391,7 +391,7 @@ async function startServer(opts?: {
   const catalog = opts?.amrCatalog ?? 'models';
   const vela = path.join(tempDir, 'vela-catalog-fixture.ts');
   fs.writeFileSync(vela, `#!${process.execPath}\nconst args = process.argv.slice(2);\nif (JSON.stringify(args) !== JSON.stringify(['model','preset','--format','json']) && JSON.stringify(args) !== JSON.stringify(['model','list','--all','--format','json'])) process.exit(9);\nif (process.env.VELA_PROFILE !== 'feature-test' || process.env.VELA_RUNTIME_KEY !== 'fixture-workspace-account' || process.env.VELA_LINK_URL !== 'https://fixture-workspace.invalid') process.exit(8);\nif (${JSON.stringify(catalog)} === 'failed') process.exit(1);\nconsole.log(JSON.stringify({source:args[1]==='preset'?'preset':'remote',data:${JSON.stringify(catalog)}==='empty'?[]:[{id:'public_model_workspace_fixture',default:true,enabled:${JSON.stringify(catalog)}!=='disabled',inputPriceUsdPerMillion:1}]}));\n`, { mode: 0o700 });
-  await writeAppConfig(tempDir, { agentModels: { amr: { model: 'default' } }, agentCliEnv: { amr: { VELA_BIN: vela, OPEN_DESIGN_AMR_PROFILE: 'feature-test', VELA_RUNTIME_KEY: 'fixture-workspace-account', VELA_LINK_URL: 'https://fixture-workspace.invalid' } } });
+  await writeAppConfig(tempDir, { agentModels: { amr: { model: 'default' } }, agentCliEnv: { amr: { VELA_BIN: vela, MISH_AMR_PROFILE: 'feature-test', VELA_RUNTIME_KEY: 'fixture-workspace-account', VELA_LINK_URL: 'https://fixture-workspace.invalid' } } });
   const db = openDatabase(tempDir);
   const now = Date.now();
   for (const id of [TEAM_PROJECT, PERSONAL_PROJECT, UNBOUND_PROJECT]) {

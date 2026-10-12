@@ -3,7 +3,7 @@ import { ACTIVE_ARTIFACT_PREVIEW_SELECTOR } from '@/playwright/artifact-preview'
 import { readFile } from 'node:fs/promises';
 import { createHash, randomUUID } from 'node:crypto';
 import { join } from 'node:path';
-import { parseAttachIntakeResponse, parseIntakeBatchSnapshot, parseSessionModelSnapshot, parseSessionRunAdmission, type AttachIntakeResponse } from '@open-design/contracts';
+import { parseAttachIntakeResponse, parseIntakeBatchSnapshot, parseSessionModelSnapshot, parseSessionRunAdmission, type AttachIntakeResponse } from '@mish/contracts';
 import { openNewProjectModal as openNewProjectModalFromProjects } from '@/playwright/rail';
 import { runErrorCard } from '@/playwright/chat';
 import { clickPreviewToolbarAction, openAllProjectFiles } from '@/playwright/workspace';
@@ -17,9 +17,9 @@ import { trackRunRequests } from '@/playwright/mock-factory';
 import type { FakeAcpHandshakeRuntime, FakeAgentId } from '@/playwright/fake-agents';
 import { T } from '@/timeouts';
 
-const STORAGE_KEY = 'open-design:config';
-const EXPERIENCE_SURVEY_RETIRED_KEY = 'open-design:experience-survey:v1:retired';
-const EXPERIENCE_SURVEY_DELIVERIES_KEY = 'open-design:experience-survey:v1:deliveries';
+const STORAGE_KEY = 'mish:config';
+const EXPERIENCE_SURVEY_RETIRED_KEY = 'mish:experience-survey:v1:retired';
+const EXPERIENCE_SURVEY_DELIVERIES_KEY = 'mish:experience-survey:v1:deliveries';
 const GENERATED_FILE = 'real-daemon-smoke.html';
 const GENERATED_HEADING = 'Real Daemon Smoke';
 const EDITED_GENERATED_HEADING = 'Real Daemon Smoke Edited';
@@ -1345,18 +1345,18 @@ test('[P1] plugin authoring produces a generated-plugin scaffold with action car
   await expectWorkspaceReady(page);
   const { projectId, conversationId } = await currentProjectContext(page);
   await expectProjectFilesToContain(page, projectId, [
-    'generated-plugin/open-design.json',
+    'generated-plugin/mish.json',
     'generated-plugin/SKILL.md',
     'generated-plugin/examples/demo.md',
   ]);
-  await expectProjectFileToContain(page, projectId, 'generated-plugin/open-design.json', '"name": "generated-plugin"');
+  await expectProjectFileToContain(page, projectId, 'generated-plugin/mish.json', '"name": "generated-plugin"');
   await expectProjectFileToContain(page, projectId, 'generated-plugin/SKILL.md', '# Generated Plugin');
 
   await expectRestoredDelayedAssistantMessage(page, projectId, conversationId, {
     producedFiles: [
       'generated-plugin/examples/demo.md',
       'generated-plugin/SKILL.md',
-      'generated-plugin/open-design.json',
+      'generated-plugin/mish.json',
     ],
     expectedThinking: false,
   });
@@ -1954,7 +1954,7 @@ async function countAcpRunSessionStarts(invocationLog: string): Promise<number> 
     .split('\n')
     .filter(Boolean)
     .map((line) => JSON.parse(line) as { client?: string; method?: string })
-    .filter((entry) => entry.client === 'open-design' && entry.method === 'session/new')
+    .filter((entry) => entry.client === 'mish' && entry.method === 'session/new')
     .length;
 }
 

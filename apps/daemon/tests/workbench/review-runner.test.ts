@@ -1,7 +1,7 @@
 import { consoleRecord } from '../../src/workbench/review/page-text.js';
 import { ev } from '../../src/workbench/review/evidence.js';
 import { describe, expect, it } from 'vitest';
-import { parseProjectRubric, parseVerificationBundle, WORKBENCH_MANDATORY_CRITERION_IDS, type ProjectRubric } from '@open-design/contracts';
+import { parseProjectRubric, parseVerificationBundle, WORKBENCH_MANDATORY_CRITERION_IDS, type ProjectRubric } from '@mish/contracts';
 import { runMechanicalReview } from '../../src/workbench/review/runner.js';
 import type { ReviewBrowserPort, ViewportCapture } from '../../src/workbench/review/types.js';
 import { knownGoodCapture, page, portFrom, resourceType, text, unavailablePort, url } from './review-capture-fixture.js';

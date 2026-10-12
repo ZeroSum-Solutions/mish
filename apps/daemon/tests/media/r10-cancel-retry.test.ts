@@ -11,7 +11,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { MEDIA_TASK_CANCELLED_CODE } from '@open-design/contracts';
+import { MEDIA_TASK_CANCELLED_CODE } from '@mish/contracts';
 import { openDatabase } from '../../src/db.js';
 import { insertMediaTask } from '../../src/media/tasks.js';
 import {

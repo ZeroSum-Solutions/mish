@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { constants } from 'node:fs';
 import { mkdir, open, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { parseConnectorDetailResponse, type ConnectorReferenceDetailResponse, type ConnectorResource } from '@open-design/contracts';
+import { parseConnectorDetailResponse, type ConnectorReferenceDetailResponse, type ConnectorResource } from '@mish/contracts';
 import { ConnectorError } from './connector-error.js';
 
 export const MOBBIN_IMAGE_MAX_BYTES = 10 * 1024 * 1024;

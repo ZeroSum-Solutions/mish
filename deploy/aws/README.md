@@ -55,7 +55,7 @@ You can deploy this stack via the AWS Management Console or the AWS CLI.
 3.  Under **Prerequisite - Prepare template**, select **Template is ready**.
 4.  Under **Specify template**, select **Upload a template file**, click **Choose file**, and select the `template.yaml` file from this directory.
 5.  Click **Next**.
-6.  Enter a **Stack name** (e.g., `open-design-stack`).
+6.  Enter a **Stack name** (e.g., `mish-stack`).
 7.  Fill in the **Parameters** according to your requirements. Note that `ApiToken`, `AllowedSourceIp`, and `DockerImage` are required.
 8.  Click **Next**. Configure any stack options if desired, then click **Next** again.
 9.  Scroll to the bottom of the review page, check the box that says **I acknowledge that AWS CloudFormation might create IAM resources**, and click **Submit**.
@@ -68,12 +68,12 @@ You can deploy this stack via the AWS Management Console or the AWS CLI.
 ```bash
 aws cloudformation deploy \
   --template-file template.yaml \
-  --stack-name open-design-stack \
+  --stack-name mish-stack \
   --capabilities CAPABILITY_IAM \
   --parameter-overrides \
     ApiToken="YOUR_SECURE_API_TOKEN" \
     AllowedSourceIp="YOUR_IP_ADDRESS/32" \
-    DockerImage="your-registry/open-design:latest"
+    DockerImage="your-registry/mish:latest"
 ```
 
 *Note: If you want to use a custom domain with HTTPS, include the `CustomDomainName` and `AcmCertificateArn` parameters in the `--parameter-overrides` list.*

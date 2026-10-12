@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/tools-dev",
+  "name": "@mish/tools-dev",
   "version": "0.22.1",
   "private": true,
   "type": "module",
@@ -13,9 +13,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@open-design/platform": "workspace:*",
-    "@open-design/sidecar": "workspace:*",
-    "@open-design/sidecar-proto": "workspace:*",
+    "@mish/platform": "workspace:*",
+    "@mish/sidecar": "workspace:*",
+    "@mish/sidecar-proto": "workspace:*",
     "cac": "6.7.14"
   },
   "devDependencies": {

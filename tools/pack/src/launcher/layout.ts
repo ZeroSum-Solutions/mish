@@ -8,9 +8,9 @@ import {
   type LauncherPaths,
   type LauncherRuntimeDescriptor,
   type LauncherVersionPaths,
-} from "@open-design/launcher-proto";
-import { SIDECAR_DEFAULTS } from "@open-design/sidecar-proto";
-import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@open-design/release";
+} from "@mish/launcher-proto";
+import { SIDECAR_DEFAULTS } from "@mish/sidecar-proto";
+import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@mish/release";
 
 import type { ToolPackConfig, ToolPackPlatform } from "../config/index.js";
 
@@ -81,7 +81,7 @@ export function resolveToolPackLauncherPayloadLayout(
   const archivePath = join(
     config.roots.output.namespaceRoot,
     "payload",
-    `Open Design-${namespaceToken}-payload.${payloadArchiveExtension(config.platform)}`,
+    `Mish-${namespaceToken}-payload.${payloadArchiveExtension(config.platform)}`,
   );
   return {
     archivePath,

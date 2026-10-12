@@ -16,9 +16,9 @@ import type {
   ReferenceSection,
   RunDesignBriefBinding,
   SiteCheckResult,
-} from '@open-design/contracts';
-import { REFERENCE_SPINES } from '@open-design/contracts';
-import { Button, Select, Spinner } from '@open-design/components';
+} from '@mish/contracts';
+import { REFERENCE_SPINES } from '@mish/contracts';
+import { Button, Select, Spinner } from '@mish/components';
 
 import { useI18n, useT } from '../../i18n';
 import { DeployPublicAccessToggle, deployAccessOf, useDeployAccessMessage, type DeployLinkAccess } from '../DeployPublicAccessToggle';

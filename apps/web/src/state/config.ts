@@ -1,4 +1,4 @@
-import type { AppConfigPrefs } from '@open-design/contracts';
+import type { AppConfigPrefs } from '@mish/contracts';
 import { MEDIA_PROVIDERS } from '../media/models';
 import { isOpenAICompatible } from '../providers/openai-compatible';
 import type {
@@ -23,7 +23,7 @@ import {
 } from '../utils/notifications';
 import { randomUUID } from '../utils/uuid';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 const CONFIG_MIGRATION_VERSION = 3;
 // Accent values that were the SHIPPED DEFAULT in an earlier build and were
 // persisted verbatim into every install's config. None of them is offered in
@@ -204,7 +204,7 @@ export const KNOWN_PROVIDERS: KnownProvider[] = [
     ],
     apiKeyConsoleLink: {
       host: 'atlascloud.ai',
-      url: 'https://atlascloud.ai/?utm_source=open_design&utm_medium=provider_preset&utm_campaign=atlascloud_byok',
+      url: 'https://atlascloud.ai/?utm_source=mish&utm_medium=provider_preset&utm_campaign=atlascloud_byok',
     },
   },
   {

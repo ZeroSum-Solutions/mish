@@ -1,4 +1,4 @@
-import type { DesignSystemSummary } from '@open-design/contracts';
+import type { DesignSystemSummary } from '@mish/contracts';
 
 /** Show source details only when an installed title cannot identify one kit. */
 export function designSystemIdentity(

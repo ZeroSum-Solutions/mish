@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseRightsAssessment, parseSourceAdmission } from '@open-design/contracts';
+import { parseRightsAssessment, parseSourceAdmission } from '@mish/contracts';
 import { evaluateSourceOperation, mapLegacyWorkbenchOperation, type EvaluateSourceOperationInput } from '../../src/workbench/source-rights.js';
 
 describe('legacy workbench operation semantics', () => {

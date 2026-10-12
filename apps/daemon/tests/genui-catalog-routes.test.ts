@@ -9,8 +9,8 @@ import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import type { GenuiCatalogResponse } from '@open-design/contracts';
-import { genuiCatalog } from '@open-design/genui-catalog/data';
+import type { GenuiCatalogResponse } from '@mish/contracts';
+import { genuiCatalog } from '@mish/genui-catalog/data';
 import { registerGenuiCatalogRoutes } from '../src/routes/genui-catalog.js';
 import { startServer } from '../src/server.js';
 

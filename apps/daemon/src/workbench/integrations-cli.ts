@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { parseConnectorInventory, parseIntegrationRoster, parseIntegrationRosterEntry, parseLicenceDraft, parseLicenceRecordSnapshot } from '@open-design/contracts';
+import { parseConnectorInventory, parseIntegrationRoster, parseIntegrationRosterEntry, parseLicenceDraft, parseLicenceRecordSnapshot } from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../daemon-url.js';
 
 export interface IntegrationsCliOptions {

@@ -9,7 +9,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'motion/react';
 import type { Variants } from 'motion/react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { useT } from '../i18n';
 import styles from './ExperienceSurvey.module.css';
 import {

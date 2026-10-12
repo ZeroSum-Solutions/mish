@@ -7,7 +7,7 @@
  * unique title (EN/ZH), a concrete subject, and buyer-facing descriptions.
  *
  * This script ONLY rewrites metadata (`SKILL.md` frontmatter +
- * `open-design.json`) and, for `example.html`, it STRIPS any stale
+ * `mish.json`) and, for `example.html`, it STRIPS any stale
  * `od-commercial-slide-refresh` overlay and fixes the `<title>`. It never
  * injects slide overlays — the native deck bodies are authored per template
  * so the card preview shows real, on-theme content, not a floating pane.
@@ -248,7 +248,7 @@ function stringListFromUnknown(value: unknown): string[] {
   return value.filter((item): item is string => typeof item === 'string').map((s) => s.trim()).filter(Boolean);
 }
 
-function updateOpenDesignJson(raw: string, copy: RefreshCopy): string {
+function updateMishJson(raw: string, copy: RefreshCopy): string {
   let manifest: Record<string, unknown>;
   try { manifest = JSON.parse(raw) as Record<string, unknown>; } catch { return raw; }
 
@@ -329,13 +329,13 @@ function refreshTemplate(root: string, dir: string, copy: RefreshCopy, isOfficia
   const skillPath = path.join(root, dir, 'SKILL.md');
   if (existsSync(skillPath)) {
     const rawSkill = readFileSync(skillPath, 'utf8');
-    const manifestPath = path.join(root, dir, 'open-design.json');
+    const manifestPath = path.join(root, dir, 'mish.json');
     const rawManifest = existsSync(manifestPath) ? readFileSync(manifestPath, 'utf8') : null;
     if (isDeckSource(rawSkill, rawManifest)) {
       const nextSkill = updateSkillMarkdown(rawSkill, copy);
       if (nextSkill !== rawSkill) { writeFileSync(skillPath, nextSkill, 'utf8'); counts.skill += 1; touched.push(path.relative(repoRoot, skillPath)); }
       if (isOfficial && rawManifest !== null) {
-        const nextManifest = updateOpenDesignJson(rawManifest, copy);
+        const nextManifest = updateMishJson(rawManifest, copy);
         if (nextManifest !== rawManifest) { writeFileSync(manifestPath, nextManifest, 'utf8'); counts.manifest += 1; touched.push(path.relative(repoRoot, manifestPath)); }
       }
     }
@@ -357,7 +357,7 @@ function main(): void {
     refreshTemplate(officialExamplesRoot, a.id, copy, true, counts, touched);
     refreshTemplate(designTemplatesRoot, a.id, copy, false, counts, touched);
   }
-  console.log(`Refreshed ${counts.skill} SKILL.md, ${counts.manifest} open-design.json, and stripped/retitled ${counts.html} example.html files across ${assignments.size} templates.`);
+  console.log(`Refreshed ${counts.skill} SKILL.md, ${counts.manifest} mish.json, and stripped/retitled ${counts.html} example.html files across ${assignments.size} templates.`);
   if (touched.length > 0) console.log(touched.join('\n'));
 }
 

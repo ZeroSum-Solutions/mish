@@ -18,7 +18,7 @@ describe('parsedToKit package static assets', () => {
   it('loads package fonts with the same canonical Workspace scope as the kit', () => {
     const kit = parsedToKit(parseDesignMd('# Example'), {
       designSystemId: 'user:example', editable: true, projectId: 'backing-project',
-      workspaceContext: { workspaceId: 'team', workspaceMemberId: 'member' } as import('@open-design/contracts').WorkspaceCollabContext,
+      workspaceContext: { workspaceId: 'team', workspaceMemberId: 'member' } as import('@mish/contracts').WorkspaceCollabContext,
       packageInfo: { availableFiles: ['fonts/inter.woff2', 'fonts/fonts.css'], manifest: {
         schemaVersion: 'od-design-system-project/v1', id: 'example', name: 'Example', category: 'Trust',
         fonts: [{ family: 'Inter', file: 'fonts/inter.woff2' }],

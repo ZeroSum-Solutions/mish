@@ -1,4 +1,4 @@
-import type { ExportFormat, ExportImageFormat, ExportResult } from "@open-design/contracts";
+import type { ExportFormat, ExportImageFormat, ExportResult } from "@mish/contracts";
 
 export interface ExportCliRequestOptions {
   fileName: string;

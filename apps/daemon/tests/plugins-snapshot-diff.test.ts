@@ -1,9 +1,9 @@
 // Plan §3.BB2 — diffSnapshots() pure helper.
 
 import { describe, expect, it } from 'vitest';
-import type { AppliedPluginSnapshot } from '@open-design/contracts';
+import type { AppliedPluginSnapshot } from '@mish/contracts';
 import { diffSnapshots } from '../src/plugins/snapshot-diff.js';
-import { strategyPackageHashFromDigests } from '@open-design/plugin-runtime';
+import { strategyPackageHashFromDigests } from '@mish/plugin-runtime';
 
 const make = (over: Partial<AppliedPluginSnapshot> = {}): AppliedPluginSnapshot => ({
   snapshotId: 'snap-1',
@@ -30,7 +30,7 @@ function strategy(profileDigest: string) {
     { path: './profiles/prototype.md', sha256: profileDigest },
   ];
   return {
-    schema: 'open-design.applied-strategy/v2' as const,
+    schema: 'mish.applied-strategy/v2' as const,
     id: 'od-next-strategy' as const,
     version: '2.0.0',
     packageHash: strategyPackageHashFromDigests(assetDigests),

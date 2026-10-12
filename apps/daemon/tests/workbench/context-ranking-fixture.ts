@@ -1,4 +1,4 @@
-import { parseProjectDesignContext, parseWorkbenchPreferencesSnapshot, type ProjectDesignContextDraft, type ResourceCandidate, type ProjectDesignContext } from '@open-design/contracts';
+import { parseProjectDesignContext, parseWorkbenchPreferencesSnapshot, type ProjectDesignContextDraft, type ResourceCandidate, type ProjectDesignContext } from '@mish/contracts';
 import type { ResourceSourceAdapter } from '../../src/workbench/resources.js';
 
 export function savedContext(overrides: Partial<ProjectDesignContextDraft> = {}, revision = 1): ProjectDesignContext {

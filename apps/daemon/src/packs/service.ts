@@ -50,7 +50,7 @@ import {
   type PackInstallOutcome,
   type PackInstallPhase,
   type PackManifest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   assertFolderSourceSafe,

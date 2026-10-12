@@ -7,7 +7,7 @@
 
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { familyRegistry, shapeAtlas } from '@open-design/agency-fast-lane/data';
+import { familyRegistry, shapeAtlas } from '@mish/agency-fast-lane/data';
 
 import { DesignIndexView } from '../../src/components/DesignIndexView';
 import { DESIGN_INDEX_CHANGED_EVENT } from '../../src/state/design-index';

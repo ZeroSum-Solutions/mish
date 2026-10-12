@@ -3,7 +3,7 @@ import express from 'express';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterEach, describe, expect, it } from 'vitest';
-import { renderDesignBriefDirective, type DesignBrief, type OdNextStrategyRequestRecipeV2 } from '@open-design/contracts';
+import { renderDesignBriefDirective, type DesignBrief, type OdNextStrategyRequestRecipeV2 } from '@mish/contracts';
 import { registerWorkbenchBriefRoutes } from '../../src/routes/workbench-brief.js';
 import { createDesignBriefService, type DesignBriefService } from '../../src/workbench/brief/service.js';
 import { runBriefCli, runDesignBriefBindingFromFlags } from '../../src/workbench/brief/cli.js';

@@ -1,6 +1,6 @@
 /**
  * The committed catalog, schema and closed lists. These run without the private kit (CI); the
- * kit comparison itself is `pnpm --filter @open-design/cult-ui-catalog check`.
+ * kit comparison itself is `pnpm --filter @mish/cult-ui-catalog check`.
  */
 
 import assert from 'node:assert/strict';

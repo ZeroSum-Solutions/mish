@@ -4,7 +4,7 @@ import {
   mediaSafetyCategory,
   type MediaFailureNextStep,
   type MediaSafetyCategory,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { interruptOpenMediaLineage, migrateMediaTaskLineage } from './lineage.js';
 import { redactMediaErrorJson, redactMediaErrorText } from './redact.js';

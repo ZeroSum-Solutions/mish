@@ -4,7 +4,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { promisify } from 'node:util';
-import type { DesignSystemSummary } from '@open-design/contracts';
+import type { DesignSystemSummary } from '@mish/contracts';
 
 const exec = promisify(execFile);
 
@@ -14,7 +14,7 @@ export async function approvedDesignSystemFixtures(titles: readonly string[]) {
   const namespace = `web-kits-${randomUUID()}`;
   const repo = path.resolve('../..');
   const tool = path.join(repo, 'tools/dev/bin/tools-dev.mjs');
-  const env = { ...process.env, OD_DATA_DIR: path.join(root, 'data'), AMR_HOME: path.join(root, 'amr'), OPEN_DESIGN_VELA_TELEMETRY: 'off' };
+  const env = { ...process.env, OD_DATA_DIR: path.join(root, 'data'), AMR_HOME: path.join(root, 'amr'), MISH_VELA_TELEMETRY: 'off' };
   const run = (args: string[]) => exec(process.execPath, [tool, ...args, '--namespace', namespace, '--tools-dev-root', root, '--no-env-file', '--json'], { cwd: repo, env, maxBuffer: 8 * 1024 * 1024 });
   const stop = async () => { await run(['stop', 'daemon']); await rm(root, { recursive: true, force: true }); };
   try {

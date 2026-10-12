@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
-import { Button } from '@open-design/components';
-import { validateVercelProjectName, type VercelNameCheckResponse } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import { validateVercelProjectName, type VercelNameCheckResponse } from '@mish/contracts';
 import { useT } from '../i18n';
 import styles from './VercelSiteNameField.module.css';
 

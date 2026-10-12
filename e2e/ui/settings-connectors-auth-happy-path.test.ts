@@ -3,7 +3,7 @@ import type { Locator, Page } from '@playwright/test';
 import { routeAgents } from '../lib/playwright/mock-factory.js';
 import { T } from '@/timeouts';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 test.describe.configure({ timeout: T.xlong });
 
 const CONNECTORS = [

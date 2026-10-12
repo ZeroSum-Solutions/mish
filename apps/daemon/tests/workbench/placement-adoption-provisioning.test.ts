@@ -27,7 +27,7 @@ import { preparePlacementBootstrap } from '../../src/workbench/placement/owner-b
 import { createFenceOnlyProjectWrites } from '../../src/workbench/placement/project-writes.js';
 import { attachPlacementRuntime } from '../../src/workbench/placement/runtime.js';
 import type { PlacementRuntimeStatus } from '../../src/workbench/placement/runtime-status.js';
-import { parseWorkbenchAdoptionRefusalDetails } from '@open-design/contracts';
+import { parseWorkbenchAdoptionRefusalDetails } from '@mish/contracts';
 
 /**
  * B4-1 executor provisioning, phase A. Portable cases run on every host: the

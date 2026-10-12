@@ -2,7 +2,7 @@ import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { parseResourceSearchRequest } from '@open-design/contracts';
+import { parseResourceSearchRequest } from '@mish/contracts';
 import { inspectResource, previewResource, searchResources } from '../../src/workbench/resources.js';
 import { paletteContrastEvidence } from '../../src/workbench/token-evidence.js';
 import { createProjectTokensSource } from '../../src/workbench/resources-tokens.js';

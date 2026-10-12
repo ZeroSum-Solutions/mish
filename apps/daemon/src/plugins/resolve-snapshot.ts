@@ -29,7 +29,7 @@ import type {
   PluginConnectorBinding,
   ProjectScenarioBindingProvenance,
   ProjectScenarioTaskProfile,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   applyPlugin,
   InternalBundledStrategyApplyError,
@@ -50,7 +50,7 @@ import { getManifestContextCraft } from './context-craft.js';
 import {
   type ConnectorProbe,
 } from './connector-gate.js';
-import type { RegistryView } from '@open-design/plugin-runtime';
+import type { RegistryView } from '@mish/plugin-runtime';
 import {
   createBundledStrategyBindingV2,
   StrategyPackageIdentityError,

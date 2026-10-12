@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ClipboardEvent } from 'react';
-import { Button } from '@open-design/components';
-import { WORKBENCH_CAPTURE_MEDIA_TYPES, type CaptureView, type WorkbenchCaptureMode, type WorkspaceCollabContext } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import { WORKBENCH_CAPTURE_MEDIA_TYPES, type CaptureView, type WorkbenchCaptureMode, type WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { workspaceResourceUrl } from '../../collab/workspace-identity';
 import { captureApi } from '../../providers/workbench-capture';

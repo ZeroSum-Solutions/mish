@@ -38,7 +38,7 @@ describe('canonical Vela terminal command integration', () => {
       },
       configuredEnv: {
         VELA_BIN: fakeVela,
-        VELA_INVOCATION_SOURCE: 'open-design',
+        VELA_INVOCATION_SOURCE: 'mish',
       },
       maxBuffer: 64 * 1024,
     };
@@ -50,7 +50,7 @@ describe('canonical Vela terminal command integration', () => {
       args: string[];
       invocationSource: string;
     };
-    expect(successLog).toEqual({ args, invocationSource: 'open-design' });
+    expect(successLog).toEqual({ args, invocationSource: 'mish' });
 
     let failure: unknown;
     try {
@@ -108,7 +108,7 @@ describe('canonical Vela terminal command integration', () => {
           'run', 'terminal', '--run-id', 'settings-run', '--outcome', 'failed',
           '--terminal-at', '2026-08-05T02:03:04.567Z', '--json',
         ],
-        invocationSource: 'open-design',
+        invocationSource: 'mish',
       });
     } finally {
       db.close();

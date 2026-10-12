@@ -51,7 +51,7 @@ describe('AmrArtifactUpgradeDialog', () => {
     const [url, target, features] = open.mock.calls[0] ?? [];
     const plansUrl = new URL(String(url));
     expect(`${plansUrl.origin}${plansUrl.pathname}`).toBe(
-      'https://open-design.ai/amr/dashboard',
+      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
     );
     expect(plansUrl.searchParams.get('billing')).toBe('plan');
     expect(target).toBe('_blank');

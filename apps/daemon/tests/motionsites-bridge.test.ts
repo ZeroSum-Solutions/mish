@@ -14,7 +14,7 @@ import { fetchMotionSitesDesignReference } from '../src/motionsites/design-refer
 import { MotionSitesLoginRequiredError, MotionSitesPaidAccessRequiredError, MotionSitesUpstreamError } from '../src/motionsites/errors.js';
 import { MOTIONSITES_MCP_SERVER_ID, MOTIONSITES_MCP_URL } from '../src/motionsites/config.js';
 import { resetLocalCorpusCache } from '../src/motionsites/local-corpus-source.js';
-import type { LocalCorpusRow } from '@open-design/section-catalog/local-corpus';
+import type { LocalCorpusRow } from '@mish/section-catalog/local-corpus';
 
 const ZEROSUM_ROW: LocalCorpusRow = {
   id: 'zs-fixture-01',

@@ -1,7 +1,7 @@
 import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   CollabMemberRole,
   WorkspaceBillingState,
@@ -10,7 +10,7 @@ import type {
   WorkspaceMemberStatus,
   WorkspaceProviderMode,
   WorkspaceType,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { resolveEffectiveVelaConsoleOrigin } from '../integrations/vela-console-origin.js';
 
 // The daemon's single B-integration point . Presence + sync need the
@@ -205,7 +205,7 @@ export function resolveWorkspaceSettingsUrl(
   // Workspace management outcomes without carrying user-entered values.
   const base = resolveEffectiveVelaConsoleOrigin(env, configuredEnv);
   const hasRuntimeProfile = Boolean(
-    configuredEnv.OPEN_DESIGN_AMR_PROFILE?.trim() || configuredEnv.VELA_PROFILE?.trim(),
+    configuredEnv.MISH_AMR_PROFILE?.trim() || configuredEnv.VELA_PROFILE?.trim(),
   );
   // A workspace payload can carry a console URL minted by the environment that
   // last served it. After an in-app profile switch that value is stale by
@@ -232,7 +232,7 @@ function withWorkspaceDeepLink(url: string, workspaceId: string): string {
       parsed.searchParams.set('workspaceId', workspaceId.trim());
     }
     if (!parsed.searchParams.get('source')) {
-      parsed.searchParams.set('source', 'open_design');
+      parsed.searchParams.set('source', 'mish');
     }
     return parsed.toString();
   } catch {

@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { parseResourceSearchRequest, type ResourceSearchRequest } from '@open-design/contracts';
+import { parseResourceSearchRequest, type ResourceSearchRequest } from '@mish/contracts';
 import { searchResources, createLocalResourceSources } from '../../src/workbench/resources.js';
 import { CONTINUOUS_MOTION_STYLE_TAG } from '../../src/workbench/context-ranking.js';
 

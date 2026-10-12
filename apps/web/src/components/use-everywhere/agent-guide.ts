@@ -219,7 +219,7 @@ function buildMcpServerConfigSnippet(info: AgentGuideMcpInstallInfo): string {
   return JSON.stringify(
     {
       mcpServers: {
-        'open-design': {
+        'mish': {
           command: info.command,
           args: info.args,
           ...(env ? { env } : {}),

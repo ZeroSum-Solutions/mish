@@ -2,7 +2,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, expect, it } from 'vitest';
-import { MCP_SECRET_MASK as M } from '@open-design/contracts';
+import { MCP_SECRET_MASK as M } from '@mish/contracts';
 import { maskMcpServer, restoreMcpSecrets } from '../src/mcp-secrets.js';
 import { readMcpConfig, writeMcpConfig } from '../src/mcp-config.js';
 

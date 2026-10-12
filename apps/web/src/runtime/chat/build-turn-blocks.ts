@@ -21,14 +21,14 @@
  * 用户会看到文字跳一下 —— 候选 E 就是因为这个代价被否的。所以所有落点都要「一次到位」,
  * 只有 run 结束那一刻允许有一次重排(liftConclusion)。
  */
-import { isMediaSafetyCategory, MEDIA_OUTPUT_SUPERSEDED_CODE } from '@open-design/contracts';
-import type { MediaSurface, PersistedAgentEvent, ProjectMediaTask } from '@open-design/contracts';
+import { isMediaSafetyCategory, MEDIA_OUTPUT_SUPERSEDED_CODE } from '@mish/contracts';
+import type { MediaSurface, PersistedAgentEvent, ProjectMediaTask } from '@mish/contracts';
 import {
   OD_DONE_KEY_ATTR_RE,
   OD_DONE_OPEN_TAG,
   OD_DONE_TAG_RE,
   stripCritiqueGrammar,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   BuildTurnInput,
   ExecutionShell,
@@ -76,7 +76,7 @@ import {
  * `od-` 前缀跟仓库里既有的协议标记(`<od-title>`、`<od-card>`)对齐,不会撞上
  * agent 真的在写的 HTML 标签。
  *
- * 标记的**形状**是共享契约(`@open-design/contracts` 的 `api/done-marker`),
+ * 标记的**形状**是共享契约(`@mish/contracts` 的 `api/done-marker`),
  * 不在这里另写一份:daemon 要用同一份判据把标记挡在落库正文之外。两边各留一份正则,
  * 迟早会对「什么算一枚标记」产生分歧,而分歧的表现形式就是协议标签出现在用户屏幕上。
  */

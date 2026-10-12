@@ -14,16 +14,16 @@ describe('resolveWorkspaceSettingsUrl', () => {
       resolveWorkspaceSettingsUrl('ws-1', undefined, {
         OD_VELA_WEB_URL: 'https://web.example',
       } as NodeJS.ProcessEnv),
-    ).toBe('https://web.example/settings?workspaceId=ws-1&source=open_design');
+    ).toBe('https://web.example/settings?workspaceId=ws-1&source=mish');
   });
 
   it('appends the id to an explicit URL that lacks it and preserves one that has it', () => {
     expect(resolveWorkspaceSettingsUrl('ws-1', 'https://web.example/settings')).toBe(
-      'https://web.example/settings?workspaceId=ws-1&source=open_design',
+      'https://web.example/settings?workspaceId=ws-1&source=mish',
     );
     expect(
       resolveWorkspaceSettingsUrl('ws-1', 'https://web.example/settings?workspaceId=ws-other'),
-    ).toBe('https://web.example/settings?workspaceId=ws-other&source=open_design');
+    ).toBe('https://web.example/settings?workspaceId=ws-other&source=mish');
     expect(
       resolveWorkspaceSettingsUrl(
         'ws-1',
@@ -41,37 +41,37 @@ describe('resolveWorkspaceSettingsUrl', () => {
 
   it('builds the link from the selected AMR profile origin', () => {
     expect(resolveWorkspaceSettingsUrl('ws-1', undefined, {
-      OPEN_DESIGN_AMR_PROFILE: 'prod',
+      MISH_AMR_PROFILE: 'prod',
       OD_VELA_WEB_URL: 'https://prod.example',
       OD_VELA_WEB_URLS: JSON.stringify({
         prod: 'https://prod.example',
         test: 'https://test.example',
       }),
     }, {
-      OPEN_DESIGN_AMR_PROFILE: 'test',
-    })).toBe('https://test.example/settings?workspaceId=ws-1&source=open_design');
+      MISH_AMR_PROFILE: 'test',
+    })).toBe('https://test.example/settings?workspaceId=ws-1&source=mish');
   });
 
   it('does not let a prod URL from workspace context override the selected profile origin', () => {
     expect(resolveWorkspaceSettingsUrl('ws-1', 'https://prod.example/settings', {
-      OPEN_DESIGN_AMR_PROFILE: 'prod',
+      MISH_AMR_PROFILE: 'prod',
       OD_VELA_WEB_URL: 'https://prod.example',
       OD_VELA_WEB_URLS: JSON.stringify({
         prod: 'https://prod.example',
         'feature-test': 'https://feature.example',
       }),
     }, {
-      OPEN_DESIGN_AMR_PROFILE: 'feature-test',
-    })).toBe('https://feature.example/settings?workspaceId=ws-1&source=open_design');
+      MISH_AMR_PROFILE: 'feature-test',
+    })).toBe('https://feature.example/settings?workspaceId=ws-1&source=mish');
   });
 
   it('fails closed instead of reusing an explicit URL when the selected profile has no trusted origin', () => {
     expect(resolveWorkspaceSettingsUrl('ws-1', 'https://prod.example/settings', {
-      OPEN_DESIGN_AMR_PROFILE: 'prod',
+      MISH_AMR_PROFILE: 'prod',
       OD_VELA_WEB_URL: 'https://prod.example',
       OD_VELA_WEB_URLS: JSON.stringify({ prod: 'https://prod.example' }),
     }, {
-      OPEN_DESIGN_AMR_PROFILE: 'feature-test',
+      MISH_AMR_PROFILE: 'feature-test',
     })).toBeUndefined();
   });
 });
@@ -89,7 +89,7 @@ describe('parseWorkspaceCollabContext', () => {
     });
 
     expect(context?.workspaceSettingsUrl).toBe(
-      'https://web.example/settings?workspaceId=ws-personal&source=open_design',
+      'https://web.example/settings?workspaceId=ws-personal&source=mish',
     );
   });
 });

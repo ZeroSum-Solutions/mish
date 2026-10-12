@@ -847,7 +847,7 @@ describe('AssistantMessage 执行记录', () => {
           {
             kind: 'status',
             label: 'publish repo',
-            detail: '{"url":"https://github.com/nexu-io/example-plugin","nameWithOwner":"nexu-io/example-plugin"}',
+            detail: '{"url":"https://github.com/ZeroSum-Solutions/example-plugin","nameWithOwner":"ZeroSum-Solutions/example-plugin"}',
           },
         ])}
         streaming={false}
@@ -856,8 +856,8 @@ describe('AssistantMessage 执行记录', () => {
     );
 
     const link = container.querySelector('[data-testid="status-detail"] a.md-link');
-    expect(link?.getAttribute('href')).toBe('https://github.com/nexu-io/example-plugin');
-    expect(link?.textContent).toBe('https://github.com/nexu-io/example-plugin');
+    expect(link?.getAttribute('href')).toBe('https://github.com/ZeroSum-Solutions/example-plugin');
+    expect(link?.textContent).toBe('https://github.com/ZeroSum-Solutions/example-plugin');
     expect(container.querySelector('[data-testid="status-detail"]')?.textContent).toContain('"}');
   });
 });

@@ -128,7 +128,7 @@ export type FamilyEffectDeclaration = {
 
 /**
  * The slice of the GenUI catalog manifest this module reads. The daemon passes
- * `genuiCatalog.manifest` from `@open-design/genui-catalog/data` (bundle-safe literals); the CLI,
+ * `genuiCatalog.manifest` from `@mish/genui-catalog/data` (bundle-safe literals); the CLI,
  * which runs from source, passes `loadEffectCatalogFromSource()`. Structural, so this package
  * takes no dependency on the catalog package.
  */

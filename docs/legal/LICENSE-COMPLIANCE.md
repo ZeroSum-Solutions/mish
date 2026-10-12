@@ -59,19 +59,19 @@ operator sets an explicit URL:
 
 | Path | Upstream default before | Now | Opt-in variable |
 |---|---|---|---|
-| Langfuse telemetry relay | none | none | `OPEN_DESIGN_TELEMETRY_RELAY_URL` |
-| AMR entry and profile analytics mirror | `amr-api.open-design.ai` | off | `OPEN_DESIGN_AMR_ANALYTICS_URL` |
-| Download-attribution ledger | `download.open-design.ai` | off | `OD_ATTRIBUTION_LEDGER_URL` |
-| What's New card document | `whatsnew.open-design.ai` on release channels | off | `OD_WHATS_NEW_URL` |
-| Packaged desktop updater | `releases.open-design.ai`, on for packaged builds | off, also under `OD_UPDATE_ENABLED` | `OD_UPDATE_METADATA_URL` |
+| Langfuse telemetry relay | none | none | `MISH_TELEMETRY_RELAY_URL` |
+| AMR entry and profile analytics mirror | `amr-api.mish.invalid` | off | `MISH_AMR_ANALYTICS_URL` |
+| Download-attribution ledger | `download.mish.invalid` | off | `OD_ATTRIBUTION_LEDGER_URL` |
+| What's New card document | `whatsnew.mish.invalid` on release channels | off | `OD_WHATS_NEW_URL` |
+| Packaged desktop updater | `releases.mish.invalid`, on for packaged builds | off, also under `OD_UPDATE_ENABLED` | `OD_UPDATE_METADATA_URL` |
 
 Known remaining upstream calls (not changed yet):
 
 - **AMR.** The AMR Cloud sign-in and AMR model routing call
-  `amr-api.open-design.ai` when a user chooses AMR. That is an upstream service
+  `amr-api.mish.invalid` when a user chooses AMR. That is an upstream service
   under upstream terms.
 - **Hosted images.** The visual-style picker and plugin previews load images
-  from `repo-assets.open-design.ai`. Turning this off breaks those previews
+  from `repo-assets.mish.invalid`. Turning this off breaks those previews
   until we host the images ourselves.
 
 ## Open items before any distribution
@@ -83,11 +83,10 @@ a desktop build to anyone:
   `NOTICE`, or the 7-Zip `License.txt` next to `7z.exe` and `7z.dll`. Add them.
 - **Vela CLI.** Stop `copyOptionalVelaCliBinary` from copying the binary, or
   build on a machine without `@powerformer/vela-cli`, and check the artifact.
-- **Packaged app identity.** Installer and bundle names still use `Open Design`
-  (for example `Open Design Beta.app`). Rename before shipping a desktop build.
+- **Packaged app identity.** Installer and bundle names use `Mish` (renamed 2026-10-12).
 - **Cloud sign-in label — done.** The UI used to name upstream's cloud service
   as if it were ours. The label is now `AMR`.
-- **Internal package scopes** (`@open-design/*`) and code identifiers are not
+- **Internal package scopes** (`@mish/*`) and code identifiers are not
   shown to users. They can stay.
 - **Upstream release workflows** (`bake-plugin-previews*.yml`,
   `whats-new-publish.yml`) publish to upstream storage and need upstream

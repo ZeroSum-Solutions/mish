@@ -17,7 +17,7 @@
  * 取舍全记在 `specs/current/chat-panel-feedback.md` 的 D 节。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 
 const call = (id: string, name: string, input: unknown): PersistedAgentEvent[] => ([

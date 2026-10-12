@@ -1,13 +1,13 @@
 # marketing-site native example package
 
-Native Mishh Mashh format is this folder's `SKILL.md` plus `open-design.json`. The package carries
+Native Mishh Mashh format is this folder's `SKILL.md` plus `mish.json`. The package carries
 the shared compiler closure under `compiler/` and the `marketing-site` family registered in
 `compiler/scripts/family.ts` (generic dispatch) and defined in
 `compiler/scripts/families/marketing-site/`.
 
 | Path | What it is |
 | --- | --- |
-| `open-design.json` | the plugin manifest |
+| `mish.json` | the plugin manifest |
 | `SKILL.md` | how to drive the family: roster, slots, limits and the compile command |
 | `compiler/` | the offline compiler closure and the family's own source |
 | `compiler/scripts/families/marketing-site/` | the family module: `contract.ts`, `slots.ts`, `recipe.schema.json`, `render.ts`, `render.test.ts`, `reference.fixture.json` |

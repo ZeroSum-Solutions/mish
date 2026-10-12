@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import type { DesignSystemSummary } from '@open-design/contracts';
+import type { DesignSystemSummary } from '@mish/contracts';
 vi.mock('../../src/providers/registry', () => ({ setDesignSystemApproval: vi.fn() }));
 vi.mock('../../src/components/DesignSystemPreviewModal', () => ({ DesignSystemPreviewModal: ({ system }: { system: DesignSystemSummary }) => <div role="dialog">Inspect {system.title}</div> }));
 vi.mock('../../src/collab/useWorkspaceContext', () => ({ useWorkspaceContext: () => ({ context: null }) }));

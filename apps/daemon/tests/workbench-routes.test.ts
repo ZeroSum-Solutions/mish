@@ -4,7 +4,7 @@ import { sendApiError } from '../src/http/api-errors.js';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseResourceDetailResponse, parseResourceSearchResponse } from '@open-design/contracts';
+import { parseResourceDetailResponse, parseResourceSearchResponse } from '@mish/contracts';
 import { registerWorkbenchRoutes, type RegisterWorkbenchRoutesDeps } from '../src/routes/workbench.js';
 import { createLocalResourceSources } from '../src/workbench/resources.js';
 import { startServer } from '../src/server.js';

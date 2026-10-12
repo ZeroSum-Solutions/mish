@@ -7,7 +7,7 @@
  * `directionId`).
  */
 
-import type { AgencySectionSelectionInput } from '@open-design/contracts';
+import type { AgencySectionSelectionInput } from '@mish/contracts';
 
 /** `undefined` when `value` is not a well-formed `AgencySectionSelectionInput`, else the
  * narrowed, field-picked value (never a passthrough of extra keys `value` may carry). */

@@ -19,10 +19,10 @@ import { T } from '@/timeouts';
 
 test.describe.configure({ timeout: T.xlong });
 
-const STORAGE_KEY = 'open-design:config';
-const LOCALE_KEY = 'open-design:locale';
-const LOCALE_SOURCE_KEY = 'open-design:locale-source';
-const HOME_CHIP_STORAGE_KEY = 'open-design:home-composer:chip';
+const STORAGE_KEY = 'mish:config';
+const LOCALE_KEY = 'mish:locale';
+const LOCALE_SOURCE_KEY = 'mish:locale-source';
+const HOME_CHIP_STORAGE_KEY = 'mish:home-composer:chip';
 const PERSISTED_HOME_CHIP_QUERY = '__e2ePersistedHomeChip';
 
 const HOME_CONFIG = {
@@ -102,7 +102,7 @@ const ACME_BRAND = {
 
 // The retained generic scenario's manifest surfaces, shared by the fixture
 // record and its apply response so both stay the same shape the bundled
-// `plugins/_official/scenarios/od-new-generation/open-design.json` ships.
+// `plugins/_official/scenarios/od-new-generation/mish.json` ships.
 const OD_NEW_GENERATION_QUERY =
   'Generate a {{artifactKind}} for {{audience}} on {{topic}}. Use the discovery → plan → generate → critique loop and stop when the critique score converges or the iteration ceiling is hit.';
 
@@ -226,7 +226,7 @@ const HOME_PLUGINS = [
   // more than one card per type and the within-mode "pick another example"
   // contract is pinned against real bundled content rather than a restored
   // template (mirrors
-  // `plugins/_official/examples/pricing-page/open-design.json`).
+  // `plugins/_official/examples/pricing-page/mish.json`).
   {
     id: 'example-pricing-page',
     title: 'Pricing Page',
@@ -355,7 +355,7 @@ const PROMPT_TEMPLATES = [
     category: 'product',
     model: 'gpt-image-2',
     aspect: '16:9',
-    source: { repo: 'open-design/image-prompts', license: 'MIT' },
+    source: { repo: 'mish/image-prompts', license: 'MIT' },
   },
   {
     id: 'video-reveal',
@@ -365,7 +365,7 @@ const PROMPT_TEMPLATES = [
     category: 'product',
     model: 'doubao-seedance-2-0-260128',
     aspect: '16:9',
-    source: { repo: 'open-design/video-prompts', license: 'MIT' },
+    source: { repo: 'mish/video-prompts', license: 'MIT' },
   },
 ];
 
@@ -860,12 +860,12 @@ test('[P1] home composer plus menu opens project, local code, Figma help, and de
     await route.fulfill({
       json: {
         project: referenceProject,
-        resolvedDir: '/tmp/open-design/reference-home-project',
+        resolvedDir: '/tmp/mish/reference-home-project',
       },
     });
   });
   await page.route('**/api/dialog/open-folder', async (route) => {
-    await route.fulfill({ json: { path: '/tmp/open-design/local-code-home' } });
+    await route.fulfill({ json: { path: '/tmp/mish/local-code-home' } });
   });
   await page.route('**/api/dir-exists', async (route) => {
     await route.fulfill({ json: { exists: true } });
@@ -1128,12 +1128,12 @@ test('[P1] home composer sends referenced workspace context into project creatio
     await route.fulfill({
       json: {
         project: referenceProject,
-        resolvedDir: '/tmp/open-design/reference-home-payload',
+        resolvedDir: '/tmp/mish/reference-home-payload',
       },
     });
   });
   await page.route('**/api/dialog/open-folder', async (route) => {
-    await route.fulfill({ json: { path: '/tmp/open-design/local-code-home-payload' } });
+    await route.fulfill({ json: { path: '/tmp/mish/local-code-home-payload' } });
   });
   await page.route('**/api/dir-exists', async (route) => {
     await route.fulfill({ json: { exists: true } });
@@ -1163,8 +1163,8 @@ test('[P1] home composer sends referenced workspace context into project creatio
   await expect.poll(() => createBodies.length).toBe(1);
   const metadata = createBodies[0]?.metadata as { linkedDirs?: string[] } | undefined;
   expect(metadata?.linkedDirs ?? []).toEqual([
-    '/tmp/open-design/reference-home-payload',
-    '/tmp/open-design/local-code-home-payload',
+    '/tmp/mish/reference-home-payload',
+    '/tmp/mish/local-code-home-payload',
   ]);
 });
 
@@ -1238,7 +1238,7 @@ test('[P1] home staged workspace context auto-sends into the first project run',
     await route.fulfill({
       json: {
         project: referenceProject,
-        resolvedDir: '/tmp/open-design/reference-home-autosend',
+        resolvedDir: '/tmp/mish/reference-home-autosend',
       },
     });
   });
@@ -1250,7 +1250,7 @@ test('[P1] home staged workspace context auto-sends into the first project run',
     runId: 'home-autosend-context-run',
   });
   await page.route('**/api/dialog/open-folder', async (route) => {
-    await route.fulfill({ json: { path: '/tmp/open-design/local-code-home-autosend' } });
+    await route.fulfill({ json: { path: '/tmp/mish/local-code-home-autosend' } });
   });
   await page.route('**/api/dir-exists', async (route) => {
     await route.fulfill({ json: { exists: true } });
@@ -1287,12 +1287,12 @@ test('[P1] home staged workspace context auto-sends into the first project run',
       expect.objectContaining({
         id: 'project:ref-home-autosend',
         label: 'Reference Home Autosend',
-        absolutePath: '/tmp/open-design/reference-home-autosend',
+        absolutePath: '/tmp/mish/reference-home-autosend',
       }),
       expect.objectContaining({
-        id: 'local-code:/tmp/open-design/local-code-home-autosend',
+        id: 'local-code:/tmp/mish/local-code-home-autosend',
         label: 'local-code-home-autosend',
-        absolutePath: '/tmp/open-design/local-code-home-autosend',
+        absolutePath: '/tmp/mish/local-code-home-autosend',
       }),
     ]),
   );
@@ -1533,8 +1533,8 @@ test('[P1] home suggestion entry remains retryable after create failures', async
 
 test("[P2] en home smoke exposes the localized creation type, design system, working directory, and run entries", async ({ page }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem('open-design:locale', "en");
-    window.localStorage.setItem('open-design:locale-source', 'manual');
+    window.localStorage.setItem('mish:locale', "en");
+    window.localStorage.setItem('mish:locale-source', 'manual');
   });
   await seedBrowserLocale(page, "en");
   await routeHomeDesignSystems(page);

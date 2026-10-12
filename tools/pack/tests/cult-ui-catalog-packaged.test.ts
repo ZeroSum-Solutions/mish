@@ -9,7 +9,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
-import { createPackageManagerInvocation } from "@open-design/platform";
+import { createPackageManagerInvocation } from "@mish/platform";
 import { describe, expect, it } from "vitest";
 
 import { INTERNAL_PACKAGES as LINUX_INTERNAL_PACKAGES } from "@/linux.js";
@@ -22,7 +22,7 @@ import { WORKSPACE_BUILD_PACKAGES } from "@/workspace-build.js";
 const execFileAsync = promisify(execFile);
 const workspaceRoot = fileURLToPath(new URL("../../../", import.meta.url));
 const packageDir = join(workspaceRoot, "packages", "cult-ui-catalog");
-const NAME = "@open-design/cult-ui-catalog";
+const NAME = "@mish/cult-ui-catalog";
 
 async function packedFiles(): Promise<Set<string>> {
   // Drop the npm_* variables of whichever runner started vitest (npx sets npm_execpath to npm), so

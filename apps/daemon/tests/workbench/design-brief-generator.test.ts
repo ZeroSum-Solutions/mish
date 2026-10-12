@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseDesignBriefRecordView } from '@open-design/contracts';
+import { parseDesignBriefRecordView } from '@mish/contracts';
 import { BRIEF_TRANSFORMER_MODEL, claudeBriefArgs, createClaudeMaxBriefGenerator } from '../../src/workbench/brief/generator.js';
 import type { ClaudeProcessRequest } from '../../src/workbench/review/reviewers/claude-visual.js';
 import { createDesignBriefService } from '../../src/workbench/brief/service.js';

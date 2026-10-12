@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RESOURCE_CATEGORIES } from '@open-design/contracts';
+import { RESOURCE_CATEGORIES } from '@mish/contracts';
 import { localInventorySources, searchEveryPage, skillPlugin } from './resources-inventory-fixture.js';
 
 /** The categories AC-R04.2 names, as RESOURCE_CATEGORIES values. */

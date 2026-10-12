@@ -4,7 +4,7 @@
 // requirement no font meets and constraints that are not font requirements.
 import { cleanup, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseResourceSearchResponse, type ResourceResult } from '@open-design/contracts';
+import { parseResourceSearchResponse, type ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchResourceSearch } from '../../../src/components/workbench/WorkbenchResourceSearch';
 import { getProjectDesignContext, getWorkbenchPreferences, searchWorkbenchResources } from '../../../src/providers/workbench';

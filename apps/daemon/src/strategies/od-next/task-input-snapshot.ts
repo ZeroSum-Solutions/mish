@@ -10,14 +10,14 @@ import {
   type OdNextProductionTaskTypeV1,
   type OdNextRequestInputFactsV1,
   type OdNextTaskConfigurationV1,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { spawnSync } from 'node:child_process';
 import { createHash, randomBytes } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { redactSecrets } from '../../redact.js';
 
-const SNAPSHOT_SCHEMA = 'open-design.od-next-task-input-snapshot/v1' as const;
+const SNAPSHOT_SCHEMA = 'mish.od-next-task-input-snapshot/v1' as const;
 export const DEFAULT_OD_NEXT_ATTACHMENT_FILE_CAP_BYTES = 16 * 1024 * 1024;
 export const DEFAULT_OD_NEXT_ATTACHMENT_TOTAL_CAP_BYTES = 32 * 1024 * 1024;
 export const DEFAULT_OD_NEXT_ATTACHMENT_COUNT_CAP = 32;

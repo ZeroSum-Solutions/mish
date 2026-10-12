@@ -2,7 +2,7 @@ import { designSystemIdentity } from '../runtime/design-system-identity';
 import identityStyles from './DesignSystemIdentity.module.css';
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { coalescedGet, evictCoalescedGet } from '../lib/coalesced-get';
-import { Badge, Button, Chip, VisuallyHidden } from '@open-design/components';
+import { Badge, Button, Chip, VisuallyHidden } from '@mish/components';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackDesignSystemsTemplateCardClick,
@@ -12,11 +12,11 @@ import {
   trackPageView,
   trackWorkspaceResourceActionResult,
 } from '../analytics/events';
-import type { DesignSystemEditClickProps } from '@open-design/contracts/analytics';
+import type { DesignSystemEditClickProps } from '@mish/contracts/analytics';
 import type {
   TrackingDesignSystemStatusAction,
   TrackingDesignSystemStatusValue,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { useI18n } from '../i18n';
 import { useWorkspaceContext } from '../collab/useWorkspaceContext';
 import {
@@ -36,7 +36,7 @@ import {
   matchesDesignSystemQuery,
   workspaceContextHasTeamIdentity,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { Locale } from '../i18n/types';
 import {
   localizeDesignSystemCategory,
@@ -63,7 +63,7 @@ import type { DesignSystemDetail, DesignSystemSummary, ProjectTemplate, Surface 
 import styles from './DesignSystemsTab.module.css';
 import { workspaceAnalyticsDimensions } from '../analytics/workspace';
 import { publicFaviconUrl } from '../utils/publicFavicon';
-import type { TrackingWorkspaceScope } from '@open-design/contracts/analytics';
+import type { TrackingWorkspaceScope } from '@mish/contracts/analytics';
 
 interface Props {
   /** EntryShell parks this mounted tab while another nav surface is visible. */

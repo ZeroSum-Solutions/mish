@@ -2,7 +2,7 @@
 
 > **Release candidate agency-bar/2.0.0-rc1. The bar freezes at the end of QT-4. No baseline is taken before then. After that, any change to anchors, weights, bands or caps bumps the version, forces re-calibration and needs a new baseline.**
 
-Generated from `e2e/benchmarks/quality/bar.ts`. Run `pnpm --filter @open-design/e2e bar:docs` to regenerate.
+Generated from `e2e/benchmarks/quality/bar.ts`. Run `pnpm --filter @mish/e2e bar:docs` to regenerate.
 
 Would we show this to a paying client as our first draft, and would the client say "this studio understands us"?
 

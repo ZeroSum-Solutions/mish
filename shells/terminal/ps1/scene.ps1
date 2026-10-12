@@ -50,13 +50,13 @@ try {
   if ($observedVersion -ne "v$NodeVersion") { Fail "official Node version mismatch" }
   [IO.Directory]::CreateDirectory((Join-Path $stage "carrier")) | Out-Null
   Move-Item -LiteralPath $roots[0].FullName -Destination (Join-Path $stage "carrier/node")
-  foreach ($directory in @("runtime/standalone", "runtime/node_modules/@open-design/sidecar/dist", "runtime/node_modules/@open-design/platform/dist", "seed", "sh", "ps1", "contract")) { [IO.Directory]::CreateDirectory((Join-Path $stage $directory)) | Out-Null }
+  foreach ($directory in @("runtime/standalone", "runtime/node_modules/@mish/sidecar/dist", "runtime/node_modules/@mish/platform/dist", "seed", "sh", "ps1", "contract")) { [IO.Directory]::CreateDirectory((Join-Path $stage $directory)) | Out-Null }
   Copy-Item -LiteralPath (Join-Path $Standalone "index.mjs") -Destination (Join-Path $stage "runtime/standalone/index.mjs")
-  Copy-Item -LiteralPath (Join-Path $Sidecar "index.mjs") -Destination (Join-Path $stage "runtime/node_modules/@open-design/sidecar/dist/index.mjs")
-  Copy-Item -LiteralPath (Join-Path $Sidecar "supervisor.mjs") -Destination (Join-Path $stage "runtime/node_modules/@open-design/sidecar/dist/supervisor.mjs")
-  Copy-Item -LiteralPath (Join-Path $Platform "index.mjs") -Destination (Join-Path $stage "runtime/node_modules/@open-design/platform/dist/index.mjs")
-  [IO.File]::WriteAllText((Join-Path $stage "runtime/node_modules/@open-design/sidecar/package.json"), '{"name":"@open-design/sidecar","type":"module","exports":{".":"./dist/index.mjs"}}' + "`n", [Text.UTF8Encoding]::new($false))
-  [IO.File]::WriteAllText((Join-Path $stage "runtime/node_modules/@open-design/platform/package.json"), '{"name":"@open-design/platform","type":"module","exports":{".":"./dist/index.mjs"}}' + "`n", [Text.UTF8Encoding]::new($false))
+  Copy-Item -LiteralPath (Join-Path $Sidecar "index.mjs") -Destination (Join-Path $stage "runtime/node_modules/@mish/sidecar/dist/index.mjs")
+  Copy-Item -LiteralPath (Join-Path $Sidecar "supervisor.mjs") -Destination (Join-Path $stage "runtime/node_modules/@mish/sidecar/dist/supervisor.mjs")
+  Copy-Item -LiteralPath (Join-Path $Platform "index.mjs") -Destination (Join-Path $stage "runtime/node_modules/@mish/platform/dist/index.mjs")
+  [IO.File]::WriteAllText((Join-Path $stage "runtime/node_modules/@mish/sidecar/package.json"), '{"name":"@mish/sidecar","type":"module","exports":{".":"./dist/index.mjs"}}' + "`n", [Text.UTF8Encoding]::new($false))
+  [IO.File]::WriteAllText((Join-Path $stage "runtime/node_modules/@mish/platform/package.json"), '{"name":"@mish/platform","type":"module","exports":{".":"./dist/index.mjs"}}' + "`n", [Text.UTF8Encoding]::new($false))
   Copy-Item -LiteralPath $Closure -Destination (Join-Path $stage "seed/closure.mjs")
   Copy-Item -LiteralPath (Join-Path $terminalSource "runtime/fossil.mjs") -Destination (Join-Path $stage "runtime/fossil.mjs")
   Copy-Item -LiteralPath (Join-Path $terminalSource "runtime/sidecar-bootstrap.mjs") -Destination (Join-Path $stage "runtime/sidecar-bootstrap.mjs")
@@ -75,11 +75,11 @@ try {
   $standaloneSha = Digest (Join-Path $stage "runtime/standalone/index.mjs")
   $closureSha = Digest (Join-Path $stage "seed/closure.mjs")
   $moduleFiles = @(
-    "runtime/node_modules/@open-design/platform/dist/index.mjs",
-    "runtime/node_modules/@open-design/platform/package.json",
-    "runtime/node_modules/@open-design/sidecar/dist/index.mjs",
-    "runtime/node_modules/@open-design/sidecar/dist/supervisor.mjs",
-    "runtime/node_modules/@open-design/sidecar/package.json"
+    "runtime/node_modules/@mish/platform/dist/index.mjs",
+    "runtime/node_modules/@mish/platform/package.json",
+    "runtime/node_modules/@mish/sidecar/dist/index.mjs",
+    "runtime/node_modules/@mish/sidecar/dist/supervisor.mjs",
+    "runtime/node_modules/@mish/sidecar/package.json"
   )
   $moduleIndex = [ordered]@{ files = @($moduleFiles | ForEach-Object { [ordered]@{ file = $_; sha256 = Digest (Join-Path $stage $_) } }); schemaVersion = 1 }
   $moduleIndexPath = Join-Path $stage "runtime/modules.json"

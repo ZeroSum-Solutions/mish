@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import type { ModelPreflightResult } from '@open-design/contracts';
+import type { ModelPreflightResult } from '@mish/contracts';
 import { preflightAttachmentNames, SessionModelPreflightBanner, SessionModelStatus } from '../../src/components/workbench/SessionModelStatus';
 import { I18nProvider } from '../../src/i18n';
 afterEach(cleanup);

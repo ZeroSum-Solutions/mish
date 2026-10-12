@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Select, Dialog, DialogBody, DialogFooter, DialogHeader, DialogTitle } from '@open-design/components';
-import type { Project, ReusableUnitManifest, UnitInsertReceipt, UnitInsertRefusal, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button, Select, Dialog, DialogBody, DialogFooter, DialogHeader, DialogTitle } from '@mish/components';
+import type { Project, ReusableUnitManifest, UnitInsertReceipt, UnitInsertRefusal, WorkspaceCollabContext } from '@mish/contracts';
 import type { Dict } from '../../i18n/types';
 import { useT } from '../../i18n';
 import { listProjects } from '../../state/projects';

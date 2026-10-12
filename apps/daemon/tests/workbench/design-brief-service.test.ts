@@ -3,7 +3,7 @@ import { join } from 'node:path';
 import { createClaudeMaxBriefGenerator } from '../../src/workbench/brief/generator.js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createHash } from 'node:crypto';
-import { canonicalDesignBriefJson, parseDesignBriefRecordView, renderDesignBriefPrompt } from '@open-design/contracts';
+import { canonicalDesignBriefJson, parseDesignBriefRecordView, renderDesignBriefPrompt } from '@mish/contracts';
 import { createDesignBriefService, BriefError } from '../../src/workbench/brief/service.js';
 import { fakeGenerator, modelOutput, referenceDoc, referenceSource, refOf, tempDir } from './design-brief-fixture.js';
 

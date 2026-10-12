@@ -36,7 +36,7 @@ async function main(): Promise<void> {
     namespace,
     platform,
     reportPath: report.root,
-    screenshot: `screenshots/open-design-${platform}-smoke.png`,
+    screenshot: `screenshots/mish-${platform}-smoke.png`,
     spec,
   });
   await saveRequiredSource(report, 'tools-pack.json', process.env.OD_PACKAGED_E2E_BUILD_JSON_PATH);

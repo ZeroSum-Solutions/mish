@@ -24,7 +24,7 @@ Primary sources:
 
 A plugin is a folder. The only required file is `SKILL.md`, which is the portable
 Agent Skills contract — the same shape that Claude Code, Codex, Cursor, and other Agent
-Skills-compatible tools already read. An optional sidecar file, `open-design.json`,
+Skills-compatible tools already read. An optional sidecar file, `mish.json`,
 adds the product-specific layer: marketplace card, pipeline, inputs, capabilities. A
 folder with only `SKILL.md` still works as a plain skill anywhere; adding the sidecar
 never makes it less portable (`plugins/spec/README.md`, "Compatibility Promise").
@@ -62,7 +62,7 @@ From `docs/plugins-spec.md` section 4 and `plugins/spec/SPEC.md` sections 1–2:
 ```text
 my-plugin/
   SKILL.md              # required — portable agent contract, YAML frontmatter + body
-  open-design.json       # optional — Mishh Mashh sidecar (marketplace card, pipeline, inputs)
+  mish.json       # optional — Mishh Mashh sidecar (marketplace card, pipeline, inputs)
   README.md              # standard readme
   preview/                # index.html / poster.png / demo.mp4 — real output, not a splash screen
   examples/               # sample outputs, one per case
@@ -83,7 +83,7 @@ description: Use this plugin when the user wants...
 The folder name, the frontmatter `name`, and the manifest `name` must match: lowercase
 letters, numbers, and hyphens only.
 
-`open-design.json` required fields (`plugins/spec/SPEC.md` section 6): `name`,
+`mish.json` required fields (`plugins/spec/SPEC.md` section 6): `name`,
 `specVersion` (the plugin spec version this manifest follows, currently `1.0.0`),
 `version` (the plugin's own semver, bumped on any behavior change),
 `compat.agentSkills[0].path` pointing at `./SKILL.md`, and — for a scenario/skill that
@@ -92,7 +92,7 @@ or `tune-collab`.
 
 A minimal real example that shows the smallest enriched shape is
 `plugins/_official/scenarios/od-plugin-authoring/`: two files, `SKILL.md` and
-`open-design.json`, no assets. Read it before building anything more complex.
+`mish.json`, no assets. Read it before building anything more complex.
 
 ## 2. Building a plugin, step by step
 
@@ -111,7 +111,7 @@ Two paths, both real:
      --out ./plugins/community
    ```
 
-   This writes `<out>/<id>/{SKILL.md,open-design.json,README.md}`. `--with-claude-plugin`
+   This writes `<out>/<id>/{SKILL.md,mish.json,README.md}`. `--with-claude-plugin`
    also adds `.claude-plugin/plugin.json` compatibility scaffolding.
 
 2. **Copy from template**, for a fully manual start:
@@ -120,7 +120,7 @@ Two paths, both real:
    cp -r plugins/spec/templates/ ./plugins/community/my-plugin/
    ```
 
-   `plugins/spec/templates/` holds `SKILL.template.md`, `open-design.template.json`,
+   `plugins/spec/templates/` holds `SKILL.template.md`, `mish.template.json`,
    `README.template.md`, and `evals.template.json`.
 
 Either way, rename the folder and the frontmatter `name` to the same lowercase id.
@@ -132,7 +132,7 @@ Either way, rename the folder and the frontmatter `name` to the same lowercase i
 - Keep `SKILL.md` under 500 lines. Move long API notes, visual rules, or exporter
   details into `references/`.
 - Never put marketplace-only data (tags, preview config) in `SKILL.md`; that belongs in
-  `open-design.json` only. Keep the skill body portable.
+  `mish.json` only. Keep the skill body portable.
 - Pick one workflow lane (`import`, `create`, `export`, `share`, `deploy`, `refine`,
   `extend`) from `plugins/spec/SPEC.md` section 3, and record it in `tags` and
   `od.scenario`/`od.mode`.
@@ -167,14 +167,14 @@ Repo-wide checks, from `plugins/spec/SPEC.md` section 10 and root `package.json`
 
 ```bash
 pnpm guard
-pnpm --filter @open-design/daemon typecheck
+pnpm --filter @mish/daemon typecheck
 ```
 
-`pnpm --filter @open-design/plugin-runtime typecheck`, cited in `plugins/spec/SPEC.md`
+`pnpm --filter @mish/plugin-runtime typecheck`, cited in `plugins/spec/SPEC.md`
 and `plugins/spec/AGENT-DEVELOPMENT.md`, targets a package named
-`@open-design/plugin-runtime`. It is not in `package.json`'s current `devDependencies`
+`@mish/plugin-runtime`. It is not in `package.json`'s current `devDependencies`
 list and no such workspace package was found in this checkout — **(not verified)**. Run
-`pnpm --filter @open-design/daemon typecheck` as the real equivalent instead.
+`pnpm --filter @mish/daemon typecheck` as the real equivalent instead.
 
 ### 2.4 Test it locally in the running app
 
@@ -206,8 +206,8 @@ Observed directly in `plugins/_official/examples/agency-fervor/` and its sibling
 | A trusted compiler | A dedicated `compose.ts` that renders the recipe into HTML; the author is told explicitly not to edit the compiler to force acceptance | `compiler/scripts/compose.ts`, `compiler/SKILL.md` |
 | `approved-assets.json` | Every image/font entry carries `id`, `file`, `kind`, `sha256`, `mediaType`, `bytes` — an integrity-checked asset roster, not a loose folder | `families/fervor/approved-assets.json` |
 | Preview media | A real compiled reference build plus a `gallery.html` wrapper for in-app preview routing | `preview/fervor-r1.html`, `preview/gallery.html` |
-| `publishedAt` stamps | ISO 8601 timestamp of first publish, required for bundled first-party plugins and enforced by a test | `open-design.json`, `e2e/tests/plugin-published-at.test.ts` (per `docs/plugins-spec.md` §5.1) |
-| i18n in `en` and other locales | `title_i18n` / `description_i18n` maps, e.g. 17 locales on `od-plugin-authoring` | `plugins/_official/scenarios/od-plugin-authoring/open-design.json` |
+| `publishedAt` stamps | ISO 8601 timestamp of first publish, required for bundled first-party plugins and enforced by a test | `mish.json`, `e2e/tests/plugin-published-at.test.ts` (per `docs/plugins-spec.md` §5.1) |
+| i18n in `en` and other locales | `title_i18n` / `description_i18n` maps, e.g. 17 locales on `od-plugin-authoring` | `plugins/_official/scenarios/od-plugin-authoring/mish.json` |
 | Rights and provenance recorded | A `media-provenance.json` plus a README "Rights" section naming source and license per asset | `families/fervor/media-provenance.json`, `plugins/_official/examples/agency-fervor/README.md` |
 | Reproducible build command | The exact CLI invocation to regenerate the reference build, checked into the README | `plugins/_official/examples/agency-fervor/README.md` |
 
@@ -237,26 +237,26 @@ Upstream's registry model, from `docs/publishing-a-plugin.md` and
    CLI; tokens stay in `gh`, never in the product).
 4. **Publish**: `od plugin publish <pluginId> --to <catalog> --repo <github-url>`. The
    catalogs a real `--to` value accepts, verified in `runPluginPublish`, are
-   `open-design`, `anthropics-skills`, `awesome-agent-skills`, `clawhub`, `skills-sh`, or
+   `mish`, `anthropics-skills`, `awesome-agent-skills`, `clawhub`, `skills-sh`, or
    `marketplace-json` (with `--catalog <path>`). This opens a GitHub PR review flow; CI
-   regenerates `open-design-marketplace.json` after merge.
+   regenerates `mish-marketplace.json` after merge.
 5. **Install from the registry**: `od marketplace refresh official`, then
    `od plugin install <pluginId>`.
 6. **Yank a bad version**: `od plugin yank <pluginId>@<version> --reason "..."` — this
    never deletes bytes, it only blocks new installs of that version.
 
 A self-hosted registry is just a static JSON file plus review process
-(`plugins/registry/official/open-design-marketplace.json` is the shipped example) served
+(`plugins/registry/official/mish-marketplace.json` is the shipped example) served
 over HTTPS; the daemon rejects an HTML tree page and requires the raw JSON URL.
 
 Two more real CLI paths matter for the "publish to our own repo" question:
 
 - `od plugin publish-repo <folder>` creates or updates a public GitHub repo named by the
   plugin's manifest — a standalone-repo publish, independent of any registry.
-- `od plugin open-design-pr <folder>` copies the plugin into
+- `od plugin mish-pr <folder>` copies the plugin into
   `plugins/community/<name>/` on a new branch of `ZeroSum-Solutions/Mishh-Mashh-2` and
   opens a PR there. It does not fork: contributors push the branch directly to the
-  private org repository. `od plugin publish --to open-design` and `od plugin yank` open
+  private org repository. `od plugin publish --to mish` and `od plugin yank` open
   issues on the same repository. All three read `MISHH_MASHH_PLUGIN_REPO` in
   `apps/daemon/src/plugins/catalog-repo.ts`.
 
@@ -297,7 +297,7 @@ listing, no ClawHub submission, unless a future decision changes that.
    defaults to `MISHH_MASHH_PLUGIN_REPO`, and `OD_MARKETPLACE_REPO`,
    `OD_MARKETPLACE_REPO_REF` and `OD_MARKETPLACE_REGISTRY_PATH` still override it.
    `OFFICIAL_PLUGIN_SOURCE_REPO` in `marketplace-seed.ts` and the `source` fields in
-   `plugins/registry/official/open-design-marketplace.json` use
+   `plugins/registry/official/mish-marketplace.json` use
    `github:ZeroSum-Solutions/Mishh-Mashh-2@main`. The official registry is read from the
    local `plugins/registry/` folder, so the private repository needs no public access.
 
@@ -310,7 +310,7 @@ listing, no ClawHub submission, unless a future decision changes that.
    plugins/_official`, or copy `plugins/spec/templates/`.
 3. Write `SKILL.md` with an activation-style description, under 500 lines, portable
    (no marketplace-only data in the body).
-4. Fill `open-design.json`: `name`, `specVersion`, `version`, `compat.agentSkills`,
+4. Fill `mish.json`: `name`, `specVersion`, `version`, `compat.agentSkills`,
    `od.taskKind`, `od.mode`, `od.pipeline` or `od.context.atoms`, minimal
    `od.capabilities`, `title_i18n`/`description_i18n` for `en`, and a
    `publishedAt` stamp.
@@ -336,14 +336,14 @@ listing, no ClawHub submission, unless a future decision changes that.
   individually re-verified for this playbook — treat that specific pipeline as
   **(not verified)** and re-check flags with `od <subcommand> --help` before scripting
   against it.
-- **`pnpm --filter @open-design/plugin-runtime typecheck`**, listed as a validation step
+- **`pnpm --filter @mish/plugin-runtime typecheck`**, listed as a validation step
   in both `plugins/spec/SPEC.md` and `plugins/spec/AGENT-DEVELOPMENT.md`, targets a
   package that was not found in this checkout's workspace. **(not verified)** — use
-  `pnpm --filter @open-design/daemon typecheck` instead.
+  `pnpm --filter @mish/daemon typecheck` instead.
 - **One constant owns the publish target.** `MISHH_MASHH_PLUGIN_REPO` in
   `apps/daemon/src/plugins/catalog-repo.ts` feeds the PR flow, the publish and yank issue
   links, and the default marketplace. Change the repository name there, then update the
-  `source` fields in `plugins/registry/official/open-design-marketplace.json` and the
+  `source` fields in `plugins/registry/official/mish-marketplace.json` and the
   URL prefix in `tools/release/src/catalog/{export,validate}.ts`.
 - **`catalog-publish.yml` is repo-gated, not branch-gated.** It checks
   the upstream repository name before it ever runs, so pushing to our

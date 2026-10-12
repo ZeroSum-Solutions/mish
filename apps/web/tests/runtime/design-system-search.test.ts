@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { matchesDesignSystemQuery } from '@open-design/contracts';
+import { matchesDesignSystemQuery } from '@mish/contracts';
 
 const system = {
   id: 'study-example', title: 'Élan', category: 'Trust to lead',

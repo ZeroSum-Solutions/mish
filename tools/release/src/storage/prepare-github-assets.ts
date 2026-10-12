@@ -1,7 +1,7 @@
 import { copyFileSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, relative, resolve } from "node:path";
 import { optional, required, writeJson } from "./common.ts";
-import { releaseChannelDescriptor } from "@open-design/release";
+import { releaseChannelDescriptor } from "@mish/release";
 
 const releaseChannel = releaseChannelDescriptor(required("RELEASE_CHANNEL")).channel;
 const releaseVersion = required("RELEASE_VERSION");
@@ -46,16 +46,16 @@ function findRequiredAsset(files: string[], name: string): string {
 }
 
 const allowedNames = [
-  `open-design-${releaseVersion}-mac-arm64.dmg`,
-  `open-design-${releaseVersion}-mac-arm64.dmg.sha256`,
-  `open-design-${releaseVersion}-mac-x64.dmg`,
-  `open-design-${releaseVersion}-mac-x64.dmg.sha256`,
-  `open-design-${releaseVersion}-win-x64-setup.exe`,
-  `open-design-${releaseVersion}-win-x64-setup.exe.sha256`,
+  `mish-${releaseVersion}-mac-arm64.dmg`,
+  `mish-${releaseVersion}-mac-arm64.dmg.sha256`,
+  `mish-${releaseVersion}-mac-x64.dmg`,
+  `mish-${releaseVersion}-mac-x64.dmg.sha256`,
+  `mish-${releaseVersion}-win-x64-setup.exe`,
+  `mish-${releaseVersion}-win-x64-setup.exe.sha256`,
   ...(enableLinux
     ? [
-        `open-design-${releaseVersion}-linux-x64.AppImage`,
-        `open-design-${releaseVersion}-linux-x64.AppImage.sha256`,
+        `mish-${releaseVersion}-linux-x64.AppImage`,
+        `mish-${releaseVersion}-linux-x64.AppImage.sha256`,
       ]
     : []),
 ];

@@ -7,9 +7,9 @@
  * touches the daemon (database, registry, the run choke point) is injected.
  */
 import type Database from 'better-sqlite3';
-import type { DesignBrief, StagedRunRecord } from '@open-design/contracts';
+import type { DesignBrief, StagedRunRecord } from '@mish/contracts';
 
-import type { StagedStopReason } from '@open-design/contracts';
+import type { StagedStopReason } from '@mish/contracts';
 import { prepareModelAdmission } from '../workbench/prepare-model.js';
 import { readAdmittedPublicInput } from '../workbench/replay.js';
 import { inheritedRunLineageHints } from '../services/run-analytics-lifecycle.js';

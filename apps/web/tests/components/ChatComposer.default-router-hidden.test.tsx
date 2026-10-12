@@ -16,8 +16,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createRef } from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { DEFAULT_UNSELECTED_SCENARIO_PLUGIN_ID } from '@open-design/contracts';
-import type { AppliedPluginSnapshot } from '@open-design/contracts';
+import { DEFAULT_UNSELECTED_SCENARIO_PLUGIN_ID } from '@mish/contracts';
+import type { AppliedPluginSnapshot } from '@mish/contracts';
 
 import { ChatComposer, type ChatComposerHandle } from '../../src/components/ChatComposer';
 import { flushMounts, typeAndSettle } from '../helpers/lexical-composer';

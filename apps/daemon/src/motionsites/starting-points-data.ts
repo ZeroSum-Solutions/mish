@@ -12,12 +12,12 @@
 // The source table carries no `category` field for templates (unlike the prompt library), so most
 // entries below have `category: undefined` and `spineAffinity: 'unclassified'` — a bare title
 // ("Glow", "Shift", "Prism") is not evidence enough to assign a spine, matching
-// `@open-design/section-catalog`'s own normalizer discipline (never guess, never default to
+// `@mish/section-catalog`'s own normalizer discipline (never guess, never default to
 // `'MI'`). The handful with `spineAffinity` set below are the ones whose title itself states an
 // unambiguous category that `shape-atlas.json`/`family-registry.json` maps confidently — same
 // citation bar the normalizer applies to the prompt library's actual `category` column.
 
-import type { MotionSitesStartingPoint } from '@open-design/contracts/api/motionsites';
+import type { MotionSitesStartingPoint } from '@mish/contracts/api/motionsites';
 
 const MOTIONSITES_TEMPLATES_BASE_URL = 'https://motionsites.ai/templates#';
 

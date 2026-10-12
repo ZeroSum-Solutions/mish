@@ -230,7 +230,7 @@ test('[P0] Team design systems catch up missed shares, updates, and retractions'
     // The badge is optimistic; a full navigation must follow the persisted
     // choice, whose passive effect can run after that first visible render.
     await expect.poll(() => memberPage.evaluate(() => localStorage.getItem(
-      'open-design:home-composer:design-system',
+      'mish:home-composer:design-system',
     ))).toBe(designSystemId);
 
     await gotoDesignSystems(memberPage);

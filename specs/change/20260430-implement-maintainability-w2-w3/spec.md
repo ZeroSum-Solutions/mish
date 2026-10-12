@@ -46,7 +46,7 @@ created: '2026-04-30'
 - `apps/web` communicates with daemon-owned capabilities through API DTOs and streaming events, while privileged local filesystem, SQLite, agent CLI, task lifecycle, logs, and artifacts stay daemon-owned. Source: `specs/current/architecture-boundaries.md:13-40`
 - The workspace currently has no `packages/*` workspace entries; `pnpm-workspace.yaml` includes `apps/*` and `e2e` only. Source: `pnpm-workspace.yaml:1-3`
 - No shared package currently exists under `packages/*`. Source: file search `packages/*/package.json`
-- Root scripts run daemon, web, build, tests, and typecheck through pnpm filters; root `typecheck` currently targets only `@open-design/web`. Source: `package.json:12-25`
+- Root scripts run daemon, web, build, tests, and typecheck through pnpm filters; root `typecheck` currently targets only `@mish/web`. Source: `package.json:12-25`
 - Dev-mode web rewrites `/api/*`, `/artifacts/*`, and `/frames/*` to the local daemon origin; the config notes that `/api/chat` SSE streams through the rewrite. Source: `apps/web/next.config.ts:35-44`
 - Web-side daemon chat types live in `apps/web/src/providers/daemon.ts`: `DaemonStreamOptions` sends `agentId`, `history`, `systemPrompt`, `projectId`, `attachments`, `model`, and `reasoning`. Source: `apps/web/src/providers/daemon.ts:19-38`
 - The web chat client posts `/api/chat` with JSON fields `agentId`, `systemPrompt`, `message`, `projectId`, `attachments`, `model`, and `reasoning`. Source: `apps/web/src/providers/daemon.ts:57-77`
@@ -136,7 +136,7 @@ flowchart LR
 - Decision: Introduce a unified `ApiError` and `SseErrorEvent` type with `code`, `message`, `details`, `retryable`, `requestId`, and `taskId`, plus compatibility helpers for existing `{ error }` and `{ code, error }` responses. Current routes return multiple ad hoc shapes; W2 should make the target contract explicit. Source: `specs/current/maintainability-roadmap.md:39-40`, `apps/daemon/src/server.ts:147-177`, `apps/daemon/src/server.ts:200-205`, `apps/daemon/src/server.ts:868-884`, `apps/daemon/src/server.ts:1170-1180`
 - Decision: Treat machine absolute paths as daemon-internal in public contracts. DTOs should use project-relative or logical paths; the existing `/api/chat` `start` event's `cwd` field should be typed as legacy/internal and removed from web-facing assumptions during adoption. Source: `specs/current/architecture-boundaries.md:58-64`, `apps/daemon/src/server.ts:1087-1095`
 - Decision: W3's end state is a compiled TypeScript daemon runtime with a transitional `allowJs` phase. The daemon currently runs `node cli.js` and exposes `./cli.js` as its bin, so TypeScript entrypoint migration needs a deliberate build output and script/bin update. Source: `apps/daemon/package.json:6-13`, `package.json:9-24`
-- Decision: Broaden typechecking from web-only to contracts, daemon, scripts, and e2e support. Root `typecheck` currently filters only `@open-design/web`; daemon has tests but no typecheck script; e2e already uses TypeScript configs and MJS/CJS operational files. Source: `package.json:19-25`, `apps/daemon/package.json:9-23`, `apps/web/tsconfig.json:2-23`, `e2e/package.json:6-12`, `e2e/playwright.config.ts:1-58`
+- Decision: Broaden typechecking from web-only to contracts, daemon, scripts, and e2e support. Root `typecheck` currently filters only `@mish/web`; daemon has tests but no typecheck script; e2e already uses TypeScript configs and MJS/CJS operational files. Source: `package.json:19-25`, `apps/daemon/package.json:9-23`, `apps/web/tsconfig.json:2-23`, `e2e/package.json:6-12`, `e2e/playwright.config.ts:1-58`
 - Decision: Migrate JavaScript/MJS/CJS files in dependency order: pure parsers/helpers, project/artifact helpers, DB/agent modules, server/CLI entrypoints, root scripts, then e2e scripts/reporters. This keeps each step verifiable and limits runtime-loader risk around Playwright reporter loading. Source: `apps/daemon/vitest.config.ts:1-8`, `apps/daemon/src/json-event-stream.ts:35-91`, `e2e/playwright.config.ts:22-37`, `e2e/package.json:8-12`, `package.json:14-15`
 
 ### Why this design
@@ -159,12 +159,12 @@ flowchart LR
 
 ### Test Strategy
 
-- Contracts: run `pnpm --filter @open-design/contracts typecheck`; add lightweight type-level coverage via exported example payloads or `tsc`-checked fixture files. Source: `specs/current/maintainability-roadmap.md:57-58`
-- Web adoption: run `pnpm --filter @open-design/web typecheck` and existing web tests after importing shared DTO/SSE/error types. Source: `apps/web/package.json:6-10`, `apps/web/tsconfig.json:2-23`
-- Daemon adoption: add and run `pnpm --filter @open-design/daemon typecheck`, then `pnpm --filter @open-design/daemon test`; daemon already uses Vitest with TypeScript config. Source: `apps/daemon/package.json:9-23`, `apps/daemon/vitest.config.ts:1-8`
+- Contracts: run `pnpm --filter @mish/contracts typecheck`; add lightweight type-level coverage via exported example payloads or `tsc`-checked fixture files. Source: `specs/current/maintainability-roadmap.md:57-58`
+- Web adoption: run `pnpm --filter @mish/web typecheck` and existing web tests after importing shared DTO/SSE/error types. Source: `apps/web/package.json:6-10`, `apps/web/tsconfig.json:2-23`
+- Daemon adoption: add and run `pnpm --filter @mish/daemon typecheck`, then `pnpm --filter @mish/daemon test`; daemon already uses Vitest with TypeScript config. Source: `apps/daemon/package.json:9-23`, `apps/daemon/vitest.config.ts:1-8`
 - SSE compatibility: add or update parser/translator tests around `/api/chat` `start`, `agent`, `stdout`, `stderr`, `error`, and `end` frames plus normalized agent payloads. Source: `apps/web/src/providers/daemon.ts:85-151`, `apps/daemon/src/json-event-stream.ts:35-91`
 - Error model compatibility: add daemon route/helper tests for existing `{ error }` and `{ code, error }` inputs mapping into the new `ApiError` shape. Source: `apps/daemon/src/server.ts:147-177`, `apps/daemon/src/server.ts:200-205`, `apps/daemon/src/server.ts:868-884`
-- Runtime migration: after each TypeScript conversion batch, run daemon tests and root typecheck; after script/e2e migration, run `pnpm --filter @open-design/e2e test` and a Playwright reporter smoke run when feasible. Source: `package.json:19-25`, `e2e/package.json:6-12`, `e2e/playwright.config.ts:22-37`
+- Runtime migration: after each TypeScript conversion batch, run daemon tests and root typecheck; after script/e2e migration, run `pnpm --filter @mish/e2e test` and a Playwright reporter smoke run when feasible. Source: `package.json:19-25`, `e2e/package.json:6-12`, `e2e/playwright.config.ts:22-37`
 
 ### Pseudocode
 
@@ -271,7 +271,7 @@ Flow:
 ### Implementation
 
 - `pnpm-workspace.yaml` - added `packages/*` so shared packages participate in the workspace graph.
-- `packages/contracts/package.json` - added `@open-design/contracts` package metadata, source exports, and `typecheck` script.
+- `packages/contracts/package.json` - added `@mish/contracts` package metadata, source exports, and `typecheck` script.
 - `packages/contracts/tsconfig.json` - added strict TypeScript configuration for shared contracts.
 - `packages/contracts/src/common.ts` - added JSON, nullable, and response envelope helper types.
 - `packages/contracts/src/errors.ts` - added `ApiError`, error codes, compatibility response types, SSE error payloads, and small pure construction helpers.
@@ -280,7 +280,7 @@ Flow:
 - `packages/contracts/src/sse/*.ts` - added typed SSE event helpers plus `/api/chat` and `/api/proxy/stream` event unions with protocol constants.
 - `packages/contracts/src/examples.ts` - added tsc-checked example payloads for key contracts.
 - `packages/contracts/src/index.ts` - added the public export surface.
-- `apps/web/package.json` and `apps/daemon/package.json` - added workspace dependencies on `@open-design/contracts` for boundary type adoption.
+- `apps/web/package.json` and `apps/daemon/package.json` - added workspace dependencies on `@mish/contracts` for boundary type adoption.
 - `apps/web/src/types.ts` - re-exported shared chat, registry, project, file, and conversation DTOs while keeping UI/config-only types local.
 - `apps/web/src/providers/daemon.ts` - typed `/api/chat` request construction, chat SSE frame handling, daemon agent payload translation, and unified SSE error payload reading with shared contracts.
 - `apps/daemon/src/server.ts` - added JSDoc contract imports, typed project/file response envelopes, typed chat/proxy request body reads, typed SSE send events, and shared-shape compatibility error helpers.
@@ -309,32 +309,32 @@ Flow:
 ### Verification
 
 - `corepack pnpm install` - passed; workspace graph recognized all 5 projects and updated lockfile state.
-- `corepack pnpm --filter @open-design/contracts typecheck` - passed.
-- `corepack pnpm --filter @open-design/web typecheck` - passed as a package graph/type resolution sanity check.
+- `corepack pnpm --filter @mish/contracts typecheck` - passed.
+- `corepack pnpm --filter @mish/web typecheck` - passed as a package graph/type resolution sanity check.
 - `corepack pnpm typecheck` - attempted; failed because the root script invokes `pnpm` from PATH version 10.28.0 while the repo requires `>=10.33.2 <11`. The Corepack package-level equivalent above passed.
-- `corepack pnpm install` - passed after adding app dependencies on `@open-design/contracts`; lockfile links web and daemon to the workspace package.
-- `corepack pnpm --filter @open-design/contracts typecheck` - passed after Step 2 adoption.
-- `corepack pnpm --filter @open-design/web typecheck` - passed after Step 2 adoption.
-- `corepack pnpm --filter @open-design/web test -- src/providers/sse.test.ts` - passed; Vitest also ran existing artifact manifest tests in the web package.
-- `corepack pnpm --filter @open-design/daemon test -- sse-response.test.mjs` - passed; Vitest also ran existing daemon artifact manifest and json event stream tests.
+- `corepack pnpm install` - passed after adding app dependencies on `@mish/contracts`; lockfile links web and daemon to the workspace package.
+- `corepack pnpm --filter @mish/contracts typecheck` - passed after Step 2 adoption.
+- `corepack pnpm --filter @mish/web typecheck` - passed after Step 2 adoption.
+- `corepack pnpm --filter @mish/web test -- src/providers/sse.test.ts` - passed; Vitest also ran existing artifact manifest tests in the web package.
+- `corepack pnpm --filter @mish/daemon test -- sse-response.test.mjs` - passed; Vitest also ran existing daemon artifact manifest and json event stream tests.
 - `corepack pnpm install` - passed after adding daemon TypeScript/type dependencies.
-- `corepack pnpm --filter @open-design/daemon typecheck` - passed after adding the daemon TypeScript foundation.
-- `corepack pnpm --filter @open-design/daemon test` - passed; all 18 daemon tests passed.
+- `corepack pnpm --filter @mish/daemon typecheck` - passed after adding the daemon TypeScript foundation.
+- `corepack pnpm --filter @mish/daemon test` - passed; all 18 daemon tests passed.
 - `corepack pnpm typecheck` - passed after root `typecheck` was broadened to contracts, web, and daemon and routed through Corepack-pinned pnpm.
-- `corepack pnpm --filter @open-design/daemon typecheck` - passed after daemon module conversion.
-- `corepack pnpm --filter @open-design/daemon build` - passed and emitted compiled daemon output under `apps/daemon/dist`.
-- `corepack pnpm --filter @open-design/daemon test` - passed after daemon module conversion; all 18 daemon tests passed.
+- `corepack pnpm --filter @mish/daemon typecheck` - passed after daemon module conversion.
+- `corepack pnpm --filter @mish/daemon build` - passed and emitted compiled daemon output under `apps/daemon/dist`.
+- `corepack pnpm --filter @mish/daemon test` - passed after daemon module conversion; all 18 daemon tests passed.
 - `node apps/daemon/dist/cli.js --help` - passed as a compiled CLI smoke check.
 - `corepack pnpm typecheck` - passed after daemon module conversion and compiled-bin package updates.
-- `corepack pnpm --filter @open-design/e2e exec tsc -p ../scripts/tsconfig.json --noEmit` - passed for root TypeScript scripts.
-- `corepack pnpm --filter @open-design/daemon build` - passed before e2e support typechecking and live-script import validation.
-- `corepack pnpm --filter @open-design/e2e typecheck` - passed for Playwright config, reporter, report metadata, and e2e support scripts.
+- `corepack pnpm --filter @mish/e2e exec tsc -p ../scripts/tsconfig.json --noEmit` - passed for root TypeScript scripts.
+- `corepack pnpm --filter @mish/daemon build` - passed before e2e support typechecking and live-script import validation.
+- `corepack pnpm --filter @mish/e2e typecheck` - passed for Playwright config, reporter, report metadata, and e2e support scripts.
 - `corepack pnpm typecheck` - passed after script and e2e support migration.
 - `node --experimental-strip-types` import smoke checks for `scripts/resolve-dev-ports.ts` and `e2e/reporters/markdown-reporter.ts` - passed.
 - `corepack pnpm test` - passed; web 15 tests, daemon 18 tests, and e2e Vitest 9 tests passed.
-- `corepack pnpm --filter @open-design/e2e test:ui:clean` - passed against the TypeScript cleanup script.
-- `corepack pnpm --filter @open-design/e2e exec playwright test -c playwright.config.ts --list` - passed as a Playwright config/reporter loading smoke check and listed 15 Chromium UI tests.
+- `corepack pnpm --filter @mish/e2e test:ui:clean` - passed against the TypeScript cleanup script.
+- `corepack pnpm --filter @mish/e2e exec playwright test -c playwright.config.ts --list` - passed as a Playwright config/reporter loading smoke check and listed 15 Chromium UI tests.
 - `corepack pnpm run check:residual-js` - passed; no project-owned residual `.js`, `.mjs`, or `.cjs` files were found outside the documented allowlist.
-- `corepack pnpm --filter @open-design/e2e exec tsc -p ../scripts/tsconfig.json --noEmit` - passed after adding the residual JavaScript scanner.
+- `corepack pnpm --filter @mish/e2e exec tsc -p ../scripts/tsconfig.json --noEmit` - passed after adding the residual JavaScript scanner.
 - `corepack pnpm typecheck` - passed after Step 6; contracts, web, daemon typecheck, daemon build, scripts typecheck, e2e typecheck, and residual JavaScript check all passed.
 - `corepack pnpm test` - passed after Step 6; web 15 tests, daemon 18 tests, and e2e Vitest 9 tests passed.

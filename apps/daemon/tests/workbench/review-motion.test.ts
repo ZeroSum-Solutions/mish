@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { renderReviewEvidenceText, reviewBundleCurrencyProblems, parseProjectRubric, parseVerificationBundle, WORKBENCH_MANDATORY_CRITERION_IDS, type ProjectRubric } from '@open-design/contracts';
+import { renderReviewEvidenceText, reviewBundleCurrencyProblems, parseProjectRubric, parseVerificationBundle, WORKBENCH_MANDATORY_CRITERION_IDS, type ProjectRubric } from '@mish/contracts';
 import { registerWorkbenchReviewRoutes } from '../../src/routes/workbench-review.js';
 import { runReviewCli } from '../../src/workbench/review-cli.js';
 import { PAUSE_CONTROL_NAME } from '../../src/workbench/review/page-scripts.js';

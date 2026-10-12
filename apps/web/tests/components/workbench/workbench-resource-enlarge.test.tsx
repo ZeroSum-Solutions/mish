@@ -8,7 +8,7 @@
 import { act, useLayoutEffect } from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { RESOURCE_CATEGORIES, parseResourceSearchResponse, type ResourceResult } from '@open-design/contracts';
+import { RESOURCE_CATEGORIES, parseResourceSearchResponse, type ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchResourceDetail } from '../../../src/components/workbench/WorkbenchResourceDetail';
 import { WorkbenchResourceSearch } from '../../../src/components/workbench/WorkbenchResourceSearch';

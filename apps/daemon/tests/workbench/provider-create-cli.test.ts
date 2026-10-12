@@ -18,7 +18,7 @@ it('actual CLI consumes provider stdin for start/resupply and rejects stdin conf
   server.listen(0); await new Promise<void>(r => server.once('listening', r));
   const base = `http://127.0.0.1:${(server.address() as { port: number }).port}`;
   temporary = await mkdtemp(path.join(tmpdir(), 'provider-cli-')); const config = path.join(temporary, 'tsconfig.json');
-  await writeFile(config, JSON.stringify({ compilerOptions: { baseUrl: root, paths: { '@open-design/contracts': ['packages/contracts/src/index.ts'] } } }));
+  await writeFile(config, JSON.stringify({ compilerOptions: { baseUrl: root, paths: { '@mish/contracts': ['packages/contracts/src/index.ts'] } } }));
   const cli = async (args: string[], input: string) => {
     const child = exec(process.execPath, [path.join(root, 'node_modules/tsx/dist/cli.mjs'), '--tsconfig', config, path.join(root, 'apps/daemon/src/cli.ts'), ...args, '--daemon-url', base, '--json'], { cwd: path.join(root, 'apps/daemon'), env: { ...process.env, OD_TOOL_TOKEN: '' }, timeout: 20000 });
     child.child.stdin?.end(input);

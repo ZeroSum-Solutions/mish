@@ -11,8 +11,8 @@
  * These specs pin that the kit's typefaces, role tokens, and font-face source
  * survive the whole chain into the composed generation input.
  */
-import { composeSystemPrompt as composeContractsSystemPrompt } from '@open-design/contracts';
-import type { OdNextStrategyRequestRecipeV2 } from '@open-design/contracts';
+import { composeSystemPrompt as composeContractsSystemPrompt } from '@mish/contracts';
+import type { OdNextStrategyRequestRecipeV2 } from '@mish/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { brandFromDesignMd } from '../src/brands/design-md-input.js';

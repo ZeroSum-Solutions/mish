@@ -71,8 +71,8 @@ The existing `section-entrance`, `scroll-story`, `flip-filter` and `svg-feedback
 Landing prep regenerates the G02 receipt with `buildG02ReactReceipt()` and writes both the daemon mirror and evidence JSON with `writeG02ReactReceipt()`. The fixture includes all 18 registered components. A fresh verification process checks deterministic reproduction and the production gate; recipe integration tests require that gate to accept the current unit bytes. React 18 is the covered major. Other majors remain pending.
 
 ```bash
-OD_UPDATE_G02_RECEIPT=1 pnpm --filter @open-design/daemon exec vitest run -c vitest.config.ts tests/workbench/g02-react-receipt.test.ts
-pnpm --filter @open-design/daemon exec vitest run -c vitest.config.ts tests/workbench/g02-react-receipt.test.ts tests/workbench/gsap-recipes.test.ts tests/workbench/gsap-recipes-runtime.test.ts tests/workbench/gsap-marketing-recipes.test.ts
+OD_UPDATE_G02_RECEIPT=1 pnpm --filter @mish/daemon exec vitest run -c vitest.config.ts tests/workbench/g02-react-receipt.test.ts
+pnpm --filter @mish/daemon exec vitest run -c vitest.config.ts tests/workbench/g02-react-receipt.test.ts tests/workbench/gsap-recipes.test.ts tests/workbench/gsap-recipes-runtime.test.ts tests/workbench/gsap-marketing-recipes.test.ts
 ```
 
 Catalog content and listing digests are derived from materialized bytes at runtime; there is no separate committed GSAP catalog digest fixture. Historical evidence imported from main is retained. G02 is the generated receipt whose inputs this branch changes.
@@ -93,9 +93,9 @@ Merged fetched main `1aed443114526c0143f666d5129ea4aa192683b9` with a merge comm
 | Four scoped daemon files in the verification command above | 160 tests passed, including fresh deterministic receipt reproduction and the production gate |
 | `pnpm guard` | Passed, exit 0 |
 | `pnpm typecheck` | Passed, exit 0 |
-| `pnpm --filter @open-design/web typecheck` after the final UI journey test | Passed, exit 0; test mock source ID kept as its literal type |
-| `pnpm --filter @open-design/web exec vitest run -c vitest.config.ts tests/components/workbench/workbench-gsap-recipe.test.tsx` | 9 tests passed, including English/Spanish presentation and unchanged adoption identity |
-| `pnpm --filter @open-design/web exec vitest run -c vitest.config.ts tests/components/workbench/workbench-resource-enlarge.test.tsx` | 42 tests passed, including Spanish search → inspect → variant switching through the real UI components and original HTTP keys |
+| `pnpm --filter @mish/web typecheck` after the final UI journey test | Passed, exit 0; test mock source ID kept as its literal type |
+| `pnpm --filter @mish/web exec vitest run -c vitest.config.ts tests/components/workbench/workbench-gsap-recipe.test.tsx` | 9 tests passed, including English/Spanish presentation and unchanged adoption identity |
+| `pnpm --filter @mish/web exec vitest run -c vitest.config.ts tests/components/workbench/workbench-resource-enlarge.test.tsx` | 42 tests passed, including Spanish search → inspect → variant switching through the real UI components and original HTTP keys |
 | `pnpm i18n:check` | Passed, exit 0 |
 | `pnpm tools-dev stop --namespace t4-motion-recipes --json`, then status | All three apps not running; no matched or remaining PIDs |
 
@@ -111,11 +111,11 @@ Logs and raw independent review outputs are in this worktree's ignored `.tmp/t4-
 
 | Command / check | Result |
 | --- | --- |
-| `pnpm --filter @open-design/daemon test tests/workbench/gsap-recipes.test.ts tests/workbench/gsap-recipes-runtime.test.ts tests/workbench/gsap-marketing-recipes.test.ts` | 3 files, 157 tests passed; includes a real expanded build/SSR/hydration fixture receipt injected only into tests |
+| `pnpm --filter @mish/daemon test tests/workbench/gsap-recipes.test.ts tests/workbench/gsap-recipes-runtime.test.ts tests/workbench/gsap-marketing-recipes.test.ts` | 3 files, 157 tests passed; includes a real expanded build/SSR/hydration fixture receipt injected only into tests |
 | `pnpm guard` | Passed, exit 0 |
-| `pnpm --filter @open-design/daemon typecheck` | Passed, exit 0 |
+| `pnpm --filter @mish/daemon typecheck` | Passed, exit 0 |
 | Independent generated-source semantic check | All 14 emitted marketing TSX components passed strict TypeScript 5.9.3 / noEmit with React 18 types and pinned GSAP packages; zero diagnostics |
-| `pnpm --filter @open-design/daemon exec vitest run -c vitest.config.ts tests/workbench/g02-react-receipt.test.ts` | 2 tests failed against the untouched committed production receipt: reproduction differs and its gate returns `receipt-unit-mismatch`. The fresh expanded fixture build itself passes. Captain regeneration is required before landing. |
+| `pnpm --filter @mish/daemon exec vitest run -c vitest.config.ts tests/workbench/g02-react-receipt.test.ts` | 2 tests failed against the untouched committed production receipt: reproduction differs and its gate returns `receipt-unit-mismatch`. The fresh expanded fixture build itself passes. Captain regeneration is required before landing. |
 | Independent implementation review | Image placeholder and updater-test findings resolved; no additional code blockers. Integration remains blocked by the production receipt. |
 
 Commands were executed through Corepack. Logs remain in this worktree's ignored `.tmp/motion-*.log`. The full daemon suite selected by the extra `--` was interrupted; it is not a passing receipt. Public-site timings, browser pin geometry and final visual quality remain unverified. Source/tests are locally committed for the captain; this worker does not push, publish, merge or restart a shared runtime.

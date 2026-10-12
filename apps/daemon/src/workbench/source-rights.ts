@@ -1,5 +1,5 @@
 import { isDeepStrictEqual } from 'node:util';
-import type { OperationRight, ResourceCandidate, RightsAssessment, SourceAdmission } from '@open-design/contracts';
+import type { OperationRight, ResourceCandidate, RightsAssessment, SourceAdmission } from '@mish/contracts';
 
 type LegacyWorkbenchOperation = ResourceCandidate['operationGrants'][number]['operation'];
 

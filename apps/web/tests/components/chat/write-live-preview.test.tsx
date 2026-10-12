@@ -2,7 +2,7 @@
 /**
  * 一次 `Write` 在聊天里只应该是**一行**。
  *
- * 用户在真机上看到的是另一回事:一行「写入 design-manifesto-parchment.html」底下
+ * 用户在真机上看到的是另一回事:一行「写入 brand-manifesto-parchment.html」底下
  * 直接摊着几十行 HTML 源码的滚动预览(原话「这又是啥啊,不应该是一个普通工具调用的
  * 样式吗? 创建 xxx?」)。
  *
@@ -21,7 +21,7 @@
  *    (「位置不对但能力不丢」)——「不丢」现在由 N4 明确否掉。
  *
  * 红测证据(改之前跑过):把 `liveToolInput` 喂进 `AssistantMessage`,DOM 里出现
- * `[data-testid="live-code-box"]`,头是「写入 / design-manifesto-parchment.html」,
+ * `[data-testid="live-code-box"]`,头是「写入 / brand-manifesto-parchment.html」,
  * 身子是整份 HTML 源码的 `<pre>` —— 与用户截图逐格对得上。
  * 修好之后那条断言**没法再写**:喂进去的通道本身被删了,所以下面第三条改成
  * 守「通道不许回来」,前两条守「该有的样子」。
@@ -58,7 +58,7 @@ const FILE_SOURCE = [
   '</html>',
 ].join('\n');
 
-const FILE_PATH = '/repo/design-manifesto-parchment.html';
+const FILE_PATH = '/repo/brand-manifesto-parchment.html';
 
 function message(events: AgentEvent[], overrides: Partial<ChatMessage> = {}): ChatMessage {
   return {
@@ -116,7 +116,7 @@ describe('Write 只落一行(N4 / D3)', () => {
     /* 一行,不是一行 + 一块代码 */
     expect(body?.children.length).toBe(1);
     expect(body?.textContent ?? '').toContain("Wrote");
-    expect(screen.getByRole('button', { name: "Open design-manifesto-parchment.html" })).toBeTruthy();
+    expect(screen.getByRole('button', { name: "Open brand-manifesto-parchment.html" })).toBeTruthy();
     /* 5 行正文 → +5 −0 */
     expect(body?.textContent ?? '').toContain('+5');
     expect(container.textContent ?? '').not.toContain(SOURCE_MARKER);

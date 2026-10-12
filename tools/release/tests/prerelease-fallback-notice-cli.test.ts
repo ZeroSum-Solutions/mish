@@ -20,7 +20,7 @@ async function compose(outputFile: string, env: Record<string, string>): Promise
         ...process.env,
         CHANNEL_LABEL: "Prerelease",
         GITHUB_OUTPUT: outputFile,
-        ORIGIN_RUN_URL: "https://github.com/nexu-io/open-design/actions/runs/111",
+        ORIGIN_RUN_URL: "https://github.com/ZeroSum-Solutions/mish/actions/runs/111",
         // No public origin and a declared pipeline state: the composer then
         // needs no network at all, so this test cannot reach out.
         PIPELINE_PROGRESS: "finished",

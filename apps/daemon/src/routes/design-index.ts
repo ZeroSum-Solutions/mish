@@ -12,7 +12,7 @@ import type {
   DesignIndexProfileResponse,
   DesignIndexRemoveResponse,
   DesignIndexTaxonomyResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   AGENCY_ROUTE_MAX_CHARS,
   DESIGN_INDEX_DEFAULT_LIMIT,
@@ -21,18 +21,18 @@ import {
   DESIGN_INDEX_MAX_LIMIT,
   DESIGN_INDEX_QUERY_LIST_KEYS,
   DESIGN_INDEX_QUERY_SCALAR_KEYS,
-} from '@open-design/contracts';
-import type { FamilyRegistry, ShapeAtlas } from '@open-design/agency-fast-lane/atlas';
-import type { FindQuery } from '@open-design/agency-fast-lane/design-index';
-import { htmlFacts } from '@open-design/agency-fast-lane/html-facts';
+} from '@mish/contracts';
+import type { FamilyRegistry, ShapeAtlas } from '@mish/agency-fast-lane/atlas';
+import type { FindQuery } from '@mish/agency-fast-lane/design-index';
+import { htmlFacts } from '@mish/agency-fast-lane/html-facts';
 import type {
   DesignProfile,
   JevProfiler,
   ProfileInput,
   ProfileSourceKind,
-} from '@open-design/agency-fast-lane/profile';
-import type { JevRouter, RouteDecision as FastLaneRouteDecision } from '@open-design/agency-fast-lane/route';
-import type { DesignTaxonomy } from '@open-design/agency-fast-lane/taxonomy';
+} from '@mish/agency-fast-lane/profile';
+import type { JevRouter, RouteDecision as FastLaneRouteDecision } from '@mish/agency-fast-lane/route';
+import type { DesignTaxonomy } from '@mish/agency-fast-lane/taxonomy';
 import { parseDesignProfile } from '../design-profile-parse.js';
 import { createDesignIndexStore } from '../design-index-store.js';
 import type { AgencyJevKeyStore } from '../storage/agency-config.js';

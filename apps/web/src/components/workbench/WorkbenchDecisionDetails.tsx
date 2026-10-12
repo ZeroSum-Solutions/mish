@@ -1,5 +1,5 @@
 import { WorkbenchComponentFit } from './WorkbenchComponentFit';
-import type { ResourceResult } from '@open-design/contracts';
+import type { ResourceResult } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { adoptionCapabilityText, canOfferApply } from './WorkbenchApplyAction';
 import styles from './workbench.module.css';

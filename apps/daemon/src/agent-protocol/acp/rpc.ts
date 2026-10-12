@@ -217,7 +217,7 @@ export function promotedOpenCodeSessionErrorPayload(data: unknown, fallbackMessa
       retryable: typeof details.retryable === 'boolean' ? details.retryable : true,
       details: {
         ...details,
-        promoted_by: 'open_design_acp',
+        promoted_by: 'mish_acp',
       },
     },
   };

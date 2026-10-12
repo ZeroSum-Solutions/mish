@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { strategyPackageHashFromDigests } from '@open-design/plugin-runtime';
-import { StrategyTaskProjectionV2Schema } from '@open-design/contracts';
-import type { AppliedPluginSnapshot, OpenDesignPlanContractV2 } from '@open-design/contracts';
+import { strategyPackageHashFromDigests } from '@mish/plugin-runtime';
+import { StrategyTaskProjectionV2Schema } from '@mish/contracts';
+import type { AppliedPluginSnapshot, MishPlanContractV2 } from '@mish/contracts';
 import type Database from 'better-sqlite3';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
@@ -99,7 +99,7 @@ function strategyBinding() {
     { path: './assets/task-profiles/prototype.md', sha256: 'b'.repeat(64) },
   ];
   return {
-    schema: 'open-design.applied-strategy/v2' as const,
+    schema: 'mish.applied-strategy/v2' as const,
     id: 'od-next-strategy' as const,
     version: '2.0.0',
     packageHash: strategyPackageHashFromDigests(assetDigests),
@@ -136,10 +136,10 @@ function createStrategySnapshot(db: Database.Database): AppliedPluginSnapshot {
   });
 }
 
-function planContract(snapshot: AppliedPluginSnapshot): OpenDesignPlanContractV2 {
+function planContract(snapshot: AppliedPluginSnapshot): MishPlanContractV2 {
   const strategy = snapshot.strategy!;
   return {
-    schema: 'open-design.plan-contract/v2',
+    schema: 'mish.plan-contract/v2',
     strategy: {
       id: 'od-next-strategy',
       version: strategy.version,
@@ -210,7 +210,7 @@ function runtimeState(input: {
   executionMode?: 'simple' | null;
 }) {
   return {
-    schema: 'open-design.strategy-state/v2' as const,
+    schema: 'mish.strategy-state/v2' as const,
     route: input.route ?? 'full_plan',
     inputStage: input.inputStage ?? 'request',
     outcome: input.outcome,
@@ -307,7 +307,7 @@ describe('OD Next planning coordinator', () => {
       runId: 'run-request',
       protocol: protocol([
         'Updated the existing header.',
-        block('open-design-runtime-state', runtimeState({
+        block('mish-runtime-state', runtimeState({
           route: 'direct_edit',
           outcome: 'completed',
           executionMode: 'simple',
@@ -337,7 +337,7 @@ describe('OD Next planning coordinator', () => {
     const awaiting = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1',
       runId: 'run-request',
-      protocol: protocol(`${question}\n${block('open-design-runtime-state', runtimeState({
+      protocol: protocol(`${question}\n${block('mish-runtime-state', runtimeState({
         outcome: 'clarification_required',
       }))}`),
       updatedAt: 120,
@@ -368,7 +368,7 @@ describe('OD Next planning coordinator', () => {
     const repeated = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1',
       runId: 'run-clarification',
-      protocol: protocol(`${question}\n${block('open-design-runtime-state', runtimeState({
+      protocol: protocol(`${question}\n${block('mish-runtime-state', runtimeState({
         inputStage: 'clarification',
         outcome: 'blocked',
       }))}`),
@@ -395,8 +395,8 @@ describe('OD Next planning coordinator', () => {
       runId: 'run-request',
       protocol: protocol([
         'Planning complete.',
-        block('open-design-plan-contract', plan),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', plan),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -436,8 +436,8 @@ describe('OD Next planning coordinator', () => {
       runId: 'run-request',
       protocol: protocol([
         '策略判断信息充足，将直接进入生产。\n\n<question-form> 无需提出',
-        block('open-design-plan-contract', plan),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', plan),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -463,8 +463,8 @@ describe('OD Next planning coordinator', () => {
       runId: 'run-request',
       protocol: protocol([
         'Planning complete. <question-form>无需提出</question-form>',
-        block('open-design-plan-contract', plan),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', plan),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -490,7 +490,7 @@ describe('OD Next planning coordinator', () => {
       runId: 'run-request',
       protocol: protocol([
         '<question-form id="scope">{"questions":[{"id":"surface","label":"Surface?"}]}</question-form>',
-        block('open-design-runtime-state', runtimeState({ outcome: 'clarification_required' })),
+        block('mish-runtime-state', runtimeState({ outcome: 'clarification_required' })),
       ].join('\n')),
       updatedAt: 120,
     });
@@ -526,7 +526,7 @@ describe('OD Next planning coordinator', () => {
         '{"questions":[{"id":"surface","label":"Surface?"}]}',
         '</question-form>',
         '</question-form>',
-        block('open-design-runtime-state', runtimeState({ outcome: 'clarification_required' })),
+        block('mish-runtime-state', runtimeState({ outcome: 'clarification_required' })),
       ].join('\n')),
       updatedAt: 120,
     });
@@ -549,8 +549,8 @@ describe('OD Next planning coordinator', () => {
       taskExecutionId: 'task-1',
       runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', plan, true),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', plan, true),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -580,8 +580,8 @@ describe('OD Next planning coordinator', () => {
       taskExecutionId: 'task-1',
       runId: 'run-repair',
       protocol: protocol([
-        block('open-design-plan-contract', plan),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', plan),
+        block('mish-runtime-state', runtimeState({
           inputStage: 'contract_repair',
           outcome: 'plan_ready',
           executionMode: 'simple',
@@ -600,18 +600,18 @@ describe('OD Next planning coordinator', () => {
     const cases = [
       {
         name: 'duplicate',
-        text: (plan: OpenDesignPlanContractV2) => [
-          block('open-design-plan-contract', plan),
-          block('open-design-plan-contract', plan),
-          block('open-design-runtime-state', runtimeState({ outcome: 'plan_ready', executionMode: 'simple' })),
+        text: (plan: MishPlanContractV2) => [
+          block('mish-plan-contract', plan),
+          block('mish-plan-contract', plan),
+          block('mish-runtime-state', runtimeState({ outcome: 'plan_ready', executionMode: 'simple' })),
         ].join('\n'),
         reason: 'od_next_protocol_plan_contract_duplicate',
       },
       {
         name: 'unanchored',
         text: () => [
-          '<open-design-plan-contract>\n{not-json}\n</open-design-plan-contract>',
-          block('open-design-runtime-state', runtimeState({ outcome: 'plan_ready', executionMode: 'simple' })),
+          '<mish-plan-contract>\n{not-json}\n</mish-plan-contract>',
+          block('mish-runtime-state', runtimeState({ outcome: 'plan_ready', executionMode: 'simple' })),
         ].join('\n'),
         reason: 'od_next_protocol_plan_contract_invalid_json',
       },
@@ -659,8 +659,8 @@ describe('OD Next planning coordinator', () => {
       taskExecutionId: 'task-1',
       runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', original, true),
-        block('open-design-runtime-state', runtimeState({ outcome: 'plan_ready', executionMode: 'simple' })),
+        block('mish-plan-contract', original, true),
+        block('mish-runtime-state', runtimeState({ outcome: 'plan_ready', executionMode: 'simple' })),
       ].join('\n')),
       repairRun: { runId: 'run-repair', sourceRunId: 'run-request' },
       executionPreflight: executionPassed,
@@ -673,8 +673,8 @@ describe('OD Next planning coordinator', () => {
       taskExecutionId: 'task-1',
       runId: 'run-repair',
       protocol: protocol([
-        block('open-design-plan-contract', changed),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', changed),
+        block('mish-runtime-state', runtimeState({
           inputStage: 'contract_repair', outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -708,7 +708,7 @@ describe('OD Next planning coordinator', () => {
     const drift = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-route-drift',
       runId: 'run-route-drift',
-      protocol: protocol(block('open-design-runtime-state', runtimeState({
+      protocol: protocol(block('mish-runtime-state', runtimeState({
         route: 'direct_edit', outcome: 'completed', executionMode: 'simple',
       }))),
       completionEvidence: { physicalStatus: 'succeeded', deliverableValid: true },
@@ -742,8 +742,8 @@ describe('OD Next planning coordinator', () => {
       taskExecutionId: 'task-profile-drift',
       runId: 'run-profile-drift',
       protocol: protocol([
-        block('open-design-plan-contract', mismatchedProfile),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', mismatchedProfile),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -777,8 +777,8 @@ describe('OD Next planning coordinator', () => {
       taskExecutionId: 'task-repair-tools',
       runId: 'run-repair-tools-request',
       protocol: protocol([
-        block('open-design-plan-contract', plan, true),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', plan, true),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -793,8 +793,8 @@ describe('OD Next planning coordinator', () => {
       taskExecutionId: 'task-repair-tools',
       runId: 'run-repair-tools',
       protocol: protocol([
-        block('open-design-plan-contract', plan),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', plan),
+        block('mish-runtime-state', runtimeState({
           inputStage: 'contract_repair', outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -812,7 +812,7 @@ describe('OD Next planning coordinator', () => {
     const cases: Array<{
       name: string;
       reason: string;
-      mutate: (plan: OpenDesignPlanContractV2) => void;
+      mutate: (plan: MishPlanContractV2) => void;
     }> = [
       {
         name: 'snapshot',
@@ -865,8 +865,8 @@ describe('OD Next planning coordinator', () => {
           taskExecutionId: taskId,
           runId,
           protocol: protocol([
-            block('open-design-plan-contract', drifted, repairAnchor),
-            block('open-design-runtime-state', runtimeState({
+            block('mish-plan-contract', drifted, repairAnchor),
+            block('mish-runtime-state', runtimeState({
               outcome: 'plan_ready', executionMode: 'simple',
             })),
           ].join('\n')),
@@ -900,8 +900,8 @@ describe('OD Next planning coordinator', () => {
       taskExecutionId: 'task-1',
       runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', planContract(snapshot)),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', planContract(snapshot)),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -953,8 +953,8 @@ describe('OD Next planning coordinator', () => {
     const planned = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', planContract(snapshot)),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', planContract(snapshot)),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -995,8 +995,8 @@ describe('OD Next planning coordinator', () => {
       intake: intakePassed, updatedAt: 110,
     });
     const parsed = protocol([
-      block('open-design-plan-contract', planContract(snapshot)),
-      block('open-design-runtime-state', runtimeState({
+      block('mish-plan-contract', planContract(snapshot)),
+      block('mish-runtime-state', runtimeState({
         outcome: 'plan_ready', executionMode: 'simple',
       })),
     ].join('\n')).finish();
@@ -1051,8 +1051,8 @@ describe('OD Next planning coordinator', () => {
     const plan = planContract(snapshot);
     plan.runManifest.productionRoutes = ['unregistered-host-route'];
     const parsed = protocol([
-      block('open-design-plan-contract', plan),
-      block('open-design-runtime-state', runtimeState({
+      block('mish-plan-contract', plan),
+      block('mish-runtime-state', runtimeState({
         outcome: 'plan_ready', executionMode: 'simple',
       })),
     ].join('\n')).finish();
@@ -1091,8 +1091,8 @@ describe('OD Next planning coordinator', () => {
       intake: intakePassed, updatedAt: 110,
     });
     const parsed = protocol([
-      block('open-design-plan-contract', planContract(snapshot)),
-      block('open-design-runtime-state', runtimeState({
+      block('mish-plan-contract', planContract(snapshot)),
+      block('mish-runtime-state', runtimeState({
         outcome: 'plan_ready', executionMode: 'simple',
       })),
     ].join('\n')).finish();
@@ -1128,8 +1128,8 @@ describe('OD Next planning coordinator', () => {
     });
     const plan = planContract(snapshot);
     const parsed = protocol([
-      block('open-design-plan-contract', plan, true),
-      block('open-design-runtime-state', runtimeState({
+      block('mish-plan-contract', plan, true),
+      block('mish-runtime-state', runtimeState({
         outcome: 'plan_ready', executionMode: 'simple',
       })),
     ].join('\n')).finish();
@@ -1172,7 +1172,7 @@ describe('OD Next planning coordinator', () => {
     const result = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1',
       runId: 'run-request',
-      protocol: protocol(block('open-design-runtime-state', runtimeState({
+      protocol: protocol(block('mish-runtime-state', runtimeState({
         route: 'direct_edit', outcome: 'completed', executionMode: 'simple',
       }))),
       completionEvidence: { physicalStatus: 'succeeded', deliverableValid: false },
@@ -1193,8 +1193,8 @@ describe('OD Next planning coordinator', () => {
     const planned = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', planContract(snapshot)),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', planContract(snapshot)),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -1225,8 +1225,8 @@ describe('OD Next planning coordinator', () => {
     const planned = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', planContract(snapshot)),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', planContract(snapshot)),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -1254,8 +1254,8 @@ describe('OD Next planning coordinator', () => {
     const planned = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', planContract(snapshot)),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', planContract(snapshot)),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -1284,7 +1284,7 @@ describe('OD Next planning coordinator', () => {
     const question = '<question-form id="scope">{"questions":[{"id":"surface","label":"Surface?"}]}</question-form>';
     const waiting = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
-      protocol: protocol(`${question}\n${block('open-design-runtime-state', runtimeState({
+      protocol: protocol(`${question}\n${block('mish-runtime-state', runtimeState({
         outcome: 'clarification_required',
       }))}`),
       updatedAt: 120,
@@ -1320,7 +1320,7 @@ describe('OD Next planning coordinator', () => {
     const question = '<question-form id="scope">{"questions":[{"id":"surface","label":"Surface?"}]}</question-form>';
     const waiting = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
-      protocol: protocol(`${question}\n${block('open-design-runtime-state', runtimeState({
+      protocol: protocol(`${question}\n${block('mish-runtime-state', runtimeState({
         outcome: 'clarification_required',
       }))}`),
       updatedAt: 120,
@@ -1332,7 +1332,7 @@ describe('OD Next planning coordinator', () => {
     const halted = 'Key requirements were skipped, so no runnable prototype plan can be formed. This task is blocked.';
     const result = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-clarification',
-      protocol: protocol(`${halted}\n${block('open-design-runtime-state', runtimeState({
+      protocol: protocol(`${halted}\n${block('mish-runtime-state', runtimeState({
         inputStage: 'clarification', outcome: 'blocked',
       }))}`),
       updatedAt: 140,
@@ -1410,7 +1410,7 @@ ${question}`),
    * looks like, which outcome it settles on, and how `strategyTaskDelivered`
    * counts it. The field record it reproduces is kept below verbatim.
    *
-   * Reproduces the field failure recorded on Open Design Beta
+   * Reproduces the field failure recorded on Mish Beta
    * 0.21.1-beta.7, task `odnext_c4ee010be6b748dc9b92984946bc10a8`,
    * run `e5d6181b-1705-4a44-964b-cdcb3fbcb6ac`.
    *
@@ -1500,7 +1500,7 @@ ${question}`),
       const outcome = finalizeStrategyPlanningTurn(db, {
         taskExecutionId,
         runId: `run-declared-${index}`,
-        protocol: protocol(`答案正文。\n${block('open-design-runtime-state', state)}`),
+        protocol: protocol(`答案正文。\n${block('mish-runtime-state', state)}`),
         completionEvidence: { physicalStatus: 'succeeded', deliverableValid: false },
         updatedAt: 120,
       });
@@ -1521,8 +1521,8 @@ ${question}`),
     const question = '<question-form id="scope">{"questions":[{"id":"surface","label":"Surface?"}]}</question-form>';
     const result = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
-      protocol: protocol(`${question}\n${block('open-design-runtime-state', {
-        schema: 'open-design.strategy-state/v2',
+      protocol: protocol(`${question}\n${block('mish-runtime-state', {
+        schema: 'mish.strategy-state/v2',
         route: 'full_plan',
         inputStage: 'request',
         outcome: 'clarification_required',
@@ -1570,7 +1570,7 @@ ${form('b')}`),
     const withPlan = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-plan-no-state', runId: 'run-plan-no-state',
       protocol: protocol(`${form('c')}
-${block('open-design-plan-contract', planContract(snapshot))}`),
+${block('mish-plan-contract', planContract(snapshot))}`),
       executionPreflight: executionPassed,
       updatedAt: 202,
     });
@@ -1596,7 +1596,7 @@ ${block('open-design-plan-contract', planContract(snapshot))}`),
     const question = '<question-form id="scope">{"questions":[{"id":"surface","label":"Surface?"}]}</question-form>';
     finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
-      protocol: protocol(`${question}\n${block('open-design-runtime-state', runtimeState({
+      protocol: protocol(`${question}\n${block('mish-runtime-state', runtimeState({
         outcome: 'clarification_required',
       }))}`),
       updatedAt: 120,
@@ -1643,7 +1643,7 @@ ${block('open-design-plan-contract', planContract(snapshot))}`),
     const question = '<question-form id="scope">{"questions":[{"id":"surface","label":"Surface?"}]}</question-form>';
     finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
-      protocol: protocol(`${question}\n${block('open-design-runtime-state', runtimeState({
+      protocol: protocol(`${question}\n${block('mish-runtime-state', runtimeState({
         outcome: 'clarification_required',
       }))}`),
       updatedAt: 120,
@@ -1682,7 +1682,7 @@ ${block('open-design-plan-contract', planContract(snapshot))}`),
     const result = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1',
       runId: 'run-request',
-      protocol: protocol(block('open-design-runtime-state', runtimeState({
+      protocol: protocol(block('mish-runtime-state', runtimeState({
         route: 'direct_edit', inputStage: 'request', outcome: 'completed',
         executionMode: 'simple',
       }))),
@@ -1741,8 +1741,8 @@ ${block('open-design-plan-contract', planContract(snapshot))}`),
     const planned = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', planContract(snapshot)),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', planContract(snapshot)),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -1774,8 +1774,8 @@ ${block('open-design-plan-contract', planContract(snapshot))}`),
     const planned = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1', runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', planContract(snapshot)),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', planContract(snapshot)),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -1829,8 +1829,8 @@ ${block('open-design-plan-contract', planContract(snapshot))}`),
       taskExecutionId: 'task-1',
       runId: 'run-request',
       protocol: protocol([
-        block('open-design-plan-contract', planContract(snapshot)),
-        block('open-design-runtime-state', runtimeState({
+        block('mish-plan-contract', planContract(snapshot)),
+        block('mish-runtime-state', runtimeState({
           outcome: 'plan_ready', executionMode: 'simple',
         })),
       ].join('\n')),
@@ -1851,7 +1851,7 @@ ${block('open-design-plan-contract', planContract(snapshot))}`),
     const drift = finalizeStrategyPlanningTurn(db, {
       taskExecutionId: 'task-1',
       runId: 'run-request',
-      protocol: protocol(block('open-design-runtime-state', runtimeState({
+      protocol: protocol(block('mish-runtime-state', runtimeState({
         route: 'direct_edit', inputStage: 'request', outcome: 'completed',
         executionMode: 'simple',
       }))),
@@ -1922,7 +1922,7 @@ ${block('open-design-plan-contract', planContract(snapshot))}`),
       taskExecutionId: 'task-1', runId: 'run-request',
       protocol: protocol([
         '<question-form id="scope">{"questions":[{"id":"surface","label":"Surface?"}]}</question-form>',
-        block('open-design-runtime-state', runtimeState({ outcome: 'clarification_required' })),
+        block('mish-runtime-state', runtimeState({ outcome: 'clarification_required' })),
       ].join('\n')),
       updatedAt: 120,
     });

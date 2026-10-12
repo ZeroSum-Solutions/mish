@@ -54,7 +54,7 @@ done
 
 [ -n "${HOME:-}" ] || fail 'HOME is not set.'
 
-INSTALL_ROOT=${OD_DSH_INSTALL_ROOT:-${XDG_DATA_HOME:-$HOME/.local/share}/open-design/toolchains/dsh}
+INSTALL_ROOT=${OD_DSH_INSTALL_ROOT:-${XDG_DATA_HOME:-$HOME/.local/share}/mish/toolchains/dsh}
 BIN_DIR=${OD_DSH_INSTALL_BIN_DIR:-$HOME/.local/bin}
 LAUNCHER=$BIN_DIR/dsh
 DIST_BASE=${OD_DSH_INSTALL_DIST_BASE:-https://nodejs.org/dist/v$NODE_VERSION}

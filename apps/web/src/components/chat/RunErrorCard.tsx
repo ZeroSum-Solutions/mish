@@ -8,7 +8,7 @@
  * 抽成组件之前它是 `ChatPane.tsx` 里 200 多行内联 JSX:样式没法集中对齐,
  * 陈列页也照不出来。这两件事都是抽出来才解决的。
  */
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import type { ComponentProps, PropsWithChildren, ReactElement, ReactNode } from 'react';
 import styles from './RunErrorCard.module.css';
 

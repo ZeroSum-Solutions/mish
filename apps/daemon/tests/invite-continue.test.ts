@@ -73,11 +73,11 @@ describe('consumeInviteContinuation', () => {
       const out = await consumeInviteContinuation('nonce-1', {
         fetch: fetchImpl,
         readSession: () => SESSION,
-        configuredEnv: { OPEN_DESIGN_AMR_PROFILE: 'feature-test' },
+        configuredEnv: { MISH_AMR_PROFILE: 'feature-test' },
       });
 
       expect(out.ok && out.context?.workspaceSettingsUrl).toBe(
-        'https://feature.example/settings?workspaceId=ws-team-1&source=open_design',
+        'https://feature.example/settings?workspaceId=ws-team-1&source=mish',
       );
     } finally {
       if (previousOrigins === undefined) delete process.env.OD_VELA_WEB_URLS;

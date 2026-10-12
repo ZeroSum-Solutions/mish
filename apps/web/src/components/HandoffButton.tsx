@@ -8,12 +8,12 @@ import type {
   HostEditor,
   HostEditorId,
   HostEditorsResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   handoffTargetIdToTracking,
   type TrackingArtifactKind,
   type TrackingProjectKind,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { fetchHostEditors, openProjectInEditor } from '../providers/registry';
 import { useAnalytics } from '../analytics/provider';
 import { trackHandoffClick } from '../analytics/events';
@@ -24,8 +24,8 @@ import { EditorIcon } from './EditorIcon';
 import { AgentIcon } from './AgentIcon';
 import { useProjectCollabContext } from '../collab/collab-context';
 
-const PREFERRED_EDITOR_KEY = 'open-design:preferred-editor';
-const PREFERRED_FRAMEWORK_KEY = 'open-design:handoff-framework';
+const PREFERRED_EDITOR_KEY = 'mish:preferred-editor';
+const PREFERRED_FRAMEWORK_KEY = 'mish:handoff-framework';
 const PROJECT_PATH_COPY_ID = 'project-path';
 
 type HandoffTab = 'editor' | 'cli';

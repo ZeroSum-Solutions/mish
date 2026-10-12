@@ -2,7 +2,7 @@
  * The web side of `GET /api/agency/builds/:id/agui`: a pure reducer from AG-UI frames to what
  * the Build panel shows, and the `EventSource` that feeds it.
  *
- * The daemon encodes with `@open-design/agui-adapter`; this file does not import it (the web app
+ * The daemon encodes with `@mish/agui-adapter`; this file does not import it (the web app
  * would then depend on that package's built output), so the small JSON Patch applier below is
  * this side's own. Frames are untrusted input and are checked here before the reducer sees them.
  *
@@ -16,7 +16,7 @@ import type {
   AgencyBuildEvent,
   AgencyBuildSnapshot,
   AgencyBuildStatus,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /** The four statuses a build ends on. Anything else means it is still running. */
 export const AGENCY_BUILD_TERMINAL: readonly AgencyBuildStatus[] = ['done', 'unrouted', 'failed', 'cancelled'];

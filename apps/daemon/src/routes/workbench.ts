@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import { parseResourceSearchRequest, type ResourceRequestContext } from '@open-design/contracts';
+import { parseResourceSearchRequest, type ResourceRequestContext } from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
 import type { AuthorizeProjectRequest } from '../collab/project-request-authority.js';
 import { requestWithWorkspaceNavigationScope, resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';

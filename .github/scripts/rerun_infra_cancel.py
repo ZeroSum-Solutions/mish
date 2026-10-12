@@ -1083,7 +1083,7 @@ def self_check() -> None:
     ) -> Any:
         del method, headers, body
         seen_paths.append(path)
-        if path.startswith(f"/repos/nexu-io/open-design/commits/{closed_run_sha}/pulls"):
+        if path.startswith(f"/repos/ZeroSum-Solutions/mish/commits/{closed_run_sha}/pulls"):
             # Association exists but is closed/open-filtered away.
             return [
                 {
@@ -1092,13 +1092,13 @@ def self_check() -> None:
                     "base": {"ref": "main"},
                 }
             ]
-        if path.startswith("/repos/nexu-io/open-design/pulls?"):
+        if path.startswith("/repos/ZeroSum-Solutions/mish/pulls?"):
             # No open PR for this repository-qualified head ref.
-            expected_head = urllib.parse.quote(f"nexu-io:{closed_branch}", safe="")
+            expected_head = urllib.parse.quote(f"ZeroSum-Solutions:{closed_branch}", safe="")
             assert "state=open" in path, path
             assert f"head={expected_head}" in path, path
             return []
-        if path.startswith("/repos/nexu-io/open-design/git/ref/heads/"):
+        if path.startswith("/repos/ZeroSum-Solutions/mish/git/ref/heads/"):
             # If consulted, tip still matches the failed SHA — but live-PR
             # resolution must not use bare branch tip as evidence.
             return {"object": {"sha": closed_run_sha, "type": "commit"}}
@@ -1110,7 +1110,7 @@ def self_check() -> None:
                             "nodes": [
                                 {
                                     "headRefOid": "e" * 40,
-                                    "headRepository": {"nameWithOwner": "nexu-io/open-design"},
+                                    "headRepository": {"nameWithOwner": "ZeroSum-Solutions/mish"},
                                 }
                             ]
                         }
@@ -1121,13 +1121,13 @@ def self_check() -> None:
 
     live = resolve_live_pr_head(
         closed_pr_request,
-        "nexu-io/open-design",
+        "ZeroSum-Solutions/mish",
         closed_run_sha,
         closed_branch,
     )
     assert live is None, live
     assert any("/commits/" in p and p.endswith("/pulls") for p in seen_paths), seen_paths
-    assert any(p.startswith("/repos/nexu-io/open-design/pulls?") for p in seen_paths), seen_paths
+    assert any(p.startswith("/repos/ZeroSum-Solutions/mish/pulls?") for p in seen_paths), seen_paths
     # Branch tip must not be consulted as live-PR evidence.
     assert not any("/git/ref/heads/" in p for p in seen_paths), seen_paths
 
@@ -1156,9 +1156,9 @@ def self_check() -> None:
         body: str | None = None,
     ) -> Any:
         del method, headers, body
-        if path.startswith(f"/repos/nexu-io/open-design/commits/{open_run_sha}/pulls"):
+        if path.startswith(f"/repos/ZeroSum-Solutions/mish/commits/{open_run_sha}/pulls"):
             return []
-        if path.startswith("/repos/nexu-io/open-design/pulls?"):
+        if path.startswith("/repos/ZeroSum-Solutions/mish/pulls?"):
             return [
                 {
                     "state": "open",
@@ -1172,7 +1172,7 @@ def self_check() -> None:
 
     live_open = resolve_live_pr_head(
         open_pr_by_head_request,
-        "nexu-io/open-design",
+        "ZeroSum-Solutions/mish",
         open_run_sha,
         open_branch,
     )
@@ -1183,7 +1183,7 @@ def self_check() -> None:
     # walking pages, job_looks_like_infra_cancel would authorize rerun --failed
     # for a real failure. The fixture must refuse.
     paged_job_id = 60
-    paged_repo = "nexu-io/open-design"
+    paged_repo = "ZeroSum-Solutions/mish"
     annotation_pages_seen: list[int] = []
 
     def paged_annotations_request(
@@ -1285,7 +1285,7 @@ def self_check() -> None:
     ) -> Any:
         del method, headers, body
         mg_paths.append(path)
-        if path.startswith(f"/repos/nexu-io/open-design/commits/{mg_run_sha}/pulls"):
+        if path.startswith(f"/repos/ZeroSum-Solutions/mish/commits/{mg_run_sha}/pulls"):
             # Synthetic merge commit is usually still associated after ejection.
             return [
                 {
@@ -1295,7 +1295,7 @@ def self_check() -> None:
                     "base": {"ref": "main"},
                 }
             ]
-        if path.startswith("/repos/nexu-io/open-design/pulls/99"):
+        if path.startswith("/repos/ZeroSum-Solutions/mish/pulls/99"):
             return {
                 "state": "open",
                 "number": 99,
@@ -1306,7 +1306,7 @@ def self_check() -> None:
 
     assert (
         resolve_merge_group_open_pr(
-            mg_open_pr_request, "nexu-io/open-design", mg_run_sha, mg_branch
+            mg_open_pr_request, "ZeroSum-Solutions/mish", mg_run_sha, mg_branch
         )
         is True
     )
@@ -1324,7 +1324,7 @@ def self_check() -> None:
         del method, headers, body
         mg_advanced_paths.append(path)
         advanced_head = "b" * 40
-        if path.startswith(f"/repos/nexu-io/open-design/commits/{mg_run_sha}/pulls"):
+        if path.startswith(f"/repos/ZeroSum-Solutions/mish/commits/{mg_run_sha}/pulls"):
             return [
                 {
                     "state": "open",
@@ -1333,7 +1333,7 @@ def self_check() -> None:
                     "base": {"ref": "main"},
                 }
             ]
-        if path.startswith("/repos/nexu-io/open-design/pulls/99"):
+        if path.startswith("/repos/ZeroSum-Solutions/mish/pulls/99"):
             return {
                 "state": "open",
                 "number": 99,
@@ -1344,7 +1344,7 @@ def self_check() -> None:
 
     assert (
         resolve_merge_group_open_pr(
-            mg_advanced_pr_request, "nexu-io/open-design", mg_run_sha, mg_branch
+            mg_advanced_pr_request, "ZeroSum-Solutions/mish", mg_run_sha, mg_branch
         )
         is False
     )
@@ -1353,7 +1353,7 @@ def self_check() -> None:
     assert (
         resolve_merge_group_open_pr(
             mg_open_pr_request,
-            "nexu-io/open-design",
+            "ZeroSum-Solutions/mish",
             mg_run_sha,
             "gh-readonly-queue/main/pr-99",
         )
@@ -1370,7 +1370,7 @@ def self_check() -> None:
     ) -> Any:
         del method, headers, body
         mg_closed_paths.append(path)
-        if path.startswith(f"/repos/nexu-io/open-design/commits/{mg_run_sha}/pulls"):
+        if path.startswith(f"/repos/ZeroSum-Solutions/mish/commits/{mg_run_sha}/pulls"):
             return [
                 {
                     "state": "closed",
@@ -1379,7 +1379,7 @@ def self_check() -> None:
                     "base": {"ref": "main"},
                 }
             ]
-        if path.startswith("/repos/nexu-io/open-design/pulls/99"):
+        if path.startswith("/repos/ZeroSum-Solutions/mish/pulls/99"):
             return {
                 "state": "closed",
                 "number": 99,
@@ -1392,7 +1392,7 @@ def self_check() -> None:
 
     assert (
         resolve_merge_group_open_pr(
-            mg_closed_pr_request, "nexu-io/open-design", mg_run_sha, mg_branch
+            mg_closed_pr_request, "ZeroSum-Solutions/mish", mg_run_sha, mg_branch
         )
         is False
     )

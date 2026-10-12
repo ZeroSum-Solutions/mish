@@ -26,7 +26,7 @@ import { REACT95_TYPECHECK_PROFILE, typecheckUnit } from './react95-typecheck.js
  * document under Strict Mode in jsdom; then drive a separate harness bundle of
  * the same unit through its behavior, keyboard, style-isolation, contrast and
  * cleanup checks. Regenerate with
- * `OD_UPDATE_REACT95_RECEIPT=1 pnpm --filter @open-design/daemon exec vitest run tests/workbench/g02-react95-receipt.test.ts`.
+ * `OD_UPDATE_REACT95_RECEIPT=1 pnpm --filter @mish/daemon exec vitest run tests/workbench/g02-react95-receipt.test.ts`.
  */
 const daemonRoot = fileURLToPath(new URL('../../', import.meta.url));
 const repoRoot = fileURLToPath(new URL('../../../../', import.meta.url));

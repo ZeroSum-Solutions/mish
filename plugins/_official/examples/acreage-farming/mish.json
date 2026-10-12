@@ -1,0 +1,150 @@
+{
+  "$schema": "https://github.com/ZeroSum-Solutions/mish/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "example-acreage-farming",
+  "title": "Fieldnotes | Farm planning",
+  "title_i18n": {
+    "zh-CN": "Fieldnotes | Farm planning",
+    "zh-TW": "Fieldnotes | Farm planning",
+    "ja": "Fieldnotes | Farm planning",
+    "ko": "Fieldnotes | Farm planning",
+    "de": "Fieldnotes | Farm planning",
+    "fr": "Fieldnotes | Farm planning",
+    "ru": "Fieldnotes | Farm planning",
+    "pt-BR": "Fieldnotes | Farm planning",
+    "it": "Fieldnotes | Farm planning",
+    "vi": "Fieldnotes | Farm planning",
+    "pl": "Fieldnotes | Farm planning",
+    "id": "Fieldnotes | Farm planning",
+    "nl": "Fieldnotes | Farm planning",
+    "ar": "Fieldnotes | Farm planning",
+    "tr": "Fieldnotes | Farm planning",
+    "uk": "Fieldnotes | Farm planning",
+    "en": "Fieldnotes | Farm planning"
+  },
+  "version": "0.2.0",
+  "publishedAt": "2026-10-08T00:00:00Z",
+  "description": "A field-planning landing page with an interactive illustrated map, seasonal workflow and trial enquiry.",
+  "description_i18n": {
+    "zh-CN": "Fieldnotes: 原创入门示例，包含本地字体、原创插画和可交互的页面。",
+    "zh-TW": "Fieldnotes: 原創入門範例，包含本地字型、原創插畫和可互動的頁面。",
+    "ja": "Fieldnotes: ローカルフォント、オリジナルの図版、操作可能なページを備えた自社制作の開始用サンプル。",
+    "ko": "Fieldnotes: 로컬 글꼴, 독창적인 삽화, 조작 가능한 페이지를 갖춘 자체 제작 시작 예제.",
+    "de": "Fieldnotes: Eigenes Startbeispiel mit lokalen Schriften, Originalillustrationen und interaktiven Seiten.",
+    "fr": "Fieldnotes: Exemple original pour démarrer, avec polices locales, illustrations originales et pages interactives.",
+    "ru": "Fieldnotes: Собственный стартовый пример с локальными шрифтами, оригинальными иллюстрациями и интерактивными страницами.",
+    "pt-BR": "Fieldnotes: Exemplo original com fontes locais, ilustrações próprias e páginas interativas.",
+    "it": "Fieldnotes: Esempio originale con font locali, illustrazioni proprie e pagine interattive.",
+    "vi": "Fieldnotes: Ví dụ khởi đầu do chúng tôi tạo, với phông chữ cục bộ, hình minh họa gốc và trang tương tác.",
+    "pl": "Fieldnotes: Własny przykład startowy z lokalnymi fontami, oryginalnymi ilustracjami i interaktywnymi stronami.",
+    "id": "Fieldnotes: Contoh awal buatan sendiri dengan font lokal, ilustrasi asli, dan halaman interaktif.",
+    "nl": "Fieldnotes: Eigen startvoorbeeld met lokale lettertypen, originele illustraties en interactieve pagina’s.",
+    "ar": "Fieldnotes: مثال أصلي للبدء بخطوط محلية ورسوم أصلية وصفحات تفاعلية.",
+    "tr": "Fieldnotes: Yerel yazı tipleri, özgün çizimler ve etkileşimli sayfalar içeren, bize ait başlangıç örneği.",
+    "uk": "Fieldnotes: Власний початковий приклад із локальними шрифтами, оригінальними ілюстраціями та інтерактивними сторінками.",
+    "en": "A field-planning landing page with an interactive illustrated map, seasonal workflow and trial enquiry."
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
+  "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2",
+  "tags": [
+    "example",
+    "first-party",
+    "prototype",
+    "design",
+    "web",
+    "desktop",
+    "landing-page",
+    "agritech",
+    "farming",
+    "marketing",
+    "owned",
+    "svg",
+    "interactive"
+  ],
+  "compat": {
+    "agentSkills": [
+      {
+        "path": "./SKILL.md"
+      }
+    ]
+  },
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "prototype",
+    "platform": "desktop",
+    "scenario": "design",
+    "surface": "web",
+    "preview": {
+      "type": "html",
+      "entry": "./example.html",
+      "motion": "scroll"
+    },
+    "useCase": {
+      "query": {
+        "zh-CN": "使用随附的 example.html 和 SKILL.md 创建适合我的项目的原创网站。保留本地字体和许可文件、响应式布局、键盘操作及减少动态效果设置。重新撰写项目文案。示例表单不发送数据。不要加载外部媒体或脚本。",
+        "zh-TW": "使用隨附的 example.html 和 SKILL.md 建立適合我的專案的原創網站。保留本地字型與授權文件、響應式版面、鍵盤操作及減少動態效果設定。重新撰寫專案文案。示範表單不傳送資料。不要載入外部媒體或指令碼。",
+        "ja": "付属の example.html と SKILL.md を使って、私のプロジェクトに合う独自のサイトを作成してください。ローカルフォントとライセンス、レスポンシブ表示、キーボード操作、動きを減らす設定を維持してください。文章は新しく書いてください。デモフォームはデータを送信しません。外部メディアやスクリプトを読み込まないでください。",
+        "ko": "제공된 example.html과 SKILL.md로 제 프로젝트에 맞는 독창적인 사이트를 만들어 주세요. 로컬 글꼴과 라이선스, 반응형 레이아웃, 키보드 조작, 동작 줄이기 설정을 유지하세요. 문구를 새로 작성하세요. 데모 양식은 데이터를 보내지 않습니다. 외부 미디어나 스크립트를 불러오지 마세요.",
+        "de": "Erstelle mit example.html und SKILL.md eine eigene Website für mein Projekt. Behalte lokale Schriften und Lizenzen, responsives Layout, Tastaturbedienung und reduzierte Bewegung bei. Schreibe neue Texte. Demoformulare senden keine Daten. Lade keine externen Medien oder Skripte.",
+        "fr": "Crée un site original pour mon projet à partir de example.html et SKILL.md. Conserve les polices locales et leurs licences, la mise en page responsive, la navigation au clavier et la réduction des animations. Rédige de nouveaux textes. Les formulaires de démonstration ne transmettent aucune donnée. Ne charge aucun média ni script externe.",
+        "ru": "Создай оригинальный сайт для моего проекта на основе example.html и SKILL.md. Сохрани локальные шрифты и лицензии, адаптивную вёрстку, управление клавиатурой и режим уменьшенного движения. Напиши новые тексты. Демоформы не отправляют данные. Не загружай внешние медиа или скрипты.",
+        "pt-BR": "Crie um site original para meu projeto usando example.html e SKILL.md. Preserve as fontes locais e suas licenças, o layout responsivo, a navegação por teclado e a redução de movimento. Escreva novos textos. Os formulários de demonstração não enviam dados. Não carregue mídia ou scripts externos.",
+        "it": "Crea un sito originale per il mio progetto usando example.html e SKILL.md. Conserva i font locali e le licenze, il layout responsive, la navigazione da tastiera e la riduzione del movimento. Scrivi nuovi testi. I moduli dimostrativi non inviano dati. Non caricare media o script esterni.",
+        "vi": "Tạo trang web độc đáo cho dự án của tôi bằng example.html và SKILL.md. Giữ phông chữ cục bộ và giấy phép, bố cục đáp ứng, điều khiển bàn phím và chế độ giảm chuyển động. Viết nội dung mới. Biểu mẫu minh họa không gửi dữ liệu. Không tải nội dung đa phương tiện hoặc mã bên ngoài.",
+        "pl": "Utwórz oryginalną witrynę dla mojego projektu na podstawie example.html i SKILL.md. Zachowaj lokalne fonty i licencje, responsywny układ, obsługę klawiatury i ograniczenie ruchu. Napisz nowe teksty. Formularze demonstracyjne nie wysyłają danych. Nie ładuj zewnętrznych mediów ani skryptów.",
+        "id": "Buat situs asli untuk proyek saya menggunakan example.html dan SKILL.md. Pertahankan font lokal dan lisensinya, tata letak responsif, kontrol keyboard, dan pengurangan gerakan. Tulis teks baru. Formulir demo tidak mengirim data. Jangan muat media atau skrip eksternal.",
+        "nl": "Maak een originele website voor mijn project met example.html en SKILL.md. Behoud lokale lettertypen en licenties, responsieve opmaak, toetsenbordbediening en verminderde beweging. Schrijf nieuwe teksten. Demoformulieren versturen geen gegevens. Laad geen externe media of scripts.",
+        "ar": "أنشئ موقعًا أصليًا لمشروعي باستخدام example.html وSKILL.md. حافظ على الخطوط المحلية وتراخيصها والتصميم المتجاوب والتحكم بلوحة المفاتيح وتقليل الحركة. اكتب نصوصًا جديدة. النماذج التجريبية لا ترسل بيانات. لا تحمّل وسائط أو نصوصًا برمجية خارجية.",
+        "tr": "example.html ve SKILL.md kullanarak projem için özgün bir site oluştur. Yerel yazı tiplerini ve lisanslarını, duyarlı düzeni, klavye kullanımını ve azaltılmış hareketi koru. Yeni metinler yaz. Demo formları veri göndermez. Harici medya veya betik yükleme.",
+        "uk": "Створи оригінальний сайт для мого проєкту на основі example.html і SKILL.md. Збережи локальні шрифти й ліцензії, адаптивну верстку, керування клавіатурою та режим зменшеного руху. Напиши нові тексти. Демоформи не надсилають дані. Не завантажуй зовнішні медіа чи скрипти.",
+        "en": "Create an original Fieldnotes | Farm planning site. Sections: Field-map hero; seasonal workflow; product FAQ; trial enquiry. Interaction: Field selection updates crop and next job; map pulse; entry reveals; native FAQ. Use the supplied example.html as the owned starting point, local OFL fonts and original SVG artwork. Keep navigation and controls usable on mobile and by keyboard. Respect reduced motion; keep content visible without JavaScript. Demo forms must clearly report that nothing is sent. Replace fictional claims with verified project facts before publication."
+      },
+      "exampleOutputs": [
+        {
+          "path": "./example.html",
+          "title": "Fieldnotes | Farm planning"
+        }
+      ]
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ],
+      "assets": [
+        "./example.html",
+        "./assets/archivo.woff2",
+        "./assets/bodoni.woff2",
+        "./assets/plex.woff2",
+        "./assets/OFL.txt",
+        "./RIGHTS.md",
+        "./fonts.css"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ]
+  },
+  "rights": {
+    "status": "owned",
+    "owner": "ZeroSum Solutions",
+    "evidence": "./RIGHTS.md"
+  }
+}

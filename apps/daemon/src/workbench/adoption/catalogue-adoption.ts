@@ -2,7 +2,7 @@ import path from 'node:path';
 import {
   RESOURCE_SOURCE_IDS, parseCatalogueAdoptionRequest, parseCatalogueSaveRequest, parsePrepareAdoptionRequest,
   type CatalogueAdoptionReport, type CatalogueSavedUnit, type CatalogueAdoptionResponse, type CatalogueReplacementReview, type CatalogueTargetRefusal, type CatalogueTargetReport, type PreparedAdoptionPlan, type PrepareAdoptionRequest, type ResourceRef,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { resourceRefKey } from '../context-ranking.js';
 import { AdoptionError, type PlacementAdoptionExecutor } from '../placement/adoption-executor.js';
 import { sha256 } from '../placement/adoption-files.js';

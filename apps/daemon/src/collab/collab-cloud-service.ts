@@ -13,7 +13,7 @@ import type {
   CollabCloudMemberDirectoryEntry,
   PreviewComment,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { CollabCloudClient } from '../integrations/collab-cloud.js';
 import type { WorkspaceContextProvider } from './workspace-context.js';
 import type {

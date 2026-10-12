@@ -1,7 +1,7 @@
 /**
  * Deterministic local catalog thumbnail capture. Never starts a runtime or edits a source kit.
  * From the repository root:
- *   mise exec -- pnpm --filter @open-design/e2e catalog:thumbnails --inventory
+ *   mise exec -- pnpm --filter @mish/e2e catalog:thumbnails --inventory
  *   ... --baseline --only=cult:marketing-hero-apple,21st:hero-ui-card --capture
  *   ... --baseline --capture --write
  * --capture without --write saves review candidates, not product assets. --baseline uses the
@@ -23,7 +23,7 @@ import { createRequire } from 'node:module';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { twenty1stMayShipLocalImage, type Twenty1stRights } from '@open-design/contracts';
+import { twenty1stMayShipLocalImage, type Twenty1stRights } from '@mish/contracts';
 import { T } from '../lib/timeouts.ts';
 
 interface Item {

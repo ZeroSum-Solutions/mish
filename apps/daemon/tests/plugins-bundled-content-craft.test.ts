@@ -13,7 +13,7 @@ describe('bundled plugin craft context', () => {
       '_official',
       'examples',
       'saas-landing',
-      'open-design.json',
+      'mish.json',
     );
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as {
       od?: { context?: { craft?: string[] } };

@@ -10,11 +10,11 @@ import {
   parseCountedReleaseVersion,
   parseReleaseBaseVersion,
   type ReleaseBaseVersionTuple,
-} from "@open-design/release";
+} from "@mish/release";
 
 const execFile = promisify(execFileCallback);
 
-const stableTagPattern = /^open-design-v(\d+\.\d+\.\d+)$/;
+const stableTagPattern = /^mish-v(\d+\.\d+\.\d+)$/;
 
 type ParsedStableVersion = {
   parsed: ReleaseBaseVersionTuple;
@@ -276,12 +276,12 @@ function readBooleanEnv(name: string): boolean {
 
 const packagedVersion = await readPackagedVersion();
 const packagedParsed = parseReleaseBaseVersion(packagedVersion) ?? fail(`invalid packaged version: ${packagedVersion}`);
-const force = readBooleanEnv("OPEN_DESIGN_RELEASE_FORCE") || readBooleanEnv("RELEASE_FORCE");
+const force = readBooleanEnv("MISH_RELEASE_FORCE") || readBooleanEnv("RELEASE_FORCE");
 
 let latestStable: ParsedStableVersion | null = null;
-const stableMetadataUrl = process.env.OPEN_DESIGN_STABLE_METADATA_URL;
+const stableMetadataUrl = process.env.MISH_STABLE_METADATA_URL;
 if (stableMetadataUrl != null && stableMetadataUrl.length > 0) {
-  validateHttpsUrl(stableMetadataUrl, "OPEN_DESIGN_STABLE_METADATA_URL");
+  validateHttpsUrl(stableMetadataUrl, "MISH_STABLE_METADATA_URL");
   const stableMetadataJson = await fetchOptionalHttpsText(stableMetadataUrl);
   if (stableMetadataJson == null) {
     fail(`stable metadata.json was not found: ${stableMetadataUrl}`);
@@ -289,7 +289,7 @@ if (stableMetadataUrl != null && stableMetadataUrl.length > 0) {
   latestStable = parseStableMetadataJson(stableMetadataJson);
   console.log(`[release-beta] stable metadata.json version: ${latestStable.value}`);
 } else {
-  const tags = await fetchGitTags("open-design-v*");
+  const tags = await fetchGitTags("mish-v*");
   for (const tag of tags) {
     const stableVersion = extractStableVersionFromTag(tag);
     if (stableVersion == null) continue;
@@ -309,11 +309,11 @@ if (latestStable != null && compareReleaseBaseVersions(packagedParsed, latestSta
   );
 }
 
-const metadataUrl = process.env.OPEN_DESIGN_BETA_METADATA_URL;
+const metadataUrl = process.env.MISH_BETA_METADATA_URL;
 if (metadataUrl == null || metadataUrl.length === 0) {
-  fail("OPEN_DESIGN_BETA_METADATA_URL is required");
+  fail("MISH_BETA_METADATA_URL is required");
 }
-validateHttpsUrl(metadataUrl, "OPEN_DESIGN_BETA_METADATA_URL");
+validateHttpsUrl(metadataUrl, "MISH_BETA_METADATA_URL");
 
 let betaNumber = 1;
 let latestBeta: ParsedBetaVersion | null = null;

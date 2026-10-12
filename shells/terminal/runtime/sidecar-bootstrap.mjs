@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 
-import { bootstrapSidecarProcess, handoffCurrentSidecarGeneration } from "@open-design/sidecar";
+import { bootstrapSidecarProcess, handoffCurrentSidecarGeneration } from "@mish/sidecar";
 
 const CONFIG_ENV = "OD_TERMINAL_SIDECAR_CONFIG_V1";
 const serialized = process.env[CONFIG_ENV];

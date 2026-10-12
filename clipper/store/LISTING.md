@@ -170,7 +170,7 @@ The **same MV3 package** publishes to Edge unchanged.
 
 Firefox needs the gecko settings already added to `manifest.json`:
 ```json
-"browser_specific_settings": { "gecko": { "id": "web-clipper@open-design.ai", "strict_min_version": "121.0" } }
+"browser_specific_settings": { "gecko": { "id": "web-clipper@mish.invalid", "strict_min_version": "121.0" } }
 ```
 And the dual background key (already in `manifest.json`) — Firefox uses
 `background.scripts`, Chrome/Edge use `background.service_worker`:
@@ -257,7 +257,7 @@ Mishh Mashh Web Clipper 把你在网上看到的任何内容一键剪藏进 Mish
 - [ ] `manifest.json` validates as JSON; loads unpacked in Chrome with no errors.
 - [ ] Icons render crisply at 16/32/48/128 (badge visible at 48+).
 - [ ] 5 screenshots captured at 1280×800 from the running app.
-- [ ] `promo-marquee.png` (1400×560) and `promo-small.png` (440×280) exported.
+- [ ] `promo-marquee.png` (1400×560) and `promo-small.png` (440×280) exported (removed; re-export with the Mish brand).
 - [ ] Privacy policy published at the URL referenced above.
 - [ ] Permission justifications pasted for every permission + host access.
 - [ ] Data-usage form completed (no data collected by developer).

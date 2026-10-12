@@ -1,4 +1,4 @@
-import { parseSessionModelSnapshot, type SessionModelSnapshot, type ChatRequest } from '@open-design/contracts';
+import { parseSessionModelSnapshot, type SessionModelSnapshot, type ChatRequest } from '@mish/contracts';
 export interface SessionModelRequest {
   snapshot: SessionModelSnapshot;
   reasoning: string | null;

@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { strategyPackageHashFromDigests } from '@open-design/plugin-runtime';
+import { strategyPackageHashFromDigests } from '@mish/plugin-runtime';
 import {
   OD_NEXT_PROMPT_BUNDLE_SCHEMA_V1,
   OD_NEXT_PROMPT_BUNDLE_SCHEMA_V2,
@@ -11,8 +11,8 @@ import {
   serializeCanonicalXml,
   serializeOdNextPromptBundleV1,
   type AppliedPluginSnapshot,
-  type OpenDesignPlanContractV2,
-} from '@open-design/contracts';
+  type MishPlanContractV2,
+} from '@mish/contracts';
 import Database from 'better-sqlite3';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -39,10 +39,10 @@ const AGENT_ID = 'codex';
 
 // A bundle written by the pre-reshape v2 composer: the same schema id today's
 // composer stamps, wrapped in the `system_prompt` element that the reshape
-// replaced with `open_design_core_system_prompt`.
+// replaced with `mish_core_system_prompt`.
 const STALE_V2_PROMPT_BUNDLE = serializeCanonicalXml({
   kind: 'element',
-  tag: 'open_design_prompt_bundle',
+  tag: 'mish_prompt_bundle',
   attributes: [['schema', OD_NEXT_PROMPT_BUNDLE_SCHEMA_V2]],
   children: [
     {
@@ -131,7 +131,7 @@ function strategyBinding() {
     { path: './assets/task-profiles/prototype.md', sha256: 'b'.repeat(64) },
   ];
   return {
-    schema: 'open-design.applied-strategy/v2' as const,
+    schema: 'mish.applied-strategy/v2' as const,
     id: 'od-next-strategy' as const,
     version: '2.0.0',
     packageHash: strategyPackageHashFromDigests(assetDigests),
@@ -168,10 +168,10 @@ function createStrategySnapshot(db: Database.Database): AppliedPluginSnapshot {
   });
 }
 
-function planContract(snapshot: AppliedPluginSnapshot): OpenDesignPlanContractV2 {
+function planContract(snapshot: AppliedPluginSnapshot): MishPlanContractV2 {
   const strategy = snapshot.strategy!;
   return {
-    schema: 'open-design.plan-contract/v2',
+    schema: 'mish.plan-contract/v2',
     strategy: {
       id: 'od-next-strategy',
       version: strategy.version,
@@ -320,7 +320,7 @@ describe('durable strategy task store', () => {
     expect(task.promptBundle.utf8Bytes).toBeGreaterThan(task.promptBundle.text.length);
     expect(task.runs[0]?.finalText).toEqual(task.promptBundle);
     expect(task.frozenInputIdentity).toEqual({
-      schema: 'open-design.od-next-frozen-input-identity/v1',
+      schema: 'mish.od-next-frozen-input-identity/v1',
       snapshotId: snapshot.snapshotId,
       strategyPackageHash: snapshot.strategy!.packageHash,
       frozenSkillPackageIdentity: strategyTaskCreateIdentityFixture().frozenSkillPackage.identity,
@@ -510,7 +510,7 @@ describe('durable strategy task store', () => {
     });
     expect(getStrategyTaskExecutionByRunId(db, 'run-request')).toEqual(task);
     expect(task.frozenSkillPackage).toMatchObject({
-      schema: 'open-design.od-next-frozen-skill-package/v1',
+      schema: 'mish.od-next-frozen-skill-package/v1',
       selections: [],
     });
 
@@ -752,7 +752,7 @@ describe('durable strategy task store', () => {
       latestRunId: 'run-production',
       activeRunId: null,
       terminalRunId: 'run-production',
-      planContract: expect.objectContaining({ schema: 'open-design.plan-contract/v2' }),
+      planContract: expect.objectContaining({ schema: 'mish.plan-contract/v2' }),
       planContractHash: expect.stringMatching(/^[a-f0-9]{64}$/),
     });
     expect(task.runs.map(({ finalText: _finalText, ...run }) => run)).toEqual([
@@ -1096,7 +1096,7 @@ describe('durable strategy task store', () => {
       },
       strategy: originalPlan.strategy,
       schema: originalPlan.schema,
-    } as OpenDesignPlanContractV2;
+    } as MishPlanContractV2;
     task = compareAndTransitionStrategyTaskExecution(db, {
       taskExecutionId: task.taskExecutionId,
       expectedRevision: task.revision,
@@ -1225,7 +1225,7 @@ describe('durable strategy task store', () => {
 
   it('keeps one unreadable Prompt Bundle from cancelling every sibling Run terminal', async () => {
     // Reshaping the v2 bundle's child tags kept the schema id
-    // `open-design.od-next-prompt-bundle/v2`, so rows written by the previous
+    // `mish.od-next-prompt-bundle/v2`, so rows written by the previous
     // v2 composer still carry today's label over a layout its parser cannot
     // read. That is one Run's corrupt record, but the startup loop called
     // `reconcileStrategyTaskRunTerminal` unguarded, so the TypeError escaped

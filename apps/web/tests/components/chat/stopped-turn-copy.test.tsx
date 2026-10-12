@@ -18,7 +18,7 @@
  */
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { AssistantMessage } from '../../../src/components/AssistantMessage';
 import type { ChatMessage } from '../../../src/types';
 

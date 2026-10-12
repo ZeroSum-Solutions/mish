@@ -24,8 +24,8 @@ import { promisify } from 'node:util';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { parseCultCatalogListResponse, parseCultCatalogItemResponse, type CultCatalogItem } from '@open-design/contracts';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
+import { parseCultCatalogListResponse, parseCultCatalogItemResponse, type CultCatalogItem } from '@mish/contracts';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
 import { runCultAddCli } from '../src/cult-add-cli.js';
 import type { CultRegistryRow } from '../src/cult-registry.js';
 import { registerCultCatalogRoutes } from '../src/routes/cult-catalog.js';

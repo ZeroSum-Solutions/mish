@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { Brand } from '@open-design/contracts';
+import type { Brand } from '@mish/contracts';
 import type { ComponentProps, ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -63,7 +63,7 @@ const registryOriginals = vi.hoisted(() => ({
     projectId: string,
     options?: {
       signal?: AbortSignal;
-      workspaceContext?: import('@open-design/contracts').WorkspaceCollabContext | null;
+      workspaceContext?: import('@mish/contracts').WorkspaceCollabContext | null;
       fresh?: boolean;
       requireAuthoritative?: boolean;
     },
@@ -371,7 +371,7 @@ function renderProjectView(
 describe('ProjectView pending prompt seeding', () => {
   beforeEach(() => {
     sessionModelApi.get.mockImplementation(async (sessionId: string, projectId: string) => ({ sessionId, projectId, revision: 0, choice: null, updatedAt: 0 }));
-    sessionModelApi.put.mockImplementation(async (sessionId: string, projectId: string, input: import('@open-design/contracts').PutSessionModel) => ({ sessionId, projectId, revision: input.expectedRevision + 1, choice: { agentId: input.agentId, modelId: input.modelId, ...(input.byokBinding ? { byokBinding: input.byokBinding } : {}) }, updatedAt: 0 }));
+    sessionModelApi.put.mockImplementation(async (sessionId: string, projectId: string, input: import('@mish/contracts').PutSessionModel) => ({ sessionId, projectId, revision: input.expectedRevision + 1, choice: { agentId: input.agentId, modelId: input.modelId, ...(input.byokBinding ? { byokBinding: input.byokBinding } : {}) }, updatedAt: 0 }));
     vi.mocked(streamViaDaemon).mockImplementation(async options => { options.onRunCreated?.('accepted-run'); });
     window.sessionStorage.clear();
     window.localStorage.clear();
@@ -972,7 +972,7 @@ describe('ProjectView pending prompt seeding', () => {
       label: 'Reference A',
       title: 'Reference A',
       path: 'reference-a',
-      absolutePath: '/tmp/open-design/missing-reference-a',
+      absolutePath: '/tmp/mish/missing-reference-a',
     };
     window.sessionStorage.setItem(`od:auto-send-first:${projectId}`, '1');
     window.sessionStorage.setItem(

@@ -27,7 +27,7 @@ function baseObservation(overrides: Record<string, unknown> = {}) {
         source: 'daemon',
         hash: 'sha256:prompt',
         bytes: 42,
-        safePayload: { type: 'open-design.prompt-stack' },
+        safePayload: { type: 'mish.prompt-stack' },
         limitations: ['redacted_safe_payload'],
       },
       childInjected: {
@@ -282,7 +282,7 @@ describe('NormalizedAgentObservationV1', () => {
 
   it('accepts only the versioned safe Run quality projection fields', () => {
     const quality = {
-      schema: 'open-design.safe-run-quality/v1',
+      schema: 'mish.safe-run-quality/v1',
       result: {
         output: {
           text: 'redacted assistant result',

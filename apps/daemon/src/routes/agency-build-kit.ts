@@ -13,8 +13,8 @@
  * starts, rather than half-applied after it.
  */
 
-import { kitDirection, KitDirectionError, type BuildDesignKit } from '@open-design/agency-fast-lane/build';
-import type { AgencyBuildDesignKitRefusalCode, DesignSystemSummary } from '@open-design/contracts';
+import { kitDirection, KitDirectionError, type BuildDesignKit } from '@mish/agency-fast-lane/build';
+import type { AgencyBuildDesignKitRefusalCode, DesignSystemSummary } from '@mish/contracts';
 import { kitRefusalReason } from './build-on-brand.js';
 import { listOwnedDesignSystemKits, type OwnedKitListerDeps } from '../workbench/resources-user-design-systems.js';
 

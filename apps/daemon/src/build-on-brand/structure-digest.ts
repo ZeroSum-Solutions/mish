@@ -15,7 +15,7 @@ import {
   type BuildOnBrandReferenceDigest,
   type BuildOnBrandSectionLayout,
   type BuildOnBrandSectionRole,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 export interface StructureDigestResult {
   digest: BuildOnBrandReferenceDigest;

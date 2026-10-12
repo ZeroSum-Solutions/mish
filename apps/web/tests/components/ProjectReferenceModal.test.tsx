@@ -7,7 +7,7 @@ import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   ProjectReferenceModal,
   type ProjectReferenceSelection,
@@ -228,14 +228,14 @@ describe('ProjectReferenceModal', () => {
     const { onSelect } = renderModal();
     vi.mocked(getProjectDetail).mockResolvedValue({
       project,
-      resolvedDir: '/tmp/open-design/project-ref',
+      resolvedDir: '/tmp/mish/project-ref',
     });
 
     await confirmSelection();
 
     await waitFor(() => {
       expect(onSelect).toHaveBeenCalledWith([
-        { project, resolvedDir: '/tmp/open-design/project-ref' },
+        { project, resolvedDir: '/tmp/mish/project-ref' },
       ]);
     });
   });
@@ -249,7 +249,7 @@ describe('ProjectReferenceModal', () => {
     renderModal({ projects: [boundProject], workspaceContext: context });
     vi.mocked(getProjectDetail).mockResolvedValue({
       project: boundProject,
-      resolvedDir: '/tmp/open-design/project-ref',
+      resolvedDir: '/tmp/mish/project-ref',
     });
 
     await confirmSelection();
@@ -288,10 +288,10 @@ describe('ProjectReferenceModal', () => {
     const { onSelect } = renderModal({ projects: [project, secondProject] });
     vi.mocked(getProjectDetail).mockImplementation(async (id: string) => {
       if (id === project.id) {
-        return { project, resolvedDir: '/tmp/open-design/project-ref' };
+        return { project, resolvedDir: '/tmp/mish/project-ref' };
       }
       if (id === secondProject.id) {
-        return { project: secondProject, resolvedDir: '/tmp/open-design/second-project' };
+        return { project: secondProject, resolvedDir: '/tmp/mish/second-project' };
       }
       return null;
     });
@@ -302,8 +302,8 @@ describe('ProjectReferenceModal', () => {
 
     await waitFor(() => {
       expect(onSelect).toHaveBeenCalledWith([
-        { project, resolvedDir: '/tmp/open-design/project-ref' },
-        { project: secondProject, resolvedDir: '/tmp/open-design/second-project' },
+        { project, resolvedDir: '/tmp/mish/project-ref' },
+        { project: secondProject, resolvedDir: '/tmp/mish/second-project' },
       ]);
     });
   });

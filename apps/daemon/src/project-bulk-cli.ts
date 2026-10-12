@@ -1,4 +1,4 @@
-import type { ProjectBulkAction, ProjectBulkResponse, ProjectBulkResult } from '@open-design/contracts';
+import type { ProjectBulkAction, ProjectBulkResponse, ProjectBulkResult } from '@mish/contracts';
 
 /** Mirror UI batching through the authorized per-project routes, continuing after failures. */
 export async function handleProjectBulkCommand(

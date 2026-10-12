@@ -6,7 +6,7 @@ import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseConnectorInventory, parseIntegrationRoster, parseLicenceRecordSnapshot } from '@open-design/contracts';
+import { parseConnectorInventory, parseIntegrationRoster, parseLicenceRecordSnapshot } from '@mish/contracts';
 import { registerWorkbenchIntegrationRoutes } from '../../src/routes/workbench-integrations.js';
 import { migrateWorkbenchLicenceRecords } from '../../src/workbench/licence-record.js';
 import { IntegrationStatusService, migrateIntegrationStatus } from '../../src/workbench/integration-status.js';

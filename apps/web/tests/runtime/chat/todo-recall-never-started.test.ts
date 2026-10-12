@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { isStruck } from '../../../src/runtime/chat/contract';
 import type { ExecutionShell, TodoSegment, TurnBlock } from '../../../src/runtime/chat/contract';

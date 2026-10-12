@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { describeFontSource, type ResourceResult } from '@open-design/contracts';
+import { describeFontSource, type ResourceResult } from '@mish/contracts';
 import { fontFallbackStack } from './check.js';
 
 /**

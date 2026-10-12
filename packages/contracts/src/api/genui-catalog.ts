@@ -1,6 +1,6 @@
 // GET /api/genui/catalog — the owned GenUI component catalog (packages/genui-catalog).
 //
-// The daemon serves the catalog manifest exactly as `@open-design/genui-catalog/data` exports it.
+// The daemon serves the catalog manifest exactly as `@mish/genui-catalog/data` exports it.
 // These types mirror that package's `Catalog` shape structurally, so contracts stays free of a
 // workspace dependency; the daemon route (`apps/daemon/src/routes/genui-catalog.ts`) checks the
 // two agree with a typed assignment (`const catalog: GenuiCatalogManifest = genuiCatalog.manifest`),

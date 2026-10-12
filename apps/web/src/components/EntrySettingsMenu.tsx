@@ -6,10 +6,10 @@ import {
 } from 'react';
 import {
   buildSocialSharePayload,
-  OPEN_DESIGN_GITHUB_REPO_URL,
+  MISH_GITHUB_REPO_URL,
   type SocialShareRequest,
   type SocialShareResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   LOCALE_LABEL,
   LOCALES,
@@ -27,10 +27,10 @@ import type { AppConfig } from '../types';
 import { Icon } from './Icon';
 import { SocialShareGrid } from './SocialShareGrid';
 
-const THREADS_URL = 'https://www.threads.com/@opendesign.ai';
-const YOUTUBE_URL = 'https://www.youtube.com/@Open-Design-ai';
-const INSTAGRAM_URL = 'https://www.instagram.com/opendesign.ai/';
-const LINKEDIN_URL = 'https://www.linkedin.com/company/open-design-ai/';
+const THREADS_URL = 'https://www.threads.com/@mish.invalid';
+const YOUTUBE_URL = 'https://www.youtube.com/@Mish-ai';
+const INSTAGRAM_URL = 'https://www.instagram.com/mish.invalid/';
+const LINKEDIN_URL = 'https://www.linkedin.com/company/mish-ai/';
 const XIAOHONGSHU_URL =
   'https://www.xiaohongshu.com/user/profile/691effad000000003002978f';
 const SHOW_UPSTREAM_COMMUNITY_LINKS = false;
@@ -79,26 +79,26 @@ export function EntrySettingsMenu({
   const { locale, setLocale } = useI18n();
   const [open, setOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
-  const [openDesignShare, setOpenDesignShare] = useState<SocialShareResponse | null>(null);
+  const [mishShare, setMishShare] = useState<SocialShareResponse | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const langListRef = useRef<HTMLDivElement | null>(null);
-  const openDesignShareRequest = useMemo<SocialShareRequest>(() => {
-    const text = t('socialShare.openDesignText');
+  const mishShareRequest = useMemo<SocialShareRequest>(() => {
+    const text = t('socialShare.mishText');
     return {
-      kind: 'open-design-repo',
+      kind: 'mish-repo',
       locale,
-      title: t('socialShare.openDesignTitle'),
+      title: t('socialShare.mishTitle'),
       text,
-      copyText: t('socialShare.openDesignCopyText', {
+      copyText: t('socialShare.mishCopyText', {
         text,
-        url: OPEN_DESIGN_GITHUB_REPO_URL,
+        url: MISH_GITHUB_REPO_URL,
       }),
     };
   }, [locale, t]);
-  const fallbackOpenDesignShare = useMemo(
-    () => buildSocialSharePayload(openDesignShareRequest),
-    [openDesignShareRequest],
+  const fallbackMishShare = useMemo(
+    () => buildSocialSharePayload(mishShareRequest),
+    [mishShareRequest],
   );
 
   useEffect(() => {
@@ -148,18 +148,18 @@ export function EntrySettingsMenu({
   useEffect(() => {
     if (!SHOW_UPSTREAM_COMMUNITY_LINKS || !open) return;
     let cancelled = false;
-    setOpenDesignShare(null);
-    void createSocialSharePayload(openDesignShareRequest)
+    setMishShare(null);
+    void createSocialSharePayload(mishShareRequest)
       .then((payload) => {
-        if (!cancelled) setOpenDesignShare(payload);
+        if (!cancelled) setMishShare(payload);
       })
       .catch(() => {
-        if (!cancelled) setOpenDesignShare(null);
+        if (!cancelled) setMishShare(null);
       });
     return () => {
       cancelled = true;
     };
-  }, [open, openDesignShareRequest]);
+  }, [open, mishShareRequest]);
 
   return (
     <div className="entry-settings-menu" ref={wrapRef}>
@@ -269,10 +269,10 @@ export function EntrySettingsMenu({
           {SHOW_UPSTREAM_COMMUNITY_LINKS ? <><section className="entry-settings-menu__section">
             <div className="entry-settings-menu__section-title">
               <Icon name="external-link" size={14} />
-              <span>{t('socialShare.openDesignSection')}</span>
+              <span>{t('socialShare.mishSection')}</span>
             </div>
             <SocialShareGrid
-              share={openDesignShare ?? fallbackOpenDesignShare}
+              share={mishShare ?? fallbackMishShare}
               className="entry-settings-social-share"
               onShare={(platform) => {
                 trackSettingsPopoverClick(analytics.track, {

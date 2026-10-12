@@ -1,7 +1,7 @@
 import type {
   ChatRunStatusResponse,
   StrategyTaskProjectionV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 type FetchRunStatus = (runId: string) => Promise<ChatRunStatusResponse | null>;
 

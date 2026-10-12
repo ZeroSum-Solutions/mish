@@ -64,7 +64,7 @@ export type ToolLoopAction = 'warn' | 'halt';
 export type ToolLoopMode = 'off' | 'warn' | 'halt';
 
 /** The verdict returned the instant a threshold is crossed. Shaped to match
- *  the `tool_loop` SSE payload in `@open-design/contracts`. */
+ *  the `tool_loop` SSE payload in `@mish/contracts`. */
 export interface ToolLoopVerdict {
   type: 'tool_loop';
   reason: ToolLoopReason;

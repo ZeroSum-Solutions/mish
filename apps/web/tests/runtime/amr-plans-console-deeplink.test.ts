@@ -4,7 +4,7 @@
  *
  * 这条测试存在的理由是一个具体的事故形状:`amrPlansUrlForProfile(_profile)` 的
  * 参数曾经带下划线前缀、刻意不用,于是 test / local / feature-test 的包**一律**跳
- * 生产 `https://open-design.ai/pricing/` —— 而那一页选中套餐会带着 plan + interval
+ * 生产 `https://github.com/ZeroSum-Solutions/mish/pricing/` —— 而那一页选中套餐会带着 plan + interval
  * 回生产 Vela 直接结账。所以这里钉的不只是「链接对不对」,而是
  * **两个 profile 必须解析到不同的 origin**:只要还有人把 profile 参数忽略掉,
  * 下面那条 origin 对比就会红。
@@ -35,13 +35,13 @@ describe('升级按钮的落点:console 的套餐页', () => {
 
   it('test profile 落在 test console,不再落在生产 Pricing', () => {
     expect(amrPlansUrlForProfile('test')).toBe(
-      'https://open-design.powerformer.net/cloud/dashboard?source=open_design&billing=plan',
+      'https://mish.powerformer.net/cloud/dashboard?source=mish&billing=plan',
     );
   });
 
   it('local profile 落在本地 console', () => {
     expect(amrPlansUrlForProfile('local')).toBe(
-      'http://localhost:5173/dashboard?source=open_design&billing=plan',
+      'http://localhost:5173/dashboard?source=mish&billing=plan',
     );
   });
 
@@ -68,7 +68,7 @@ describe('升级按钮的落点:console 的套餐页', () => {
     );
     setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
     expect(amrPlansUrlForProfile('feature-test')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design&billing=plan`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish&billing=plan`,
     );
   });
 

@@ -10,8 +10,8 @@ import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { cultLocalOnlyRefusal, parseCultCopyResponse, parseCultRegistryItem } from '@open-design/contracts';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
+import { cultLocalOnlyRefusal, parseCultCopyResponse, parseCultRegistryItem } from '@mish/contracts';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
 import { mainFileOf, repairRelativeImports, resolveCultKitDir, type CultRegistryRow } from '../src/cult-registry.js';
 import { registerCultRegistryRoutes } from '../src/routes/cult-registry.js';
 import { writeFixtureKit } from './helpers/cult-kit-fixture.js';

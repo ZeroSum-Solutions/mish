@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseCaptureImportMetadata, type CaptureView } from '@open-design/contracts';
+import { parseCaptureImportMetadata, type CaptureView } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchCapturePanel } from '../../../src/components/workbench/WorkbenchCapturePanel';
 import * as imaging from '../../../src/components/workbench/capture-image';

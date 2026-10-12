@@ -60,7 +60,7 @@ describe.skip('AMR insufficient balance run failures', () => {
       });
       expect(events).toContain('AMR_INSUFFICIENT_BALANCE');
       expect(events).toContain(
-        'https://open-design.ai/amr/dashboard?source=open_design',
+        'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?source=mish',
       );
 
       const messages = await listMessages(

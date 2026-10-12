@@ -1,6 +1,6 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { buildOnBrandResultSchema, siteCheckResultSchema } from '@open-design/contracts';
+import { buildOnBrandResultSchema, siteCheckResultSchema } from '@mish/contracts';
 import { cancelRun, pollRun, refused } from './lifecycle.ts';
 import type { Builder } from './types.ts';
 

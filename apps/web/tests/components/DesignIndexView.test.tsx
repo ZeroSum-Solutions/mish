@@ -15,7 +15,7 @@ import type {
   DesignProfile,
   DesignTaxonomy,
   RouteDecision,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { DesignIndexView } from '../../src/components/DesignIndexView';
 import { designProfileFixture } from '../fixtures/design-profile';

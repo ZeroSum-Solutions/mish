@@ -20,7 +20,7 @@
  *    最后一组把这件事**反过来钉住**:少了那一步就是两行 —— 那一步是承重的,不是可选的。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import {
   IN_FLIGHT_TOOL_INPUT_MARKER,

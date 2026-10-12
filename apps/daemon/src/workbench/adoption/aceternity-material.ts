@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import type { OperationRight, ResourceRef } from '@open-design/contracts';
+import type { OperationRight, ResourceRef } from '@mish/contracts';
 import { resolveShadcnRegistryItem, type ShadcnFetch } from '../../design-systems/shadcn-import.js';
 import { ACETERNITY_OWNER_DECISION, aceternityApplyAllowed, aceternityAssessmentFor, aceternityReuseAllowed } from '../aceternity-rights.js';
 import { ACETERNITY_ITEMS } from '../reference-sources.js';

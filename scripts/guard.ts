@@ -387,7 +387,7 @@ function isAllowedDependencySpec(spec: string): boolean {
 // reproducible. A peer range aimed at a third-party host is the opposite
 // case — the host's version is chosen by the user, so an exact peer means
 // any host upgrade leaves the peer unsatisfiable and the plugin refuses to
-// install at all. `@open-design/dsh-runtime` hit exactly that: pinned to a
+// install at all. `@mish/dsh-runtime` hit exactly that: pinned to a
 // single DeepSeek Harness release candidate, it became uninstallable the
 // moment the upstream shipped the next one.
 //
@@ -935,9 +935,9 @@ const webImportIsolationSkippedDirectories = new Set([
   "test-results",
 ]);
 const webImportIsolationForbiddenPackages = [
-  "@open-design/platform",
-  "@open-design/sidecar",
-  "@open-design/sidecar-proto",
+  "@mish/platform",
+  "@mish/sidecar",
+  "@mish/sidecar-proto",
 ];
 const webImportIsolationForbiddenDaemonRoots = [
   "apps/daemon/src",
@@ -1041,7 +1041,7 @@ function webImportIsolationViolationReason(fromRepositoryPath: string, specifier
   if (!resolvedPath) return null;
 
   if (webImportIsolationForbiddenDaemonRoots.some((root) => isPathOrDescendant(resolvedPath, root))) {
-    return "apps/web must use daemon HTTP APIs or @open-design/contracts instead of daemon private source";
+    return "apps/web must use daemon HTTP APIs or @mish/contracts instead of daemon private source";
   }
 
   if (webImportIsolationForbiddenPackageRoots.some((root) => isPathOrDescendant(resolvedPath, root))) {
@@ -1424,7 +1424,7 @@ async function checkStylePolicy(): Promise<boolean> {
 // lands inside the author's string and silently truncates their page.
 //
 // That defect reappeared in six separate files because each one hand-rolled its
-// own lookup. `@open-design/contracts/runtime/html-injection-points` is now the
+// own lookup. `@mish/contracts/runtime/html-injection-points` is now the
 // single implementation, and this check is what keeps the next one from being
 // written: a grep-driven sweep already missed an entire app once.
 // ---------------------------------------------------------------------------

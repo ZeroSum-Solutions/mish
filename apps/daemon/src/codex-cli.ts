@@ -9,7 +9,7 @@
 // is a thin spawn() wrapper with a 30s timeout.
 
 import { spawn } from 'node:child_process';
-import { createCommandInvocation, type CommandInvocation } from '@open-design/platform';
+import { createCommandInvocation, type CommandInvocation } from '@mish/platform';
 import { resolveAgentBin } from './runtimes/resolution.js';
 import { withoutIdentityEnv } from './runtimes/identity-env.js';
 import { agentInheritedEnv } from './runtimes/inherited-env.js';
@@ -125,7 +125,7 @@ export async function probeCodexInstall(name: string): Promise<CodexInstallStatu
 
 export interface CodexInstallSpec {
   // MCP server name as it will appear in ~/.codex/config.toml. We
-  // hard-code "open-design" at the route layer but keep the parameter
+  // hard-code "mish" at the route layer but keep the parameter
   // explicit so the helper can later be reused for other server names.
   name: string;
   command: string;

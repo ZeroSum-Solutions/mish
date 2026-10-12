@@ -230,7 +230,7 @@ function sectionSchema(spec: SectionSpec): Schema {
 export function recipeSchema(): Schema {
   return {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
-    $id: `https://open-design.ai/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
+    $id: `https://github.com/ZeroSum-Solutions/mish/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
     title: `${FAMILY_ID} recipe`,
     description: 'A restaurant or food-business page kind (atlas BA.02): header, hero, menu highlights, hours and location, reservations, chef or story, a gallery placeholder, optional reviews and a footer. Derived from compiler/scripts/families/restaurant/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.',
     $comment: 'contract.ts additionally enforces markup-free plain text, email and phone formats on the nullable atoms, and that a null appears only on an x-atom string leaf or in the x-optional reviews slot.',

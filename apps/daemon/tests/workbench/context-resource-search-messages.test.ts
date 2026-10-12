@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { parseResourceSearchRequest, type ResourceSearchRequest } from '@open-design/contracts';
+import { parseResourceSearchRequest, type ResourceSearchRequest } from '@mish/contracts';
 import { searchResources, type ResourceSourceAdapter } from '../../src/workbench/resources.js';
 import { candidate, savedContext, adapter, projectState } from './context-ranking-fixture.js';
 const authority = { principalId: 'local-daemon', projectId: 'p' };

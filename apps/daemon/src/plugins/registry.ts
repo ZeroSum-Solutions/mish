@@ -2,7 +2,7 @@
 //
 // - Scans `<daemonDataDir>/plugins/<id>/` (the OD-canonical install root) for
 //   manifest folders.
-// - Resolves a plugin folder into either an `open-design.json`-anchored
+// - Resolves a plugin folder into either an `mish.json`-anchored
 //   manifest or a synthesized one derived from `SKILL.md` /
 //   `.claude-plugin/plugin.json` (per spec §3 compatibility matrix).
 // - Persists discovered records into the `installed_plugins` SQLite row so
@@ -23,14 +23,14 @@ import {
   parseManifest,
   validateSafe,
   type ManifestParseResult,
-} from '@open-design/plugin-runtime';
+} from '@mish/plugin-runtime';
 import type {
   InstalledPluginRecord,
   MarketplaceTrust,
   PluginManifest,
   PluginSourceKind,
   TrustTier,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { defaultTrustForRecord, resolveCapabilitiesGranted } from './trust.js';
 import { isInternalBundledStrategyV2 } from './strategy-provenance.js';
 import { getWorkspaceResourceByResourceId } from '../db.js';
@@ -111,7 +111,7 @@ export async function resolvePluginFolder(opts: ResolveOptions): Promise<Resolve
     return { ok: false, errors: [`Plugin path is not a directory: ${folder}`], warnings };
   }
 
-  const sidecarPath = path.join(folder, 'open-design.json');
+  const sidecarPath = path.join(folder, 'mish.json');
   const skillPath = path.join(folder, 'SKILL.md');
   const claudePath = path.join(folder, '.claude-plugin', 'plugin.json');
 
@@ -120,7 +120,7 @@ export async function resolvePluginFolder(opts: ResolveOptions): Promise<Resolve
     const rawSidecar = await fsp.readFile(sidecarPath, 'utf8');
     const parsed: ManifestParseResult = parseManifest(rawSidecar);
     if (!parsed.ok) {
-      errors.push(...parsed.errors.map((e) => `open-design.json: ${e}`));
+      errors.push(...parsed.errors.map((e) => `mish.json: ${e}`));
     } else {
       sidecar = parsed.manifest;
       warnings.push(...parsed.warnings);
@@ -144,7 +144,7 @@ export async function resolvePluginFolder(opts: ResolveOptions): Promise<Resolve
   if (!sidecar && adapters.length === 0) {
     return {
       ok: false,
-      errors: [...errors, `Plugin folder contains no SKILL.md, no .claude-plugin/plugin.json, and no open-design.json: ${folder}`],
+      errors: [...errors, `Plugin folder contains no SKILL.md, no .claude-plugin/plugin.json, and no mish.json: ${folder}`],
       warnings,
     };
   }

@@ -1,5 +1,5 @@
-import type { PreviewAdapterFamily } from '@open-design/contracts';
-import { findRealTagEnd, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import type { PreviewAdapterFamily } from '@mish/contracts';
+import { findRealTagEnd, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 /**
  * AC-R07 preamble: the readiness checks a preview adapter family adds on top of the plain HTML

@@ -679,7 +679,7 @@ const RELATIVE_PATH_JSON = {
  */
 export const packManifestJsonSchema = {
   $schema: 'https://json-schema.org/draft/2020-12/schema',
-  $id: 'https://open-design.ai/schemas/mishh-pack-1.json',
+  $id: 'https://github.com/ZeroSum-Solutions/mish/schemas/mishh-pack-1.json',
   title: 'mishh-pack@1 manifest (pack.json)',
   type: 'object',
   additionalProperties: false,

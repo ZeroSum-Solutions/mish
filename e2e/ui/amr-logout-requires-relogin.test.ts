@@ -52,7 +52,7 @@ function amrAgentToggle(settings: Locator): Locator {
 
 test('[P0] after local Sign out, the app returns to Cloud sign-in without clearing setup', async ({ page }) => {
   await stubCatalogsEmpty(page);
-  const root = join(tmpdir(), `open-design-amr-logout-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+  const root = join(tmpdir(), `mish-amr-logout-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   const reloginVelaBin = await writeFakeVelaBin(join(root, 'bin-relogin'), {
     failAuthAtPrompt: true,
     requireLoginConfig: false,
@@ -139,7 +139,7 @@ test('[P0] after local Sign out, the app returns to Cloud sign-in without cleari
   await expect(page.getByRole('button', { name: /Sign in to AMR|登录 AMR/i })).toBeVisible();
   await expect(page.getByTestId('home-hero-input')).toHaveCount(0);
   await expect.poll(() => page.evaluate(() => {
-    const raw = window.localStorage.getItem('open-design:config');
+    const raw = window.localStorage.getItem('mish:config');
     return raw ? JSON.parse(raw) : null;
   })).toMatchObject({
     agentId: 'amr',

@@ -279,7 +279,7 @@ describe('AmrLoginPill', () => {
     expect(screen.getByText('leaf@example.com')).toBeTruthy();
     expect(screen.getByText('TEST')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'https://open-design.powerformer.net/cloud/dashboard?source=open_design',
+      'https://mish.powerformer.net/cloud/dashboard?source=mish',
     );
   });
 
@@ -294,7 +294,7 @@ describe('AmrLoginPill', () => {
 
     expect(screen.getByText('LOCAL')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'http://localhost:5173/dashboard?source=open_design',
+      'http://localhost:5173/dashboard?source=mish',
     );
   });
 
@@ -309,7 +309,7 @@ describe('AmrLoginPill', () => {
 
     expect(screen.queryByText('PROD')).toBeNull();
     expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'https://open-design.ai/amr/dashboard?source=open_design',
+      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?source=mish',
     );
   });
 
@@ -317,7 +317,7 @@ describe('AmrLoginPill', () => {
     const fetchMock = vi.fn(async (input: string | URL | Request) => {
       const url = typeof input === 'string' ? input : input.toString();
       if (url === '/api/attribution/bridge-url') {
-        return jsonResponse({ body: { url: 'https://open-design.ai/amr/dashboard?od_bridge=odbr_12345678' } });
+        return jsonResponse({ body: { url: 'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?od_bridge=odbr_12345678' } });
       }
       if (url === '/api/system/open-external') return jsonResponse({ body: { ok: true } });
       return new Response('{}', { status: 202 });
@@ -346,8 +346,8 @@ describe('AmrLoginPill', () => {
     fireEvent.click(link);
 
     const url = new URL(link.href);
-    expect(url.searchParams.get('source')).toBe('open_design');
-    expect(url.searchParams.get('od_origin')).toBe('open_design');
+    expect(url.searchParams.get('source')).toBe('mish');
+    expect(url.searchParams.get('od_origin')).toBe('mish');
     expect(url.searchParams.get('od_entry_source')).toBe('settings_amr_console');
     expect(url.searchParams.get('od_device_id')).toBe('od-install-abc');
     expect(url.searchParams.get('od_entry_id')).toMatch(/^od-amr-/u);
@@ -366,7 +366,7 @@ describe('AmrLoginPill', () => {
       '/api/system/open-external',
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ url: 'https://open-design.ai/amr/dashboard?od_bridge=odbr_12345678' }),
+        body: JSON.stringify({ url: 'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?od_bridge=odbr_12345678' }),
       }),
     );
   });
@@ -393,7 +393,7 @@ describe('AmrLoginPill', () => {
     });
 
     const link = screen.getByRole('link', { name: 'Manage' }) as HTMLAnchorElement;
-    expect(link.href).toBe('https://feature.example/dashboard?source=open_design');
+    expect(link.href).toBe('https://feature.example/dashboard?source=mish');
     fireEvent.click(link);
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(

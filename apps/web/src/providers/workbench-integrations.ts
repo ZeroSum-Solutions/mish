@@ -1,7 +1,7 @@
 import {
   parseIntegrationRoster, parseIntegrationRosterEntry, parseLicenceRecordSnapshot, parsePutLicenceRecord,
   type IntegrationRoster, type IntegrationRosterEntry, type LicenceRecordSnapshot, type PutLicenceRecord,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { WorkbenchRequestError } from './workbench';
 
 /** Same endpoints and DTOs as `od workbench integrations` and `od workbench licence`. */

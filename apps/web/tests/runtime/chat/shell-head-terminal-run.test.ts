@@ -15,7 +15,7 @@
  * 这个文件是回归护栏,不是 bug 的落点。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import type { BuildTurnInput, ExecutionShell } from '../../../src/runtime/chat/contract';
 

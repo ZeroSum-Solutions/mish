@@ -4,7 +4,7 @@ import type Database from 'better-sqlite3';
 import {
   OWNED_IMPORT_LIMITS, PLACEHOLDER_KINDS, parseOwnedImportRecord, parseOwnedImportRequest,
   type OwnedImportRecord, type ResourceCandidate, type ResourceRef, type ResourceRequestContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { CatalogueMaterial, CatalogueMaterialSource } from '../adoption/catalogue-material.js';
 import type { ResourceSourceAdapter } from '../resources.js';
 

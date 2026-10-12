@@ -12,7 +12,7 @@ import {
 
 describe("sanitizeNamespace", () => {
   it("keeps alphanumerics, dots, hyphens, and underscores", () => {
-    expect(sanitizeNamespace("Open-Design.beta_1")).toBe("Open-Design.beta_1");
+    expect(sanitizeNamespace("Mish.beta_1")).toBe("Mish.beta_1");
   });
 
   it("replaces forbidden chars with hyphens and collapses runs", () => {
@@ -31,14 +31,14 @@ describe("macAppBundleName", () => {
 
 describe("macAppExecutablePath", () => {
   it("joins the Contents/MacOS executable path under the bundle", () => {
-    const appPath = "/tmp/out/mac/Open Design.app";
+    const appPath = "/tmp/out/mac/Mish.app";
     expect(macAppExecutablePath(appPath)).toBe(join(appPath, "Contents", "MacOS", PRODUCT_NAME));
   });
 
   it("honors a custom executable name", () => {
-    const appPath = "/tmp/out/mac/Open Design.app";
-    expect(macAppExecutablePath(appPath, "open-design-beta")).toBe(
-      join(appPath, "Contents", "MacOS", "open-design-beta"),
+    const appPath = "/tmp/out/mac/Mish.app";
+    expect(macAppExecutablePath(appPath, "mish-beta")).toBe(
+      join(appPath, "Contents", "MacOS", "mish-beta"),
     );
   });
 });

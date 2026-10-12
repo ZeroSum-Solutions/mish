@@ -1,7 +1,7 @@
 // Licensed packs: reading `pack.json` from disk, the pack digest, and the one
 // error type every pack module throws.
 //
-// The schema itself is pure and lives in `@open-design/contracts`
+// The schema itself is pure and lives in `@mish/contracts`
 // (`packages/contracts/src/api/packs.ts`). This module adds the Node side:
 // a byte cap enforced before parsing, a no-follow open, and sha256.
 
@@ -15,7 +15,7 @@ import {
   type PackInstallErrorCode,
   type PackManifest,
   type PackRemoveErrorCode,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 export type PackErrorCode = PackInstallErrorCode | PackRemoveErrorCode;
 

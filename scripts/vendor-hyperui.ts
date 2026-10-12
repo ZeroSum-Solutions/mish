@@ -97,7 +97,7 @@ interface ContentsEntry {
 }
 
 async function fetchJson(url: string): Promise<unknown> {
-  const headers: Record<string, string> = { 'user-agent': 'open-design-vendor-hyperui' };
+  const headers: Record<string, string> = { 'user-agent': 'mish-vendor-hyperui' };
   const token = process.env.GITHUB_TOKEN;
   if (token) headers.authorization = `Bearer ${token}`;
   const response = await fetch(url, { headers });
@@ -108,7 +108,7 @@ async function fetchJson(url: string): Promise<unknown> {
 }
 
 async function fetchText(url: string): Promise<string> {
-  const response = await fetch(url, { headers: { 'user-agent': 'open-design-vendor-hyperui' } });
+  const response = await fetch(url, { headers: { 'user-agent': 'mish-vendor-hyperui' } });
   if (!response.ok) {
     throw new Error(`GET ${url} -> ${response.status} ${response.statusText}`);
   }

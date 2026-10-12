@@ -3,7 +3,7 @@ import fs, { mkdtempSync, rmSync, writeFileSync, mkdirSync, readFileSync, exists
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Brand } from '@open-design/contracts';
+import type { Brand } from '@mish/contracts';
 
 import {
   closeDatabase,
@@ -346,8 +346,8 @@ describe('agent-driven brand extraction engine', () => {
 
   it('prefers source-backed human brand tokens over script/debug color noise', () => {
     const brand = brandFromMaterial({
-      url: 'https://open-design.ai/',
-      finalUrl: 'https://open-design.ai/',
+      url: 'https://github.com/ZeroSum-Solutions/mish/',
+      finalUrl: 'https://github.com/ZeroSum-Solutions/mish/',
       siteName: 'Kestrel',
       title: 'Kestrel',
       description: 'Kestrel design system.',
@@ -374,7 +374,7 @@ describe('agent-driven brand extraction engine', () => {
       thin: false,
       blocked: false,
       materialMd: '',
-    }, 'https://open-design.ai/');
+    }, 'https://github.com/ZeroSum-Solutions/mish/');
 
     expect(brand.colors.find((color) => color.role === 'accent')?.hex).toBe('#63fe13');
     expect(brand.typography.body.family).toBe('Albert Sans');

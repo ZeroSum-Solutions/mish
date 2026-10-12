@@ -23,8 +23,8 @@ import type {
   LibraryAssetKind,
   LibraryEditAsPageResponse,
   LibrarySourceKind,
-} from '@open-design/contracts';
-import { LIBRARY_UPLOAD_MAX_BYTES, isLibraryUploadMimeAllowed } from '@open-design/contracts';
+} from '@mish/contracts';
+import { LIBRARY_UPLOAD_MAX_BYTES, isLibraryUploadMimeAllowed } from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
 import {
   addLibraryAssetSource,

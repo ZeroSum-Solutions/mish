@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import { parseWorkbenchAdoptionStatusResponse, type WorkbenchAdoptionStatus } from '@open-design/contracts';
+import { parseWorkbenchAdoptionStatusResponse, type WorkbenchAdoptionStatus } from '@mish/contracts';
 
 import { useT } from '../i18n';
 import { Icon } from './Icon';

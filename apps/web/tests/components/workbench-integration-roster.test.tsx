@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { licenceOperationStatuses, type IntegrationRoster, type IntegrationRosterEntry, type LicenceRecordSnapshot } from '@open-design/contracts';
+import { licenceOperationStatuses, type IntegrationRoster, type IntegrationRosterEntry, type LicenceRecordSnapshot } from '@mish/contracts';
 import { I18nProvider } from '../../src/i18n';
 import { WorkbenchIntegrationRoster } from '../../src/components/workbench/WorkbenchIntegrationRoster';
 import { getIntegrationRoster, putLicenceRecord, testIntegration } from '../../src/providers/workbench-integrations';

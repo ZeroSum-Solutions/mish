@@ -5,7 +5,7 @@ export interface ApprovedDesignSystemSeed {
   id: string;
   revision: string;
 }
-type SeedKit = { id: string; approval?: import('@open-design/contracts').DesignSystemApproval };
+type SeedKit = { id: string; approval?: import('@mish/contracts').DesignSystemApproval };
 export async function approveAtlasSeed(seeds: readonly ApprovedDesignSystemSeed[], io: {
   list(): Promise<SeedKit[]>;
   approve(seed: ApprovedDesignSystemSeed): Promise<SeedKit>;

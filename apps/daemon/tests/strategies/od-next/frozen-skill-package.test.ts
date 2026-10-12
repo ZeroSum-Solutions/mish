@@ -63,8 +63,8 @@ describe('OD Next frozen user-selected Skill package', () => {
   it('normalizes legacy and array forms through aliases without reordering', () => {
     expect(normalizeSelectedSkillIds({
       skillId: ' editorial-collage ',
-      skillIds: ['open-design-landing', 'frontend-design', 'frontend-design'],
-    })).toEqual(['open-design-landing', 'frontend-design']);
+      skillIds: ['mish-landing', 'frontend-design', 'frontend-design'],
+    })).toEqual(['mish-landing', 'frontend-design']);
   });
 
   it('persists immutable bytes and materializes them after live source mutation/deletion', async () => {
@@ -175,7 +175,7 @@ describe('OD Next frozen user-selected Skill package', () => {
     // The cap exists so oversized bytes are never read into memory, and that
     // still holds: the file is skipped before any read, and `readBoundedNoFollow`
     // re-enforces the same limit on whatever it does read. What must NOT follow
-    // is deleting the Skill — `example-open-design-landing` links a bundled
+    // is deleting the Skill — `example-mish-landing` links a bundled
     // `assets/hero.png`, and rejecting the capture over one screenshot dropped
     // every word of that card's prose.
     const skill = await fixtureSkill();

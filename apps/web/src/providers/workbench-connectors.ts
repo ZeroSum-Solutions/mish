@@ -1,7 +1,7 @@
 import {
   parseConnectorDetailResponse, parseConnectorSearchResponse,
   type ConnectorDetailRequest, type ConnectorReferenceDetailResponse, type ConnectorSearchRequest, type ConnectorSearchResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { WorkbenchRequestError } from './workbench';
 
 /** Typed refusal with the daemon's code, message and recovery (nextSteps or missing receipts). */

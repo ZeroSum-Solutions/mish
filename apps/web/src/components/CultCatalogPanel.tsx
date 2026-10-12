@@ -23,9 +23,9 @@ import {
   type CultCatalogItem,
   type CultCatalogRelatedItem,
   type CultCatalogState,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
-import { Button, Chip, EmptyState } from '@open-design/components';
+import { Button, Chip, EmptyState } from '@mish/components';
 
 import { useT } from '../i18n';
 import { CultLivePreviewModal, prefetchCultPreview } from './CultLivePreview';

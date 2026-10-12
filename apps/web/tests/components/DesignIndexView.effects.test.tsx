@@ -10,7 +10,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { AgencyBuildSnapshot, AgencyFamilyEffectsResponse, DesignTaxonomy, RouteDecision } from '@open-design/contracts';
+import type { AgencyBuildSnapshot, AgencyFamilyEffectsResponse, DesignTaxonomy, RouteDecision } from '@mish/contracts';
 
 import { DesignIndexView } from '../../src/components/DesignIndexView';
 import { emitBuildEnd, emitBuildEvent } from '../helpers/agency-build-agui-frames';

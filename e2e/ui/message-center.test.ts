@@ -3,8 +3,8 @@ import { routeAgents, suppressWhatsNew } from '@/playwright/mock-factory';
 import { ensureRailOpen } from '@/playwright/rail';
 import type { Page } from '@playwright/test';
 
-const STORAGE_KEY = 'open-design:config';
-const READ_KEY = 'open-design.message-center.anonymous-read-ids.v1';
+const STORAGE_KEY = 'mish:config';
+const READ_KEY = 'mish.message-center.anonymous-read-ids.v1';
 
 test.describe.configure({ timeout: 30_000 });
 
@@ -17,8 +17,8 @@ async function seedEntryHome(page: Page, options?: { locale?: string }) {
     window.localStorage.clear();
     window.sessionStorage.clear();
     if (locale) {
-      window.localStorage.setItem('open-design:locale', locale);
-      window.localStorage.setItem('open-design:locale-source', 'manual');
+      window.localStorage.setItem('mish:locale', locale);
+      window.localStorage.setItem('mish:locale-source', 'manual');
     }
     window.localStorage.setItem(
       key,

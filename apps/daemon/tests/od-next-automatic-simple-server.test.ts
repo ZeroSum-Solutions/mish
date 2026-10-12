@@ -11,14 +11,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type {
   AppliedStrategyBindingV2,
   OdNextRuntimeCapabilitySnapshotV1,
-  OpenDesignPlanContractV2,
+  MishPlanContractV2,
   ProjectScenarioTaskProfile,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   normalizeAgentObservationV1,
   OD_NEXT_PROMPT_STAGE_CONTRACT_V2,
   parseOdNextPromptBundleV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 const uuidControl = vi.hoisted(() => ({ forced: [] as string[] }));
 let pendingAutomaticFixtureIdentity: {
@@ -126,7 +126,7 @@ const INTAKE_PASSED = {
 
 function complexCapabilitySnapshot(): OdNextRuntimeCapabilitySnapshotV1 {
   const withoutHash: Omit<OdNextRuntimeCapabilitySnapshotV1, 'snapshotHash'> = {
-    schema: 'open-design.od-next-runtime-capability-snapshot/v1',
+    schema: 'mish.od-next-runtime-capability-snapshot/v1',
     runtimePath: 'codex',
     agentId: 'codex',
     agentCliVersion: 'synthetic-cli-simulating-fixture/1',
@@ -266,7 +266,7 @@ describe('OD Next automatic production through the real server', () => {
     const invocations = await readProjectInvocations(fixture.logPath, fixture.projectId);
     expect(invocations).toHaveLength(1);
     expect(invocations[0]?.stdin).not.toContain('OD Next Strategy V2');
-    expect(invocations[0]?.stdin).not.toContain('open-design.strategy-state/v2');
+    expect(invocations[0]?.stdin).not.toContain('mish.strategy-state/v2');
     const researchStart = invocations[0]!.stdin.indexOf('## Research command contract');
     const researchEnd = invocations[0]!.stdin.indexOf('# User request', researchStart);
     expect(researchStart).toBeGreaterThanOrEqual(0);
@@ -462,7 +462,7 @@ describe('OD Next automatic production through the real server', () => {
     const exampleDir = path.join(binDir, 'stale-selected-example');
     await cp(MEETING_NOTES_EXAMPLE_DIR, exampleDir, { recursive: true });
     const staleExamplePluginId = 'example-stale-meeting-notes';
-    const manifestPath = path.join(exampleDir, 'open-design.json');
+    const manifestPath = path.join(exampleDir, 'mish.json');
     const manifest = JSON.parse(await readFile(manifestPath, 'utf8')) as Record<string, unknown>;
     await writeFile(manifestPath, JSON.stringify({
       ...manifest,
@@ -645,7 +645,7 @@ describe('OD Next automatic production through the real server', () => {
       .slice(invocationsBefore);
     expect(ordinaryInvocations).toHaveLength(1);
     expect(ordinaryInvocations[0]?.stdin).not.toContain('OD Next Strategy V2');
-    expect(ordinaryInvocations[0]?.stdin).not.toContain('open-design.strategy-state/v2');
+    expect(ordinaryInvocations[0]?.stdin).not.toContain('mish.strategy-state/v2');
 
     // The operator-facing surface names the authority that decided, so the
     // person who just configured the mode can confirm theirs is the one in
@@ -1277,7 +1277,7 @@ describe('OD Next automatic production through the real server', () => {
     expect(active.strategyTask).toMatchObject({ inputStage: 'request', terminal: false });
     const activeTask = getStrategyTaskExecution(database(), active.taskExecutionId as string);
     expect(activeTask?.frozenSkillPackage).toMatchObject({
-        schema: 'open-design.od-next-frozen-skill-package/v1',
+        schema: 'mish.od-next-frozen-skill-package/v1',
         selections: [],
       });
     expect(activeTask?.runs[0]?.finalText).toEqual(activeTask?.promptBundle);
@@ -1288,8 +1288,8 @@ describe('OD Next automatic production through the real server', () => {
     expect(promptBundleText).toContain(`<od-next key="${doneKey}" value="Add an orders list page"/>`);
     expect(promptBundleText).toContain(`<od-focus key="${doneKey}"`);
     expect(promptBundleText.slice(
-      promptBundleText.indexOf('<open_design_core_system_prompt>'),
-      promptBundleText.indexOf('</open_design_core_system_prompt>'),
+      promptBundleText.indexOf('<mish_core_system_prompt>'),
+      promptBundleText.indexOf('</mish_core_system_prompt>'),
     )).not.toContain(doneKey);
     expect(activeTask?.promptBundle.utf8Bytes).toBe(
       Buffer.byteLength(activeTask?.promptBundle.text ?? '', 'utf8'),
@@ -1935,8 +1935,8 @@ describe('OD Next automatic production through the real server', () => {
       .map((line) => JSON.parse(line) as { event: string; data: RunStatus })
       .filter((event) => event.event === 'end');
     expect(watched.stdout).toContain('Prepared a simple plan.');
-    expect(watched.stdout).not.toContain('<open-design-plan-contract>');
-    expect(watched.stdout).not.toContain('<open-design-runtime-state>');
+    expect(watched.stdout).not.toContain('<mish-plan-contract>');
+    expect(watched.stdout).not.toContain('<mish-runtime-state>');
     expect(watchedEnds.map((event) => event.data.strategyTask?.inputStage)).toEqual([
       'contract_repair',
       'production',
@@ -1953,8 +1953,8 @@ describe('OD Next automatic production through the real server', () => {
       terminal.runs.map((mapping) => mapping.finalText.text),
     );
     expect(invocations[0]?.argv).not.toContain('resume');
-    expect(invocations[0]?.stdin).toMatch(/^<open_design_prompt_bundle/);
-    expect(invocations[0]?.stdin).toContain('<open_design_core_system_prompt>');
+    expect(invocations[0]?.stdin).toMatch(/^<mish_prompt_bundle/);
+    expect(invocations[0]?.stdin).toContain('<mish_core_system_prompt>');
     expect(invocations[0]?.stdin).toContain('<user_first_prompt>');
     expect(invocations[0]?.stdin).toContain('<task_metadata>');
     expect(invocations[0]?.stdin).toContain('<context>');
@@ -1995,13 +1995,13 @@ describe('OD Next automatic production through the real server', () => {
     // the shared cache prefix, so no per-task or per-run value may appear in it.
     const firstStdin = invocations[0]!.stdin;
     const systemPromptSlice = firstStdin.slice(
-      firstStdin.indexOf('  <open_design_core_system_prompt>'),
+      firstStdin.indexOf('  <mish_core_system_prompt>'),
       firstStdin.indexOf('  </active_stages>'),
     );
     expect(systemPromptSlice.length).toBeGreaterThan(0);
     for (const perTaskValue of [
-      'open-design.od-next-task-configuration/v1',
-      'open-design.od-next-request-input-facts/v1',
+      'mish.od-next-task-configuration/v1',
+      'mish.od-next-request-input-facts/v1',
       'task-input:attachments/attachment-001.pdf',
       'workspace:project',
       // The runtime tool contract embeds the daemon URL, which is per-run.
@@ -2011,8 +2011,8 @@ describe('OD Next automatic production through the real server', () => {
       expect(systemPromptSlice).not.toContain(perTaskValue);
       expect(firstStdin).toContain(perTaskValue);
     }
-    expect(invocations[0]?.stdin).toContain('open-design.od-next-task-configuration/v1');
-    expect(invocations[0]?.stdin).toContain('open-design.od-next-request-input-facts/v1');
+    expect(invocations[0]?.stdin).toContain('mish.od-next-task-configuration/v1');
+    expect(invocations[0]?.stdin).toContain('mish.od-next-request-input-facts/v1');
     expect(invocations[0]?.stdin).toContain('"taskType":"prototype"');
     expect(invocations[0]?.stdin).toContain('task-input:attachments/attachment-001.pdf');
     expect(invocations[0]?.stdin).toContain('task-input:attachments/attachment-002.txt');
@@ -2026,15 +2026,15 @@ describe('OD Next automatic production through the real server', () => {
       .toEqual([true, true]);
     expect(invocations[1]?.stdin).toContain('native continuation — contract_repair');
     expect(invocations[2]?.stdin).toContain('native continuation — production');
-    expect(invocations[1]?.stdin).toMatch(/^<open_design_request_turn/);
-    expect(invocations[2]?.stdin).toMatch(/^<open_design_request_turn/);
+    expect(invocations[1]?.stdin).toMatch(/^<mish_request_turn/);
+    expect(invocations[2]?.stdin).toMatch(/^<mish_request_turn/);
     expect(invocations[1]?.stdin).toContain('stage="contract_repair" task_run_index="1"');
     expect(invocations[2]?.stdin).toContain('stage="production" task_run_index="2"');
     expect(invocations[1]?.stdin).not.toContain('# User request');
     expect(invocations[2]?.stdin).not.toContain('# User request');
-    expect(invocations[1]?.stdin).not.toContain('open-design.strategy-state/v2');
+    expect(invocations[1]?.stdin).not.toContain('mish.strategy-state/v2');
     expect(invocations[2]?.stdin).toContain('## Closing Runtime State');
-    expect(invocations[2]?.stdin).toContain('schema open-design.strategy-state/v2');
+    expect(invocations[2]?.stdin).toContain('schema mish.strategy-state/v2');
     expect(invocations[2]?.stdin).toContain('inputStage production');
     expect(invocations[2]?.stdin).toContain('no Plan Contract block');
     expect(statuses[0]!.updatedAt).toBeLessThanOrEqual(invocations[1]!.startedAt);
@@ -2107,7 +2107,7 @@ describe('OD Next automatic production through the real server', () => {
         boundary: 'hostComposed',
         kind: mapping.finalText.kind,
         promptSchema: mapping.finalText.schema,
-        schema: 'open-design.od-next-exact-send-prompt/v1',
+        schema: 'mish.od-next-exact-send-prompt/v1',
         stage: mapping.inputStage,
         sha256: mapping.finalText.sha256,
         utf8Bytes: mapping.finalText.utf8Bytes,
@@ -2972,9 +2972,9 @@ function planContract(
   strategy: AppliedStrategyBindingV2,
   mode: 'repair' | 'direct' | 'complex' = 'repair',
   capability = complexCapabilitySnapshot(),
-): OpenDesignPlanContractV2 {
+): MishPlanContractV2 {
   return {
-    schema: 'open-design.plan-contract/v2',
+    schema: 'mish.plan-contract/v2',
     strategy: {
       id: 'od-next-strategy',
       version: strategy.version,
@@ -3052,7 +3052,7 @@ function runtimeState(input: {
   executionMode?: 'simple' | 'complex';
 }) {
   return {
-    schema: 'open-design.strategy-state/v2',
+    schema: 'mish.strategy-state/v2',
     route: input.route ?? 'full_plan',
     inputStage: input.inputStage ?? 'request',
     outcome: input.outcome,
@@ -3069,38 +3069,38 @@ function machineBlock(tag: string, value: unknown, fenced = false): string {
 async function writeStrategyCodex(
   dir: string,
   mode: 'repair' | 'direct' | 'complex',
-  plan: OpenDesignPlanContractV2,
+  plan: MishPlanContractV2,
 ): Promise<{ bin: string; logPath: string }> {
   const bin = path.join(dir, `codex-${mode}`);
   const logPath = path.join(dir, `codex-${mode}.jsonl`);
   const initialRepair = [
     'Prepared a simple plan.',
-    machineBlock('open-design-plan-contract', plan, true),
-    machineBlock('open-design-runtime-state', runtimeState({ outcome: 'plan_ready' })),
+    machineBlock('mish-plan-contract', plan, true),
+    machineBlock('mish-runtime-state', runtimeState({ outcome: 'plan_ready' })),
   ].join('\n');
   const repaired = [
-    machineBlock('open-design-plan-contract', plan),
-    machineBlock('open-design-runtime-state', runtimeState({
+    machineBlock('mish-plan-contract', plan),
+    machineBlock('mish-runtime-state', runtimeState({
       inputStage: 'contract_repair',
       outcome: 'plan_ready',
     })),
   ].join('\n');
-  const production = machineBlock('open-design-runtime-state', runtimeState({
+  const production = machineBlock('mish-runtime-state', runtimeState({
     inputStage: 'production',
     outcome: 'completed',
   }));
-  const direct = machineBlock('open-design-runtime-state', runtimeState({
+  const direct = machineBlock('mish-runtime-state', runtimeState({
     route: 'direct_edit',
     outcome: 'completed',
   }));
   const complexPlan = [
     'Prepared a complex plan.',
-    machineBlock('open-design-plan-contract', plan),
-    machineBlock('open-design-runtime-state', runtimeState({
+    machineBlock('mish-plan-contract', plan),
+    machineBlock('mish-runtime-state', runtimeState({
       outcome: 'plan_ready', executionMode: 'complex',
     })),
   ].join('\n');
-  const complexProduction = machineBlock('open-design-runtime-state', runtimeState({
+  const complexProduction = machineBlock('mish-runtime-state', runtimeState({
     inputStage: 'production', outcome: 'completed', executionMode: 'complex',
   }));
 
@@ -3193,19 +3193,19 @@ setTimeout(finish, 1500);
 
 async function writeStrategyClaude(
   dir: string,
-  plan: OpenDesignPlanContractV2,
+  plan: MishPlanContractV2,
 ): Promise<{ bin: string; logPath: string }> {
   const bin = path.join(dir, 'claude-complex');
   const logPath = path.join(dir, 'claude-complex.jsonl');
   const complexPlan = [
     'Prepared a complex plan.',
-    machineBlock('open-design-plan-contract', plan),
-    machineBlock('open-design-runtime-state', runtimeState({
+    machineBlock('mish-plan-contract', plan),
+    machineBlock('mish-runtime-state', runtimeState({
       outcome: 'plan_ready',
       executionMode: 'complex',
     })),
   ].join('\n');
-  const complexProduction = machineBlock('open-design-runtime-state', runtimeState({
+  const complexProduction = machineBlock('mish-runtime-state', runtimeState({
     inputStage: 'production',
     outcome: 'completed',
     executionMode: 'complex',

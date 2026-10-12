@@ -5,7 +5,7 @@ import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { access, stat } from 'node:fs/promises';
 import { join } from 'node:path';
-import { integrationTestability, parseIntegrationRuntime, type IntegrationRosterEntry, type IntegrationRuntime } from '@open-design/contracts';
+import { integrationTestability, parseIntegrationRuntime, type IntegrationRosterEntry, type IntegrationRuntime } from '@mish/contracts';
 import { readMcpConfig, effectiveMcpAuthMode, type McpServerConfig } from '../mcp-config.js';
 import { getToken, isTokenExpired, type StoredMcpToken } from '../mcp-tokens.js';
 import { listMotionSitesTools } from '../motionsites/mcp-client.js';

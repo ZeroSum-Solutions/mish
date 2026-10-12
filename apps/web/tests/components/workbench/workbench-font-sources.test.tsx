@@ -5,7 +5,7 @@
 // the same DTOs `od workbench search --json` prints.
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseResourceSearchResponse, type FontKitDeclaration, type FontProfile, type ResourceResult } from '@open-design/contracts';
+import { parseResourceSearchResponse, type FontKitDeclaration, type FontProfile, type ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchResourceDetail } from '../../../src/components/workbench/WorkbenchResourceDetail';
 import { WorkbenchResourceSearch } from '../../../src/components/workbench/WorkbenchResourceSearch';

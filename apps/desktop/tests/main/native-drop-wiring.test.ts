@@ -61,6 +61,6 @@ describe("native drop wiring", () => {
     expect(intake).toContain("webUtils.getPathForFile(file)");
     expect(intake).toContain("instanceof File");
     expect(intake).toContain("'intake:list-directory'");
-    expect(preload).toMatch(/hostBridge = \{[\s\S]*\bintake,[\s\S]*\} satisfies OpenDesignHostBridge/);
+    expect(preload).toMatch(/hostBridge = \{[\s\S]*\bintake,[\s\S]*\} satisfies MishHostBridge/);
   });
 });

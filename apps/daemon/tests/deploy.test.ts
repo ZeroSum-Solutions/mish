@@ -297,12 +297,12 @@ describe('deploy file set', () => {
     await writeFile(path.join(dir, 'page.html'), '<!doctype html><body><h1>Hello</h1></body>');
 
     const files = await buildDeployFileSet(projectsRoot, projectId, 'page.html', {
-      hookScriptUrl: 'https://cdn.example.com/open-design-hook.js',
+      hookScriptUrl: 'https://cdn.example.com/mish-hook.js',
     });
     const html = files.find((f) => f.file === 'index.html')?.data.toString('utf8') ?? '';
 
     expect(html).toContain(
-      '<script src="https://cdn.example.com/open-design-hook.js" defer data-open-design-deploy-hook="true" data-closeable="true"></script></body>',
+      '<script src="https://cdn.example.com/mish-hook.js" defer data-mish-deploy-hook="true" data-closeable="true"></script></body>',
     );
   });
 
@@ -511,8 +511,8 @@ describe('deploy file set', () => {
     const out = injectDeployHookScript(html, 'https://cdn.example.com/hook.js');
 
     expect(out).toContain(authored);
-    expect(out.indexOf('data-open-design-deploy-hook')).toBeGreaterThan(out.indexOf('<main>real</main>'));
-    expect(out.indexOf('data-open-design-deploy-hook')).toBeLessThan(out.lastIndexOf('</body>'));
+    expect(out.indexOf('data-mish-deploy-hook')).toBeGreaterThan(out.indexOf('<main>real</main>'));
+    expect(out.indexOf('data-mish-deploy-hook')).toBeLessThan(out.lastIndexOf('</body>'));
   });
 
   it('extracts url() and @import refs from inline <style> blocks', () => {
@@ -3122,7 +3122,7 @@ describe('deploy link access', () => {
   });
 
   describe('confirmAnonymousPageGet redirect validation', () => {
-    const RESOLVER = Symbol.for('open-design.daemon.publicProbeResolveHost');
+    const RESOLVER = Symbol.for('mish.daemon.publicProbeResolveHost');
     const slots = globalThis as unknown as Record<symbol, unknown>;
     const priorResolver = slots[RESOLVER];
     afterEach(() => {
@@ -3188,7 +3188,7 @@ describe('deploy link access', () => {
   });
 
   describe('confirmAnonymousPageGet pinned connection (DNS rebinding)', () => {
-    const RESOLVER = Symbol.for('open-design.daemon.publicProbeResolveHost');
+    const RESOLVER = Symbol.for('mish.daemon.publicProbeResolveHost');
     const slots = globalThis as unknown as Record<symbol, unknown>;
     const priorResolver = slots[RESOLVER];
     afterEach(() => {
@@ -3349,7 +3349,7 @@ describe('deploy link access', () => {
     });
 
     it('never requests a name that resolves to a NAT64 address', async () => {
-      const RESOLVER = Symbol.for('open-design.daemon.publicProbeResolveHost');
+      const RESOLVER = Symbol.for('mish.daemon.publicProbeResolveHost');
       const slots = globalThis as unknown as Record<symbol, unknown>;
       const prior = slots[RESOLVER];
       slots[RESOLVER] = async () => ['64:ff9b::7f00:1'];

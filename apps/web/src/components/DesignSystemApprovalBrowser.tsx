@@ -1,7 +1,7 @@
 import styles from './DesignSystemApprovalBrowser.module.css';
 import { useState } from 'react';
-import { Button } from '@open-design/components';
-import { isApprovedDesignSystem, type DesignSystemSummary, type WorkspaceCollabContext } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import { isApprovedDesignSystem, type DesignSystemSummary, type WorkspaceCollabContext } from '@mish/contracts';
 import { useWorkspaceContext } from '../collab/useWorkspaceContext';
 import { useT } from '../i18n';
 import { setDesignSystemApproval } from '../providers/registry';

@@ -1,7 +1,7 @@
 import {
   DESKTOP_UPDATE_STATES,
   type DesktopUpdateStatusSnapshot,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 
 import type { DesktopUpdater, DesktopUpdaterLogger } from "../updater.js";
 
@@ -65,7 +65,7 @@ export function createDesktopUpdaterScheduler(
     if (!warnedZeroDelay) {
       warnedZeroDelay = true;
       logger.warn(
-        `[open-design updater] refusing non-positive scheduled poll delay (${delayMs}ms); `
+        `[mish updater] refusing non-positive scheduled poll delay (${delayMs}ms); `
           + `using ${MIN_SCHEDULED_POLL_DELAY_MS}ms floor`,
       );
     }
@@ -128,7 +128,7 @@ export function createDesktopUpdaterScheduler(
             }
           }
         } catch (silentError) {
-          logger.warn("[open-design updater] startup silent payload update failed", silentError);
+          logger.warn("[mish updater] startup silent payload update failed", silentError);
         }
       }
       if (status.installResult != null) {
@@ -136,7 +136,7 @@ export function createDesktopUpdaterScheduler(
         return;
       }
     } catch (error) {
-      logger.warn("[open-design updater] scheduled update check failed", error);
+      logger.warn("[mish updater] scheduled update check failed", error);
     } finally {
       tickRunning = false;
     }

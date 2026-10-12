@@ -9,7 +9,7 @@ import { homeBriefPreview } from '../helpers/home-brief-preview';
 import { act } from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { RouteDecision } from '@open-design/contracts';
+import type { RouteDecision } from '@mish/contracts';
 
 vi.mock('../../src/components/home-hero/PlaceholderCarousel', () => ({
   PlaceholderCarousel: () => null,
@@ -400,7 +400,7 @@ describe('HomeView — Jev chooses', () => {
     expect(screen.getByTestId('home-hero-jev-chooses').getAttribute('aria-pressed')).toBe('false');
     expect(screen.queryByTestId('home-hero-jev-notice')).toBeNull();
     expect(homeHeroPromptText()).toBe(BRIEF);
-    expect(window.localStorage.getItem('open-design:home-composer:jev-chooses')).toBeNull();
+    expect(window.localStorage.getItem('mish:home-composer:jev-chooses')).toBeNull();
     await send();
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
     const payload = onSubmit.mock.calls[0]![0];

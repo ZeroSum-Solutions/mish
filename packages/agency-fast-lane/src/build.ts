@@ -290,7 +290,7 @@ export type BuildInput = {
   /**
    * The GenUI catalog manifest the effect questions and guards read names, descriptions, kinds
    * and categories from. The daemon passes `genuiCatalog.manifest` from
-   * `@open-design/genui-catalog/data`; the CLI passes `loadEffectCatalogFromSource()`. Given, never
+   * `@mish/genui-catalog/data`; the CLI passes `loadEffectCatalogFromSource()`. Given, never
    * loaded here — see `routeBuild` on why this module reads no file.
    */
   effectCatalog?: EffectCatalog;
@@ -386,7 +386,7 @@ export type RouteBuildInput = {
  * `atlas.ts` builds its default paths from `import.meta.dirname` — which, inlined, is the
  * prebundle's own directory, where no `atlas/` exists. A packaged `family: 'auto'` build would
  * ENOENT before it ever reached Jev. The daemon passes the objects from the generated, bundle-safe
- * `@open-design/agency-fast-lane/data` module, exactly as it already does for the design index;
+ * `@mish/agency-fast-lane/data` module, exactly as it already does for the design index;
  * the CLI runs from source and passes `loadAtlasData()`. See `tools/pack/tests/prebundle/`.
  */
 export async function routeBuild(input: RouteBuildInput, deps: Pick<BuildDeps, 'createJevRouter'>): Promise<RouteDecision> {

@@ -15,7 +15,7 @@ import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MCP_SECRET_MASK, type McpServerConfig, type McpServersResponse } from '@open-design/contracts';
+import { MCP_SECRET_MASK, type McpServerConfig, type McpServersResponse } from '@mish/contracts';
 import { sendApiError } from '../src/http/api-errors.js';
 import { registerMcpRoutes } from '../src/mcp-routes.js';
 import { readMcpConfig, sanitizeMcpConfig, writeMcpConfig } from '../src/mcp-config.js';

@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { parsePutSessionModel, parseSessionModelSnapshot, sessionModelChoicesEqual, type SessionModelSnapshot } from '@open-design/contracts';
+import { parsePutSessionModel, parseSessionModelSnapshot, sessionModelChoicesEqual, type SessionModelSnapshot } from '@mish/contracts';
 
 export class SessionModelError extends Error {
   constructor(public readonly status: number, public readonly code: 'project-forbidden' | 'SESSION_MODEL_REVISION_CONFLICT' | 'VALIDATION_FAILED', message: string, public readonly current?: SessionModelSnapshot) { super(message); }

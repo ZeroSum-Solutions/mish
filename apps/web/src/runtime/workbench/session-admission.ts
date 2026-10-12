@@ -1,4 +1,4 @@
-import { parseSessionRunAdmission, type SessionRunAdmission, type SessionExecutionChoice } from '@open-design/contracts';
+import { parseSessionRunAdmission, type SessionRunAdmission, type SessionExecutionChoice } from '@mish/contracts';
 /** Accept only a host snapshot belonging to this physical run and known scope. */
 export function readSessionRunAdmission(input: unknown, expected: { runId?: string; projectId?: string | null; sessionId?: string | null }): SessionRunAdmission | null {
   try {

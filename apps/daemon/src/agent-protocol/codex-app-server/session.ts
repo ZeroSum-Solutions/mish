@@ -360,7 +360,7 @@ export function attachCodexAppServerSession(
     'initialize',
     {
       clientInfo: {
-        name: 'open-design',
+        name: 'mish',
         title: 'Mishh Mashh',
         version: opts.clientVersion ?? '0.0.0',
       },

@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
-import { renderActiveStageBlock } from '@open-design/contracts';
+import { renderActiveStageBlock } from '@mish/contracts';
 
 import {
   PLATFORM_CONTRACTS_BLOCK,

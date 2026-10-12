@@ -1,4 +1,4 @@
-import { parseRightsAssessment, type OperationRight, type RightsAssessment } from '@open-design/contracts';
+import { parseRightsAssessment, type OperationRight, type RightsAssessment } from '@mish/contracts';
 import { assertOwnerAcceptedPrincipal, LOCAL_OWNER_PRINCIPAL } from './source-records.js';
 
 /**

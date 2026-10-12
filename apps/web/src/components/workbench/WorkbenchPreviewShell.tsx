@@ -1,5 +1,5 @@
 import { createContext, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { useT } from '../../i18n';
 import { navigate } from '../../router';
 import styles from './workbench.module.css';

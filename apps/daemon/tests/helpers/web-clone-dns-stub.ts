@@ -4,7 +4,7 @@
 
 const PUBLIC_ANSWERS: Record<string, string> = {
   'example.com': '93.184.215.14',
-  'nexu.io': '76.76.21.21',
+  'mish.io': '76.76.21.21',
   'stripe.com': '185.166.143.1',
 };
 

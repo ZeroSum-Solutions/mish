@@ -10,7 +10,7 @@ import path from 'node:path';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterEach, expect, it } from 'vitest';
-import { parseIntakeBatchSnapshot, parseIntakeFilePutResponse, type IntakeFileOutcome } from '@open-design/contracts';
+import { parseIntakeBatchSnapshot, parseIntakeFilePutResponse, type IntakeFileOutcome } from '@mish/contracts';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { libraryObjectPath } from '../../src/library.js';

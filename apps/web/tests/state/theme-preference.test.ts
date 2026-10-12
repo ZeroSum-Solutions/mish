@@ -8,7 +8,7 @@ import { applyAppearanceToDocument, resolveAppTheme } from '../../src/state/appe
 import { DEFAULT_CONFIG, loadConfig } from '../../src/state/config';
 import type { AppConfig } from '../../src/types';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 const store = new Map<string, string>();
 
 vi.stubGlobal('localStorage', {

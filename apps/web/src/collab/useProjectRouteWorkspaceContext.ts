@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { BackoffController } from '../lib/backoff';
 import {
   WORKSPACE_CONTEXT_REFRESH_EVENT,

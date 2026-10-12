@@ -39,7 +39,7 @@
  * 一个都没有被「调整」过。
  */
 import { describe, expect, it } from 'vitest';
-import type { ChatMessage, PersistedAgentEvent } from '@open-design/contracts';
+import type { ChatMessage, PersistedAgentEvent } from '@mish/contracts';
 import { foldStrategyTaskTurns } from '../../../src/components/ChatPane';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { groupThinking, type ThoughtsGroup } from '../../../src/runtime/chat/group-thinking';

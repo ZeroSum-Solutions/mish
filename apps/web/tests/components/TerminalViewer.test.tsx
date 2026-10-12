@@ -81,7 +81,7 @@ describe('TerminalViewer', () => {
 
     const loading = screen.getByTestId('terminal-loading');
     expect(loading.textContent).toContain('Mishh Mashh shell');
-    expect(loading.textContent).not.toContain('open-design shell');
+    expect(loading.textContent).not.toContain('mish shell');
     expect(loading.textContent).toContain("Starting terminal…");
     expect(loading.textContent).toContain("Preparing the project shell. This usually takes a few seconds.");
   });

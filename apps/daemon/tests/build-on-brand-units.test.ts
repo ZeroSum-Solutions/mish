@@ -5,8 +5,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { buildOnBrandRequestSchema, buildOnBrandPlanSchema } from '@open-design/contracts';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
+import { buildOnBrandRequestSchema, buildOnBrandPlanSchema } from '@mish/contracts';
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
 
 import { planBuildOnBrand } from '../src/build-on-brand/plan.js';
 import { digestReferenceHtml, THIN_DIGEST_WARNING } from '../src/build-on-brand/structure-digest.js';

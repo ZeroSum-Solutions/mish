@@ -1,5 +1,5 @@
 /**
- * Projects the canonical Cult UI Pro inventory (`@open-design/cult-ui-catalog/catalog.json`,
+ * Projects the canonical Cult UI Pro inventory (`@mish/cult-ui-catalog/catalog.json`,
  * metadata and hashes only) into the display rows of `GET /api/cult/catalog`
  * (`packages/contracts/src/api/cult-catalog.ts`).
  *
@@ -14,7 +14,7 @@
  * "-inspired", "-powered" and "inspired by" clauses. The scrub fails closed: after the phrase
  * rules, a backstop replaces any deny-list name still present, and `assertBrandFree` throws if
  * one survives, so raw provider text never reaches the DTO. The raw text stays in the inventory,
- * server-side. The scrub itself lives in `@open-design/contracts` (api/cult-brand.ts).
+ * server-side. The scrub itself lives in `@mish/contracts` (api/cult-brand.ts).
  *
  * The id is public too: `cult:<slug>`, the row's brand-free public slug
  * (`packages/cult-ui-catalog/generated/slugs.json`), never the internal inventory name.
@@ -39,8 +39,8 @@ import type {
   CultCatalogRelatedItem,
   CultCatalogSectionKind,
   CultCatalogState,
-} from '@open-design/contracts';
-import { CULT_CATALOG_PORT_QUEUES, isCultCatalogSectionKind } from '@open-design/contracts';
+} from '@mish/contracts';
+import { CULT_CATALOG_PORT_QUEUES, isCultCatalogSectionKind } from '@mish/contracts';
 
 /**
  * The inventory's conversion statuses, mirrored from `packages/cult-ui-catalog/src/types.ts`
@@ -95,8 +95,8 @@ export {
   cultDisplayText,
   cultDisplayTitle,
   findDeniedBrand,
-} from '@open-design/contracts';
-import { cultDisplayCategory, cultDisplayTags, cultDisplayText, cultDisplayTitle } from '@open-design/contracts';
+} from '@mish/contracts';
+import { cultDisplayCategory, cultDisplayTags, cultDisplayText, cultDisplayTitle } from '@mish/contracts';
 
 // ---------------------------------------------------------------------------------------------
 // State, dependencies, rows

@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { parseModelPreflightRequest, parseModelPreflightResult, type ModelPreflightRequest, parsePutSessionModel, parseSessionModelChoice, parseSessionModelSnapshot, type SessionModelChoice } from '@open-design/contracts';
+import { parseModelPreflightRequest, parseModelPreflightResult, type ModelPreflightRequest, parsePutSessionModel, parseSessionModelChoice, parseSessionModelSnapshot, type SessionModelChoice } from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../daemon-url.js';
 import type { WorkbenchCliOptions } from '../workbench-cli.js';
 

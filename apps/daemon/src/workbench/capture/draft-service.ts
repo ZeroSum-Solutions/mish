@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { load } from 'cheerio';
-import { parseCaptureDraftRevision, parseCaptureDraftModelOutput, type CaptureDraftRevision, type CaptureRecord, type CreateCaptureDraftRequest } from '@open-design/contracts';
+import { parseCaptureDraftRevision, parseCaptureDraftModelOutput, type CaptureDraftRevision, type CaptureRecord, type CreateCaptureDraftRequest } from '@mish/contracts';
 import type { CaptureService } from './capture-service.js';
 import { createCaptureDraftStore } from './draft-store.js';
 import { stripRasterMetadata } from './image-metadata.js';

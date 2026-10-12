@@ -172,7 +172,7 @@ export interface DisconnectMcpOAuthRequest {
 }
 
 /** Shape of the `postMessage` payload the OAuth callback page emits to
- * its opener (and broadcasts on the `open-design-mcp-oauth` channel). */
+ * its opener (and broadcasts on the `mish-mcp-oauth` channel). */
 export type McpOAuthPostMessage =
   | { type: 'mcp-oauth'; ok: true; serverId: string | null }
   | { type: 'mcp-oauth'; ok: false; message: string | null };

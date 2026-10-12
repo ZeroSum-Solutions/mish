@@ -1,8 +1,8 @@
 import { WorkbenchComponentFit } from './WorkbenchComponentFit';
 import { localizeMotionRecipe, localizeMotionRecipeVariantTitle } from './motion-recipe-labels';
 import { useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Button } from '@open-design/components';
-import type { ResourceDetailResponse, ResourceResult, InstalledPluginRecord, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import type { ResourceDetailResponse, ResourceResult, InstalledPluginRecord, WorkspaceCollabContext } from '@mish/contracts';
 import { getWorkbenchResource, WorkbenchRequestError } from '../../providers/workbench';
 import { useT } from '../../i18n';
 import { WorkbenchExpandedContext, WorkbenchPreviewShell } from './WorkbenchPreviewShell';

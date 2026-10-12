@@ -1,4 +1,4 @@
-import { sessionModelChoicesEqual, type PutSessionModel, type SessionModelChoice, type SessionModelSnapshot } from '@open-design/contracts';
+import { sessionModelChoicesEqual, type PutSessionModel, type SessionModelChoice, type SessionModelSnapshot } from '@mish/contracts';
 export interface SessionModelApi {
   get(id: string): Promise<SessionModelSnapshot>;
   put(id: string, input: PutSessionModel): Promise<SessionModelSnapshot>;

@@ -24,7 +24,7 @@ import {
 type SqliteDb = Database.Database;
 
 export const OD_NEXT_FROZEN_SKILL_PACKAGE_SCHEMA =
-  'open-design.od-next-frozen-skill-package/v1' as const;
+  'mish.od-next-frozen-skill-package/v1' as const;
 const MAX_SKILL_COUNT = 8;
 const MAX_SIDE_FILE_COUNT = 32;
 const MAX_SKILL_BODY_BYTES = 256 * 1024;
@@ -619,7 +619,7 @@ function adoptedCanonicalId(input: {
  *
  * - **Absent.** A path that resolves to nothing was never part of the Skill.
  * - **Over budget.** A file past {@link MAX_SIDE_FILE_BYTES} is a bundled
- *   binary the roster happened to name — `example-open-design-landing` links a
+ *   binary the roster happened to name — `example-mish-landing` links a
  *   multi-hundred-KB `assets/hero.png`. It is too large to carry, which says
  *   nothing about whether the Skill's prose is worth carrying.
  *

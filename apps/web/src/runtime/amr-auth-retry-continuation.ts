@@ -2,7 +2,7 @@ import {
   isSameWorkspacePrincipal,
   type WorkspaceCollabContext,
   type WorkspacePrincipal,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { workspaceIdentityCacheKey } from '../collab/workspace-identity';
 

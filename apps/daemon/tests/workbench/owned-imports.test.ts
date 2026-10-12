@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import express from 'express';
-import { parseOwnedImportRecord } from '@open-design/contracts';
+import { parseOwnedImportRecord } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchOwnedImportRoutes } from '../../src/routes/workbench-owned-imports.js';
 import { searchResources } from '../../src/workbench/resources.js';

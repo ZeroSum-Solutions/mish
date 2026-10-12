@@ -12,7 +12,7 @@ import path from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { PACK_ARCHIVE_MAX_BYTES, type PackInstallEvent } from '@open-design/contracts';
+import { PACK_ARCHIVE_MAX_BYTES, type PackInstallEvent } from '@mish/contracts';
 
 import {
   PackFetchError,

@@ -28,8 +28,8 @@
  * who asked.
  */
 
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
-import { normalizeMotionSitesPrompts, type MotionSitesListPromptsResponse } from '@open-design/section-catalog/motionsites';
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
+import { normalizeMotionSitesPrompts, type MotionSitesListPromptsResponse } from '@mish/section-catalog/motionsites';
 import { getLocalCorpusEntries } from './local-corpus-source.js';
 import { resolveMotionSitesMcpConnection } from './connection.js';
 import { callMotionSitesTool, McpHttpTransportError } from './mcp-client.js';

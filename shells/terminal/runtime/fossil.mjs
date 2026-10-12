@@ -3,7 +3,7 @@ import { appendFile, readFile, writeFile } from "node:fs/promises";
 import { isAbsolute, normalize, relative, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { convergeSidecarLaunch, getSidecarStatus, invokeSidecar, stopSidecar } from "@open-design/sidecar";
+import { convergeSidecarLaunch, getSidecarStatus, invokeSidecar, stopSidecar } from "@mish/sidecar";
 
 const requestPath = process.env.OD_TERMINAL_FOSSIL_REQUEST_V1;
 const resultPath = process.env.OD_TERMINAL_FOSSIL_RESULT_V1;

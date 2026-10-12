@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/agency-fast-lane",
+  "name": "@mish/agency-fast-lane",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -37,7 +37,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@open-design/cult-ui-catalog": "workspace:*"
+    "@mish/cult-ui-catalog": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.12.2",

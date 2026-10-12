@@ -6,7 +6,7 @@
  * 因为耗时是按**轮次**算的(一个 running 标志喂给所有壳),而不是按壳自己的起止。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import type { ExecutionShell } from '../../../src/runtime/chat/contract';
 

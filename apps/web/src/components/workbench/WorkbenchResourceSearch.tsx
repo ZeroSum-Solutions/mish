@@ -1,7 +1,7 @@
 import { localizeMotionRecipe } from './motion-recipe-labels';
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@open-design/components';
-import type { FontKitInventory, ResourceSearchResponse, ResourceResult, InstalledPluginRecord, WorkspaceCollabContext, WorkbenchPreferencesSnapshot, ProjectDesignContextSnapshot } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import type { FontKitInventory, ResourceSearchResponse, ResourceResult, InstalledPluginRecord, WorkspaceCollabContext, WorkbenchPreferencesSnapshot, ProjectDesignContextSnapshot } from '@mish/contracts';
 import { searchWorkbenchResources, getWorkbenchPreferences, putWorkbenchPreferences, getProjectDesignContext, WorkbenchRequestError } from '../../providers/workbench';
 import { useT } from '../../i18n';
 import { WorkbenchProjectContext } from './WorkbenchProjectContext';

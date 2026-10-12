@@ -18,11 +18,11 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AgencyBuildResponse, AgencyBuildSnapshot } from '@open-design/contracts';
-import { buildSite, PAGE_TOO_LARGE } from '@open-design/agency-fast-lane/build';
-import type { ModelCall } from '@open-design/agency-fast-lane/deepseek';
-import { PAGE_BYTE_LIMIT } from '@open-design/agency-fast-lane/effects';
-import { loadFamilyPackage, type FamilyPackage } from '@open-design/agency-fast-lane/family';
+import type { AgencyBuildResponse, AgencyBuildSnapshot } from '@mish/contracts';
+import { buildSite, PAGE_TOO_LARGE } from '@mish/agency-fast-lane/build';
+import type { ModelCall } from '@mish/agency-fast-lane/deepseek';
+import { PAGE_BYTE_LIMIT } from '@mish/agency-fast-lane/effects';
+import { loadFamilyPackage, type FamilyPackage } from '@mish/agency-fast-lane/family';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

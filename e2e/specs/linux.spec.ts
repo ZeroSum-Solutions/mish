@@ -33,7 +33,7 @@ const linuxHeadlessDescribe = shouldRunLinuxHeadlessSmoke ? describe : describe.
 const shouldRunLinuxAppImageSmoke =
   process.platform === 'linux' && process.env.OD_PACKAGED_E2E_LINUX_APPIMAGE === '1';
 const linuxAppImageDescribe = shouldRunLinuxAppImageSmoke ? describe : describe.skip;
-const expectedTelemetryRelayUrl = process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL?.trim() || null;
+const expectedTelemetryRelayUrl = process.env.MISH_TELEMETRY_RELAY_URL?.trim() || null;
 
 const runtimeNamespaceRoot = join(toolsPackDir, 'runtime', 'linux', 'namespaces', namespace);
 const userHome = linuxUserHome();
@@ -321,7 +321,7 @@ async function startInstalledAppImageHeadlessAndFindRelay(
     OD_PACKAGED_NAMESPACE: namespace,
     OD_PACKAGED_NAMESPACE_BASE_ROOT: dirname(runtimeNamespaceRoot),
   };
-  delete env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+  delete env.MISH_TELEMETRY_RELAY_URL;
   const child = spawn(appImagePath, ['--appimage-extract-and-run', '--headless'], {
     cwd: dirname(appImagePath),
     detached: true,
@@ -361,7 +361,7 @@ async function findDescendantWithRelay(rootPid: number, expectedRelayUrl: string
     if (!entry.isDirectory() || !/^\d+$/u.test(entry.name)) continue;
     const pid = Number(entry.name);
     if (!await isProcessDescendant(pid, rootPid)) continue;
-    const relay = await readProcessEnvValue(pid, 'OPEN_DESIGN_TELEMETRY_RELAY_URL');
+    const relay = await readProcessEnvValue(pid, 'MISH_TELEMETRY_RELAY_URL');
     if (relay === expectedRelayUrl) return pid;
   }
   return null;

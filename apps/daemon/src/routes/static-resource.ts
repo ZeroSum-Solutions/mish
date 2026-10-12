@@ -7,8 +7,8 @@ import fs from 'node:fs';
 import type {
   DesignSystemTokenContractRebuildJobResponse,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
-import { matchesDesignSystemQuery, TeamResourceCopyForbiddenError } from '@open-design/contracts';
+} from '@mish/contracts';
+import { matchesDesignSystemQuery, TeamResourceCopyForbiddenError } from '@mish/contracts';
 import {
   enforceTeamResourceCopyAllowed,
   type TeamResourceStateProvider,
@@ -68,7 +68,7 @@ import {
   type SkillInstallErrorCode,
 } from '../services/skill-installation.js';
 import type { RouteDeps } from '../server-context.js';
-import { findRealElementRange, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealElementRange, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 export interface RegisterAtomRoutesDeps {
   db: Database.Database;
@@ -367,7 +367,7 @@ export function registerStaticResourceRoutes(app: Express, ctx: RegisterStaticRe
   // Install and import both land a kit as a draft. Every response says so,
   // with the one-line publish command, so neither the UI nor `od` can report
   // "installed" without the step that makes the kit usable for generation.
-  const designSystemInstallSelectability = (designSystem: { id: string; title?: unknown; status?: unknown; approval?: import('@open-design/contracts').DesignSystemApproval }) =>
+  const designSystemInstallSelectability = (designSystem: { id: string; title?: unknown; status?: unknown; approval?: import('@mish/contracts').DesignSystemApproval }) =>
     designSystemSelectability({
       id: designSystem.id,
       ...(designSystem.approval ? { approval: designSystem.approval } : {}),

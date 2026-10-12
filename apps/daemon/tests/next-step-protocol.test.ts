@@ -27,7 +27,7 @@ import {
   parseNextStepMarkerValue,
   renderNextStepMarkerExample,
   stripNextStepMarkers,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 const KEY = 'a7f3c91ed2b40561';
 const THREE = ['再加一页订单列表', '把商品卡换成两列布局', '补一套深色模式'];

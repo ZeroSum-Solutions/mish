@@ -14,12 +14,12 @@ import {
   releaseNamespace,
   type ReleaseBaseVersionTuple,
   type ReleaseChannel,
-} from "@open-design/release";
+} from "@mish/release";
 
 const execFile = promisify(execFileCallback);
 
 const stableReleaseBranchPattern = /^release\/v(\d+\.\d+\.\d+)$/;
-const stableTagPattern = /^open-design-v(\d+\.\d+\.\d+)$/;
+const stableTagPattern = /^mish-v(\d+\.\d+\.\d+)$/;
 
 type GitHubRelease = {
   draft?: boolean;
@@ -64,23 +64,23 @@ function fail(message: string): never {
 }
 
 function log(message: string): void {
-  const prefix = process.env.OPEN_DESIGN_RELEASE_CHANNEL === "prerelease" ? "release-prerelease" : "release-stable";
+  const prefix = process.env.MISH_RELEASE_CHANNEL === "prerelease" ? "release-prerelease" : "release-stable";
   console.log(`[${prefix}] ${message}`);
 }
 
 async function execGh(args: string[]): Promise<{ stdout: string }> {
-  const nodeScript = process.env.OPEN_DESIGN_GH_NODE_SCRIPT;
+  const nodeScript = process.env.MISH_GH_NODE_SCRIPT;
   if (nodeScript != null && nodeScript.length > 0) {
     return execFile(process.execPath, [nodeScript, ...args]);
   }
-  return execFile(process.env.OPEN_DESIGN_GH_BIN ?? "gh", args);
+  return execFile(process.env.MISH_GH_BIN ?? "gh", args);
 }
 
 function parseChannel(value: string | undefined): ReleaseChannel {
   const channel = value == null || value.length === 0 ? "stable" : value;
   const descriptor = releaseChannelDescriptor(channel);
   if (descriptor.channel !== "stable" && descriptor.channel !== "prerelease") {
-    fail(`OPEN_DESIGN_RELEASE_CHANNEL must be stable or prerelease; got ${channel}`);
+    fail(`MISH_RELEASE_CHANNEL must be stable or prerelease; got ${channel}`);
   }
   return descriptor.channel;
 }
@@ -89,7 +89,7 @@ function parseStableDryRunMode(value: string | undefined): StableDryRunMode {
   if (value == null || value.length === 0 || value === "false") return "";
   if (value === "true" || value === "metadata") return "metadata";
   if (value === "prepublish") return "prepublish";
-  fail("OPEN_DESIGN_RELEASE_DRY_RUN must be metadata, prepublish, true, or false");
+  fail("MISH_RELEASE_DRY_RUN must be metadata, prepublish, true, or false");
 }
 
 function parseBaseVersionInput(value: string | undefined, sourceName: string): ParsedStableVersion | null {
@@ -119,12 +119,12 @@ function parseReleaseBranchVersion(branch: string): ParsedStableVersion | null {
 
 function resolvePrereleaseBaseVersion(branch: string, inputValue: string | undefined): ParsedStableVersion {
   const branchVersion = parseReleaseBranchVersion(branch);
-  const inputVersion = parseBaseVersionInput(inputValue, "OPEN_DESIGN_STABLE_VERSION");
+  const inputVersion = parseBaseVersionInput(inputValue, "MISH_STABLE_VERSION");
 
   if (branchVersion != null) {
     if (inputVersion != null && inputVersion.value !== branchVersion.value) {
       fail(
-        `OPEN_DESIGN_STABLE_VERSION ${inputVersion.value} must match release branch version ${branchVersion.value} when both are provided`,
+        `MISH_STABLE_VERSION ${inputVersion.value} must match release branch version ${branchVersion.value} when both are provided`,
       );
     }
     return branchVersion;
@@ -132,7 +132,7 @@ function resolvePrereleaseBaseVersion(branch: string, inputValue: string | undef
 
   if (inputVersion != null) return inputVersion;
 
-  fail("release-prerelease requires either a release/vX.Y.Z branch or OPEN_DESIGN_STABLE_VERSION");
+  fail("release-prerelease requires either a release/vX.Y.Z branch or MISH_STABLE_VERSION");
 }
 
 function resolveStableBaseVersion(branch: string): ParsedStableVersion {
@@ -342,10 +342,10 @@ async function validateStablePrereleaseMetadata(options: {
 
   const prereleaseVersionInput = options.prereleaseVersionInput?.trim() ?? "";
   if (prereleaseVersionInput.length === 0) {
-    fail("OPEN_DESIGN_STABLE_PRERELEASE_VERSION is required when channel=stable; pass the exact validated prerelease version");
+    fail("MISH_STABLE_PRERELEASE_VERSION is required when channel=stable; pass the exact validated prerelease version");
   }
 
-  const prerelease = parsePrereleaseVersion(prereleaseVersionInput, "OPEN_DESIGN_STABLE_PRERELEASE_VERSION");
+  const prerelease = parsePrereleaseVersion(prereleaseVersionInput, "MISH_STABLE_PRERELEASE_VERSION");
   if (prerelease.baseVersion !== options.packagedVersion) {
     fail(
       `stable channel prerelease gate requires base version ${options.packagedVersion}; got ${prerelease.prereleaseVersion}`,
@@ -353,9 +353,9 @@ async function validateStablePrereleaseMetadata(options: {
   }
 
   const publicOrigin = trimTrailingSlash(
-    options.publicOrigin ?? fail("OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN is required when channel=stable"),
+    options.publicOrigin ?? fail("MISH_RELEASES_PUBLIC_ORIGIN is required when channel=stable"),
   );
-  validateHttpsUrl(publicOrigin, "OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN");
+  validateHttpsUrl(publicOrigin, "MISH_RELEASES_PUBLIC_ORIGIN");
 
   const expectedVersionPrefix = `prerelease/versions/${prerelease.prereleaseVersion}`;
   const expectedVersionUrl = `${publicOrigin}/${expectedVersionPrefix}`;
@@ -545,8 +545,8 @@ function setOutput(name: string, value: string): void {
 }
 
 const repository = process.env.GITHUB_REPOSITORY ?? fail("GITHUB_REPOSITORY is required");
-const channel = parseChannel(process.env.OPEN_DESIGN_RELEASE_CHANNEL);
-const stableDryRunMode = channel === "stable" ? parseStableDryRunMode(process.env.OPEN_DESIGN_RELEASE_DRY_RUN) : "";
+const channel = parseChannel(process.env.MISH_RELEASE_CHANNEL);
+const stableDryRunMode = channel === "stable" ? parseStableDryRunMode(process.env.MISH_RELEASE_DRY_RUN) : "";
 const dryRun = stableDryRunMode.length > 0;
 const runPrepublishJobs = channel !== "stable" || stableDryRunMode === "prepublish" || stableDryRunMode === "";
 const publishSideEffectsEnabled = channel !== "stable" || stableDryRunMode === "";
@@ -557,7 +557,7 @@ const branch = process.env.GITHUB_REF_NAME ?? "";
 const stableBaseVersion =
   channel === "stable"
     ? resolveStableBaseVersion(branch)
-    : resolvePrereleaseBaseVersion(branch, process.env.OPEN_DESIGN_STABLE_VERSION);
+    : resolvePrereleaseBaseVersion(branch, process.env.MISH_STABLE_VERSION);
 const packagedParsed = stableBaseVersion.parsed;
 if (stableBaseVersion.value !== packagedVersion) {
   fail(
@@ -566,7 +566,7 @@ if (stableBaseVersion.value !== packagedVersion) {
 }
 
 const releases = await fetchReleases(repository);
-const versionTag = `open-design-v${packagedVersion}`;
+const versionTag = `mish-v${packagedVersion}`;
 
 let latestStable: ParsedStableVersion | null = null;
 for (const release of releases) {
@@ -594,11 +594,11 @@ let prereleaseNumber = "";
 let stateSource = channel === "prerelease" ? "R2 metadata.json" : "GitHub Releases";
 
 if (channel === "prerelease") {
-  const metadataUrl = process.env.OPEN_DESIGN_PRERELEASE_METADATA_URL;
+  const metadataUrl = process.env.MISH_PRERELEASE_METADATA_URL;
   if (metadataUrl == null || metadataUrl.length === 0) {
-    fail("OPEN_DESIGN_PRERELEASE_METADATA_URL is required for prerelease channel");
+    fail("MISH_PRERELEASE_METADATA_URL is required for prerelease channel");
   }
-  validateHttpsUrl(metadataUrl, "OPEN_DESIGN_PRERELEASE_METADATA_URL");
+  validateHttpsUrl(metadataUrl, "MISH_PRERELEASE_METADATA_URL");
 
   let nextPrereleaseNumber = 1;
   let latestPrerelease: ParsedPrereleaseVersion | null = null;
@@ -638,8 +638,8 @@ if (channel === "prerelease") {
     branch: `release/v${stableBaseVersion.value}`,
     commit,
     packagedVersion,
-    prereleaseVersionInput: process.env.OPEN_DESIGN_STABLE_PRERELEASE_VERSION,
-    publicOrigin: process.env.OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN,
+    prereleaseVersionInput: process.env.MISH_STABLE_PRERELEASE_VERSION,
+    publicOrigin: process.env.MISH_RELEASES_PUBLIC_ORIGIN,
     repository,
   });
   stateSource = `R2 prerelease metadata ${stablePrerelease.prereleaseVersion}`;

@@ -25,9 +25,9 @@ import type {
   AgencyEffectsResult,
   AgencyFamilyEffectsResponse,
   ApiErrorResponse,
-} from '@open-design/contracts';
-import { AGENCY_BUILD_MAX_EFFECT_HINTS } from '@open-design/contracts';
-import { PageTooLargeError, type BuildDeps, type BuildInput, type BuildResult } from '@open-design/agency-fast-lane/build';
+} from '@mish/contracts';
+import { AGENCY_BUILD_MAX_EFFECT_HINTS } from '@mish/contracts';
+import { PageTooLargeError, type BuildDeps, type BuildInput, type BuildResult } from '@mish/agency-fast-lane/build';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

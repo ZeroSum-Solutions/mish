@@ -38,7 +38,7 @@ import {
   workspaceTeamPluginBindingAllowsRead,
   workspaceTeamPluginBindingResourceId,
 } from '../src/plugins/registry.js';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 let tempDir: string;
 

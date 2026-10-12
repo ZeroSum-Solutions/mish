@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import type { LibraryAsset } from '@open-design/contracts';
+import type { LibraryAsset } from '@mish/contracts';
 import { LibraryPreviewModal } from '../../src/components/LibraryPreviewModal';
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); });
 const asset = (kind: LibraryAsset['kind']): LibraryAsset => ({ id: 'asset', kind, storage: 'owned', capturedAt: 1, archivedDate: '2026-10-03', contentHash: 'a'.repeat(64), tags: [], sources: [{ id: 'source', assetId: 'asset', sourceKind: 'drop', createdAt: 1 }], size: 200 * 1024 * 1024, createdAt: 1, updatedAt: 1 });

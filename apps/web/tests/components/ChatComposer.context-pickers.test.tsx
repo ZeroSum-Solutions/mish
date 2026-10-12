@@ -17,7 +17,7 @@ vi.mock('../../src/analytics/events', async (importOriginal) => {
 import { ChatComposer, type ChatComposerHandle } from '../../src/components/ChatComposer';
 import { I18nProvider } from '../../src/i18n';
 import type { Locale } from '../../src/i18n/types';
-import type { AppliedPluginSnapshot, Project, ProjectMetadata } from '@open-design/contracts';
+import type { AppliedPluginSnapshot, Project, ProjectMetadata } from '@mish/contracts';
 import { $getRoot, $getSelection, $isElementNode, $isRangeSelection, $isTextNode, HISTORY_PUSH_TAG, UNDO_COMMAND } from 'lexical';
 import { $isMentionNode } from '../../src/components/composer/MentionNode';
 import { composerText, getComposerEditor, pressEnter, typeAndSettle, typeInComposer } from '../helpers/lexical-composer';
@@ -887,7 +887,7 @@ describe('ChatComposer context pickers', () => {
     await waitFor(() => expect(resolveDeferredProjectPatch).toBeTruthy());
 
     await act(async () => {
-      window.dispatchEvent(new CustomEvent('opendesign:annotation', { detail: {
+      window.dispatchEvent(new CustomEvent('mish:annotation', { detail: {
         action: 'send', note: 'Update the marked region.', ack,
       } }));
     });
@@ -1062,7 +1062,7 @@ describe('ChatComposer context pickers', () => {
 
     if (rewrite === 'skill removal') fireEvent.click(screen.getByLabelText('Remove Deck Builder'));
     else await act(async () => {
-      window.dispatchEvent(new CustomEvent('opendesign:annotation', { detail: { action: 'draft', note: 'Keep this annotation.' } }));
+      window.dispatchEvent(new CustomEvent('mish:annotation', { detail: { action: 'draft', note: 'Keep this annotation.' } }));
     });
 
     const input = screen.getByTestId('chat-composer-input');
@@ -1589,7 +1589,7 @@ describe('ChatComposer context pickers', () => {
     await waitFor(() => expect(onSend).toHaveBeenCalledTimes(1));
 
     await act(async () => {
-      window.dispatchEvent(new CustomEvent('opendesign:annotation', { detail: {
+      window.dispatchEvent(new CustomEvent('mish:annotation', { detail: {
         action, note: 'Keep this annotation for retry.', ack,
       } }));
     });
@@ -1607,7 +1607,7 @@ describe('ChatComposer context pickers', () => {
     fireEvent.click(await screen.findByTestId('composer-plus-local-code'));
     await waitFor(() => expect(composerText()).toContain('@reference-dir'));
     await act(async () => {
-      window.dispatchEvent(new CustomEvent('opendesign:stage-attachment', { detail: {
+      window.dispatchEvent(new CustomEvent('mish:stage-attachment', { detail: {
         attachments: [{ path: 'reference.txt', name: 'reference.txt', kind: 'file' }],
       } }));
     });
@@ -1616,7 +1616,7 @@ describe('ChatComposer context pickers', () => {
     await typeAndSettle('Continue without that reference.');
     await waitFor(() => expect(resolveDeferredProjectPatch).toBeTruthy());
     await act(async () => {
-      window.dispatchEvent(new CustomEvent('opendesign:annotation', { detail: {
+      window.dispatchEvent(new CustomEvent('mish:annotation', { detail: {
         action: 'send', note: 'Update the marked region.', ack: vi.fn(),
       } }));
     });
@@ -1648,11 +1648,11 @@ describe('ChatComposer context pickers', () => {
     referenceProjectDetails = {
       'reference-a': {
         project: referenceA,
-        resolvedDir: '/tmp/open-design/reference-a',
+        resolvedDir: '/tmp/mish/reference-a',
       },
       'reference-b': {
         project: referenceB,
-        resolvedDir: '/tmp/open-design/reference-b',
+        resolvedDir: '/tmp/mish/reference-b',
       },
     };
     const onProjectMetadataChange = vi.fn();
@@ -1673,8 +1673,8 @@ describe('ChatComposer context pickers', () => {
     });
     expect(projectPatchBodies()[0]?.metadata?.linkedDirs).toEqual([
       '/Users/me/work-dir',
-      '/tmp/open-design/reference-a',
-      '/tmp/open-design/reference-b',
+      '/tmp/mish/reference-a',
+      '/tmp/mish/reference-b',
     ]);
     await waitFor(() => {
       const stagedText = screen.getByTestId('staged-contexts').textContent ?? '';
@@ -1686,8 +1686,8 @@ describe('ChatComposer context pickers', () => {
         metadata: expect.objectContaining({
         linkedDirs: [
           '/Users/me/work-dir',
-          '/tmp/open-design/reference-a',
-          '/tmp/open-design/reference-b',
+          '/tmp/mish/reference-a',
+          '/tmp/mish/reference-b',
         ],
       }),
       }),
@@ -1708,7 +1708,7 @@ describe('ChatComposer context pickers', () => {
     referenceProjectDetails = {
       'reference-a': {
         project: referenceA,
-        resolvedDir: '/tmp/open-design/missing-reference-a',
+        resolvedDir: '/tmp/mish/missing-reference-a',
       },
     };
     rejectNextProjectPatch = true;

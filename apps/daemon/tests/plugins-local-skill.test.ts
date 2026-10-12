@@ -20,7 +20,7 @@ import {
 } from '../src/plugins/apply.js';
 import { skillCwdAliasSegment } from '../src/cwd-aliases.js';
 import { loadPluginLocalSkill } from '../src/plugins/local-skill.js';
-import type { InstalledPluginRecord, PluginManifest } from '@open-design/contracts';
+import type { InstalledPluginRecord, PluginManifest } from '@mish/contracts';
 
 function manifestWithSkills(skills: Array<{ ref?: string; path?: string }>): PluginManifest {
   return {
@@ -72,7 +72,7 @@ describe('bundled od-default application', () => {
       '../../../plugins/_official/scenarios/od-default',
     );
     const manifest = JSON.parse(
-      await readFile(path.join(pluginDir, 'open-design.json'), 'utf8'),
+      await readFile(path.join(pluginDir, 'mish.json'), 'utf8'),
     ) as PluginManifest;
     const craftIds = manifest.od?.context?.craft ?? [];
     const atomIds = [
@@ -154,7 +154,7 @@ describe('loadPluginLocalSkill', () => {
       '../../../plugins/_official/scenarios/od-default',
     );
     const manifest = JSON.parse(
-      await readFile(path.join(pluginDir, 'open-design.json'), 'utf8'),
+      await readFile(path.join(pluginDir, 'mish.json'), 'utf8'),
     ) as PluginManifest;
     const local = await loadPluginLocalSkill(pluginRecord(pluginDir, manifest));
 

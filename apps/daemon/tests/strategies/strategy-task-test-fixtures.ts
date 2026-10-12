@@ -2,7 +2,7 @@ import {
   serializeOdNextRequestTurnV1,
   serializeOdNextPromptBundleV2,
   type StrategyInputStageV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { createEmptyFrozenSkillPackage } from '../../src/strategies/od-next/frozen-skill-package.js';
 

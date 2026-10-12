@@ -8,7 +8,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { CultCatalogItem, CultCatalogListResponse, CultPreviewInfo } from '@open-design/contracts';
+import type { CultCatalogItem, CultCatalogListResponse, CultPreviewInfo } from '@mish/contracts';
 
 import { CatalogView } from '../../src/components/CatalogView';
 import { CultLivePreviewModal, FRAME_SETTLE_TIMEOUT_MS, prefetchCultPreview } from '../../src/components/CultLivePreview';

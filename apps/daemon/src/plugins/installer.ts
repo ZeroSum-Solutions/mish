@@ -38,7 +38,7 @@ import type {
   MarketplaceTrust,
   PluginSourceKind,
   TrustTier,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type Database from 'better-sqlite3';
 import { recordPluginEvent } from './events.js';
 import { upsertPluginLockfileEntry } from './lockfile.js';

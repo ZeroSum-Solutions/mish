@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog, DialogDescription, DialogTitle, IconButton } from '@open-design/components';
-import type { ProjectFile, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button, Dialog, DialogDescription, DialogTitle, IconButton } from '@mish/components';
+import type { ProjectFile, WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { Icon } from '../Icon';
 import { mediaApi, type MediaCatalog } from './media-api';

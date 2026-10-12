@@ -1,22 +1,22 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  OPEN_DESIGN_BRIEF_ARTIFACT_TYPES,
-  collectOpenDesignBrief,
-  formatOpenDesignBriefForCli,
-  openDesignBriefCatalog,
-  validateOpenDesignBriefCatalog,
+  MISH_BRIEF_ARTIFACT_TYPES,
+  collectMishBrief,
+  formatMishBriefForCli,
+  mishBriefCatalog,
+  validateMishBriefCatalog,
 } from '../src/index.js';
 
 describe('Mishh Mashh shared Brief decisions', () => {
   it('defines deterministic choice-only questions for all eight artifact types', () => {
-    expect(Object.keys(openDesignBriefCatalog).sort()).toEqual(
-      [...OPEN_DESIGN_BRIEF_ARTIFACT_TYPES].sort(),
+    expect(Object.keys(mishBriefCatalog).sort()).toEqual(
+      [...MISH_BRIEF_ARTIFACT_TYPES].sort(),
     );
 
-    for (const artifactType of OPEN_DESIGN_BRIEF_ARTIFACT_TYPES) {
-      const first = collectOpenDesignBrief({ artifactType });
-      const retry = collectOpenDesignBrief({ artifactType });
+    for (const artifactType of MISH_BRIEF_ARTIFACT_TYPES) {
+      const first = collectMishBrief({ artifactType });
+      const retry = collectMishBrief({ artifactType });
 
       expect(retry).toEqual(first);
       expect(first.questions.length).toBeGreaterThanOrEqual(2);
@@ -33,9 +33,9 @@ describe('Mishh Mashh shared Brief decisions', () => {
   });
 
   it('deep-freezes the shared catalog as runtime protocol truth', () => {
-    expect(Object.isFrozen(openDesignBriefCatalog)).toBe(true);
-    for (const artifactType of OPEN_DESIGN_BRIEF_ARTIFACT_TYPES) {
-      const questions = openDesignBriefCatalog[artifactType];
+    expect(Object.isFrozen(mishBriefCatalog)).toBe(true);
+    for (const artifactType of MISH_BRIEF_ARTIFACT_TYPES) {
+      const questions = mishBriefCatalog[artifactType];
       expect(Object.isFrozen(questions)).toBe(true);
       for (const question of questions) {
         expect(Object.isFrozen(question)).toBe(true);
@@ -48,19 +48,19 @@ describe('Mishh Mashh shared Brief decisions', () => {
   });
 
   it('caps invalid catalogs at five questions and rejects duplicate question or option ids', () => {
-    const website = openDesignBriefCatalog.website;
-    expect(() => validateOpenDesignBriefCatalog({
-      ...openDesignBriefCatalog,
+    const website = mishBriefCatalog.website;
+    expect(() => validateMishBriefCatalog({
+      ...mishBriefCatalog,
       website: [...website, ...website],
     })).toThrow(/at most 5/i);
 
-    expect(() => validateOpenDesignBriefCatalog({
-      ...openDesignBriefCatalog,
+    expect(() => validateMishBriefCatalog({
+      ...mishBriefCatalog,
       website: [website[0]!, { ...website[1]!, id: website[0]!.id }],
     })).toThrow(/duplicate question id/i);
 
-    expect(() => validateOpenDesignBriefCatalog({
-      ...openDesignBriefCatalog,
+    expect(() => validateMishBriefCatalog({
+      ...mishBriefCatalog,
       website: [{
         ...website[0]!,
         options: [website[0]!.options[0]!, website[0]!.options[0]!],
@@ -69,14 +69,14 @@ describe('Mishh Mashh shared Brief decisions', () => {
   });
 
   it('does not repeat known decisions and invalidates answers after an artifact type switch', () => {
-    const website = collectOpenDesignBrief({
+    const website = collectMishBrief({
       artifactType: 'website',
       knownAnswers: { 'website.goal': ['launch-product'] },
     });
     expect(website.questions.map((question) => question.id)).not.toContain('website.goal');
     expect(website.answers).toEqual({ 'website.goal': ['launch-product'] });
 
-    const prototype = collectOpenDesignBrief({
+    const prototype = collectMishBrief({
       artifactType: 'product-prototype',
       previousArtifactType: 'website',
       knownAnswers: {
@@ -89,12 +89,12 @@ describe('Mishh Mashh shared Brief decisions', () => {
   });
 
   it('uses valid defaults for skipped or fully specified briefs and emits stable CLI text', () => {
-    const initial = collectOpenDesignBrief({ artifactType: 'audio', skip: true });
+    const initial = collectMishBrief({ artifactType: 'audio', skip: true });
     expect(initial.complete).toBe(true);
     expect(initial.questions).toEqual([]);
-    expect(Object.keys(initial.answers)).toHaveLength(openDesignBriefCatalog.audio.length);
+    expect(Object.keys(initial.answers)).toHaveLength(mishBriefCatalog.audio.length);
 
-    const cli = formatOpenDesignBriefForCli(initial);
+    const cli = formatMishBriefForCli(initial);
     expect(cli).toContain('Mishh Mashh brief');
     expect(cli).toContain('Artifact: audio');
     expect(cli).toContain('Ready to confirm');
@@ -103,11 +103,11 @@ describe('Mishh Mashh shared Brief decisions', () => {
     expect(cli).not.toContain('briefDraftId');
     expect(cli).not.toContain('nonce');
     expect(cli).not.toContain('[object Object]');
-    expect(formatOpenDesignBriefForCli(initial)).toBe(cli);
+    expect(formatMishBriefForCli(initial)).toBe(cli);
   });
 
   it('offers a short-audio duration that covers the canonical 15-second fixture', () => {
-    const duration = openDesignBriefCatalog.audio.find(
+    const duration = mishBriefCatalog.audio.find(
       (question) => question.id === 'audio.duration',
     );
     const short = duration?.options.find((option) => option.id === 'short');
@@ -117,7 +117,7 @@ describe('Mishh Mashh shared Brief decisions', () => {
 
   it('copies and deeply freezes accepted answer arrays', () => {
     const source = ['mobile'];
-    const brief = collectOpenDesignBrief({
+    const brief = collectMishBrief({
       artifactType: 'product-prototype',
       knownAnswers: { 'prototype.platform': source },
     });

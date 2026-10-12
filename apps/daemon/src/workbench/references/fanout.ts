@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import {
   REFERENCE_SOURCES, parseConnectorSearchResponse, parseReferenceFanoutRequest, parseReferenceFanoutResponse,
   type ConnectorSearchRequest, type ConnectorSearchResponse, type FanoutReference, type ReferenceFanoutResponse, type ReferenceSection,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { ConnectorError } from '../connectors/connector-error.js';
 import { mayUseOwnerSeatConnector } from '../connectors/connector-references.js';
 import { untilAborted } from './abort.js';

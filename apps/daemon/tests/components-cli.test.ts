@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseComponentLedgerReport } from '@open-design/contracts';
+import { parseComponentLedgerReport } from '@mish/contracts';
 import { runComponentsCli } from '../src/components-cli.js';
 import { registerComponentLedgerRoutes } from '../src/routes/component-ledger.js';
 import { requireLocalDaemonRequest } from '../src/http/local-daemon-request.js';

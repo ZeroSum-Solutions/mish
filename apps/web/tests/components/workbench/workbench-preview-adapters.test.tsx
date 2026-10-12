@@ -8,7 +8,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { JSDOM } from 'jsdom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { PreviewAdapterFamily } from '@open-design/contracts';
+import type { PreviewAdapterFamily } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchHtmlPreview } from '../../../src/components/workbench/WorkbenchHtmlPreview';
 import { WorkbenchVideoPreview } from '../../../src/components/workbench/WorkbenchVideoPreview';

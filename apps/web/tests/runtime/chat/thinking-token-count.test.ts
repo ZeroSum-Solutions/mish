@@ -9,7 +9,7 @@
  *  ③ 「很久没变」这件事在这里算,组件只负责画(零新增 timer)。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import {
   buildTurnBlocks,
   THINKING_TOKENS_STALL_MS,

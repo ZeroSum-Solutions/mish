@@ -1,4 +1,4 @@
-import { findRealTagEnd, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealTagEnd, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 /**
  * AC-R07 preamble ("no CDN Tailwind") and the batch-4 preview model: the floor policy every

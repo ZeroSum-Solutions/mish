@@ -59,7 +59,7 @@ import {
   type InstalledPluginRecord,
   type PackFileEntry,
   type TrustTier,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type Database from 'better-sqlite3';
 
 import { isRemotePackSource, type PackContentHandler, type PackContentHandlerContext } from '../packs/handlers.js';

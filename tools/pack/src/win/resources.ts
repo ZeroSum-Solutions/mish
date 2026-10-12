@@ -62,10 +62,10 @@ export async function prepareResourceTree(
   const node = {
     id: "win.resource-tree",
     key,
-    outputs: ["open-design"],
+    outputs: ["mish"],
     invalidate: async () => null,
     build: async ({ entryRoot }: { entryRoot: string }): Promise<ResourceTreeCacheMetadata> => {
-      const resourceRoot = join(entryRoot, "open-design");
+      const resourceRoot = join(entryRoot, "mish");
       await mkdir(resourceRoot, { recursive: true });
       await copyBundledResourceTrees({
         workspaceRoot: config.workspaceRoot,
@@ -85,16 +85,16 @@ export async function prepareResourceTree(
         requireBundled: config.requireVelaCli,
         resourceRoot,
       });
-      return { resourceName: "open-design" };
+      return { resourceName: "mish" };
     },
   };
   const manifest = await cache.acquire({
-    materialize: options.materialize ? [{ from: "open-design", to: paths.resourceRoot }] : [],
+    materialize: options.materialize ? [{ from: "mish", to: paths.resourceRoot }] : [],
     node,
   });
   return {
     key,
-    resourceRoot: options.materialize ? paths.resourceRoot : join(manifest.entryPath, "open-design"),
+    resourceRoot: options.materialize ? paths.resourceRoot : join(manifest.entryPath, "mish"),
   };
 }
 

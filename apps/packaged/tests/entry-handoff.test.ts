@@ -6,10 +6,10 @@ import { join } from "node:path";
 import { runInNewContext } from "node:vm";
 import { ModuleKind, ScriptTarget, transpileModule } from "typescript";
 import { describe, expect, it } from "vitest";
-import * as launcherProto from "@open-design/launcher-proto";
-import * as release from "@open-design/release";
-import type { SidecarStamp } from "@open-design/sidecar";
-import * as sidecarProto from "@open-design/sidecar-proto";
+import * as launcherProto from "@mish/launcher-proto";
+import * as release from "@mish/release";
+import type { SidecarStamp } from "@mish/sidecar";
+import * as sidecarProto from "@mish/sidecar-proto";
 
 const require = createRequire(import.meta.url);
 function compile(name: string, entry = false): string {
@@ -61,10 +61,10 @@ async function scenario(platform: "darwin" | "win32", channel: "stable" | "prere
   const paths = { logsRoot: join(root, "logs"), dataRoot: join(root, "data"), runtimeRoot: join(root, "runtime") };
   const selected = new Error("selection boundary");
   const modules: Record<string, unknown> = {
-    "@open-design/launcher-proto": launcherProto,
-    "@open-design/release": release,
-    "@open-design/sidecar-proto": sidecarProto,
-    "@open-design/platform": {
+    "@mish/launcher-proto": launcherProto,
+    "@mish/release": release,
+    "@mish/sidecar-proto": sidecarProto,
+    "@mish/platform": {
       waitForProcessExit: async (pid: number) => {
         expect(pid).toBe(4242);
         trace.push("wait-armed"); armed.resolve();
@@ -75,7 +75,7 @@ async function scenario(platform: "darwin" | "win32", channel: "stable" | "prere
         return { remainingPids: [4242], forcedPids: [], stoppedPids: [] };
       },
     },
-    "@open-design/sidecar": {
+    "@mish/sidecar": {
       readCurrentSidecarStamp: () => null,
       isCurrentSidecarLauncher: () => false,
       getSidecarStatus: async (stamp: SidecarStamp) => {
@@ -89,7 +89,7 @@ async function scenario(platform: "darwin" | "win32", channel: "stable" | "prere
       bootstrapSidecarProcess: async () => { trace.push(`bootstrap:${alive}`); return false; },
     },
     "electron": { app: { commandLine: { appendSwitch() {} }, exit: (code: number) => trace.push(`exit:${code}`) } },
-    "@open-design/desktop/main": { async recordIncomingUpdateLifecycle() {}, applyOsLocaleSwitch() {}, applyLoopbackConnectionLimitSwitch() {} },
+    "@mish/desktop/main": { async recordIncomingUpdateLifecycle() {}, applyOsLocaleSwitch() {}, applyLoopbackConnectionLimitSwitch() {} },
     "./config.js": { readPackagedConfig: async () => ({ namespace, appVersion: version }) },
     "./headless-runtime.js": { parsePackagedHeadlessRequest: () => ({ headless: false }), runPackagedMcpActionAgainstExistingDaemon: async () => false },
     "./paths.js": { resolvePackagedNamespacePaths: () => paths },

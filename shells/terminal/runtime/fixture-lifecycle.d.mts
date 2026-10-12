@@ -6,11 +6,11 @@ import type {
   LifecycleStatus,
   StandaloneLifecycleTransitionPort,
   StandaloneGenerationBinding,
-} from "@open-design/standalone";
+} from "@mish/standalone";
 
 export class FileFixtureLifecyclePort implements LifecyclePort, StandaloneLifecycleTransitionPort {
   constructor(root: string, options: {
-    algebra: typeof import("@open-design/standalone").SHARED_LIFECYCLE_ALGEBRA;
+    algebra: typeof import("@mish/standalone").SHARED_LIFECYCLE_ALGEBRA;
     heartbeatIntervalMs?: number;
     leaseDurationMs?: number;
     transitionLeaseDurationMs?: number;

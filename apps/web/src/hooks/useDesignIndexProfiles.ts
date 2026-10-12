@@ -2,7 +2,7 @@
 //
 // Re-read on every transition to active — not only on mount — because Home
 // stays mounted while the user visits the Design index tab, stores a profile
-// there and comes back. The same read runs on `open-design:design-index-changed`
+// there and comes back. The same read runs on `mish:design-index-changed`
 // so a store or a removal shows up without a tab switch.
 //
 // A generation counter arbitrates overlapping reads: a slow first response
@@ -11,7 +11,7 @@
 // family cards it already has.
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { DesignProfile } from '@open-design/contracts';
+import type { DesignProfile } from '@mish/contracts';
 import { DESIGN_INDEX_CHANGED_EVENT, listDesignIndexProfiles } from '../state/design-index';
 
 export interface DesignIndexProfilesState {

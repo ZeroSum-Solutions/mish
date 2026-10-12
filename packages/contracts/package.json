@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/contracts",
+  "name": "@mish/contracts",
   "version": "0.22.1",
   "private": true,
   "type": "module",
@@ -105,7 +105,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tests.json --noEmit"
   },
   "dependencies": {
-    "@open-design/release": "workspace:*",
+    "@mish/release": "workspace:*",
     "zod": "3.25.76"
   },
   "devDependencies": {

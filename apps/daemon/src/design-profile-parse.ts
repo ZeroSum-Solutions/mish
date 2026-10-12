@@ -7,11 +7,11 @@ import {
   type DesignProfileSourceKind,
   type DesignQualityResult,
   type DesignStyleAxis,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   PUBLIC_PREVIEW_URL_MAX_CHARS,
   publicPreviewUrlProblem,
-} from '@open-design/agency-fast-lane/preview-url';
+} from '@mish/agency-fast-lane/preview-url';
 
 /**
  * Runtime parser for a `DesignProfile` arriving from outside the daemon — `POST /api/design-index`,

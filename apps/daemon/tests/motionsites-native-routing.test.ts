@@ -6,8 +6,8 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MotionSitesCatalogResponse } from '@open-design/contracts/api/motionsites';
-import type { SectionsListResponse } from '@open-design/contracts/api/section-catalog';
+import type { MotionSitesCatalogResponse } from '@mish/contracts/api/motionsites';
+import type { SectionsListResponse } from '@mish/contracts/api/section-catalog';
 
 import { writeMcpConfig } from '../src/mcp-config.js';
 import { getToken, setToken } from '../src/mcp-tokens.js';

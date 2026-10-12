@@ -1,4 +1,4 @@
-import type { DesignBriefPreview } from '@open-design/contracts';
+import type { DesignBriefPreview } from '@mish/contracts';
 const field = (value: string | null) => ({ value, basis: 'assumed' as const });
 export const homeBriefPreview: DesignBriefPreview = {
   schema: 'design-brief/1', originalText: 'A bakery site',

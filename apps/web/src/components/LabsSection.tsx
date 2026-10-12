@@ -3,7 +3,7 @@ import type {
   OdNextRolloutControlResponse,
   OdNextRolloutMode,
   TrackingLabsOptOutReason,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { trackLabsItemToggled } from '../analytics/events';
 import { useAnalytics } from '../analytics/provider';

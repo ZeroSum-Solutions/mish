@@ -11,7 +11,7 @@ describe('extractWebCloneTargetUrls', () => {
   });
 
   it('reads an explicit URL and a bare domain', () => {
-    expect(extractWebCloneTargetUrls('clone https://nexu.io please.')).toEqual(['https://nexu.io/']);
+    expect(extractWebCloneTargetUrls('clone https://github.com/ZeroSum-Solutions please.')).toEqual(['https://github.com/ZeroSum-Solutions/']);
     expect(extractWebCloneTargetUrls('想要复刻的网站链接：stripe.com')).toEqual(['https://stripe.com/']);
     expect(extractWebCloneTargetUrl('Website URL to clone: example.com/about')).toBe('https://example.com/about');
   });

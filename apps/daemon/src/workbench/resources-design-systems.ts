@@ -3,7 +3,7 @@ import { kitTokenAxes, kitTokenNames } from './component-kit.js';
 import { constants } from 'node:fs';
 import { open, readdir, realpath, stat } from 'node:fs/promises';
 import path from 'node:path';
-import type { ResourceCandidate, ResourceRef, ResourceRequestContext, ResourceSourceSnapshot } from '@open-design/contracts';
+import type { ResourceCandidate, ResourceRef, ResourceRequestContext, ResourceSourceSnapshot } from '@mish/contracts';
 import { designSystemPackageFileUrl } from '../routes/design-systems.js';
 import type { ResourceSourceAdapter } from './resources.js';
 import type { TokenSpecimen } from './token-evidence.js';

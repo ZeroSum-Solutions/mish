@@ -17,7 +17,7 @@ describe('AMR account failure classification', () => {
   // navigates to.
   it('points the recharge link at the console dashboard, not a wallet page', () => {
     expect(DEFAULT_AMR_RECHARGE_URL).toBe(
-      'https://open-design.ai/amr/dashboard?source=open_design',
+      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?source=mish',
     );
   });
 
@@ -406,7 +406,7 @@ describe('AMR account failure classification', () => {
 
   // The `invalid session` lesson, applied to the rest of the list. Each string
   // below was a member of the auth branch, and a search of the vela repository
-  // (`/Users/elian/Documents/nexu/vela`, both `apps/cli` and `services/`) plus
+  // (`/Users/elian/Documents/mish/vela`, both `apps/cli` and `services/`) plus
   // this repository's own message sources found no upstream that emits it: they
   // are synonyms someone supplied for shapes upstream never sends. They are not
   // free — every one of them is live against arbitrary tool output.

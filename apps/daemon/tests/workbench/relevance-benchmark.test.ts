@@ -1,6 +1,6 @@
 import { expect, it } from 'vitest';
-import type { ResourceCandidate } from '@open-design/contracts';
-import type { SectionCatalogSectionKind, SectionCatalogSpineCode } from '@open-design/contracts/api/section-catalog';
+import type { ResourceCandidate } from '@mish/contracts';
+import type { SectionCatalogSectionKind, SectionCatalogSpineCode } from '@mish/contracts/api/section-catalog';
 import {
   rankContextualResources, selectLexicalResources, summarizeTopFiveAcceptability,
   dedupeVariantGroups, isContinuousMotionDecoration, type RelevanceBenchmarkLabel,

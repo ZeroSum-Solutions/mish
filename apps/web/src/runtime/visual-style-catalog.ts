@@ -115,7 +115,7 @@ interface VisualStyleCatalogEntry {
   recommended?: boolean;
 }
 
-const STYLE_CATALOG_ASSET_ORIGIN = 'https://repo-assets.open-design.ai';
+const STYLE_CATALOG_ASSET_ORIGIN = 'https://repo-assets.mish.invalid';
 const STYLE_CATALOG_ASSET_PATH = '/style-catalog/v1';
 const STYLE_CATALOG_ASSET_BASE_URL = `${STYLE_CATALOG_ASSET_ORIGIN}${STYLE_CATALOG_ASSET_PATH}`;
 /**

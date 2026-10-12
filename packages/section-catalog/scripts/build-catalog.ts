@@ -694,7 +694,7 @@ export function serialiseCatalog(catalog: SectionCatalog): string {
 
 /**
  * True when `diskText` (the current contents of `catalog.json`) is not what `pnpm --filter
- * @open-design/section-catalog catalog` would write for `built` — including when `diskText` is
+ * @mish/section-catalog catalog` would write for `built` — including when `diskText` is
  * unparsable, when an entry's fields were hand-edited into a different key order (canonicalized
  * away, so that alone is not "stale"), when any entry's content differs, or when the *entries
  * array itself* is shuffled into a different order than `built`'s sorted-by-id order (still
@@ -730,7 +730,7 @@ function main(): void {
   const current = existsSync(catalogPath) ? readFileSync(catalogPath, 'utf8') : '';
   if (check) {
     if (isCatalogStale(current, built)) {
-      console.error('build-catalog: catalog.json is stale. Run `pnpm --filter @open-design/section-catalog catalog` and commit the result.');
+      console.error('build-catalog: catalog.json is stale. Run `pnpm --filter @mish/section-catalog catalog` and commit the result.');
       process.exitCode = 1;
       return;
     }

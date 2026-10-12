@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from 'node:crypto';
 import {
   WORKBENCH_CAPTURE_MAX_BYTES, type CaptureImportMetadata, type CaptureList, type CaptureRecord, type CaptureView, type WorkbenchDeclarationSurface,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { sniffRaster } from './image.js';
 import { stripRasterMetadata } from './image-metadata.js';
 import { redactSourceUrl } from './source-url.js';

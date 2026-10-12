@@ -10,13 +10,13 @@
 // So we deliberately keep the data dir on the container's local filesystem.
 
 @description('Base name for the deployment. A globally-unique suffix is appended to the web app.')
-param name string = 'open-design'
+param name string = 'mish'
 
 @description('Azure region. Defaults to the resource group location.')
 param location string = resourceGroup().location
 
 @description('Container image to run. Pin to a digest (image@sha256:...) for production.')
-param image string = 'docker.io/vanjayak/open-design:latest'
+param image string = 'docker.io/vanjayak/mish:latest'
 
 @description('App Service plan SKU. B1 is the smallest tier that supports Always On and health checks.')
 param appServicePlanSku string = 'B1'

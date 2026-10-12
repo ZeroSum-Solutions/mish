@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { Icon } from '../Icon';
 import styles from './ResponsiveComposerToolbar.module.css';
 

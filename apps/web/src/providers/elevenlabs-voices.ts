@@ -1,5 +1,5 @@
-import { readApiErrorMessage } from '@open-design/contracts';
-import type { AudioVoiceOption } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
+import type { AudioVoiceOption } from '@mish/contracts';
 
 type JsonRecord = Record<string, unknown>;
 

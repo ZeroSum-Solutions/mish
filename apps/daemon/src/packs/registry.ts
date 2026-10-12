@@ -49,7 +49,7 @@ import {
   type PackContentKind,
   type PackFileEntry,
   type PackManifest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import type { PackHandlerStatus } from './handlers.js';
 import { isPackError, O_NOFOLLOW, PackError, readPackManifestFile } from './manifest.js';

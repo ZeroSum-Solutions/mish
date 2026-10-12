@@ -21,7 +21,7 @@ import { App } from '../../src/App';
 import { transferWithRetry } from '../../src/runtime/intake/transfer-queue';
 import { createIntakeBatch, putIntakeFile, attachIntakeBatch } from '../../src/providers/intake';
 import { resetSessionModelApiFixture } from '../fixtures/session-model-api';
-import { parseIntakeBatchSnapshot, parseIntakeFilePutResponse, parseAttachIntakeResponse, type IntakeBatchSnapshot } from '@open-design/contracts';
+import { parseIntakeBatchSnapshot, parseIntakeFilePutResponse, parseAttachIntakeResponse, type IntakeBatchSnapshot } from '@mish/contracts';
 import type { AppConfig, Project } from '../../src/types';
 import {
   fetchComposioConfigFromDaemon,

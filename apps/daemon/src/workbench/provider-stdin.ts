@@ -1,5 +1,5 @@
 import type { Readable } from 'node:stream';
-import { parseTransientSessionProviderCarrier, type ByokChatProviderConfig } from '@open-design/contracts';
+import { parseTransientSessionProviderCarrier, type ByokChatProviderConfig } from '@mish/contracts';
 const MAX_PROVIDER_BYTES = 16_384;
 export class ProviderStdinError extends Error {}
 export function assertProviderStdinUsage(flags: Record<string, unknown>, command: string): void {

@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 
 import {
   APP_KEYS,
-  OPEN_DESIGN_SIDECAR_CONTRACT,
+  MISH_SIDECAR_CONTRACT,
   SIDECAR_MESSAGES,
   SIDECAR_MODES,
   SIDECAR_SOURCES,
@@ -15,7 +15,7 @@ import {
   type DesktopUpdateAction,
   type DesktopUpdateResult,
   type WebStatusSnapshot,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   convergeSidecarLaunch,
   findSidecarProcesses,
@@ -24,8 +24,8 @@ import {
   stopSidecars,
   withSidecarLifecycleLock,
   type SidecarStamp,
-} from "@open-design/sidecar";
-import { readLogTail } from "@open-design/platform";
+} from "@mish/sidecar";
+import { readLogTail } from "@mish/platform";
 
 import type { ToolPackConfig } from "../config/index.js";
 import { allPackagedSidecarStopRequests, toolPackSidecarStamp } from "../config/sidecar-stamps.js";
@@ -241,7 +241,7 @@ async function pinInstalledPackagedConfigNamespace(
   config: ToolPackConfig,
   executablePath: string,
 ): Promise<{ installedConfigPath: string; launchConfigPath: string }> {
-  const installedConfigPath = join(dirname(executablePath), "resources", "open-design-config.json");
+  const installedConfigPath = join(dirname(executablePath), "resources", "mish-config.json");
   if (!(await pathExists(installedConfigPath))) {
     throw new Error(`installed packaged config missing at ${installedConfigPath}`);
   }
@@ -256,7 +256,7 @@ async function pinInstalledPackagedConfigNamespace(
   };
   const body = `${JSON.stringify(pinned, null, 2)}\n`;
   await writeFile(installedConfigPath, body, "utf8");
-  const launchConfigPath = join(config.roots.runtime.namespaceRoot, "runtime", "launch-open-design-config.json");
+  const launchConfigPath = join(config.roots.runtime.namespaceRoot, "runtime", "launch-mish-config.json");
   await mkdir(dirname(launchConfigPath), { recursive: true });
   await writeFile(launchConfigPath, body, "utf8");
   return { installedConfigPath, launchConfigPath };

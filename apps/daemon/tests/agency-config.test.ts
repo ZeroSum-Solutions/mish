@@ -14,14 +14,14 @@ import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AgencyJevConfigResponse, ApiErrorResponse } from '@open-design/contracts';
-import type { AgencyModelProvider } from '@open-design/contracts';
-import { AGENCY_JEV_KEY_ENV, AGENCY_JEV_KEY_MAX_CHARS, AGENCY_MODEL_KEY_ENV, AGENCY_MODEL_PROVIDERS } from '@open-design/contracts';
-import { PROVIDERS, createProviderKeyResolver } from '@open-design/agency-fast-lane/deepseek';
-import { loadAtlasData } from '@open-design/agency-fast-lane/atlas';
-import { createJevProfiler } from '@open-design/agency-fast-lane/profile';
-import { DEFAULT_CONSENSUS_K, createJevRouter } from '@open-design/agency-fast-lane/route';
-import { loadDesignTaxonomy } from '@open-design/agency-fast-lane/taxonomy';
+import type { AgencyJevConfigResponse, ApiErrorResponse } from '@mish/contracts';
+import type { AgencyModelProvider } from '@mish/contracts';
+import { AGENCY_JEV_KEY_ENV, AGENCY_JEV_KEY_MAX_CHARS, AGENCY_MODEL_KEY_ENV, AGENCY_MODEL_PROVIDERS } from '@mish/contracts';
+import { PROVIDERS, createProviderKeyResolver } from '@mish/agency-fast-lane/deepseek';
+import { loadAtlasData } from '@mish/agency-fast-lane/atlas';
+import { createJevProfiler } from '@mish/agency-fast-lane/profile';
+import { DEFAULT_CONSENSUS_K, createJevRouter } from '@mish/agency-fast-lane/route';
+import { loadDesignTaxonomy } from '@mish/agency-fast-lane/taxonomy';
 
 import {
   AgencyJevConfigUnreadableError,

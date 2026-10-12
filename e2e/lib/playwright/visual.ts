@@ -1,11 +1,11 @@
 import { expect } from '@playwright/test';
 import type { Locator, Page, Route } from '@playwright/test';
-import type { Project } from '@open-design/contracts';
+import type { Project } from '@mish/contracts';
 import {
   parseCreateIntakeBatchRequest, parseIntakeBatchSnapshot, parseListIntakeBatchesResponse,
   parseIntakeFilePutResponse, parseAttachIntakeRequest, parseAttachIntakeResponse,
   parseClearIntakeRequest, type IntakeBatchSnapshot,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { createHash } from 'node:crypto';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -13,8 +13,8 @@ import { routeAgents } from './mock-factory.js';
 import { openSettingsDialog } from './amr.js';
 import { T } from '@/timeouts';
 
-const STORAGE_KEY = 'open-design:config';
-const VISUAL_STABILITY_STORAGE_KEY = 'open-design:visual-stability';
+const STORAGE_KEY = 'mish:config';
+const VISUAL_STABILITY_STORAGE_KEY = 'mish:visual-stability';
 const VISUAL_STYLE_ID = 'od-visual-stability-style';
 
 type VisualConfig = {

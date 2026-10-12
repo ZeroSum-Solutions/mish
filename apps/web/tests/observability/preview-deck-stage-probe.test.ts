@@ -6,7 +6,7 @@ import {
   PREVIEW_OBSERVABILITY_HOST_STATE_MESSAGE_TYPE,
   PREVIEW_OBSERVABILITY_MESSAGE_TYPE,
   buildPreviewObservabilityBridge,
-} from '@open-design/contracts/runtime/preview-observability';
+} from '@mish/contracts/runtime/preview-observability';
 
 /**
  * Behavioural cover for the OPEND-2147 deck-stage probe.

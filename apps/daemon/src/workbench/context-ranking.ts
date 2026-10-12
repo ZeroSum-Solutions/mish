@@ -1,4 +1,4 @@
-import type { ResourceCandidate, ResourceRef, ProjectDesignContext, ResourceSearchResponse } from '@open-design/contracts';
+import type { ResourceCandidate, ResourceRef, ProjectDesignContext, ResourceSearchResponse } from '@mish/contracts';
 import { fontRequirementFit, fontRequirementsFromContext } from '../fonts/requirements.js';
 
 // NOT bumped, despite selection semantics changing here (selectLexicalResources now lets

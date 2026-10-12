@@ -3,7 +3,7 @@ import {
   parseAdoptionOperationResponse, parseApplyAdoptionRequest, parseCatalogueAdoptionRequest, parseCatalogueAdoptionResponse, parseCatalogueSaveRequest,
   parseCatalogueSavedUnitDeleteResponse, parseCatalogueSavedUnitResponse, parseCatalogueSavedUnitsResponse, parsePrepareAdoptionRequest, parsePrepareAdoptionResponse,
   parseWorkbenchAdoptionStatusResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../../daemon-url.js';
 
 export interface AdoptionCliOptions {

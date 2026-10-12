@@ -14,7 +14,7 @@ import { useMemo } from 'react';
 import type {
   InstalledPluginRecord,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useT } from '../i18n';
 import { PreviewSurface } from './plugins-home/cards/PreviewSurface';
 import { extractCategories } from './plugins-home/facets';

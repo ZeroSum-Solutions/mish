@@ -20,5 +20,5 @@ export {
   findQuestionFormCloseTag,
   questionFormBodyIsRenderable,
   scanQuestionForms,
-} from '@open-design/contracts';
-export type { QuestionFormScan } from '@open-design/contracts';
+} from '@mish/contracts';
+export type { QuestionFormScan } from '@mish/contracts';

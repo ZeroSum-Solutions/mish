@@ -4,7 +4,7 @@ import { mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { parseVerificationBundle, type VerificationBundle } from '@open-design/contracts';
+import { parseVerificationBundle, type VerificationBundle } from '@mish/contracts';
 import { registerWorkbenchReviewRoutes } from '../../src/routes/workbench-review.js';
 import { runReviewCli } from '../../src/workbench/review-cli.js';
 import { createCdpReviewPort } from '../../src/workbench/review/cdp-worker.js';

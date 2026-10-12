@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseVerificationBundle, type VerificationBundle } from '@open-design/contracts';
+import { parseVerificationBundle, type VerificationBundle } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchReviewBundle } from '../../../src/components/workbench/WorkbenchReviewRun';
 

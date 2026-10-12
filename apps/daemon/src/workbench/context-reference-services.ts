@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3';
 import type { Request, Response } from 'express';
-import type { ResourceRef, InstalledPluginRecord } from '@open-design/contracts';
+import type { ResourceRef, InstalledPluginRecord } from '@mish/contracts';
 import { getProject, getWorkspaceResourceByResourceId } from '../db.js';
 import { isSafeId } from '../projects.js';
 import { getLibraryAsset } from '../library-store.js';

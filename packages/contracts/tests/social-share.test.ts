@@ -2,19 +2,19 @@ import { describe, expect, it } from 'vitest';
 
 import {
   buildSocialSharePayload,
-  OPEN_DESIGN_GITHUB_REPO_URL,
+  MISH_GITHUB_REPO_URL,
 } from '../src/api/social-share';
 
 describe('social-share contract', () => {
   it('builds Mishh Mashh repository share targets', () => {
     const payload = buildSocialSharePayload({
-      kind: 'open-design-repo',
+      kind: 'mish-repo',
       locale: 'zh-CN',
       title: 'Mishh Mashh GitHub',
       text: '推荐 Mishh Mashh',
     });
 
-    expect(payload.url).toBe(OPEN_DESIGN_GITHUB_REPO_URL);
+    expect(payload.url).toBe(MISH_GITHUB_REPO_URL);
     expect(payload.locale).toBe('zh-CN');
     expect(payload.platforms.some((target) => target.platform === 'x' && target.shareUrl?.includes('twitter.com/intent/tweet'))).toBe(true);
     expect(payload.platforms.some((target) => target.platform === 'xiaohongshu' && target.mode === 'copy-open')).toBe(true);
@@ -24,16 +24,16 @@ describe('social-share contract', () => {
     const payload = buildSocialSharePayload({
       kind: 'project-html',
       locale: 'en',
-      url: 'https://example.com/open-design-demo',
+      url: 'https://example.com/mish-demo',
       title: 'Demo',
-      text: `Built with Mishh Mashh. Repo: ${OPEN_DESIGN_GITHUB_REPO_URL}`,
-      copyText: `Demo\nhttps://example.com/open-design-demo\n${OPEN_DESIGN_GITHUB_REPO_URL}`,
+      text: `Built with Mishh Mashh. Repo: ${MISH_GITHUB_REPO_URL}`,
+      copyText: `Demo\nhttps://example.com/mish-demo\n${MISH_GITHUB_REPO_URL}`,
     });
 
-    expect(payload.url).toBe('https://example.com/open-design-demo');
-    expect(payload.githubRepoUrl).toBe(OPEN_DESIGN_GITHUB_REPO_URL);
-    expect(payload.copyText).toContain(OPEN_DESIGN_GITHUB_REPO_URL);
+    expect(payload.url).toBe('https://example.com/mish-demo');
+    expect(payload.githubRepoUrl).toBe(MISH_GITHUB_REPO_URL);
+    expect(payload.copyText).toContain(MISH_GITHUB_REPO_URL);
     expect(payload.platforms.find((target) => target.platform === 'telegram')?.shareUrl)
-      .toContain('https%3A%2F%2Fexample.com%2Fopen-design-demo');
+      .toContain('https%3A%2F%2Fexample.com%2Fmish-demo');
   });
 });

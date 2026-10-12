@@ -22,8 +22,8 @@ case "$mac_artifact_mode" in
     ;;
 esac
 
-source_dmg="$tools_pack_dir/out/mac/namespaces/$TOOLS_PACK_NAMESPACE/dmg/Open Design-$TOOLS_PACK_NAMESPACE.dmg"
-source_zip="$tools_pack_dir/out/mac/namespaces/$TOOLS_PACK_NAMESPACE/zip/Open Design-$TOOLS_PACK_NAMESPACE.zip"
+source_dmg="$tools_pack_dir/out/mac/namespaces/$TOOLS_PACK_NAMESPACE/dmg/Mish-$TOOLS_PACK_NAMESPACE.dmg"
+source_zip="$tools_pack_dir/out/mac/namespaces/$TOOLS_PACK_NAMESPACE/zip/Mish-$TOOLS_PACK_NAMESPACE.zip"
 if [ ! -f "$source_dmg" ]; then
   echo "expected dmg not found at $source_dmg" >&2
   exit 1
@@ -33,8 +33,8 @@ if [ "$mac_artifact_mode" != "dmg-only" ] && [ ! -f "$source_zip" ]; then
   exit 1
 fi
 
-versioned_dmg="open-design-${RELEASE_VERSION}${asset_suffix}-mac-arm64.dmg"
-versioned_zip="open-design-${RELEASE_VERSION}${asset_suffix}-mac-arm64.zip"
+versioned_dmg="mish-${RELEASE_VERSION}${asset_suffix}-mac-arm64.dmg"
+versioned_zip="mish-${RELEASE_VERSION}${asset_suffix}-mac-arm64.zip"
 dmg_checksum_file="$versioned_dmg.sha256"
 zip_checksum_file="$versioned_zip.sha256"
 

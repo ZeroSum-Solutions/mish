@@ -9,7 +9,7 @@
  * 真 CLI 2.1.259 的逐字节 stdout,不是手搭帧):
  *
  *   L15 '{"file_path": "/private/tmp/claude-501'
- *   L16 '/-Users-elian-Documents-open-design/bff58f5e-18'
+ *   L16 '/-Users-elian-Documents-mish/bff58f5e-18'
  *   L17 'bb-4b58-96e7-8180846e980a/'
  *   L18 'scratchpad/w107/cwd/alpha.html'
  *   L19 '", "content": "<!doctype html><html><body'   ← 路径在这一帧收尾

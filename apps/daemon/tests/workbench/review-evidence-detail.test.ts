@@ -7,7 +7,7 @@ import { writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import type { ProjectRubric, VerificationBundle } from '@open-design/contracts';
+import type { ProjectRubric, VerificationBundle } from '@mish/contracts';
 import { createClaudeVisualReviewer } from '../../src/workbench/review/reviewers/claude-visual.js';
 import { createDeepSeekReviewer } from '../../src/workbench/review/reviewers/deepseek.js';
 import { createJevReviewer } from '../../src/workbench/review/reviewers/jev.js';

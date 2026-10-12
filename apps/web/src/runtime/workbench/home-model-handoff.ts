@@ -1,4 +1,4 @@
-import { parseRunDesignBriefBinding, parseSessionModelChoice, type RunDesignBriefBinding, type SessionModelChoice, type RunContextSelection, type AttachIntakeResponse, type SessionModelSnapshot } from '@open-design/contracts';
+import { parseRunDesignBriefBinding, parseSessionModelChoice, type RunDesignBriefBinding, type SessionModelChoice, type RunContextSelection, type AttachIntakeResponse, type SessionModelSnapshot } from '@mish/contracts';
 import type { ChatAttachment } from '../../types';
 import { intakeAttachmentKind } from '../intake/intake-attachment-kind';
 export interface HomeModelHandoff {

@@ -9,7 +9,7 @@
  * 里逐条记着,已经踩过五次)。
  *
  * 平时它当一条烟雾测试跑(四种场景真的渲染出了东西);要量的时候给它一个落点:
- *   OD_WRITE_RAIL=/abs/path/probe.html pnpm --filter @open-design/web exec \
+ *   OD_WRITE_RAIL=/abs/path/probe.html pnpm --filter @mish/web exec \
  *     vitest run -c vitest.config.ts tests/components/chat/record-columns-probe.test.tsx
  * 然后用无头 Chrome 的 CDP 打开那张页面读坐标 —— 做法照
  * `docs/design/chat-mirror/measure.mjs`(本仓库不装 playwright)。

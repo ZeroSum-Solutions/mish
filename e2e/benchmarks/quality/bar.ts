@@ -331,7 +331,7 @@ export function rollUp(scores: Record<string, number>, eligibility: readonly Eli
 
 export function renderAgencyBarMarkdown(): string {
   const lines = ['# Agency quality bar', '', `> **Release candidate ${AGENCY_BAR.version}. ${AGENCY_BAR.freezePolicy}**`, '',
-    'Generated from `e2e/benchmarks/quality/bar.ts`. Run `pnpm --filter @open-design/e2e bar:docs` to regenerate.', '', AGENCY_BAR.question, '',
+    'Generated from `e2e/benchmarks/quality/bar.ts`. Run `pnpm --filter @mish/e2e bar:docs` to regenerate.', '', AGENCY_BAR.question, '',
     '## Layer 1: eligibility', '', 'Mechanical facts decide eligibility. Failures stay visible with evidence. Missing or unread evidence is inconclusive.', '',
     ...AGENCY_BAR.eligibility.map(item => `- **${item.id}**: ${item.description}`), '',
     '## Layer 2: advisory quality', '', 'Judge against the accepted direction. A restrained single-family design, a short page or a static page can earn A.', '',

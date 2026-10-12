@@ -14,15 +14,15 @@ import {
   type DesktopStatusSnapshot,
   type DesktopUpdateAction,
   type DesktopUpdateResult,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   convergeSidecarLaunch,
   getSidecarStatus,
   invokeSidecar,
   stopSidecars,
   type SidecarStamp as ConvergedSidecarStamp,
-} from "@open-design/sidecar";
-import { readLogTail } from "@open-design/platform";
+} from "@mish/sidecar";
+import { readLogTail } from "@mish/platform";
 import type { ToolPackConfig } from "../config/index.js";
 import { allPackagedSidecarStopRequests, toolPackSidecarStamp } from "../config/sidecar-stamps.js";
 import { resolveToolPackLauncherLayout } from "../launcher/layout.js";

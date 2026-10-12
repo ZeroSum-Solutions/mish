@@ -12,9 +12,9 @@
   disabled: true
 
 - insert:
-    - id: open-design-startup
-      name: '@open-design/dsh-runtime/startup'
+    - id: mish-startup
+      name: '@mish/dsh-runtime/startup'
 
-    - id: open-design-runtime
-      name: '@open-design/dsh-runtime'
-      inject: [openDesignStartup]
+    - id: mish-runtime
+      name: '@mish/dsh-runtime'
+      inject: [mishStartup]

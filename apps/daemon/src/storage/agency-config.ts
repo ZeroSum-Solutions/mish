@@ -44,9 +44,9 @@ import type {
   AgencyJevConfigSource,
   AgencyKeyStatus,
   AgencyModelProvider,
-} from '@open-design/contracts';
-import { AGENCY_JEV_KEY_ENV, AGENCY_JEV_KEY_MAX_CHARS, AGENCY_MODEL_PROVIDERS } from '@open-design/contracts';
-import { providerEnvKey } from '@open-design/agency-fast-lane/deepseek';
+} from '@mish/contracts';
+import { AGENCY_JEV_KEY_ENV, AGENCY_JEV_KEY_MAX_CHARS, AGENCY_MODEL_PROVIDERS } from '@mish/contracts';
+import { providerEnvKey } from '@mish/agency-fast-lane/deepseek';
 
 /** Owner-only, like every other credential file the daemon writes. */
 const FILE_MODE = 0o600;

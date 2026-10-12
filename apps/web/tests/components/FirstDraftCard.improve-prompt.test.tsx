@@ -7,7 +7,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeAll, afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 import { approvedDesignSystemFixtures } from '../helpers/approved-design-systems';
-import type { DesignSystemSummary, RouteDecision } from '@open-design/contracts';
+import type { DesignSystemSummary, RouteDecision } from '@mish/contracts';
 
 vi.mock('../../src/components/workbench/WorkbenchImprovePrompt', () => ({
   WorkbenchImprovePrompt: ({ projectId, draft, onUse }: { projectId: string; draft: string; onUse: (b: unknown) => void }) => (

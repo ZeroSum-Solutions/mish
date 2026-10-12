@@ -3,12 +3,12 @@ import { memo, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, 
 import type { ArtifactExportFormat } from '../runtime/chat/artifact-export';
 import { AnchoredMenuShell } from './chat/AnchoredMenuShell';
 import { createPortal, flushSync } from 'react-dom';
-import { Button, Input, Select } from '@open-design/components';
+import { Button, Input, Select } from '@mish/components';
 import {
   getLatestHostPreviewNavigationFailure,
   subscribeHostPreviewNavigationFailure,
-  type OpenDesignHostPreviewNavigationFailure,
-} from '@open-design/host';
+  type MishHostPreviewNavigationFailure,
+} from '@mish/host';
 import { CenteredLoader } from './Loading';
 import { APP_CHROME_FILE_ACTIONS_ID, APP_CHROME_FILE_ACTIONS_SELECTOR } from './AppChromeHeader';
 import {
@@ -27,13 +27,13 @@ import {
   type SocialShareResponse,
   type DeployPublicAccessOutcome,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
-import { PREVIEW_OBSERVABILITY_HOST_STATE_MESSAGE_TYPE } from '@open-design/contracts/runtime/preview-observability';
-import { PREVIEW_URL_GUARD_MAX_HTML_BYTES } from '@open-design/contracts/runtime/preview-guards';
+} from '@mish/contracts';
+import { PREVIEW_OBSERVABILITY_HOST_STATE_MESSAGE_TYPE } from '@mish/contracts/runtime/preview-observability';
+import { PREVIEW_URL_GUARD_MAX_HTML_BYTES } from '@mish/contracts/runtime/preview-guards';
 import {
   isPreviewRuntimeState,
   type PreviewRuntimeState,
-} from '@open-design/contracts/runtime/preview-runtime-state';
+} from '@mish/contracts/runtime/preview-runtime-state';
 import {
   appendResourceQuery,
   workspaceIdentityCacheKey,
@@ -49,7 +49,7 @@ import {
   type TrackingArtifactKind,
   type TrackingProjectKind,
   type TrackingDeployProvider,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import { exportErrorCode } from '../analytics/export-error-code';
 import { deployErrorCode } from '../analytics/deploy-error-code';
@@ -98,7 +98,7 @@ import {
 } from './markdown-scroll-sync';
 import { useT, useI18n } from '../i18n';
 import { VercelSiteNameField } from './VercelSiteNameField';
-import { validateVercelProjectName, vercelSiteNameSuggestion } from '@open-design/contracts';
+import { validateVercelProjectName, vercelSiteNameSuggestion } from '@mish/contracts';
 import { DeployPublicAccessToggle, deployAccessOf, type DeployLinkAccess } from './DeployPublicAccessToggle';
 import { useDismissOnOutsideInteraction } from '../hooks/useDismissOnOutsideInteraction';
 import {
@@ -180,7 +180,7 @@ import {
   exportReactComponentAsZip,
   captureHostIframeSnapshot,
   imageDataUrlToBlob,
-  isOpenDesignHostAvailable,
+  isMishHostAvailable,
   openSandboxedPreviewInNewTab,
   prepareImageExportTarget,
   planDeckImageCapture,
@@ -508,7 +508,7 @@ function previewViewportIcon(viewport: PreviewViewportId): string {
   return 'computer-line';
 }
 
-const EXPORT_READY_NUDGE_STORAGE_PREFIX = 'open-design:export-ready-nudge:';
+const EXPORT_READY_NUDGE_STORAGE_PREFIX = 'mish:export-ready-nudge:';
 const COMMENT_SIDE_DOCK_WIDTH = 320;
 const COMMENT_SIDE_DOCK_RAIL_WIDTH = 42;
 const COMMENT_SIDE_DOCK_GAP = 12;
@@ -674,7 +674,7 @@ function persistentPreviewBootstrapUrl(html: string, forceBlob = false): string 
 function previewRuntimeUrl(href: string): string {
   const runtimeHref = typeof globalThis.location?.href === 'string'
     ? globalThis.location.href
-    : 'http://open-design.local/';
+    : 'http://mish.local/';
   return new URL(href, runtimeHref).href;
 }
 type PreviewContentWidthCacheEntry = {
@@ -5030,7 +5030,7 @@ export function CommentSidePanel({
   );
 }
 
-const COMMENT_SIDE_DRAG_MIME = 'application/x-open-design-preview-comment';
+const COMMENT_SIDE_DRAG_MIME = 'application/x-mish-preview-comment';
 
 type CommentSideDropEdge = 'before' | 'after';
 
@@ -7594,7 +7594,7 @@ function HtmlViewer({
   const unknownExportOrigin = (
     status: ArtifactExportOriginProps['artifact_origin_status'] = 'missing_version',
   ): ArtifactExportOriginProps => ({
-    entry_surface: 'open_design_ui',
+    entry_surface: 'mish_ui',
     artifact_origin_status: status,
     origin_entry_surface: 'unknown',
   });
@@ -11514,7 +11514,7 @@ function HtmlViewer({
     scheduleSrcDocTransportTimeout,
   ]);
   const handleHostPreviewNavigationFailure = useCallback((
-    failure: OpenDesignHostPreviewNavigationFailure,
+    failure: MishHostPreviewNavigationFailure,
   ) => {
     const aboutSrcDocFailure = failure.validatedUrl === 'about:srcdoc';
     const localBlobFailure = failure.validatedUrl.startsWith('blob:od://app/');
@@ -15447,7 +15447,7 @@ function HtmlViewer({
     const pdfTitle = context?.title ?? exportTitle;
     const pdfSource = context?.content ?? source ?? '';
     const pdfDeck = deckExportSignalForContext(context);
-    if (isOpenDesignHostAvailable()) {
+    if (isMishHostAvailable()) {
       const res = await exportProjectScreenshotPdf({
         projectId,
         fileName: file.name,
@@ -15673,7 +15673,7 @@ function HtmlViewer({
     // reports; otherwise (Copy screenshot, Mark/Draw capture) it grabs the
     // CURRENT slide, mirroring what's on screen. An ordinary page is its
     // full-page capture either way.
-    if (isOpenDesignHostAvailable() && projectId && file.name) {
+    if (isMishHostAvailable() && projectId && file.name) {
       // Deck-vs-page uses the same signal as PDF export — broader than the viewer's nav
       // signal — so runtime-managed decks (`<deck-stage>` / `data-screen-label`,
       // no literal `.slide`) export as a deck instead of a single page-mode shot
@@ -15920,7 +15920,7 @@ function HtmlViewer({
     // unacceptable for a Chinese-first product. Falls back to the
     // vector/browser print path on web or on failure.
     fireShareExport('pdf', async () => {
-      if (isOpenDesignHostAvailable()) {
+      if (isMishHostAvailable()) {
         const res = await exportProjectScreenshotPdf({
           projectId,
           fileName: file.name,

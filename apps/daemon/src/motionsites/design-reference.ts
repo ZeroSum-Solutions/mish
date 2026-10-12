@@ -16,10 +16,10 @@ import { resolveMotionSitesMcpConnection } from './connection.js';
 import { classifyMotionSitesFailure, MotionSitesLoginRequiredError, MotionSitesUpstreamError } from './errors.js';
 import { getLocalCorpusText } from './local-corpus-source.js';
 
-/** `SectionCatalogEntry.id` prefix `@open-design/section-catalog`'s `local-corpus.ts` gives every
+/** `SectionCatalogEntry.id` prefix `@mish/section-catalog`'s `local-corpus.ts` gives every
  * bundled owner-authored entry (`zerosum-kit:<row.id>`) — see that module's `toEntry`. */
 const ZEROSUM_KIT_ID_PREFIX = 'zerosum-kit:';
-/** Mirrors `@open-design/section-catalog`'s `motionsites.ts` `normalizeMotionSitesPrompt`'s
+/** Mirrors `@mish/section-catalog`'s `motionsites.ts` `normalizeMotionSitesPrompt`'s
  * `id: \`motionsites-prompt:${result.id}\`` — the prefix a federated MotionSites entry's id
  * carries. */
 const MOTIONSITES_PROMPT_ID_PREFIX = 'motionsites-prompt:';

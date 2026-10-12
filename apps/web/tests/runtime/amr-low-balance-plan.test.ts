@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { AmrWalletSnapshot } from '@open-design/contracts';
+import type { AmrWalletSnapshot } from '@mish/contracts';
 import { resolveAmrPlan } from '../../src/runtime/amr-low-balance-plan';
 import { fetchVelaLoginStatus } from '../../src/providers/daemon';
 

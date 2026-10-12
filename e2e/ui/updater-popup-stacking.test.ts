@@ -44,7 +44,7 @@ test.beforeEach(async ({ page }) => {
       },
       channel: 'prerelease',
       currentVersion: '0.14.1-prerelease.1',
-      downloadPath: '/tmp/open-design-update.dmg',
+      downloadPath: '/tmp/mish-update.dmg',
       enabled: true,
       mode: 'package-launcher',
       platform: 'darwin',

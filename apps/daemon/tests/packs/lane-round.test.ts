@@ -9,7 +9,7 @@ import path from 'node:path';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { parsePackManifest } from '@open-design/contracts';
+import { parsePackManifest } from '@mish/contracts';
 
 import type { PackContentHandler } from '../../src/packs/handlers.js';
 import { PackError, packManifestDigest } from '../../src/packs/manifest.js';
@@ -57,7 +57,7 @@ function recording(behaviour: { failActivate?: boolean } = {}) {
 function pluginPack(options: FixturePackOptions = {}): FixturePackOptions {
   return {
     ...options,
-    files: [...fixtureKitFiles(), { path: 'plugins/alpha/open-design.json', content: '{"id":"alpha"}\n' }],
+    files: [...fixtureKitFiles(), { path: 'plugins/alpha/mish.json', content: '{"id":"alpha"}\n' }],
     contents: [
       { kind: 'component-kit', schema: 'od-cult-kit/1', id: 'demo-kit', path: 'kits/demo' },
       { kind: 'plugins', schema: 'od-plugin-dir/1', path: 'plugins', ids: ['alpha'] },

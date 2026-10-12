@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import { mkdir } from 'node:fs/promises';
 import path from 'node:path';
-import { createCommandInvocation } from '@open-design/platform';
+import { createCommandInvocation } from '@mish/platform';
 import { resolveAgentBin } from '../../../runtimes/resolution.js';
 import { buildReviewPrompt, parseVerdicts, VERDICTS_JSON_SCHEMA } from './prompt.js';
 import { ReviewerCallError, type ReviewerAdapter, type ReviewerInput, type ReviewerResult } from './types.js';

@@ -2,7 +2,7 @@
 // progress events, and a reconnect's second RUN_STARTED starts steps over but keeps the events.
 
 import { describe, expect, it } from 'vitest';
-import type { AgencyBuildAguiState, AgencyBuildEvent, AgencyBuildSnapshot } from '@open-design/contracts';
+import type { AgencyBuildAguiState, AgencyBuildEvent, AgencyBuildSnapshot } from '@mish/contracts';
 
 import {
   agencyBuildSnapshotFromAgui,

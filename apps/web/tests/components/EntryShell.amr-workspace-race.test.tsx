@@ -5,7 +5,7 @@ import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EntryShell } from '../../src/components/EntryShell';
@@ -774,7 +774,7 @@ describe('EntryShell AMR workspace precheck race', () => {
     expect(
       await screen.findByRole('heading', { name: 'Sign in to AMR' }),
     ).toBeTruthy();
-    expect(window.localStorage.getItem('open-design:home-composer:prompt')).toBe(
+    expect(window.localStorage.getItem('mish:home-composer:prompt')).toBe(
       'Keep this draft through Cloud reauthentication',
     );
   });

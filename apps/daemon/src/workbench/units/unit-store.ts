@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { parseReusableUnitManifest, WORKBENCH_UNIT_ID_PATTERN, type ReusableUnitManifest } from '@open-design/contracts';
+import { parseReusableUnitManifest, WORKBENCH_UNIT_ID_PATTERN, type ReusableUnitManifest } from '@mish/contracts';
 
 const SHA256 = /^[a-f0-9]{64}$/u;
 export const unitObjectId = (sha256: string) => `unit-object:${sha256}`;

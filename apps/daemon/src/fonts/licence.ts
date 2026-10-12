@@ -1,4 +1,4 @@
-import type { FontProfile, ResourceCandidate } from '@open-design/contracts';
+import type { FontProfile, ResourceCandidate } from '@mish/contracts';
 import type { FontCatalogueFamily } from './catalogue.js';
 
 /** The licence facts every font family carries, whichever source it comes from. */

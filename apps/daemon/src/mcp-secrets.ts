@@ -12,7 +12,7 @@
  * Errors name the server and the field, never a value.
  */
 
-import { MCP_SECRET_MASK } from '@open-design/contracts';
+import { MCP_SECRET_MASK } from '@mish/contracts';
 import { effectiveMcpAuthMode, type McpServerConfig } from './mcp-config.js';
 
 /** Connection fields are opaque: credentials may appear anywhere, regardless of shape. */

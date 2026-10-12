@@ -8,13 +8,13 @@
 // Each guard takes the narrowest shape it actually reads rather than the full
 // `ChatRun`, so a caller can hand over any object that carries those fields.
 
-import type { DesignSystemRunNotice } from '@open-design/contracts';
+import type { DesignSystemRunNotice } from '@mish/contracts';
 import type {
   ChatRunStatus,
   ChatRunStatusResponse,
   ProjectMetadata as ContractProjectMetadata,
   StrategyTaskProjectionV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { AnalyticsContext } from '../analytics.js';
 import type { RunArtifactBaseline } from '../run-artifact-fs.js';
 import type {
@@ -138,10 +138,10 @@ export interface ChatRun {
   clientRequestId?: string | null;
   requestFingerprint?: string | null;
   requestFingerprintVersion?: 1 | 2;
-  modelAdmission?: import('@open-design/contracts').SessionRunAdmission | null;
+  modelAdmission?: import('@mish/contracts').SessionRunAdmission | null;
   strategyRolloutDecision?: OdNextRolloutDecision | null;
   /** Both stages of a staged-drafting turn; shared by every Run in the chain. */
-  staged?: import('@open-design/contracts').StagedRunRecord;
+  staged?: import('@mish/contracts').StagedRunRecord;
   agentId: string | null;
   workspaceScope?: RunWorkspaceScope | null;
   model?: string | null;

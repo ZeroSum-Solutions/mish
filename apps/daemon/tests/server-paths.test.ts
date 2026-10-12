@@ -79,10 +79,10 @@ describe('resolveDaemonResourceRoot', () => {
       'versions',
       '0.10.0-beta.15',
       'payload',
-      'Open Design Beta.app',
+      'Mish Beta.app',
       'Contents',
       'Resources',
-      'open-design',
+      'mish',
     );
 
     expect(resolveDaemonResourceRoot({ configured, safeBases: [installationRoot] })).toBe(configured);
@@ -101,9 +101,9 @@ describe('resolveDaemonResourceRoot', () => {
 describe('resolveDaemonPluginPreviewsDir', () => {
   it('resolves under the resource root in the packaged layout', () => {
     // Packaged: the prebundled daemon's PROJECT_ROOT is Resources/app (no data/),
-    // but the bundled manifest lives under OD_RESOURCE_ROOT (Resources/open-design).
-    const resourceRoot = '/Applications/Open Design.app/Contents/Resources/open-design';
-    const projectRoot = '/Applications/Open Design.app/Contents/Resources/app';
+    // but the bundled manifest lives under OD_RESOURCE_ROOT (Resources/mish).
+    const resourceRoot = '/Applications/Mish.app/Contents/Resources/mish';
+    const projectRoot = '/Applications/Mish.app/Contents/Resources/app';
 
     expect(
       resolveDaemonPluginPreviewsDir({ env: {}, resourceRoot, projectRoot }),
@@ -125,14 +125,14 @@ describe('resolveDaemonPluginPreviewsDir', () => {
     expect(
       resolveDaemonPluginPreviewsDir({
         env: { OD_PLUGIN_PREVIEWS_DIR: '/abs/previews' },
-        resourceRoot: '/res/open-design',
+        resourceRoot: '/res/mish',
         projectRoot,
       }),
     ).toBe('/abs/previews');
     expect(
       resolveDaemonPluginPreviewsDir({
         env: { OD_PLUGIN_PREVIEWS_DIR: 'rel/previews' },
-        resourceRoot: '/res/open-design',
+        resourceRoot: '/res/mish',
         projectRoot,
       }),
     ).toBe(path.join(projectRoot, 'rel', 'previews'));

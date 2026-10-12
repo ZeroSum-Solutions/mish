@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import type { CreateIntakeBatchRequest, IntakeFileDescriptor, IntakeFileState, ApiError } from '@open-design/contracts';
+import type { CreateIntakeBatchRequest, IntakeFileDescriptor, IntakeFileState, ApiError } from '@mish/contracts';
 export type IntakeSelector = [workspaceId: string, memberId: string] | null;
 export interface IntakeBatchRow { id: string; manifest_json: string; selector_json: string; revision: number; created_at: number; updated_at: number }
 export interface Materialization { projectId: string; conversationId?: string; relPath: string; complete: boolean }

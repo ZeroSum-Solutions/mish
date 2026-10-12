@@ -7,7 +7,7 @@ import { resetSessionModelApiFixture } from '../fixtures/session-model-api';
 // keeping historical rows visible during refresh belongs to a separate fix.
 
 import { act, cleanup, render, waitFor } from '@testing-library/react';
-import { buildWorkspacePermissions, type WorkspaceCollabContext } from '@open-design/contracts';
+import { buildWorkspacePermissions, type WorkspaceCollabContext } from '@mish/contracts';
 import { forwardRef, useImperativeHandle, useState, type ComponentProps, type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

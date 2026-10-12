@@ -43,12 +43,12 @@ case "$RELEASE_TARGET" in
     esac
 
     arch="${RELEASE_TARGET#mac_}"
-    source_dmg="$TOOLS_PACK_DIR/out/mac/namespaces/$RELEASE_NAMESPACE/dmg/Open Design-$RELEASE_NAMESPACE.dmg"
-    source_zip="$TOOLS_PACK_DIR/out/mac/namespaces/$RELEASE_NAMESPACE/zip/Open Design-$RELEASE_NAMESPACE.zip"
-    source_payload="$TOOLS_PACK_DIR/out/mac/namespaces/$RELEASE_NAMESPACE/payload/Open Design-$RELEASE_NAMESPACE-payload.zip"
-    versioned_dmg="open-design-$RELEASE_VERSION$RELEASE_ASSET_SUFFIX-mac-$arch.dmg"
-    versioned_zip="open-design-$RELEASE_VERSION$RELEASE_ASSET_SUFFIX-mac-$arch.zip"
-    versioned_payload="open-design-$RELEASE_VERSION$RELEASE_ASSET_SUFFIX-mac-$arch-payload.zip"
+    source_dmg="$TOOLS_PACK_DIR/out/mac/namespaces/$RELEASE_NAMESPACE/dmg/Mish-$RELEASE_NAMESPACE.dmg"
+    source_zip="$TOOLS_PACK_DIR/out/mac/namespaces/$RELEASE_NAMESPACE/zip/Mish-$RELEASE_NAMESPACE.zip"
+    source_payload="$TOOLS_PACK_DIR/out/mac/namespaces/$RELEASE_NAMESPACE/payload/Mish-$RELEASE_NAMESPACE-payload.zip"
+    versioned_dmg="mish-$RELEASE_VERSION$RELEASE_ASSET_SUFFIX-mac-$arch.dmg"
+    versioned_zip="mish-$RELEASE_VERSION$RELEASE_ASSET_SUFFIX-mac-$arch.zip"
+    versioned_payload="mish-$RELEASE_VERSION$RELEASE_ASSET_SUFFIX-mac-$arch-payload.zip"
 
     if [ ! -f "$source_dmg" ]; then
       echo "expected dmg not found at $source_dmg" >&2
@@ -95,8 +95,8 @@ releaseNotes: "$release_notes"
 EOF
     ;;
   linux_x64)
-    source_appimage="$TOOLS_PACK_DIR/out/linux/namespaces/$RELEASE_NAMESPACE/builder/Open Design-$RELEASE_NAMESPACE.AppImage"
-    versioned_appimage="open-design-$RELEASE_VERSION$RELEASE_ASSET_SUFFIX-linux-x64.AppImage"
+    source_appimage="$TOOLS_PACK_DIR/out/linux/namespaces/$RELEASE_NAMESPACE/builder/Mish-$RELEASE_NAMESPACE.AppImage"
+    versioned_appimage="mish-$RELEASE_VERSION$RELEASE_ASSET_SUFFIX-linux-x64.AppImage"
     if [ ! -f "$source_appimage" ]; then
       echo "expected AppImage not found at $source_appimage" >&2
       exit 1

@@ -9,12 +9,12 @@ import {
   invokeSidecar,
   stopSidecar,
   type SidecarStamp,
-} from "@open-design/sidecar";
+} from "@mish/sidecar";
 import {
   createStandaloneGenerationBinding,
   sha256Hex,
   type GenerationRecord,
-} from "@open-design/standalone";
+} from "@mish/standalone";
 
 import { repoRoot, terminalRoot } from "./helpers.js";
 

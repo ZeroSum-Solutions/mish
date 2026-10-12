@@ -364,17 +364,17 @@ the active-run staging implementation is in
   Harness Web UI for provider setup after installation:
 
   ```sh
-  curl -fsSL 'https://open-design.ai/install-dsh.sh?version=1' | sh
+  curl -fsSL 'https://github.com/ZeroSum-Solutions/mish/install-dsh.sh?version=1' | sh
   ```
 
   ```powershell
-  & ([scriptblock]::Create((irm 'https://open-design.ai/install-dsh.ps1?version=1')))
+  & ([scriptblock]::Create((irm 'https://github.com/ZeroSum-Solutions/mish/install-dsh.ps1?version=1')))
   ```
 
   From Windows Command Prompt, the equivalent bootstrap is:
 
   ```bat
-  curl -fsSL "https://open-design.ai/install-dsh.cmd?version=1" -o "%TEMP%\install-dsh.cmd" && call "%TEMP%\install-dsh.cmd"
+  curl -fsSL "https://github.com/ZeroSum-Solutions/mish/install-dsh.cmd?version=1" -o "%TEMP%\install-dsh.cmd" && call "%TEMP%\install-dsh.cmd"
   ```
 
   Pass `--no-launch` to the downloaded POSIX script or `-NoLaunch` to the
@@ -382,18 +382,18 @@ the active-run staging implementation is in
   pin the exact versions in the adapter's compatibility policy and do not use
   a global npm install.
 - The adapter also requires a Mishh Mashh-owned Harness profile named
-  `open-design`. The package source lives at
+  `mish`. The package source lives at
   [`packages/dsh-runtime`](../packages/dsh-runtime). Packaged OD builds embed
   an exact tarball and SHA-256 manifest for this thin component; they do not
   depend on a public npm release at setup time. Repository developers may pack
   and install the same source manually:
 
   ```sh
-  pnpm --filter @open-design/dsh-runtime build
+  pnpm --filter @mish/dsh-runtime build
   pnpm -C packages/dsh-runtime pack --pack-destination <temporary-directory>
-  dsh plugin --profile open-design add <temporary-directory>/open-design-dsh-runtime-0.1.0.tgz
-  dsh --profile open-design --probe
-  dsh --profile open-design --models
+  dsh plugin --profile mish add <temporary-directory>/mish-dsh-runtime-0.1.0.tgz
+  dsh --profile mish --probe
+  dsh --profile mish --models
   ```
 
 - Detection first checks `dsh --version`, then requires the profile's strict
@@ -403,7 +403,7 @@ the active-run staging implementation is in
   confirmation installs the embedded component through the user's `dsh`,
   rescans, selects, and connection-tests it. Cancelling changes nothing. Only a
   missing `dsh` executable belongs in the installable-agent group.
-- Each OD run starts a fresh `dsh --profile open-design --stdio` process. The
+- Each OD run starts a fresh `dsh --profile mish --stdio` process. The
   JSONL profile protocol creates a Harness session on the first turn and cold
   resumes that exact session on later turns. This is profile-stdio resume, not
   a CLI resume flag and not ACP.
@@ -412,7 +412,7 @@ the active-run staging implementation is in
   existing watcher and artifact preview own delivery.
 - Phase one uses credentials already configured for Harness or inherited as
   `DEEPSEEK_API_KEY`; Mishh Mashh neither stores nor reads back the secret.
-- Model detection comes from `dsh --profile open-design --models`. Each model
+- Model detection comes from `dsh --profile mish --models`. Each model
   may expose its own reasoning-effort choices; OD validates and forwards only
   one of the choices advertised for that selected model.
 

@@ -19,7 +19,7 @@ import { mkdir, open, rename, rm } from 'node:fs/promises';
 import { realpathSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
-import { MCP_SECRET_MASK } from '@open-design/contracts';
+import { MCP_SECRET_MASK } from '@mish/contracts';
 import { McpCredentialFileError, readPrivateMcpFile } from './mcp-private-file.js';
 import { MOTIONSITES_MCP_TEMPLATE, MOTIONSITES_MCP_URL } from './motionsites/config.js';
 

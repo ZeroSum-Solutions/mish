@@ -141,7 +141,7 @@ server {
 }
 ```
 
-Set `OPEN_DESIGN_ALLOWED_ORIGINS` in `deploy/.env` to the public URL so CORS clears the proxy. The `OD_API_TOKEN` referenced in the Nginx block above is generated automatically by `deploy/scripts/install.sh` and written into `deploy/.env`; copy that value (or wire `proxy_set_header Authorization` to read it from a secrets manager) so the proxy authenticates on every request.
+Set `MISH_ALLOWED_ORIGINS` in `deploy/.env` to the public URL so CORS clears the proxy. The `OD_API_TOKEN` referenced in the Nginx block above is generated automatically by `deploy/scripts/install.sh` and written into `deploy/.env`; copy that value (or wire `proxy_set_header Authorization` to read it from a secrets manager) so the proxy authenticates on every request.
 
 ## Path B — Deploy to ACK
 
@@ -155,7 +155,7 @@ Mishh Mashh does not yet ship an official Helm chart. The minimal manifest below
 
 > **Required env for Kubernetes:** the daemon defaults to `OD_BIND_HOST=127.0.0.1`, which makes the readiness probe (and the Service) unable to reach the container. To make the Pod reachable inside the cluster you must set `OD_BIND_HOST=0.0.0.0`, and the daemon's bound-API-token guard then requires `OD_API_TOKEN` to be set whenever it binds to a non-loopback interface. Both env vars are reflected in the manifest below.
 >
-> Also note that the daemon reads `OD_ALLOWED_ORIGINS` directly. The `OPEN_DESIGN_ALLOWED_ORIGINS` name documented in `deploy/.env.example` is a Compose-only alias mapped in `deploy/docker-compose.yml`; for the direct-container ACK path you must set `OD_ALLOWED_ORIGINS` instead.
+> Also note that the daemon reads `OD_ALLOWED_ORIGINS` directly. The `MISH_ALLOWED_ORIGINS` name documented in `deploy/.env.example` is a Compose-only alias mapped in `deploy/docker-compose.yml`; for the direct-container ACK path you must set `OD_ALLOWED_ORIGINS` instead.
 
 Create the API-token secret first:
 
@@ -197,7 +197,7 @@ spec:
                   name: mishh-mashh-secrets
                   key: api-token            # required whenever OD_BIND_HOST is non-loopback
             - name: OD_ALLOWED_ORIGINS
-              value: "https://design.example.cn"  # set when fronting with an Ingress; daemon reads OD_*, not OPEN_DESIGN_*
+              value: "https://design.example.cn"  # set when fronting with an Ingress; daemon reads OD_*, not MISH_*
           # Storage volume mounts are intentionally omitted here.
           # Before adding them, you MUST read root AGENTS.md -> Daemon data directory contract.
           readinessProbe:
@@ -269,7 +269,7 @@ Mishh Mashh's daemon binds to `127.0.0.1:7456` and is never exposed directly. Pu
 
 1. A reverse proxy that terminates TLS (Nginx, Caddy, Alibaba Cloud SLB/ALB).
 2. An ICP-filed domain (for mainland regions).
-3. CORS allowlist set via `OPEN_DESIGN_ALLOWED_ORIGINS` (Compose / `deploy/.env` path) or `OD_ALLOWED_ORIGINS` (direct-container / Kubernetes path).
+3. CORS allowlist set via `MISH_ALLOWED_ORIGINS` (Compose / `deploy/.env` path) or `OD_ALLOWED_ORIGINS` (direct-container / Kubernetes path).
 
 See [`docs/install-guide.md`](../../install-guide.md) for the full topology and reverse-proxy guidance.
 
@@ -281,7 +281,7 @@ See [`docs/install-guide.md`](../../install-guide.md) for the full topology and 
 | HTTP/HTTPS to your domain is blocked | Domain not ICP-filed for a mainland region | Complete ICP filing, or move to a non-mainland region (HK/SG) |
 | `aliyun ecs RunInstances` fails with "Real-name authentication required" | Account not 实名认证 | Complete real-name verification in the account console |
 | ACK pods stuck in `ImagePullBackOff` from a private ACR repo | Cluster lacks pull credentials for the namespace | Create an `aliyun-acr-credential-helper` secret or use the cluster's ACR plugin |
-| 200 from `/api/health` but UI fails to load | CORS rejecting the proxied origin, **or** the reverse proxy not forwarding the bearer token (Compose always generates `OD_API_TOKEN`; only `/api/health`, `/api/version`, `/api/daemon/status` skip auth) | Set `OPEN_DESIGN_ALLOWED_ORIGINS` (Compose / `deploy/.env`) or `OD_ALLOWED_ORIGINS` (direct container / ACK) to the public URL, **and** add `proxy_set_header Authorization "Bearer <OD_API_TOKEN>"` to the Nginx / SLB upstream config |
+| 200 from `/api/health` but UI fails to load | CORS rejecting the proxied origin, **or** the reverse proxy not forwarding the bearer token (Compose always generates `OD_API_TOKEN`; only `/api/health`, `/api/version`, `/api/daemon/status` skip auth) | Set `MISH_ALLOWED_ORIGINS` (Compose / `deploy/.env`) or `OD_ALLOWED_ORIGINS` (direct container / ACK) to the public URL, **and** add `proxy_set_header Authorization "Bearer <OD_API_TOKEN>"` to the Nginx / SLB upstream config |
 | ACK Pod stuck in `NotReady`, readiness probe fails | Daemon defaulting to `OD_BIND_HOST=127.0.0.1` so the kubelet can't reach it | Set `OD_BIND_HOST=0.0.0.0` and `OD_API_TOKEN` in the Pod env (the daemon refuses non-loopback binds without a token) |
 | SLB health check fails | SLB hits `7456` but security group blocks intra-VPC | Allow the SLB backend CIDR on `7456/tcp` in the security group |
 

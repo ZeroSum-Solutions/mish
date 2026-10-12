@@ -1,4 +1,4 @@
-import { extractWebCloneTargetUrls } from '@open-design/contracts';
+import { extractWebCloneTargetUrls } from '@mish/contracts';
 
 import { assertPublicBrandUrl, type PublicUrlHostLookup } from './brands/safe-fetch.js';
 

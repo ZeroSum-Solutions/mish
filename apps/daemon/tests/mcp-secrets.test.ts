@@ -2,7 +2,7 @@
 // a mask is placed back on PUT.
 
 import { describe, expect, it } from 'vitest';
-import { MCP_SECRET_MASK as M } from '@open-design/contracts';
+import { MCP_SECRET_MASK as M } from '@mish/contracts';
 import { maskArgs, maskMcpServer, maskUrl, McpSecretMaskError, restoreMcpSecrets } from '../src/mcp-secrets.js';
 
 describe('opaque saved connection fields', () => {

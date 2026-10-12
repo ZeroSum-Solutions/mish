@@ -14,16 +14,16 @@ Mishh Mashh is a fork of an upstream project. The upstream network calls are off
 
 | What | Opt-in variable |
 |---|---|
-| Quality-trace relay (Langfuse) | `OPEN_DESIGN_TELEMETRY_RELAY_URL` |
-| AMR entry and profile analytics mirror | `OPEN_DESIGN_AMR_ANALYTICS_URL` |
+| Quality-trace relay (Langfuse) | `MISH_TELEMETRY_RELAY_URL` |
+| AMR entry and profile analytics mirror | `MISH_AMR_ANALYTICS_URL` |
 | Download-attribution ledger | `OD_ATTRIBUTION_LEDGER_URL` |
 | What's New card | `OD_WHATS_NEW_URL` |
 | Desktop updater | `OD_UPDATE_METADATA_URL` |
 
 Two upstream calls remain:
 
-- **AMR.** If you choose AMR sign-in or AMR model routing, the app calls `amr-api.open-design.ai`. AMR is an upstream service, not a ZeroSum service. Its own terms apply.
-- **Hosted preview images.** The visual-style picker and plugin previews load images from `repo-assets.open-design.ai`. The request shows your IP address to that host.
+- **AMR.** If you choose AMR sign-in or AMR model routing, the app calls `amr-api.mish.invalid`. AMR is an upstream service, not a ZeroSum service. Its own terms apply.
+- **Hosted preview images.** The visual-style picker and plugin previews load images from `repo-assets.mish.invalid`. The request shows your IP address to that host.
 
 The full record is in [`docs/legal/LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md), "Network defaults".
 

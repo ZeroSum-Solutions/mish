@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import {
   parseReviewRunList, parseReviewRunView, parseRunMechanicalReviewRequest, parseStartReviewRunRequest, parseVerificationBundle, parseVerificationBundleList, renderVerificationBundleText, resolveDefaultReviewEntry,
   type ReviewEvidenceLocale, type ReviewRunView, type StartReviewRunRequest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../daemon-url.js';
 import type { WorkbenchCliOptions } from '../workbench-cli.js';
 

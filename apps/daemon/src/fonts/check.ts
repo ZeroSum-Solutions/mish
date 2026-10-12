@@ -1,5 +1,5 @@
-import type { FontCheckResponse, ResourceResult } from '@open-design/contracts';
-import { parseFontCheckRequest } from '@open-design/contracts';
+import type { FontCheckResponse, ResourceResult } from '@mish/contracts';
+import { parseFontCheckRequest } from '@mish/contracts';
 import { parseUnicodeRanges, rangesContain, type FontCatalogueFamily } from './catalogue.js';
 import { fontRights } from './licence.js';
 

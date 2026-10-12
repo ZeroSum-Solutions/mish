@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Button, Input, Select } from '@open-design/components';
+import { Button, Input, Select } from '@mish/components';
 import {
   WORKBENCH_UNIT_KINDS, type ReusableUnitManifest, type UnitSavePlan, type UnitSaveRequest, type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useT } from '../../i18n';
 import { fetchProjectFiles } from '../../providers/registry';
 import { unitApi } from '../../providers/workbench-capture';

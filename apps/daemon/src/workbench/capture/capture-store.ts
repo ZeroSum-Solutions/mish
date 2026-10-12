@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { parseCaptureRecord, WORKBENCH_CAPTURE_ID_PATTERN, type CaptureRecord } from '@open-design/contracts';
+import { parseCaptureRecord, WORKBENCH_CAPTURE_ID_PATTERN, type CaptureRecord } from '@mish/contracts';
 
 const MAX_SCANNED = 2_000;
 

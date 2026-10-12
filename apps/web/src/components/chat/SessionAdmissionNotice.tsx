@@ -1,4 +1,4 @@
-import type { SessionRunAdmission, SessionExecutionChoice } from '@open-design/contracts';
+import type { SessionRunAdmission, SessionExecutionChoice } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { readSessionRunAdmission, sessionExecutionLabel } from '../../runtime/workbench/session-admission';
 import { Foldable } from './primitives/Foldable';

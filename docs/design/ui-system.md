@@ -197,7 +197,7 @@ show conditionally stay mounted and toggle a class so exits can play.
 
 ## 10. Components
 
-Reach for `@open-design/components` before writing markup:
+Reach for `@mish/components` before writing markup:
 
 | Component | Use |
 |---|---|

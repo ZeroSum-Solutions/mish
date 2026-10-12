@@ -234,8 +234,8 @@ page templates, and image/video/audio templates.
 **Accept when:**
 
 - Bundled first-party plugins live under `plugins/_official/<tier>/<id>/`; portable specification examples live under `plugins/spec/examples/<id>/` and are not treated as installed catalog entries.
-- Each portable plugin has a `SKILL.md`. Mishh Mashh display, input, preview, pipeline, capability, and source metadata lives in `open-design.json`, not in the portable skill body.
-- `open-design.json` conforms to `docs/schemas/open-design.plugin.v1.json` and references only supported atoms, design systems, craft docs, assets, scripts, MCP servers, or connectors.
+- Each portable plugin has a `SKILL.md`. Mishh Mashh display, input, preview, pipeline, capability, and source metadata lives in `mish.json`, not in the portable skill body.
+- `mish.json` conforms to `docs/schemas/mish.plugin.v1.json` and references only supported atoms, design systems, craft docs, assets, scripts, MCP servers, or connectors.
 - Plugin content stays portable and does not import app-private source.
 - Contribution-facing spec documentation updates its matching `*.zh-CN.md` mirror.
 - Validation follows `plugins/AGENTS.md`, including plugin-runtime typechecking and `od plugin validate` when the built CLI is available.
@@ -243,9 +243,9 @@ page templates, and image/video/audio templates.
 **Block when:**
 
 - A spec example is placed in the bundled registration subtree or described as auto-installed.
-- Mishh Mashh-only marketplace/runtime metadata is embedded in `SKILL.md` instead of `open-design.json`.
+- Mishh Mashh-only marketplace/runtime metadata is embedded in `SKILL.md` instead of `mish.json`.
 - The plugin imports app internals, bypasses supported extension points, or adds new runtime semantics without updating the plugin contract and consumers.
-- An enriched or bundled example lacks its skill, `open-design.json`, referenced assets, or required bilingual documentation update.
+- An enriched or bundled example lacks its skill, `mish.json`, referenced assets, or required bilingual documentation update.
 
 ### 4.7 Craft additions (`craft/`)
 
@@ -296,7 +296,7 @@ Review in this order. Each priority lists the concrete checks for it.
 
 - No committed secrets, API keys, or `media-config.json` content. No widening of credential storage scope without explicit need.
 - Logs do not leak credentials, tokens, or full prompt payloads.
-- Keep control-plane runtime state separate from daemon-owned data. Sidecar and `tools-dev` runtime/log state follows the namespace-scoped `.tmp/<source>/<namespace>/...` contract (with `tools-dev` logs under `.tmp/tools-dev/<namespace>/...`). Private IPC endpoints are derived by `@open-design/sidecar` from the five-field stamp and current OS principal; POSIX endpoints use a principal-scoped, hashed directory under the OS temporary directory, and callers must treat the concrete path as opaque.
+- Keep control-plane runtime state separate from daemon-owned data. Sidecar and `tools-dev` runtime/log state follows the namespace-scoped `.tmp/<source>/<namespace>/...` contract (with `tools-dev` logs under `.tmp/tools-dev/<namespace>/...`). Private IPC endpoints are derived by `@mish/sidecar` from the five-field stamp and current OS principal; POSIX endpoints use a principal-scoped, hashed directory under the OS temporary directory, and callers must treat the concrete path as opaque.
 - Daemon-owned data must derive from the daemon's already-resolved `RUNTIME_DATA_DIR`; subprocesses inherit that truth through `OD_DATA_DIR`. Review the root **Daemon data directory contract** instead of documenting or recomputing another concrete daemon data path.
 - For daemon, desktop, sidecar, path, log, or namespace changes, validate the relevant side of that split per `AGENTS.md`: resolved daemon data-root propagation for daemon data; concurrent namespaces, log-path inspection, and desktop `inspect eval`/`inspect screenshot` for control-plane state.
 
@@ -348,6 +348,6 @@ Concrete examples of PRs that should be closed under [Close instead of request c
 - **Domain-specific app smuggled in as tests.** A PR adding tests for a "Quranic Arabic Learning App" with selectors like `#dashboard`, `#exercise`, `.vocabulary-item`, `.arabic-word` when those surfaces are not part of Mishh Mashh — violates the "tests target real routes/DOM/APIs" rule.
 - **Standalone-app E2E URLs.** Playwright tests hard-coding `http://localhost:17573/index.html` instead of using the configured Mishh Mashh app flow — violates the "use the existing harness, base URL, and lifecycle conventions" rule.
 - **Tautological assertions.** `expect(count + exerciseCount).toBeGreaterThanOrEqual(0)` — violates the "test assertions provide real signal" rule.
-- **Ad hoc launcher script.** A new root script that hard-codes `~/projects/open-design`, assumes a user-specific tool such as `fnm`, or bypasses `pnpm tools-dev` — violates the "scripts use the documented control plane" rule and recreates a [Forbidden surface](#2-forbidden-surfaces).
+- **Ad hoc launcher script.** A new root script that hard-codes `~/projects/mish`, assumes a user-specific tool such as `fnm`, or bypasses `pnpm tools-dev` — violates the "scripts use the documented control plane" rule and recreates a [Forbidden surface](#2-forbidden-surfaces).
 
 A reasonable underlying intent (e.g. "we need RTL or Arabic coverage") does not justify keeping such a PR open. Ask for a fresh PR that exercises the actual Mishh Mashh app through the existing harness.

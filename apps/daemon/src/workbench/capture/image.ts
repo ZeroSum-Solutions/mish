@@ -1,4 +1,4 @@
-import type { CaptureRecord } from '@open-design/contracts';
+import type { CaptureRecord } from '@mish/contracts';
 
 export type RasterInfo = { mediaType: CaptureRecord['image']['mediaType']; width: number; height: number };
 

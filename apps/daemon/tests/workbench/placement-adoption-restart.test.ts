@@ -7,7 +7,7 @@ import { createHash, createHmac, randomBytes } from 'node:crypto';
 import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { WORKBENCH_ADOPTION_ROOT_RECORD } from '@open-design/contracts';
+import { WORKBENCH_ADOPTION_ROOT_RECORD } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchAdoptionRoutes } from '../../src/routes/workbench-adoption.js';
 import { canonicalJson } from '../../src/workbench/placement/adoption-plan.js';

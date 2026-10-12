@@ -4,11 +4,11 @@ import { access, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promise
 import path from 'node:path';
 import { promisify } from 'node:util';
 
-import { createPackageManagerInvocation } from '@open-design/platform';
+import { createPackageManagerInvocation } from '@mish/platform';
 import type {
   AgentCompanionSetupAction,
   AgentCompanionSetupResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { agentCliEnvForAgent, readAppConfig } from './app-config.js';
 import { detectAgent } from './runtimes/detection.js';
@@ -17,14 +17,14 @@ import { execAgentFile } from './runtimes/invocation.js';
 import { applyAgentLaunchEnv, resolveAgentLaunch } from './runtimes/launch.js';
 import { getAgentDef } from './runtimes/registry.js';
 import {
-  hasOpenDesignProfile,
-  resolveOpenDesignProfileDir,
+  hasMishProfile,
+  resolveMishProfileDir,
 } from './runtimes/defs/deepseek-harness.js';
 
 const execFileAsync = promisify(execFile);
 const DSH_AGENT_ID = 'deepseek-harness';
 const DSH_RUNTIME_RESOURCE_DIRECTORY = path.join('agent-runtimes', 'deepseek-harness');
-const DSH_RUNTIME_PACKAGE_NAME = '@open-design/dsh-runtime';
+const DSH_RUNTIME_PACKAGE_NAME = '@mish/dsh-runtime';
 
 type RuntimeManifest = {
   file: string;
@@ -151,9 +151,9 @@ async function stageVerifiedBundleInProfile(
   manifest: RuntimeManifest,
   bytes: Buffer,
 ): Promise<string> {
-  const relativeDirectory = '.open-design';
+  const relativeDirectory = '.mish';
   const file = `${manifest.sha256}.tgz`;
-  const profileDirectory = resolveOpenDesignProfileDir(env);
+  const profileDirectory = resolveMishProfileDir(env);
   const bundleDirectory = path.join(profileDirectory, relativeDirectory);
   await mkdir(bundleDirectory, { recursive: true });
   await writeFile(path.join(bundleDirectory, file), bytes);
@@ -224,12 +224,12 @@ async function installDeepSeekHarnessCompanionOnce(options: {
     spawnEnvForAgent(DSH_AGENT_ID, process.env, configuredEnv),
     launch,
   );
-  const profileWasPresent = hasOpenDesignProfile(childEnv);
+  const profileWasPresent = hasMishProfile(childEnv);
   const packageSpec = await stageVerifiedBundleInProfile(childEnv, manifest, bytes);
   try {
     await execAgentFile(
       launch.launchPath,
-      ['plugin', '--profile', 'open-design', 'add', packageSpec],
+      ['plugin', '--profile', 'mish', 'add', packageSpec],
       { env: childEnv, timeout: 120_000, maxBuffer: 2 * 1024 * 1024 },
     );
   } catch (error) {

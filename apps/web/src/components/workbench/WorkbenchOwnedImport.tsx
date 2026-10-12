@@ -1,6 +1,6 @@
 import { useEffect, useId, useState, type InputHTMLAttributes } from 'react';
-import { Button, Input, Select } from '@open-design/components';
-import type { OwnedImportRecord, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button, Input, Select } from '@mish/components';
+import type { OwnedImportRecord, WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { createOwnedImport, listOwnedImports } from '../../providers/workbench-owned-imports';
 import { WorkbenchRequestError } from '../../providers/workbench';

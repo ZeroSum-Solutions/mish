@@ -7,12 +7,12 @@ import {
   isModelWindowLimitFailure,
   readMembershipConcurrencyResetAt,
   readModelWindowResetAt,
-} from '@open-design/contracts';
-import type { RunFailureAction } from '@open-design/contracts';
+} from '@mish/contracts';
+import type { RunFailureAction } from '@mish/contracts';
 import { byokApiKeyIsEditableInSettings } from '../utils/byokProvider';
 
 // AMR model-gateway console (account, balance, top-up, plans).
-// `source=open_design` tags the landing page_view so vela analytics can
+// `source=mish` tags the landing page_view so vela analytics can
 // attribute the visit to Mishh Mashh (per-product revenue/traffic attribution).
 //
 // The console's dashboard — not a wallet page — is the account surface every
@@ -22,13 +22,13 @@ import { byokApiKeyIsEditableInSettings } from '../utils/byokProvider';
 // (vela #1055), so sending a user to /wallet would drop them on a surface the
 // product no longer navigates to.
 export const AMR_CONSOLE_URL =
-  'https://open-design.ai/amr/dashboard?source=open_design';
+  'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?source=mish';
 export const DEFAULT_AMR_RECHARGE_URL = AMR_CONSOLE_URL;
 export const AMR_RECHARGE_URL = DEFAULT_AMR_RECHARGE_URL;
 
 // Path + attribution the console is always reached through, so a runtime
 // origin only has to carry the host.
-const AMR_CONSOLE_PATH = '/dashboard?source=open_design';
+const AMR_CONSOLE_PATH = '/dashboard?source=mish';
 
 /**
  * The console's `billing=<intent>` value that means "open the upgrade surface
@@ -80,7 +80,7 @@ export const AMR_CONSOLE_UPGRADE_INTENT = 'plan';
 export const AMR_CONSOLE_AUTO_RECHARGE_INTENT = 'auto-recharge';
 
 // The test entry moved off `vela.powerformer.net` onto
-// `open-design.powerformer.net/cloud` when vela cut the test Cloud domain over
+// `mish.powerformer.net/cloud` when vela cut the test Cloud domain over
 // (vela #1922 prepare, #1929 finalize). That host serves the test Landing page
 // at `/` and routes `/cloud*` to the AMR web origin; the legacy hostname is no
 // longer a mapped test route and must not be relied on for a redirect.
@@ -90,8 +90,8 @@ export const AMR_CONSOLE_AUTO_RECHARGE_INTENT = 'auto-recharge';
 // it arrives through the daemon's runtime console origin instead.
 const AMR_CONSOLE_URL_BY_PROFILE: Record<string, string> = {
   prod: DEFAULT_AMR_RECHARGE_URL,
-  test: 'https://open-design.powerformer.net/cloud/dashboard?source=open_design',
-  local: 'http://localhost:5173/dashboard?source=open_design',
+  test: 'https://mish.powerformer.net/cloud/dashboard?source=mish',
+  local: 'http://localhost:5173/dashboard?source=mish',
 };
 
 // Every AMR profile the packaged runtime can be built with (mirrors the daemon's

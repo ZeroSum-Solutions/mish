@@ -20,10 +20,10 @@ import type {
   AgencyBuildSnapshot,
   AgencyFamiliesResponse,
   AgencyFamilySectionsResponse,
-} from '@open-design/contracts';
-import { applyJsonPatch, type JsonPatchOp } from '@open-design/agui-adapter';
-import { familyRegistry } from '@open-design/agency-fast-lane/data';
-import type { BuildEvent, BuildInput, BuildResult } from '@open-design/agency-fast-lane/build';
+} from '@mish/contracts';
+import { applyJsonPatch, type JsonPatchOp } from '@mish/agui-adapter';
+import { familyRegistry } from '@mish/agency-fast-lane/data';
+import type { BuildEvent, BuildInput, BuildResult } from '@mish/agency-fast-lane/build';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

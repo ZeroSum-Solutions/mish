@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { SOURCE_OPERATIONS, connectorResourceRef, parseConnectorDetailResponse, parseConnectorSearchResponse, parseRightsAssessment } from '@open-design/contracts';
+import { SOURCE_OPERATIONS, connectorResourceRef, parseConnectorDetailResponse, parseConnectorSearchResponse, parseRightsAssessment } from '@mish/contracts';
 import { writeMcpConfig } from '../../src/mcp-config.js';
 import { getToken, setToken } from '../../src/mcp-tokens.js';
 import { sendApiError } from '../../src/http/api-errors.js';

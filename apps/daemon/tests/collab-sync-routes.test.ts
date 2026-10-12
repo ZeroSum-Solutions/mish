@@ -19,7 +19,7 @@ import {
   parseUnitInsertRequest,
   parseUnitSaveRequest,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { runVelaResourceCommand } from '../src/collab/vela-cli-resource-adapter.js';
 import {
   createCollabRuntime,
@@ -2980,7 +2980,7 @@ describe('collab sync routes', () => {
     tempDirs.push(dir);
     await mkdir(path.join(dir, '.od-skills', 'fs-emerald'), { recursive: true });
     await writeFile(
-      path.join(dir, '.od-skills', 'fs-emerald', 'open-design.json'),
+      path.join(dir, '.od-skills', 'fs-emerald', 'mish.json'),
       JSON.stringify({ title: 'Emerald Editorial', name: 'example-fs-emerald-editorial' }),
     );
 
@@ -3004,7 +3004,7 @@ describe('collab sync routes', () => {
     tempDirs.push(dir);
     await mkdir(path.join(dir, '.od-skills', 'fs-emerald'), { recursive: true });
     await writeFile(
-      path.join(dir, '.od-skills', 'fs-emerald', 'open-design.json'),
+      path.join(dir, '.od-skills', 'fs-emerald', 'mish.json'),
       JSON.stringify({ title: 'Emerald Editorial' }),
     );
 

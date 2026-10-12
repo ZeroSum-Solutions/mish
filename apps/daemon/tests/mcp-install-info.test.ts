@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import express from 'express';
-import { SIDECAR_ENV } from '@open-design/sidecar-proto';
+import { SIDECAR_ENV } from '@mish/sidecar-proto';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { isLocalSameOrigin } from '../src/origin-validation.js';
 import { buildMcpInstallPayload } from '../src/mcp-install-info.js';
@@ -309,7 +309,7 @@ describe('GET /api/mcp/install-info', () => {
 
   it('pins the packaged headless bootstrap in the installed MCP config', async () => {
     const bootstrapArgs =
-      '["-g","-j","/Applications/Open Design.app","--args","--headless"]';
+      '["-g","-j","/Applications/Mish.app","--args","--headless"]';
     const { port, server } = await startHarness(
       cliPath,
       {
@@ -361,7 +361,7 @@ describe('GET /api/mcp/install-info', () => {
       cliPath,
       {
         [SIDECAR_ENV.NAMESPACE]: 'foo',
-        OD_UNRELATED_RUNTIME_HINT: '/var/run/open-design',
+        OD_UNRELATED_RUNTIME_HINT: '/var/run/mish',
       },
       dataDir,
     );

@@ -350,7 +350,7 @@
       stopBusy();
       if (!res || !res.ok) {
         toast(res && res.error === 'not running'
-          ? t('openDesignStartApp')
+          ? t('mishStartApp')
           : t('failed', { error: (res && res.error) || t('unknown') }));
         return;
       }
@@ -834,7 +834,7 @@
     stopBusy();
     if (!res || !res.ok) {
       toast(res && res.error === 'not running'
-        ? t('openDesignStartApp')
+        ? t('mishStartApp')
         : t('failed', { error: (res && res.error) || t('unknown') }));
       return;
     }
@@ -1295,7 +1295,7 @@
       stopBusy();
       if (!res || !res.ok) {
         toast(res && res.error === 'not running'
-          ? t('openDesignStartApp')
+          ? t('mishStartApp')
           : t('failed', { error: (res && res.error) || t('unknown') }));
         return;
       }
@@ -1441,7 +1441,7 @@
     stopBusy();
     if (!res || !res.ok) {
       toast(res && res.error === 'not running'
-        ? t('openDesignStartApp')
+        ? t('mishStartApp')
         : t('failed', { error: (res && res.error) || t('unknown') }));
       return;
     }
@@ -1499,7 +1499,7 @@
         <button class="badge" id="b" type="button" aria-label="${esc(t('saveImageToLibrary'))}">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         </button>
-        <span class="tip">${esc(t('saveImageToOpenDesign'))}</span>
+        <span class="tip">${esc(t('saveImageToMish'))}</span>
       </div>`);
     document.documentElement.appendChild(imgBadgeHost);
     imgBadgeBtn = sh.getElementById('b');
@@ -1532,7 +1532,7 @@
       }
       if (!res || !res.ok) {
         toast(res && res.error === 'not running'
-          ? t('openDesignStartApp')
+          ? t('mishStartApp')
           : t('failed', { error: (res && res.error) || t('unknown') }));
         return;
       }

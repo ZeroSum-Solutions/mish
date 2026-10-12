@@ -14,7 +14,7 @@ import {
   type BuildOnBrandRequest,
   type BuildOnBrandResult,
   type SiteCheckResult,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /** Exit codes (spec §CLI). */
 export const BUILD_ON_BRAND_EXIT = {

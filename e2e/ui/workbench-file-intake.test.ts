@@ -158,8 +158,8 @@ async function trayNeverOverlapsComposerOrHeader(page: Page, locale: 'en', close
  test.setTimeout(T.xlong);
  if (locale !== 'en') {
   await page.addInitScript((nextLocale) => {
-   window.localStorage.setItem('open-design:locale', nextLocale);
-   window.localStorage.setItem('open-design:locale-source', 'manual');
+   window.localStorage.setItem('mish:locale', nextLocale);
+   window.localStorage.setItem('mish:locale-source', 'manual');
   }, locale);
  }
  await routeMockAgents(page); await routeAppConfig(page);
@@ -191,7 +191,7 @@ async function trayNeverOverlapsComposerOrHeader(page: Page, locale: 'en', close
    if (window !== window.top) return;
    const config = JSON.parse(window.localStorage.getItem(key) ?? '{}');
    window.localStorage.setItem(key, JSON.stringify({ ...config, pet }));
-   window.localStorage.setItem('open-design:pet-position', JSON.stringify({ right: 24, bottom: 24 }));
+   window.localStorage.setItem('mish:pet-position', JSON.stringify({ right: 24, bottom: 24 }));
   }, { key: STORAGE_KEY, pet });
   await page.route('**/api/app-config', async route => {
    if (route.request().method() !== 'GET') return route.continue();

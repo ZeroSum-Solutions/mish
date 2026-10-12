@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { SOURCE_OPERATIONS, parseRightsAssessment } from '@open-design/contracts';
+import { SOURCE_OPERATIONS, parseRightsAssessment } from '@mish/contracts';
 import { ACETERNITY_FREE_RIGHTS_ASSESSMENTS, ACETERNITY_RIGHTS_EVIDENCE, OWNER_DECISION_EVIDENCE } from '../../src/workbench/aceternity-rights.js';
 import { ACETERNITY_ITEMS } from '../../src/workbench/reference-sources.js';
 

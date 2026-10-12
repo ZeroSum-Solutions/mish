@@ -14,7 +14,7 @@ import type {
   PointerEvent as ReactPointerEvent,
   ReactNode,
 } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { tForLanguageTag, useT } from '../i18n';
 import type { DirectionCard, FormOption, QuestionForm } from '../artifacts/question-form';
 import {
@@ -765,7 +765,7 @@ export const QuestionFormView = forwardRef<QuestionFormHandle, Props>(function Q
            * 换到 direction-cards 里?」)。
            *
            * 目录是**产品自己的功能**:每个 context 一沓真预览图,共 96 张,住在 R2
-           * (`repo-assets.open-design.ai/style-catalog/v1/`)。而模型**现开**的
+           * (`repo-assets.mish.invalid/style-catalog/v1/`)。而模型**现开**的
            * `direction-cards` 没有素材 —— 预览面只能画占位块,用户看到的就是几张
            * 「纯色卡」。同一件事(选视觉方向)不该有真图和占位块两副样子。
            *

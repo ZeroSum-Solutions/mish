@@ -5,11 +5,11 @@ import { join } from 'node:path';
 import { useLayoutEffect, useRef, useState, type ReactElement } from 'react';
 import { act, cleanup, createEvent, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { installMockOpenDesignHost } from '@open-design/host/testing';
+import { installMockMishHost } from '@mish/host/testing';
 import type {
-  OpenDesignHostPreviewNavigationFailure,
-  OpenDesignHostPreviewNavigationFailureListener,
-} from '@open-design/host';
+  MishHostPreviewNavigationFailure,
+  MishHostPreviewNavigationFailureListener,
+} from '@mish/host';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { ANNOTATION_EVENT } from '../../src/components/PreviewDrawOverlay';
 
@@ -108,7 +108,7 @@ import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /** A team workspace context — the only state that can address the resource hub,
  *  and therefore the only one where the public "Publish file" entry is offered. */
@@ -7372,7 +7372,7 @@ describe('FileViewer SVG artifacts', () => {
         exports: ['html'],
       },
     });
-    const restoreHost = installMockOpenDesignHost();
+    const restoreHost = installMockMishHost();
     const fetchMock = vi.fn(async (input: unknown) => {
       const url = typeof input === 'string'
         ? input
@@ -7430,7 +7430,7 @@ describe('FileViewer SVG artifacts', () => {
       mime: 'text/html',
       kind: 'html',
     });
-    const restoreHost = installMockOpenDesignHost();
+    const restoreHost = installMockMishHost();
     const fetchMock = vi.fn(async (input: unknown) => {
       const url = typeof input === 'string'
         ? input
@@ -9447,13 +9447,13 @@ describe('FileViewer tweaks toolbar', () => {
 
   it('keeps a verified srcDoc frame visible when Electron reports a late ERR_ABORTED', () => {
     vi.useFakeTimers();
-    let latestNavigationFailure: OpenDesignHostPreviewNavigationFailure | null = null;
-    let navigationFailureListener: OpenDesignHostPreviewNavigationFailureListener | null = null;
-    const emitNavigationFailure = (failure: OpenDesignHostPreviewNavigationFailure) => {
+    let latestNavigationFailure: MishHostPreviewNavigationFailure | null = null;
+    let navigationFailureListener: MishHostPreviewNavigationFailureListener | null = null;
+    const emitNavigationFailure = (failure: MishHostPreviewNavigationFailure) => {
       latestNavigationFailure = failure;
       navigationFailureListener?.(failure);
     };
-    const restoreHost = installMockOpenDesignHost({
+    const restoreHost = installMockMishHost({
       host: {
         preview: {
           getLatestNavigationFailure: () => latestNavigationFailure,
@@ -9529,8 +9529,8 @@ describe('FileViewer tweaks toolbar', () => {
 
   it('uses an exact active ERR_ABORTED to probe an unverified generation once', () => {
     vi.useFakeTimers();
-    let navigationFailureListener: OpenDesignHostPreviewNavigationFailureListener | null = null;
-    const restoreHost = installMockOpenDesignHost({
+    let navigationFailureListener: MishHostPreviewNavigationFailureListener | null = null;
+    const restoreHost = installMockMishHost({
       host: {
         preview: {
           subscribeNavigationFailure: (listener) => {
@@ -9578,8 +9578,8 @@ describe('FileViewer tweaks toolbar', () => {
 
   it('immediately recovers an exact active Mishh Mashh blob navigation abort', () => {
     vi.useFakeTimers();
-    let navigationFailureListener: OpenDesignHostPreviewNavigationFailureListener | null = null;
-    const restoreHost = installMockOpenDesignHost({
+    let navigationFailureListener: MishHostPreviewNavigationFailureListener | null = null;
+    const restoreHost = installMockMishHost({
       host: {
         preview: {
           subscribeNavigationFailure: (listener) => {
@@ -9625,8 +9625,8 @@ describe('FileViewer tweaks toolbar', () => {
 
   it('probes the active unverified frame when Electron loses the aborted frame name', () => {
     vi.useFakeTimers();
-    let navigationFailureListener: OpenDesignHostPreviewNavigationFailureListener | null = null;
-    const restoreHost = installMockOpenDesignHost({
+    let navigationFailureListener: MishHostPreviewNavigationFailureListener | null = null;
+    const restoreHost = installMockMishHost({
       host: {
         preview: {
           subscribeNavigationFailure: (listener) => {
@@ -9675,8 +9675,8 @@ describe('FileViewer tweaks toolbar', () => {
 
   it('keeps live edit styles on the replacement frame and replays them when its bridge becomes ready', async () => {
     vi.useFakeTimers();
-    let navigationFailureListener: OpenDesignHostPreviewNavigationFailureListener | null = null;
-    const restoreHost = installMockOpenDesignHost({
+    let navigationFailureListener: MishHostPreviewNavigationFailureListener | null = null;
+    const restoreHost = installMockMishHost({
       host: {
         preview: {
           subscribeNavigationFailure: (listener) => {

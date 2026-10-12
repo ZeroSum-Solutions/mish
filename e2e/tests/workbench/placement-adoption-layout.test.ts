@@ -6,7 +6,7 @@ import {
   WORKBENCH_ADOPTION_HELPER_LAYOUT,
   WORKBENCH_ADOPTION_HELPER_RECORD_SCHEMA,
   WORKBENCH_ADOPTION_ROOT_RECORD,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   PLACEMENT_ADOPTION_EXECUTOR_ENV,

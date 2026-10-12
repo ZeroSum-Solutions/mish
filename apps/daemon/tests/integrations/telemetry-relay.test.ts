@@ -1,28 +1,28 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  normalizeOpenDesignTelemetryRelayUrl,
-  OPEN_DESIGN_TELEMETRY_RELAY_URLS,
+  normalizeMishTelemetryRelayUrl,
+  MISH_TELEMETRY_RELAY_URLS,
 } from '../../src/integrations/telemetry-relay.js';
 
 describe('Mishh Mashh telemetry relay URLs', () => {
-  it('keeps production on telemetry.open-design.ai', () => {
-    expect(OPEN_DESIGN_TELEMETRY_RELAY_URLS.prod).toBe(
-      'https://telemetry.open-design.ai/api/langfuse',
+  it('keeps production on telemetry.mish.invalid', () => {
+    expect(MISH_TELEMETRY_RELAY_URLS.prod).toBe(
+      'https://telemetry.mish.invalid/api/langfuse',
     );
-    expect(normalizeOpenDesignTelemetryRelayUrl(
-      'https://telemetry.open-design.ai/api/langfuse//',
-    )).toBe(OPEN_DESIGN_TELEMETRY_RELAY_URLS.prod);
+    expect(normalizeMishTelemetryRelayUrl(
+      'https://telemetry.mish.invalid/api/langfuse//',
+    )).toBe(MISH_TELEMETRY_RELAY_URLS.prod);
   });
 
-  it('moves legacy self-host test URLs to telemetry-test.open-design.ai', () => {
-    expect(normalizeOpenDesignTelemetryRelayUrl(
-      'https://telemetry-selfhost.open-design.ai/api/langfuse/',
-    )).toBe(OPEN_DESIGN_TELEMETRY_RELAY_URLS.test);
+  it('moves legacy self-host test URLs to telemetry-test.mish.invalid', () => {
+    expect(normalizeMishTelemetryRelayUrl(
+      'https://telemetry-selfhost.mish.invalid/api/langfuse/',
+    )).toBe(MISH_TELEMETRY_RELAY_URLS.test);
   });
 
   it('leaves custom relay URLs unchanged', () => {
-    expect(normalizeOpenDesignTelemetryRelayUrl(
+    expect(normalizeMishTelemetryRelayUrl(
       'https://telemetry.example.test/api/langfuse/',
     )).toBe('https://telemetry.example.test/api/langfuse');
   });

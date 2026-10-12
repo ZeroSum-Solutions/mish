@@ -257,7 +257,7 @@ def event_payload():
 
 
 def run_gh(args):
-    override = os.environ.get("OPEN_DESIGN_GH_NODE_SCRIPT")
+    override = os.environ.get("MISH_GH_NODE_SCRIPT")
     command = (["node", override] if override else ["gh"]) + args
     return subprocess.run(command, check=True, text=True, stdout=subprocess.PIPE).stdout
 

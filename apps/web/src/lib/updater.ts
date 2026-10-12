@@ -1,25 +1,25 @@
 import {
-  OPEN_DESIGN_HOST_UPDATER_STATES,
+  MISH_HOST_UPDATER_STATES,
   checkHostUpdater,
   clearHostUpdaterCache,
   downloadHostUpdater,
   getHostUpdaterStatus,
   installHostUpdater,
-  isOpenDesignHostAvailable,
+  isMishHostAvailable,
   quitHostAfterUpdaterInstallerOpen,
   setHostUpdaterMenuLabels,
   subscribeHostUpdater,
   subscribeHostUpdaterOpenDialog,
-  type OpenDesignHostActionResult,
-  type OpenDesignHostFailure,
-  type OpenDesignHostUpdaterActionOptions,
-  type OpenDesignHostUpdaterMenuLabels,
-  type OpenDesignHostUpdaterOpenDialogListener,
-  type OpenDesignHostUpdaterReinstallSnapshot,
-  type OpenDesignHostUpdaterResult,
-  type OpenDesignHostUpdaterStatusListener,
-  type OpenDesignHostUpdaterStatusSnapshot,
-} from '@open-design/host';
+  type MishHostActionResult,
+  type MishHostFailure,
+  type MishHostUpdaterActionOptions,
+  type MishHostUpdaterMenuLabels,
+  type MishHostUpdaterOpenDialogListener,
+  type MishHostUpdaterReinstallSnapshot,
+  type MishHostUpdaterResult,
+  type MishHostUpdaterStatusListener,
+  type MishHostUpdaterStatusSnapshot,
+} from '@mish/host';
 
 export type UpdaterEnvironment = 'desktop' | 'web';
 
@@ -30,8 +30,8 @@ export type UpdaterDownloadProgress = {
 };
 
 export type UpdaterActionResult =
-  | { ok: true; model: UpdaterModel; status: OpenDesignHostUpdaterStatusSnapshot }
-  | OpenDesignHostFailure;
+  | { ok: true; model: UpdaterModel; status: MishHostUpdaterStatusSnapshot }
+  | MishHostFailure;
 
 export type UpdaterRestartSafety =
   | { activeRunCount: number; state: 'blocked' }
@@ -59,16 +59,16 @@ export type UpdaterModel = {
    * outdated installed outer package). UI copy priority: `reinstall.url`
    * jump link > default i18n reinstall copy.
    */
-  reinstall: OpenDesignHostUpdaterReinstallSnapshot | null;
+  reinstall: MishHostUpdaterReinstallSnapshot | null;
   requiresManualInstall: boolean;
   upToDate: boolean;
   shouldShowControl: boolean;
   shouldPrompt: boolean;
-  status: OpenDesignHostUpdaterStatusSnapshot | null;
+  status: MishHostUpdaterStatusSnapshot | null;
   supported: boolean;
 };
 
-function modelFromHostResult(result: OpenDesignHostUpdaterResult): UpdaterActionResult {
+function modelFromHostResult(result: MishHostUpdaterResult): UpdaterActionResult {
   if (!result.ok) return result;
   return {
     ok: true,
@@ -83,10 +83,10 @@ function clampPercent(value: number): number {
 }
 
 function downloadProgressFromStatus(
-  status: OpenDesignHostUpdaterStatusSnapshot | null,
+  status: MishHostUpdaterStatusSnapshot | null,
 ): UpdaterDownloadProgress | null {
   if (status == null) return null;
-  if (status.state !== OPEN_DESIGN_HOST_UPDATER_STATES.DOWNLOADING) return null;
+  if (status.state !== MISH_HOST_UPDATER_STATES.DOWNLOADING) return null;
   const sourceProgress = status.incoming?.progress ?? status.progress;
 
   const receivedBytes = Math.max(0, sourceProgress?.receivedBytes ?? 0);
@@ -103,16 +103,16 @@ function downloadProgressFromStatus(
 }
 
 export function deriveUpdaterModel(
-  status: OpenDesignHostUpdaterStatusSnapshot | null,
+  status: MishHostUpdaterStatusSnapshot | null,
   options: { hostAvailable?: boolean } = {},
 ): UpdaterModel {
-  const hostAvailable = options.hostAvailable ?? isOpenDesignHostAvailable();
+  const hostAvailable = options.hostAvailable ?? isMishHostAvailable();
   const environment: UpdaterEnvironment = hostAvailable ? 'desktop' : 'web';
   const state = status?.state;
   const busy =
-    state === OPEN_DESIGN_HOST_UPDATER_STATES.CHECKING ||
-    state === OPEN_DESIGN_HOST_UPDATER_STATES.DOWNLOADING ||
-    state === OPEN_DESIGN_HOST_UPDATER_STATES.INSTALLING;
+    state === MISH_HOST_UPDATER_STATES.CHECKING ||
+    state === MISH_HOST_UPDATER_STATES.DOWNLOADING ||
+    state === MISH_HOST_UPDATER_STATES.INSTALLING;
   const canOpenInstaller = Boolean(
     hostAvailable &&
     status?.enabled &&
@@ -127,7 +127,7 @@ export function deriveUpdaterModel(
   );
   const canInstallUpdate = canOpenInstaller || canApplyInPlace;
   const hasDownloadedInstaller = Boolean(
-    state === OPEN_DESIGN_HOST_UPDATER_STATES.DOWNLOADED &&
+    state === MISH_HOST_UPDATER_STATES.DOWNLOADED &&
     status?.downloadPath,
   );
   const installerOpened = status?.installResult != null;
@@ -136,7 +136,7 @@ export function deriveUpdaterModel(
   const availableVersion = status?.availableVersion ?? null;
   const currentVersion = status?.currentVersion ?? null;
   const downloadProgress = downloadProgressFromStatus(status);
-  const upToDate = state === OPEN_DESIGN_HOST_UPDATER_STATES.NOT_AVAILABLE;
+  const upToDate = state === MISH_HOST_UPDATER_STATES.NOT_AVAILABLE;
   const promptKey =
     status == null || availableVersion == null
       ? null
@@ -175,48 +175,48 @@ export function deriveUpdaterModel(
   };
 }
 
-export async function readUpdaterStatus(options?: OpenDesignHostUpdaterActionOptions): Promise<UpdaterActionResult> {
+export async function readUpdaterStatus(options?: MishHostUpdaterActionOptions): Promise<UpdaterActionResult> {
   return modelFromHostResult(await getHostUpdaterStatus(options));
 }
 
-export async function checkForUpdaterUpdate(options?: OpenDesignHostUpdaterActionOptions): Promise<UpdaterActionResult> {
+export async function checkForUpdaterUpdate(options?: MishHostUpdaterActionOptions): Promise<UpdaterActionResult> {
   return modelFromHostResult(await checkHostUpdater(options));
 }
 
-export async function downloadUpdaterUpdate(options?: OpenDesignHostUpdaterActionOptions): Promise<UpdaterActionResult> {
+export async function downloadUpdaterUpdate(options?: MishHostUpdaterActionOptions): Promise<UpdaterActionResult> {
   return modelFromHostResult(await downloadHostUpdater(options));
 }
 
-export async function openUpdaterInstaller(options?: OpenDesignHostUpdaterActionOptions): Promise<UpdaterActionResult> {
+export async function openUpdaterInstaller(options?: MishHostUpdaterActionOptions): Promise<UpdaterActionResult> {
   return modelFromHostResult(await installHostUpdater(options));
 }
 
-export async function clearUpdaterCache(options?: OpenDesignHostUpdaterActionOptions): Promise<UpdaterActionResult> {
+export async function clearUpdaterCache(options?: MishHostUpdaterActionOptions): Promise<UpdaterActionResult> {
   return modelFromHostResult(await clearHostUpdaterCache(options));
 }
 
 export async function quitAfterUpdaterInstallerOpen(
-  options?: OpenDesignHostUpdaterActionOptions,
-): Promise<OpenDesignHostActionResult> {
+  options?: MishHostUpdaterActionOptions,
+): Promise<MishHostActionResult> {
   return await quitHostAfterUpdaterInstallerOpen(options);
 }
 
-export function subscribeToUpdaterStatus(listener: OpenDesignHostUpdaterStatusListener): () => void {
+export function subscribeToUpdaterStatus(listener: MishHostUpdaterStatusListener): () => void {
   return subscribeHostUpdater(listener);
 }
 
-export function subscribeToUpdaterOpenDialog(listener: OpenDesignHostUpdaterOpenDialogListener): () => void {
+export function subscribeToUpdaterOpenDialog(listener: MishHostUpdaterOpenDialogListener): () => void {
   return subscribeHostUpdaterOpenDialog(listener);
 }
 
 export async function syncUpdaterMenuLabels(
-  labels: OpenDesignHostUpdaterMenuLabels,
-): Promise<OpenDesignHostActionResult> {
+  labels: MishHostUpdaterMenuLabels,
+): Promise<MishHostActionResult> {
   return await setHostUpdaterMenuLabels(labels);
 }
 
 export function restartSafetyFromUpdaterStatus(
-  status: OpenDesignHostUpdaterStatusSnapshot | null,
+  status: MishHostUpdaterStatusSnapshot | null,
 ): UpdaterRestartSafety | null {
   const code = status?.error?.code;
   if (code !== 'active-runs-blocked' && code !== 'active-runs-unknown') return null;
@@ -231,7 +231,7 @@ export function restartSafetyFromUpdaterStatus(
   return { activeRunCount: null, state: 'unknown' };
 }
 
-export function restartSafetyFromActionResult(result: OpenDesignHostActionResult): UpdaterRestartSafety | null {
+export function restartSafetyFromActionResult(result: MishHostActionResult): UpdaterRestartSafety | null {
   if (result.ok || (result.reason !== 'active-runs-blocked' && result.reason !== 'active-runs-unknown')) {
     return null;
   }

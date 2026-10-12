@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 // Client-side export helpers used by the Share menu in the HTML viewer.
 // Export formats run entirely in the browser:
 //   - PDF  : open the artifact in a popup window and trigger window.print().
@@ -15,7 +15,7 @@ import {
   findRealTagEnd,
   findRealTagOffset,
   HTML_TAG_PATTERNS,
-} from '@open-design/contracts/runtime/html-injection-points';
+} from '@mish/contracts/runtime/html-injection-points';
 
 import { buildSrcdoc, type SrcdocOptions } from './srcdoc';
 import { buildReactComponentSrcdoc } from './react-component';
@@ -24,10 +24,10 @@ import { isDaemonProxyConnectionFailure } from './daemon-proxy-failure';
 import { randomUUID } from '../utils/uuid';
 import {
   captureHostPage,
-  isOpenDesignHostAvailable,
+  isMishHostAvailable,
   printHostPdf,
-} from '@open-design/host';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+} from '@mish/host';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import {
   workspaceProjectHeaders,
   workspaceResourceUrl,
@@ -36,7 +36,7 @@ import { sourceHasLegacyDeckScreenSlides } from './deck-slide-structure';
 
 // Re-exported so app components can gate desktop-only export paths without
 // importing the host package directly.
-export { isOpenDesignHostAvailable } from '@open-design/host';
+export { isMishHostAvailable } from '@mish/host';
 
 const DESIGN_HANDOFF_FILENAME = 'DESIGN-HANDOFF.md';
 const DESIGN_MANIFEST_FILENAME = 'DESIGN-MANIFEST.json';
@@ -170,7 +170,7 @@ export function buildDesignManifestContent(opts: {
   const { files, htmlFiles, screenHtmlFiles, cssFiles, jsFiles, assetFiles, entryFile } = designFileMap(requestedEntryFile, opts.files);
   const screenFiles = screenHtmlFiles.length > 0 ? screenHtmlFiles : [entryFile];
   return JSON.stringify({
-    schema: 'open-design.design-manifest.v1',
+    schema: 'mish.design-manifest.v1',
     title,
     kind: opts.kind ?? 'html',
     entryFile,
@@ -483,7 +483,7 @@ export async function requestPreviewSnapshot(
 export async function captureHostRegionSnapshot(
   clipRect: { left: number; top: number; width: number; height: number } | null,
 ): Promise<PreviewSnapshot | null> {
-  if (!isOpenDesignHostAvailable()) return null;
+  if (!isMishHostAvailable()) return null;
   const clip = clipRect && clipRect.width >= 1 && clipRect.height >= 1
     ? {
         x: Math.max(0, Math.round(clipRect.left)),
@@ -1435,7 +1435,7 @@ export async function exportAsPdf(
   // omits allow-modals here because the native flow never calls
   // window.print(); granting it would let untrusted artifact code call
   // alert()/confirm() and stall the hidden Electron window indefinitely.
-  if (isOpenDesignHostAvailable()) {
+  if (isMishHostAvailable()) {
     if (sandboxedPreview) {
       doc = buildSandboxedPreviewDocument(doc, title);
     }

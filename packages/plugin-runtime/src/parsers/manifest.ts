@@ -1,8 +1,8 @@
 import {
-  OPEN_DESIGN_PLUGIN_SPEC_VERSION,
+  MISH_PLUGIN_SPEC_VERSION,
   PluginManifestSchema,
   type PluginManifest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 export interface ManifestParseSuccess {
   ok: true;
@@ -18,7 +18,7 @@ export interface ManifestParseFailure {
 
 export type ManifestParseResult = ManifestParseSuccess | ManifestParseFailure;
 
-// Read raw `open-design.json` text into a typed PluginManifest. The Zod
+// Read raw `mish.json` text into a typed PluginManifest. The Zod
 // schema is permissive (passthrough), so unknown forward-compatible fields
 // survive parse without complaint. Warnings carry adapter hints — e.g. a
 // claude-plugin sidecar that declared an unmappable capability.
@@ -30,7 +30,7 @@ export function parseManifest(raw: string): ManifestParseResult {
     return {
       ok: false,
       warnings: [],
-      errors: [`open-design.json is not valid JSON: ${(err as Error).message}`],
+      errors: [`mish.json is not valid JSON: ${(err as Error).message}`],
     };
   }
   return parseManifestObject(json);
@@ -48,7 +48,7 @@ export function parseManifestObject(value: unknown): ManifestParseResult {
   return {
     ok: true,
     manifest: {
-      specVersion: OPEN_DESIGN_PLUGIN_SPEC_VERSION,
+      specVersion: MISH_PLUGIN_SPEC_VERSION,
       ...result.data,
     },
     warnings: [],

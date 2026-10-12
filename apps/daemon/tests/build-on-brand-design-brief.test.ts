@@ -6,7 +6,7 @@ import type http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import express from 'express';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import type { DesignSystemSummary } from '@open-design/contracts';
+import type { DesignSystemSummary } from '@mish/contracts';
 
 import { registerBuildOnBrandRoutes, type BuildOnBrandStartInput } from '../src/routes/build-on-brand.js';
 import { sendApiError } from '../src/http/api-errors.js';

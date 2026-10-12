@@ -14,7 +14,7 @@ import {
   type CreateIntakeBatchRequest,
   type IntakeBatchSnapshot,
   type IntakeFilePutResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { WorkbenchIntake } from '../../src/components/WorkbenchIntake';
 import { IntakeStore } from '../../src/runtime/intake/intake-store';
 
@@ -2566,7 +2566,7 @@ describe('FileWorkspace launcher tab creation', () => {
       <FileWorkspace
         projectId="project-1"
         projectKind="prototype"
-        resolvedDir="/tmp/open-design/project-1"
+        resolvedDir="/tmp/mish/project-1"
         files={[]}
         liveArtifacts={[]}
         onRefreshFiles={vi.fn()}
@@ -2589,7 +2589,7 @@ describe('FileWorkspace launcher tab creation', () => {
       <FileWorkspace
         projectId="project-1"
         projectKind="prototype"
-        resolvedDir="/tmp/open-design/project-1"
+        resolvedDir="/tmp/mish/project-1"
         files={[workspaceFile('cover.html')]}
         liveArtifacts={[]}
         onRefreshFiles={vi.fn()}
@@ -2606,7 +2606,7 @@ describe('FileWorkspace launcher tab creation', () => {
         kind: 'design-files',
         label: 'Design Files',
         tabId: '__design_files__',
-        absolutePath: '/tmp/open-design/project-1',
+        absolutePath: '/tmp/mish/project-1',
       });
     });
   });
@@ -3263,7 +3263,7 @@ describe('DesignFilesPanel plugin folders', () => {
         projectId="project-1"
         projectKind="prototype"
         files={[
-          workspaceFile('generated-plugin/open-design.json'),
+          workspaceFile('generated-plugin/mish.json'),
           workspaceFile('generated-plugin/SKILL.md'),
           workspaceFile('generated-plugin/examples/demo.md'),
         ]}

@@ -26,14 +26,14 @@ import {
   type ComponentLedgerCohort,
   type ComponentLedgerRow,
   type ComponentState,
-} from '@open-design/contracts';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
-import { genuiCatalog } from '@open-design/genui-catalog/data';
-import type { CatalogEntry } from '@open-design/genui-catalog';
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
-import cultCatalogJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
-import twenty1stJson from '@open-design/21st-catalog/generated/21st-items.json' with { type: 'json' };
-import originalsJson from '@open-design/21st-catalog/generated/21st-originals.json' with { type: 'json' };
+} from '@mish/contracts';
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
+import { genuiCatalog } from '@mish/genui-catalog/data';
+import type { CatalogEntry } from '@mish/genui-catalog';
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
+import cultCatalogJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
+import twenty1stJson from '@mish/21st-catalog/generated/21st-items.json' with { type: 'json' };
+import originalsJson from '@mish/21st-catalog/generated/21st-originals.json' with { type: 'json' };
 import type { React95Kit } from './kits/react95/kit-types.js';
 import { react95UnitFiles } from './kits/react95/unit.js';
 import { REACT95_KIT } from './kits/react95/kit.generated.js';
@@ -101,7 +101,7 @@ function genuiRow(root: string, entry: CatalogEntry): ComponentLedgerRow {
       viewports: [...REVIEW_VIEWPORTS], reducedMotion: motion ? 'required' : 'not-applicable',
     },
     dependencies: [
-      ...(ported ? [{ name: '@open-design/genui-catalog runtime', kind: 'runtime' as const, version: null }] : []),
+      ...(ported ? [{ name: '@mish/genui-catalog runtime', kind: 'runtime' as const, version: null }] : []),
       ...(webgl ? [{ name: 'webgl', kind: 'capability' as const, version: null }] : []),
       ...[...new Set(upstream)].map(name => ({ name, kind: 'upstream-declared' as const, version: null })),
     ],

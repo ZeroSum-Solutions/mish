@@ -19,7 +19,7 @@ import {
   type PackInstallOutcome,
   type PackInstallPhase,
   type PackInstallRequest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { parseSseFrame } from '../providers/sse';
 

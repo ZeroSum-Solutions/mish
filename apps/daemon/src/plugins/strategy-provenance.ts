@@ -4,11 +4,11 @@ import {
   type AppliedStrategyBindingV2,
   type BundledStrategyDeclarationV2,
   type InstalledPluginRecord,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   normalizeStrategyAssetPath,
   strategyPackageHashFromDigests,
-} from '@open-design/plugin-runtime';
+} from '@mish/plugin-runtime';
 
 type StrategyProvenanceInput = Pick<InstalledPluginRecord, 'sourceKind' | 'manifest'>;
 
@@ -106,7 +106,7 @@ export function validateBundledStrategyActivationV2(
   }
 
   const expectedPaths = [
-    './open-design.json',
+    './mish.json',
     './SKILL.md',
     declaration.assets.core.path,
     declaration.assets.orchestration.path,

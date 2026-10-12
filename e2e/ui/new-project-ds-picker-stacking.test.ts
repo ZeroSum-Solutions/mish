@@ -13,7 +13,7 @@ import { routeAgents } from '../lib/playwright/mock-factory.js';
 // and cannot rise above later sibling sections. The fix lifts the OPEN
 // picker's stacking context above its siblings.
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 
 const AGENTS = [
   {
@@ -98,7 +98,7 @@ test.beforeEach(async ({ page }) => {
   await routeAgents(page, AGENTS);
 });
 
-test('[P1] open design system dropdown paints above the form sections below it', async ({
+test('[P1] mish system dropdown paints above the form sections below it', async ({
   page,
 }) => {
   // Wide enough that the entry rail is docked by default, matching the

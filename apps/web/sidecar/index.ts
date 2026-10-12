@@ -1,5 +1,5 @@
-import { APP_KEYS } from "@open-design/sidecar-proto";
-import { SidecarFactory, type SidecarClient } from "@open-design/sidecar";
+import { APP_KEYS } from "@mish/sidecar-proto";
+import { SidecarFactory, type SidecarClient } from "@mish/sidecar";
 
 import { startWebSidecar, type WebSidecarHandle } from "./server.js";
 

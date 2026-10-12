@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 import {
   parsePutProjectDesignContext, parsePutProjectRubric, parsePutWorkbenchPreferences,
   parseProjectDesignContextSnapshot, parseProjectRubricSnapshot, parseWorkbenchPreferencesSnapshot,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../daemon-url.js';
 import type { WorkbenchCliOptions } from '../workbench-cli.js';
 

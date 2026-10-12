@@ -38,7 +38,7 @@ beforeAll(async () => {
   const folder = join(fixtureRoot, USER_ID);
   await mkdir(join(folder, 'fonts'), { recursive: true });
   await writeFile(join(folder, 'fonts', 'Licensed.woff2'), 'wOF2-licensed');
-  await writeFile(join(folder, 'open-design.json'), JSON.stringify({
+  await writeFile(join(folder, 'mish.json'), JSON.stringify({
     name: USER_ID,
     title: 'User font fixture',
     version: '1.0.0',
@@ -84,7 +84,7 @@ it('lets an Origin: null GET/HEAD for a bundled official plugin font through the
 });
 
 it('refuses Origin: null for a non-font asset of a bundled official plugin', async () => {
-  for (const rel of ['SKILL.md', 'open-design.json']) {
+  for (const rel of ['SKILL.md', 'mish.json']) {
     const res = await fetch(assetUrl(BUNDLED_ID, rel), { headers: { Origin: 'null' } });
     expect(res.status, rel).toBe(403);
     expect(await res.json(), rel).toEqual(GUARD_ERROR);

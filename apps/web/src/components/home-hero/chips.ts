@@ -19,8 +19,8 @@
 //   - `action` — discriminated union the HomeView dispatcher matches
 //     on. The rail component itself stays presentational.
 
-import type { ProjectKind, ProjectMetadata } from '@open-design/contracts';
-import type { DefaultScenarioPluginId } from '@open-design/contracts';
+import type { ProjectKind, ProjectMetadata } from '@mish/contracts';
+import type { DefaultScenarioPluginId } from '@mish/contracts';
 import type { IconName } from '../Icon';
 
 // Plugin ids the chip rail can dispatch to. Most chips route to a
@@ -389,7 +389,7 @@ export function orderedCreateChips(): HomeHeroChip[] {
 // Cross-surface handoff: the workspace tabs-bar "+" fan picks a template
 // outside the hero; HomeHero listens for this window event and applies the
 // chip exactly as if its own template picker had been clicked.
-export const HOME_APPLY_TEMPLATE_EVENT = 'open-design:home-apply-template';
+export const HOME_APPLY_TEMPLATE_EVENT = 'mish:home-apply-template';
 
 // Helper used by tests + the rail component to pull the chip metadata
 // off a click target without round-tripping through React state.

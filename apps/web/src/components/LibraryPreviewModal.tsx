@@ -23,8 +23,8 @@ import { useI18n } from '../i18n';
 import { type CSSProperties, useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
-import { LIBRARY_UPLOAD_MAX_BYTES, type LibraryAsset } from '@open-design/contracts';
-import { Button } from '@open-design/components';
+import { LIBRARY_UPLOAD_MAX_BYTES, type LibraryAsset } from '@mish/contracts';
+import { Button } from '@mish/components';
 import { libraryAssetElementUrl, libraryAssetFigmaUrl, libraryAssetPreviewUrl, libraryAssetRawUrl } from '../providers/registry';
 import { modalOverlay, modalContent } from '../motion';
 import {

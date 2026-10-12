@@ -1,4 +1,4 @@
-import { reviewDecisionActorSchema, reviewFindingDecisionRequestSchema, reviewFindingDecisionProblem, type ReviewDecisionActor, type ReviewFindingDecisionAction, type ReviewRunView } from '@open-design/contracts';
+import { reviewDecisionActorSchema, reviewFindingDecisionRequestSchema, reviewFindingDecisionProblem, type ReviewDecisionActor, type ReviewFindingDecisionAction, type ReviewRunView } from '@mish/contracts';
 import type { ReviewRunStore } from './run-store.js';
 import { ReviewRunError } from './run-service.js';
 

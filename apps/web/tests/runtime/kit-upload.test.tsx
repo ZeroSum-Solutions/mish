@@ -6,7 +6,7 @@ import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 const registryMocks = vi.hoisted(() => ({
   fetchProjectFileText: vi.fn(),

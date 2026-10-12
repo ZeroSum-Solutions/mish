@@ -41,7 +41,7 @@ describe('resolveStandaloneServerEntry', () => {
   it('resolves the traced monorepo standalone server entry', async () => {
     const previousDistDir = process.env.OD_WEB_DIST_DIR;
     delete process.env.OD_WEB_DIST_DIR;
-    const webRoot = await mkdtemp(join(tmpdir(), 'open-design-web-standalone-'));
+    const webRoot = await mkdtemp(join(tmpdir(), 'mish-web-standalone-'));
     const nestedRoot = join(webRoot, '.next', 'standalone', 'apps', 'web');
     const fallbackRoot = join(webRoot, '.next', 'standalone');
 
@@ -65,8 +65,8 @@ describe('resolveStandaloneServerEntry', () => {
   it('prefers a copied standalone resource root before package fallback entries', async () => {
     const previousDistDir = process.env.OD_WEB_DIST_DIR;
     delete process.env.OD_WEB_DIST_DIR;
-    const webRoot = await mkdtemp(join(tmpdir(), 'open-design-web-package-'));
-    const copiedRoot = await mkdtemp(join(tmpdir(), 'open-design-web-copied-'));
+    const webRoot = await mkdtemp(join(tmpdir(), 'mish-web-package-'));
+    const copiedRoot = await mkdtemp(join(tmpdir(), 'mish-web-copied-'));
     const copiedWebRoot = join(copiedRoot, 'apps', 'web');
     const packageFallbackRoot = join(webRoot, '.next', 'standalone', 'apps', 'web');
 
@@ -89,7 +89,7 @@ describe('resolveStandaloneServerEntry', () => {
   });
 
   it('can resolve a copied standalone resource without a web package root', async () => {
-    const copiedRoot = await mkdtemp(join(tmpdir(), 'open-design-web-copied-only-'));
+    const copiedRoot = await mkdtemp(join(tmpdir(), 'mish-web-copied-only-'));
     const copiedWebRoot = join(copiedRoot, 'apps', 'web');
 
     try {
@@ -105,12 +105,12 @@ describe('resolveStandaloneServerEntry', () => {
 
 describe('createStandaloneServerArgs', () => {
   it('preloads a parent monitor before running the standalone server entry', () => {
-    const args = createStandaloneServerArgs('/tmp/open-design/server.js');
+    const args = createStandaloneServerArgs('/tmp/mish/server.js');
 
     expect(args).toHaveLength(3);
     expect(args[0]).toBe('--import');
     expect(args[1]).toBe(createStandaloneParentMonitorImport());
-    expect(args[2]).toBe('/tmp/open-design/server.js');
+    expect(args[2]).toBe('/tmp/mish/server.js');
   });
 
   it('uses a data import that exits when the recorded parent disappears', () => {
@@ -144,8 +144,8 @@ describe('standalone backend binding', () => {
     const previousOutputMode = process.env.OD_WEB_OUTPUT_MODE;
     const previousStandaloneRoot = process.env.OD_WEB_STANDALONE_ROOT;
     const previousStartupTimeout = process.env.OD_STANDALONE_STARTUP_TIMEOUT_MS;
-    const standaloneRoot = await mkdtemp(join(tmpdir(), 'open-design-web-slow-http-'));
-    const runtimeRoot = await mkdtemp(join(tmpdir(), 'open-design-web-runtime-'));
+    const standaloneRoot = await mkdtemp(join(tmpdir(), 'mish-web-slow-http-'));
+    const runtimeRoot = await mkdtemp(join(tmpdir(), 'mish-web-runtime-'));
     const fakeWebRoot = join(standaloneRoot, 'apps', 'web');
 
     try {
@@ -200,8 +200,8 @@ process.on('SIGTERM', () => server.close(() => process.exit(0)));
     const previousOutputMode = process.env.OD_WEB_OUTPUT_MODE;
     const previousStandaloneRoot = process.env.OD_WEB_STANDALONE_ROOT;
     const previousStartupTimeout = process.env.OD_STANDALONE_STARTUP_TIMEOUT_MS;
-    const standaloneRoot = await mkdtemp(join(tmpdir(), 'open-design-web-hijacked-port-'));
-    const runtimeRoot = await mkdtemp(join(tmpdir(), 'open-design-web-hijacked-runtime-'));
+    const standaloneRoot = await mkdtemp(join(tmpdir(), 'mish-web-hijacked-port-'));
+    const runtimeRoot = await mkdtemp(join(tmpdir(), 'mish-web-hijacked-runtime-'));
     const fakeWebRoot = join(standaloneRoot, 'apps', 'web');
     let handle: Awaited<ReturnType<typeof startWebSidecar>> | undefined;
 

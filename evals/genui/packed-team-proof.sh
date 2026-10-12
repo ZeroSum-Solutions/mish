@@ -8,18 +8,18 @@
 #
 # - Daemon CLI entry: `apps/daemon/bin/od.mjs` imports `apps/daemon/dist/cli.js` and THROWS if
 #   that dist file is missing, telling the caller to run `pnpm bootstrap` or
-#   `pnpm --filter @open-design/daemon build` first. So the daemon package must be BUILT (not
+#   `pnpm --filter @mish/daemon build` first. So the daemon package must be BUILT (not
 #   just installed) before `od.mjs` can run at all.
 #
 # - Minimal build chain: `apps/daemon/package.json`'s own `pretest` script is
-#     pnpm --filter '@open-design/daemon^...' --workspace-concurrency=4 --if-present run build
+#     pnpm --filter '@mish/daemon^...' --workspace-concurrency=4 --if-present run build
 #   (`^...` = the daemon's workspace dependencies, not the daemon itself — pretest exists because
 #   the daemon's OWN tests run against source via `tsx`/vitest, not its dist). We need the
 #   daemon's OWN dist too (see above), so this script drops the `^` and runs
-#     pnpm --filter '@open-design/daemon...' run build
-#   which builds the daemon AND everything it depends on — `@open-design/contracts`,
-#   `@open-design/registry-protocol`, `@open-design/agency-fast-lane`, `@open-design/platform`,
-#   `@open-design/sidecar`, etc. — each via its own `build` script, in dependency order. This is
+#     pnpm --filter '@mish/daemon...' run build
+#   which builds the daemon AND everything it depends on — `@mish/contracts`,
+#   `@mish/registry-protocol`, `@mish/agency-fast-lane`, `@mish/platform`,
+#   `@mish/sidecar`, etc. — each via its own `build` script, in dependency order. This is
 #   the same pnpm `--filter <pkg>...` idiom the repo's own scripts use (see also the root
 #   `package.json` `typecheck` script), not a bespoke chain — deliberately, since a bespoke list
 #   of "build these N packages in this order" rots the moment a new shared package is added.
@@ -31,7 +31,7 @@
 #   !isServerOutput`; `next build` sets `NODE_ENV=production` itself, and no
 #   `OD_WEB_OUTPUT_MODE` is set here, so a plain `next build` in `apps/web` is a static export to
 #   `out/` — exactly what the daemon looks for. So this script ALSO runs
-#     pnpm --filter '@open-design/web...' run build
+#     pnpm --filter '@mish/web...' run build
 #   (folded into the one pnpm invocation below via a second `--filter`, which pnpm unions with
 #   the first rather than running the build twice for shared deps).
 #
@@ -39,8 +39,8 @@
 #   `apps/daemon/src/server.ts`'s `RUNTIME_DATA_DIR` both key off `OD_DATA_DIR` (falls back to
 #   `<projectRoot>/.od`) — this is what isolates the SQLite DB, the plugin cache, and project
 #   files. `apps/daemon/src/deploy.ts`'s `deployConfigPath()` keys off `OD_USER_STATE_DIR`
-#   (falls back to `~/.open-design`) — deploy-provider tokens live there; unused by this proof
-#   but pointed at the temp clone anyway so nothing here can touch `~/.open-design` on this
+#   (falls back to `~/.mish`) — deploy-provider tokens live there; unused by this proof
+#   but pointed at the temp clone anyway so nothing here can touch `~/.mish` on this
 #   machine. Port: `apps/daemon/src/cli.ts`'s `runDaemonStart` reads `--port` then `OD_PORT`
 #   then 7456; host similarly via `OD_BIND_HOST` (default 127.0.0.1).
 #
@@ -260,14 +260,14 @@ if [ "$REQUIRED_FAILED" = "0" ]; then
 fi
 
 # ---- 3. Build what the daemon (+ the web root it serves) needs ------------------------------
-# See the header comment: this is `@open-design/daemon`'s own `pretest` filter pattern, widened
+# See the header comment: this is `@mish/daemon`'s own `pretest` filter pattern, widened
 # to include the daemon's own build (needed for `dist/cli.js` to exist) and unioned with
-# `@open-design/web` (needed for `apps/web/out` to exist, so the daemon has a web root to serve).
+# `@mish/web` (needed for `apps/web/out` to exist, so the daemon has a web root to serve).
 if [ "$REQUIRED_FAILED" = "0" ]; then
   run_step "pnpm build (daemon + web + their workspace deps)" \
     mise exec -C "$CLONE_DIR" -- pnpm \
-      --filter '@open-design/daemon...' \
-      --filter '@open-design/web...' \
+      --filter '@mish/daemon...' \
+      --filter '@mish/web...' \
       --workspace-concurrency=4 --if-present run build
 fi
 
@@ -285,7 +285,7 @@ DAEMON_URL=""
 if [ "$REQUIRED_FAILED" = "0" ]; then
   DAEMON_URL="http://127.0.0.1:$PORT"
   OD_DATA_DIR="$CLONE_DIR/.od-proof-data"
-  OD_USER_STATE_DIR="$CLONE_DIR/.open-design-proof-state"
+  OD_USER_STATE_DIR="$CLONE_DIR/.mish-proof-state"
   mkdir -p "$OD_DATA_DIR" "$OD_USER_STATE_DIR"
 
   # An exported DEEPSEEK_API_KEY wins (the daemon resolves env -> stored config -> vault);

@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3';
 import { createHash } from 'node:crypto';
-import { escapeTranscriptRoleDelimiters, sanitizePriorAssistantTurnForTranscript, type SessionRunAdmission } from '@open-design/contracts';
+import { escapeTranscriptRoleDelimiters, sanitizePriorAssistantTurnForTranscript, type SessionRunAdmission } from '@mish/contracts';
 import { getMessage, userRequestBeforeAssistantMessage } from '../db.js';
 import { scrubDsmlToolProtocolTail } from '../artifacts/text-suppression.js';
 import { normalizeRunContextSelection, renderRunContextPrompt } from '../runtimes/chat-run-context.js';

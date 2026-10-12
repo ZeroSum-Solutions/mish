@@ -54,7 +54,7 @@ function localAgentProfilesFile(): string | null {
   if (explicitPath) {
     return explicitPath;
   }
-  return path.join(homedir(), '.open-design', 'agents.local.json');
+  return path.join(homedir(), '.mish', 'agents.local.json');
 }
 
 function normalizeStringList(value: unknown): string[] {

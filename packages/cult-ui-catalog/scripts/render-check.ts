@@ -191,7 +191,7 @@ export function frozenPackageViolations(): { violations: Violation[]; syncedDirs
       const rel = relative(REPO_ROOT, file);
       if (/cult/i.test(name)) violations.push({ page: rel, category: 'frozen', detail: 'a Cult file inside a synchronized compiler copy' });
       else if (/\.(ts|js|mjs)$/.test(name) && /cult-ui-catalog/.test(readFileSync(file, 'utf8'))) {
-        violations.push({ page: rel, category: 'frozen', detail: 'a synchronized compiler file references @open-design/cult-ui-catalog' });
+        violations.push({ page: rel, category: 'frozen', detail: 'a synchronized compiler file references @mish/cult-ui-catalog' });
       }
     }
   };

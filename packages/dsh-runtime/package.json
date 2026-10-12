@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/dsh-runtime",
+  "name": "@mish/dsh-runtime",
   "version": "0.1.0",
   "description": "DeepSeek Harness profile runtime for Mishh Mashh",
   "license": "Apache-2.0",

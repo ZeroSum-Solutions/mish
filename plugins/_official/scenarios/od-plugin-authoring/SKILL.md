@@ -16,14 +16,14 @@ Produce a folder named `generated-plugin/` in the active project workspace.
 At minimum, the folder must contain:
 
 - `SKILL.md` with frontmatter and clear agent instructions.
-- `open-design.json` with valid plugin metadata, `od.kind`, mode, task kind, capabilities, and inputs when needed.
+- `mish.json` with valid plugin metadata, `od.kind`, mode, task kind, capabilities, and inputs when needed.
 
 Add `examples/`, `assets/`, or other supporting files only when they help the plugin be used or reviewed.
 
 ## Authoring rules
 
-- Follow `docs/plugins-spec.md` and the schema at `docs/schemas/open-design.plugin.v1.json`.
-- Treat `SKILL.md` as the canonical behavior description. `open-design.json` should describe how Mishh Mashh installs, applies, and presents that behavior.
+- Follow `docs/plugins-spec.md` and the schema at `docs/schemas/mish.plugin.v1.json`.
+- Treat `SKILL.md` as the canonical behavior description. `mish.json` should describe how Mishh Mashh installs, applies, and presents that behavior.
 - Keep the generated plugin local-user friendly: it should not require marketplace publishing, enterprise trust setup, or private team catalog configuration.
 - Choose a stable plugin id from the user's requested workflow. Use lowercase letters, numbers, dashes, underscores, or dots.
 - Include a short readiness summary when finished:
@@ -37,7 +37,7 @@ Add `examples/`, `assets/`, or other supporting files only when they help the pl
 ```text
 generated-plugin/
   SKILL.md
-  open-design.json
+  mish.json
   examples/
   assets/
 ```

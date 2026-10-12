@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   codexAgentDef,
-  codexOpenDesignShellEnvironmentArgs,
+  codexMishShellEnvironmentArgs,
 } from '../../src/runtimes/defs/codex.js';
 
 // codex is capture-style: it mints its own thread id (reported on the stream's
@@ -99,7 +99,7 @@ describe('codex buildArgs session resume', () => {
 
   it('carries only the Mishh Mashh wrapper contract across Codex shell environment filtering', () => {
     const args = codexAgentDef.buildArgs('prompt', [], [], {}, {});
-    const shellArgs = codexOpenDesignShellEnvironmentArgs();
+    const shellArgs = codexMishShellEnvironmentArgs();
 
     expect(args).toEqual(expect.arrayContaining(shellArgs));
     expect(shellArgs).toContain('allow_login_shell=false');

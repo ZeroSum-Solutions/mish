@@ -67,7 +67,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render as rtlRender, screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { ToolRow } from '../../../src/components/chat/primitives/ToolRow';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';

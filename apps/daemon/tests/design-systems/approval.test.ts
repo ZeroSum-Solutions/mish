@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { afterEach, expect, it } from 'vitest';
 import { listDesignSystems } from '../../src/design-systems/index.js';
-import { designSystemSelectability } from '@open-design/contracts';
+import { designSystemSelectability } from '@mish/contracts';
 
 let root = '';
 afterEach(async () => { if (root) await rm(root, { recursive: true, force: true }); });

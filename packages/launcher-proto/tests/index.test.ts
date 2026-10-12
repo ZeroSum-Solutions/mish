@@ -250,10 +250,10 @@ describe("launcher desktop handoff descriptors", () => {
     handoffId: "f5d4a712-8ba9-4c28-bcad-6dbed5db2d7c",
     namespace: "release-beta",
     outer: {
-      executablePath: process.platform === "win32" ? "C:\\Program Files\\Open Design Beta\\Open Design Beta.exe" : "/Applications/Open Design Beta.app/Contents/MacOS/Open Design Beta",
+      executablePath: process.platform === "win32" ? "C:\\Program Files\\Mish Beta\\Mish Beta.exe" : "/Applications/Mish Beta.app/Contents/MacOS/Mish Beta",
       pid: 4321,
     },
-    payloadExecutablePath: process.platform === "win32" ? "C:\\od-data\\payload\\Open Design Beta.exe" : "/tmp/od-data/payload/Open Design Beta.app/Contents/MacOS/Open Design Beta",
+    payloadExecutablePath: process.platform === "win32" ? "C:\\od-data\\payload\\Mish Beta.exe" : "/tmp/od-data/payload/Mish Beta.app/Contents/MacOS/Mish Beta",
     previous: { generation: 0, version: "0.8.1-beta.1" },
     schemaVersion: LAUNCHER_SCHEMA_VERSION,
     source: { generation: 1, version: "0.8.1-beta.2" },

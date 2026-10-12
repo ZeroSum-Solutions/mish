@@ -106,7 +106,7 @@ export type ProjectFileVersionSource = 'ai' | 'manual' | 'restore';
 export type ProjectFileVersionPromptSource = 'message' | 'project' | 'manual' | 'restore';
 
 export type ArtifactOriginEntrySurface =
-  | 'open_design_ui'
+  | 'mish_ui'
   | 'od_cli'
   | 'external_mcp'
   | 'unknown';
@@ -217,7 +217,7 @@ export interface ProjectExportManifestArtifact {
   updatedAt: string | null;
 }
 
-export const PROJECT_EXPORT_MANIFEST_SCHEMA = 'open-design.project-export-manifest.v1' as const;
+export const PROJECT_EXPORT_MANIFEST_SCHEMA = 'mish.project-export-manifest.v1' as const;
 
 export interface ProjectExportManifestResponse {
   schema: typeof PROJECT_EXPORT_MANIFEST_SCHEMA;

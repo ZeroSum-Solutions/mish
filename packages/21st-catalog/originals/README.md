@@ -51,12 +51,12 @@ The user supplied the saved collection and requested original reusable implement
 From the repository root:
 
 ```sh
-mise exec -- corepack pnpm --filter @open-design/21st-catalog originals
-mise exec -- corepack pnpm --filter @open-design/21st-catalog exec node --experimental-strip-types scripts/originals.ts --check
-mise exec -- corepack pnpm --filter @open-design/21st-catalog typecheck
-mise exec -- corepack pnpm --filter @open-design/21st-catalog exec node --experimental-strip-types --test tests/originals.test.ts tests/twenty-first.test.ts
-mise exec -- corepack pnpm --filter @open-design/daemon exec vitest run -c vitest.config.ts tests/twenty1st-routes.test.ts tests/twenty1st-cli.test.ts
-mise exec -- corepack pnpm --filter @open-design/web exec vitest run -c vitest.config.ts tests/components/CatalogView.21st.test.tsx
+mise exec -- corepack pnpm --filter @mish/21st-catalog originals
+mise exec -- corepack pnpm --filter @mish/21st-catalog exec node --experimental-strip-types scripts/originals.ts --check
+mise exec -- corepack pnpm --filter @mish/21st-catalog typecheck
+mise exec -- corepack pnpm --filter @mish/21st-catalog exec node --experimental-strip-types --test tests/originals.test.ts tests/twenty-first.test.ts
+mise exec -- corepack pnpm --filter @mish/daemon exec vitest run -c vitest.config.ts tests/twenty1st-routes.test.ts tests/twenty1st-cli.test.ts
+mise exec -- corepack pnpm --filter @mish/web exec vitest run -c vitest.config.ts tests/components/CatalogView.21st.test.tsx
 ```
 
 The generator reads only our source tree and public saved metadata. It embeds TypeScript-stripped browser modules as generated JSON compatibility output, with exact SHA256 CSP script/style hashes; it adds no tracked JavaScript files, framework, dependency, or network build step.

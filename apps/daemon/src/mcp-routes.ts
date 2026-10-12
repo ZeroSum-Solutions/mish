@@ -2,7 +2,7 @@ import { mcpTokenMatchesEndpoint } from './mcp-endpoint.js';
 import { sendInternalError } from './http/api-errors.js';
 import type { Express } from 'express';
 import fs from 'node:fs';
-import { SIDECAR_ENV } from '@open-design/sidecar-proto';
+import { SIDECAR_ENV } from '@mish/sidecar-proto';
 import { buildMcpInstallPayload, type McpInstallPayload } from './mcp-install-info.js';
 import { installCodexMcp, probeCodexInstall, uninstallCodexMcp } from './codex-cli.js';
 import { MCP_TEMPLATES, buildAcpMcpServers, buildClaudeMcpJson, isManagedProjectCwd, readMcpConfig, writeMcpConfig } from './mcp-config.js';
@@ -47,7 +47,7 @@ export function registerMcpRoutes(app: Express, ctx: RegisterMcpRoutesDeps) {
   function computeInstallPayload(): McpInstallPayload {
     const cliPath = OD_BIN;
     // Forward only the opaque inherited client capability. IPC endpoint
-    // naming and transport stay private to @open-design/sidecar.
+    // naming and transport stay private to @mish/sidecar.
     const sidecarEnv = inheritedEnvironment();
     const isSidecarMode = Object.keys(sidecarEnv).length > 0;
     const mcpBootstrapCommand = process.env.OD_MCP_BOOTSTRAP_COMMAND;
@@ -114,7 +114,7 @@ export function registerMcpRoutes(app: Express, ctx: RegisterMcpRoutesDeps) {
   // so we shell out to it rather than rewriting ~/.codex/config.toml
   // ourselves — that way we inherit Codex's merge / validation rules
   // and only need to track its argv. See apps/daemon/src/codex-cli.ts.
-  const CODEX_MCP_NAME = 'open-design';
+  const CODEX_MCP_NAME = 'mish';
 
   app.get('/api/mcp/install/codex/status', async (req, res) => {
     if (!isLocalSameOrigin(req, getResolvedPort())) {

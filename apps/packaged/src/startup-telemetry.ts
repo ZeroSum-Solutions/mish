@@ -55,7 +55,7 @@ export const STARTUP_FAILURE_EVENT = "packaged_runtime_failed";
 //
 // EVENT_SCHEMA_VERSION must stay in lockstep with
 // packages/contracts/src/analytics/public-params.ts. It is replicated (not
-// imported) because apps/packaged does not depend on @open-design/contracts and
+// imported) because apps/packaged does not depend on @mish/contracts and
 // a single integer isn't worth a new cross-package dependency that also
 // complicates the daemon-chunk externalization.
 const EVENT_SCHEMA_VERSION = 2;
@@ -71,13 +71,13 @@ const CAPTURE_SOURCE = "packaged/startup";
 // env=production dashboards. apps/packaged only ever runs as a packaged build,
 // so an unset NODE_ENV here means packaged production, not dev; treat anything
 // that isn't an explicit development marker as production so the two sides
-// match. Explicit overrides (OD_TELEMETRY_ENV / OPEN_DESIGN_ENV / POSTHOG_ENV /
+// match. Explicit overrides (OD_TELEMETRY_ENV / MISH_ENV / POSTHOG_ENV /
 // LANGFUSE_ENVIRONMENT) still win for anyone who needs to force a bucket
 // (e.g. a maintainer smoke-testing a local packaged build).
 function resolveTelemetryEnv(env: NodeJS.ProcessEnv = process.env): string {
   const explicit =
     env.OD_TELEMETRY_ENV?.trim() ||
-    env.OPEN_DESIGN_ENV?.trim() ||
+    env.MISH_ENV?.trim() ||
     env.POSTHOG_ENV?.trim() ||
     env.LANGFUSE_ENVIRONMENT?.trim();
   if (explicit) return explicit;
@@ -169,7 +169,7 @@ export function classifyStartupFailure(
 // A thrown-error headline in a log tail: `SqliteError: database disk image is
 // malformed`, `TypeError: x is not a function`, `Error [ERR_X]: …`. Anchored on
 // a leading identifier that ends in Error/Exception so stack frames (`    at …`)
-// and our own bracketed prefixes (`[open-design packaged] exited …`) never match.
+// and our own bracketed prefixes (`[mish packaged] exited …`) never match.
 const DAEMON_ERROR_LINE_RE =
   /^(?:\s*(?:Uncaught|Unhandled)\s+)?[A-Za-z_$][\w$]*(?:Error|Exception)(?:\s*\[[^\]]+\])?\s*:\s*.+$/;
 

@@ -1,4 +1,4 @@
-export const OPEN_DESIGN_BRIEF_ARTIFACT_TYPES = [
+export const MISH_BRIEF_ARTIFACT_TYPES = [
   'website',
   'product-prototype',
   'presentation',
@@ -9,17 +9,17 @@ export const OPEN_DESIGN_BRIEF_ARTIFACT_TYPES = [
   'design-system',
 ] as const;
 
-export type OpenDesignBriefArtifactType =
-  (typeof OPEN_DESIGN_BRIEF_ARTIFACT_TYPES)[number];
+export type MishBriefArtifactType =
+  (typeof MISH_BRIEF_ARTIFACT_TYPES)[number];
 
-export interface OpenDesignBriefOption {
+export interface MishBriefOption {
   /** Stable, unlocalized value submitted by Desktop and CLI hosts. */
   id: string;
   label: string;
   description: string;
 }
 
-export interface OpenDesignBriefQuestion {
+export interface MishBriefQuestion {
   /** Stable, artifact-qualified decision id. */
   id: string;
   label: string;
@@ -28,23 +28,23 @@ export interface OpenDesignBriefQuestion {
   required: true;
   allowCustom: false;
   defaultOptionId: string;
-  options: readonly OpenDesignBriefOption[];
+  options: readonly MishBriefOption[];
 }
 
-export type OpenDesignBriefAnswers = Readonly<Record<string, readonly string[]>>;
+export type MishBriefAnswers = Readonly<Record<string, readonly string[]>>;
 
-export interface OpenDesignBriefDecision {
-  artifactType: OpenDesignBriefArtifactType;
-  decisionSource: 'open-design-shared-brief-v1';
-  questions: readonly OpenDesignBriefQuestion[];
-  answers: OpenDesignBriefAnswers;
+export interface MishBriefDecision {
+  artifactType: MishBriefArtifactType;
+  decisionSource: 'mish-shared-brief-v1';
+  questions: readonly MishBriefQuestion[];
+  answers: MishBriefAnswers;
   summary: string;
   complete: boolean;
 }
 
-export interface CollectOpenDesignBriefInput {
-  artifactType: OpenDesignBriefArtifactType;
-  previousArtifactType?: OpenDesignBriefArtifactType;
+export interface CollectMishBriefInput {
+  artifactType: MishBriefArtifactType;
+  previousArtifactType?: MishBriefArtifactType;
   knownAnswers?: Readonly<Record<string, unknown>>;
   /**
    * Explicit "use recommended defaults" path. This is the deterministic
@@ -53,11 +53,11 @@ export interface CollectOpenDesignBriefInput {
   skip?: boolean;
 }
 
-export type OpenDesignBriefCatalog = Readonly<
-  Record<OpenDesignBriefArtifactType, readonly OpenDesignBriefQuestion[]>
+export type MishBriefCatalog = Readonly<
+  Record<MishBriefArtifactType, readonly MishBriefQuestion[]>
 >;
 
-function option(id: string, label: string, description: string): OpenDesignBriefOption {
+function option(id: string, label: string, description: string): MishBriefOption {
   return { id, label, description };
 }
 
@@ -66,8 +66,8 @@ function question(
   label: string,
   description: string,
   defaultOptionId: string,
-  options: readonly OpenDesignBriefOption[],
-): OpenDesignBriefQuestion {
+  options: readonly MishBriefOption[],
+): MishBriefQuestion {
   return {
     id,
     label,
@@ -81,7 +81,7 @@ function question(
 }
 
 function freezeBriefCatalog<
-  T extends Record<string, readonly OpenDesignBriefQuestion[]>,
+  T extends Record<string, readonly MishBriefQuestion[]>,
 >(catalog: T): T {
   for (const questions of Object.values(catalog)) {
     for (const item of questions) {
@@ -100,7 +100,7 @@ function freezeBriefCatalog<
  * localized later, but ids, ordering, defaults, and skip behavior are product
  * protocol.
  */
-export const openDesignBriefCatalog: OpenDesignBriefCatalog = freezeBriefCatalog({
+export const mishBriefCatalog: MishBriefCatalog = freezeBriefCatalog({
   website: [
     question(
       'website.goal',
@@ -383,8 +383,8 @@ export const openDesignBriefCatalog: OpenDesignBriefCatalog = freezeBriefCatalog
   ],
 });
 
-export function validateOpenDesignBriefCatalog(
-  catalog: OpenDesignBriefCatalog,
+export function validateMishBriefCatalog(
+  catalog: MishBriefCatalog,
 ): void {
   for (const [artifactType, questions] of Object.entries(catalog)) {
     if (questions.length > 5) {
@@ -413,10 +413,10 @@ export function validateOpenDesignBriefCatalog(
   }
 }
 
-validateOpenDesignBriefCatalog(openDesignBriefCatalog);
+validateMishBriefCatalog(mishBriefCatalog);
 
 function normalizedAnswer(
-  question: OpenDesignBriefQuestion,
+  question: MishBriefQuestion,
   value: unknown,
 ): readonly string[] | null {
   const answer = typeof value === 'string'
@@ -431,10 +431,10 @@ function normalizedAnswer(
 }
 
 function answerSummary(
-  artifactType: OpenDesignBriefArtifactType,
-  answers: OpenDesignBriefAnswers,
+  artifactType: MishBriefArtifactType,
+  answers: MishBriefAnswers,
 ): string {
-  const lines = openDesignBriefCatalog[artifactType]
+  const lines = mishBriefCatalog[artifactType]
     .map((item) => {
       const selected = answers[item.id]?.[0];
       const label = item.options.find((candidate) => candidate.id === selected)?.label;
@@ -444,10 +444,10 @@ function answerSummary(
   return lines.length > 0 ? lines.join('\n') : 'No Brief decisions have been confirmed yet.';
 }
 
-export function collectOpenDesignBrief(
-  input: CollectOpenDesignBriefInput,
-): OpenDesignBriefDecision {
-  const definitions = openDesignBriefCatalog[input.artifactType];
+export function collectMishBrief(
+  input: CollectMishBriefInput,
+): MishBriefDecision {
+  const definitions = mishBriefCatalog[input.artifactType];
   const source = input.knownAnswers ?? {};
   const answers: Record<string, readonly string[]> = {};
 
@@ -466,7 +466,7 @@ export function collectOpenDesignBrief(
   const immutableAnswers = Object.freeze({ ...answers });
   return Object.freeze({
     artifactType: input.artifactType,
-    decisionSource: 'open-design-shared-brief-v1',
+    decisionSource: 'mish-shared-brief-v1',
     questions: Object.freeze([...questions]),
     answers: immutableAnswers,
     summary: answerSummary(input.artifactType, immutableAnswers),
@@ -474,15 +474,15 @@ export function collectOpenDesignBrief(
   });
 }
 
-export function summarizeOpenDesignBrief(
-  artifactType: OpenDesignBriefArtifactType,
-  answers: OpenDesignBriefAnswers,
+export function summarizeMishBrief(
+  artifactType: MishBriefArtifactType,
+  answers: MishBriefAnswers,
 ): string {
   return answerSummary(artifactType, answers);
 }
 
-export function formatOpenDesignBriefForCli(
-  brief: OpenDesignBriefDecision,
+export function formatMishBriefForCli(
+  brief: MishBriefDecision,
   displayArtifactType: string = brief.artifactType,
 ): string {
   const lines = [

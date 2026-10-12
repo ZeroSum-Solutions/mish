@@ -35,7 +35,7 @@ runs:
         # headless with zero apt packages added), so the browser binary preinstalled into
         # PLAYWRIGHT_BROWSERS_PATH is genuinely sufficient — same contract as the ARC image.
         case "$RUNNER_LABELS_JSON" in
-          *'"nexu-runners-'*|*'"mishmash-aws"'*)
+          *'"mish-runners-'*|*'"mishmash-aws"'*)
             if [ -n "${PLAYWRIGHT_BROWSERS_PATH:-}" ] && [ -d "$PLAYWRIGHT_BROWSERS_PATH" ]; then
               chromium_bin="$(find "$PLAYWRIGHT_BROWSERS_PATH" -type f \
                 \( -name chrome -o -name chromium -o -name chrome-headless-shell \) \

@@ -9,7 +9,7 @@ import {
   DELIVERABLE_SYNTAX_CHECKER as CONTRACT_DELIVERABLE_SYNTAX_CHECKER,
   type DeliverableSyntaxCheckResult as ContractDeliverableSyntaxResult,
   type DeliverableSyntaxDiagnostic as ContractDeliverableSyntaxDiagnostic,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 export const DELIVERABLE_SYNTAX_CHECKER = CONTRACT_DELIVERABLE_SYNTAX_CHECKER;
 

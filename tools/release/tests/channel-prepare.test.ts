@@ -141,7 +141,7 @@ async function writeFakeGhScript(root: string): Promise<string> {
 }
 
 /**
- * Hermetic stand-in for the repository's `open-design-v*` tags. The prepare
+ * Hermetic stand-in for the repository's `mish-v*` tags. The prepare
  * scripts derive the latest-stable floor from `git tag --list`, so without
  * this the tests depend on whatever tags the local clone happens to have —
  * green on tagless CI checkouts, permanently red on any developer clone once
@@ -199,15 +199,15 @@ function stablePrereleaseMetadata(publicOrigin: string, baseVersion: string): Re
     github: {
       branch: `release/v${baseVersion}`,
       commit: "0123456789abcdef0123456789abcdef01234567",
-      repository: "nexu-io/open-design",
+      repository: "ZeroSum-Solutions/mish",
       workflow: "release-prerelease",
     },
     platforms: {
       mac: {
         arch: "arm64",
         artifacts: {
-          dmg: artifact("Open Design.dmg"),
-          zip: artifact("Open Design-mac-arm64.zip"),
+          dmg: artifact("Mish.dmg"),
+          zip: artifact("Mish-mac-arm64.zip"),
         },
         enabled: true,
         signed: true,
@@ -215,8 +215,8 @@ function stablePrereleaseMetadata(publicOrigin: string, baseVersion: string): Re
       macIntel: {
         arch: "x64",
         artifacts: {
-          dmg: artifact("Open Design Intel.dmg"),
-          zip: artifact("Open Design-mac-x64.zip"),
+          dmg: artifact("Mish Intel.dmg"),
+          zip: artifact("Mish-mac-x64.zip"),
         },
         enabled: true,
         signed: true,
@@ -224,7 +224,7 @@ function stablePrereleaseMetadata(publicOrigin: string, baseVersion: string): Re
       win: {
         arch: "x64",
         artifacts: {
-          installer: artifact("Open Design Setup.exe"),
+          installer: artifact("Mish Setup.exe"),
         },
         enabled: true,
       },
@@ -261,20 +261,20 @@ describe("tools-release local channel prepare validation", () => {
     try {
       const fakeGh = await writeFakeGhScript(ghRoot);
       const commonEnv = {
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
-        OPEN_DESIGN_GH_NODE_SCRIPT: fakeGh,
-        OPEN_DESIGN_STABLE_METADATA_URL: `${server.origin}/stable/latest/metadata.json`,
-        OPEN_DESIGN_STABLE_VERSION: packagedVersion,
+        MISH_GH_NODE_SCRIPT: fakeGh,
+        MISH_STABLE_METADATA_URL: `${server.origin}/stable/latest/metadata.json`,
+        MISH_STABLE_VERSION: packagedVersion,
         // Matches the stable fixture metadata above and keeps the tag-derived
         // latest-stable floor below any real packaged version.
-        ...(await createHermeticTagRepoEnv(["open-design-v0.9.0"])),
+        ...(await createHermeticTagRepoEnv(["mish-v0.9.0"])),
       };
 
       const beta = await runPrepare("beta", {
         ...commonEnv,
         GITHUB_REF_NAME: "main",
-        OPEN_DESIGN_BETA_METADATA_URL: `${server.origin}/beta/latest/metadata.json`,
+        MISH_BETA_METADATA_URL: `${server.origin}/beta/latest/metadata.json`,
       });
       expect(beta.stdout).toContain("[release-beta] channel: beta");
       expect(beta.outputs.release_version).toBe(`${packagedVersion}-beta.1`);
@@ -284,7 +284,7 @@ describe("tools-release local channel prepare validation", () => {
       const prerelease = await runPrepare("prerelease", {
         ...commonEnv,
         GITHUB_REF_NAME: "main",
-        OPEN_DESIGN_PRERELEASE_METADATA_URL: `${server.origin}/prerelease/latest/metadata.json`,
+        MISH_PRERELEASE_METADATA_URL: `${server.origin}/prerelease/latest/metadata.json`,
       });
       expect(prerelease.stdout).toContain("[release-prerelease] channel: prerelease");
       expect(prerelease.outputs.release_version).toBe(`${packagedVersion}-prerelease.1`);
@@ -312,11 +312,11 @@ describe("tools-release local channel prepare validation", () => {
     try {
       const beta = await runPrepare("beta", {
         GITHUB_REF_NAME: "main",
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
-        OPEN_DESIGN_BETA_METADATA_URL: `${server.origin}/beta/latest/metadata.json`,
-        OPEN_DESIGN_RELEASE_FORCE: "1",
-        OPEN_DESIGN_STABLE_METADATA_URL: `${server.origin}/stable/latest/metadata.json`,
+        MISH_BETA_METADATA_URL: `${server.origin}/beta/latest/metadata.json`,
+        MISH_RELEASE_FORCE: "1",
+        MISH_STABLE_METADATA_URL: `${server.origin}/stable/latest/metadata.json`,
       });
 
       expect(beta.stdout).toContain("[release-beta] force: true");
@@ -340,12 +340,12 @@ describe("tools-release local channel prepare validation", () => {
       const fakeGh = await writeFakeGhScript(ghRoot);
       const stable = await runPrepare("stable", {
         GITHUB_REF_NAME: `release/v${packagedVersion}`,
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
-        OPEN_DESIGN_GH_NODE_SCRIPT: fakeGh,
-        OPEN_DESIGN_RELEASE_DRY_RUN: "true",
-        OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN: server.origin,
-        OPEN_DESIGN_STABLE_PRERELEASE_VERSION: prereleaseVersion,
+        MISH_GH_NODE_SCRIPT: fakeGh,
+        MISH_RELEASE_DRY_RUN: "true",
+        MISH_RELEASES_PUBLIC_ORIGIN: server.origin,
+        MISH_STABLE_PRERELEASE_VERSION: prereleaseVersion,
       });
 
       expect(stable.stdout).toContain("[release-stable] channel: stable");
@@ -356,7 +356,7 @@ describe("tools-release local channel prepare validation", () => {
       expect(stable.outputs.github_release_enabled).toBe("false");
       expect(stable.outputs.publish_side_effects_enabled).toBe("false");
       expect(stable.outputs.run_prepublish_jobs).toBe("false");
-      expect(stable.outputs.version_tag).toBe(`open-design-v${packagedVersion}`);
+      expect(stable.outputs.version_tag).toBe(`mish-v${packagedVersion}`);
     } finally {
       await server.close();
       await rm(ghRoot, { force: true, recursive: true });
@@ -375,12 +375,12 @@ describe("tools-release local channel prepare validation", () => {
       const fakeGh = await writeFakeGhScript(ghRoot);
       const stable = await runPrepare("stable", {
         GITHUB_REF_NAME: `release/v${packagedVersion}`,
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
-        OPEN_DESIGN_GH_NODE_SCRIPT: fakeGh,
-        OPEN_DESIGN_RELEASE_DRY_RUN: "prepublish",
-        OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN: server.origin,
-        OPEN_DESIGN_STABLE_PRERELEASE_VERSION: prereleaseVersion,
+        MISH_GH_NODE_SCRIPT: fakeGh,
+        MISH_RELEASE_DRY_RUN: "prepublish",
+        MISH_RELEASES_PUBLIC_ORIGIN: server.origin,
+        MISH_STABLE_PRERELEASE_VERSION: prereleaseVersion,
       });
 
       expect(stable.stdout).toContain("[release-stable] dry run mode: prepublish");
@@ -407,12 +407,12 @@ describe("tools-release local channel prepare validation", () => {
       const fakeGh = await writeFakeGhScript(ghRoot);
       const stable = await runPrepare("stable", {
         GITHUB_REF_NAME: `release/v${packagedVersion}`,
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
-        OPEN_DESIGN_GH_NODE_SCRIPT: fakeGh,
-        OPEN_DESIGN_RELEASE_DRY_RUN: "false",
-        OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN: server.origin,
-        OPEN_DESIGN_STABLE_PRERELEASE_VERSION: prereleaseVersion,
+        MISH_GH_NODE_SCRIPT: fakeGh,
+        MISH_RELEASE_DRY_RUN: "false",
+        MISH_RELEASES_PUBLIC_ORIGIN: server.origin,
+        MISH_STABLE_PRERELEASE_VERSION: prereleaseVersion,
       });
 
       expect(stable.stdout).toContain("[release-stable] dry run: false");
@@ -437,12 +437,12 @@ describe("tools-release local channel prepare validation", () => {
       const fakeGh = await writeFakeGhScript(ghRoot);
       await expect(runPrepare("stable", {
         GITHUB_REF_NAME: `release/v${packagedVersion}`,
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
-        OPEN_DESIGN_GH_NODE_SCRIPT: fakeGh,
-        OPEN_DESIGN_RELEASE_DRY_RUN: "metadata",
-        OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN: server.origin,
-        OPEN_DESIGN_STABLE_PRERELEASE_VERSION: `${packagedVersion}-preview.2`,
+        MISH_GH_NODE_SCRIPT: fakeGh,
+        MISH_RELEASE_DRY_RUN: "metadata",
+        MISH_RELEASES_PUBLIC_ORIGIN: server.origin,
+        MISH_STABLE_PRERELEASE_VERSION: `${packagedVersion}-preview.2`,
       })).rejects.toThrow(/prereleaseVersion must be x\.y\.z-prerelease\.N/);
     } finally {
       await server.close();
@@ -462,12 +462,12 @@ describe("tools-release local channel prepare validation", () => {
       const fakeGh = await writeFakeGhScript(ghRoot);
       await expect(runPrepare("stable", {
         GITHUB_REF_NAME: "main",
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
-        OPEN_DESIGN_GH_NODE_SCRIPT: fakeGh,
-        OPEN_DESIGN_RELEASE_DRY_RUN: "metadata",
-        OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN: server.origin,
-        OPEN_DESIGN_STABLE_PRERELEASE_VERSION: prereleaseVersion,
+        MISH_GH_NODE_SCRIPT: fakeGh,
+        MISH_RELEASE_DRY_RUN: "metadata",
+        MISH_RELEASES_PUBLIC_ORIGIN: server.origin,
+        MISH_STABLE_PRERELEASE_VERSION: prereleaseVersion,
       })).rejects.toThrow(/requires GITHUB_REF_NAME to be release\/vX\.Y\.Z; got main/);
     } finally {
       await server.close();

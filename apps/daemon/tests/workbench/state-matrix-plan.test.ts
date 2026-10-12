@@ -5,7 +5,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { parseComponentLedger, planStateMatrix } from '@open-design/contracts';
+import { parseComponentLedger, planStateMatrix } from '@mish/contracts';
 
 const ledger = parseComponentLedger(JSON.parse(readFileSync(path.resolve(import.meta.dirname, '../../src/workbench/component-ledger.json'), 'utf8')));
 

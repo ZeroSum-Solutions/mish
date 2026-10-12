@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3';
 import { createHash, randomUUID } from 'node:crypto';
-import { parsePutSessionModel, parseSessionByokBinding, parseSessionExecutionChoice, parseSessionRunAdmission, sessionByokBindingsEqual, sessionModelChoicesEqual, type ByokChatProviderConfig, type SessionExecutionChoice, type SessionModelSnapshot, type SessionRunAdmission } from '@open-design/contracts';
+import { parsePutSessionModel, parseSessionByokBinding, parseSessionExecutionChoice, parseSessionRunAdmission, sessionByokBindingsEqual, sessionModelChoicesEqual, type ByokChatProviderConfig, type SessionExecutionChoice, type SessionModelSnapshot, type SessionRunAdmission } from '@mish/contracts';
 import { assertModelSession, readSessionModel } from './session-model.js';
 import { buildOpenCodeByokProviderConfig } from '../runtimes/byok-opencode.js';
 

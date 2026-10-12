@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SOURCE_OPERATIONS } from '@open-design/contracts';
+import { SOURCE_OPERATIONS } from '@mish/contracts';
 import { createLocalResourceSources, searchResources } from '../../src/workbench/resources.js';
 import { runAdoptionCli } from '../../src/workbench/placement/adoption-cli.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';

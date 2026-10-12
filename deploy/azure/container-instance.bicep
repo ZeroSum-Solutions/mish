@@ -4,13 +4,13 @@ targetScope = 'resourceGroup'
 param location string = resourceGroup().location
 
 @description('Container group name.')
-param containerGroupName string = 'open-design'
+param containerGroupName string = 'mish'
 
 @description('DNS label for the Azure Container Instances upstream endpoint. Must be unique in the selected region.')
-param dnsNameLabel string = toLower('open-design-${uniqueString(resourceGroup().id, location)}')
+param dnsNameLabel string = toLower('mish-${uniqueString(resourceGroup().id, location)}')
 
 @description('Mishh Mashh container image.')
-param image string = 'ghcr.io/nexu-io/od:latest'
+param image string = 'ghcr.io/zerosum-solutions/mish:latest'
 
 @secure()
 @description('Required Mishh Mashh API token. Generate with: openssl rand -hex 32')
@@ -36,7 +36,7 @@ param memoryInGB int = 1
 param fileShareQuotaGB int = 10
 
 var storageAccountName = take(toLower('od${uniqueString(resourceGroup().id, location)}'), 24)
-var fileShareName = 'opendesigndata'
+var fileShareName = 'mishdata'
 var appPort = 7456
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
@@ -86,7 +86,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
     }
     containers: [
       {
-        name: 'open-design'
+        name: 'mish'
         properties: {
           image: image
           ports: [
@@ -137,7 +137,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
           }
           volumeMounts: [
             {
-              name: 'open-design-data'
+              name: 'mish-data'
               mountPath: '/app/.od'
               readOnly: false
             }
@@ -158,7 +158,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
     ]
     volumes: [
       {
-        name: 'open-design-data'
+        name: 'mish-data'
         azureFile: {
           shareName: dataShare.name
           storageAccountName: storageAccount.name

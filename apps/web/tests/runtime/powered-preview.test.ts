@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { buildProjectPoweredFileUrl } from '@open-design/contracts';
+import { buildProjectPoweredFileUrl } from '@mish/contracts';
 import {
   resolvePoweredBaseOrigin,
   swapLoopbackHost,

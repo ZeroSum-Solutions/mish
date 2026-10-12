@@ -8,7 +8,7 @@ import {
   SITE_CHECK_RULE_IDS,
   type SiteCheckResult,
   type SiteCheckRuleId,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 export interface SiteFiles {
   /** Project-relative path → text, for every root-level `.html` and every `.css` file. */

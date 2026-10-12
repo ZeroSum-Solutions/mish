@@ -27,8 +27,8 @@ import {
   type DesignBrief,
   type DesignSystemSummary,
   designSystemSelectability,
-} from '@open-design/contracts';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
+} from '@mish/contracts';
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
 import type { HttpDeps } from '../server-context.js';
 import type { AuthorizeProjectRequest } from '../collab/project-request-authority.js';
 import { digestReferenceHtml } from '../build-on-brand/structure-digest.js';

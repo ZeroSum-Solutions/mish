@@ -2,7 +2,7 @@
  * Post-build step: emit dist/data.js and dist/data.d.ts, the catalog and every ported component's
  * built assets as plain JavaScript literals (the pattern of
  * packages/agency-fast-lane/scripts/copy-dist-data.ts). The daemon and web import
- * `@open-design/genui-catalog/data`; data that travels as code survives any bundler, where a file
+ * `@mish/genui-catalog/data`; data that travels as code survives any bundler, where a file
  * read through `import.meta.dirname` would break inside the daemon's esbuild prebundle.
  *
  * The catalog goes through `validateCatalog`, so a malformed catalog.json fails the build rather

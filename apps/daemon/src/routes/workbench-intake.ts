@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from 'express';
 import { stat } from 'node:fs/promises';
-import { parseCreateIntakeBatchRequest, parseAttachIntakeRequest, parseClearIntakeRequest } from '@open-design/contracts';
+import { parseCreateIntakeBatchRequest, parseAttachIntakeRequest, parseClearIntakeRequest } from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
 import type { AuthorizeProjectRequest } from '../collab/project-request-authority.js';
 import { requestWithWorkspaceNavigationScope, resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';

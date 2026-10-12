@@ -1,4 +1,4 @@
-import { parseOwnedImportList, parseOwnedImportRecord, parseOwnedImportRequest, type OwnedImportList, type OwnedImportRecord, type OwnedImportRequest, type WorkspaceCollabContext } from '@open-design/contracts';
+import { parseOwnedImportList, parseOwnedImportRecord, parseOwnedImportRequest, type OwnedImportList, type OwnedImportRecord, type OwnedImportRequest, type WorkspaceCollabContext } from '@mish/contracts';
 import { workspaceProjectHeaders } from '../collab/workspace-identity';
 import { checkedWorkbenchResponse } from './workbench-connectors';
 

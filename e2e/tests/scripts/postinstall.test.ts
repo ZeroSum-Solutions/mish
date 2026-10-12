@@ -201,13 +201,13 @@ describe("postinstall script contract", () => {
   it("[P2] builds the daemon once after its workspace dependencies and propagates failure", () => {
     const sandbox = createSandbox();
     try {
-      writeTarget(sandbox, "packages/contracts", { name: "@open-design/contracts" });
+      writeTarget(sandbox, "packages/contracts", { name: "@mish/contracts" });
       writeTarget(sandbox, "apps/daemon", {
-        name: "@open-design/daemon",
-        dependencies: { "@open-design/contracts": "workspace:*" },
+        name: "@mish/daemon",
+        dependencies: { "@mish/contracts": "workspace:*" },
       });
       const invocationLog = writePnpmStub(sandbox);
-      const env = { OPEN_DESIGN_POSTINSTALL_CONCURRENCY: "2" };
+      const env = { MISH_POSTINSTALL_CONCURRENCY: "2" };
       const success = runFixturePostinstall(sandbox, env);
       expect(success.status, String(success.stderr)).toBe(0);
       const events = readStubEvents(invocationLog);
@@ -273,7 +273,7 @@ describe("postinstall script contract", () => {
     const targets = postinstallBuildTargetList();
     expect(missingBuildTargets).toEqual([]);
     expect(missingTsconfigs).toEqual([]);
-    expect(dependencySpecifier(rootManifest, "@open-design/daemon")).toBe("workspace:*");
+    expect(dependencySpecifier(rootManifest, "@mish/daemon")).toBe("workspace:*");
     expect(targets.indexOf("packages/release")).toBeGreaterThanOrEqual(0);
     expect(targets.indexOf("packages/contracts")).toBeGreaterThanOrEqual(0);
     expect(targets.indexOf("packages/release")).toBeLessThan(targets.indexOf("packages/contracts"));
@@ -283,19 +283,19 @@ describe("postinstall script contract", () => {
   it("[P2] skips absent tsconfig targets in partial install contexts on the default path", () => {
     const sandbox = createSandbox();
     try {
-      writeTarget(sandbox, "packages/release", { name: "@open-design/release" });
+      writeTarget(sandbox, "packages/release", { name: "@mish/release" });
       writeTarget(sandbox, "packages/contracts", {
-        dependencies: { "@open-design/release": "workspace:*" },
-        name: "@open-design/contracts",
+        dependencies: { "@mish/release": "workspace:*" },
+        name: "@mish/contracts",
       });
       writeTarget(sandbox, "packages/components", {
-        dependencies: { "@open-design/contracts": "workspace:*" },
-        name: "@open-design/components",
+        dependencies: { "@mish/contracts": "workspace:*" },
+        name: "@mish/components",
       });
-      writeTarget(sandbox, "apps/daemon", { name: "@open-design/daemon", tsconfig: false });
+      writeTarget(sandbox, "apps/daemon", { name: "@mish/daemon", tsconfig: false });
       const invocationLog = writePnpmStub(sandbox);
 
-      const result = runFixturePostinstall(sandbox, { OPEN_DESIGN_POSTINSTALL_CONCURRENCY: "" });
+      const result = runFixturePostinstall(sandbox, { MISH_POSTINSTALL_CONCURRENCY: "" });
       expect(result.status, String(result.stderr)).toBe(0);
       expect(result.stdout).toContain("postinstall: dependency-aware parallel build enabled (concurrency=1)");
       expect(result.stdout).toContain("postinstall: skipping apps/daemon (no tsconfig.json in this context)");
@@ -314,19 +314,19 @@ describe("postinstall script contract", () => {
   it("[P2] preserves workspace dependency ordering when postinstall builds in parallel", () => {
     const sandbox = createSandbox();
     try {
-      writeTarget(sandbox, "packages/release", { name: "@open-design/release" });
+      writeTarget(sandbox, "packages/release", { name: "@mish/release" });
       writeTarget(sandbox, "packages/contracts", {
-        dependencies: { "@open-design/release": "workspace:*" },
-        name: "@open-design/contracts",
+        dependencies: { "@mish/release": "workspace:*" },
+        name: "@mish/contracts",
       });
       writeTarget(sandbox, "packages/components", {
-        dependencies: { "@open-design/contracts": "workspace:*" },
-        name: "@open-design/components",
+        dependencies: { "@mish/contracts": "workspace:*" },
+        name: "@mish/components",
       });
-      writeTarget(sandbox, "packages/download", { name: "@open-design/download" });
+      writeTarget(sandbox, "packages/download", { name: "@mish/download" });
       const invocationLog = writePnpmStub(sandbox);
 
-      const result = runFixturePostinstall(sandbox, { OPEN_DESIGN_POSTINSTALL_CONCURRENCY: "2" });
+      const result = runFixturePostinstall(sandbox, { MISH_POSTINSTALL_CONCURRENCY: "2" });
       expect(result.status, String(result.stderr)).toBe(0);
       expect(result.stdout).toContain("postinstall: dependency-aware parallel build enabled (concurrency=2)");
 
@@ -342,7 +342,7 @@ describe("postinstall script contract", () => {
   it("[P2] rebuilds better-sqlite3 when the native addon cannot load", () => {
     const sandbox = createSandbox();
     try {
-      writeTarget(sandbox, "apps/daemon", { name: "@open-design/daemon", tsconfig: false });
+      writeTarget(sandbox, "apps/daemon", { name: "@mish/daemon", tsconfig: false });
       const addonDirectory = join(sandbox, "apps/daemon/node_modules/better-sqlite3");
       mkdirSync(addonDirectory, { recursive: true });
       writeFileSync(join(addonDirectory, "package.json"), '{"name":"better-sqlite3","main":"index.cjs"}\n');
@@ -356,7 +356,7 @@ describe("postinstall script contract", () => {
       expect(result.status, String(result.stderr)).toBe(0);
       expect(result.stdout).toContain("postinstall: rebuilding better-sqlite3");
       expect(readStubEvents(invocationLog)).toContainEqual({
-        args: ["--filter", "@open-design/daemon", "rebuild", "better-sqlite3"],
+        args: ["--filter", "@mish/daemon", "rebuild", "better-sqlite3"],
         event: "start",
         target: "",
       });

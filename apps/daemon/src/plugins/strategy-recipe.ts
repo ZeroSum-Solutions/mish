@@ -7,7 +7,7 @@ import {
   type AppliedPluginSnapshot,
   type OdNextPromptBundleStageV2,
   type OdNextStrategyRequestRecipeV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { resolvePluginFolder } from './registry.js';
 import {
   loadBundledStrategyPromptAssetsV2,

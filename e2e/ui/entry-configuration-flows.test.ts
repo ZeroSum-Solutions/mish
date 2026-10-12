@@ -5,7 +5,7 @@ import { routeAgents, suppressWhatsNew } from '@/playwright/mock-factory';
 import { T } from '@/timeouts';
 import type { Locator, Page } from '@playwright/test';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 
 test.describe.configure({ timeout: T.xlong });
 
@@ -55,7 +55,7 @@ const IMAGE_TEMPLATE = {
   model: 'gpt-image-1',
   aspect: '4:5',
   source: {
-    repo: 'open-design/test-prompts',
+    repo: 'mish/test-prompts',
     license: 'MIT',
     author: 'Mishh Mashh QA',
   },

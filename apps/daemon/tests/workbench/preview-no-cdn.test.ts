@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { demoDocument, genuiCatalog } from '@open-design/genui-catalog/data';
+import { demoDocument, genuiCatalog } from '@mish/genui-catalog/data';
 import { convertedPreviewHtml } from '../../src/cult-live-preview.js';
 import { CULT_CONVERTED_DOCUMENT_CSP } from '../../src/routes/cult-live-preview.js';
 import { BundledCultPreviews } from '../../src/services/bundled-cult-previews.js';
@@ -11,8 +11,8 @@ import { loadGsapRuntime } from '../../src/workbench/recipes/gsap/runtime.js';
 import { renderGsapPreview } from '../../src/workbench/recipes/gsap/materials.js';
 import { renderSectionPreview } from '../../src/workbench/section-previews.js';
 import { publicCultEntry } from '../../src/routes/sections.js';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
 
 /**
  * AC-R07 preamble: "no CDN Tailwind". Every document an Enlarge preview can open is checked here
@@ -133,7 +133,7 @@ describe('no CDN Tailwind, remote script, stylesheet or font in any Enlarge prev
   });
   it('bundled plugin previews', () => {
     const documents: Array<[string, string]> = [];
-    for (const manifestFile of findFiles(pluginsRoot, 'open-design.json')) {
+    for (const manifestFile of findFiles(pluginsRoot, 'mish.json')) {
       const manifest = JSON.parse(readFileSync(manifestFile, 'utf8')) as { od?: { preview?: { entry?: string } } };
       const entry = manifest.od?.preview?.entry;
       if (!entry) continue;

@@ -3,10 +3,10 @@ import { createPortal } from 'react-dom';
 import type { Project } from '../types';
 import { useI18n } from '../i18n';
 import { getProjectDetail, listProjects } from '../state/projects';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { dirExists } from '../providers/registry';
 import { workspaceIdentityCacheKey } from '../collab/workspace-identity';
-import { Button, IconButton } from '@open-design/components';
+import { Button, IconButton } from '@mish/components';
 import { Icon } from './Icon';
 import styles from './ProjectReferenceModal.module.css';
 

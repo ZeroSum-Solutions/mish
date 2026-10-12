@@ -12,8 +12,8 @@ import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { AgencyBuildResponse, AgencyBuildSnapshot, ApiErrorResponse, DesignSystemSummary } from '@open-design/contracts';
-import type { BuildInput, BuildResult } from '@open-design/agency-fast-lane/build';
+import type { AgencyBuildResponse, AgencyBuildSnapshot, ApiErrorResponse, DesignSystemSummary } from '@mish/contracts';
+import type { BuildInput, BuildResult } from '@mish/agency-fast-lane/build';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

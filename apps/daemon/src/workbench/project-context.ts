@@ -5,7 +5,7 @@ import {
   serializeProjectDesignContextDraft, serializeProjectRubricDraft,
   type ProjectDesignContextDraft, type ProjectDesignContextSnapshot, type ProjectRubricSnapshot,
   type WorkbenchPreferencesSnapshot, type ResourceRef, type ApiErrorCode,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 type Db = Database.Database;
 type Family = 'context' | 'rubric' | 'preferences';

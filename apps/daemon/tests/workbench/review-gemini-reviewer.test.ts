@@ -4,7 +4,7 @@ import { chmod, mkdir, mkdtemp, readdir, readFile, readlink, rm, stat, symlink, 
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseReviewRunView, WORKBENCH_REVIEWER_ROLES } from '@open-design/contracts';
+import { parseReviewRunView, WORKBENCH_REVIEWER_ROLES } from '@mish/contracts';
 import { bootReviewRuns, fakeReviewer } from './review-run-fixture.js';
 import { DEFAULT_REVIEWER_PLAN } from '../../src/workbench/review/reviewer-plan.js';
 import { createGeminiReviewer } from '../../src/workbench/review/reviewers/gemini.js';

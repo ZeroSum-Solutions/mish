@@ -57,14 +57,14 @@ export function validateHtmlPluginPreviewContract({
   const prefix = `${EXAMPLES_REPO_PATH}/${pluginId}`;
   const violations: string[] = [];
   if (!isRecord(manifest) || !isRecord(manifest.od)) {
-    return [`${prefix}/open-design.json: HTML-backed template requires an od manifest object`];
+    return [`${prefix}/mish.json: HTML-backed template requires an od manifest object`];
   }
 
   const od = manifest.od;
   const preview = isRecord(od.preview) ? od.preview : undefined;
   if (preview?.type !== "html" || preview.entry !== EXAMPLE_ENTRY) {
     violations.push(
-      `${prefix}/open-design.json: HTML-backed template preview must use type "html" and entry "${EXAMPLE_ENTRY}"`,
+      `${prefix}/mish.json: HTML-backed template preview must use type "html" and entry "${EXAMPLE_ENTRY}"`,
     );
   }
 
@@ -73,7 +73,7 @@ export function validateHtmlPluginPreviewContract({
     && (template.surface === "document" || od.scenario === "documents")
   );
   if (documentSurface && preview?.motion !== "scroll") {
-    violations.push(`${prefix}/open-design.json: document HTML preview must declare motion "scroll"`);
+    violations.push(`${prefix}/mish.json: document HTML preview must declare motion "scroll"`);
   }
 
   const useCase = isRecord(od.useCase) ? od.useCase : undefined;
@@ -84,12 +84,12 @@ export function validateHtmlPluginPreviewContract({
       })
     : [];
   if (!outputPaths.includes(EXAMPLE_ENTRY)) {
-    violations.push(`${prefix}/open-design.json: od.useCase.exampleOutputs must include "${EXAMPLE_ENTRY}"`);
+    violations.push(`${prefix}/mish.json: od.useCase.exampleOutputs must include "${EXAMPLE_ENTRY}"`);
   }
 
   const context = isRecord(od.context) ? od.context : undefined;
   if (!stringArray(context?.assets).includes(EXAMPLE_ENTRY)) {
-    violations.push(`${prefix}/open-design.json: od.context.assets must include "${EXAMPLE_ENTRY}"`);
+    violations.push(`${prefix}/mish.json: od.context.assets must include "${EXAMPLE_ENTRY}"`);
   }
 
   if (exampleHtml === undefined || exampleHtml.trim().length === 0) {
@@ -165,10 +165,10 @@ export async function checkHtmlPluginPreviewContracts(repoRoot: string = default
 
     let manifestText: string | undefined;
     try {
-      manifestText = await readOptional(path.join(pluginRoot, "open-design.json"));
+      manifestText = await readOptional(path.join(pluginRoot, "mish.json"));
     } catch (error) {
       violations.push(
-        `${EXAMPLES_REPO_PATH}/${entry.name}/open-design.json: could not be read: ${formatError(error)}`,
+        `${EXAMPLES_REPO_PATH}/${entry.name}/mish.json: could not be read: ${formatError(error)}`,
       );
       continue;
     }
@@ -177,7 +177,7 @@ export async function checkHtmlPluginPreviewContracts(repoRoot: string = default
       manifest = manifestText === undefined ? undefined : JSON.parse(manifestText) as unknown;
     } catch (error) {
       violations.push(
-        `${EXAMPLES_REPO_PATH}/${entry.name}/open-design.json: could not be parsed: ${
+        `${EXAMPLES_REPO_PATH}/${entry.name}/mish.json: could not be parsed: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );

@@ -8,7 +8,7 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { approvedComponentFits } from '../../helpers/approved-component-fits';
-import type { ResourceResult } from '@open-design/contracts';
+import type { ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchApplyAction } from '../../../src/components/workbench/WorkbenchApplyAction';
 import { WorkbenchHtmlPreview } from '../../../src/components/workbench/WorkbenchHtmlPreview';

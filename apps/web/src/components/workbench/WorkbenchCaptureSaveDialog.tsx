@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog, DialogBody, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Input } from '@open-design/components';
-import type { CaptureImportMetadata, CaptureView, WorkbenchCaptureMode, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button, Dialog, DialogBody, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Input } from '@mish/components';
+import type { CaptureImportMetadata, CaptureView, WorkbenchCaptureMode, WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { captureApi } from '../../providers/workbench-capture';
 import { cropImage, regionInside, type CaptureRegion } from './capture-image';

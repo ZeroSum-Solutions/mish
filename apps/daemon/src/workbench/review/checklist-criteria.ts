@@ -1,4 +1,4 @@
-import { parseProjectRubricDraft, type ObservedBehavior, type ProjectRubric } from '@open-design/contracts';
+import { parseProjectRubricDraft, type ObservedBehavior, type ProjectRubric } from '@mish/contracts';
 import type { MandatoryCriterionId } from './plan.js';
 
 /**

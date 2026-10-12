@@ -24,8 +24,8 @@
 
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { AgencyBuildBlockPlan, AgencyBuildComposition, AgencyBuildSnapshot, AgencyBuildStatus, AgencyEffectsInput, AgencySectionSelectionInput } from '@open-design/contracts';
-import { AGENCY_BUILD_HISTORY_LIMIT, parseAgencyEffectsInput, parseAgencyEffectsResult } from '@open-design/contracts';
+import type { AgencyBuildBlockPlan, AgencyBuildComposition, AgencyBuildSnapshot, AgencyBuildStatus, AgencyEffectsInput, AgencySectionSelectionInput } from '@mish/contracts';
+import { AGENCY_BUILD_HISTORY_LIMIT, parseAgencyEffectsInput, parseAgencyEffectsResult } from '@mish/contracts';
 import { parseSectionSelectionShape } from './agency-build-section-selection.js';
 
 /** The closed set `AgencyBuildStatus` allows, kept in step with it by hand — same discipline as

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 
-import { assignCultSlugs, CULT_PUBLIC_SLUG, isCultBrandFree } from '@open-design/contracts';
+import { assignCultSlugs, CULT_PUBLIC_SLUG, isCultBrandFree } from '@mish/contracts';
 
 import { SLUGS_SCHEMA, slugManifestText, type SlugManifest } from '../scripts/slugs.ts';
 import type { CultCatalog } from '../src/types.ts';

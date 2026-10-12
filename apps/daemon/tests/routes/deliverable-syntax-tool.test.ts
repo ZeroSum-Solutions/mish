@@ -84,7 +84,7 @@ describe('deliverable syntax tool route', () => {
   it('resets legacy checker state before requesting repair under the new rules', async () => {
     const test = await fixture({ entryFile: 'index.html', content: '<script>const point = { y: "dates", y: 410 };</script>' });
     test.run.deliverableSyntaxRepair = {
-      schema: 'open-design.deliverable-syntax-repair/v1',
+      schema: 'mish.deliverable-syntax-repair/v1',
       checker: 'web-syntax@1', candidateHash: 'legacy', attempt: 3, maxAttempts: 3,
     };
     expect((await test.check()).body).toMatchObject({
@@ -106,7 +106,7 @@ describe('deliverable syntax tool route', () => {
     const response = await test.check();
     expect(response.status).toBe(200);
     expect(response.body).toMatchObject({
-      schema: 'open-design.deliverable-syntax-tool/v1',
+      schema: 'mish.deliverable-syntax-tool/v1',
       status: 'skipped',
       repair: { action: 'none', attempt: 0, maxAttempts: 3 },
     });
@@ -138,7 +138,7 @@ describe('deliverable syntax tool route', () => {
     });
     expect(passed.body.agentMessage).toBeUndefined();
     expect(test.run.deliverableSyntaxValidation.metrics).toEqual({
-      schema: 'open-design.deliverable-syntax-metrics/v1',
+      schema: 'mish.deliverable-syntax-metrics/v1',
       checkCount: 2,
       checkerDurationMs: 10,
       repairableCheckCount: 1,

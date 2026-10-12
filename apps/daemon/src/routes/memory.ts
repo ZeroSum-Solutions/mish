@@ -1,6 +1,6 @@
 import { sendInternalError } from '../http/api-errors.js';
 import type { Express } from 'express';
-import { MEMORY_TYPES } from '@open-design/contracts';
+import { MEMORY_TYPES } from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
 
 import {

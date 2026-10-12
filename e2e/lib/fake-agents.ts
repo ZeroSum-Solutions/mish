@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
-import { DECK_SKELETON_HTML } from '@open-design/contracts';
+import { DECK_SKELETON_HTML } from '@mish/contracts';
 
 const PROTOCOL_DECK_CANARY_HTML = DECK_SKELETON_HTML
   .replace('<!-- SLOT: deck title -->', 'Deck protocol matrix canary')
@@ -92,7 +92,7 @@ export async function createFakeAcpHandshakeRuntime(
 ): Promise<FakeAcpHandshakeRuntime> {
   const root = options.root ?? path.join(
     tmpdir(),
-    `open-design-fake-acp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    `mish-fake-acp-${process.pid}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
   );
   await mkdir(root, { recursive: true });
   const script = path.join(root, 'fake-acp-handshake-cli.mjs');
@@ -175,8 +175,8 @@ export async function createFakeAgentRuntimes(
     ? input
     : (input.runtimeIds ?? ['codex', ...FAKE_AGENT_RUNTIME_IDS]);
   const root = Array.isArray(input)
-    ? path.join(tmpdir(), `open-design-fake-agents-${process.pid}`)
-    : (input.root ?? path.join(tmpdir(), `open-design-fake-agents-${process.pid}`));
+    ? path.join(tmpdir(), `mish-fake-agents-${process.pid}`)
+    : (input.root ?? path.join(tmpdir(), `mish-fake-agents-${process.pid}`));
   await mkdir(root, { recursive: true });
 
   const runtimes = {} as Record<FakeAgentId, FakeAgentRuntime>;
@@ -609,7 +609,7 @@ function emitOdNextPlanningRun(promptText, inputStage = 'request', taskTypeOverr
   }
   const deliverableKind = identity.taskType === 'ppt' ? 'deck' : 'prototype';
   const plan = {
-    schema: 'open-design.plan-contract/v2',
+    schema: 'mish.plan-contract/v2',
     strategy: {
       id: 'od-next-strategy', version: identity.version,
       packageHash: identity.packageHash, snapshotId: identity.snapshotId,
@@ -640,14 +640,14 @@ function emitOdNextPlanningRun(promptText, inputStage = 'request', taskTypeOverr
     },
   };
   const state = {
-    schema: 'open-design.strategy-state/v2', route: 'full_plan', inputStage,
+    schema: 'mish.strategy-state/v2', route: 'full_plan', inputStage,
     outcome: 'plan_ready', executionMode: 'simple', reasonCodes: [],
   };
   emitSuccess(
-    'The local canary plan is ready.\\n<open-design-plan-contract>\\n'
-      + JSON.stringify(plan) + '\\n</open-design-plan-contract>\\n'
-      + '<open-design-runtime-state>\\n' + JSON.stringify(state)
-      + '\\n</open-design-runtime-state>',
+    'The local canary plan is ready.\\n<mish-plan-contract>\\n'
+      + JSON.stringify(plan) + '\\n</mish-plan-contract>\\n'
+      + '<mish-runtime-state>\\n' + JSON.stringify(state)
+      + '\\n</mish-runtime-state>',
     false,
     false,
   );
@@ -658,7 +658,7 @@ function emitOdNextPlanningRun(promptText, inputStage = 'request', taskTypeOverr
 function emitOdNextClarificationRequest(promptText) {
   odNextPromptIdentity(promptText);
   const state = {
-    schema: 'open-design.strategy-state/v2', route: 'full_plan', inputStage: 'request',
+    schema: 'mish.strategy-state/v2', route: 'full_plan', inputStage: 'request',
     outcome: 'clarification_required', executionMode: null,
     reasonCodes: ['od_next_clarification_required'],
   };
@@ -668,8 +668,8 @@ function emitOdNextClarificationRequest(promptText) {
     + '</question-form>';
   emitSuccess(
     'One platform choice is required.\\n' + form
-      + '\\n<open-design-runtime-state>\\n' + JSON.stringify(state)
-      + '\\n</open-design-runtime-state>',
+      + '\\n<mish-runtime-state>\\n' + JSON.stringify(state)
+      + '\\n</mish-runtime-state>',
     false,
     false,
   );
@@ -683,14 +683,14 @@ function emitOdNextClarificationRun(promptText) {
 
 function emitOdNextBlockedRun() {
   const state = {
-    schema: 'open-design.strategy-state/v2', route: 'full_plan', inputStage: 'request',
+    schema: 'mish.strategy-state/v2', route: 'full_plan', inputStage: 'request',
     outcome: 'blocked', executionMode: null,
     reasonCodes: ['od_next_canary_fixture_blocked'],
   };
   emitSuccess(
     'The local canary was blocked by its fixture guard.\\n'
-      + '<open-design-runtime-state>\\n' + JSON.stringify(state)
-      + '\\n</open-design-runtime-state>',
+      + '<mish-runtime-state>\\n' + JSON.stringify(state)
+      + '\\n</mish-runtime-state>',
     false,
     false,
   );
@@ -710,7 +710,7 @@ async function emitOdNextProductionRun(promptText) {
     'utf8',
   );
   const state = {
-    schema: 'open-design.strategy-state/v2', route: 'full_plan', inputStage: 'production',
+    schema: 'mish.strategy-state/v2', route: 'full_plan', inputStage: 'production',
     outcome: 'completed', executionMode: 'simple', reasonCodes: [],
   };
   emitSuccess(
@@ -719,8 +719,8 @@ async function emitOdNextProductionRun(promptText) {
       : legacyDeck
       ? 'Created the selected-template legacy deck canary.\\n'
       : 'Created od-next-active-canary.html through the continued native session.\\n')
-      + '<open-design-runtime-state>\\n' + JSON.stringify(state)
-      + '\\n</open-design-runtime-state>',
+      + '<mish-runtime-state>\\n' + JSON.stringify(state)
+      + '\\n</mish-runtime-state>',
     false,
     false,
   );
@@ -739,7 +739,7 @@ async function emitPluginAuthoringRun() {
   const folder = join(projectDir(), 'generated-plugin');
   await mkdir(join(folder, 'examples'), { recursive: true });
   await writeFileFs(
-    join(folder, 'open-design.json'),
+    join(folder, 'mish.json'),
     JSON.stringify({
       specVersion: 1,
       name: 'generated-plugin',
@@ -762,7 +762,7 @@ async function emitPluginAuthoringRun() {
     'utf8',
   );
   const summary = [
-    'Created generated-plugin with open-design.json, SKILL.md, and examples/demo.md.',
+    'Created generated-plugin with mish.json, SKILL.md, and examples/demo.md.',
     'od plugin validate: passed',
     'od plugin pack: generated-plugin-0.1.0.tgz',
     'od plugin install --source: passed',
@@ -1310,8 +1310,8 @@ function emitOpenCodeRepeatedToolFailures() {
         callID: 'fake-opencode-failure-' + index,
         state: {
           status: 'completed',
-          input: { command: 'cat missing-open-design-file.txt' },
-          output: 'cat: missing-open-design-file.txt: No such file or directory',
+          input: { command: 'cat missing-mish-file.txt' },
+          output: 'cat: missing-mish-file.txt: No such file or directory',
           exitCode: 1,
         },
       },

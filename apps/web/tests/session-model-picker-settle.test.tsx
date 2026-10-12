@@ -4,7 +4,7 @@
 // and unmount or a conversation change ends the wait as `cancelled`.
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { PutSessionModel, SessionModelSnapshot } from '@open-design/contracts';
+import type { PutSessionModel, SessionModelSnapshot } from '@mish/contracts';
 import { resetWorkspaceAccountGeneration } from '../src/collab/workspace-identity';
 import { DEFAULT_CONFIG } from '../src/state/config';
 import {

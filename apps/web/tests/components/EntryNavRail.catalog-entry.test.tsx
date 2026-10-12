@@ -4,7 +4,7 @@
 // renders on both rail branches and the click lands on /catalog.
 
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { EntryNavRail } from '../../src/components/EntryNavRail';

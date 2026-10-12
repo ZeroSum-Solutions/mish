@@ -2,7 +2,7 @@ import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { networkInterfaces } from 'node:os';
 
-import { parseMacosScutilProxyOutput, parseWindowsInternetSettingsProxyOutput } from '@open-design/platform';
+import { parseMacosScutilProxyOutput, parseWindowsInternetSettingsProxyOutput } from '@mish/platform';
 
 const MAX_CONFIG_LENGTH = 4096;
 

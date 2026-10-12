@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseResourceSearchResponse, type ResourceResult } from '@open-design/contracts';
+import { parseResourceSearchResponse, type ResourceResult } from '@mish/contracts';
 import { advanceWorkspaceAccountGeneration, resetWorkspaceAccountGeneration } from '../../src/collab/workspace-identity';
 import { I18nProvider } from '../../src/i18n';
 import { WorkbenchResourceSearch } from '../../src/components/workbench/WorkbenchResourceSearch';

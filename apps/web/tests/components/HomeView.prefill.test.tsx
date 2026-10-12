@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { act } from 'react';
-import { buildWorkspacePermissions, buildWorkspaceSeatSummary, type WorkspaceCollabContext } from '@open-design/contracts';
+import { buildWorkspacePermissions, buildWorkspaceSeatSummary, type WorkspaceCollabContext } from '@mish/contracts';
 
 const workspaceContextOverride = vi.hoisted(() => ({ context: null as WorkspaceCollabContext | null }));
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
@@ -947,7 +947,7 @@ describe('HomeView prompt handoff', () => {
     });
     // The badge renders optimistically; draft persistence runs in a passive
     // effect. Wait for the persisted state instead of assuming the badge flushed it.
-    await waitFor(() => expect(JSON.parse(window.localStorage.getItem('open-design:home-composer:chip')!)).toEqual({
+    await waitFor(() => expect(JSON.parse(window.localStorage.getItem('mish:home-composer:chip')!)).toEqual({
       chipId: 'prototype',
       pluginId: 'example-web-prototype',
       projectKind: 'prototype',
@@ -1205,7 +1205,7 @@ describe('HomeView prompt handoff', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('home-hero-template-trigger').textContent).toContain('Prototype');
-      expect(JSON.parse(window.localStorage.getItem('open-design:home-composer:chip') ?? '{}'))
+      expect(JSON.parse(window.localStorage.getItem('mish:home-composer:chip') ?? '{}'))
         .toMatchObject({ chipId: 'prototype', prototypeSubtypeId: subtype });
     });
 
@@ -1288,7 +1288,7 @@ describe('HomeView prompt handoff', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('home-hero-template-trigger').textContent).toContain('Prototype');
-      expect(JSON.parse(window.localStorage.getItem('open-design:home-composer:chip') ?? '{}'))
+      expect(JSON.parse(window.localStorage.getItem('mish:home-composer:chip') ?? '{}'))
         .toMatchObject({ chipId: 'prototype', prototypeSubtypeId: legacyChipId });
     });
 
@@ -1792,7 +1792,7 @@ describe('HomeView prompt handoff', () => {
     // 'mobile' / 'wireframe' id still selects the scene it became.
     await clickHomeShortcut(subtype);
     await waitFor(() => {
-      expect(JSON.parse(window.localStorage.getItem('open-design:home-composer:chip') ?? '{}'))
+      expect(JSON.parse(window.localStorage.getItem('mish:home-composer:chip') ?? '{}'))
         .toMatchObject({ chipId: 'prototype', prototypeSubtypeId: subtype });
     });
     fireEvent.click(

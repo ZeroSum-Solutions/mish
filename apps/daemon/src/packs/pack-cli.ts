@@ -33,7 +33,7 @@ import {
   type PackApiErrorCode,
   type PackGithubAccessStatus,
   type PackInstallRequest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { isLoopbackHostname } from '../http/local-daemon-request.js';
 import { computePackDigest, describeMismatch } from './pack-digest.js';

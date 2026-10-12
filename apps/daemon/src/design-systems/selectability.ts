@@ -1,5 +1,5 @@
 // Daemon entry point for "is this design kit selectable for generation, and
-// if not, why". The rule and its wording live in `@open-design/contracts` so
+// if not, why". The rule and its wording live in `@mish/contracts` so
 // the web app, the CLI and every daemon route agree; this module adds the
 // catalogue-lookup result shape that routes consume.
 //
@@ -8,7 +8,7 @@
 // refuses a draft should answer with `sendDesignSystemNotSelectable`.
 
 import type { Response } from 'express';
-import type { DesignSystemUnselectableReason } from '@open-design/contracts';
+import type { DesignSystemUnselectableReason } from '@mish/contracts';
 import { sendApiError } from '../http/api-errors.js';
 
 export {
@@ -16,13 +16,13 @@ export {
   designSystemRunNotice,
   designSystemSelectability,
   parseDesignSystemRunNotice,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 export type {
   DesignSystemRunNotice,
   DesignSystemRunNoticeReason,
   DesignSystemSelectability,
   DesignSystemUnselectableReason,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 type SummaryLike = { id: string } & Record<string, unknown>;
 

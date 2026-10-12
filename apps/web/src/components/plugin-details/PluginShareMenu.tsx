@@ -16,7 +16,7 @@
 // toast confirms every copy action so the user trusts the click landed.
 
 import { useEffect, useRef, useState } from 'react';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 import { Icon } from '../Icon';
 import { useT } from '../../i18n';
 import { copyToClipboard } from '../../lib/copy-to-clipboard';
@@ -164,7 +164,7 @@ export function PluginShareMenu({ record, variant = 'default' }: Props) {
   // Open-in-tab actions are real anchors so users can right-click,
   // copy the link address, or open in a new tab from browser chrome.
   const openItems: ShareLinkItem[] = [];
-  if (links.sourceUrl && !links.sourceUrl.includes('github.com/nexu-io/open-design')) {
+  if (links.sourceUrl && !links.sourceUrl.includes('github.com/ZeroSum-Solutions/mish')) {
     openItems.push({
       key: 'source',
       label:
@@ -175,7 +175,7 @@ export function PluginShareMenu({ record, variant = 'default' }: Props) {
       href: links.sourceUrl,
     });
   }
-  if (links.homepageUrl && !links.homepageUrl.includes('github.com/nexu-io/open-design')) {
+  if (links.homepageUrl && !links.homepageUrl.includes('github.com/ZeroSum-Solutions/mish')) {
     openItems.push({
       key: 'homepage',
       label: t('plugins.actions.openHomepage'),

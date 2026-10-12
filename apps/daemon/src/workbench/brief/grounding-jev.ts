@@ -1,4 +1,4 @@
-import { postSystemOne, type JevKeyResolver } from '@open-design/agency-fast-lane/jev';
+import { postSystemOne, type JevKeyResolver } from '@mish/agency-fast-lane/jev';
 import type { BriefGroundingChecker, BriefGroundingResult, BriefJudgment } from './grounding.js';
 
 const DEFAULT_ENDPOINT = 'https://api.typesafe.ai/v1/systemone';

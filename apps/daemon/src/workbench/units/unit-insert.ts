@@ -2,7 +2,7 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { constants } from 'node:fs';
 import { lstat, mkdir, readFile, readdir, realpath, rename, rmdir, unlink, writeFile, open } from 'node:fs/promises';
 import path from 'node:path';
-import { parseUnitInsertReceipt, WORKBENCH_UNIT_INSERT_ID_PATTERN, type ReusableUnitManifest, type UnitInsertReceipt, type UnitInsertRequest, type UnitUndoInsertRequest } from '@open-design/contracts';
+import { parseUnitInsertReceipt, WORKBENCH_UNIT_INSERT_ID_PATTERN, type ReusableUnitManifest, type UnitInsertReceipt, type UnitInsertRequest, type UnitUndoInsertRequest } from '@mish/contracts';
 import { relocateUnitSource } from './unit-relocation.js';
 import { UnitError } from './unit-files.js';
 import type { PlacementProjectWrites, PlacementFinalIO } from '../placement/project-writes.js';

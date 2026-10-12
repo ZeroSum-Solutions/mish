@@ -408,9 +408,9 @@ Minimum local validation after implementation:
 
 ```sh
 # Mishh Mashh
-pnpm --filter @open-design/contracts typecheck
-pnpm --filter @open-design/daemon test
-pnpm --filter @open-design/web test
+pnpm --filter @mish/contracts typecheck
+pnpm --filter @mish/daemon test
+pnpm --filter @mish/web test
 pnpm guard
 pnpm typecheck
 ```

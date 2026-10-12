@@ -1,4 +1,4 @@
-import { postSystemOne, type JevKeyResolver } from '@open-design/agency-fast-lane/jev';
+import { postSystemOne, type JevKeyResolver } from '@mish/agency-fast-lane/jev';
 import { isVisualFactsId } from '../evidence-detail.js';
 import { textReviewerSplit } from './abstain.js';
 import { fencedJson } from './prompt.js';

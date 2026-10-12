@@ -14,7 +14,7 @@ import { createGzip } from 'node:zlib';
 import { Header } from 'tar';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { PACK_MANIFEST_MAX_BYTES, PACK_MAX_ENTRIES } from '@open-design/contracts';
+import { PACK_MANIFEST_MAX_BYTES, PACK_MAX_ENTRIES } from '@mish/contracts';
 
 import {
   assertFolderSourceSafe,

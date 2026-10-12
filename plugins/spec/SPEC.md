@@ -24,12 +24,12 @@ The folder name, `name`, and manifest `name` should match. Use lowercase letters
 
 ## 2. Enriched Mishh Mashh Plugin
 
-Add `open-design.json` when the plugin should appear in Mishh Mashh as a marketplace card or starter:
+Add `mish.json` when the plugin should appear in Mishh Mashh as a marketplace card or starter:
 
 ```text
 my-plugin/
   SKILL.md
-  open-design.json
+  mish.json
   README.md
   preview/
   examples/
@@ -38,11 +38,11 @@ my-plugin/
   evals/
 ```
 
-`open-design.json` points at the skill and declares the product surface:
+`mish.json` points at the skill and declares the product surface:
 
 ```json
 {
-  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "$schema": "https://github.com/ZeroSum-Solutions/mish/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "my-plugin",
   "title": "My Plugin",
@@ -206,9 +206,9 @@ Also add `evals/trigger-queries.json` for activation testing when the descriptio
 Before opening a PR:
 
 1. Validate JSON syntax.
-2. Confirm `open-design.json` includes `specVersion` and a bumped plugin `version` when behavior changed.
+2. Confirm `mish.json` includes `specVersion` and a bumped plugin `version` when behavior changed.
 3. Run `pnpm guard`.
-4. Run `pnpm --filter @open-design/plugin-runtime typecheck`.
+4. Run `pnpm --filter @mish/plugin-runtime typecheck`.
 5. If available, run `od plugin validate ./path/to/plugin`.
 6. Include one screenshot, rendered preview, or example output when the plugin is visual.
 7. Explain trust and capabilities in the PR body.

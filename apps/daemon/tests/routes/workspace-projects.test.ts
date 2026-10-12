@@ -1,5 +1,5 @@
 import express from 'express';
-import type { ApiErrorResponse } from '@open-design/contracts';
+import type { ApiErrorResponse } from '@mish/contracts';
 import type http from 'node:http';
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';

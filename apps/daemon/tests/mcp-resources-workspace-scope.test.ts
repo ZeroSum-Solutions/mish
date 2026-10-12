@@ -4,7 +4,7 @@ import {
   _listMcpResources,
   _readMcpResource,
   createMcpDaemonTarget,
-  OPEN_DESIGN_BRIEF_APP_RESOURCE,
+  MISH_BRIEF_APP_RESOURCE,
 } from '../src/mcp.js';
 import { _resetMcpWorkspaceContextCacheForTests } from '../src/mcp-workspace-context.js';
 
@@ -118,7 +118,7 @@ describe('MCP workspace-scoped resource handlers (#6770)', () => {
     expect(skillCall?.init?.headers).toBeUndefined();
     expect(dsCall?.init?.headers).toBeUndefined();
     // Built-in resources still listed.
-    expect(result.resources.some((r) => r.uri === OPEN_DESIGN_BRIEF_APP_RESOURCE)).toBe(true);
+    expect(result.resources.some((r) => r.uri === MISH_BRIEF_APP_RESOURCE)).toBe(true);
     expect(result.resources.some((r) => r.uri === 'od://focus/active')).toBe(true);
   });
 
@@ -159,7 +159,7 @@ describe('MCP workspace-scoped resource handlers (#6770)', () => {
     const fetchMock = vi.fn(async () => new Response('should-not-be-called', { status: 500 }));
     vi.stubGlobal('fetch', fetchMock);
 
-    const result = await _readMcpResource(target(), OPEN_DESIGN_BRIEF_APP_RESOURCE);
+    const result = await _readMcpResource(target(), MISH_BRIEF_APP_RESOURCE);
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(result.contents[0]?.mimeType).toBe('text/html;profile=mcp-app');

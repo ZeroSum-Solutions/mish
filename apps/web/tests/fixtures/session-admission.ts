@@ -1,4 +1,4 @@
-import type { SessionRunAdmission } from '@open-design/contracts';
+import type { SessionRunAdmission } from '@mish/contracts';
 export const admission: SessionRunAdmission = {
   version: 1, runId: 'accepted-run', sessionId: 'actual-seed', projectId: 'actual-project', cursorSequence: 2, previousRunId: 'source-run', admittedAt: 1,
   selectionSource: 'session', selectionRevision: 3, requested: { agentId: 'codex', modelId: 'default' }, effectiveModel: 'codex-effective', reasoning: 'high', serviceTier: null,

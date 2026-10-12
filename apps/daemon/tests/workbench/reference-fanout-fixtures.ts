@@ -1,4 +1,4 @@
-import { SOURCE_OPERATIONS, parseConnectorSearchResponse, type ConnectorResource } from '@open-design/contracts';
+import { SOURCE_OPERATIONS, parseConnectorSearchResponse, type ConnectorResource } from '@mish/contracts';
 export function resource(source: 'refero' | 'mobbin', id: string, url?: string): ConnectorResource {
   return {
     connectorId: source, itemId: id, title: `${source} dental ${id}`, category: 'screen', access: 'unknown',

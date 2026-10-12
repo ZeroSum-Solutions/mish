@@ -5,7 +5,7 @@ import { createReadStream, constants, existsSync } from 'node:fs';
 import { copyFile, link, lstat, mkdir, open, rename, rm, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import type { Readable } from 'node:stream';
-import { parseCreateIntakeBatchRequest, type ApiError, type ApiErrorCode, type CreateIntakeBatchRequest, type IntakeBatchSnapshot, type IntakeFileOutcome, type IntakeFilePutResponse, type AttachIntakeRequest, type AttachIntakeResponse, type ClearIntakeRequest, type LibraryAssetKind } from '@open-design/contracts';
+import { parseCreateIntakeBatchRequest, type ApiError, type ApiErrorCode, type CreateIntakeBatchRequest, type IntakeBatchSnapshot, type IntakeFileOutcome, type IntakeFilePutResponse, type AttachIntakeRequest, type AttachIntakeResponse, type ClearIntakeRequest, type LibraryAssetKind } from '@mish/contracts';
 import { kindForMime, libraryObjectPath, registerStreamedLibraryAsset, resolveAssetBytesPath } from '../library.js';
 import { addLibraryAssetSource, getLibraryAsset } from '../library-store.js';
 import { IntakeTextProbe, detectIntakeMime } from './intake-mime.js';

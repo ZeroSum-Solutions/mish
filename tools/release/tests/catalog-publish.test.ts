@@ -16,7 +16,7 @@ const FIXTURE_ROOT = resolve(import.meta.dirname, "fixtures/catalog");
 const SOURCE_COMMIT = "cccccccccccccccccccccccccccccccccccccccc";
 const OLDER_COMMIT = "dddddddddddddddddddddddddddddddddddddddd";
 const SAME_TIME_NEWER_COMMIT = "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
-const BUCKET = "open-design-release-fixture";
+const BUCKET = "mish-release-fixture";
 
 type StoredObject = { body: Buffer; etag: string };
 type EtagHeaderStyle = "quoted" | "unquoted" | "weak";

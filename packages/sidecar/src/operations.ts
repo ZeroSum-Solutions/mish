@@ -1,7 +1,7 @@
 import type { ChildProcess } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-import type { SpawnProcessRequest } from "@open-design/platform";
+import type { SpawnProcessRequest } from "@mish/platform";
 import {
   captureProcessSnapshotsByPids,
   createProcessStampArgs,
@@ -11,7 +11,7 @@ import {
   spawnBackgroundProcess,
   spawnLoggedProcess,
   stopProcesses,
-} from "@open-design/platform";
+} from "@mish/platform";
 
 import { requestJsonIpc } from "./json-ipc.js";
 import {

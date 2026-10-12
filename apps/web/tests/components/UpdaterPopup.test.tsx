@@ -3,13 +3,13 @@
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { OpenDesignHostUpdaterStatusListener, OpenDesignHostUpdaterStatusSnapshot } from '@open-design/host';
-import { installMockOpenDesignHost } from '@open-design/host/testing';
+import type { MishHostUpdaterStatusListener, MishHostUpdaterStatusSnapshot } from '@mish/host';
+import { installMockMishHost } from '@mish/host/testing';
 
 import { UpdaterPopup } from '../../src/components/UpdaterPopup';
 import { I18nProvider } from '../../src/i18n';
 
-function idleStatus(): OpenDesignHostUpdaterStatusSnapshot {
+function idleStatus(): MishHostUpdaterStatusSnapshot {
   return {
     arch: 'arm64',
     capabilities: {
@@ -28,20 +28,20 @@ function idleStatus(): OpenDesignHostUpdaterStatusSnapshot {
   };
 }
 
-function downloadedStatus(overrides: Partial<OpenDesignHostUpdaterStatusSnapshot> = {}): OpenDesignHostUpdaterStatusSnapshot {
+function downloadedStatus(overrides: Partial<MishHostUpdaterStatusSnapshot> = {}): MishHostUpdaterStatusSnapshot {
   return {
     ...idleStatus(),
     availableVersion: '1.2.3-beta.4',
-    downloadPath: '/tmp/open-design-updater/Open Design Beta.dmg',
+    downloadPath: '/tmp/mish-updater/Mish Beta.dmg',
     state: 'downloaded',
     ...overrides,
   };
 }
 
-function payloadDownloadedStatus(overrides: Partial<OpenDesignHostUpdaterStatusSnapshot> = {}): OpenDesignHostUpdaterStatusSnapshot {
+function payloadDownloadedStatus(overrides: Partial<MishHostUpdaterStatusSnapshot> = {}): MishHostUpdaterStatusSnapshot {
   return downloadedStatus({
     artifact: {
-      name: 'open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+      name: 'mish-1.2.3-beta.4-mac-arm64-payload.zip',
       platformKey: 'mac',
       size: 1024,
       type: 'payload',
@@ -53,7 +53,7 @@ function payloadDownloadedStatus(overrides: Partial<OpenDesignHostUpdaterStatusS
       canOpenInstaller: false,
       requiresManualInstall: false,
     },
-    downloadPath: '/tmp/open-design-updater/open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+    downloadPath: '/tmp/mish-updater/mish-1.2.3-beta.4-mac-arm64-payload.zip',
     ...overrides,
   });
 }
@@ -87,7 +87,7 @@ describe('UpdaterPopup', () => {
         state: 'error',
       }),
     ]) {
-      restoreHost = installMockOpenDesignHost({
+      restoreHost = installMockMishHost({
         host: {
           updater: {
             status: vi.fn(async () => status),
@@ -109,7 +109,7 @@ describe('UpdaterPopup', () => {
   });
 
   it('shows only the ready indicator until the user opens the install prompt', async () => {
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -135,7 +135,7 @@ describe('UpdaterPopup', () => {
   });
 
   it('uses reinstall copy and the learn-more link for forced installer reinstalls', async () => {
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus({
@@ -162,7 +162,7 @@ describe('UpdaterPopup', () => {
   });
 
   it('omits the learn-more link when the reinstall requirement carries no url', async () => {
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus({
@@ -184,7 +184,7 @@ describe('UpdaterPopup', () => {
   });
 
   it('uses localized ready prompt copy from the app i18n provider', async () => {
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -206,7 +206,7 @@ describe('UpdaterPopup', () => {
   });
 
   it('uses install-and-restart copy for payload updates', async () => {
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => payloadDownloadedStatus()),
@@ -233,7 +233,7 @@ describe('UpdaterPopup', () => {
 
   it('seeds the default silent-update preference only after a successful daemon GET', async () => {
     const persistSilentUpdates = vi.fn(async () => undefined);
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -261,7 +261,7 @@ describe('UpdaterPopup', () => {
 
   it('does not seed when daemon GET failed (ready=false) even if bootstrap finished', async () => {
     const persistSilentUpdates = vi.fn(async () => undefined);
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -287,7 +287,7 @@ describe('UpdaterPopup', () => {
 
   it('does not seed true over a daemon opt-out that was temporarily undefined during hydration', async () => {
     const persistSilentUpdates = vi.fn(async () => undefined);
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -323,7 +323,7 @@ describe('UpdaterPopup', () => {
         resolveSave = resolve;
       }),
     );
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -370,7 +370,7 @@ describe('UpdaterPopup', () => {
       await Promise.reject(new Error('daemon offline'));
       appConfig = { allowSilentUpdates: value };
     });
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -404,7 +404,7 @@ describe('UpdaterPopup', () => {
   });
 
   it('renders an explicit disabled silent update preference as unchecked', async () => {
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -419,7 +419,7 @@ describe('UpdaterPopup', () => {
   });
 
   it('dismisses the confirmation prompt before installation starts', async () => {
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => downloadedStatus()),
@@ -441,14 +441,14 @@ describe('UpdaterPopup', () => {
 
   it('keeps the prompt in handoff loading after opening the installer', async () => {
     let status = downloadedStatus();
-    let resolveInstall: (status: OpenDesignHostUpdaterStatusSnapshot) => void = () => undefined;
-    const install = vi.fn(() => new Promise<OpenDesignHostUpdaterStatusSnapshot>((resolve) => {
+    let resolveInstall: (status: MishHostUpdaterStatusSnapshot) => void = () => undefined;
+    const install = vi.fn(() => new Promise<MishHostUpdaterStatusSnapshot>((resolve) => {
       resolveInstall = resolve;
     }));
     const quit = vi.fn()
       .mockResolvedValueOnce({ ok: true as const })
       .mockImplementationOnce(() => new Promise<never>(() => undefined));
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           install,
@@ -473,7 +473,7 @@ describe('UpdaterPopup', () => {
         installResult: {
           dryRun: true,
           openedAt: '2026-05-19T00:00:00.000Z',
-          path: '/tmp/open-design-updater/Open Design Beta.dmg',
+          path: '/tmp/mish-updater/Mish Beta.dmg',
         },
       });
       resolveInstall(status);
@@ -495,7 +495,7 @@ describe('UpdaterPopup', () => {
       installResult: { openedAt: '2026-09-10T05:20:14Z', path: status.downloadPath! },
     }));
     const quit = vi.fn(async () => ({ ok: true as const }));
-    restoreHost = installMockOpenDesignHost({ host: { updater: {
+    restoreHost = installMockMishHost({ host: { updater: {
       install, quit, status: vi.fn(async () => status),
     } } });
     render(<UpdaterPopup />);
@@ -524,7 +524,7 @@ describe('UpdaterPopup', () => {
     }));
     const quit = vi.fn().mockResolvedValueOnce({ ok: false, reason: 'desktop quit is not available' })
       .mockResolvedValueOnce({ ok: true });
-    restoreHost = installMockOpenDesignHost({ host: { updater: {
+    restoreHost = installMockMishHost({ host: { updater: {
       install, quit, status: vi.fn(async () => status),
     } } });
     render(<UpdaterPopup />);
@@ -546,7 +546,7 @@ describe('UpdaterPopup', () => {
       },
       state: 'error',
     }));
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           install,
@@ -567,8 +567,8 @@ describe('UpdaterPopup', () => {
   });
 
   it('reacts to updater subscription events by showing the ready indicator only', async () => {
-    const listeners = new Set<OpenDesignHostUpdaterStatusListener>();
-    restoreHost = installMockOpenDesignHost({
+    const listeners = new Set<MishHostUpdaterStatusListener>();
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => idleStatus()),

@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { parseResourceSearchRequest } from '@open-design/contracts';
+import { parseResourceSearchRequest } from '@mish/contracts';
 import { createReact95Materials, createReact95ResourceSource, react95PreviewPath } from '../../src/workbench/kits/react95/materials.js';
 import { REACT95_TOOLCHAIN } from '../../src/workbench/kits/react95/pins.js';
 import { createGsapRecipeMaterials, createGsapResourceSource } from '../../src/workbench/recipes/gsap/index.js';

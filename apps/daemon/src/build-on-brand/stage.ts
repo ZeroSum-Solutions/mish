@@ -7,7 +7,7 @@
  * No system-prompt text changes here: the message and the staged files reach the legacy, BYOK
  * and OD Next composition paths identically (docs/prompt-composition.md).
  */
-import type { BuildOnBrandPlan, BuildOnBrandRoute } from '@open-design/contracts';
+import type { BuildOnBrandPlan, BuildOnBrandRoute } from '@mish/contracts';
 
 export const STAGE_DIR = '_brand-build';
 

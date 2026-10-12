@@ -1151,7 +1151,7 @@ describe('MemorySection', () => {
       connected = true;
       window.dispatchEvent(new MessageEvent('message', {
         origin: window.location.origin,
-        data: { type: 'open-design:connector-connected' },
+        data: { type: 'mish:connector-connected' },
       }));
 
       await waitFor(() => expect(onConnectorsChanged).toHaveBeenCalledTimes(1));
@@ -1236,11 +1236,11 @@ describe('MemorySection', () => {
       // A sandboxed document that does not know the nonce is ignored.
       window.dispatchEvent(new MessageEvent('message', {
         origin: 'null',
-        data: { type: 'open-design:connector-connected', callbackNonce: 'forged-nonce-0123456789' },
+        data: { type: 'mish:connector-connected', callbackNonce: 'forged-nonce-0123456789' },
       }));
       window.dispatchEvent(new MessageEvent('message', {
         origin: 'null',
-        data: { type: 'open-design:connector-connected' },
+        data: { type: 'mish:connector-connected' },
       }));
       await new Promise((resolve) => setTimeout(resolve, 20));
       expect(onConnectorsChanged).not.toHaveBeenCalled();
@@ -1248,7 +1248,7 @@ describe('MemorySection', () => {
       // The real callback page runs sandboxed (Origin: null) and echoes it.
       window.dispatchEvent(new MessageEvent('message', {
         origin: 'null',
-        data: { type: 'open-design:connector-connected', connectorId: 'github', callbackNonce: nonce },
+        data: { type: 'mish:connector-connected', connectorId: 'github', callbackNonce: nonce },
       }));
       await waitFor(() => expect(onConnectorsChanged).toHaveBeenCalledTimes(1));
       await waitFor(() => expect(within(githubRow).getByText('octo@example.test')).toBeTruthy());

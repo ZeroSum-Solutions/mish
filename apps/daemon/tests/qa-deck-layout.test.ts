@@ -25,7 +25,7 @@ const VALID_BRAND = {
 };
 
 function renderRealDeck(): string {
-  const brand = validateBrand({ ...VALID_BRAND }, 'https://open-design.ai');
+  const brand = validateBrand({ ...VALID_BRAND }, 'https://github.com/ZeroSum-Solutions/mish');
   const system = buildBrandSystem(brand);
   const deck = system.files['artifacts/deck.html'];
   if (!deck) throw new Error('expected a deck artifact in the brand system');

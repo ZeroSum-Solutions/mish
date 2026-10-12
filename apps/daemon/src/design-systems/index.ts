@@ -21,7 +21,7 @@ import {
   type ComponentsManifest,
   extractComponentsManifest,
   summarizeComponentsManifestForPrompt,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { readDesignSystemApproval, readDesignSystemSnapshot } from './approval.js';
 import { APPROVED_BUILT_IN_SEED } from './approved-built-in-seed.js';
@@ -46,7 +46,7 @@ export type DesignSystemRevisionStatus = 'pending' | 'accepted' | 'rejected';
 export type DesignSystemArtifactMode = 'generated' | 'agent-managed';
 
 export type DesignSystemSummary = {
-  approval?: import('@open-design/contracts').DesignSystemApproval;
+  approval?: import('@mish/contracts').DesignSystemApproval;
   id: string;
   title: string;
   category: string;

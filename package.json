@@ -1,5 +1,5 @@
 {
-  "name": "open-design",
+  "name": "mish",
   "version": "0.22.1",
   "private": true,
   "packageManager": "pnpm@10.33.2",
@@ -29,12 +29,12 @@
     "typecheck": "pnpm -r --workspace-concurrency=4 --if-present run typecheck && tsc -p scripts/tsconfig.json --noEmit"
   },
   "devDependencies": {
-    "@open-design/components": "workspace:*",
-    "@open-design/daemon": "workspace:*",
-    "@open-design/tools-dev": "workspace:*",
-    "@open-design/tools-pack": "workspace:*",
-    "@open-design/tools-release": "workspace:*",
-    "@open-design/tools-serve": "workspace:*",
+    "@mish/components": "workspace:*",
+    "@mish/daemon": "workspace:*",
+    "@mish/tools-dev": "workspace:*",
+    "@mish/tools-pack": "workspace:*",
+    "@mish/tools-release": "workspace:*",
+    "@mish/tools-serve": "workspace:*",
     "@types/node": "20.19.39",
     "tsx": "4.22.3",
     "typescript": "5.9.3",

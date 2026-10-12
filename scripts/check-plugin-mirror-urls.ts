@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────────────
  * scripts/check-plugin-mirror-urls.ts
  *
- * Guard for `plugin-assets.open-design.ai` references inside bundled example
+ * Guard for `plugin-assets.mish.invalid` references inside bundled example
  * plugins' `example.html`. The daemon's preview route (`apps/daemon/src/
  * routes/plugins/assets.ts`) only rewrites an external `src`/`poster`/CSS
  * `url()` value to the same-origin asset-cache proxy when its path ends in a
@@ -11,14 +11,14 @@
  * `connect-src 'none'`, no `font-src`) blocks it outright — a live 404/broken
  * asset in the shipped preview.
  *
- * This is not hypothetical: 10 `plugin-assets.open-design.ai` URLs across
+ * This is not hypothetical: 10 `plugin-assets.mish.invalid` URLs across
  * ai-designer-portfolio, dreamcore-landing, evergreen-finance, and
  * stellar-launch carried a malformed `&w=1280&q=85` suffix after `.webp`
  * (an image-CDN resize query that never had a leading `?`), which is not a
  * cacheable extension. Fixed by stripping the suffix; this guard catches a
  * repeat.
  *
- * Checks every `plugin-assets.open-design.ai` URL referenced in each bundled
+ * Checks every `plugin-assets.mish.invalid` URL referenced in each bundled
  * example plugin's `example.html` and fails if any is not cache-eligible.
  *
  * Run standalone: `pnpm exec tsx scripts/check-plugin-mirror-urls.ts`
@@ -33,7 +33,7 @@ import { isCacheableExternalUrl } from "../apps/daemon/src/plugins/plugin-asset-
 
 const repoRoot = path.resolve(import.meta.dirname, "..");
 const EXAMPLES_REPO_PATH = "plugins/_official/examples";
-const MIRROR_HOST = "plugin-assets.open-design.ai";
+const MIRROR_HOST = "plugin-assets.mish.invalid";
 
 // Matches an absolute http(s) URL up to the first quote, space, or closing
 // paren/angle-bracket — same boundary the daemon's own rewriter and the

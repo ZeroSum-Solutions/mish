@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { parseConnectorDetailResponse, parseConnectorSelectionRequest, parseConnectorSearchRequest, parseConnectorSearchResponse } from '@open-design/contracts';
+import { parseConnectorDetailResponse, parseConnectorSelectionRequest, parseConnectorSearchRequest, parseConnectorSearchResponse } from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../../daemon-url.js';
 
 export interface ConnectorCliOptions {

@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 
 import { BrowserWindow, dialog, ipcMain, shell } from "electron";
 
-import { DIAGNOSTICS_FILENAME_PREFIX, diagnosticsFileName } from "@open-design/diagnostics";
+import { DIAGNOSTICS_FILENAME_PREFIX, diagnosticsFileName } from "@mish/diagnostics";
 
 import { fetchDiagnosticsBundle } from "./diagnostics-fetch.js";
 

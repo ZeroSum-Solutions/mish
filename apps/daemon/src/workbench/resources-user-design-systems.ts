@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { kitTokenAxes, kitTokenNames } from './component-kit.js';
 import { realpath } from 'node:fs/promises';
 import path from 'node:path';
-import type { ResourceCandidate, ResourceRef, ResourceRequestContext } from '@open-design/contracts';
+import type { ResourceCandidate, ResourceRef, ResourceRequestContext } from '@mish/contracts';
 import { resolveMemberVerifiedLocalWorkspaceRequestAuthority, resolveOptionalLocalWorkspaceRequestAuthority, type VerifyWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';
 import { readPackageFile } from './resources-design-systems.js';
 import { tokenPreviewUrl, type WorkspaceNavigation } from './resources-tokens.js';

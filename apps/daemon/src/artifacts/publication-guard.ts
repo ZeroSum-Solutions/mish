@@ -16,7 +16,7 @@
 // finished output.
 //
 // Pairs with structured `od.inputs` on presentation plugins.
-// open-design.json`. The inputs gate is the primary contract — this guard
+// mish.json`. The inputs gate is the primary contract — this guard
 // is the defense-in-depth invariant that catches agents that bypassed the
 // structured contract (e.g. routed through `od-default`) but still tried
 // to publish a placeholder-laden HTML/deck artifact.

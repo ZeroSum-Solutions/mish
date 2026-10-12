@@ -5,14 +5,14 @@ import { workspaceAccountScopedCacheKey } from './collab/workspace-identity';
 import { readHomeModelHandoff, writeHomeModelHandoff, materializeHomeModelHandoff, saveCreatedHomeModelHandoff, type HomeModelHandoff } from './runtime/workbench/home-model-handoff';
 import { putSessionModel } from './providers/workbench';
 import { sessionChoiceFromConfig } from './runtime/workbench/session-model-config';
-import type { SessionModelChoice } from '@open-design/contracts';
+import type { SessionModelChoice } from '@mish/contracts';
 import { WorkbenchIntake } from './components/WorkbenchIntake';
 import { workbenchIntakeStore } from './runtime/intake/intake-store';
 import { intakeAttachmentKind } from './runtime/intake/intake-attachment-kind';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { AnimatePresence, motion, MotionConfig } from 'motion/react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { reportAgentDetectDiagnostics } from './analytics/agent-detect';
 import { useAnalytics } from './analytics/provider';
 import {
@@ -33,7 +33,7 @@ import {
   deriveConfigureGlobals,
   projectKindFromMetadataToTracking,
   fidelityToTracking,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import type {
   AmrModelsResponse,
   ChatSessionMode,
@@ -46,8 +46,8 @@ import type {
   ProjectWorkspaceScope,
   ProjectScenarioTaskProfile,
   WorkspaceProjectSummary,
-} from '@open-design/contracts';
-import { DEFAULT_DESIGN_SYSTEM_ID, DEFAULT_UNSELECTED_SCENARIO_PLUGIN_ID } from '@open-design/contracts';
+} from '@mish/contracts';
+import { DEFAULT_DESIGN_SYSTEM_ID, DEFAULT_UNSELECTED_SCENARIO_PLUGIN_ID } from '@mish/contracts';
 import { EntryView } from './components/EntryView';
 import type { ProjectTitleHint } from './components/EntryShell';
 import type { IntegrationTab } from './components/IntegrationsView';
@@ -236,7 +236,7 @@ import {
   removeProjectFromDisplaySnapshots,
   writeProjectDisplaySnapshot,
 } from './state/project-display-cache';
-import { getOpenDesignHost, type OpenDesignHostProjectImportSuccess } from '@open-design/host';
+import { getMishHost, type MishHostProjectImportSuccess } from '@mish/host';
 import { useI18n } from './i18n';
 import { liveArtifactTabId } from './types';
 import type {
@@ -295,9 +295,9 @@ interface PendingProjectCreation {
   files: readonly File[];
 }
 
-const APP_CONFIG_CHANGED_EVENT = 'open-design:app-config-changed';
+const APP_CONFIG_CHANGED_EVENT = 'mish:app-config-changed';
 const AMR_AGENT_ID = 'amr';
-const AMR_PROFILE_ENV_KEY = 'OPEN_DESIGN_AMR_PROFILE';
+const AMR_PROFILE_ENV_KEY = 'MISH_AMR_PROFILE';
 const AGENT_FOCUS_REFRESH_THROTTLE_MS = 10_000;
 
 /**
@@ -923,7 +923,7 @@ function AppInner() {
   const { t } = useI18n();
   const iframeKeepAlivePool = useIframeKeepAlivePool();
   const clientType = useMemo(() => detectClientType(), []);
-  const hostPlatform = useMemo(() => getOpenDesignHost()?.client.platform, []);
+  const hostPlatform = useMemo(() => getMishHost()?.client.platform, []);
   useModalWindowDragGuard();
   const workspaceContextState = useWorkspaceContext();
   const {
@@ -2029,13 +2029,13 @@ function AppInner() {
   }, [applyAmrLoginStatus]);
 
   useEffect(() => {
-    const usesOpenDesignCloud =
+    const usesMishCloud =
       config.mode === 'daemon'
       && config.agentId === AMR_AGENT_ID;
     const cloudIdentityRejected =
       workspaceContextState.failure === 'reauth-required'
       || (
-        usesOpenDesignCloud
+        usesMishCloud
         && (
           amrLoginStatus?.loggedIn === false
           || amrLoginStatus?.sessionState === 'reauth_required'
@@ -3634,7 +3634,7 @@ function AppInner() {
   // atomically. The renderer never sees the path, token, or daemon DTO;
   // it receives host-owned project identifiers and refreshes project state
   // through the normal daemon API.
-  const handleImportFolderResponse = useCallback(async (result: OpenDesignHostProjectImportSuccess) => {
+  const handleImportFolderResponse = useCallback(async (result: MishHostProjectImportSuccess) => {
     rememberLocalProject(result.projectId);
     const importedProjectContext = workspaceContextRef.current;
     const project = await getProject(result.projectId, importedProjectContext);
@@ -4426,7 +4426,7 @@ function AppInner() {
     accountGeneration: number,
   ) => {
     invalidatePluginCatalogCache({ workspaceContext: context, accountGeneration });
-    window.dispatchEvent(new CustomEvent('open-design:plugins-changed'));
+    window.dispatchEvent(new CustomEvent('mish:plugins-changed'));
   }, []);
 
   teamResourceRefreshRefs.current.skill = handleSkillsChanged;
@@ -5509,7 +5509,7 @@ function AppInner() {
           setPendingDesignSystemCreateEntry('design_systems_page');
           navigate({ kind: 'design-system-create' });
         }}
-        onOpenDesignSystem={(id: string) => navigate({ kind: 'design-system-detail', designSystemId: id })}
+        onMishSystem={(id: string) => navigate({ kind: 'design-system-detail', designSystemId: id })}
         onDesignSystemsRefresh={refreshDesignSystems}
         onPersistComposioKey={handleConfigPersistComposioKey}
         onOpenSettings={openSettings}

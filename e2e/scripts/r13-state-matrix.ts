@@ -2,7 +2,7 @@
  * AC-R13 state-matrix diagnostic against an explicitly supplied loopback runtime. Opt-in, not a
  * CI test, no lifecycle or provider calls (same rules as scripts/catalog-audit.ts).
  *
- *   pnpm --filter @open-design/e2e catalog:state-matrix http://127.0.0.1:<web-or-daemon-port> <label> [--family=a,b] [--only=id,id]
+ *   pnpm --filter @mish/e2e catalog:state-matrix http://127.0.0.1:<web-or-daemon-port> <label> [--family=a,b] [--only=id,id]
  *
  * Reads the frozen component ledger (apps/daemon/src/workbench/component-ledger.json), plans one
  * batch per dependency family and runs each batch in one browser (cold first item, warm rest).
@@ -17,7 +17,7 @@
 import { chromium, type Page } from '@playwright/test';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { parseComponentLedger, planStateMatrix, type StateMatrixProbe } from '@open-design/contracts';
+import { parseComponentLedger, planStateMatrix, type StateMatrixProbe } from '@mish/contracts';
 import { T } from '../lib/timeouts.ts';
 
 const origin = new URL(process.argv[2] ?? 'http://127.0.0.1:3000');

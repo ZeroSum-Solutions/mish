@@ -14,7 +14,7 @@ import {
   FullPlanV2Schema,
   OD_NEXT_PLAN_CONTRACT_BLOCK,
   OD_NEXT_RUNTIME_STATE_BLOCK,
-  OpenDesignPlanContractV2Schema,
+  MishPlanContractV2Schema,
   StrategyRuntimeStateV2Schema,
 } from '../src/plugins/strategy-v2.js';
 import { composeSystemPrompt } from '../src/prompts/system.js';
@@ -182,7 +182,7 @@ describe('OD Next V2 prompt recipe', () => {
     // `taskProfile.requiredDeliverables: The canonical deliverable must be part
     // of requiredDeliverables.`
     const prompt = composeOdNextStrategyRequestPromptV2(recipe);
-    const contract = OpenDesignPlanContractV2Schema.parse(
+    const contract = MishPlanContractV2Schema.parse(
       parseWireBlock(prompt, OD_NEXT_PLAN_CONTRACT_BLOCK),
     );
     const multiDeliverable = {
@@ -196,7 +196,7 @@ describe('OD Next V2 prompt recipe', () => {
         ],
       },
     };
-    const rejected = OpenDesignPlanContractV2Schema.safeParse(multiDeliverable);
+    const rejected = MishPlanContractV2Schema.safeParse(multiDeliverable);
     expect(rejected.success).toBe(false);
     expect(JSON.stringify(rejected.error?.issues)).toContain(
       'The canonical deliverable must be part of requiredDeliverables.',
@@ -352,7 +352,7 @@ describe('OD Next V2 prompt recipe', () => {
     const contract = parseWireBlock(prompt, OD_NEXT_PLAN_CONTRACT_BLOCK);
     // The example carries only per-task-type values; every per-task value is a
     // placeholder the Agent copies from <runtime_facts>.
-    expect(OpenDesignPlanContractV2Schema.parse(contract)).toMatchObject({
+    expect(MishPlanContractV2Schema.parse(contract)).toMatchObject({
       taskProfile: {
         taskProfileVersion: '2.0.0',
         canonicalDeliverable: { kind: 'prototype' },
@@ -524,10 +524,10 @@ describe('OD Next V2 prompt recipe', () => {
     const planContract = parseWireBlock(prompt, OD_NEXT_PLAN_CONTRACT_BLOCK);
     const runtimeState = parseWireBlock(prompt, OD_NEXT_RUNTIME_STATE_BLOCK);
 
-    expect(OpenDesignPlanContractV2Schema.parse(planContract)).toEqual(planContract);
+    expect(MishPlanContractV2Schema.parse(planContract)).toEqual(planContract);
     expect(StrategyRuntimeStateV2Schema.parse(runtimeState)).toEqual(runtimeState);
-    expect(prompt).toContain('open-design.plan-contract/v2');
-    expect(prompt).toContain('open-design.strategy-state/v2');
+    expect(prompt).toContain('mish.plan-contract/v2');
+    expect(prompt).toContain('mish.strategy-state/v2');
     expect(prompt).toContain('capabilitySnapshotHash');
     expect(prompt).toContain('productionRoutes');
     expect(prompt).toContain('decisionSummary');
@@ -659,12 +659,12 @@ describe('OD Next V2 prompt recipe', () => {
     expect(clarification).toContain('Clarification answer');
     expect(contractRepair).toContain('serialization-only');
     expect(production).toContain(`planContractHash=${A}`);
-    expect(production).toMatch(/^<open_design_request_turn/);
+    expect(production).toMatch(/^<mish_request_turn/);
     expect(production).toContain('task_execution_id="task-1"');
     expect(production).toContain('stage="production" task_run_index="1"');
     expect(production).toContain('## Closing Runtime State');
-    expect(production).toContain('exactly one open-design-runtime-state block');
-    expect(production).toContain('schema open-design.strategy-state/v2');
+    expect(production).toContain('exactly one mish-runtime-state block');
+    expect(production).toContain('schema mish.strategy-state/v2');
     expect(production).toContain('route full_plan');
     expect(production).toContain('inputStage production');
     expect(production).toContain('executionMode equal to the mode locked');

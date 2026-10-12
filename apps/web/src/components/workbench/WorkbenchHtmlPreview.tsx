@@ -1,8 +1,8 @@
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { Button } from '@open-design/components';
-import type { PreviewAdapterFamily } from '@open-design/contracts';
-import { parsePreviewObservabilityMessage } from '@open-design/contracts/runtime/preview-observability';
-import { findRealTagEnd, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { Button } from '@mish/components';
+import type { PreviewAdapterFamily } from '@mish/contracts';
+import { parsePreviewObservabilityMessage } from '@mish/contracts/runtime/preview-observability';
+import { findRealTagEnd, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 import { buildSrcdoc } from '../../runtime/srcdoc';
 import { useT } from '../../i18n';
 import styles from './workbench.module.css';

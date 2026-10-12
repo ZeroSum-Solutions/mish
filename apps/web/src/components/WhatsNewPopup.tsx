@@ -1,7 +1,7 @@
 import { createPortal } from 'react-dom';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { Button, Dialog } from '@open-design/components';
+import { Button, Dialog } from '@mish/components';
 import { useI18n } from '../i18n';
 import { fetchWhatsNew, openExternalUrl } from '../providers/registry';
 import {
@@ -109,7 +109,7 @@ export function WhatsNewPopup({ active }: { active: boolean }) {
         imageUrl: info.content.imageUrl ?? null,
         // The hosted feed is still operated by the upstream project. Preserve
         // release notes, but never render an upstream destination as a CTA.
-        linkUrl: localized.linkUrl?.includes('open-design.ai') ? null : localized.linkUrl,
+        linkUrl: localized.linkUrl?.includes('mish.invalid') ? null : localized.linkUrl,
         ctaLabel: localized.ctaLabel,
       });
     });

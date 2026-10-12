@@ -1,4 +1,4 @@
-import type { AgencyBuildCompositionResult } from '@open-design/contracts';
+import type { AgencyBuildCompositionResult } from '@mish/contracts';
 
 type Receipt = NonNullable<AgencyBuildCompositionResult['supportGate']>;
 const probability = (value: number | undefined) => typeof value === 'number' && Number.isFinite(value) && value >= 0 && value <= 1;

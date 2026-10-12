@@ -110,7 +110,7 @@ case "$manifest_digest" in *[!a-f0-9]*|'') fail "invalid manifest digest";; esac
 [ "${#manifest_digest}" -eq 64 ] || fail "invalid manifest digest"
 [ "$(sha256_file "$terminal_root/install-manifest.json")" = "$manifest_digest" ] || fail "installed manifest digest mismatch"
 
-exchange_root=${TMPDIR:-/tmp}/nexu-terminal-$$
+exchange_root=${TMPDIR:-/tmp}/mish-terminal-$$
 (umask 077 && mkdir "$exchange_root") || fail "cannot create fossil exchange"
 trap 'rm -rf "$exchange_root"' EXIT HUP INT TERM
 resolution_file=$exchange_root/carrier-resolution.json

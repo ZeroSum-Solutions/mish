@@ -1,6 +1,6 @@
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { parseDesignBriefPreview } from '@open-design/contracts';
+import { parseDesignBriefPreview } from '@mish/contracts';
 import { digest, type client } from './api.ts';
 import type { BriefCase } from './types.ts';
 

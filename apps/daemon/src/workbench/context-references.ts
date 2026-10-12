@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import {
   parsePutProjectDesignContext, parsePutProjectRubric,
   type ProjectDesignContextDraft, type ResourceRef, type ResourceRequestContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { LibraryAssetRecord } from '../library-store.js';
 import type { ProjectContextReferences } from './project-context.js';
 import { inspectResource, type ResourceSourceAdapter } from './resources.js';

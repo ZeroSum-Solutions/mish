@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
-import { Button, Input } from '@open-design/components';
-import type { AdoptionOperationView, CatalogueAdoptionResponse, CatalogueSavedUnit, ResourceResult, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button, Input } from '@mish/components';
+import type { AdoptionOperationView, CatalogueAdoptionResponse, CatalogueSavedUnit, ResourceResult, WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { AdoptionRequestError, applyAdoptionPlan, copyWorkbenchCode, deleteSavedCatalogueUnit, getAdoptionStatus, listSavedCatalogueUnits, prepareCatalogueAdoption, saveCatalogueUnit, undoAdoptionOperation } from '../../providers/workbench-adoption';
 import { copyToClipboard } from '../../lib/copy-to-clipboard';

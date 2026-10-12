@@ -9,7 +9,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render as rtlRender } from '@testing-library/react';
 import type { ReactElement } from 'react';
-import type { PersistedAgentEvent, ProjectMediaTask } from '@open-design/contracts';
+import type { PersistedAgentEvent, ProjectMediaTask } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import type { Locale } from '../../../src/i18n/types';
 import { ImageRow } from '../../../src/components/chat/primitives/ImageRow';

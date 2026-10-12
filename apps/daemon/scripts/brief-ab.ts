@@ -22,9 +22,9 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { homedir, tmpdir } from 'node:os';
 import path from 'node:path';
-import { designBriefModelOutputSchema, renderDesignBriefPrompt, type DesignBrief, type DesignBriefPreview } from '@open-design/contracts';
-import { createModelCaller, vaultSecret } from '@open-design/agency-fast-lane/deepseek';
-import { postSystemOne, resolveJevKey } from '@open-design/agency-fast-lane/jev';
+import { designBriefModelOutputSchema, renderDesignBriefPrompt, type DesignBrief, type DesignBriefPreview } from '@mish/contracts';
+import { createModelCaller, vaultSecret } from '@mish/agency-fast-lane/deepseek';
+import { postSystemOne, resolveJevKey } from '@mish/agency-fast-lane/jev';
 import { createClaudeMaxBriefGenerator, type BriefGenerator } from '../src/workbench/brief/generator.js';
 import { createProviderBriefGenerator, withSchemaInstructions } from '../src/workbench/brief/generator-provider.js';
 import { fenced } from '../src/workbench/brief/prompt.js';

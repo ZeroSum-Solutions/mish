@@ -7,7 +7,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { randomUUID } from 'node:crypto';
-import type { AttachIntakeResponse, IntakeBatchSnapshot, IntakeFilePutResponse } from '@open-design/contracts';
+import type { AttachIntakeResponse, IntakeBatchSnapshot, IntakeFilePutResponse } from '@mish/contracts';
 import type { PlacementBootstrap } from '../../src/workbench/placement/owner-bootstrap.js';
 
 // The shutdown case boots a synthetic coordinated owner on any host; keep process observation synthetic.

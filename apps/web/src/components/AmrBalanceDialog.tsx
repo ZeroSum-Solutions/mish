@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog } from '@open-design/components';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import { Button, Dialog } from '@mish/components';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../i18n';
 import { useAnalytics } from '../analytics/provider';
 import { getResolvedDeviceId } from '../analytics/client';

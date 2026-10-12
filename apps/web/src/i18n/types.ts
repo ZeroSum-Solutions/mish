@@ -3072,10 +3072,10 @@ export interface Dict {
   'ds.saving': string;
   'ds.copyDesignMd': string;
   'ds.editDesignMd': string;
-  'ds.openDesignMd': string;
+  'ds.mishMd': string;
   'ds.copyDesignMdModule': string;
   'ds.editDesignMdModule': string;
-  'ds.openDesignMdModule': string;
+  'ds.mishMdModule': string;
   'ds.uploadMd': string;
   'ds.uploadFont': string;
   'ds.pasteImage': string;
@@ -3236,10 +3236,10 @@ export interface Dict {
   'avatar.reasoningLabel': string;
   'avatar.serviceTierLabel': string;
   'avatar.customSuffix': string;
-  'socialShare.openDesignSection': string;
-  'socialShare.openDesignTitle': string;
-  'socialShare.openDesignText': string;
-  'socialShare.openDesignCopyText': string;
+  'socialShare.mishSection': string;
+  'socialShare.mishTitle': string;
+  'socialShare.mishText': string;
+  'socialShare.mishCopyText': string;
   'socialShare.projectSection': string;
   'socialShare.publishPageTitle': string;
   'socialShare.publishPageSubtitle': string;
@@ -4915,8 +4915,8 @@ export interface Dict {
   'assistant.forkingConversation': string;
   /** 分叉分界线下面那行脚注 —— 告诉人 Fork 不是跳走,上文已经带过去了。 */
   'assistant.forkNote': string;
-  'assistant.shareToOpenDesign': string;
-  'assistant.shareToOpenDesignBusy': string;
+  'assistant.shareToMish': string;
+  'assistant.shareToMishBusy': string;
   'assistant.feedbackPrompt': string;
   'assistant.feedbackPositive': string;
   'assistant.feedbackNegative': string;
@@ -5650,7 +5650,7 @@ export interface Dict {
   'library.previewAsset': string;
   'library.selectAsset': string;
   'library.deselectAsset': string;
-  'library.openDesignSystem': string;
+  'library.mishSystem': string;
   'library.openProject': string;
   'library.opening': string;
   'library.editAsPage': string;

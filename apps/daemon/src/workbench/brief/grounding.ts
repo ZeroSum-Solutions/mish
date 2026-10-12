@@ -1,4 +1,4 @@
-import { DESIGN_BRIEF_TEXT_PATHS, type DesignBriefModelOutput } from '@open-design/contracts';
+import { DESIGN_BRIEF_TEXT_PATHS, type DesignBriefModelOutput } from '@mish/contracts';
 import { createClaudeMaxBriefGenerator, type BriefGenerator, type ClaudeMaxBriefGeneratorOptions } from './generator.js';
 import { fenced } from './prompt.js';
 

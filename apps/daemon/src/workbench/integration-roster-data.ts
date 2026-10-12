@@ -1,5 +1,5 @@
 import { PRODUCT_AGENT_DEFS } from '../runtimes/registry.js';
-import { parseIntegrationRosterEntry, type IntegrationRosterEntry } from '@open-design/contracts';
+import { parseIntegrationRosterEntry, type IntegrationRosterEntry } from '@mish/contracts';
 import { REFERO_EVIDENCE, REFERO_RIGHTS_SUMMARY } from './connectors/refero.js';
 
 /**

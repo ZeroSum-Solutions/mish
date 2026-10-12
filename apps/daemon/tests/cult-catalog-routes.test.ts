@@ -16,12 +16,12 @@ import {
   parseCultCatalogItemResponse,
   parseCultCatalogListResponse,
   type CultCatalogListResponse,
-} from '@open-design/contracts';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
-import cultCurationJson from '@open-design/cult-ui-catalog/catalog-curation.json' with { type: 'json' };
-import cultThumbnailsJson from '@open-design/cult-ui-catalog/generated/thumbnails.json' with { type: 'json' };
-import cultSlugsJson from '@open-design/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
+} from '@mish/contracts';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
+import cultCurationJson from '@mish/cult-ui-catalog/catalog-curation.json' with { type: 'json' };
+import cultThumbnailsJson from '@mish/cult-ui-catalog/generated/thumbnails.json' with { type: 'json' };
+import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
 import { cultGeneratedDir, cultPreviewPath, registerCultCatalogRoutes } from '../src/routes/cult-catalog.js';
 import { startServer } from '../src/server.js';
 import {

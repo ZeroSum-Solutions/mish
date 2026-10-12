@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { execAgentFile } from './shared.js';
-import type { ModelCapability, ModelCost, ModelMetadata } from '@open-design/contracts';
+import type { ModelCapability, ModelCost, ModelMetadata } from '@mish/contracts';
 import type { RuntimeAgentDef, RuntimeModelOption } from '../types.js';
 
 const AMR_MODELS_TIMEOUT_MS = 10_000;

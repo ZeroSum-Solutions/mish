@@ -34,8 +34,8 @@
 // cheapest way to make sure the one ask actually happens is to let the next
 // delivery re-arm.
 
-const RETIRED_KEY = 'open-design:experience-survey:v1:retired';
-const DELIVERY_COUNT_KEY = 'open-design:experience-survey:v1:deliveries';
+const RETIRED_KEY = 'mish:experience-survey:v1:retired';
+const DELIVERY_COUNT_KEY = 'mish:experience-survey:v1:deliveries';
 
 /**
  * Deliveries a user must reach before the card may be armed. One, today: the

@@ -1,5 +1,5 @@
 /** Reviewed copy edits shared by source exports and converted layout previews. */
-import refinementsJson from '@open-design/cult-ui-catalog/catalog-copy-refinements.json' with { type: 'json' };
+import refinementsJson from '@mish/cult-ui-catalog/catalog-copy-refinements.json' with { type: 'json' };
 
 type Replacement = { item: string; slot: string; from: string; to: string };
 const refinements = refinementsJson as { replacements: Replacement[] };

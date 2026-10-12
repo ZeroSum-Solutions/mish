@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { licenceOperationStatuses, type LicenceRecordSnapshot } from '@open-design/contracts';
+import { licenceOperationStatuses, type LicenceRecordSnapshot } from '@mish/contracts';
 import { buildIntegrationRoster } from '../../src/workbench/integration-roster.js';
 import { CONNECTOR_DEFINITIONS } from '../../src/workbench/connectors/connector-proxy.js';
 

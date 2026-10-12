@@ -8,7 +8,7 @@ import { PreviewModal } from '../../src/components/PreviewModal';
 import { createDropCoordinator } from '../../src/runtime/intake/drop-coordinator';
 import { I18nProvider } from '../../src/i18n';
 import type { DesignKit } from '../../src/runtime/design-kit';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 
 function previewKit(): DesignKit {
   return {

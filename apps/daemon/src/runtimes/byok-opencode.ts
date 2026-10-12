@@ -1,8 +1,8 @@
-import type { ByokChatProviderConfig } from '@open-design/contracts';
+import type { ByokChatProviderConfig } from '@mish/contracts';
 
 export const BYOK_OPENCODE_AGENT_ID = 'byok-opencode';
-export const BYOK_OPENCODE_PROVIDER_ID = 'open-design-byok';
-export const BYOK_OPENCODE_API_KEY_ENV = 'OPEN_DESIGN_BYOK_API_KEY';
+export const BYOK_OPENCODE_PROVIDER_ID = 'mish-byok';
+export const BYOK_OPENCODE_API_KEY_ENV = 'MISH_BYOK_API_KEY';
 export const BYOK_OPENCODE_PROVIDER_REQUIRED_MESSAGE =
   'BYOK OpenCode requires a complete provider configuration for this run.';
 const DEFAULT_CONTEXT_TOKEN_LIMIT = 128_000;

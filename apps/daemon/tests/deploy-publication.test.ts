@@ -1,5 +1,5 @@
 import express from 'express';
-import type { DeployPreflightResponse, DeployProjectFileResponse } from '@open-design/contracts';
+import type { DeployPreflightResponse, DeployProjectFileResponse } from '@mish/contracts';
 import type { Server } from 'node:http';
 import { mkdtemp, mkdir, rm, symlink, writeFile } from 'node:fs/promises';
 import os from 'node:os';

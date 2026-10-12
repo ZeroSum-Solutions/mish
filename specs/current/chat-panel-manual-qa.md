@@ -5,7 +5,7 @@
 
 运行:`pnpm tools-dev run web --daemon-port 17456 --web-port 17573`
 改过 `apps/daemon/src/**` 必须重启(tsx 不热更);改过 `packages/contracts/src/**`
-先 `pnpm --filter @open-design/contracts build`。
+先 `pnpm --filter @mish/contracts build`。
 
 ---
 

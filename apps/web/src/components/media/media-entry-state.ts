@@ -9,7 +9,7 @@ import {
   type MediaFailureNextStep,
   type MediaGalleryEntry,
   type MediaSafetyCategory,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 export type MediaEntryStatusView =
   | 'queued'

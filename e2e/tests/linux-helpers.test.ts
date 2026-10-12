@@ -5,11 +5,11 @@ import { linuxRemovalStatusMessage } from "../lib/linux-helpers.js";
 describe("linux e2e helpers", () => {
   it("[P1] delegates user-home resolution to node os.homedir", async () => {
     vi.resetModules();
-    vi.doMock("node:os", () => ({ homedir: () => "/tmp/open-design-test-home" }));
+    vi.doMock("node:os", () => ({ homedir: () => "/tmp/mish-test-home" }));
 
     try {
       const { linuxUserHome } = await import("../lib/linux-helpers.js");
-      expect(linuxUserHome()).toBe("/tmp/open-design-test-home");
+      expect(linuxUserHome()).toBe("/tmp/mish-test-home");
     } finally {
       vi.doUnmock("node:os");
       vi.resetModules();

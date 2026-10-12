@@ -1696,7 +1696,7 @@ describe('EntryShell onboarding Mishh Mashh AMR runtime', () => {
     renderOnboarding({
       config: baseConfig({
         agentId: 'claude-code',
-        agentCliEnv: { 'claude-code': { OPEN_DESIGN_TEST: '1' } },
+        agentCliEnv: { 'claude-code': { MISH_TEST: '1' } },
         agentModels: { 'claude-code': { model: 'sonnet', reasoning: 'high' } },
       }),
       agents: [amrAgent(), cliAgent()],
@@ -1718,7 +1718,7 @@ describe('EntryShell onboarding Mishh Mashh AMR runtime', () => {
       agentId: 'claude-code',
       model: 'sonnet',
       reasoning: 'high',
-      agentCliEnv: { 'claude-code': { OPEN_DESIGN_TEST: '1' } },
+      agentCliEnv: { 'claude-code': { MISH_TEST: '1' } },
     });
   });
 
@@ -1792,7 +1792,7 @@ describe('EntryShell onboarding Mishh Mashh AMR runtime', () => {
     expect(JSON.parse(String(loginInit.body))).toMatchObject({
       attribution: {
         entryId: expect.stringMatching(/^od-amr-/u),
-        sourceProduct: 'open_design',
+        sourceProduct: 'mish',
         sourceDetail: 'onboarding_amr_card',
       },
     });

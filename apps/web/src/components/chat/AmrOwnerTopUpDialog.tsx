@@ -29,7 +29,7 @@
  */
 import { useEffect, useId, type ReactElement } from 'react';
 import { createPortal } from 'react-dom';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { Icon } from '../Icon';
 import { useT } from '../../i18n';
 import { chatSeam } from './ChatRoot';

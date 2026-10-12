@@ -1,4 +1,4 @@
-import { FONT_CATEGORIES, FONT_SPINE_CODES, FONT_STYLES, FONT_TONES, FONT_TRAITS, FONT_UNICODE_RANGE_MAX_LENGTH, FONT_UNICODE_RANGE_PATTERN } from '@open-design/contracts';
+import { FONT_CATEGORIES, FONT_SPINE_CODES, FONT_STYLES, FONT_TONES, FONT_TRAITS, FONT_UNICODE_RANGE_MAX_LENGTH, FONT_UNICODE_RANGE_PATTERN } from '@mish/contracts';
 import snapshotJson from './fontsource-snapshot.json' with { type: 'json' };
 import { FONT_FILE_LIMIT, isSafeRelativePath } from './local-files.js';
 

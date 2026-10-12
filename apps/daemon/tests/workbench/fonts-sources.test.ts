@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseFontCheckRequest, parseFontCheckResponse, parseResourceSearchRequest, type ResourceCandidate, type ResourceResult } from '@open-design/contracts';
+import { parseFontCheckRequest, parseFontCheckResponse, parseResourceSearchRequest, type ResourceCandidate, type ResourceResult } from '@mish/contracts';
 import { checkFont } from '../../src/fonts/check.js';
 import { bundledFontListings, validateFontListing } from '../../src/fonts/listings.js';
 import { renderFontSpecimen } from '../../src/fonts/specimen.js';

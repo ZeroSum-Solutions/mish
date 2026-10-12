@@ -192,7 +192,7 @@ describe('browser authentication for non-loopback Docker peers', () => {
     expect(unauthenticatedShell.headers.get('set-cookie')).toBeNull();
     expect(await unauthenticatedShell.text()).not.toContain('docker shell');
 
-    const credentials = Buffer.from('open-design:secret-test-token').toString('base64');
+    const credentials = Buffer.from('mish:secret-test-token').toString('base64');
     const basicApiResp = await fetch(`${baseUrl}/api/plugins`, {
       headers: { authorization: `Basic ${credentials}` },
     });
@@ -216,7 +216,7 @@ describe('browser authentication for non-loopback Docker peers', () => {
 
     const invalidCredentials = [
       undefined,
-      `Basic ${Buffer.from('open-design:wrong-token').toString('base64')}`,
+      `Basic ${Buffer.from('mish:wrong-token').toString('base64')}`,
       `Basic ${Buffer.from('admin:secret-test-token').toString('base64')}`,
       'Basic not-base64!',
       'Bearer wrong-token',
@@ -257,7 +257,7 @@ describe('browser authentication for non-loopback Docker peers', () => {
     makeConnectionsAppearNonLoopback(server);
 
     const port = new URL(baseUrl).port;
-    const credentials = Buffer.from('open-design:secret-test-token').toString('base64');
+    const credentials = Buffer.from('mish:secret-test-token').toString('base64');
     const browserHeaders = {
       authorization: `Basic ${credentials}`,
       'sec-fetch-dest': 'empty',

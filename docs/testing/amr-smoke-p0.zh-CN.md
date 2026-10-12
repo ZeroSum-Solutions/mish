@@ -79,7 +79,7 @@
 
 - `/api/agents` 返回
 - `/api/integrations/vela/status` 返回
-- 当前 `OPEN_DESIGN_AMR_PROFILE`
+- 当前 `MISH_AMR_PROFILE`
 - 当前使用的是 fake 还是真实 `vela`
 - 相关 daemon 日志
 - 相关 web / desktop 日志

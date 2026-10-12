@@ -6,7 +6,7 @@ import { mkdir, mkdtemp, readdir, readFile, rm, writeFile } from 'node:fs/promis
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseVerificationBundle, type ReviewEgressFetch, type RunMechanicalReviewRequest } from '@open-design/contracts';
+import { parseVerificationBundle, type ReviewEgressFetch, type RunMechanicalReviewRequest } from '@mish/contracts';
 import { registerWorkbenchReviewRoutes } from '../../src/routes/workbench-review.js';
 import { runReviewCli } from '../../src/workbench/review-cli.js';
 import { egressDigest, type EgressSummary } from '../../src/workbench/review/egress.js';

@@ -14,7 +14,7 @@
  * shape as `od cult add|show`.
  */
 
-import { cultPreviewFrameUrl, cultPreviewInfoUrl, parseCultPreviewInfoResponse, type CultPreviewTheme } from '@open-design/contracts';
+import { cultPreviewFrameUrl, cultPreviewInfoUrl, parseCultPreviewInfoResponse, type CultPreviewTheme } from '@mish/contracts';
 
 import type { CultAddCliOptions, CultAddCliResult } from './cult-add-cli.js';
 

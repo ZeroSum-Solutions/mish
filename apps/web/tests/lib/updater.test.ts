@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { OpenDesignHostUpdaterStatusSnapshot } from '@open-design/host';
-import { installMockOpenDesignHost } from '@open-design/host/testing';
+import type { MishHostUpdaterStatusSnapshot } from '@mish/host';
+import { installMockMishHost } from '@mish/host/testing';
 
 import {
   checkForUpdaterUpdate,
@@ -15,14 +15,14 @@ import {
   syncUpdaterMenuLabels,
 } from '../../src/lib/updater';
 
-function downloadedStatus(overrides: Partial<OpenDesignHostUpdaterStatusSnapshot> = {}): OpenDesignHostUpdaterStatusSnapshot {
+function downloadedStatus(overrides: Partial<MishHostUpdaterStatusSnapshot> = {}): MishHostUpdaterStatusSnapshot {
   return {
     arch: 'arm64',
     artifact: {
-      name: 'Open Design Beta.dmg',
+      name: 'Mish Beta.dmg',
       platformKey: 'macAppleSilicon',
       type: 'dmg',
-      url: 'https://fixture.test/Open Design Beta.dmg',
+      url: 'https://fixture.test/Mish Beta.dmg',
     },
     availableVersion: '1.2.3-beta.4',
     capabilities: {
@@ -33,7 +33,7 @@ function downloadedStatus(overrides: Partial<OpenDesignHostUpdaterStatusSnapshot
     },
     channel: 'beta',
     currentVersion: '1.2.3-beta.3',
-    downloadPath: '/tmp/open-design-updater/Open Design Beta.dmg',
+    downloadPath: '/tmp/mish-updater/Mish Beta.dmg',
     enabled: true,
     mode: 'package-launcher',
     platform: 'darwin',
@@ -43,13 +43,13 @@ function downloadedStatus(overrides: Partial<OpenDesignHostUpdaterStatusSnapshot
   };
 }
 
-function payloadDownloadedStatus(overrides: Partial<OpenDesignHostUpdaterStatusSnapshot> = {}): OpenDesignHostUpdaterStatusSnapshot {
+function payloadDownloadedStatus(overrides: Partial<MishHostUpdaterStatusSnapshot> = {}): MishHostUpdaterStatusSnapshot {
   return downloadedStatus({
     artifact: {
-      name: 'open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+      name: 'mish-1.2.3-beta.4-mac-arm64-payload.zip',
       platformKey: 'mac',
       type: 'payload',
-      url: 'https://fixture.test/open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+      url: 'https://fixture.test/mish-1.2.3-beta.4-mac-arm64-payload.zip',
     },
     capabilities: {
       canApplyInPlace: true,
@@ -57,7 +57,7 @@ function payloadDownloadedStatus(overrides: Partial<OpenDesignHostUpdaterStatusS
       canOpenInstaller: false,
       requiresManualInstall: false,
     },
-    downloadPath: '/tmp/open-design-updater/open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+    downloadPath: '/tmp/mish-updater/mish-1.2.3-beta.4-mac-arm64-payload.zip',
     ...overrides,
   });
 }
@@ -169,10 +169,10 @@ describe('web updater model', () => {
         incoming: {
           arch: 'arm64',
           artifact: {
-            name: 'Open Design Beta 1.2.3-beta.5.dmg',
+            name: 'Mish Beta 1.2.3-beta.5.dmg',
             platformKey: 'macAppleSilicon',
             type: 'dmg',
-            url: 'https://fixture.test/Open Design Beta 1.2.3-beta.5.dmg',
+            url: 'https://fixture.test/Mish Beta 1.2.3-beta.5.dmg',
           },
           channel: 'beta',
           key: '1.2.3-beta.5-mac-arm64',
@@ -200,7 +200,7 @@ describe('web updater model', () => {
         installResult: {
           dryRun: true,
           openedAt: '2026-05-19T00:00:00.000Z',
-          path: '/tmp/open-design-updater/Open Design Beta.dmg',
+          path: '/tmp/mish-updater/Mish Beta.dmg',
         },
       }),
       { hostAvailable: true },
@@ -223,11 +223,11 @@ describe('web updater model', () => {
       installResult: {
         dryRun: true,
         openedAt: '2026-05-19T00:00:00.000Z',
-        path: status.downloadPath ?? '/tmp/open-design-updater/Open Design Beta.dmg',
+        path: status.downloadPath ?? '/tmp/mish-updater/Mish Beta.dmg',
       },
     }));
     const quit = vi.fn(async () => ({ ok: true as const }));
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: {
         updater: {
           check,
@@ -273,7 +273,7 @@ describe('web updater model', () => {
       openDialog = listener;
       return vi.fn();
     });
-    restoreHost = installMockOpenDesignHost({
+    restoreHost = installMockMishHost({
       host: { updater: { setMenuLabels, subscribeOpenDialog } },
     });
 

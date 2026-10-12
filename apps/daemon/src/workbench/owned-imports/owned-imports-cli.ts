@@ -1,6 +1,6 @@
 import { readdir, readFile, lstat } from 'node:fs/promises';
 import path from 'node:path';
-import { OWNED_IMPORT_LIMITS, parseOwnedImportList, parseOwnedImportRecord, parseOwnedImportRequest } from '@open-design/contracts';
+import { OWNED_IMPORT_LIMITS, parseOwnedImportList, parseOwnedImportRecord, parseOwnedImportRequest } from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../../daemon-url.js';
 
 export interface OwnedImportCliOptions {

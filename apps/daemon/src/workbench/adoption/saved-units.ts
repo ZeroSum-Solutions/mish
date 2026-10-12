@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdirSync, renameSync, rmSync } from 'node:fs';
 import path from 'node:path';
-import { CATALOGUE_TARGET_ADAPTERS, RESOURCE_SOURCE_IDS, type CatalogueSavedUnit, type CatalogueTargetReport, type ResourceRef } from '@open-design/contracts';
+import { CATALOGUE_TARGET_ADAPTERS, RESOURCE_SOURCE_IDS, type CatalogueSavedUnit, type CatalogueTargetReport, type ResourceRef } from '@mish/contracts';
 import { ADOPTION_MAX_FILE_BYTES, readNamedRegularFile, writeExclusiveFile } from '../placement/adoption-files.js';
 import { canonicalJson } from '../placement/adoption-plan.js';
 

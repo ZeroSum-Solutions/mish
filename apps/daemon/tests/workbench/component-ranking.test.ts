@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { rankKitComponents as rank, componentApplyGate as gate } from '../../src/workbench/component-ranking.js';
 import { candidate, savedContext, booking } from './context-ranking-fixture.js';
-import type { ResourceCandidate } from '@open-design/contracts';
+import type { ResourceCandidate } from '@mish/contracts';
 
 const projectFacts = { projectId: 'p', contextRevision: 1, rubricRevision: 1, rubricCurrent: true };
 const rankKitComponents: typeof rank = (items, options) => rank(items, { projectFacts, ...options });

@@ -252,7 +252,7 @@ beforeEach(async () => {
   originalHome = process.env.HOME;
   tmpHome = mkdtempSync(path.join(tmpdir(), 'od-vela-routes-'));
   process.env.HOME = tmpHome;
-  process.env.OPEN_DESIGN_AMR_PROFILE = 'local';
+  process.env.MISH_AMR_PROFILE = 'local';
   process.env.VELA_PROFILE = 'prod';
 });
 
@@ -272,14 +272,14 @@ afterEach(async () => {
     await writeAppConfig(process.env.OD_DATA_DIR as string, { ...originalAppConfig });
     if (originalHome === undefined) delete process.env.HOME;
     else process.env.HOME = originalHome;
-    delete process.env.OPEN_DESIGN_AMR_PROFILE;
+    delete process.env.MISH_AMR_PROFILE;
     delete process.env.VELA_PROFILE;
     delete process.env.OD_AMR_LOGIN_ACTIVATION_GRACE_MS;
     delete process.env.OD_PUBLIC_BASE_URL;
     delete process.env.VELA_RUNTIME_KEY;
     delete process.env.VELA_LINK_URL;
-    delete process.env.OPEN_DESIGN_AMR_ANALYTICS_URL;
-    delete process.env.OPEN_DESIGN_AMR_ANALYTICS_ENV;
+    delete process.env.MISH_AMR_ANALYTICS_URL;
+    delete process.env.MISH_AMR_ANALYTICS_ENV;
     delete process.env.OD_AMR_WALLET_FETCH_TIMEOUT_MS;
     rmSync(tmpHome, {
       recursive: true,
@@ -669,7 +669,7 @@ describe('GET /api/integrations/vela/status', () => {
       http: {},
       env: {
         HOME: tmpHome,
-        OPEN_DESIGN_AMR_PROFILE: 'local',
+        MISH_AMR_PROFILE: 'local',
         PATH: '',
       },
     });
@@ -799,7 +799,7 @@ describe('GET /api/integrations/vela/status', () => {
     const cfg = JSON.parse(readFileSync(configPath(), 'utf8'));
     cfg.profiles.prod = {};
     writeFileSync(configPath(), JSON.stringify(cfg, null, 2), 'utf8');
-    process.env.OPEN_DESIGN_AMR_PROFILE = 'prod';
+    process.env.MISH_AMR_PROFILE = 'prod';
     await writeAppConfig(dataDir, {
       ...previous,
       agentCliEnv: {
@@ -807,7 +807,7 @@ describe('GET /api/integrations/vela/status', () => {
         amr: {
           ...((previous.agentCliEnv?.amr as Record<string, string>) ?? {}),
           VELA_BIN: FAKE_VELA,
-          OPEN_DESIGN_AMR_PROFILE: 'local',
+          MISH_AMR_PROFILE: 'local',
         },
       },
     });
@@ -829,7 +829,7 @@ describe('GET /api/integrations/vela/status', () => {
   it('keeps Settings-configured AMR env, profile, status, and model catalog in sync', async () => {
     const dataDir = process.env.OD_DATA_DIR as string;
     const previous = await readAppConfig(dataDir);
-    process.env.OPEN_DESIGN_AMR_PROFILE = 'prod';
+    process.env.MISH_AMR_PROFILE = 'prod';
     await writeAppConfig(dataDir, {
       ...previous,
       agentCliEnv: {
@@ -837,7 +837,7 @@ describe('GET /api/integrations/vela/status', () => {
         amr: {
           ...((previous.agentCliEnv?.amr as Record<string, string>) ?? {}),
           VELA_BIN: FAKE_VELA,
-          OPEN_DESIGN_AMR_PROFILE: 'local',
+          MISH_AMR_PROFILE: 'local',
           VELA_RUNTIME_KEY: 'rt-settings-risk-smoke',
           VELA_LINK_URL: 'http://localhost:18081',
         },
@@ -1532,7 +1532,7 @@ describe('POST /api/integrations/vela/login', () => {
       const { status } = await postJson(`${baseUrl}/api/integrations/vela/login`, {
         attribution: {
           entryId: 'od-amr-entry-onboarding',
-          sourceProduct: 'open_design',
+          sourceProduct: 'mish',
           sourceDetail: 'onboarding_amr_sign_in_continue',
           occurredAt: '2026-06-16T08:00:00.000Z',
           odDeviceId: 'body-should-not-win',
@@ -1542,13 +1542,13 @@ describe('POST /api/integrations/vela/login', () => {
 
       await waitForFile(dumpPath);
       const env = JSON.parse(readFileSync(dumpPath, 'utf8'));
-      expect(env.OPEN_DESIGN_AMR_ORIGIN).toBe('open_design');
-      expect(env.OPEN_DESIGN_AMR_ENTRY_ID).toBe('od-amr-entry-onboarding');
-      expect(env.OPEN_DESIGN_AMR_ENTRY_SOURCE).toBe(
+      expect(env.MISH_AMR_ORIGIN).toBe('mish');
+      expect(env.MISH_AMR_ENTRY_ID).toBe('od-amr-entry-onboarding');
+      expect(env.MISH_AMR_ENTRY_SOURCE).toBe(
         'onboarding_amr_sign_in_continue',
       );
-      expect(env.OPEN_DESIGN_AMR_ENTRY_AT).toBe('2026-06-16T08:00:00.000Z');
-      expect(env.OPEN_DESIGN_AMR_DEVICE_ID).toBe('od-install-abc');
+      expect(env.MISH_AMR_ENTRY_AT).toBe('2026-06-16T08:00:00.000Z');
+      expect(env.MISH_AMR_DEVICE_ID).toBe('od-install-abc');
     } finally {
       await writeAppConfig(dataDir, previous as unknown as Record<string, unknown>);
     }
@@ -1568,8 +1568,8 @@ describe('POST /api/integrations/vela/login', () => {
     await waitForFile(dumpPath);
 
     const env = JSON.parse(readFileSync(dumpPath, 'utf8'));
-    expect(env.OPEN_DESIGN_AMR_AUTH_ATTEMPT_ID).toBe(authAttemptId);
-    expect(env.OPEN_DESIGN_AMR_AUTH_STAGE_FORMAT).toBeUndefined();
+    expect(env.MISH_AMR_AUTH_ATTEMPT_ID).toBe(authAttemptId);
+    expect(env.MISH_AMR_AUTH_STAGE_FORMAT).toBeUndefined();
     const status = await getJson<{
       authAttemptId?: string;
       authRoute?: string;
@@ -1611,10 +1611,10 @@ describe('POST /api/integrations/vela/login', () => {
           'x-od-analytics-device-id': 'od-install-plugin',
           'x-od-analytics-client-type': 'external_mcp',
           'x-od-analytics-entry-surface': 'external_mcp',
-          'x-od-analytics-external-plugin-id': 'open-design',
+          'x-od-analytics-external-plugin-id': 'mish',
           'x-od-analytics-external-plugin-version': '0.4.0',
           'x-od-analytics-distribution-mechanism': 'git_marketplace',
-          'x-od-analytics-publisher-class': 'open_design_first_party',
+          'x-od-analytics-publisher-class': 'mish_first_party',
         },
       );
       expect(status).toBe(202);
@@ -1622,13 +1622,13 @@ describe('POST /api/integrations/vela/login', () => {
       await waitForFile(dumpPath);
       const env = JSON.parse(readFileSync(dumpPath, 'utf8'));
       expect(env.OD_INSTALLATION_ID).toBe('od-install-plugin');
-      expect(env.OPEN_DESIGN_PLUGIN_WORKFLOW_ID).toBe(
+      expect(env.MISH_PLUGIN_WORKFLOW_ID).toBe(
         '019f9414-85e8-7f20-8d8f-7f868b2d4b5f',
       );
-      expect(env.OPEN_DESIGN_EXTERNAL_PLUGIN_ID).toBe('open-design');
-      expect(env.OPEN_DESIGN_EXTERNAL_PLUGIN_VERSION).toBe('0.4.0');
-      expect(env.OPEN_DESIGN_DISTRIBUTION_MECHANISM).toBe('git_marketplace');
-      expect(env.OPEN_DESIGN_PUBLISHER_CLASS).toBe('open_design_first_party');
+      expect(env.MISH_EXTERNAL_PLUGIN_ID).toBe('mish');
+      expect(env.MISH_EXTERNAL_PLUGIN_VERSION).toBe('0.4.0');
+      expect(env.MISH_DISTRIBUTION_MECHANISM).toBe('git_marketplace');
+      expect(env.MISH_PUBLISHER_CLASS).toBe('mish_first_party');
     } finally {
       await writeAppConfig(dataDir, previous as unknown as Record<string, unknown>);
     }
@@ -1654,19 +1654,19 @@ describe('POST /api/integrations/vela/login', () => {
           'x-od-analytics-device-id': 'od-install-plugin',
           'x-od-analytics-client-type': 'external_mcp',
           'x-od-analytics-entry-surface': 'external_mcp',
-          'x-od-analytics-external-plugin-id': 'open-design',
+          'x-od-analytics-external-plugin-id': 'mish',
           'x-od-analytics-external-plugin-version': '0.4.0',
           'x-od-analytics-distribution-mechanism': 'git_marketplace',
-          'x-od-analytics-publisher-class': 'open_design_first_party',
+          'x-od-analytics-publisher-class': 'mish_first_party',
         },
       );
       expect(status).toBe(202);
 
       await waitForFile(dumpPath);
       const env = JSON.parse(readFileSync(dumpPath, 'utf8'));
-      expect(env.OPEN_DESIGN_PLUGIN_WORKFLOW_ID).toBeUndefined();
-      expect(env.OPEN_DESIGN_EXTERNAL_PLUGIN_ID).toBeUndefined();
-      expect(env.OPEN_DESIGN_EXTERNAL_PLUGIN_VERSION).toBeUndefined();
+      expect(env.MISH_PLUGIN_WORKFLOW_ID).toBeUndefined();
+      expect(env.MISH_EXTERNAL_PLUGIN_ID).toBeUndefined();
+      expect(env.MISH_EXTERNAL_PLUGIN_VERSION).toBeUndefined();
     } finally {
       await writeAppConfig(dataDir, previous as unknown as Record<string, unknown>);
     }
@@ -1686,7 +1686,7 @@ describe('POST /api/integrations/vela/login', () => {
       const { status } = await postJson(`${baseUrl}/api/integrations/vela/login`, {
         attribution: {
           entryId: 'od-amr-entry-onboarding',
-          sourceProduct: 'open_design',
+          sourceProduct: 'mish',
           sourceDetail: 'onboarding_amr_sign_in_continue',
           occurredAt: '2026-06-16T08:00:00.000Z',
           odDeviceId: 'body-should-be-dropped',
@@ -1696,8 +1696,8 @@ describe('POST /api/integrations/vela/login', () => {
 
       await waitForFile(dumpPath);
       const env = JSON.parse(readFileSync(dumpPath, 'utf8'));
-      expect(env.OPEN_DESIGN_AMR_ENTRY_ID).toBe('od-amr-entry-onboarding');
-      expect(env.OPEN_DESIGN_AMR_DEVICE_ID).toBeUndefined();
+      expect(env.MISH_AMR_ENTRY_ID).toBe('od-amr-entry-onboarding');
+      expect(env.MISH_AMR_DEVICE_ID).toBeUndefined();
     } finally {
       await writeAppConfig(dataDir, previous as unknown as Record<string, unknown>);
     }
@@ -1717,7 +1717,7 @@ describe('POST /api/integrations/vela/login', () => {
       const { status } = await postJson(`${baseUrl}/api/integrations/vela/login`, {
         attribution: {
           entryId: 'od-amr-entry-onboarding',
-          sourceProduct: 'open_design',
+          sourceProduct: 'mish',
           sourceDetail: 'onboarding_amr_sign_in_continue',
           occurredAt: '2026-06-16T08:00:00.000Z',
           odDeviceId: 'body-should-be-dropped',
@@ -1727,8 +1727,8 @@ describe('POST /api/integrations/vela/login', () => {
 
       await waitForFile(dumpPath);
       const env = JSON.parse(readFileSync(dumpPath, 'utf8'));
-      expect(env.OPEN_DESIGN_AMR_ENTRY_ID).toBe('od-amr-entry-onboarding');
-      expect(env.OPEN_DESIGN_AMR_DEVICE_ID).toBeUndefined();
+      expect(env.MISH_AMR_ENTRY_ID).toBe('od-amr-entry-onboarding');
+      expect(env.MISH_AMR_DEVICE_ID).toBeUndefined();
     } finally {
       await writeAppConfig(dataDir, previous as unknown as Record<string, unknown>);
     }
@@ -1737,7 +1737,7 @@ describe('POST /api/integrations/vela/login', () => {
   it('derives the fallback login API proxy from OD_PUBLIC_BASE_URL when the direct attempt fails', async () => {
     const dumpPath = path.join(tmpHome, 'vela-env-public-base-url.json');
     await setFakeVelaControls({ FAKE_VELA_ENV_DUMP_PATH: dumpPath });
-    process.env.OD_PUBLIC_BASE_URL = 'https://open-design.example.com/';
+    process.env.OD_PUBLIC_BASE_URL = 'https://mish.example.com/';
     await setFakeVelaControls({ FAKE_VELA_LOGIN_FAIL_WITHOUT_API_URL: 'start device authorization: API request failed with status 502: broken edge' });
 
     const { status } = await postJson(`${baseUrl}/api/integrations/vela/login`);
@@ -1746,7 +1746,7 @@ describe('POST /api/integrations/vela/login', () => {
     await waitForFile(dumpPath);
     const env = JSON.parse(readFileSync(dumpPath, 'utf8'));
     expect(env.VELA_API_URL).toBe(
-      'https://open-design.example.com/api/integrations/vela/api-proxy',
+      'https://mish.example.com/api/integrations/vela/api-proxy',
     );
   });
 
@@ -1806,7 +1806,7 @@ describe('POST /api/integrations/vela/login', () => {
   });
 
   it('passes the resolved AMR profile to vela login even when VELA_PROFILE is set differently', async () => {
-    process.env.OPEN_DESIGN_AMR_PROFILE = 'test';
+    process.env.MISH_AMR_PROFILE = 'test';
     process.env.VELA_PROFILE = 'local';
     await setFakeVelaControls({ FAKE_VELA_LOGIN_USER_EMAIL: 'login-test@example.com' });
 
@@ -1830,7 +1830,7 @@ describe('POST /api/integrations/vela/login', () => {
   it('passes the Settings-configured AMR profile to vela login', async () => {
     const dataDir = process.env.OD_DATA_DIR as string;
     const previous = await readAppConfig(dataDir);
-    process.env.OPEN_DESIGN_AMR_PROFILE = 'prod';
+    process.env.MISH_AMR_PROFILE = 'prod';
     process.env.VELA_PROFILE = 'prod';
     await setFakeVelaControls({ FAKE_VELA_LOGIN_USER_EMAIL: 'settings-login@example.com' });
     await writeAppConfig(dataDir, {
@@ -1840,7 +1840,7 @@ describe('POST /api/integrations/vela/login', () => {
         amr: {
           ...((previous.agentCliEnv?.amr as Record<string, string>) ?? {}),
           VELA_BIN: FAKE_VELA,
-          OPEN_DESIGN_AMR_PROFILE: 'local',
+          MISH_AMR_PROFILE: 'local',
         },
       },
     });
@@ -1869,7 +1869,7 @@ describe('POST /api/integrations/vela/login', () => {
   it('uses the same Settings-configured AMR env for login and subsequent status reads', async () => {
     const dataDir = process.env.OD_DATA_DIR as string;
     const previous = await readAppConfig(dataDir);
-    process.env.OPEN_DESIGN_AMR_PROFILE = 'prod';
+    process.env.MISH_AMR_PROFILE = 'prod';
     process.env.VELA_PROFILE = 'prod';
     await setFakeVelaControls({ FAKE_VELA_LOGIN_USER_EMAIL: 'settings-roundtrip@example.com' });
     await writeAppConfig(dataDir, {
@@ -1879,7 +1879,7 @@ describe('POST /api/integrations/vela/login', () => {
         amr: {
           ...((previous.agentCliEnv?.amr as Record<string, string>) ?? {}),
           VELA_BIN: FAKE_VELA,
-          OPEN_DESIGN_AMR_PROFILE: 'local',
+          MISH_AMR_PROFILE: 'local',
         },
       },
     });
@@ -2085,7 +2085,7 @@ describe('ALL /api/integrations/vela/api-proxy/*', () => {
       expect(resp.status).toBe(201);
       expect(await resp.json()).toEqual({ ok: true });
       expect(upstreamRequests).toHaveLength(1);
-      expect(upstreamRequests[0]?.href).toBe('https://amr-api.open-design.ai/api/v1/oauth/token');
+      expect(upstreamRequests[0]?.href).toBe('https://amr-api.mish.invalid/api/v1/oauth/token');
       expect(upstreamRequests[0]?.method).toBe('POST');
       expect(upstreamRequests[0]?.headers['content-type']).toContain(
         'application/x-www-form-urlencoded',
@@ -2409,7 +2409,7 @@ describe('ALL /api/integrations/vela/message-center/*', () => {
       runtimeKey: undefined,
       user: undefined,
     });
-    await setSettingsAmrEnv({ OPEN_DESIGN_AMR_PROFILE: 'test' });
+    await setSettingsAmrEnv({ MISH_AMR_PROFILE: 'test' });
     try {
       const response = await fetch(
         `${baseUrl}/api/integrations/vela/message-center-public/messages?locale=en-US&limit=30`,
@@ -2423,7 +2423,7 @@ describe('ALL /api/integrations/vela/message-center/*', () => {
         },
       ]);
     } finally {
-      await setSettingsAmrEnv({ OPEN_DESIGN_AMR_PROFILE: undefined });
+      await setSettingsAmrEnv({ MISH_AMR_PROFILE: undefined });
       await new Promise<void>((resolve) => upstream.close(() => resolve()));
     }
   });
@@ -2542,18 +2542,18 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
       captureServer.listen(0, '127.0.0.1', () => resolve());
     });
     const address = captureServer.address() as AddressInfo;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_URL =
+    process.env.MISH_AMR_ANALYTICS_URL =
       `http://127.0.0.1:${address.port}/api/v1/analytics/events`;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_ENV = 'test';
+    process.env.MISH_AMR_ANALYTICS_ENV = 'test';
 
     const payload = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'chat_panel',
       area: 'amr_entry',
       element: 'chat_error_recharge',
       action: 'click_amr_entry',
       entryId: 'od-amr-entry-123',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'chat_error_recharge',
       entryOccurredAt: '2026-06-03T12:00:00.000Z',
     };
@@ -2578,7 +2578,7 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
             common: {
               eventId: 'od-amr-entry-od-amr-entry-123',
               eventTime: '2026-06-03T12:00:00.000Z',
-              registryKey: 'open_design_amr_entry',
+              registryKey: 'mish_amr_entry',
               eventName: 'amr_entry',
               eventType: 'click',
               platform: 'web',
@@ -2619,18 +2619,18 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
       captureServer.listen(0, '127.0.0.1', () => resolve());
     });
     const address = captureServer.address() as AddressInfo;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_URL =
+    process.env.MISH_AMR_ANALYTICS_URL =
       `http://127.0.0.1:${address.port}/api/v1/analytics/events`;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_ENV = 'test';
+    process.env.MISH_AMR_ANALYTICS_ENV = 'test';
 
     const payload = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'home',
       area: 'amr_entry',
       element: 'deepseek_workbench_badge',
       action: 'click_amr_entry',
       entryId: 'od-amr-entry-campaign',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'deepseek_workbench_badge',
       entryOccurredAt: '2026-08-06T12:00:00.000Z',
       campaignId: 'deepseek_v4_flash',
@@ -2679,18 +2679,18 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
       captureServer.listen(0, '127.0.0.1', () => resolve());
     });
     const address = captureServer.address() as AddressInfo;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_URL =
+    process.env.MISH_AMR_ANALYTICS_URL =
       `http://127.0.0.1:${address.port}/api/v1/analytics/events`;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_ENV = 'test';
+    process.env.MISH_AMR_ANALYTICS_ENV = 'test';
 
     const payload = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'chat_panel',
       area: 'amr_entry',
       element: 'chat_error_recharge',
       action: 'click_amr_entry',
       entryId: 'od-amr-entry-456',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'chat_error_recharge',
       entryOccurredAt: '2026-06-03T12:00:00.000Z',
       odRole: 'pm',
@@ -2739,18 +2739,18 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
       captureServer.listen(0, '127.0.0.1', () => resolve());
     });
     const address = captureServer.address() as AddressInfo;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_URL =
+    process.env.MISH_AMR_ANALYTICS_URL =
       `http://127.0.0.1:${address.port}/api/v1/analytics/events`;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_ENV = 'test';
+    process.env.MISH_AMR_ANALYTICS_ENV = 'test';
 
     const payload = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'onboarding',
       area: 'onboarding',
       element: 'about_you_submit',
       action: 'submit_profile',
       entryId: 'od-amr-entry-profile',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'onboarding_amr_sign_in_continue',
       entryOccurredAt: '2026-06-03T12:00:00.000Z',
       profileOccurredAt: '2026-06-03T12:03:00.000Z',
@@ -2781,7 +2781,7 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
             common: {
               eventId: 'od-onboarding-profile-od-amr-entry-profile',
               eventTime: '2026-06-03T12:03:00.000Z',
-              registryKey: 'open_design_onboarding_profile',
+              registryKey: 'mish_onboarding_profile',
               eventName: 'onboarding_profile',
               eventType: 'result',
               platform: 'web',
@@ -2804,13 +2804,13 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
 
   it('drops an over-long profile value rather than mirroring it', () => {
     const base = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'chat_panel',
       area: 'amr_entry',
       element: 'chat_error_recharge',
       action: 'click_amr_entry',
       entryId: 'od-amr-entry-789',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'chat_error_recharge',
       entryOccurredAt: '2026-06-03T12:00:00.000Z',
     };
@@ -2842,13 +2842,13 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
 
   it('rejects malformed AMR onboarding profile analytics payloads', async () => {
     const base = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'onboarding',
       area: 'onboarding',
       element: 'about_you_submit',
       action: 'submit_profile',
       entryId: 'od-amr-entry-profile',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'onboarding_amr_sign_in_continue',
       entryOccurredAt: '2026-06-03T12:00:00.000Z',
       profileOccurredAt: '2026-06-03T12:03:00.000Z',
@@ -2869,7 +2869,7 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
 
     const { status, body } = await postJson<{ error: string }>(
       `${baseUrl}/api/integrations/vela/analytics-profile`,
-      { payload: { pageName: 'open_design' } },
+      { payload: { pageName: 'mish' } },
     );
 
     expect(status).toBe(400);
@@ -2878,13 +2878,13 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
 
   it('rejects non-onboarding sources for AMR onboarding profile analytics', async () => {
     const payload = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'onboarding',
       area: 'onboarding',
       element: 'about_you_submit',
       action: 'submit_profile',
       entryId: 'od-amr-entry-profile',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'settings_amr_console',
       entryOccurredAt: '2026-06-03T12:00:00.000Z',
       profileOccurredAt: '2026-06-03T12:03:00.000Z',
@@ -2905,7 +2905,7 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
   it('rejects malformed AMR entry analytics payloads', async () => {
     const { status, body } = await postJson<{ error: string }>(
       `${baseUrl}/api/integrations/vela/analytics-entry`,
-      { payload: { pageName: 'open_design' } },
+      { payload: { pageName: 'mish' } },
     );
 
     expect(status).toBe(400);
@@ -2930,18 +2930,18 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
       captureServer.listen(0, '127.0.0.1', () => resolve());
     });
     const address = captureServer.address() as AddressInfo;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_URL =
+    process.env.MISH_AMR_ANALYTICS_URL =
       `http://127.0.0.1:${address.port}/api/v1/analytics/events`;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_ENV = 'test';
+    process.env.MISH_AMR_ANALYTICS_ENV = 'test';
 
     const payload = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'chat_panel',
       area: 'amr_entry',
       element: 'chat_error_recharge',
       action: 'click_amr_entry',
       entryId: 'od-amr-entry-no-consent',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'chat_error_recharge',
       entryOccurredAt: '2026-06-03T12:00:00.000Z',
     };
@@ -2989,18 +2989,18 @@ describe('POST /api/integrations/vela/analytics-entry', () => {
       captureServer.listen(0, '127.0.0.1', () => resolve());
     });
     const address = captureServer.address() as AddressInfo;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_URL =
+    process.env.MISH_AMR_ANALYTICS_URL =
       `http://127.0.0.1:${address.port}/api/v1/analytics/events`;
-    process.env.OPEN_DESIGN_AMR_ANALYTICS_ENV = 'test';
+    process.env.MISH_AMR_ANALYTICS_ENV = 'test';
 
     const payload = {
-      pageName: 'open_design',
+      pageName: 'mish',
       sourcePageName: 'chat_panel',
       area: 'amr_entry',
       element: 'chat_error_recharge',
       action: 'click_amr_entry',
       entryId: 'od-amr-entry-metrics-off',
-      sourceProduct: 'open_design',
+      sourceProduct: 'mish',
       sourceDetail: 'chat_error_recharge',
       entryOccurredAt: '2026-06-03T12:00:00.000Z',
     };
@@ -3176,7 +3176,7 @@ describe('POST /api/integrations/vela/logout', () => {
           ...((previous.agentCliEnv?.amr as Record<string, string>) ?? {}),
           VELA_BIN: FAKE_VELA,
           VELA_OPENCODE_BIN: '/tmp/opencode',
-          OPEN_DESIGN_AMR_PROFILE: 'local',
+          MISH_AMR_PROFILE: 'local',
           VELA_RUNTIME_KEY: 'rt-env-secret',
           VELA_LINK_URL: 'https://openrouter.example/v1',
         },
@@ -3223,7 +3223,7 @@ describe('POST /api/integrations/vela/logout', () => {
       user: { id: 'prod-user', email: 'prod@example.com' },
     };
     writeFileSync(configPath(), JSON.stringify(cfg, null, 2), 'utf8');
-    process.env.OPEN_DESIGN_AMR_PROFILE = 'prod';
+    process.env.MISH_AMR_PROFILE = 'prod';
     await writeAppConfig(dataDir, {
       ...previous,
       agentCliEnv: {
@@ -3231,7 +3231,7 @@ describe('POST /api/integrations/vela/logout', () => {
         amr: {
           ...((previous.agentCliEnv?.amr as Record<string, string>) ?? {}),
           VELA_BIN: FAKE_VELA,
-          OPEN_DESIGN_AMR_PROFILE: 'local',
+          MISH_AMR_PROFILE: 'local',
         },
       },
     });
@@ -3310,13 +3310,13 @@ describe('login → status round-trip (E2E across the three routes)', () => {
 
 describe('parseAmrEntryAnalyticsPayload — entry sources added in this PR', () => {
   const payloadFor = (source: string, page: string) => ({
-    pageName: 'open_design',
+    pageName: 'mish',
     sourcePageName: page,
     area: 'amr_entry',
     element: source,
     action: 'click_amr_entry',
     entryId: 'od-amr-entry-x',
-    sourceProduct: 'open_design',
+    sourceProduct: 'mish',
     sourceDetail: source,
     entryOccurredAt: '2026-06-03T12:00:00.000Z',
   });

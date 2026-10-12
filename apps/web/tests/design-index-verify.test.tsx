@@ -18,7 +18,7 @@ import type {
   AgencyBuildRepairResponse,
   AgencyBuildSnapshot,
   RouteDecision,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 const registryMocks = vi.hoisted(() => {
   class AgencyBuildRepairError extends Error {

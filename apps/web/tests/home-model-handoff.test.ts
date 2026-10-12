@@ -1,4 +1,4 @@
-import type { AttachIntakeResponse } from '@open-design/contracts';
+import type { AttachIntakeResponse } from '@mish/contracts';
 import { describe, expect, it, vi } from 'vitest';
 import { materializeHomeModelHandoff, saveCreatedHomeModelHandoff, homeModelHandoffOwnsInput, readHomeModelHandoff, writeHomeModelHandoff, type HomeModelHandoff } from '../src/runtime/workbench/home-model-handoff';
 const record: HomeModelHandoff = { projectId: 'actual-project', sessionId: 'actual-seed', choice: { agentId: 'codex', modelId: 'default' }, modelRevision: 0, modelSaveFailed: false, prompt: 'retained input', context: { workspaceItems: [] }, autoSend: true, workingDirReady: true, batchIds: ['saved-batch'], batchFileIds: { 'saved-batch': ['good', 'bad'] }, completedBatchIds: [], attachments: [{ path: 'existing.txt', name: 'existing.txt', kind: 'file', size: 1 }], ready: false };

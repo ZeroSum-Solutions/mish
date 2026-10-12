@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import type Database from 'better-sqlite3';
-import type { DesignSystemWorkspaceSyncConflict } from '@open-design/contracts';
+import type { DesignSystemWorkspaceSyncConflict } from '@mish/contracts';
 import { normalizeArtifactRuntimeImports } from '../artifacts/runtime-compat.js';
 import { validatePortableProjectPath } from '../projects.js';
 import {

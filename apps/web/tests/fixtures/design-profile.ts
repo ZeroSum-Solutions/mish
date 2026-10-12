@@ -4,7 +4,7 @@
 // Design index test can say the one thing it cares about (a spine, a family, a
 // preview URL) without restating twenty fields that never vary.
 
-import type { DesignJudgment, DesignProfile, DesignStyleAxis } from '@open-design/contracts';
+import type { DesignJudgment, DesignProfile, DesignStyleAxis } from '@mish/contracts';
 
 export function judgment(choice: string, confidence = 0.9): DesignJudgment {
   return { choice, confidence, probabilities: { [choice]: confidence } };

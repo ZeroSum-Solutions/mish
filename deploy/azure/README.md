@@ -2,7 +2,7 @@
 
 Deploy Mishh Mashh to Microsoft Azure from the published runtime image — the
 same single Alpine image used by [`deploy/docker-compose.yml`](../docker-compose.yml)
-and the [Helm chart](../../charts/open-design). The daemon serves both the API
+and the [Helm chart](../../charts/mish). The daemon serves both the API
 and the built web UI on one port, so there is no separate web container.
 
 > [!IMPORTANT]
@@ -15,7 +15,7 @@ and the built web UI on one port, so there is no separate web container.
 > data is reset on restart, redeploy, or scale.
 >
 > For durable self-hosting today, use [`deploy/docker-compose.yml`](../docker-compose.yml)
-> (named volume) or the [Helm chart](../../charts/open-design) (PVC with
+> (named volume) or the [Helm chart](../../charts/mish) (PVC with
 > `ReadWriteOnce`). A durable Azure lane needs block storage (e.g. a VM with a
 > managed disk) and is out of scope here.
 
@@ -43,13 +43,13 @@ supply one, deploys the chosen template, and prints the URL:
 # App Service (managed HTTPS, always on)
 deploy/azure/deploy-azure.sh \
   --target app-service \
-  --resource-group open-design-rg \
+  --resource-group mish-rg \
   --location eastus
 
 # Azure Container Instances (serverless, pay-per-second)
 deploy/azure/deploy-azure.sh \
   --target aci \
-  --resource-group open-design-rg \
+  --resource-group mish-rg \
   --location eastus
 ```
 
@@ -70,10 +70,10 @@ curl -fsS http://<dns>.<region>.azurecontainer.io:7456/api/health
 The templates are standard Bicep, so you can skip the wrapper and call `az`:
 
 ```bash
-az group create --name open-design-rg --location eastus
+az group create --name mish-rg --location eastus
 
 az deployment group create \
-  --resource-group open-design-rg \
+  --resource-group mish-rg \
   --template-file deploy/azure/app-service.bicep \
   --parameters apiToken="$(openssl rand -hex 32)"
 ```
@@ -86,9 +86,9 @@ Both templates share these parameters (defaults in parentheses):
 
 | Parameter | Description |
 | --- | --- |
-| `name` (`open-design`) | Base name; a unique suffix is appended to globally-scoped resources |
+| `name` (`mish`) | Base name; a unique suffix is appended to globally-scoped resources |
 | `location` (resource group location) | Azure region |
-| `image` (`docker.io/vanjayak/open-design:latest`) | Container image; pin to a digest for production |
+| `image` (`docker.io/vanjayak/mish:latest`) | Container image; pin to a digest for production |
 | `apiToken` (**required**, secure) | API token guarding the daemon |
 | `nodeOptions` (`--max-old-space-size=192`) | Node.js heap cap |
 | `extraAllowedOrigins` (empty) | Extra comma-separated browser origins allowed to call `/api` |
@@ -107,8 +107,8 @@ Use a digest instead of the mutable `latest` tag for reproducible deployments:
 ```bash
 deploy/azure/deploy-azure.sh \
   --target app-service \
-  --resource-group open-design-rg \
-  --image docker.io/vanjayak/open-design@sha256:<digest>
+  --resource-group mish-rg \
+  --image docker.io/vanjayak/mish@sha256:<digest>
 ```
 
 ## Security notes
@@ -136,5 +136,5 @@ redeploy starts from an empty data dir.
 Delete the whole resource group when you're done:
 
 ```bash
-az group delete --name open-design-rg --yes --no-wait
+az group delete --name mish-rg --yes --no-wait
 ```

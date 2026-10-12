@@ -3,11 +3,11 @@ import { expect } from '@playwright/test';
 import type {
   WorkspaceCollabContext,
   WorkspaceDirectoryItem,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { ensureRailOpen } from './rail.js';
 import { T } from '@/timeouts';
 
-export const STORAGE_KEY = 'open-design:config';
+export const STORAGE_KEY = 'mish:config';
 export const OPEN_SETTINGS_LABEL = /Open settings|打开设置|開啟設定|Account & settings/i;
 
 type MockAmrWalletOptions = {

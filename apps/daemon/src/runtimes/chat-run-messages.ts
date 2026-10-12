@@ -1,9 +1,9 @@
-import { parseDesignSystemRunNotice } from '@open-design/contracts';
+import { parseDesignSystemRunNotice } from '@mish/contracts';
 import { performance } from 'node:perf_hooks';
 import type Database from 'better-sqlite3';
-import type { PersistedAgentEvent } from '@open-design/contracts';
-import { MAX_ARTIFACT_FOCUS_SHOW, MAX_NEXT_STEP_SUGGESTIONS } from '@open-design/contracts';
-import type { RunFinishedProps } from '@open-design/contracts/analytics';
+import type { PersistedAgentEvent } from '@mish/contracts';
+import { MAX_ARTIFACT_FOCUS_SHOW, MAX_NEXT_STEP_SUGGESTIONS } from '@mish/contracts';
+import type { RunFinishedProps } from '@mish/contracts/analytics';
 import {
   appendMessageAgentEvents,
   clearMessageAgentEventBatches,

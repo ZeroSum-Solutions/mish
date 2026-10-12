@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import type { CatalogueTargetRefusal } from '@open-design/contracts';
+import type { CatalogueTargetRefusal } from '@mish/contracts';
 import type { InstalledPackage } from '../../adoption/installed-packages.js';
 
 type Manifest = Record<string, unknown>;

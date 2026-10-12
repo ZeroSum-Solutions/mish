@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 // `useBrandExtract` — kick off a programmatic-first brand extraction.
 //
 // Extraction is no longer an in-place SSE pipeline. `POST /api/brands { url }`
@@ -10,7 +10,7 @@ import { readApiErrorMessage } from '@open-design/contracts';
 // coarse status the New Brand modal / onboarding step render.
 
 import { useCallback, useRef, useState } from 'react';
-import type { BrandExtractStartResponse, BrandStatus, WorkspaceCollabContext } from '@open-design/contracts';
+import type { BrandExtractStartResponse, BrandStatus, WorkspaceCollabContext } from '@mish/contracts';
 import { useI18n } from '../i18n';
 import { workspaceProjectHeaders } from '../state/projects';
 

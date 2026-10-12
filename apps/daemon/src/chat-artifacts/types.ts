@@ -12,7 +12,7 @@
 // they are SUPPOSED to: the cover is the frozen static shot of that turn, the
 // click opens today's latest. That is the product ruling, not a bug.
 
-import type { ChatArtifactSnapshotState as ContractChatArtifactSnapshotState } from '@open-design/contracts';
+import type { ChatArtifactSnapshotState as ContractChatArtifactSnapshotState } from '@mish/contracts';
 
 /** Lifecycle of one immutable capture. */
 export type ChatArtifactSnapshotState = 'pending' | 'ready' | 'failed' | 'orphaned';
@@ -57,7 +57,7 @@ export type ChatArtifactFailureCode =
 export type {
   ChatArtifactDisplayPolicy,
   ChatArtifactRef,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /**
  * The projection's own view of a capture's lifecycle. `orphaned` never reaches

@@ -30,7 +30,7 @@ import { cleanup, fireEvent, render } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { ReactElement } from 'react';
-import type { ChatMessage, PersistedAgentEvent } from '@open-design/contracts';
+import type { ChatMessage, PersistedAgentEvent } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { AssistantMessage } from '../../../src/components/AssistantMessage';
 

@@ -9,7 +9,7 @@ import { join, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
-import { createPackageManagerInvocation } from "@open-design/platform";
+import { createPackageManagerInvocation } from "@mish/platform";
 import { describe, expect, it } from "vitest";
 
 import { INTERNAL_PACKAGES as LINUX_INTERNAL_PACKAGES } from "@/linux.js";
@@ -22,7 +22,7 @@ import { WORKSPACE_BUILD_PACKAGES } from "@/workspace-build.js";
 const execFileAsync = promisify(execFile);
 const workspaceRoot = fileURLToPath(new URL("../../../", import.meta.url));
 const packageDir = join(workspaceRoot, "packages", "21st-catalog");
-const NAME = "@open-design/21st-catalog";
+const NAME = "@mish/21st-catalog";
 
 async function packedFiles(): Promise<Set<string>> {
   // Drop the npm_* variables of whichever runner started vitest (npx sets npm_execpath to npm), so
@@ -60,8 +60,8 @@ describe("packaged 21st.dev catalog", () => {
     expect(WORKSPACE_BUILD_PACKAGES.map((pkg) => pkg.name)).toContain(NAME);
   });
 
-  it("is added beside @open-design/cult-ui-catalog, which every lane still installs (P1-4a-AC3)", () => {
-    const CULT = "@open-design/cult-ui-catalog";
+  it("is added beside @mish/cult-ui-catalog, which every lane still installs (P1-4a-AC3)", () => {
+    const CULT = "@mish/cult-ui-catalog";
     for (const [lane, names] of [
       ["linux", LINUX_INTERNAL_PACKAGES.map((pkg) => pkg.name)],
       ["mac", MAC_INTERNAL_PACKAGES.map((pkg) => pkg.name)],

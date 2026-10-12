@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { CAPTURE_DRAFT_MODEL_JSON_SCHEMA, parseCaptureDraftModelOutput } from '@open-design/contracts';
+import { CAPTURE_DRAFT_MODEL_JSON_SCHEMA, parseCaptureDraftModelOutput } from '@mish/contracts';
 import { renderCaptureDraftPrompt } from '../../prompts/capture-draft.js';
 import { stripRasterMetadata } from './image-metadata.js';
 import { resolveAgentBin } from '../../runtimes/resolution.js';

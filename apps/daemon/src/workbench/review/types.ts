@@ -1,7 +1,7 @@
 // Browser-port boundary for the R06.2 mechanical runner. The runner's pure
 // logic (plan → evaluate → aggregate) consumes ViewportCapture records; only
 // cdp-worker.ts talks to a real browser. Tests inject a fake port.
-import type { ObservedBehavior } from '@open-design/contracts';
+import type { ObservedBehavior } from '@mish/contracts';
 import type { EgressSummary } from './egress.js';
 import type { EvidenceParam, EvidenceText, PageText } from './evidence.js';
 import type { ConsoleRecord } from './page-text.js';

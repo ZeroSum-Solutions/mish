@@ -5,11 +5,11 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 import {
-  OPEN_DESIGN_SIDECAR_CONTRACT,
+  MISH_SIDECAR_CONTRACT,
   SIDECAR_DEFAULTS,
-} from "@open-design/sidecar-proto";
-import { resolveNamespace } from "@open-design/sidecar";
-import { releaseChannelFromVersion, releaseNamespace } from "@open-design/release";
+} from "@mish/sidecar-proto";
+import { resolveNamespace } from "@mish/sidecar";
+import { releaseChannelFromVersion, releaseNamespace } from "@mish/release";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -20,12 +20,12 @@ function resolveToolPackRoot(startDir: string): string {
     if (existsSync(packageJsonPath)) {
       const require = createRequire(packageJsonPath);
       const packageJson = require(packageJsonPath) as { name?: string };
-      if (packageJson.name === "@open-design/tools-pack") return candidate;
+      if (packageJson.name === "@mish/tools-pack") return candidate;
     }
 
     const parent = path.dirname(candidate);
     if (parent === candidate) {
-      throw new Error(`could not locate @open-design/tools-pack package from ${startDir}`);
+      throw new Error(`could not locate @mish/tools-pack package from ${startDir}`);
     }
     candidate = parent;
   }
@@ -109,7 +109,7 @@ export type ToolPackConfig = {
   telemetryRelayUrl?: string;
   /**
    * PostHog product-analytics ingest key, sourced from process.env.POSTHOG_KEY
-   * at packaging time. Baked into open-design-config.json so the packaged
+   * at packaging time. Baked into mish-config.json so the packaged
    * daemon can read it as POSTHOG_KEY env at launch — only official Open
    * Design builds (CI with the secret set) ship with this; forks compiling
    * locally produce binaries that omit the key and the integration
@@ -122,7 +122,7 @@ export type ToolPackConfig = {
   /**
    * Origin of the vela web console this build's AMR backend serves, sourced
    * from `OD_VELA_WEB_URL` at packaging time. Baked into
-   * open-design-config.json so the packaged runtime can forward it to the
+   * mish-config.json so the packaged runtime can forward it to the
    * daemon as `OD_VELA_WEB_URL`, which is what turns the workspace-team
    * transports on and what the workspace settings / members / dashboard
    * console links are derived from.
@@ -217,7 +217,7 @@ function resolveToolPackAmrProfile(value: string | undefined): ToolPackAmrProfil
   if (normalized === "prod" || normalized === "test" || normalized === "feature-test" || normalized === "local") {
     return normalized;
   }
-  throw new Error(`OPEN_DESIGN_AMR_PROFILE must be prod, test, feature-test, or local: ${value}`);
+  throw new Error(`MISH_AMR_PROFILE must be prod, test, feature-test, or local: ${value}`);
 }
 
 function resolveToolPackPosthogKey(value: string | undefined): string | undefined {
@@ -335,10 +335,10 @@ function resolveToolPackTelemetryRelayUrl(value: string | undefined): string | u
   try {
     parsed = new URL(normalized);
   } catch {
-    throw new Error(`OPEN_DESIGN_TELEMETRY_RELAY_URL must be an absolute https URL: ${value}`);
+    throw new Error(`MISH_TELEMETRY_RELAY_URL must be an absolute https URL: ${value}`);
   }
   if (parsed.protocol !== "https:") {
-    throw new Error(`OPEN_DESIGN_TELEMETRY_RELAY_URL must use https: ${value}`);
+    throw new Error(`MISH_TELEMETRY_RELAY_URL must use https: ${value}`);
   }
   return normalized.replace(/\/+$/, "");
 }
@@ -388,7 +388,7 @@ export function resolveToolPackConfig(
 ): ToolPackConfig {
   const appVersion = resolveToolPackAppVersion(options.appVersion);
   const namespace = resolveNamespace({
-    contract: OPEN_DESIGN_SIDECAR_CONTRACT,
+    contract: MISH_SIDECAR_CONTRACT,
     env: process.env,
     namespace: options.namespace ?? defaultNamespaceForAppVersion(platform, appVersion),
   });
@@ -433,8 +433,8 @@ export function resolveToolPackConfig(
     requireVelaCli: options.requireVelaCli === true,
     silent: options.silent !== false,
     signed: options.signed === true,
-    amrProfile: resolveToolPackAmrProfile(process.env.OPEN_DESIGN_AMR_PROFILE),
-    telemetryRelayUrl: resolveToolPackTelemetryRelayUrl(process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL),
+    amrProfile: resolveToolPackAmrProfile(process.env.MISH_AMR_PROFILE),
+    telemetryRelayUrl: resolveToolPackTelemetryRelayUrl(process.env.MISH_TELEMETRY_RELAY_URL),
     updateMetadataUrl: resolveToolPackUpdateMetadataUrl(process.env.OD_UPDATE_METADATA_URL),
     posthogKey: resolveToolPackPosthogKey(process.env.POSTHOG_KEY),
     posthogHost: resolveToolPackPosthogHost(process.env.POSTHOG_HOST),

@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { constants } from 'node:fs';
 import { lstat, writeFile } from 'node:fs/promises';
-import { parseResourceDetailResponse } from '@open-design/contracts';
+import { parseResourceDetailResponse } from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../../daemon-url.js';
 
 export interface RecipeCliOptions { baseUrl?: string; env?: NodeJS.ProcessEnv; write?: (value: unknown) => void }

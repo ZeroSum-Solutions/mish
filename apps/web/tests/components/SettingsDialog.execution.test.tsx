@@ -2,9 +2,9 @@
 
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { OpenDesignHostUpdaterStatusSnapshot } from '@open-design/host';
-import { installMockOpenDesignHost } from '@open-design/host/testing';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { MishHostUpdaterStatusSnapshot } from '@mish/host';
+import { installMockMishHost } from '@mish/host/testing';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { en } from '../../src/i18n/locales/en';
 
 function optionNames(container: HTMLElement): string[] {
@@ -327,11 +327,11 @@ const sampleDesignSystems = [
   },
 ];
 
-let restoreOpenDesignHost: (() => void) | null = null;
+let restoreMishHost: (() => void) | null = null;
 
 function updateStatus(
-  overrides: Partial<OpenDesignHostUpdaterStatusSnapshot> = {},
-): OpenDesignHostUpdaterStatusSnapshot {
+  overrides: Partial<MishHostUpdaterStatusSnapshot> = {},
+): MishHostUpdaterStatusSnapshot {
   return {
     arch: 'arm64',
     capabilities: {
@@ -554,8 +554,8 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  restoreOpenDesignHost?.();
-  restoreOpenDesignHost = null;
+  restoreMishHost?.();
+  restoreMishHost = null;
 });
 
 describe('SettingsDialog privacy settings interactions', () => {
@@ -933,7 +933,7 @@ describe('SettingsDialog execution settings BYOK interactions', () => {
       'https://api.atlascloud.ai/v1',
     );
     expect(screen.getByRole('link', { name: 'Get key ↗' }).getAttribute('href')).toBe(
-      'https://atlascloud.ai/?utm_source=open_design&utm_medium=provider_preset&utm_campaign=atlascloud_byok',
+      'https://atlascloud.ai/?utm_source=mish&utm_medium=provider_preset&utm_campaign=atlascloud_byok',
     );
   });
 
@@ -2809,7 +2809,7 @@ describe('SettingsDialog execution settings Local CLI interactions', () => {
       version: null,
       models: [],
       installUrl: 'https://github.com/MoonshotAI/kimi-cli',
-      docsUrl: 'https://www.kimi.com/code/docs/en/kimi-cli/guides/getting-started.html?aff=open-design',
+      docsUrl: 'https://www.kimi.com/code/docs/en/kimi-cli/guides/getting-started.html?aff=mish',
     };
     const { onPersist } = renderSettingsDialog(
       { mode: 'daemon', agentId: null },
@@ -4834,9 +4834,9 @@ describe('SettingsDialog connectors interactions', () => {
 
 describe('SettingsDialog MCP server interactions', () => {
   const installInfo = {
-    command: '/Applications/Open Design.app/Contents/Resources/open-design/bin/node',
+    command: '/Applications/Mish.app/Contents/Resources/mish/bin/node',
     args: [
-      '/Applications/Open Design.app/Contents/Resources/app/node_modules/@open-design/daemon/dist/cli.js',
+      '/Applications/Mish.app/Contents/Resources/app/node_modules/@mish/daemon/dist/cli.js',
       'mcp',
       '--daemon-url',
       'http://127.0.0.1:51706',
@@ -4892,7 +4892,7 @@ describe('SettingsDialog MCP server interactions', () => {
     expect(screen.getByRole('heading', { name: /Connect Mishh Mashh to your coding agent/i })).toBeTruthy();
     expect(screen.queryByText(/Run this command in your terminal/i)).toBeNull();
     await waitFor(() => {
-      expect(screen.getByText(/claude mcp add-json --scope user open-design/i)).toBeTruthy();
+      expect(screen.getByText(/claude mcp add-json --scope user mish/i)).toBeTruthy();
     });
     expect(screen.getByText(/Keep Mishh Mashh running\. Restart your coding agent after setup\./i)).toBeTruthy();
     expect(screen.getByText(/What your agent can do/i)).toBeTruthy();
@@ -4905,7 +4905,7 @@ describe('SettingsDialog MCP server interactions', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/claude mcp add-json --scope user open-design/i)).toBeTruthy();
+      expect(screen.getByText(/claude mcp add-json --scope user mish/i)).toBeTruthy();
     });
 
     fireEvent.click(screen.getByRole('button', { name: /Claude Code/i }));
@@ -4914,7 +4914,7 @@ describe('SettingsDialog MCP server interactions', () => {
     await waitFor(() => {
       expect(screen.getByText(/Append this table to ~\/\.codex\/config\.toml/i)).toBeTruthy();
     });
-    expect(screen.getByText(/\[mcp_servers\.open-design\]/i)).toBeTruthy();
+    expect(screen.getByText(/\[mcp_servers\.mish\]/i)).toBeTruthy();
 
     // Scope to the picker trigger ("Codex" + the TOML method chip) so
     // we don't collide with the new one-click "Install in Codex" /
@@ -4936,14 +4936,14 @@ describe('SettingsDialog MCP server interactions', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/claude mcp add-json --scope user open-design/i)).toBeTruthy();
+      expect(screen.getByText(/claude mcp add-json --scope user mish/i)).toBeTruthy();
     });
 
     fireEvent.click(screen.getByRole('button', { name: 'Copy setup command' }));
 
     await waitFor(() => {
       expect(writeTextMock).toHaveBeenCalledWith(
-        expect.stringContaining("claude mcp add-json --scope user open-design"),
+        expect.stringContaining("claude mcp add-json --scope user mish"),
       );
     });
     expect(screen.getByText('Copied')).toBeTruthy();
@@ -4968,7 +4968,7 @@ describe('SettingsDialog MCP server interactions', () => {
 describe('SettingsDialog language interactions', () => {
   afterEach(() => {
     cleanup();
-    window.localStorage.removeItem('open-design:locale');
+    window.localStorage.removeItem('mish:locale');
     document.documentElement.removeAttribute('lang');
     document.documentElement.removeAttribute('dir');
   });
@@ -5166,7 +5166,7 @@ describe('SettingsDialog draft reconciliation', () => {
         agentCliEnv: {
           codex: { CODEX_BIN: '/tmp/codex-dev' },
           amr: {
-            OPEN_DESIGN_AMR_PROFILE: 'prod',
+            MISH_AMR_PROFILE: 'prod',
             AMR_API_BASE_URL: 'https://draft.example.test',
           },
         },
@@ -5188,7 +5188,7 @@ describe('SettingsDialog draft reconciliation', () => {
           },
           agentCliEnv: {
             amr: {
-              OPEN_DESIGN_AMR_PROFILE: 'local',
+              MISH_AMR_PROFILE: 'local',
               AMR_API_BASE_URL: 'https://daemon.example.test',
             },
           },
@@ -5222,7 +5222,7 @@ describe('SettingsDialog draft reconciliation', () => {
         agentCliEnv: {
           codex: { CODEX_BIN: '/tmp/codex-dev' },
           amr: {
-            OPEN_DESIGN_AMR_PROFILE: 'local',
+            MISH_AMR_PROFILE: 'local',
             AMR_API_BASE_URL: 'https://draft.example.test',
           },
         },
@@ -5250,7 +5250,7 @@ describe('SettingsDialog draft reconciliation', () => {
           },
           agentCliEnv: {
             amr: {
-              OPEN_DESIGN_AMR_PROFILE: 'prod',
+              MISH_AMR_PROFILE: 'prod',
             },
           },
         },
@@ -5259,7 +5259,7 @@ describe('SettingsDialog draft reconciliation', () => {
           agentModels: {},
           agentCliEnv: {
             amr: {
-              OPEN_DESIGN_AMR_PROFILE: 'local',
+              MISH_AMR_PROFILE: 'local',
             },
           },
         },
@@ -5273,13 +5273,13 @@ describe('SettingsDialog draft reconciliation', () => {
         {
           codex: { CODEX_BIN: '/tmp/codex-dev' },
           amr: {
-            OPEN_DESIGN_AMR_PROFILE: 'prod',
+            MISH_AMR_PROFILE: 'prod',
             AMR_API_BASE_URL: 'https://draft.example.test',
           },
         },
         {
           amr: {
-            OPEN_DESIGN_AMR_PROFILE: 'local',
+            MISH_AMR_PROFILE: 'local',
             AMR_API_BASE_URL: 'https://daemon.example.test',
           },
         },
@@ -5287,7 +5287,7 @@ describe('SettingsDialog draft reconciliation', () => {
     ).toEqual({
       codex: { CODEX_BIN: '/tmp/codex-dev' },
       amr: {
-        OPEN_DESIGN_AMR_PROFILE: 'local',
+        MISH_AMR_PROFILE: 'local',
         AMR_API_BASE_URL: 'https://draft.example.test',
       },
     });
@@ -5912,17 +5912,17 @@ describe('SettingsDialog about interactions', () => {
     });
     const downloaded = updateStatus({
       artifact: {
-        name: 'Open Design Beta.dmg',
+        name: 'Mish Beta.dmg',
         platformKey: 'macAppleSilicon',
         type: 'dmg',
-        url: 'https://fixture.test/Open Design Beta.dmg',
+        url: 'https://fixture.test/Mish Beta.dmg',
       },
       availableVersion: '1.2.3-beta.4',
-      downloadPath: '/tmp/open-design-updater/Open Design Beta.dmg',
+      downloadPath: '/tmp/mish-updater/Mish Beta.dmg',
       state: 'downloaded',
     });
     const download = vi.fn(async () => downloaded);
-    restoreOpenDesignHost = installMockOpenDesignHost({
+    restoreMishHost = installMockMishHost({
       host: {
         updater: {
           download,
@@ -5960,7 +5960,7 @@ describe('SettingsDialog about interactions', () => {
   it('clears the updater cache from the about page after inline confirmation', async () => {
     const cleared = updateStatus({ state: 'idle' });
     const clearCache = vi.fn(async () => cleared);
-    restoreOpenDesignHost = installMockOpenDesignHost({
+    restoreMishHost = installMockMishHost({
       host: {
         updater: {
           'clear-cache': clearCache,
@@ -5997,7 +5997,7 @@ describe('SettingsDialog about interactions', () => {
   });
 
   it('hides updater cache recovery when packaged updates are unsupported', async () => {
-    restoreOpenDesignHost = installMockOpenDesignHost({
+    restoreMishHost = installMockMishHost({
       host: {
         updater: {
           status: vi.fn(async () => updateStatus({
@@ -6030,10 +6030,10 @@ describe('SettingsDialog about interactions', () => {
   it('installs a downloaded payload update from the about page', async () => {
     const payloadReady = updateStatus({
       artifact: {
-        name: 'open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+        name: 'mish-1.2.3-beta.4-mac-arm64-payload.zip',
         platformKey: 'mac',
         type: 'payload',
-        url: 'https://fixture.test/open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+        url: 'https://fixture.test/mish-1.2.3-beta.4-mac-arm64-payload.zip',
       },
       availableVersion: '1.2.3-beta.4',
       capabilities: {
@@ -6042,7 +6042,7 @@ describe('SettingsDialog about interactions', () => {
         canOpenInstaller: false,
         requiresManualInstall: false,
       },
-      downloadPath: '/tmp/open-design-updater/open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+      downloadPath: '/tmp/mish-updater/mish-1.2.3-beta.4-mac-arm64-payload.zip',
       state: 'downloaded',
     });
     const installing = updateStatus({
@@ -6051,7 +6051,7 @@ describe('SettingsDialog about interactions', () => {
     });
     const install = vi.fn(async () => installing);
     const quit = vi.fn(async () => ({ ok: true as const }));
-    restoreOpenDesignHost = installMockOpenDesignHost({
+    restoreMishHost = installMockMishHost({
       host: {
         updater: {
           install,
@@ -6090,10 +6090,10 @@ describe('SettingsDialog about interactions', () => {
   it('keeps a quit retry action when update install succeeds but quit throws or fails', async () => {
     const payloadReady = updateStatus({
       artifact: {
-        name: 'open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+        name: 'mish-1.2.3-beta.4-mac-arm64-payload.zip',
         platformKey: 'mac',
         type: 'payload',
-        url: 'https://fixture.test/open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+        url: 'https://fixture.test/mish-1.2.3-beta.4-mac-arm64-payload.zip',
       },
       availableVersion: '1.2.3-beta.4',
       capabilities: {
@@ -6102,7 +6102,7 @@ describe('SettingsDialog about interactions', () => {
         canOpenInstaller: false,
         requiresManualInstall: false,
       },
-      downloadPath: '/tmp/open-design-updater/open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+      downloadPath: '/tmp/mish-updater/mish-1.2.3-beta.4-mac-arm64-payload.zip',
       state: 'downloaded',
     });
     const installed = updateStatus({
@@ -6110,7 +6110,7 @@ describe('SettingsDialog about interactions', () => {
       installResult: {
         dryRun: true,
         openedAt: '2026-05-19T00:00:00.000Z',
-        path: '/tmp/open-design-updater/open-design-1.2.3-beta.4-mac-arm64-payload.zip',
+        path: '/tmp/mish-updater/mish-1.2.3-beta.4-mac-arm64-payload.zip',
       },
     });
     const install = vi.fn(async () => installed);
@@ -6120,7 +6120,7 @@ describe('SettingsDialog about interactions', () => {
         ok: false as const,
         reason: 'desktop quit is not available',
       });
-    restoreOpenDesignHost = installMockOpenDesignHost({
+    restoreMishHost = installMockMishHost({
       host: {
         updater: {
           install,

@@ -32,14 +32,14 @@ test('ACP session params do not request global MCP config mutation', () => {
 });
 
 test('ACP session params normalize explicit MCP servers to ACP stdio shape', () => {
-  const mcpServers = [{ name: 'open-design-live-artifacts', command: 'od', args: ['mcp', 'live-artifacts'] }];
+  const mcpServers = [{ name: 'mish-live-artifacts', command: 'od', args: ['mcp', 'live-artifacts'] }];
 
   assert.deepEqual(buildAcpSessionNewParams('/tmp/od-project', { mcpServers }), {
     cwd: path.resolve('/tmp/od-project'),
     mcpServers: [
       {
         type: 'stdio',
-        name: 'open-design-live-artifacts',
+        name: 'mish-live-artifacts',
         command: 'od',
         args: ['mcp', 'live-artifacts'],
         env: [],
@@ -3693,7 +3693,7 @@ test('attachAcpSession promotes allowlisted OpenCode role-marker ACP errors', ()
       retryable: true,
       details: {
         ...details,
-        promoted_by: 'open_design_acp',
+        promoted_by: 'mish_acp',
       },
     },
   });

@@ -29,7 +29,7 @@ function ensureDaemonCliBuilt() {
   });
 }
 
-const TEST_DATA_DIR_SYMBOL = Symbol.for('open-design.daemon.vitestDataDir');
+const TEST_DATA_DIR_SYMBOL = Symbol.for('mish.daemon.vitestDataDir');
 
 const globalState = globalThis as typeof globalThis & {
   [TEST_DATA_DIR_SYMBOL]?: string;
@@ -63,11 +63,11 @@ configureComposioConfigStore(process.env.OD_DATA_DIR);
 composioConnectorProvider.configureCatalogCache(process.env.OD_DATA_DIR);
 // Keep unit tests from reading a developer's stored Vela profile and routing
 // Langfuse-shaped telemetry through the authenticated Vela sink by accident.
-process.env.OPEN_DESIGN_VELA_TELEMETRY ??= 'off';
+process.env.MISH_VELA_TELEMETRY ??= 'off';
 
 // Publish/share endpoints shell out through OD_NODE_BIN + OD_BIN (dist/cli.js).
 // Build the CLI artifact once per vitest process so package tests do not depend
-// on a prior manual `pnpm --filter @open-design/daemon build`.
+// on a prior manual `pnpm --filter @mish/daemon build`.
 ensureDaemonCliBuilt();
 process.env.OD_DAEMON_CLI_PATH = daemonCliDist;
 
@@ -76,4 +76,4 @@ process.env.OD_DAEMON_CLI_PATH = daemonCliDist;
 // mock `fetch` with made-up hosts, so name resolution answers with one fixed
 // public address here instead of real DNS. A test that needs a
 // private answer replaces this slot for its own duration.
-(globalThis as Record<symbol, unknown>)[Symbol.for('open-design.daemon.publicProbeResolveHost')] = async () => ['93.184.216.34'];
+(globalThis as Record<symbol, unknown>)[Symbol.for('mish.daemon.publicProbeResolveHost')] = async () => ['93.184.216.34'];

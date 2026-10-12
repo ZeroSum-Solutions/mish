@@ -11,7 +11,7 @@ import {
   SIDECAR_SOURCES,
   type DesktopRenderFramesInput,
   type DesktopRenderFramesResult,
-} from '@open-design/sidecar-proto';
+} from '@mish/sidecar-proto';
 
 const stopRuntime = vi.fn(async () => undefined);
 const startDaemonRuntime = vi.fn(async (_options?: unknown) => ({

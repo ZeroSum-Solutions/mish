@@ -6,8 +6,8 @@ import {
   LAUNCHER_SCHEMA_VERSION,
   resolveLauncherPaths,
   resolveLauncherVersionPaths,
-} from "@open-design/launcher-proto";
-import { SIDECAR_SOURCES } from "@open-design/sidecar-proto";
+} from "@mish/launcher-proto";
+import { SIDECAR_SOURCES } from "@mish/sidecar-proto";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -23,9 +23,9 @@ async function fixture() {
   const runtimeRoot = join(root, "namespaces", namespace, "runtime");
   const launcherPaths = resolveLauncherPaths({ channel: "beta", namespace, root });
   const versionPaths = resolveLauncherVersionPaths({ channel: "beta", namespace, root, version });
-  const outerBundlePath = join(root, "installed", "Open Design Beta.local.app");
-  const outerExecutablePath = join(outerBundlePath, "Contents", "MacOS", "Open Design Beta");
-  const payloadExecutablePath = join(versionPaths.payloadRoot, "Open Design Beta.app", "Contents", "MacOS", "Open Design Beta");
+  const outerBundlePath = join(root, "installed", "Mish Beta.local.app");
+  const outerExecutablePath = join(outerBundlePath, "Contents", "MacOS", "Mish Beta");
+  const payloadExecutablePath = join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "MacOS", "Mish Beta");
   await mkdir(join(outerExecutablePath, ".."), { recursive: true });
   await mkdir(join(payloadExecutablePath, ".."), { recursive: true });
   await mkdir(runtimeRoot, { recursive: true });
@@ -34,7 +34,7 @@ async function fixture() {
   await writeFile(payloadExecutablePath, "");
   await writeFile(versionPaths.manifestPath, JSON.stringify({
     channel: "beta",
-    entry: { executable: "payload/Open Design Beta.app/Contents/MacOS/Open Design Beta" },
+    entry: { executable: "payload/Mish Beta.app/Contents/MacOS/Mish Beta" },
     namespace,
     platform: "darwin",
     schemaVersion: LAUNCHER_SCHEMA_VERSION,
@@ -225,7 +225,7 @@ describe("legacy payload desktop handoff", () => {
       await symlink(value.root, aliasRoot, "dir");
       await writeFile(value.launcherPaths.installPath, JSON.stringify({
         channel: "beta",
-        launchPath: join(aliasRoot, "installed", "Open Design Beta.local.app"),
+        launchPath: join(aliasRoot, "installed", "Mish Beta.local.app"),
         namespace: value.namespace,
         schemaVersion: LAUNCHER_SCHEMA_VERSION,
       }));
@@ -251,12 +251,12 @@ describe("legacy payload desktop handoff", () => {
 
   it("does nothing outside the packaged desktop runtime", async () => {
     await expect(prepareLegacyPayloadDesktopHandoff({
-      dataRoot: "/tmp/open-design/data",
+      dataRoot: "/tmp/mish/data",
       env: {},
       namespace: "default",
       outerPid: null,
       platform: "darwin",
-      runtimeRoot: "/tmp/open-design/runtime",
+      runtimeRoot: "/tmp/mish/runtime",
       source: SIDECAR_SOURCES.TOOLS_DEV,
     })).resolves.toEqual({ kind: "none", reason: "not-packaged" });
   });

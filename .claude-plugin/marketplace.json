@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/marketplace.json",
-  "name": "open-design",
+  "name": "mish",
   "owner": {
     "name": "ZeroSum-Solutions",
     "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
@@ -8,8 +8,8 @@
   "description": "Mishh Mashh — local-first design app exposed to coding agents over MCP. Install once with your agent's plugin command and projects/files/skills are reachable through stdio.",
   "plugins": [
     {
-      "name": "open-design",
-      "source": "./plugins/open-design",
+      "name": "mish",
+      "source": "./plugins/mish",
       "description": "Mishh Mashh MCP server (stdio). Skills plus projects/files/preview tools, served by your local `od` daemon. Requires `od` on PATH (built from this repository)."
     }
   ]

@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/desktop",
+  "name": "@mish/desktop",
   "version": "0.22.1",
   "private": true,
   "type": "module",
@@ -19,15 +19,15 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tests.json --noEmit"
   },
   "dependencies": {
-    "@open-design/contracts": "workspace:*",
-    "@open-design/diagnostics": "workspace:*",
-    "@open-design/download": "workspace:*",
-    "@open-design/host": "workspace:*",
-    "@open-design/launcher-proto": "workspace:*",
-    "@open-design/platform": "workspace:*",
-    "@open-design/release": "workspace:*",
-    "@open-design/sidecar": "workspace:*",
-    "@open-design/sidecar-proto": "workspace:*"
+    "@mish/contracts": "workspace:*",
+    "@mish/diagnostics": "workspace:*",
+    "@mish/download": "workspace:*",
+    "@mish/host": "workspace:*",
+    "@mish/launcher-proto": "workspace:*",
+    "@mish/platform": "workspace:*",
+    "@mish/release": "workspace:*",
+    "@mish/sidecar": "workspace:*",
+    "@mish/sidecar-proto": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.12.2",
