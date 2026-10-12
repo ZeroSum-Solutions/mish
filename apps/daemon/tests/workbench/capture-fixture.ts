@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { deflateSync } from 'node:zlib';
-import { encodeCaptureMetadataHeader, type CaptureImportMetadata } from '@open-design/contracts';
+import { encodeCaptureMetadataHeader, type CaptureImportMetadata } from '@mish/contracts';
 import type { CaptureBytesPort } from '../../src/workbench/capture/capture-service.js';
 
 const crcTable = Array.from({ length: 256 }, (_, n) => {

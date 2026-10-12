@@ -9,7 +9,7 @@ import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   DESIGN_SYSTEM_STATUS_WAIT_MS,

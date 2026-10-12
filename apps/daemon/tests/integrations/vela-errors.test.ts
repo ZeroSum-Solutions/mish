@@ -15,10 +15,8 @@ describe('AMR account failure classification', () => {
   // every other assertion in this file references the constant symbolically and
   // would keep passing while pointing users at a surface the product no longer
   // navigates to.
-  it('points the recharge link at the console dashboard, not a wallet page', () => {
-    expect(DEFAULT_AMR_RECHARGE_URL).toBe(
-      'https://open-design.ai/amr/dashboard?source=open_design',
-    );
+  it('offers no recharge link unless an AMR console is configured', () => {
+    expect(DEFAULT_AMR_RECHARGE_URL).toBeUndefined();
   });
 
   it('classifies insufficient_balance JSON-RPC failures as rechargeable AMR balance errors', () => {
@@ -29,13 +27,11 @@ describe('AMR account failure classification', () => {
     expect(failure).toMatchObject({
       code: 'AMR_INSUFFICIENT_BALANCE',
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
     });
-    expect(failure?.message).toContain(DEFAULT_AMR_RECHARGE_URL);
+    expect(failure?.message).toContain('Top up your AMR balance in your AMR account');
     expect(amrAccountFailureDetails(failure!)).toEqual({
       kind: 'amr_account',
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
     });
   });
 
@@ -52,7 +48,6 @@ describe('AMR account failure classification', () => {
     expect(failure).toMatchObject({
       code: 'AMR_INSUFFICIENT_BALANCE',
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
     });
   });
 
@@ -234,7 +229,6 @@ describe('AMR account failure classification', () => {
       expect(classifyAmrAccountFailure(text)).toMatchObject({
         code: 'AMR_INSUFFICIENT_BALANCE',
         action: 'recharge',
-        actionUrl: DEFAULT_AMR_RECHARGE_URL,
       });
     }
   });
@@ -249,7 +243,6 @@ describe('AMR account failure classification', () => {
     expect(failure).toMatchObject({
       code: 'AMR_INSUFFICIENT_BALANCE',
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
     });
   });
 
@@ -406,7 +399,7 @@ describe('AMR account failure classification', () => {
 
   // The `invalid session` lesson, applied to the rest of the list. Each string
   // below was a member of the auth branch, and a search of the vela repository
-  // (`/Users/elian/Documents/nexu/vela`, both `apps/cli` and `services/`) plus
+  // (`/Users/elian/Documents/mish/vela`, both `apps/cli` and `services/`) plus
   // this repository's own message sources found no upstream that emits it: they
   // are synonyms someone supplied for shapes upstream never sends. They are not
   // free — every one of them is live against arbitrary tool output.

@@ -1,4 +1,4 @@
-import type { UpdateLifecycleObservation } from "@open-design/desktop/main";
+import type { UpdateLifecycleObservation } from "@mish/desktop/main";
 import type { ChildProcess } from "node:child_process";
 import { access, appendFile, mkdir, open, rename, type FileHandle } from "node:fs/promises";
 import { createRequire } from "node:module";
@@ -7,7 +7,7 @@ import { setTimeout as sleep } from "node:timers/promises";
 
 import {
   APP_KEYS,
-  OPEN_DESIGN_SIDECAR_CONTRACT,
+  MISH_SIDECAR_CONTRACT,
   SIDECAR_ENV,
   SIDECAR_MESSAGES,
   SIDECAR_MODES,
@@ -15,7 +15,7 @@ import {
   type DaemonStatusSnapshot,
   type RegisterWebUrlResult,
   type WebStatusSnapshot,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   getSidecarStatus,
   invokeSidecar,
@@ -24,13 +24,13 @@ import {
   type SpawnedSidecar,
   type SidecarStamp,
   type SidecarRuntimeContext,
-} from "@open-design/sidecar";
+} from "@mish/sidecar";
 import {
   mergeProxyAwareEnv,
   resolveSystemProxyEnv,
   wellKnownUserToolchainBins,
-} from "@open-design/platform";
-import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@open-design/release";
+} from "@mish/platform";
+import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@mish/release";
 
 import type { PackagedWebOutputMode } from "./config.js";
 import type { PackagedNamespacePaths } from "./paths.js";
@@ -552,7 +552,7 @@ export async function retireExistingSidecar(
 ): Promise<void> {
   await appendSidecarLifecycleLog(
     logPath,
-    `[open-design packaged] retiring prior ${stamp.app} generation before launch`,
+    `[mish packaged] retiring prior ${stamp.app} generation before launch`,
   );
   try {
     const stopped = await (deps.stop ?? stopSidecar)(stamp, { termGraceMs: 2_500 });
@@ -562,7 +562,7 @@ export async function retireExistingSidecar(
   } catch (error) {
     await appendSidecarLifecycleLog(
       logPath,
-      `[open-design packaged] existing sidecar shutdown failed app=${stamp.app} error=${error instanceof Error ? error.message : String(error)}`,
+      `[mish packaged] existing sidecar shutdown failed app=${stamp.app} error=${error instanceof Error ? error.message : String(error)}`,
     );
     throw error;
   }
@@ -577,7 +577,7 @@ function extractPort(url: string): string {
 // reach even when the inherited PATH from launchd / a desktop launcher is
 // stripped down to nothing. The user-toolchain portion of the search list
 // (Homebrew, npm globals, nvm/fnm/mise, cargo, ...) lives in
-// @open-design/platform's wellKnownUserToolchainBins so the daemon
+// @mish/platform's wellKnownUserToolchainBins so the daemon
 // resolver and this PATH builder cannot drift again. See issue #442.
 const PACKAGED_POSIX_SYSTEM_BINS = ["/usr/bin", "/bin", "/usr/sbin", "/sbin"] as const;
 
@@ -678,7 +678,7 @@ export function buildPackagedDaemonSpawnEnv(
       : { OD_NODE_BIN: options.nodeCommand }),
     ...(options.amrProfile == null || options.amrProfile.length === 0
       ? {}
-      : { OPEN_DESIGN_AMR_PROFILE: options.amrProfile }),
+      : { MISH_AMR_PROFILE: options.amrProfile }),
     ...workspaceTeamTransportEnv(options.amrProfile, options.velaWebUrl),
     ...(options.velaWebUrls == null || Object.keys(options.velaWebUrls).length === 0
       ? {}
@@ -694,7 +694,7 @@ export function buildPackagedDaemonSpawnEnv(
     ...pickPackagedDesktopHandoffEnv(options.desktopHandoffEnv ?? {}),
     ...(options.telemetryRelayUrl == null || options.telemetryRelayUrl.length === 0
       ? {}
-      : { OPEN_DESIGN_TELEMETRY_RELAY_URL: options.telemetryRelayUrl }),
+      : { MISH_TELEMETRY_RELAY_URL: options.telemetryRelayUrl }),
     // OD_LEGACY_DATA_DIR is the one-shot recovery handle for users
     // upgrading from 0.3.x .od/ layouts. The daemon's startup
     // migrator (legacy-data-migrator.ts) reads it; the env-allowlist
@@ -813,7 +813,7 @@ export async function closeManagedChild(child: ManagedSidecarChild, observe?: (e
   const startedAt = Date.now();
   const appendLifecycleLog = async (message: string): Promise<void> => appendSidecarLifecycleLog(child.logPath, message);
   try {
-    await appendLifecycleLog(`[open-design packaged] shutdown requested app=${child.app} pid=${child.child.pid ?? "unknown"}`);
+    await appendLifecycleLog(`[mish packaged] shutdown requested app=${child.app} pid=${child.child.pid ?? "unknown"}`);
     // A daemon may briefly hold shutdown while committing a desktop handoff.
     // The sidecar generation boundary still owns escalation; packaged only
     // supplies a bounded grace appropriate for that lifecycle operation.
@@ -824,12 +824,12 @@ export async function closeManagedChild(child: ManagedSidecarChild, observe?: (e
         duration_ms: Date.now() - startedAt, forced_process_count: stop.forcedPids.length, remaining_process_count: stop.remainingPids.length });
     } catch {}
     if (stop.forcedPids.length > 0) {
-      await appendLifecycleLog(`[open-design packaged] graceful shutdown timed out app=${child.app} pid=${child.child.pid ?? "unknown"}; forced=${stop.forcedPids.join(",")}`);
+      await appendLifecycleLog(`[mish packaged] graceful shutdown timed out app=${child.app} pid=${child.child.pid ?? "unknown"}; forced=${stop.forcedPids.join(",")}`);
     }
     if (stop.remainingPids.length > 0) {
       throw new Error(`failed to stop packaged ${child.app} sidecar processes: ${stop.remainingPids.join(", ")}`);
     }
-    await appendLifecycleLog(`[open-design packaged] exited app=${child.app} pid=${child.child.pid ?? "unknown"} code=${child.child.exitCode ?? "unknown"} signal=${child.child.signalCode ?? "none"}`);
+    await appendLifecycleLog(`[mish packaged] exited app=${child.app} pid=${child.child.pid ?? "unknown"} code=${child.child.exitCode ?? "unknown"} signal=${child.child.signalCode ?? "none"}`);
   } finally {
     await child.logHandle.close().catch(() => undefined);
   }
@@ -910,9 +910,9 @@ export async function startPackagedSidecars(
   let webSupervisor: { close(): Promise<void> } | null = null;
 
   const daemonSidecarEntry =
-    options.daemonSidecarEntry ?? resolveSidecarEntry("@open-design/daemon", "sidecar");
+    options.daemonSidecarEntry ?? resolveSidecarEntry("@mish/daemon", "sidecar");
   const webSidecarEntry =
-    options.webSidecarEntry ?? resolveSidecarEntry("@open-design/web", "sidecar");
+    options.webSidecarEntry ?? resolveSidecarEntry("@mish/web", "sidecar");
   const prewarmLog = (message: string): void => {
     void appendSidecarLifecycleLog(join(paths.logsRoot, "launcher", "latest.log"), message);
   };

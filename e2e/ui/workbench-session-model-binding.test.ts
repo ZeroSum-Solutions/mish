@@ -10,7 +10,7 @@ import {
   type SessionModelChoice,
   type SessionModelSnapshot,
   type SessionRunAdmission,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { clusterTest, expect } from '@/playwright/suite';
 import { createFakeAgentRuntimes, type FakeAgentRuntime } from '@/playwright/fake-agents';
 import { routeUnavailableVelaStatus } from '@/playwright/mock-factory';
@@ -42,7 +42,7 @@ import { T } from '@/timeouts';
 // apps/daemon/tests/workbench/replay-ac-r02.test.ts (replay rules).
 
 const execFileAsync = promisify(execFile);
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 const MODEL_A = { id: 'gpt-6-sol', label: 'GPT-6 Sol' } as const;
 const MODEL_B = { id: 'gpt-6-luna', label: 'GPT-6 Luna' } as const;
 // The fake Codex sleeps 15s on this prompt, so the turn is still running while

@@ -12,7 +12,7 @@ import {
   type OdNextLayoutPrimitivesPresenceV1,
   type AppliedPluginSnapshot,
   type OdNextDevicePlatformResolutionV1,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { resolvePluginFolder } from '../../plugins/registry.js';
 import { loadBundledStrategyPromptAssetsV2 } from '../../plugins/strategy-package.js';
@@ -50,7 +50,7 @@ export class InvalidOdNextDeviceFrameRootError extends Error {
  * ours, and must not be allowed to nominate that name for deletion.
  */
 export const OD_NEXT_DEVICE_FRAME_MANIFEST = '.od-next-device-frames.json' as const;
-const OD_NEXT_DEVICE_FRAME_MANIFEST_SCHEMA = 'open-design.od-next-device-frames/v1' as const;
+const OD_NEXT_DEVICE_FRAME_MANIFEST_SCHEMA = 'mish.od-next-device-frames/v1' as const;
 
 /**
  * Every filename this materializer can ever stage, retire, or record. The

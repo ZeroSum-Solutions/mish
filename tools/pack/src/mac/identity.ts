@@ -1,10 +1,10 @@
-import { SIDECAR_DEFAULTS } from "@open-design/sidecar-proto";
+import { SIDECAR_DEFAULTS } from "@mish/sidecar-proto";
 import {
   releaseChannelFromNamespace,
   releaseChannelFromVersion,
   releaseChannelDescriptor,
   releaseInstallIdentity,
-} from "@open-design/release";
+} from "@mish/release";
 
 import type { ToolPackConfig } from "../config/index.js";
 import { MAC_PRODUCT_DISPLAY_NAME } from "./constants.js";
@@ -27,7 +27,7 @@ export function resolveMacInstallIdentity(config: Pick<ToolPackConfig, "namespac
   const channel = releaseChannelFromVersion(config.appVersion)
     ?? releaseChannelFromNamespace(config.namespace, SIDECAR_DEFAULTS.namespace);
   const legacyIdentity = channel == null
-    ? { appId: "io.open-design.desktop" }
+    ? { appId: "io.mish.desktop" }
     : releaseInstallIdentity(channel);
   const productName = channel == null || channel === "stable"
     ? MAC_PRODUCT_DISPLAY_NAME

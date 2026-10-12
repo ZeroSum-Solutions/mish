@@ -15,7 +15,7 @@
  * - tokens: identifier tokens in markup attributes (`id`, `for`, `class`, `aria-labelledby` and the
  *   other id-list attributes, in-page `href`, `url(#…)`) and in the CSS (`.class`, `#id`,
  *   `@keyframes name`, `--custom-property`) that name a denied brand
- *   (`isCultBrandFree`, @open-design/contracts). Each gets `cultBrandFreeSegment` of itself
+ *   (`isCultBrandFree`, @mish/contracts). Each gets `cultBrandFreeSegment` of itself
  *   (`footer-vite-email` → `footer-email-series-vt`), made unique within the adapter with `-2`,
  *   `-3`, … A pure function of the adapter, applied as a whole token everywhere, so an id and its
  *   references stay paired.
@@ -23,7 +23,7 @@
  *   a denied brand, context-only names included (`isCultBrandFreeLabel`: `aria-label="Discord"`),
  *   each with `cultBrandFreeLabel` of itself (`Discord` → `A third-party service`).
  *
- * `pnpm --filter @open-design/cult-ui-catalog adapters` regenerates it after the adapters; `check`
+ * `pnpm --filter @mish/cult-ui-catalog adapters` regenerates it after the adapters; `check`
  * fails when it is stale.
  */
 
@@ -31,7 +31,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
-import { cultBrandFreeLabel, cultBrandFreeSegment, isCultBrandFree, isCultBrandFreeLabel } from '@open-design/contracts';
+import { cultBrandFreeLabel, cultBrandFreeSegment, isCultBrandFree, isCultBrandFreeLabel } from '@mish/contracts';
 
 import { PACKAGE_DIR, worstCaseFill } from './adapter-check.ts';
 

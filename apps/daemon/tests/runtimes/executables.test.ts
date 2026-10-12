@@ -74,7 +74,7 @@ fsTest(
     const root = mkdtempSync(join(tmpdir(), 'od-amr-built-in-'));
     try {
       return withEnvSnapshot(['PATH', 'OD_AGENT_HOME', 'OD_RESOURCE_ROOT', 'VELA_OPENCODE_BIN'], () => {
-        const resourceRoot = join(root, 'resources', 'open-design');
+        const resourceRoot = join(root, 'resources', 'mish');
         const builtInVela = join(resourceRoot, 'bin', 'vela');
         const companionTree = join(resourceRoot, 'bin', 'libexec', 'opencode');
         mkdirSync(join(resourceRoot, 'bin'), { recursive: true });
@@ -109,7 +109,7 @@ fsTest(
     const root = mkdtempSync(join(tmpdir(), 'od-amr-built-in-no-opencode-'));
     try {
       return withEnvSnapshot(['PATH', 'OD_AGENT_HOME', 'OD_RESOURCE_ROOT', 'VELA_OPENCODE_BIN'], () => {
-        const resourceRoot = join(root, 'resources', 'open-design');
+        const resourceRoot = join(root, 'resources', 'mish');
         const builtInVela = join(resourceRoot, 'bin', 'vela');
         mkdirSync(join(resourceRoot, 'bin'), { recursive: true });
         writeFileSync(builtInVela, '#!/bin/sh\nexit 0\n');
@@ -181,7 +181,7 @@ fsTest(
     const root = mkdtempSync(join(tmpdir(), 'od-amr-built-in-precedence-'));
     try {
       return withEnvSnapshot(['PATH', 'OD_AGENT_HOME', 'OD_RESOURCE_ROOT'], () => {
-        const resourceRoot = join(root, 'resources', 'open-design');
+        const resourceRoot = join(root, 'resources', 'mish');
         const builtInVela = join(resourceRoot, 'bin', 'vela');
         const configuredVela = join(root, 'configured', 'vela');
         mkdirSync(join(resourceRoot, 'bin'), { recursive: true });
@@ -250,7 +250,7 @@ fsTest(
         chmodSync(pathVela, 0o755);
         process.env.PATH = pathBin;
         process.env.OD_AGENT_HOME = join(root, 'empty-home');
-        process.env.OD_RESOURCE_ROOT = join(root, 'resources', 'open-design');
+        process.env.OD_RESOURCE_ROOT = join(root, 'resources', 'mish');
 
         const resolved = resolveAgentExecutable(minimalAgentDef({ id: 'amr', bin: 'vela' }));
 

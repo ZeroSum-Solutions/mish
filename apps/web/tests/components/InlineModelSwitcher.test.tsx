@@ -3,7 +3,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { InlineModelSwitcher } from '../../src/components/InlineModelSwitcher';
 import {
   AMR_LOGIN_POLL_INTERVAL_MS,
@@ -14,6 +14,10 @@ import { providerModelsCacheKey } from '../../src/components/providerModelsCache
 import { resetWorkspaceContextCache } from '../../src/collab/useWorkspaceContext';
 import type { AgentInfo, AppConfig, ProviderModelOption } from '../../src/types';
 import { workspaceDirectoryFixture } from '../helpers/workspace-context';
+import { TEST_AMR_CONSOLE_ORIGIN, useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const analyticsMocks = vi.hoisted(() => ({ track: vi.fn() }));
 
@@ -227,7 +231,7 @@ function expectVelaLoginWithAttribution(
   };
   expect(body.attribution).toEqual(expect.objectContaining({
     entryId: expect.stringMatching(/^od-amr-/u),
-    sourceProduct: 'open_design',
+    sourceProduct: 'mish',
     sourceDetail,
   }));
   expect(Number.isFinite(Date.parse(body.attribution?.occurredAt ?? ''))).toBe(true);
@@ -829,6 +833,7 @@ describe('InlineModelSwitcher AMR row', () => {
           JSON.stringify({
             loggedIn: true,
             profile: 'test',
+            consoleOrigin: TEST_AMR_CONSOLE_ORIGIN,
             user: { id: 'user-1', email: 'manual-amr@example.local' },
             account: { plan: 'plus', balanceUsd: '42.0000' },
             configPath: '/Users/test/.amr/config.json',
@@ -865,13 +870,54 @@ describe('InlineModelSwitcher AMR row', () => {
     // The point of this case is the PROFILE: a signed-in test-profile account
     // must not be handed a production upgrade link. While the plans URL ignored
     // its profile argument this assertion read the prod host (T54).
-    expect(parsed.origin).toBe('https://open-design.powerformer.net');
-    expect(parsed.pathname).toBe('/cloud/dashboard');
+    expect(parsed.origin).toBe(TEST_AMR_CONSOLE_ORIGIN);
+    expect(parsed.pathname).toBe('/dashboard');
     expect(parsed.searchParams.get('billing')).toBe('plan');
     expect(parsed.searchParams.get('od_entry_source')).toBe('inline_amr_upgrade');
     expect(parsed.searchParams.get('od_device_id')).toBe('od-install-abc');
     expect(target).toBe('_blank');
     expect(features).toBe('noopener,noreferrer');
+  });
+
+  it('hides the inline upgrade action when no AMR console origin is configured', async () => {
+    const workspaceContext = personalWorkspaceContext();
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = input.toString();
+      if (url === '/api/integrations/vela/status') {
+        return new Response(
+          JSON.stringify({
+            loggedIn: true,
+            profile: 'test',
+            user: { id: 'user-1', email: 'manual-amr@example.local' },
+            account: { plan: 'plus', balanceUsd: '42.0000' },
+            configPath: '/Users/test/.amr/config.json',
+          }),
+          { status: 200, headers: { 'content-type': 'application/json' } },
+        );
+      }
+      // Personal workspace: `canManageBilling` is always true there, so this
+      // is the control case proving the permission gate below does not
+      // suppress the upgrade entry for non-team identities.
+      if (url === '/api/workspace/directory') {
+        return workspaceDirectoryResponse(workspaceContext);
+      }
+      if (url === '/api/workspace/context') {
+        return workspaceContextResponse(workspaceContext);
+      }
+      throw new Error(`Unexpected fetch: ${url}`);
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    renderSwitcher({
+      telemetry: { metrics: true },
+      installationId: 'od-install-abc',
+    });
+
+    fireEvent.click(screen.getByTestId('inline-model-switcher-chip'));
+    const popover = screen.getByTestId('inline-model-switcher-popover');
+    showAgentTab();
+    await within(popover).findByText('$42.00');
+    expect(screen.queryByTestId('inline-model-switcher-account-upgrade')).toBeNull();
   });
 
   // recvqfYKutwWlQ: a team member's plan tier can be upgradeable while the

@@ -1,0 +1,73 @@
+[
+  {
+    "family": "ownededitorial",
+    "archetype": "TL.05",
+    "spine": "TL",
+    "skin": "Editorial",
+    "skinInferred": true,
+    "summary": "Synthetic ownededitorial route fixture for TL.05 and Editorial.",
+    "pageKind": "site"
+  },
+  {
+    "family": "ownedcinematic",
+    "archetype": "TL.05",
+    "spine": "TL",
+    "skin": "Cinematic and immersive",
+    "skinInferred": true,
+    "summary": "Synthetic ownedcinematic route fixture for TL.05 and Cinematic and immersive. static product photography or 3D renders, with no scroll-linked or video-based motion, do not make a brief ownedcinematic. Not a SaaS, e-commerce, course, museum or contractor; motion or cinematic styling alone is insufficient.",
+    "pageKind": "site",
+    "requiresExactArchetype": true,
+    "excludes": [
+      "static product photography or 3D renders, with no scroll-linked or video-based motion, do not make a brief ownedcinematic."
+    ]
+  },
+  {
+    "family": "ownedcontractor",
+    "archetype": "TL.04",
+    "spine": "TL",
+    "skin": "Heritage and craft",
+    "skinInferred": true,
+    "summary": "Synthetic ownedcontractor route fixture for TL.04 and Heritage and craft.",
+    "pageKind": "site"
+  },
+  {
+    "family": "ownedsite",
+    "archetype": "TL.04",
+    "spine": "TL",
+    "skin": "Minimal and quiet",
+    "skinInferred": true,
+    "summary": "Synthetic ownedsite route fixture for TL.04 and Minimal and quiet.",
+    "pageKind": "site"
+  },
+  {
+    "family": "ownedinstitution",
+    "archetype": "BA.03",
+    "spine": "BA",
+    "skin": "Corporate and institutional",
+    "skinInferred": true,
+    "summary": "Synthetic ownedinstitution route fixture for BA.03 and Corporate and institutional.",
+    "pageKind": "site"
+  },
+  {
+    "family": "ownedmaker",
+    "archetype": "TL.06",
+    "spine": "TL",
+    "skin": "Heritage and craft",
+    "skinInferred": true,
+    "summary": "Synthetic ownedmaker route fixture for TL.06 and Heritage and craft. Not a catalog or product buy: a brief with a product grid, cart or checkout is not ownedmaker — that visitor buys off a catalog, not by phone or email.",
+    "pageKind": "site",
+    "sameSpineOnly": true,
+    "excludes": [
+      "Not a catalog or product buy: a brief with a product grid, cart or checkout is not ownedmaker — that visitor buys off a catalog, not by phone or email."
+    ]
+  },
+  {
+    "family": "ownedlearning",
+    "archetype": "LM.01",
+    "spine": "LM",
+    "skin": "Playful and illustrative",
+    "skinInferred": true,
+    "summary": "Synthetic ownedlearning route fixture for LM.01 and Playful and illustrative.",
+    "pageKind": "site"
+  }
+]

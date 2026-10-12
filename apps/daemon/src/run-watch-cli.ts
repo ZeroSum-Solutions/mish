@@ -1,4 +1,4 @@
-import { runSuccessor } from '@open-design/contracts';
+import { runSuccessor } from '@mish/contracts';
 
 export async function streamRunEvents(base: string, initialRunId: string, workspaceHeaders: Record<string, string> = {}) {
   let runId = initialRunId;

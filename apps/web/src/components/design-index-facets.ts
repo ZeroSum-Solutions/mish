@@ -12,7 +12,7 @@ import {
   DESIGN_STYLE_AXES,
   type DesignProfile,
   type DesignStyleAxis,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /** Tied to `DESIGN_INDEX_QUERY_LIST_KEYS` itself, not a hand-copied literal union, so a list
  *  facet added to the query contract cannot silently go unrecognized here. */

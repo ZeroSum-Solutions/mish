@@ -20,14 +20,14 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type SetStateAction,
 } from 'react';
-import type { AmrWalletSnapshot } from '@open-design/contracts';
-import { Chip, VisuallyHidden } from '@open-design/components';
+import type { AmrWalletSnapshot } from '@mish/contracts';
+import { Chip, VisuallyHidden } from '@mish/components';
 import { useT } from '../i18n';
 import {
   agentIdToTracking,
   byokProtocolToTracking,
   modelIdForTracking,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import {
   amrHandoffDeviceId,
@@ -81,7 +81,7 @@ import {
   isAmrSessionAuthenticated,
   notifyAmrLoginStatusChanged,
 } from './amrLoginPolling';
-import { orderAgentsWithOpenDesignFirst } from './agentOrdering';
+import { orderAgentsWithMishFirst } from './agentOrdering';
 import { anchorSelectionInView } from './pickerSelectionAnchor';
 import {
   agentModelIsSelectable,
@@ -180,7 +180,7 @@ const API_PROTOCOL_TABS: Array<{ id: ApiProtocol; title: string }> = [
   { id: 'aihubmix', title: 'AIHubMix' },
 ];
 
-const AMR_REMINDER_SEEN_KEY = 'open-design:inline-amr-cli-reminder-seen:v2';
+const AMR_REMINDER_SEEN_KEY = 'mish:inline-amr-cli-reminder-seen:v2';
 let amrReminderSeenFallback = false;
 
 function readAmrReminderSeen(): boolean {
@@ -770,7 +770,7 @@ export function InlineModelSwitcher({
 
   const installedAgents = useMemo(
     () =>
-      orderAgentsWithOpenDesignFirst(
+      orderAgentsWithMishFirst(
         agents.filter((a) => a.available && isVisibleLocalCliAgent(a)),
       ),
     [agents],
@@ -972,7 +972,14 @@ export function InlineModelSwitcher({
 
   /** Where a refused model pick sends the user instead — the same plans
    *  destination the settings picker's upgrade lock already opens. */
+  // `null` when no AMR console origin is configured: upgrade entries are
+  // then unavailable (the button is hidden, the disabled-option lock has no
+  // upgrade action).
+  const amrPlansUrl = amrPlansUrlForProfile(
+    amrStatus?.profile ?? config.agentCliEnv?.amr?.MISH_AMR_PROFILE,
+  );
   const openAmrModelUpgrade = useCallback(() => {
+    if (!amrPlansUrl) return;
     const attribution = recordAmrEntry(
       analytics.track,
       campaignNeedsUpgrade
@@ -995,21 +1002,14 @@ export function InlineModelSwitcher({
       installationId: config.installationId,
     });
     window.open(
-      attributedAmrUrl(
-        amrPlansUrlForProfile(
-          amrStatus?.profile ?? config.agentCliEnv?.amr?.OPEN_DESIGN_AMR_PROFILE,
-        ),
-        attribution,
-        deviceId,
-      ),
+      attributedAmrUrl(amrPlansUrl, attribution, deviceId),
       '_blank',
       'noopener,noreferrer',
     );
   }, [
-    amrStatus?.profile,
+    amrPlansUrl,
     analytics.track,
     campaignNeedsUpgrade,
-    config.agentCliEnv?.amr?.OPEN_DESIGN_AMR_PROFILE,
     config.installationId,
     config.telemetry?.metrics,
   ]);
@@ -1079,7 +1079,8 @@ export function InlineModelSwitcher({
   const amrCanUpgrade =
     amrLoggedIn &&
     canUpgradeVelaPlan(amrStatus?.account?.plan) &&
-    Boolean(workspaceContext?.permissions?.canManageBilling);
+    Boolean(workspaceContext?.permissions?.canManageBilling) &&
+    amrPlansUrl !== null;
   const amrActionLabel = amrLoginPending
     ? t('settings.amrSigningIn')
     : amrLoggedIn
@@ -1469,6 +1470,7 @@ export function InlineModelSwitcher({
             data-testid="inline-model-switcher-account-upgrade"
             onClick={(e) => {
               e.stopPropagation();
+              if (!amrPlansUrl) return;
               const attribution = recordAmrEntry(
                 analytics.track,
                 'inline_amr_upgrade',
@@ -1482,10 +1484,7 @@ export function InlineModelSwitcher({
               });
               window.open(
                 attributedAmrUrl(
-                  amrPlansUrlForProfile(
-                    amrStatus?.profile ??
-                      config.agentCliEnv?.amr?.OPEN_DESIGN_AMR_PROFILE,
-                  ),
+                  amrPlansUrl,
                   attribution,
                   deviceId,
                 ),
@@ -1838,7 +1837,7 @@ export function InlineModelSwitcher({
                         : undefined
                     }
                     onDisabledOptionUpgrade={
-                      currentAgent.id === 'amr'
+                      currentAgent.id === 'amr' && amrPlansUrl
                         ? openAmrModelUpgrade
                         : undefined
                     }

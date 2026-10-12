@@ -3,7 +3,7 @@ name: refine-critique-loop
 description: Use this plugin when the user has an existing Mishh Mashh artifact and wants targeted critique, patching, brand tightening, responsive fixes, or quality improvement without starting over.
 license: MIT
 metadata:
-  author: open-design-spec
+  author: mish-spec
   version: "0.1.0"
 ---
 

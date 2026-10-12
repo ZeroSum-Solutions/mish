@@ -31,15 +31,15 @@ import {
 } from '../src/startup-telemetry.js';
 
 // Verbatim daemon log tail from issue #4638.
-const ISSUE_4638_LOG = `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'better-sqlite3' imported from /Applications/Open Design.app/Contents/Resources/app/prebundled/daemon/chunks/server-PULTSXNL.mjs
+const ISSUE_4638_LOG = `Error [ERR_MODULE_NOT_FOUND]: Cannot find package 'better-sqlite3' imported from /Applications/Mish.app/Contents/Resources/app/prebundled/daemon/chunks/server-PULTSXNL.mjs
     at Object.getPackageJSONURL (node:internal/modules/package_json_reader:301:9)
-[open-design packaged] exited app=daemon pid=45305 code=1 signal=none`;
+[mish packaged] exited app=daemon pid=45305 code=1 signal=none`;
 
 // Verbatim shape of what waitForStatus throws (sidecars.ts:206-208).
 const DAEMON_EXIT_MESSAGE =
-  'daemon exited before reporting status (code=1, signal=none); see /Users/liudetao/Library/Application Support/Open Design/namespaces/release-stable/logs/daemon/latest.log for details';
+  'daemon exited before reporting status (code=1, signal=none); see /Users/liudetao/Library/Application Support/Mish/namespaces/release-stable/logs/daemon/latest.log for details';
 const WEB_EXIT_MESSAGE =
-  'daemon exited before reporting status (code=1, signal=none); see /Users/liudetao/Library/Application Support/Open Design/namespaces/release-stable/logs/web/latest.log for details';
+  'daemon exited before reporting status (code=1, signal=none); see /Users/liudetao/Library/Application Support/Mish/namespaces/release-stable/logs/web/latest.log for details';
 
 describe('parseDaemonLogTail', () => {
   it('extracts the error code and missing module from the #4638 log', () => {
@@ -75,7 +75,7 @@ describe('classifyStartupFailure', () => {
     // is backslash-separated. A naive "/web/" check would misreport this as
     // daemon-start — the one platform split this field exists for.
     const winWebMessage =
-      'daemon exited before reporting status (code=1, signal=none); see C:\\Users\\Alice\\AppData\\Roaming\\Open Design\\namespaces\\release-stable\\logs\\web\\latest.log for details';
+      'daemon exited before reporting status (code=1, signal=none); see C:\\Users\\Alice\\AppData\\Roaming\\Mish\\namespaces\\release-stable\\logs\\web\\latest.log for details';
     expect(classifyStartupFailure(new Error(winWebMessage), false).failureKind).toBe('web-start');
   });
 
@@ -95,7 +95,7 @@ describe('classifyStartupFailure', () => {
     // time, so there is no exit code, signal, or daemon log to read. Splitting
     // it out of `unknown` is what makes the win32 budget-raise measurable.
     const winPipe =
-      'timed out waiting for sidecar status at \\\\.\\pipe\\open-design-release-stable-win-daemon (connect ENOENT \\\\.\\pipe\\open-design-release-stable-win-daemon)';
+      'timed out waiting for sidecar status at \\\\.\\pipe\\mish-release-stable-win-daemon (connect ENOENT \\\\.\\pipe\\mish-release-stable-win-daemon)';
     const c = classifyStartupFailure(new Error(winPipe), false);
     expect(c.failureKind).toBe('status-timeout');
     expect(c.exitCode).toBeNull();
@@ -107,7 +107,7 @@ describe('classifyStartupFailure', () => {
 describe('scrubUserPaths', () => {
   it('redacts the user home directory but keeps the rest of the path', () => {
     const scrubbed = scrubUserPaths(
-      '/Users/liudetao/Library/Application Support/Open Design/namespaces/release-stable/logs/daemon/latest.log',
+      '/Users/liudetao/Library/Application Support/Mish/namespaces/release-stable/logs/daemon/latest.log',
     );
     expect(scrubbed).not.toContain('liudetao');
     expect(scrubbed).toContain('/Users/<redacted>/Library/Application Support');
@@ -256,13 +256,13 @@ describe('captureStartupFailure', () => {
     // prod and filtered out of the env=production dashboards.
     const saved = {
       OD_TELEMETRY_ENV: process.env.OD_TELEMETRY_ENV,
-      OPEN_DESIGN_ENV: process.env.OPEN_DESIGN_ENV,
+      MISH_ENV: process.env.MISH_ENV,
       POSTHOG_ENV: process.env.POSTHOG_ENV,
       LANGFUSE_ENVIRONMENT: process.env.LANGFUSE_ENVIRONMENT,
       NODE_ENV: process.env.NODE_ENV,
     };
     delete process.env.OD_TELEMETRY_ENV;
-    delete process.env.OPEN_DESIGN_ENV;
+    delete process.env.MISH_ENV;
     delete process.env.POSTHOG_ENV;
     delete process.env.LANGFUSE_ENVIRONMENT;
     delete process.env.NODE_ENV;
@@ -504,10 +504,10 @@ describe('reportStartupFailure', () => {
 //     a total black hole with no way to count or name the residue.
 describe('startup-failure attribution', () => {
   // Verbatim tail shape of a daemon that threw without an ERR_ code.
-  const NON_ERR_CODE_LOG = `[open-design daemon] starting namespace=release-stable-win
+  const NON_ERR_CODE_LOG = `[mish daemon] starting namespace=release-stable-win
 SqliteError: database disk image is malformed
     at Database.prepare (node:sqlite:214:9)
-[open-design packaged] exited app=daemon pid=8123 code=1 signal=none`;
+[mish packaged] exited app=daemon pid=8123 code=1 signal=none`;
 
   it('names the daemon crash when the log tail carries no ERR_ code', () => {
     const parsed = parseDaemonLogTail(NON_ERR_CODE_LOG);
@@ -627,7 +627,7 @@ describe('errno triplet privacy', () => {
 
   it('reduces a path-bearing Windows syscall to the operation token', () => {
     const err = Object.assign(new Error('spawn UNKNOWN'), {
-      syscall: 'spawn C:\\Users\\Alice Smith\\AppData\\Open Design\\vela.exe',
+      syscall: 'spawn C:\\Users\\Alice Smith\\AppData\\Mish\\vela.exe',
     });
     expect(readErrnoFields(err).syscall).toBe('spawn');
   });
@@ -680,11 +680,11 @@ describe('daemon_log_tail (unparseable log recovery)', () => {
   // Nothing here matches ERR_*, "Cannot find module/package", or the
   // `XError: …` headline — exactly the shape that reports all-null today.
   const UNPARSEABLE_LOG = [
-    '[open-design packaged] starting app=daemon',
-    'loading config from /Users/liudetao/Library/Application Support/Open Design/config.json',
-    'cache dir C:\\Users\\John Doe\\AppData\\Roaming\\Open Design\\cache',
+    '[mish packaged] starting app=daemon',
+    'loading config from /Users/liudetao/Library/Application Support/Mish/config.json',
+    'cache dir C:\\Users\\John Doe\\AppData\\Roaming\\Mish\\cache',
     'something we have never seen went wrong while binding the port',
-    '[open-design packaged] exited app=daemon pid=45305 code=1 signal=none',
+    '[mish packaged] exited app=daemon pid=45305 code=1 signal=none',
   ].join('\n');
 
   async function captureProps(

@@ -45,7 +45,7 @@ function Test-NodeVersion([string]$Version) {
 if (-not $HOME) { Fail 'HOME is not set.' }
 
 $LocalData = if ($env:LOCALAPPDATA) { $env:LOCALAPPDATA } else { Join-Path $HOME 'AppData\Local' }
-$InstallRoot = if ($env:OD_DSH_INSTALL_ROOT) { $env:OD_DSH_INSTALL_ROOT } else { Join-Path $LocalData 'OpenDesign\toolchains\dsh' }
+$InstallRoot = if ($env:OD_DSH_INSTALL_ROOT) { $env:OD_DSH_INSTALL_ROOT } else { Join-Path $LocalData 'Mish\toolchains\dsh' }
 $BinDir = if ($env:OD_DSH_INSTALL_BIN_DIR) { $env:OD_DSH_INSTALL_BIN_DIR } else { Join-Path $HOME '.local\bin' }
 $Launcher = Join-Path $BinDir 'dsh.cmd'
 $DistBase = if ($env:OD_DSH_INSTALL_DIST_BASE) { $env:OD_DSH_INSTALL_DIST_BASE.TrimEnd('/') } else { "https://nodejs.org/dist/v$NodeVersion" }

@@ -8,6 +8,10 @@ import {
   type DaemonRunFinishedEventDetail,
 } from '../../src/providers/daemon';
 import { requestAmrArtifactUpgrade } from '../../src/runtime/amr-artifact-upgrade';
+import { useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 type RuntimeAwareFinishedRunDetail = DaemonRunFinishedEventDetail & {
   agentId?: string;

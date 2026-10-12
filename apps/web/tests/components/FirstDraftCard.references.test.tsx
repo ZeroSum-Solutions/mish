@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import type { RouteDecision } from '@open-design/contracts';
+import type { RouteDecision } from '@mish/contracts';
 import { FirstDraftCard } from '../../src/components/design-index/FirstDraftCard';
 import { I18nProvider } from '../../src/i18n';
 import { referenceFanout } from '../helpers/reference-fanout';

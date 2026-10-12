@@ -1,9 +1,9 @@
 import { useId, useState } from 'react';
-import { Button, Input, Select } from '@open-design/components';
+import { Button, Input, Select } from '@mish/components';
 import {
   CONNECTOR_IDS, CONNECTOR_PLATFORMS, CONNECTOR_SEARCH_KINDS,
   type ConnectorPlatform, type ConnectorReferenceDetailResponse, type ConnectorSearchKind, type ConnectorSearchRequest, type ConnectorSearchResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useT } from '../../i18n';
 import { getConnectorDetail, searchConnector } from '../../providers/workbench-connectors';
 import { WorkbenchRequestError } from '../../providers/workbench';

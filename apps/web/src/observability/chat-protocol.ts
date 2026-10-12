@@ -26,7 +26,7 @@ import type {
   ChatRecoveryOutcome,
   ChatRecoveryPath,
   ChatRecoveryProps,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 
 import { reportSafetyEvent } from '../analytics/error-tracking';
 import { chatCorrelation, pushChatBreadcrumb } from './chat-context';

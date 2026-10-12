@@ -5,7 +5,7 @@ import {
   PREVIEW_OBSERVABILITY_MESSAGE_TYPE,
   buildPreviewObservabilityBridge,
   type PreviewObservabilityMessage,
-} from '@open-design/contracts/runtime/preview-observability';
+} from '@mish/contracts/runtime/preview-observability';
 
 interface ScheduledTask {
   at: number;

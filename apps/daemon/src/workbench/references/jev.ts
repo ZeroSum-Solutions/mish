@@ -1,4 +1,4 @@
-import { postSystemOne, type JevKeyResolver } from '@open-design/agency-fast-lane/jev';
+import { postSystemOne, type JevKeyResolver } from '@mish/agency-fast-lane/jev';
 import { untilAborted } from './abort.js';
 import type { ReferenceJudge, ReferenceJudgment } from './fanout.js';
 

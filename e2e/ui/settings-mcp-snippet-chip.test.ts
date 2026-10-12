@@ -10,7 +10,7 @@ import { suppressWhatsNew } from '../lib/playwright/mock-factory.js';
 // rectangle behind every wrapped segment — reading as permanent selection
 // highlights. The inner `<code>` must stay transparent.
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 
 test.beforeEach(async ({ page }) => {
   // The entry home mounts `WhatsNewPopup` (EntryShell.tsx) and its backdrop sits

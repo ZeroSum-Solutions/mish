@@ -1,4 +1,4 @@
-import { FONT_KIT_REASONS, type FontKitDeclaration, type FontKitInventory, type ResourceCandidate } from '@open-design/contracts';
+import { FONT_KIT_REASONS, type FontKitDeclaration, type FontKitInventory, type ResourceCandidate } from '@mish/contracts';
 import { familyKey, type FontKitLoading, type KitFontDeclaration, type KitFontScan } from './kit-scan.js';
 
 /**

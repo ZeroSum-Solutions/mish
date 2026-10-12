@@ -3,7 +3,7 @@ import path from 'node:path';
 import type {
   InstalledPluginRecord,
   ProjectMetadata,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { load } from 'cheerio';
 import { ensureProject } from '../projects.js';
 
@@ -19,7 +19,7 @@ const EXCLUDED_DIR_NAMES = new Set([
 
 const EXCLUDED_FILE_NAMES = new Set([
   '.DS_Store',
-  'open-design.json',
+  'mish.json',
   'SKILL.md',
 ]);
 

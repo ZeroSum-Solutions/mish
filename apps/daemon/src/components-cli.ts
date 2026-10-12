@@ -1,4 +1,4 @@
-import { parseComponentLedger, parseComponentLedgerReport } from '@open-design/contracts';
+import { parseComponentLedger, parseComponentLedgerReport } from '@mish/contracts';
 import ledgerJson from './workbench/component-ledger.json' with { type: 'json' };
 import { buildComponentLedgerReport } from './workbench/component-ledger-report.js';
 import { isLoopbackHostname } from './http/local-daemon-request.js';

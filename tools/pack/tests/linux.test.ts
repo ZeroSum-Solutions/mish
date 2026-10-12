@@ -6,14 +6,14 @@ import { dirname, join, resolve } from "node:path";
 import { posix } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { findSidecarProcesses, getSidecarStatus, invokeSidecar, stopSidecar } from "@open-design/sidecar";
+import { findSidecarProcesses, getSidecarStatus, invokeSidecar, stopSidecar } from "@mish/sidecar";
 import {
   APP_KEYS,
-  OPEN_DESIGN_SIDECAR_CONTRACT,
+  MISH_SIDECAR_CONTRACT,
   SIDECAR_MESSAGES,
   SIDECAR_MODES,
   SIDECAR_SOURCES,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import { describe, expect, it, vi } from "vitest";
 
 const stopSidecarMock = vi.hoisted(() => vi.fn(async (_stamp?: unknown, _options?: unknown) => ({
@@ -41,8 +41,8 @@ const stopSidecarsMock = vi.hoisted(() => vi.fn(async (requests: Array<{ options
   };
 }));
 
-vi.mock("@open-design/sidecar", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("@open-design/sidecar")>();
+vi.mock("@mish/sidecar", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@mish/sidecar")>();
   return {
     ...actual,
     findSidecarProcesses: vi.fn(async () => []),
@@ -172,11 +172,11 @@ describe("buildDockerArgs", () => {
     const args = buildDockerArgs(
       {
         ...makeConfig(),
-        telemetryRelayUrl: "https://telemetry.open-design.ai/api/langfuse",
+        telemetryRelayUrl: "https://telemetry.mish.invalid/api/langfuse",
       },
       { uid: 1000, gid: 1000 },
     );
-    expect(args).toContain("OPEN_DESIGN_TELEMETRY_RELAY_URL=https://telemetry.open-design.ai/api/langfuse");
+    expect(args).toContain("MISH_TELEMETRY_RELAY_URL=https://telemetry.mish.invalid/api/langfuse");
   });
 
   it("passes the AMR profile into containerized builds when configured", () => {
@@ -187,12 +187,12 @@ describe("buildDockerArgs", () => {
       },
       { uid: 1000, gid: 1000 },
     );
-    expect(args).toContain("OPEN_DESIGN_AMR_PROFILE=test");
+    expect(args).toContain("MISH_AMR_PROFILE=test");
   });
 
   it("bind-mounts the host Vela binary directory and rewrites the env path into the container", () => {
-    const previous = process.env.OPEN_DESIGN_VELA_CLI_BIN;
-    process.env.OPEN_DESIGN_VELA_CLI_BIN = "/host/bin/vela";
+    const previous = process.env.MISH_VELA_CLI_BIN;
+    process.env.MISH_VELA_CLI_BIN = "/host/bin/vela";
     try {
       const args = buildDockerArgs(makeConfig(), { uid: 1000, gid: 1000 });
       // The container only mounts /project, /tools-pack, and cache/home by
@@ -201,11 +201,11 @@ describe("buildDockerArgs", () => {
       // and the env rewritten to the container-side path so the resource
       // copier can actually read the binary.
       expect(args).toContain("/host/bin:/opt/vela-cli:ro");
-      expect(args).toContain("OPEN_DESIGN_VELA_CLI_BIN=/opt/vela-cli/vela");
-      expect(args).not.toContain("OPEN_DESIGN_VELA_CLI_BIN=/host/bin/vela");
+      expect(args).toContain("MISH_VELA_CLI_BIN=/opt/vela-cli/vela");
+      expect(args).not.toContain("MISH_VELA_CLI_BIN=/host/bin/vela");
     } finally {
-      if (previous === undefined) delete process.env.OPEN_DESIGN_VELA_CLI_BIN;
-      else process.env.OPEN_DESIGN_VELA_CLI_BIN = previous;
+      if (previous === undefined) delete process.env.MISH_VELA_CLI_BIN;
+      else process.env.MISH_VELA_CLI_BIN = previous;
     }
   });
 
@@ -382,7 +382,7 @@ describe("stopPackedLinuxHeadless", () => {
       await writeFile(
         markerPath,
         `${JSON.stringify({
-          appPath: "/tmp/Open-Design.AppImage",
+          appPath: "/tmp/Mish.AppImage",
           executablePath: "/tmp/.mount_od/AppRun",
           logPath: join(namespaceRoot, "logs", "desktop", "latest.log"),
           namespaceRoot,
@@ -438,7 +438,7 @@ describe("stopPackedLinuxHeadless", () => {
       await writeFile(
         markerPath,
         `${JSON.stringify({
-          appPath: "/tmp/Open-Design.AppImage",
+          appPath: "/tmp/Mish.AppImage",
           executablePath: "/tmp/.mount_od/AppRun",
           logPath: join(namespaceRoot, "logs", "desktop", "latest.log"),
           namespaceRoot,
@@ -579,7 +579,7 @@ describe("resolveProductionInstallCommand", () => {
 describe("renderDesktopTemplate", () => {
   const template = `[Desktop Entry]
 Type=Application
-Name=Open Design (@@NAMESPACE@@)
+Name=Mish (@@NAMESPACE@@)
 Exec=env -u ELECTRON_RUN_AS_NODE OD_PACKAGED_NAMESPACE=@@NAMESPACE@@ @@EXEC_PATH@@ --appimage-extract-and-run %U
 Icon=@@ICON_PATH@@
 MimeType=x-scheme-handler/od;
@@ -588,21 +588,21 @@ MimeType=x-scheme-handler/od;
   it("substitutes all @@TOKEN@@ placeholders", () => {
     const out = renderDesktopTemplate(template, {
       namespace: "default",
-      execPath: "/home/u/.local/bin/Open-Design.default.AppImage",
-      iconName: "open-design-default",
+      execPath: "/home/u/.local/bin/Mish.default.AppImage",
+      iconName: "mish-default",
     });
-    expect(out).toContain("Name=Open Design (default)");
+    expect(out).toContain("Name=Mish (default)");
     expect(out).toContain(
-      "Exec=env -u ELECTRON_RUN_AS_NODE OD_PACKAGED_NAMESPACE=default /home/u/.local/bin/Open-Design.default.AppImage --appimage-extract-and-run %U",
+      "Exec=env -u ELECTRON_RUN_AS_NODE OD_PACKAGED_NAMESPACE=default /home/u/.local/bin/Mish.default.AppImage --appimage-extract-and-run %U",
     );
-    expect(out).toContain("Icon=open-design-default");
+    expect(out).toContain("Icon=mish-default");
   });
 
   it("uses OD_PACKAGED_NAMESPACE (not OD_NAMESPACE) so apps/packaged actually picks up the namespace override", () => {
     const out = renderDesktopTemplate(template, {
       namespace: "ns",
       execPath: "/x",
-      iconName: "open-design-ns",
+      iconName: "mish-ns",
     });
     expect(out).toMatch(/^Exec=env -u ELECTRON_RUN_AS_NODE OD_PACKAGED_NAMESPACE=ns /m);
     expect(out).not.toMatch(/OD_NAMESPACE=/);
@@ -612,7 +612,7 @@ MimeType=x-scheme-handler/od;
     const out = renderDesktopTemplate(template, {
       namespace: "ns",
       execPath: "/x",
-      iconName: "open-design-ns",
+      iconName: "mish-ns",
     });
     expect(out).toMatch(/^Exec=env -u ELECTRON_RUN_AS_NODE /m);
   });
@@ -621,7 +621,7 @@ MimeType=x-scheme-handler/od;
     const out = renderDesktopTemplate(template, {
       namespace: "ns",
       execPath: "/x",
-      iconName: "open-design-ns",
+      iconName: "mish-ns",
     });
     expect(out).toMatch(/^Exec=.*--appimage-extract-and-run .*%U$/m);
   });
@@ -630,7 +630,7 @@ MimeType=x-scheme-handler/od;
     const out = renderDesktopTemplate(template, {
       namespace: "ns",
       execPath: "/x",
-      iconName: "open-design-ns",
+      iconName: "mish-ns",
     });
     expect(out).not.toMatch(/@@[A-Z_]+@@/);
   });
@@ -639,7 +639,7 @@ MimeType=x-scheme-handler/od;
     const out = renderDesktopTemplate(template, {
       namespace: "ns",
       execPath: "/x",
-      iconName: "open-design-ns",
+      iconName: "mish-ns",
     });
     expect(out).toContain("MimeType=x-scheme-handler/od;");
   });
@@ -649,8 +649,8 @@ describe("renderLinuxPackagedMainEntry", () => {
   it("loads the ESM packaged entry without require or temporary keepalive handles", () => {
     const out = renderLinuxPackagedMainEntry();
 
-    expect(out).toContain('import("@open-design/packaged")');
-    expect(out).not.toContain('require("@open-design/packaged")');
+    expect(out).toContain('import("@mish/packaged")');
+    expect(out).not.toContain('require("@mish/packaged")');
     expect(out).not.toContain("setTimeout");
   });
 });
@@ -667,7 +667,7 @@ describe("renderLinuxAppImageAppRun", () => {
 
     expect(out).toContain("unset ELECTRON_RUN_AS_NODE");
     expect(out.indexOf("unset ELECTRON_RUN_AS_NODE")).toBeLessThan(out.indexOf('exec "$BIN"'));
-    expect(out).toContain('BIN="$APPDIR/Open Design"');
+    expect(out).toContain('BIN="$APPDIR/Mish"');
   });
 
   it("preserves AppImageLauncher install-only behavior", () => {
@@ -695,7 +695,7 @@ describe("renderLinuxAppImageAppRun", () => {
     const appDir = join(root, "AppDir");
     const appRunPath = join(appDir, "AppRun");
     const observedEnvPath = join(root, "observed-env.txt");
-    const electronPath = join(appDir, "Open Design");
+    const electronPath = join(appDir, "Mish");
 
     try {
       await mkdir(appDir, { recursive: true });
@@ -788,11 +788,11 @@ describe("shouldRejectLinuxHeadlessInspectOptions", () => {
 
   it("rejects headless eval and screenshot requests", () => {
     expect(shouldRejectLinuxHeadlessInspectOptions({ expr: "document.title" })).toBe(true);
-    expect(shouldRejectLinuxHeadlessInspectOptions({ path: "/tmp/open-design-linux.png" })).toBe(true);
+    expect(shouldRejectLinuxHeadlessInspectOptions({ path: "/tmp/mish-linux.png" })).toBe(true);
     expect(
       shouldRejectLinuxHeadlessInspectOptions({
         expr: "document.title",
-        path: "/tmp/open-design-linux.png",
+        path: "/tmp/mish-linux.png",
       }),
     ).toBe(true);
   });
@@ -818,17 +818,17 @@ describe("inspectPackedLinuxApp", () => {
       throw new Error("packaged status unavailable");
     });
     vi.mocked(invokeSidecar)
-      .mockResolvedValueOnce({ ok: true, value: "Open Design" })
-      .mockResolvedValueOnce({ path: "/tmp/open-design-linux.png" });
+      .mockResolvedValueOnce({ ok: true, value: "Mish" })
+      .mockResolvedValueOnce({ path: "/tmp/mish-linux.png" });
 
     const result = await inspectPackedLinuxApp(makeConfig(), {
       expr: "document.title",
-      path: "/tmp/open-design-linux.png",
+      path: "/tmp/mish-linux.png",
     });
 
     expect(result).toEqual({
-      eval: { ok: true, value: "Open Design" },
-      screenshot: { path: "/tmp/open-design-linux.png" },
+      eval: { ok: true, value: "Mish" },
+      screenshot: { path: "/tmp/mish-linux.png" },
       status: { state: "running", url: "od://app/" },
     });
     expect(getSidecarStatus).toHaveBeenCalledTimes(2);
@@ -843,7 +843,7 @@ describe("inspectPackedLinuxApp", () => {
       if (stamp.source === SIDECAR_SOURCES.PACKAGED) return { state: "running", url: "od://app/" };
       throw new Error("stale tools-pack endpoint");
     });
-    vi.mocked(invokeSidecar).mockResolvedValueOnce({ ok: true, value: "Open Design" });
+    vi.mocked(invokeSidecar).mockResolvedValueOnce({ ok: true, value: "Mish" });
 
     const result = await inspectPackedLinuxApp(makeConfig(), { expr: "document.title" });
 
@@ -858,7 +858,7 @@ describe("inspectPackedLinuxApp", () => {
 });
 
 describe("matchesAppImageProcess", () => {
-  const installPath = "/home/u/.local/bin/Open-Design.default.AppImage";
+  const installPath = "/home/u/.local/bin/Mish.default.AppImage";
 
   it("matches FUSE-mode (executable === installPath)", () => {
     const ok = matchesAppImageProcess(
@@ -904,7 +904,7 @@ describe("matchesAppImageProcess", () => {
     const ok = matchesAppImageProcess(
       {
         pid: 1234,
-        executable: "/tmp/appimage_extracted_fe548e54/Open Design",
+        executable: "/tmp/appimage_extracted_fe548e54/Mish",
         env: { APPIMAGE: "/tmp/appimage_extracted_fe548e54/AppRun" },
       },
       installPath,
@@ -916,7 +916,7 @@ describe("matchesAppImageProcess", () => {
     const ok = matchesAppImageProcess(
       {
         pid: 1234,
-        executable: "/tmp/appimage_extracted_fe548e54/Open Design",
+        executable: "/tmp/appimage_extracted_fe548e54/Mish",
         env: { APPIMAGE: "/tmp/other/AppRun" },
       },
       installPath,
@@ -928,7 +928,7 @@ describe("matchesAppImageProcess", () => {
     const ok = matchesAppImageProcess(
       {
         pid: 1234,
-        executable: "/tmp/appimage_extracted_fe548e54/Open Design",
+        executable: "/tmp/appimage_extracted_fe548e54/Mish",
         env: { APPIMAGE: installPath },
       },
       installPath,
@@ -940,7 +940,7 @@ describe("matchesAppImageProcess", () => {
     const ok = matchesAppImageProcess(
       {
         pid: 1234,
-        executable: "/tmp/appimage_extracted_fe548e54/Open Design",
+        executable: "/tmp/appimage_extracted_fe548e54/Mish",
         env: { APPIMAGE: "/elsewhere/Other.AppImage" },
       },
       installPath,

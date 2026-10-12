@@ -1,8 +1,8 @@
 import { expect, type Page, type Request, type Route } from '@playwright/test';
-import { byokChoiceCompletenessIssues, FILE_UPLOAD_MAX_BYTES, parseModelPreflightRequest, parsePutSessionModel, sessionModelChoicesEqual, type ModelPreflightMismatch, type ModelPreflightResult, type SessionModelSnapshot } from '@open-design/contracts';
+import { byokChoiceCompletenessIssues, FILE_UPLOAD_MAX_BYTES, parseModelPreflightRequest, parsePutSessionModel, sessionModelChoicesEqual, type ModelPreflightMismatch, type ModelPreflightResult, type SessionModelSnapshot } from '@mish/contracts';
 import { expectStableCount } from './assertions.js';
 
-export const STORAGE_KEY = 'open-design:config';
+export const STORAGE_KEY = 'mish:config';
 
 const STANDARD_CONFIG = {
   mode: 'daemon',

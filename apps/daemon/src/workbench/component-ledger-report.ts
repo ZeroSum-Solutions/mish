@@ -4,7 +4,7 @@ import path from 'node:path';
 import {
   parseComponentLedgerReport,
   type ComponentLedger, type ComponentLedgerReport, type ComponentLedgerReportEntry,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { PackRegistry, ResolvedPackContent } from '../packs/registry.js';
 import { genuiComponentDigest } from './component-ledger-digest.js';
 

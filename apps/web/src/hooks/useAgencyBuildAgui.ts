@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { AgencyBuildSnapshot } from '@open-design/contracts';
+import type { AgencyBuildSnapshot } from '@mish/contracts';
 
 import {
   agencyBuildAgui,

@@ -19,7 +19,7 @@ od plugin apply plugin-id --input artifact=prototype --input audience=founders -
 ## Files
 
 - `SKILL.md` - portable agent instructions.
-- `open-design.json` - versioned Mishh Mashh marketplace and apply metadata.
+- `mish.json` - versioned Mishh Mashh marketplace and apply metadata.
 - `examples/` - sample output or fixture prompts.
 - `evals/` - repeatable quality checks.
 

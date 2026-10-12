@@ -4,7 +4,7 @@ import path from 'node:path';
 import {
   encodeCaptureMetadataHeader, parseCaptureImportMetadata, parseCaptureList, parseCaptureView, parseReusableUnitManifest,
   parseUnitInsertRequest, parseUnitInsertReceipt, parseUnitInsertList, WORKBENCH_UNIT_ID_PATTERN, WORKBENCH_UNIT_INSERT_ID_PATTERN, parseUnitList, parseUnitSavePlan, parseUnitSaveRequest, WORKBENCH_CAPTURE_MAX_BYTES, WORKBENCH_CAPTURE_METADATA_HEADER,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { mayForwardScopedToolToken, resolveDaemonUrl } from '../daemon-url.js';
 import type { WorkbenchCliOptions } from '../workbench-cli.js';
 

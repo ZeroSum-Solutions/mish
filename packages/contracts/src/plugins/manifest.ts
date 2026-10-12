@@ -1,13 +1,13 @@
 import { z } from 'zod';
 
-// `open-design.json` schema (v1). Mirrors docs/schemas/open-design.plugin.v1.json
+// `mish.json` schema (v1). Mirrors docs/schemas/mish.plugin.v1.json
 // with one addition: this Zod schema is permissive on the top level so adapter
 // outputs (synthesized PluginManifest from SKILL.md frontmatter or claude
 // plugin.json) parse cleanly without losing forward-compatible fields.
 
-export const OPEN_DESIGN_PLUGIN_SPEC_VERSION = '1.0.0';
+export const MISH_PLUGIN_SPEC_VERSION = '1.0.0';
 
-export const OpenDesignSpecVersionSchema = z.string().min(1);
+export const MishSpecVersionSchema = z.string().min(1);
 
 export const ReferenceSchema = z.object({
   ref:  z.string().optional(),
@@ -138,7 +138,7 @@ export type PluginConnectorRef = z.infer<typeof PluginConnectorRefSchema>;
 
 export const PluginManifestSchema = z.object({
   $schema:     z.string().optional(),
-  specVersion: OpenDesignSpecVersionSchema.optional(),
+  specVersion: MishSpecVersionSchema.optional(),
   name:        z.string().min(1).regex(/^[a-z0-9][a-z0-9._-]*$/),
   title:       z.string().optional(),
   title_i18n:  LocalizedTextSchema.optional(),

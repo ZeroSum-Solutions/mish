@@ -19,20 +19,24 @@ export interface AmrAccountFailureSignal {
   stderrTail?: unknown;
 }
 
-// `source=open_design` tags the console landing page_view so vela analytics can
+// `source=mish` tags the console landing page_view so vela analytics can
 // attribute the recharge visit to Mishh Mashh.
 //
 // The console dashboard, not a wallet page: balance and manual top-up were
 // rehomed onto it (vela #1055) and the wallet route left the product's
 // information architecture, so this link must not send a user there.
-export const DEFAULT_AMR_RECHARGE_URL =
-  'https://open-design.ai/amr/dashboard?source=open_design';
+// AMR is an upstream service this product does not operate, so there is no default console.
+// Set MISH_AMR_CONSOLE_URL to offer a top-up link.
+export const DEFAULT_AMR_RECHARGE_URL: string | undefined =
+  process.env.MISH_AMR_CONSOLE_URL?.trim() || undefined;
 
 const AMR_AUTH_REQUIRED_MESSAGE =
   'AMR sign-in is required. Sign in to AMR Cloud again, then retry this run.';
 
 const AMR_INSUFFICIENT_BALANCE_MESSAGE =
-  `AMR Cloud reported insufficient balance for this model. Top up your AMR balance at ${DEFAULT_AMR_RECHARGE_URL}, then retry this run.`;
+  DEFAULT_AMR_RECHARGE_URL
+    ? `AMR Cloud reported insufficient balance for this model. Top up your AMR balance at ${DEFAULT_AMR_RECHARGE_URL}, then retry this run.`
+    : 'AMR Cloud reported insufficient balance for this model. Top up your AMR balance in your AMR account, then retry this run.';
 
 const AMR_TIER_UPGRADE_REQUIRED_MESSAGE =
   'Your current AMR plan does not include this model or request type. Upgrade your AMR plan, or switch to an available model and retry.';
@@ -189,7 +193,7 @@ export function classifyAmrAccountFailureDetails(details: unknown): AmrAccountFa
       code: 'AMR_INSUFFICIENT_BALANCE',
       message: AMR_INSUFFICIENT_BALANCE_MESSAGE,
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
+      ...(DEFAULT_AMR_RECHARGE_URL ? { actionUrl: DEFAULT_AMR_RECHARGE_URL } : {}),
     };
   }
 
@@ -253,7 +257,7 @@ export function classifyAmrAccountFailure(text: string): AmrAccountFailure | nul
       code: 'AMR_INSUFFICIENT_BALANCE',
       message: AMR_INSUFFICIENT_BALANCE_MESSAGE,
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
+      ...(DEFAULT_AMR_RECHARGE_URL ? { actionUrl: DEFAULT_AMR_RECHARGE_URL } : {}),
     };
   }
 

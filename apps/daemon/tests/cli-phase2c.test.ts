@@ -11,8 +11,8 @@ import {
   SidecarFactory,
   type SidecarClient,
   type SidecarStamp,
-} from '@open-design/sidecar';
-import { APP_KEYS, SIDECAR_MESSAGES } from '@open-design/sidecar-proto';
+} from '@mish/sidecar';
+import { APP_KEYS, SIDECAR_MESSAGES } from '@mish/sidecar-proto';
 
 import { createAgentRuntimeEnv, startServer } from '../src/server.js';
 import { resetDesktopAuthForTests, setDesktopAuthSecret } from '../src/desktop-auth.js';
@@ -411,7 +411,7 @@ describe('mintImportTokenForCli', () => {
   });
 
   it('reports inactive when desktop import auth gate is dormant', () => {
-    const result = mintImportTokenForCli('/tmp/open-design-cli-import');
+    const result = mintImportTokenForCli('/tmp/mish-cli-import');
 
     expect(result).toMatchObject({
       ok: false,
@@ -424,7 +424,7 @@ describe('mintImportTokenForCli', () => {
     const secret = randomBytes(32);
     setDesktopAuthSecret(secret);
 
-    const result = mintImportTokenForCli('/tmp/open-design-cli-import');
+    const result = mintImportTokenForCli('/tmp/mish-cli-import');
 
     expect(result.ok).toBe(true);
     if (result.ok) {

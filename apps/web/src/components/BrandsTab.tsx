@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Button } from '@open-design/components';
-import type { BrandSummary, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import type { BrandSummary, WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../i18n';
 import { navigate, useRoute } from '../router';
 import {

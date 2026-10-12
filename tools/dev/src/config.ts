@@ -5,10 +5,10 @@ import { resolveDesktopUserDataDir } from "./desktop-profile.js";
 
 import {
   APP_KEYS,
-  OPEN_DESIGN_SIDECAR_CONTRACT,
+  MISH_SIDECAR_CONTRACT,
   SIDECAR_ENV,
   SIDECAR_SOURCES,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   resolveAppRuntimePath,
   resolveLogFilePath,
@@ -16,7 +16,7 @@ import {
   resolveNamespaceRoot,
   resolveSidecarBase,
   resolveSourceRuntimeRoot,
-} from "@open-design/sidecar";
+} from "@mish/sidecar";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -90,8 +90,8 @@ function resolveAppConfig(options: {
 }): ToolDevAppConfig {
   return {
     app: options.app,
-    latestLogPath: resolveLogFilePath({ runtimeRoot: options.namespaceRoot, app: options.app, contract: OPEN_DESIGN_SIDECAR_CONTRACT }),
-    logDir: path.dirname(resolveLogFilePath({ runtimeRoot: options.namespaceRoot, app: options.app, contract: OPEN_DESIGN_SIDECAR_CONTRACT })),
+    latestLogPath: resolveLogFilePath({ runtimeRoot: options.namespaceRoot, app: options.app, contract: MISH_SIDECAR_CONTRACT }),
+    logDir: path.dirname(resolveLogFilePath({ runtimeRoot: options.namespaceRoot, app: options.app, contract: MISH_SIDECAR_CONTRACT })),
   };
 }
 
@@ -150,19 +150,19 @@ export function parseParentPidOption(value: number | string | null | undefined):
 
 export function resolveToolDevConfig(options: ToolDevOptions = {}): ToolDevConfig {
   const desktopUserDataDir = resolveDesktopUserDataDir(options.desktopUserDataDir);
-  const namespace = resolveNamespace({ namespace: options.namespace, env: process.env, contract: OPEN_DESIGN_SIDECAR_CONTRACT });
+  const namespace = resolveNamespace({ namespace: options.namespace, env: process.env, contract: MISH_SIDECAR_CONTRACT });
   const toolsDevRoot = resolveSidecarBase({
     base: options.toolsDevRoot ?? process.env[SIDECAR_ENV.BASE] ?? resolveSourceRuntimeRoot({
-      contract: OPEN_DESIGN_SIDECAR_CONTRACT,
+      contract: MISH_SIDECAR_CONTRACT,
       projectRoot: WORKSPACE_ROOT,
       source: SIDECAR_SOURCES.TOOLS_DEV,
     }),
-    contract: OPEN_DESIGN_SIDECAR_CONTRACT,
+    contract: MISH_SIDECAR_CONTRACT,
     env: process.env,
     projectRoot: WORKSPACE_ROOT,
     source: SIDECAR_SOURCES.TOOLS_DEV,
   });
-  const namespaceRoot = resolveNamespaceRoot({ base: toolsDevRoot, namespace, contract: OPEN_DESIGN_SIDECAR_CONTRACT });
+  const namespaceRoot = resolveNamespaceRoot({ base: toolsDevRoot, namespace, contract: MISH_SIDECAR_CONTRACT });
   const daemon = resolveAppConfig({ app: APP_KEYS.DAEMON, namespace, namespaceRoot, toolsDevRoot });
   const desktop = resolveAppConfig({ app: APP_KEYS.DESKTOP, namespace, namespaceRoot, toolsDevRoot });
   const web = resolveAppConfig({ app: APP_KEYS.WEB, namespace, namespaceRoot, toolsDevRoot });
@@ -187,8 +187,8 @@ export function resolveToolDevConfig(options: ToolDevOptions = {}): ToolDevConfi
       },
       web: {
         ...web,
-        nextDistDir: resolveAppRuntimePath({ app: APP_KEYS.WEB, namespaceRoot, fileName: "next", contract: OPEN_DESIGN_SIDECAR_CONTRACT }),
-        nextTsconfigPath: resolveAppRuntimePath({ app: APP_KEYS.WEB, namespaceRoot, fileName: "tsconfig.json", contract: OPEN_DESIGN_SIDECAR_CONTRACT }),
+        nextDistDir: resolveAppRuntimePath({ app: APP_KEYS.WEB, namespaceRoot, fileName: "next", contract: MISH_SIDECAR_CONTRACT }),
+        nextTsconfigPath: resolveAppRuntimePath({ app: APP_KEYS.WEB, namespaceRoot, fileName: "tsconfig.json", contract: MISH_SIDECAR_CONTRACT }),
         sidecarEntryPath: path.join(WORKSPACE_ROOT, "apps/web/sidecar/index.ts"),
       },
     },

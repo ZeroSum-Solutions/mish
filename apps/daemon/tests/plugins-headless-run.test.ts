@@ -342,9 +342,9 @@ describe('Plan §8 e2e-3 (entry slice) — headless install → project → run'
     const fixture = path.join(pluginRoot, pluginId);
     await mkdir(fixture, { recursive: true });
     await writeFile(
-      path.join(fixture, 'open-design.json'),
+      path.join(fixture, 'mish.json'),
       JSON.stringify({
-        $schema: 'https://open-design.ai/schemas/plugin.v1.json',
+        $schema: 'https://github.com/ZeroSum-Solutions/mish/schemas/plugin.v1.json',
         name: pluginId,
         title: 'Headless CLI Plugin',
         version: '1.0.0',
@@ -414,7 +414,7 @@ let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { input += chunk; });
 process.stdin.on('end', () => {
-  const capturePath = process.env.OD_PROMPT_CAPTURE;
+  const capturePath = ${JSON.stringify(capturePath)};
   fs.appendFileSync(capturePath + '.all', '--- prompt ---\\n' + input + '\\n');
   if (input.includes('# Headless Local Skill') || input.includes('## Active plugin')) {
     fs.writeFileSync(capturePath, input);
@@ -479,9 +479,9 @@ process.stdin.on('end', () => {
     const fixture = path.join(tmpRoot, 'pipeline-plugin');
     await fs.mkdir(fixture, { recursive: true });
     await fs.writeFile(
-      path.join(fixture, 'open-design.json'),
+      path.join(fixture, 'mish.json'),
       JSON.stringify({
-        $schema: 'https://open-design.ai/schemas/plugin.v1.json',
+        $schema: 'https://github.com/ZeroSum-Solutions/mish/schemas/plugin.v1.json',
         name: 'pipeline-plugin',
         title: 'Pipeline Plugin',
         version: '1.0.0',

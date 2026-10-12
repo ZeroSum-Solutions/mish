@@ -850,7 +850,7 @@ describe('spec 4b: total-time cap', () => {
 //   P1_3_LIVE_SOURCE=github:ZeroSum-Solutions/mishh-licensed \
 //   P1_3_LIVE_RECEIPT=~/Inbox/notes/<date>-p1-3-live-redirect-receipt.json \
 //   GH_TOKEN="<read-only token>" \
-//   pnpm --filter @open-design/daemon exec vitest run tests/packs/github-fetcher.test.ts -t live
+//   pnpm --filter @mish/daemon exec vitest run tests/packs/github-fetcher.test.ts -t live
 // The receipt records hosts, statuses and whether Authorization was sent, never
 // the token, any part of it, or a signed Location URL.
 const LIVE_SOURCE = process.env.P1_3_LIVE_SOURCE;

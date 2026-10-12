@@ -1,5 +1,5 @@
 import { useId } from 'react';
-import { Button, VisuallyHidden } from '@open-design/components';
+import { Button, VisuallyHidden } from '@mish/components';
 import { useAnalytics } from '../analytics/provider';
 import { getResolvedDeviceId } from '../analytics/client';
 import {
@@ -32,7 +32,10 @@ export function AmrArtifactUpgradeHomeCard({
   const titleId = useId();
   const descriptionId = useId();
 
+  // No configured AMR console: the plans CTA is unavailable and not rendered.
+  const plansUrl = amrPlansUrlForProfile(profile);
   const openPlans = () => {
+    if (!plansUrl) return;
     const attribution = recordAmrEntry(
       analytics.track,
       'home_artifact_upgrade',
@@ -45,7 +48,7 @@ export function AmrArtifactUpgradeHomeCard({
       installationId,
     });
     window.open(
-      attributedAmrUrl(amrPlansUrlForProfile(profile), attribution, deviceId),
+      attributedAmrUrl(plansUrl, attribution, deviceId),
       '_blank',
       'noopener,noreferrer',
     );
@@ -84,15 +87,17 @@ export function AmrArtifactUpgradeHomeCard({
         >
           {t('chat.amrArtifactUpgrade.homeArtifactCta')}
         </Button>
-        <Button
-          variant="primary"
-          className={styles.cta}
-          onClick={openPlans}
-          data-testid="amr-artifact-upgrade-home-plans"
-        >
-          {t('chat.amrArtifactUpgrade.homePlansCta')}
-          <VisuallyHidden>{` (${t('common.openInNewTab')})`}</VisuallyHidden>
-        </Button>
+        {plansUrl ? (
+          <Button
+            variant="primary"
+            className={styles.cta}
+            onClick={openPlans}
+            data-testid="amr-artifact-upgrade-home-plans"
+          >
+            {t('chat.amrArtifactUpgrade.homePlansCta')}
+            <VisuallyHidden>{` (${t('common.openInNewTab')})`}</VisuallyHidden>
+          </Button>
+        ) : null}
       </div>
       <Button
         variant="ghost"

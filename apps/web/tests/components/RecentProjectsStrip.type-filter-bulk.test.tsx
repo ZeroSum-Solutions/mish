@@ -12,7 +12,7 @@ import {
 } from '../../src/components/RecentProjectsStrip';
 import { WorkspaceProjectMoveError } from '../../src/state/projects';
 import type { Project } from '../../src/types';
-import type { WorkspaceProjectSummary } from '@open-design/contracts';
+import type { WorkspaceProjectSummary } from '@mish/contracts';
 
 // Typed on the argument the component actually passes, so `.mock.calls`
 // destructures instead of widening to the empty tuple.

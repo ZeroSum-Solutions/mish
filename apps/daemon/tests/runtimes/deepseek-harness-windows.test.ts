@@ -23,12 +23,14 @@ import {
   createCommandInvocation,
   listProcessSnapshots,
   stopProcesses,
-} from '@open-design/platform';
+} from '@mish/platform';
 
 const require = createRequire(import.meta.url);
 
-function writeFakeDshCarrier(dir: string): string {
-  const fixture = path.resolve('tests/fixtures/dsh-profile/fake-dsh.ts');
+function writeFakeDshCarrier(dir: string, mode?: string): string {
+  const source = path.resolve('tests/fixtures/dsh-profile/fake-dsh.ts');
+  const fixture = mode ? path.join(dir, 'fake-dsh.mjs') : source;
+  if (mode) writeFileSync(fixture, `Object.assign(process.env, ${JSON.stringify({ OD_DSH_FAKE_MODE: mode, OD_DSH_FAKE_SESSION_ROOT: dir })}); await import(${JSON.stringify(pathToFileURL(source).href)});`);
   const tsxLoader = pathToFileURL(require.resolve('tsx')).href;
   if (process.platform === 'win32') {
     const carrier = path.join(dir, 'dsh.cmd');
@@ -49,7 +51,7 @@ function writeFakeDshCarrier(dir: string): string {
 
 function createProfileHome(dir: string): string {
   const home = path.join(dir, 'dsh-home');
-  const profile = path.join(home, 'profiles', 'open-design');
+  const profile = path.join(home, 'profiles', 'mish');
   mkdirSync(profile, { recursive: true });
   writeFileSync(path.join(profile, 'package.json'), '{}\n');
   return home;
@@ -70,7 +72,7 @@ describe('DeepSeek Harness Windows carrier', () => {
       expect(detected.available).toBe(true);
       expect(detected.version).toBe('0.1.0-rc.6');
       expect(getDetectedRuntimeVersions('deepseek-harness')).toMatchObject({
-        runtimeCompanionName: '@open-design/dsh-runtime',
+        runtimeCompanionName: '@mish/dsh-runtime',
         runtimeCompanionVersion: 'fixture-1',
       });
     } finally {
@@ -161,7 +163,7 @@ describe('DeepSeek Harness Windows carrier', () => {
       OD_DSH_FAKE_SESSION_ROOT: process.env.OD_DSH_FAKE_SESSION_ROOT,
     };
     try {
-      writeFakeDshCarrier(dir);
+      writeFakeDshCarrier(dir, 'missing-credential');
       process.env.PATH = `${dir}${delimiter}${previous.PATH ?? ''}`;
       process.env.DSH_HOME = createProfileHome(dir);
       process.env.OD_DSH_FAKE_MODE = 'missing-credential';
@@ -195,7 +197,7 @@ describe('DeepSeek Harness Windows carrier', () => {
         const env = { ...process.env, OD_DSH_FAKE_SESSION_ROOT: dir };
         const invocation = createCommandInvocation({
           command: carrier,
-          args: ['--profile', 'open-design', '--stdio'],
+          args: ['--profile', 'mish', '--stdio'],
           env,
         });
         child = spawn(invocation.command, invocation.args, {

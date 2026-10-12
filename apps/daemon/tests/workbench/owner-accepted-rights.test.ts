@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import type { RightsAssessment } from '@open-design/contracts';
+import type { RightsAssessment } from '@mish/contracts';
 import { ACETERNITY_FREE_RIGHTS_ASSESSMENTS } from '../../src/workbench/aceternity-rights.js';
 import { assertOwnerAcceptedPrincipal, parseStoredSourceRecord } from '../../src/workbench/source-records.js';
 

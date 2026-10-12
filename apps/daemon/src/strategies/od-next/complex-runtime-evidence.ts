@@ -1,8 +1,8 @@
 import {
   OdNextRuntimeCapabilitySnapshotV1Schema,
-  type OpenDesignPlanContractV2,
+  type MishPlanContractV2,
   type StrategyInputStageV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { buildStructuredMainRunObservationV1 } from '../../observability/main-run-observation.js';
 import { adaptRuntimeChildObservationsV1 } from '../../observability/runtime-child-observations.js';
@@ -20,7 +20,7 @@ interface ComplexRunEvidenceInput {
   stage: StrategyInputStageV2;
   agentId: string;
   capabilitySnapshot: unknown;
-  plan: OpenDesignPlanContractV2;
+  plan: MishPlanContractV2;
   run: {
     status: string;
     createdAt: number;

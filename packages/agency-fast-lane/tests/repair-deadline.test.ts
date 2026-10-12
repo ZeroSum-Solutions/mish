@@ -20,10 +20,10 @@ import { loadFamilyPackage } from '../src/family.ts';
 import type { FaithfulnessChecker, FaithfulnessSlot } from '../src/jev.ts';
 import { FAITHFULNESS_RULE, failedUnitOf, runFastLane, UnitDeadlineError } from '../src/run.ts';
 import { isObject, type Json, type JsonObject } from '../src/spine.ts';
-import { fakeJevChecker, fakeModel, fillTemplate, loadMaben, promptBlock } from './fixtures.ts';
+import { fakeJevChecker, fakeModel, fillTemplate, loadTestSite, promptBlock } from './fixtures.ts';
 
-const pkg = await loadMaben();
-const ENTRY = 'maben-r1.html';
+const pkg = await loadTestSite();
+const ENTRY = 'ownedsite-r1.html';
 const BRIEF = 'Riverbend Dental, a family dental practice in Boise. Same-day crowns, sedation options, open Saturdays.';
 const EXAMPLES = path.resolve(import.meta.dirname, '../../../plugins/_official/examples');
 
@@ -50,7 +50,7 @@ test('a transport failure during a faithfulness repair fails the run and names t
     (error: unknown) => error,
   );
   assert.ok(failure instanceof FakeTransportError, 'the provider error propagates with its own class');
-  assert.equal(failedUnitOf(failure), 'maben-hero');
+  assert.equal(failedUnitOf(failure), 'ownedsite-hero');
 });
 
 test('an unexpected error during a faithfulness repair is not swallowed', async () => {

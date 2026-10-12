@@ -21,10 +21,10 @@
  */
 
 import type { Express, Request, Response } from 'express';
-import type { CultCopyResponse } from '@open-design/contracts';
-import { cultLocalOnlyRefusal } from '@open-design/contracts';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
-import cultSlugsJson from '@open-design/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
+import type { CultCopyResponse } from '@mish/contracts';
+import { cultLocalOnlyRefusal } from '@mish/contracts';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
+import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
 
 import { CultRegistry, CultRegistryError, resolveCultKitDir, type CultRegistryRow } from '../cult-registry.js';
 import type { RouteDeps } from '../server-context.js';

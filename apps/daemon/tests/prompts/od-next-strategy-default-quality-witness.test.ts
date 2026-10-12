@@ -8,12 +8,12 @@ import {
   type AppliedPluginSnapshot,
   type PluginManifest,
   type PluginPipeline,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   parseManifest,
   resolveAppliedPipeline,
   type ScenarioRegistryEntry,
-} from '@open-design/plugin-runtime';
+} from '@mish/plugin-runtime';
 import { composeSystemPrompt } from '../../src/prompts/system.js';
 import { loadAtomBodies } from '../../src/plugins/atom-bodies.js';
 import { registerBundledPlugins } from '../../src/plugins/bundled.js';
@@ -129,10 +129,10 @@ async function composeDefaultPrompt(
 
 beforeAll(async () => {
   officialManifest = loadManifest(
-    'plugins/_official/scenarios/od-new-generation/open-design.json',
+    'plugins/_official/scenarios/od-new-generation/mish.json',
   );
   const retainedExample = loadManifest(
-    'plugins/_official/examples/meeting-notes/open-design.json',
+    'plugins/_official/examples/meeting-notes/mish.json',
   );
   inheritedManifest = {
     ...retainedExample,

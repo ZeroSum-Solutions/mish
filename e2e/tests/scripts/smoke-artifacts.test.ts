@@ -43,12 +43,12 @@ function metadataBody(origin: string): Record<string, unknown> {
     releaseTargets: {
       mac_arm64: {
         status: "published",
-        artifacts: { dmg: asset(`open-design-${VERSION}-mac-arm64.dmg`, DMG_BYTES) },
+        artifacts: { dmg: asset(`mish-${VERSION}-mac-arm64.dmg`, DMG_BYTES) },
       },
       mac_x64: { status: "missing", enabled: false, reason: "not requested", result: "skipped" },
       win_x64: {
         status: "published",
-        artifacts: { installer: asset(`open-design-${VERSION}-win-x64-setup.exe`, EXE_BYTES) },
+        artifacts: { installer: asset(`mish-${VERSION}-win-x64-setup.exe`, EXE_BYTES) },
       },
     },
   };
@@ -77,11 +77,11 @@ beforeAll(async () => {
       return;
     }
     if (path.endsWith("-mac-arm64.dmg.sha256")) {
-      send(`${sha256(DMG_BYTES)}  open-design-${VERSION}-mac-arm64.dmg\n`, "text/plain");
+      send(`${sha256(DMG_BYTES)}  mish-${VERSION}-mac-arm64.dmg\n`, "text/plain");
       return;
     }
     if (path.endsWith("-win-x64-setup.exe.sha256")) {
-      send(`${sha256(EXE_BYTES)}  open-design-${VERSION}-win-x64-setup.exe\n`, "text/plain");
+      send(`${sha256(EXE_BYTES)}  mish-${VERSION}-win-x64-setup.exe\n`, "text/plain");
       return;
     }
     if (path.endsWith("-mac-arm64.dmg")) {
@@ -166,7 +166,7 @@ describe("smoke-artifacts", () => {
       "namespaces",
       "release-prerelease",
       "dmg",
-      "Open Design-release-prerelease.dmg",
+      "Mish-release-prerelease.dmg",
     );
     expect(existsSync(staged)).toBe(true);
     expect(await readFile(staged)).toEqual(DMG_BYTES);
@@ -199,7 +199,7 @@ describe("smoke-artifacts", () => {
       "namespaces",
       "release-prerelease-win",
       "builder",
-      "Open Design-release-prerelease-win-setup.exe",
+      "Mish-release-prerelease-win-setup.exe",
     );
     expect(existsSync(staged)).toBe(true);
     expect(await readFile(staged)).toEqual(EXE_BYTES);

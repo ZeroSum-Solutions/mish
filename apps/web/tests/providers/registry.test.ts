@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { installMockOpenDesignHost } from '@open-design/host/testing';
+import { installMockMishHost } from '@mish/host/testing';
 import { advanceWorkspaceAccountGeneration } from '../../src/collab/workspace-identity';
 import { isTrustedConnectorCallbackMessage } from '../../src/runtime/connector-callback-trust';
 import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   cancelConnectorAuthorization,
@@ -1852,11 +1852,11 @@ describe('connectConnector', () => {
     expect(callbackNonce).toMatch(/^[A-Za-z0-9_-]{16,128}$/u);
     expect(isTrustedConnectorCallbackMessage({
       origin: 'null',
-      data: { type: 'open-design:connector-connected', callbackNonce },
+      data: { type: 'mish:connector-connected', callbackNonce },
     })).toBe(true);
     expect(isTrustedConnectorCallbackMessage({
       origin: 'null',
-      data: { type: 'open-design:connector-connected', callbackNonce: `${callbackNonce}x` },
+      data: { type: 'mish:connector-connected', callbackNonce: `${callbackNonce}x` },
     })).toBe(false);
   });
 
@@ -1980,7 +1980,7 @@ describe('connectConnector', () => {
     vi.stubGlobal('window', {
       open,
     } as unknown as Window & typeof globalThis);
-    const restoreHost = installMockOpenDesignHost({
+    const restoreHost = installMockMishHost({
       host: { shell: { openExternal } },
     });
     const fetchMock = vi.fn(async (url: string) => {
@@ -2016,7 +2016,7 @@ describe('connectConnector', () => {
     vi.stubGlobal('window', {
       open,
     } as unknown as Window & typeof globalThis);
-    const restoreHost = installMockOpenDesignHost({
+    const restoreHost = installMockMishHost({
       host: { shell: { openExternal } },
     });
     const fetchMock = vi.fn(async (url: string) => {
@@ -2317,7 +2317,7 @@ describe('deploy provider registry helpers', () => {
       projectId: 'project-1',
       fileName: 'index.html',
       providerId: CLOUDFLARE_PAGES_PROVIDER_ID,
-      url: 'https://open-design-preview.pages.dev',
+      url: 'https://mish-preview.pages.dev',
       deploymentId: 'cf-deployment-1',
       deploymentCount: 1,
       target: 'preview',
@@ -2336,7 +2336,7 @@ describe('deploy provider registry helpers', () => {
     ).resolves.toMatchObject({
       providerId: CLOUDFLARE_PAGES_PROVIDER_ID,
       deploymentId: 'cf-deployment-1',
-      url: 'https://open-design-preview.pages.dev',
+      url: 'https://mish-preview.pages.dev',
     });
 
     expect(fetchMock).toHaveBeenCalledWith('/api/projects/project-1/deploy', {
@@ -2360,7 +2360,7 @@ describe('deploy provider registry helpers', () => {
       projectId: 'project-1',
       fileName: 'index.html',
       providerId: CLOUDFLARE_PAGES_PROVIDER_ID,
-      url: 'https://open-design-preview.pages.dev',
+      url: 'https://mish-preview.pages.dev',
       deploymentId: 'cf-deployment-2',
       deploymentCount: 1,
       target: 'production',

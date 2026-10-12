@@ -7,7 +7,7 @@ import {
   parseOdNextPromptBundleV2,
   serializeOdNextPromptBundleV2,
   type StrategyInputStageV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { redactSecrets } from './redact.js';
 import type { StrategyTaskFinalTextIdentity } from './strategies/task-store.js';
@@ -77,7 +77,7 @@ export interface PromptStackTelemetry {
 }
 
 export interface OdNextExactSendPromptEvidenceV1 {
-  schema: 'open-design.od-next-exact-send-prompt/v1';
+  schema: 'mish.od-next-exact-send-prompt/v1';
   boundary: 'hostComposed';
   kind: StrategyTaskFinalTextIdentity['kind'];
   promptSchema: StrategyTaskFinalTextIdentity['schema'];
@@ -98,7 +98,7 @@ export class InvalidOdNextExactSendPromptError extends Error {
 }
 
 export interface StructuredPromptStackInput {
-  type: 'open-design.prompt-stack';
+  type: 'mish.prompt-stack';
   redactionVersion: typeof PROMPT_STACK_REDACTION_VERSION;
   promptFingerprint: string;
   stackFingerprint: string;
@@ -120,7 +120,7 @@ export interface StructuredPromptStackInput {
 }
 
 export interface SafeChildPromptInput extends Record<string, unknown> {
-  type: 'open-design.child-injected-prompt';
+  type: 'mish.child-injected-prompt';
   redactionVersion: typeof PROMPT_STACK_REDACTION_VERSION;
   messageCount: number;
   capturedMessageCount: number;
@@ -255,7 +255,7 @@ export function buildSafeChildPromptTelemetry(
     hash: sha256(JSON.stringify(messages)),
     bytes: rawBytes,
     safePayload: {
-      type: 'open-design.child-injected-prompt',
+      type: 'mish.child-injected-prompt',
       redactionVersion: PROMPT_STACK_REDACTION_VERSION,
       messageCount: messages.length,
       capturedMessageCount: safeMessages.length,
@@ -526,7 +526,7 @@ export function bindOdNextExactSendPromptEvidence(input: {
   return {
     ...input.telemetry,
     odNextExactSend: {
-      schema: 'open-design.od-next-exact-send-prompt/v1',
+      schema: 'mish.od-next-exact-send-prompt/v1',
       boundary: 'hostComposed',
       kind: input.persisted.kind,
       promptSchema: input.persisted.schema,
@@ -586,7 +586,7 @@ export function structuredPromptStackInput(
   telemetry: PromptStackTelemetry,
 ): StructuredPromptStackInput {
   return {
-    type: 'open-design.prompt-stack',
+    type: 'mish.prompt-stack',
     redactionVersion: telemetry.redactionVersion,
     promptFingerprint: telemetry.promptFingerprint,
     stackFingerprint: telemetry.stackFingerprint,

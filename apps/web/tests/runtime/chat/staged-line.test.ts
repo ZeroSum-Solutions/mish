@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { StagedRunRecord, StagedStageRecord } from '@open-design/contracts';
+import type { StagedRunRecord, StagedStageRecord } from '@mish/contracts';
 
 import { stagedLineState, stagedModelLabel } from '../../../src/runtime/chat/staged-line';
 

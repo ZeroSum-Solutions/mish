@@ -58,9 +58,9 @@ describe('parseMarketplace', () => {
   it('accepts a tiny catalog', () => {
     const result = parseMarketplace(JSON.stringify({
       specVersion: '1.0.0',
-      name: 'open-design-official',
+      name: 'mish-official',
       version: '1.0.0',
-      plugins: [{ name: 'make-a-deck', source: 'github:open-design/plugins/make-a-deck', version: '0.1.0' }],
+      plugins: [{ name: 'make-a-deck', source: 'github:mish/plugins/make-a-deck', version: '0.1.0' }],
     }));
     expect(result.ok).toBe(true);
   });
@@ -68,7 +68,7 @@ describe('parseMarketplace', () => {
   it('rejects when catalog version is missing', () => {
     const result = parseMarketplace(JSON.stringify({
       name: 'no-version',
-      plugins: [{ name: 'make-a-deck', source: 'github:open-design/plugins/make-a-deck', version: '0.1.0' }],
+      plugins: [{ name: 'make-a-deck', source: 'github:mish/plugins/make-a-deck', version: '0.1.0' }],
     }));
     expect(result.ok).toBe(false);
   });
@@ -77,7 +77,7 @@ describe('parseMarketplace', () => {
     const result = parseMarketplace(JSON.stringify({
       name: 'missing-plugin-version',
       version: '1.0.0',
-      plugins: [{ name: 'make-a-deck', source: 'github:open-design/plugins/make-a-deck' }],
+      plugins: [{ name: 'make-a-deck', source: 'github:mish/plugins/make-a-deck' }],
     }));
     expect(result.ok).toBe(false);
   });

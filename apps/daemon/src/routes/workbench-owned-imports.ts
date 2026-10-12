@@ -1,6 +1,6 @@
 import path from 'node:path';
 import express, { type Express, type Request, type RequestHandler, type Response } from 'express';
-import { OWNED_IMPORT_LIMITS } from '@open-design/contracts';
+import { OWNED_IMPORT_LIMITS } from '@mish/contracts';
 import { resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';
 import { OwnedImportError, type OwnedImportStore } from '../workbench/owned-imports/owned-imports.js';
 

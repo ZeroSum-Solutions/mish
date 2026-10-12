@@ -373,7 +373,7 @@ export async function writeAssembledApp(
         dependencies,
         description: "Mishh Mashh packaged runtime",
         main: "./main.cjs",
-        name: "open-design-packaged-app",
+        name: "mish-packaged-app",
         ...(optionalDependencies == null ? {} : { optionalDependencies }),
         private: true,
         productName: identity.productName,

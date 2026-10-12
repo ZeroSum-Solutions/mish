@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import {
   SOURCE_OPERATIONS, SUPPORTED_ADOPTION_TARGETS,
   type NativeFormatRefusalDetails, type OperationRightsRefusalDetails, type ResourceCandidate, type ResourceRef, type ResourceSourceIdentity,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { ACETERNITY_APPLY_OPERATIONS, ACETERNITY_RIGHTS_EVIDENCE, aceternityApplyAllowed, aceternityAssessmentFor } from './aceternity-rights.js';
 import { resourceRefKey } from './context-ranking.js';
 import type { ResourceSourceAdapter } from './resources.js';

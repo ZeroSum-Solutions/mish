@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { FONT_SPINE_CODES, parseResourceSearchRequest, type ResourceCandidate } from '@open-design/contracts';
+import { FONT_SPINE_CODES, parseResourceSearchRequest, type ResourceCandidate } from '@mish/contracts';
 import { searchResources } from '../../src/workbench/resources.js';
-import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
+import { createFontsResourceSource } from '../fixtures/daemon-b/fonts.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import type { ProjectDesignContextDraft } from '@open-design/contracts';
+import type { ProjectDesignContextDraft } from '@mish/contracts';
 import { putProjectContext, readProjectContext, readWorkbenchPreferences } from '../../src/workbench/project-context.js';
 import { savedContext, projectState } from './context-ranking-fixture.js';
 import { database, references } from './project-context-fixture.js';
@@ -18,7 +18,7 @@ function contextDraftWith(fields: Pick<ProjectDesignContextDraft, 'brandDirectio
   draft.factSources = leaves.map(([fieldPath, value]) => ({ fieldPath, value, origin: 'user-confirmed', source: null, confidence: null, rationale: 'Project owner declaration' }));
   return draft;
 }
-import { REPO_BUNDLED_PLUGINS_ROOT, authority, catalogueCopy, projectAuthority } from './fonts-fixture.js';
+import { REPO_BUNDLED_PLUGINS_ROOT, authority, catalogueCopy, projectAuthority } from '../fixtures/daemon-b/fonts.js';
 
 // The curated Fontsource snapshot alone; the Google Fonts and Fontshare listings are covered in fonts-sources.test.ts.
 const fonts = () => createFontsResourceSource({ root: REPO_BUNDLED_PLUGINS_ROOT, listings: [] });
@@ -169,7 +169,7 @@ describe('AC-R11.3 reranking and rights', () => {
     for (const file of fraunces.localFiles) {
       expect(file).toMatchObject({ state: 'available', format: 'woff2', url: `/api/workbench/fonts/files/${file.sha256}` });
       expect(file.notice).toMatchObject({ state: 'available', url: `/api/workbench/fonts/notices/${file.notice.sha256}` });
-      expect(file.provenance).toContain('media-provenance.json#');
+      expect(file.provenance).toBe('Owned synthetic file with declared cmap test metadata; not measured font glyph evidence.');
     }
   });
 });

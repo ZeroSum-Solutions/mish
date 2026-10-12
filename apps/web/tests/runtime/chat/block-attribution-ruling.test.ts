@@ -17,7 +17,7 @@
  *     它还制造过两张卡头**显示同一个耗时**的坏画面(thinking 事件不带时刻)。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import type { ExecutionShell, TurnBlock } from '../../../src/runtime/chat/contract';
 

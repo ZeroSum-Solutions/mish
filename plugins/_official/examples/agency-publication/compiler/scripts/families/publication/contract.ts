@@ -166,7 +166,7 @@ function sectionSchema(spec: SectionSpec): Schema {
 export function recipeSchema(): Schema {
   return {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
-    $id: `https://open-design.ai/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
+    $id: `https://github.com/ZeroSum-Solutions/mish/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
     title: `${FAMILY_ID} recipe`,
     description: 'A static publication or media page kind (atlas CS.01): masthead, lead story, topics, latest stories, series, archive, optional authors, newsletter sign-up, membership and footer. Derived from compiler/scripts/families/publication/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.',
     $comment: 'contract.ts additionally enforces markup-free plain text, an email format on the nullable footer contact atom (the byline, story and archive dates, and membership prices and periods are nullable too), and that a null appears only on an x-atom string leaf or in the x-optional authors slot.',

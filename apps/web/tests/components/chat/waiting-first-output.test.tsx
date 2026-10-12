@@ -66,7 +66,7 @@
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
-import type { ChatMessage } from '@open-design/contracts';
+import type { ChatMessage } from '@mish/contracts';
 
 import { AssistantMessage } from '../../../src/components/AssistantMessage';
 import { WAITING_FIRST_OUTPUT_AFTER_MS } from '../../../src/components/chat/ExecutionShell';

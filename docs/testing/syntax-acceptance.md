@@ -89,7 +89,7 @@ Explicit, fixed-synthetic upload canary (never accepts an external dataset,
 fixture manifest, real mode, production profile or more than one repeat):
 
 ```bash
-OPEN_DESIGN_TELEMETRY_RELAY_URL=https://telemetry-test.open-design.ai/api/langfuse \
+MISH_TELEMETRY_RELAY_URL=https://telemetry-test.mish.invalid/api/langfuse \
   pnpm exec tsx scripts/syntax-acceptance.ts --mode replay --upload-telemetry --repeat 1
 ```
 
@@ -163,8 +163,8 @@ files stayed byte-identical to their originals. All blocked-delivery counts were
 zero. Transport waiting was 2.46–3.85 seconds, after Run delivery; it is not checker
 or repair cost. These tiny synthetic timings are not a production latency promise.
 
-Exact authenticated browser readback found all three Traces in **open-design-test**,
-not the production **open-design** project. Each showed the fixture model tag,
+Exact authenticated browser readback found all three Traces in **mish-test**,
+not the production **mish** project. Each showed the fixture model tag,
 native environment `synthetic-test-274a1e44`, the actual execution tree and the
 same syntax timing/outcome fields as its local receipt.
 Filtering Traces to this unique native environment returned exactly three distinct

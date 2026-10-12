@@ -451,7 +451,7 @@ describe("managed download package", () => {
       const pruned = await pruneManagedDownloads({ basePath });
 
       expect(pruned.removed).toBe(0);
-      expect(existsSync(join(basePath, ".open-design-download-root.json"))).toBe(true);
+      expect(existsSync(join(basePath, ".mish-download-root.json"))).toBe(true);
       expect(existsSync(join(basePath, artifactName))).toBe(true);
     },
   );
@@ -466,7 +466,7 @@ describe("managed download package", () => {
     await expect(pruneManagedDownloads({ basePath })).rejects.toMatchObject({
       code: MANAGED_DOWNLOAD_ERROR_CODES.STORE_NOT_OWNED,
     });
-    expect(existsSync(join(basePath, ".open-design-download-root.json"))).toBe(false);
+    expect(existsSync(join(basePath, ".mish-download-root.json"))).toBe(false);
   });
 
   it("does not extend the OS-artifact allowance to arbitrary directories such as a stray .git", async () => {
@@ -479,7 +479,7 @@ describe("managed download package", () => {
     await expect(pruneManagedDownloads({ basePath })).rejects.toMatchObject({
       code: MANAGED_DOWNLOAD_ERROR_CODES.STORE_NOT_OWNED,
     });
-    expect(existsSync(join(basePath, ".open-design-download-root.json"))).toBe(false);
+    expect(existsSync(join(basePath, ".mish-download-root.json"))).toBe(false);
   });
 
   it("does not claim a fresh managed base whose only entry is a directory named .DS_Store", async () => {
@@ -492,7 +492,7 @@ describe("managed download package", () => {
     await expect(pruneManagedDownloads({ basePath })).rejects.toMatchObject({
       code: MANAGED_DOWNLOAD_ERROR_CODES.STORE_NOT_OWNED,
     });
-    expect(existsSync(join(basePath, ".open-design-download-root.json"))).toBe(false);
+    expect(existsSync(join(basePath, ".mish-download-root.json"))).toBe(false);
     expect(existsSync(join(basePath, ".DS_Store", "hidden.txt"))).toBe(true);
   });
 
@@ -508,7 +508,7 @@ describe("managed download package", () => {
     await expect(pruneManagedDownloads({ basePath })).rejects.toMatchObject({
       code: MANAGED_DOWNLOAD_ERROR_CODES.STORE_NOT_OWNED,
     });
-    expect(existsSync(join(basePath, ".open-design-download-root.json"))).toBe(false);
+    expect(existsSync(join(basePath, ".mish-download-root.json"))).toBe(false);
     expect(existsSync(outsideTarget)).toBe(true);
   });
 });

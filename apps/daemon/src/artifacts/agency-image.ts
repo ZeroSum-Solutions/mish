@@ -3,7 +3,7 @@ import { constants } from 'node:fs';
 import { lstat, mkdir, open, realpath, unlink } from 'node:fs/promises';
 import path from 'node:path';
 import { load } from 'cheerio';
-import type { ArtifactManifest } from '@open-design/contracts';
+import type { ArtifactManifest } from '@mish/contracts';
 import { agencyPublicationScope } from './deploy-scope.js';
 import type { PlacementFinalIO } from '../workbench/placement/project-writes.js';
 

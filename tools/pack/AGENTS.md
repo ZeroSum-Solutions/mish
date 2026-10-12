@@ -14,7 +14,7 @@ Read `tools/pack/CACHE.md` before changing any build-cache node key, adding a ca
 - Linux AppImage build/install/start/stop/logs/uninstall/cleanup smoke commands.
 - Linux headless (no-Electron) install/start/stop via `--headless` flag on `install`, `start`, and `stop`.
 - Linux containerized builds via `electronuserland/builder` Docker image for distro-agnostic glibc compat.
-- Consuming sidecar/process/path primitives from `@open-design/sidecar-proto`, `@open-design/sidecar`, and `@open-design/platform`.
+- Consuming sidecar/process/path primitives from `@mish/sidecar-proto`, `@mish/sidecar`, and `@mish/platform`.
 
 ## Does not own
 
@@ -27,9 +27,9 @@ Read `tools/pack/CACHE.md` before changing any build-cache node key, adding a ca
 
 - Keep cross-platform source responsibilities in named directories such as `cache/`, `config/`, `launcher/`, `resources/`, `updates/`, and `versioning/`; keep platform-owned behavior below `mac/` or `win/`. Mirror those responsibilities in `tests/` when a test set has the same ownership. A new root-level `src/*.ts` file is intentionally treated as unclassified by CI and pays the conservative Windows payload fallback until it is placed in an owned source unit.
 - Tests import source modules through the test-only `@/*` alias. Tests that intentionally inspect source text use the same alias with Vitest's `?raw` suffix; do not reintroduce directory-depth-dependent `../src/` imports or file URLs.
-- Do not hand-build stamp argv, IPC paths, or process matching; use `@open-design/sidecar` launch/discovery/invoke/stop atomics.
+- Do not hand-build stamp argv, IPC paths, or process matching; use `@mish/sidecar` launch/discovery/invoke/stop atomics.
 - Do not use port numbers in data/log/runtime/cache path decisions. Namespace decides paths; ports are only transient transports.
-- Public release artifacts must use channel-specific app identity: stable uses `Open Design`, beta uses `Open Design Beta`, prerelease uses `Open Design Prerelease`, and preview uses `Open Design Preview`. Local tools-pack installs may still use namespace-scoped install paths only as a developer multi-instance validation convention.
+- Public release artifacts must use channel-specific app identity: stable uses `Mish`, beta uses `Mish Beta`, prerelease uses `Mish Prerelease`, and preview uses `Mish Preview`. Local tools-pack installs may still use namespace-scoped install paths only as a developer multi-instance validation convention.
 - Do not let namespace-named `.app` installs change data/log/runtime/cache path conventions.
 - `--dir` controls tools-pack output/runtime/install validation roots only. It must not be treated as the cache root. The default workspace tools-pack cache is the hot path. `--cache-dir` is a special-case escape hatch for cache isolation or cold-cache validation, not a routine QA/build parameter.
 - Use `--portable` for public/release artifacts so packaged config does not bake local tools-pack runtime roots from the build machine.
@@ -56,25 +56,25 @@ Read this section before changing packaged auto-update behavior. The updater cro
 
 ### Release metadata shape
 
-The runtime updater reads `https://releases.open-design.ai/<channel>/latest/metadata.json` unless `OD_UPDATE_METADATA_URL` overrides it. For package-launcher updates:
+The runtime updater reads `https://releases.mish.invalid/<channel>/latest/metadata.json` unless `OD_UPDATE_METADATA_URL` overrides it. For package-launcher updates:
 
 - A valid packaged-launcher context prefers `platforms.<platform>.artifacts.payload`; the platform installer (`dmg` on macOS or `installer` on Windows) remains the recovery/fallback path.
 - The artifact must have a checksum, preferably `sha256Url`; the updater verifies bytes before exposing an install action.
 - `OD_UPDATE_CURRENT_VERSION` may override the packaged version for tests, but user-flow package validation should prefer building the package with the intended `--app-version`.
 - Release metadata may include `releaseNote.content`, with a `defaultLocale` and locale descriptors containing `url`, `mediaType`, `sha256`, and `size`. The updater does not currently consume this block; `tools-release` owns its publication and verification independently from updater UI behavior.
-- Release metadata may include `control.launcher.version.{min, url}` — the installer-reinstall floor. The updater compares `min` against the **physically installed outer package version** (read at check time from the outer bundle's `open-design-config.json` via the launcher launch path; `OD_UPDATE_INSTALLED_VERSION` overrides it for tests), NOT the running payload version — payload updates never touch the outer bundle, so a broken outer generation must reach the installer path even when its payload is current. When the floor trips (or `min` is set but the outer version is unreadable — conservative), the updater selects the installer artifact and, when no newer release exists, offers a same-version installer reinstall; snapshot field `reinstall` carries `{reason, installedVersion, minVersion, url}` and the web UI presents the optional operator `url` as a jump link with default i18n copy as fallback. Publication: channel policy is managed as one repo-vars pair per channel — `RELEASE_LAUNCHER_VERSION_MIN_<CHANNEL>` + `RELEASE_LAUNCHER_VERSION_MIN_URL_<CHANNEL>` — passed through workflows verbatim (no YAML fallback expressions) and resolved by the shared resolver in `tools/release/src/storage/launcher-version-floor.ts`: a non-stable channel whose own pair is unset falls back to the STABLE pair as a unit, and format/https/floor validation is applied at that single point. `publish-metadata` hard-fails when `min` exceeds the release version — a floor this release cannot satisfy would make the same-version reinstall offer nag forever. `verify-metadata` re-resolves the same channel policy and checks the published block against it; `summary-metadata` surfaces the floor in the step summary.
+- Release metadata may include `control.launcher.version.{min, url}` — the installer-reinstall floor. The updater compares `min` against the **physically installed outer package version** (read at check time from the outer bundle's `mish-config.json` via the launcher launch path; `OD_UPDATE_INSTALLED_VERSION` overrides it for tests), NOT the running payload version — payload updates never touch the outer bundle, so a broken outer generation must reach the installer path even when its payload is current. When the floor trips (or `min` is set but the outer version is unreadable — conservative), the updater selects the installer artifact and, when no newer release exists, offers a same-version installer reinstall; snapshot field `reinstall` carries `{reason, installedVersion, minVersion, url}` and the web UI presents the optional operator `url` as a jump link with default i18n copy as fallback. Publication: channel policy is managed as one repo-vars pair per channel — `RELEASE_LAUNCHER_VERSION_MIN_<CHANNEL>` + `RELEASE_LAUNCHER_VERSION_MIN_URL_<CHANNEL>` — passed through workflows verbatim (no YAML fallback expressions) and resolved by the shared resolver in `tools/release/src/storage/launcher-version-floor.ts`: a non-stable channel whose own pair is unset falls back to the STABLE pair as a unit, and format/https/floor validation is applied at that single point. `publish-metadata` hard-fails when `min` exceeds the release version — a floor this release cannot satisfy would make the same-version reinstall offer nag forever. `verify-metadata` re-resolves the same channel policy and checks the published block against it; `summary-metadata` surfaces the floor in the step summary.
 - The updater exposes a manual disaster-recovery `clear-cache` action (`od:update:clear-cache` IPC, sidecar action `clear-cache`, Settings → About "Clear update cache" row with a two-stage inline confirm). It resets one-shot update state (downloaded release, install freeze) back to `idle`, purges `releases/`, `staging/`, `downloads/`, and `.back/`, removes a stale launcher `attempt.json` plus any non-`confirmed` desktop-handoff journal, and deletes non-retained launcher payload versions. Runtime `active`/`lastSuccessful` versions, explicit `retained` cleanup entries, `install.json`, and a `confirmed` handoff journal are never touched; locked files defer through the existing cleanup.json retry machinery. An installer helper already spawned by a prior install action is not cancelled.
 - Release-note source lives at `docs/CHANGELOG/v<full-releaseVersion>/<locale>.md`. All channels use the same publication pipeline, while stable additionally requires `en` and `zh-CN` before platform builds proceed.
-- Post-update "what's new" highlights are NOT carried in release `metadata.json`. The daemon's `/api/whats-new` fetches a single hand-curated document on a dedicated R2 bucket (`https://whatsnew.open-design.ai/whats-new.json`, overridable with `OD_WHATS_NEW_URL`); the web home surface shows a one-time card driven by that document's `id`, not the running version. The document is maintained in this repository at `docs/whats-new.json` and published by `.github/workflows/whats-new-publish.yml`; operators edit that one file after a release — there is no per-version publish tooling. See `docs/whats-new.md`.
+- Post-update "what's new" highlights are NOT carried in release `metadata.json`. The daemon's `/api/whats-new` fetches a single hand-curated document on a dedicated R2 bucket (`https://whatsnew.mish.invalid/whats-new.json`, overridable with `OD_WHATS_NEW_URL`); the web home surface shows a one-time card driven by that document's `id`, not the running version. The document is maintained in this repository at `docs/whats-new.json` and published by `.github/workflows/whats-new-publish.yml`; operators edit that one file after a release — there is no per-version publish tooling. See `docs/whats-new.md`.
 
 ### Channel identity rules
 
 Channel identity must be stable across install, update install, shortcuts, registry entries, and app data:
 
-- Stable: `Open Design`, namespace `default` or stable release namespace.
-- Beta Windows: `Open Design Beta`, namespace `release-beta-win`, uninstall key `Open Design-release-beta-win`.
-- Prerelease Windows: `Open Design Prerelease`, namespace `release-prerelease-win`, uninstall key `Open Design-release-prerelease-win`.
-- Preview Windows: `Open Design Preview`, namespace `release-preview-win`, uninstall key `Open Design-release-preview-win`.
+- Stable: `Mish`, namespace `default` or stable release namespace.
+- Beta Windows: `Mish Beta`, namespace `release-beta-win`, uninstall key `Mish-release-beta-win`.
+- Prerelease Windows: `Mish Prerelease`, namespace `release-prerelease-win`, uninstall key `Mish-release-prerelease-win`.
+- Preview Windows: `Mish Preview`, namespace `release-preview-win`, uninstall key `Mish-release-preview-win`.
 - Beta-like ad hoc namespaces such as `beta-local-flow` are test namespaces, not the beta channel. They must not be used for user-flow beta validation because they create a different registry key while sharing a confusing display name/path.
 
 If a local release-channel package is meant to be updated by a real feed, build it with the matching release namespace and an older matching `--app-version` such as `--namespace release-beta-win --app-version 0.10.0-beta.1` or `--namespace release-prerelease-win --app-version 0.10.0-prerelease.1`. Otherwise the installed package and the downloaded package can appear as separate registry entries even though they target the same display name.
@@ -101,18 +101,18 @@ This harness is appropriate for asserting IPC, popup rendering, progress, checks
 
 ### High-confidence local user-flow acceptance
 
-Use this when validating release-channel behavior before handing a Windows beta build to a human tester. This path intentionally avoids mock services and exercises the selected real beta feed. For the self-hosted `release-beta-s` lane, the real feed is the S3 origin configured by `release_public_origin`, currently `https://s3.nexu.space/od-releases`.
+Use this when validating release-channel behavior before handing a Windows beta build to a human tester. This path intentionally avoids mock services and exercises the selected real beta feed. For the self-hosted `release-beta-s` lane, the real feed is the S3 origin configured by `release_public_origin`, currently `https://mish.invalid/od-releases`.
 
 1. Confirm the latest beta metadata first:
 
 ```bash
-curl.exe --ssl-no-revoke -fsSL https://releases.open-design.ai/beta/latest/metadata.json
+curl.exe --ssl-no-revoke -fsSL https://releases.mish.invalid/beta/latest/metadata.json
 ```
 
 For `release-beta-s`, check the internal feed instead:
 
 ```bash
-curl.exe --ssl-no-revoke -fsSL https://s3.nexu.space/od-releases/betas/latest/metadata.json
+curl.exe --ssl-no-revoke -fsSL https://mish.invalid/od-releases/betas/latest/metadata.json
 ```
 
 2. Build a non-portable Windows beta package with the real beta namespace and a version lower than latest:
@@ -124,33 +124,33 @@ pnpm tools-pack win build --dir C:\odtp-beta-release-fixed --namespace release-b
 3. Give the tester the generated installer:
 
 ```text
-C:\odtp-beta-release-fixed\out\win\namespaces\release-beta-win\builder\Open Design-release-beta-win-setup.exe
+C:\odtp-beta-release-fixed\out\win\namespaces\release-beta-win\builder\Mish-release-beta-win-setup.exe
 ```
 
 4. Expected user flow:
 
 - User installs `0.8.0-beta.5` through the NSIS UI.
-- User launches `Open Design Beta`.
+- User launches `Mish Beta`.
 - App auto-checks the real beta feed and selects the latest Windows launcher payload when the package-launcher context is valid. The installer is the fallback path when the payload artifact or launcher context is unavailable.
-- For the payload path, the app downloads `platforms.win.artifacts.payload`, verifies sha256, prepares the payload under `%APPDATA%\Open Design\launcher\channels\beta\namespaces\release-beta-win\versions\<version>\payload`, and shows the web updater popup.
+- For the payload path, the app downloads `platforms.win.artifacts.payload`, verifies sha256, prepares the payload under `%APPDATA%\Mish\launcher\channels\beta\namespaces\release-beta-win\versions\<version>\payload`, and shows the web updater popup.
 - The native Windows File menu must not expose update actions. On macOS, the app menu exposes the state-aware update item and opens the renderer update dialog without making background checks intrusive.
 - The updater popup uses i18n strings and download progress must not flash to 100% before real bytes arrive.
 - Applying the payload update should quit and relaunch the exact executable under the prepared version's `payload` directory, then mark launcher `active` and `lastSuccessful` to that version and clear `attempt.json`.
 - For a historical outer, the handoff must retain the true previous launcher pointer for fail-closed recovery and terminate with `desktop-handoff.json` absent or `confirmed`; `prepared` and `armed` are not successful terminal states.
 - After a full stop, launching the installed shortcut/outer again must still converge on the same active payload desktop and preserve daemon/API behavior, including a real PPTX export.
-- If the updater falls back to the installer path, clicking `Open installer` opens the real downloaded beta installer. Installing it should overwrite the same `Open Design-release-beta-win` registry key, not create a second beta key.
+- If the updater falls back to the installer path, clicking `Open installer` opens the real downloaded beta installer. Installing it should overwrite the same `Mish-release-beta-win` registry key, not create a second beta key.
 
 5. Registry and launcher sanity check after beta.6 update:
 
 ```powershell
 Get-ItemProperty 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*' -ErrorAction SilentlyContinue |
-  Where-Object { $_.DisplayName -like 'Open Design*' } |
+  Where-Object { $_.DisplayName -like 'Mish*' } |
   Select-Object PSChildName,DisplayName,DisplayVersion,InstallLocation
 
-Get-Content "$env:APPDATA\Open Design\launcher\channels\beta\namespaces\release-beta-win\runtime.json"
+Get-Content "$env:APPDATA\Mish\launcher\channels\beta\namespaces\release-beta-win\runtime.json"
 ```
 
-For a clean beta channel result, expect one beta entry with `PSChildName` `Open Design-release-beta-win` and the latest `DisplayVersion`.
+For a clean beta channel result, expect one beta entry with `PSChildName` `Mish-release-beta-win` and the latest `DisplayVersion`.
 For the payload path, also expect launcher `active.version` and `lastSuccessful.version` to match the latest beta version, `attempt.json` to be absent, and the running desktop executable to resolve below that version's `payload` directory. `desktop-handoff.json` may be absent for a current outer or `confirmed` for a historical outer; `prepared` and `armed` are not successful terminal states.
 Windows Settings > Apps may cache uninstall metadata within the current view. If Settings still shows the previous beta version after the registry query is correct, switch away from the Apps view and back, or reopen Settings, before treating it as an installer failure. The registry query above is the source of truth for this harness.
 
@@ -170,14 +170,14 @@ pnpm tools-pack win cleanup --dir C:\odtp-beta-release-fixed --namespace release
 `docs/testing/updater-lifecycle.md` is the full lifecycle-to-test coverage map (including deliberate manual-only nodes); consult it to find the owning tests for the node you touched, then run the narrow tests plus the repo checks:
 
 ```bash
-pnpm --filter @open-design/desktop test -- tests/main/updater.test.ts tests/main/updater-host-boundary.test.ts tests/main/preload-host-boundary.test.ts
-pnpm --filter @open-design/web test -- tests/components/UpdaterPopup.test.tsx tests/lib/updater.test.ts
-pnpm --filter @open-design/tools-serve test
-pnpm --filter @open-design/tools-pack test -- tests/win-identity.test.ts tests/win-app.test.ts tests/win-builder.test.ts
-pnpm --filter @open-design/desktop typecheck
-pnpm --filter @open-design/web typecheck
-pnpm --filter @open-design/tools-pack typecheck
-pnpm --filter @open-design/tools-serve typecheck
+pnpm --filter @mish/desktop test -- tests/main/updater.test.ts tests/main/updater-host-boundary.test.ts tests/main/preload-host-boundary.test.ts
+pnpm --filter @mish/web test -- tests/components/UpdaterPopup.test.tsx tests/lib/updater.test.ts
+pnpm --filter @mish/tools-serve test
+pnpm --filter @mish/tools-pack test -- tests/win-identity.test.ts tests/win-app.test.ts tests/win-builder.test.ts
+pnpm --filter @mish/desktop typecheck
+pnpm --filter @mish/web typecheck
+pnpm --filter @mish/tools-pack typecheck
+pnpm --filter @mish/tools-serve typecheck
 git diff --check
 pnpm guard
 pnpm typecheck

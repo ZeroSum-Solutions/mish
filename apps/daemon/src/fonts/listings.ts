@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { FONT_CATEGORIES, FONT_STYLES } from '@open-design/contracts';
+import { FONT_CATEGORIES, FONT_STYLES } from '@mish/contracts';
 import googleJson from './google-fonts-snapshot.json' with { type: 'json' };
 // The Google Fonts listing is split in two files so each stays under the repository's 1 MiB blob guard.
 import googleJsonPart2 from './google-fonts-snapshot-2.json' with { type: 'json' };

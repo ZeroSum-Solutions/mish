@@ -1,7 +1,7 @@
 // Reviewer-adapter boundary for R03 review runs. The run service only talks to
 // these interfaces; each adapter wraps one approved provider lane. Tests inject
 // fakes, so no unit test touches a provider.
-import type { ReviewAbstainReason, ReviewerReasonCode, ReviewerRecord, ReviewerRole } from '@open-design/contracts';
+import type { ReviewAbstainReason, ReviewerReasonCode, ReviewerRecord, ReviewerRole } from '@mish/contracts';
 import type { JudgmentContract } from '../judgment-seeds.js';
 
 /** One check a reviewer is asked about. Mechanical checks carry the runner's verdict to challenge. */

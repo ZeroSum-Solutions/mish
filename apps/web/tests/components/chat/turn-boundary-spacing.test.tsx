@@ -51,7 +51,7 @@ import { spawnSync } from 'node:child_process';
 import { cleanup, render } from '@testing-library/react';
 import type { ReactElement } from 'react';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
-import type { ChatMessage, PersistedAgentEvent } from '@open-design/contracts';
+import type { ChatMessage, PersistedAgentEvent } from '@mish/contracts';
 
 import { I18nProvider } from '../../../src/i18n';
 import { AssistantMessage } from '../../../src/components/AssistantMessage';

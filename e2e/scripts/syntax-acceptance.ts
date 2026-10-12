@@ -6,7 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs, promisify } from 'node:util';
-import { DELIVERABLE_SYNTAX_FINALIZATION_REASONS, DELIVERABLE_SYNTAX_SAFE_FIX_RULES } from '@open-design/contracts';
+import { DELIVERABLE_SYNTAX_FINALIZATION_REASONS, DELIVERABLE_SYNTAX_SAFE_FIX_RULES } from '@mish/contracts';
 import { createToolsDevSuite, e2eWorkspaceRoot } from '../lib/tools-dev/runtime.ts';
 import { runToolsDevJson } from '../lib/tools-dev/cli.ts';
 
@@ -29,8 +29,8 @@ export function resolveSyntaxTelemetryCanary(input: {
     || (input.repeat !== undefined && input.repeat !== '1')) {
     throw new Error('Telemetry canary requires replay, test profile, one repeat and built-in synthetic fixtures only');
   }
-  if (input.relayUrl !== 'https://telemetry-test.open-design.ai/api/langfuse') {
-    throw new Error('Telemetry canary requires explicit OPEN_DESIGN_TELEMETRY_RELAY_URL pointing to the official test relay');
+  if (input.relayUrl !== 'https://telemetry-test.mish.invalid/api/langfuse') {
+    throw new Error('Telemetry canary requires explicit MISH_TELEMETRY_RELAY_URL pointing to the official test relay');
   }
   if (!input.token || !/^[a-z0-9]{8}$/.test(input.token)) throw new Error('Missing isolated canary token');
   const html = (script: string) => `<!doctype html><script>${script}</script>`;
@@ -50,8 +50,8 @@ export function resolveSyntaxTelemetryCanary(input: {
       VELA_CONTROL_KEY: '', VELA_RUNTIME_KEY: '',
       LANGFUSE_PUBLIC_KEY: '', LANGFUSE_SECRET_KEY: '',
       POSTHOG_KEY: '', NEXT_PUBLIC_POSTHOG_KEY: '',
-      OPEN_DESIGN_TELEMETRY_RELAY_URL: input.relayUrl,
-      OPEN_DESIGN_OBJECT_RELAY_URL: '',
+      MISH_TELEMETRY_RELAY_URL: input.relayUrl,
+      MISH_OBJECT_RELAY_URL: '',
       OD_TELEMETRY_ENV: `synthetic-test-${input.token}`,
     },
   };
@@ -222,7 +222,7 @@ export async function collectRealEvidence(output: string, expectedIds: string[])
       && syntax.finalization.committedPatchCount === 0 && syntax.recoveredDeliveryCount === 0;
     return { ...entry, deliveredWithWarning, repairVerified,
     passed: entry.status === 'succeeded' && entry.metrics?.strategyRoute === 'od-next'
-      && entry.metrics?.agent === 'open-design:amr' && entry.metrics?.model === 'deepseek-v4-flash'
+      && entry.metrics?.agent === 'mish:amr' && entry.metrics?.model === 'deepseek-v4-flash'
       && (deliveredWithWarning || repairVerified || deliveredWithoutRepair),
     };
   });
@@ -260,7 +260,7 @@ const canary = resolveSyntaxTelemetryCanary({
   enabled: values['upload-telemetry'] === true, mode, profile: values.profile!,
   externalInputs: Boolean(values.dataset || values['fixture-manifest'] || values.runner || values.vela || values.sha256),
   repeat: values.repeat, isolatedRoot: root, token: randomUUID().slice(0, 8),
-  relayUrl: process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL,
+  relayUrl: process.env.MISH_TELEMETRY_RELAY_URL,
 });
 if (canary) await mkdir(canary.env.AMR_HOME, { mode: 0o700 });
 const telemetryPrefs = canary?.prefs ?? { metrics: false, content: false, artifactManifest: false };
@@ -278,7 +278,7 @@ const env: Record<string, string | undefined> = {
   OD_INSTALLATION_DIR: '', OD_LEGACY_DATA_DIR: '',
   OD_NEXT_STRATEGY_ROLLOUT: mode === 'real' ? 'active' : 'off',
   OD_DELIVERABLE_SYNTAX_FINALIZER: '1',
-  OPEN_DESIGN_AMR_PROFILE: values.profile, VELA_PROFILE: values.profile,
+  MISH_AMR_PROFILE: values.profile, VELA_PROFILE: values.profile,
   ...(values.vela ? { VELA_BIN: path.resolve(values.vela) } : {}),
   ...canary?.env,
 };
@@ -482,7 +482,7 @@ try {
     } catch { throw new Error(`AMR_AUTH_BLOCKED: Vela profile ${values.profile} is not authenticated/reachable`); }
   }
   console.log('Building current worktree and dependencies (no --skip-build).');
-  await command('pnpm', ['--filter', '@open-design/daemon...', '--workspace-concurrency=4', 'build'], 'build.log', 600_000);
+  await command('pnpm', ['--filter', '@mish/daemon...', '--workspace-concurrency=4', 'build'], 'build.log', 600_000);
   report.build = {
     serverSha256: hash(await readFile(path.join(workspace, 'apps/daemon/dist/server.js'))),
     finalizerSha256: hash(await readFile(path.join(workspace, 'apps/daemon/dist/artifacts/deliverable-syntax-finalization.js'))),
@@ -495,7 +495,7 @@ try {
     agentId: mode === 'real' ? 'amr' : 'claude',
     telemetry: telemetryPrefs, privacyDecisionAt: Date.now(),
     ...(mode === 'real' ? { agentCliEnv: { amr: {
-      VELA_BIN: path.resolve(values.vela!), VELA_PROFILE: values.profile, OPEN_DESIGN_AMR_PROFILE: values.profile,
+      VELA_BIN: path.resolve(values.vela!), VELA_PROFILE: values.profile, MISH_AMR_PROFILE: values.profile,
     } } } : {}),
   });
   if (mode === 'replay') {

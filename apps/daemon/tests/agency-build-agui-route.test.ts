@@ -13,9 +13,9 @@ import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AgencyBuildAguiState, AgencyBuildEvent, AgencyBuildResponse, AgencyBuildSnapshot } from '@open-design/contracts';
-import { applyJsonPatch, foldAgencyBuildState, type JsonPatchOp } from '@open-design/agui-adapter';
-import type { BuildEvent, BuildInput, BuildResult } from '@open-design/agency-fast-lane/build';
+import type { AgencyBuildAguiState, AgencyBuildEvent, AgencyBuildResponse, AgencyBuildSnapshot } from '@mish/contracts';
+import { applyJsonPatch, foldAgencyBuildState, type JsonPatchOp } from '@mish/agui-adapter';
+import type { BuildEvent, BuildInput, BuildResult } from '@mish/agency-fast-lane/build';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

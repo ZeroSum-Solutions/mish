@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import {
   LAUNCHER_SCHEMA_VERSION,
   resolveLauncherVersionPaths,
-} from "@open-design/launcher-proto";
+} from "@mish/launcher-proto";
 
 import type { ToolPackConfig } from "../config/index.js";
 import {

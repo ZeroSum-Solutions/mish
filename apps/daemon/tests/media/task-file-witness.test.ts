@@ -4,7 +4,7 @@ import { stat, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { ProjectFile } from '@open-design/contracts';
+import type { ProjectFile } from '@mish/contracts';
 import { closeDatabase, insertProject, openDatabase } from '../../src/db.js';
 import { insertMediaTask } from '../../src/media/tasks.js';
 import { ensureProject } from '../../src/projects.js';

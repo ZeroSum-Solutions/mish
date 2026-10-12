@@ -20,10 +20,10 @@ import {
   downloadCopyAndClear,
   type ManagedDownloadChecksum,
   type ManagedDownloadProgress,
-} from "@open-design/download";
+} from "@mish/download";
 import {
   LAUNCHER_SCHEMA_VERSION,
-} from "@open-design/launcher-proto";
+} from "@mish/launcher-proto";
 import {
   DESKTOP_UPDATE_ACTIONS,
   DESKTOP_UPDATE_MODES,
@@ -36,7 +36,7 @@ import {
   type DesktopUpdateReinstallSnapshot,
   type DesktopUpdateStatusSnapshot,
   type DesktopUpdateState,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   markInstallerObservationOpenFailed,
   writePendingInstallerObservation,
@@ -270,10 +270,10 @@ async function clearInterruptedIncomingDownload(
   const stagingDir = resolve(stagingRoot, incoming.cycleId);
   if (containsPath(stagingRoot, stagingDir)) {
     await rm(stagingDir, { force: true, recursive: true }).catch((error: unknown) => {
-      logger.warn("[open-design updater] failed to clean interrupted update staging directory", error);
+      logger.warn("[mish updater] failed to clean interrupted update staging directory", error);
     });
   } else {
-    logger.warn("[open-design updater] skipped escaped interrupted update staging directory", {
+    logger.warn("[mish updater] skipped escaped interrupted update staging directory", {
       cycleId: incoming.cycleId,
       stagingDir,
     });
@@ -283,7 +283,7 @@ async function clearInterruptedIncomingDownload(
     incoming: undefined,
   };
   await writeStoreMetadata(root, next);
-  logger.warn("[open-design updater] cleared interrupted update download", {
+  logger.warn("[mish updater] cleared interrupted update download", {
     cycleId: incoming.cycleId,
     version: incoming.version,
   });
@@ -446,7 +446,7 @@ export function createDesktopUpdater(
   const sessionId = `${now().toISOString()}-${processPid}`;
 
   function logUpdateEvent(event: string, fields: Record<string, unknown> = {}): void {
-    logger.info?.("[open-design updater] lifecycle", {
+    logger.info?.("[mish updater] lifecycle", {
       currentVersion: config.currentVersion,
       event,
       mode: config.mode,
@@ -670,7 +670,7 @@ export function createDesktopUpdater(
       now,
       trigger: "cold-start",
     }).catch((lifecycleError: unknown) => {
-      logger.warn("[open-design updater] failed to run cold-start release lifecycle", lifecycleError);
+      logger.warn("[mish updater] failed to run cold-start release lifecycle", lifecycleError);
       return null;
     });
     if (coldStartLifecycle != null) lifecycleSummary = coldStartLifecycle;
@@ -687,7 +687,7 @@ export function createDesktopUpdater(
       logger,
       now,
     }).catch((lifecycleError: unknown) => {
-      logger.warn("[open-design updater] failed to run launcher cleanup lifecycle", lifecycleError);
+      logger.warn("[mish updater] failed to run launcher cleanup lifecycle", lifecycleError);
       return null;
     });
     if (launcherLifecycle != null) {
@@ -1020,7 +1020,7 @@ export function createDesktopUpdater(
         readyVersion: nextCandidate.version,
         trigger: "next-version-ready",
       }).catch((lifecycleError: unknown) => {
-        logger.warn("[open-design updater] failed to run next-version-ready release lifecycle", lifecycleError);
+        logger.warn("[mish updater] failed to run next-version-ready release lifecycle", lifecycleError);
         return null;
       });
       if (readyLifecycle != null) lifecycleSummary = readyLifecycle;
@@ -1066,7 +1066,7 @@ export function createDesktopUpdater(
       await recordUpdateLifecycle(observationHandle, { stage: "install_requested", outcome: "started" });
       return observationHandle;
     } catch (observationError) {
-      logger.warn("[open-design updater] failed to write installer observation", observationError);
+      logger.warn("[mish updater] failed to write installer observation", observationError);
       return null;
     }
   }
@@ -1079,7 +1079,7 @@ export function createDesktopUpdater(
     try {
       await markInstallerObservationOpenFailed(observation, failedAt);
     } catch (observationError) {
-      logger.warn("[open-design updater] failed to update installer observation", observationError);
+      logger.warn("[mish updater] failed to update installer observation", observationError);
     }
   }
 
@@ -1304,7 +1304,7 @@ export function createDesktopUpdater(
         const target = resolve(transientRoot, entry);
         if (!containsPath(transientRoot, target)) continue;
         await rm(target, { force: true, recursive: true }).catch((error: unknown) => {
-          logger.warn("[open-design updater] failed manual transient cache cleanup", {
+          logger.warn("[mish updater] failed manual transient cache cleanup", {
             error: error instanceof Error ? error.message : String(error),
             path: target,
           });

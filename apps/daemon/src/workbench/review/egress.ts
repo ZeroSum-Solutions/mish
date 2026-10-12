@@ -20,7 +20,7 @@ import http from 'node:http';
 import https from 'node:https';
 import { BlockList, isIP } from 'node:net';
 import { addressParam, ev, evidenceLocation, evidenceUrl, evidenceVocabulary, hostParam, pageEnum, PageText, readPageText, RESOURCE_TYPES, type EvidenceContext, type EvidenceParam, type EvidenceText } from './evidence.js';
-import { reviewEgressPolicySchema, WORKBENCH_REVIEW_EGRESS_LIMITS, WORKBENCH_REVIEW_EGRESS_SCHEMA, WORKBENCH_REVIEW_PREVIEW_HOST, type ReviewEgressEvidence, type ReviewEgressFetch, type StoredReviewEgressEvidence } from '@open-design/contracts';
+import { reviewEgressPolicySchema, WORKBENCH_REVIEW_EGRESS_LIMITS, WORKBENCH_REVIEW_EGRESS_SCHEMA, WORKBENCH_REVIEW_PREVIEW_HOST, type ReviewEgressEvidence, type ReviewEgressFetch, type StoredReviewEgressEvidence } from '@mish/contracts';
 
 export type EgressLimits = { -readonly [K in keyof Omit<typeof WORKBENCH_REVIEW_EGRESS_LIMITS, 'maxHosts'>]: number };
 type MutableLimits = EgressLimits;
@@ -109,7 +109,7 @@ export function validatedAllowHosts(allowHosts: readonly string[]): string[] {
 
 /** The only response headers that reach the page: enough for type sniffing and CORS, never cookies. */
 const PASSED_RESPONSE_HEADERS = ['content-type', 'access-control-allow-origin', 'access-control-expose-headers', 'cross-origin-resource-policy', 'timing-allow-origin'];
-const USER_AGENT = 'OpenDesign-Review/1 (evidence egress)';
+const USER_AGENT = 'Mish-Review/1 (evidence egress)';
 
 const sha256 = (value: Buffer | string) => createHash('sha256').update(value).digest('hex');
 /**

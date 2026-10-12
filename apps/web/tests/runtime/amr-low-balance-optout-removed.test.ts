@@ -3,7 +3,7 @@
 // 红测 · 拆掉低余额「不再提醒」这颗 opt-out(产品 2026-09-04 拍板,原话「拆掉吧」)
 //
 // 缺陷:首页那张软提醒弹窗底部的「不再提醒」勾选框写的是
-// `open-design:amr-low-balance-warn-optout:v1`,而**项目页发送前**那道余额闸门的
+// `mish:amr-low-balance-warn-optout:v1`,而**项目页发送前**那道余额闸门的
 // soft 档读的是同一个位。于是在首页勾过一次的人,项目页的升级卡被永久静音 ——
 // 而他勾的时候以为自己关的只是首页那个弹窗。这与 T51「升级卡不该有关闭态,余额
 // 条件成立就一直在」直接冲突。
@@ -27,7 +27,7 @@
 //   · 零余额 + 没有遗留位 → 同样硬拦(证明拦住不是位造成的)
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AmrWalletSnapshot } from '@open-design/contracts';
+import type { AmrWalletSnapshot } from '@mish/contracts';
 import { checkAmrBalanceGate } from '../../src/runtime/amr-balance-gate';
 import {
   fetchAmrWalletSnapshot,
@@ -46,7 +46,7 @@ const mockedFetchStatus = vi.mocked(fetchVelaLoginStatus);
  * 已经在真实用户机器上落盘的那条位。删读取方之后它只应该是一条死数据。
  * 这里写死字面量而不是 import 常量:常量本身也要被删。
  */
-const LEGACY_OPTOUT_KEY = 'open-design:amr-low-balance-warn-optout:v1';
+const LEGACY_OPTOUT_KEY = 'mish:amr-low-balance-warn-optout:v1';
 
 /** 那颗 opt-out 当年作用的那一段:高于硬拦线的一个小余额。 */
 const LOW_BALANCE = '1.20';

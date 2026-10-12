@@ -2,7 +2,7 @@ import { randomUUID, createHash } from 'node:crypto';
 import { createReadStream } from 'node:fs';
 import { stat, lstat, open, unlink, type FileHandle } from 'node:fs/promises';
 import path from 'node:path';
-import { parseAttachIntakeResponse, parseClearIntakeRequest, parseIntakeBatchSnapshot, parseIntakeFilePutResponse, parseListIntakeBatchesResponse, type IntakeBatchSnapshot, type IntakeFileOutcome } from '@open-design/contracts';
+import { parseAttachIntakeResponse, parseClearIntakeRequest, parseIntakeBatchSnapshot, parseIntakeFilePutResponse, parseListIntakeBatchesResponse, type IntakeBatchSnapshot, type IntakeFileOutcome } from '@mish/contracts';
 import { withReadabilityNotice } from './intake-policy.js';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../daemon-url.js';
 import type { WorkbenchCliOptions } from '../workbench-cli.js';

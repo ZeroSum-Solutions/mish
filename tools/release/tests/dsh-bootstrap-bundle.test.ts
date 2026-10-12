@@ -8,7 +8,7 @@ import {
   type DshBootstrapObject,
 } from "../src/storage/dsh-bootstrap-bundle.ts";
 
-const LANDING_PS1_URL = "https://open-design.ai/install-dsh.ps1?version=1";
+const LANDING_PS1_URL = "https://github.com/ZeroSum-Solutions/mish/install-dsh.ps1?version=1";
 
 function sources(cmd = `download '${LANDING_PS1_URL}'`): DshBootstrapObject[] {
   return [

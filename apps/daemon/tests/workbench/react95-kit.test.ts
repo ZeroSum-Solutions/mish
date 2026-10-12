@@ -10,7 +10,7 @@ import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:f
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseResourceDetailResponse, parseResourceSearchResponse, type ResourceCandidate } from '@open-design/contracts';
+import { parseResourceDetailResponse, parseResourceSearchResponse, type ResourceCandidate } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchAdoptionRoutes } from '../../src/routes/workbench-adoption.js';
 import { registerWorkbenchKitRoutes } from '../../src/routes/workbench-kits.js';

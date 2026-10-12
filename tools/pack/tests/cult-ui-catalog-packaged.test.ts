@@ -3,13 +3,14 @@
 // (`packages/cult-ui-catalog/generated/`: the typed index, the contract shim, one adapter per
 // insertable catalog row and one WebP preview each) must be in that list, and every lane must
 // install the package, or the agency fast lane cannot resolve a `cult:<name>` selection.
+import { existsSync } from "node:fs";
 import { execFile } from "node:child_process";
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 
-import { createPackageManagerInvocation } from "@open-design/platform";
+import { createPackageManagerInvocation } from "@mish/platform";
 import { describe, expect, it } from "vitest";
 
 import { INTERNAL_PACKAGES as LINUX_INTERNAL_PACKAGES } from "@/linux.js";
@@ -22,7 +23,7 @@ import { WORKSPACE_BUILD_PACKAGES } from "@/workspace-build.js";
 const execFileAsync = promisify(execFile);
 const workspaceRoot = fileURLToPath(new URL("../../../", import.meta.url));
 const packageDir = join(workspaceRoot, "packages", "cult-ui-catalog");
-const NAME = "@open-design/cult-ui-catalog";
+const NAME = "@mish/cult-ui-catalog";
 
 async function packedFiles(): Promise<Set<string>> {
   // Drop the npm_* variables of whichever runner started vitest (npx sets npm_execpath to npm), so
@@ -59,7 +60,7 @@ describe("packaged Cult adapter registry", () => {
 
   it("ships the index, the shim, every insertable row's adapter and every preview in the package tarball", async () => {
     const [files, rows] = await Promise.all([packedFiles(), insertableRows()]);
-    expect(rows.length).toBeGreaterThan(0);
+    // The public repository ships no licensed rows; the index and shim must still ship.
     expect(files.has("catalog.json")).toBe(true);
     expect(files.has("generated/index.ts")).toBe(true);
     expect(files.has("generated/section-adapter.ts")).toBe(true);
@@ -69,7 +70,9 @@ describe("packaged Cult adapter registry", () => {
     }
     // Nothing under generated/ is left behind: the tarball carries the directory as committed.
     for (const sub of ["adapters", "previews"]) {
-      for (const file of await readdir(join(packageDir, "generated", sub))) {
+      const dir = join(packageDir, "generated", sub);
+      if (!existsSync(dir)) continue;
+      for (const file of await readdir(dir)) {
         expect(files.has(`generated/${sub}/${file}`), `generated/${sub}/${file}`).toBe(true);
       }
     }

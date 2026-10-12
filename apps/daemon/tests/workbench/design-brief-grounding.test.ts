@@ -3,7 +3,7 @@ import { createDesignBriefService } from '../../src/workbench/brief/service.js';
 import { fakeGenerator, modelOutput, tempDir } from './design-brief-fixture.js';
 import { createClaudeMaxBriefGroundingChecker, createModelBriefGroundingChecker, BRIEF_GROUNDING_JSON_SCHEMA } from '../../src/workbench/brief/grounding.js';
 import type { ClaudeProcessRunner } from '../../src/workbench/review/reviewers/claude-visual.js';
-import { canonicalDesignBriefJson, renderDesignBriefPrompt } from '@open-design/contracts';
+import { canonicalDesignBriefJson, renderDesignBriefPrompt } from '@mish/contracts';
 import { createHash } from 'node:crypto';
 
 type Claim = { id: string; value: string };

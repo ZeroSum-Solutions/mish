@@ -2,8 +2,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
-  DEFAULT_AMR_RECHARGE_URL,
+  amrAutoRechargeUrlForProfile,
+  amrConsoleUrlForProfile,
   amrConsoleUrlForWorkspace,
+  amrPlansUrlForProfile,
   amrPlansUrlForWorkspace,
   amrProfileBadgeLabel,
   amrRechargeUrlForProfile,
@@ -23,79 +25,61 @@ afterEach(() => {
 });
 
 describe('amrRechargeUrlForProfile', () => {
-  // Product decision: there is no wallet page in the console's information
-  // architecture any more — balance, top-up and the auto-recharge policy all
-  // report on the dashboard (vela #1055 rehomed them there). Every console
-  // entry this module builds therefore targets `/dashboard`, not `/wallet`.
-  it('targets the console dashboard on every AMR profile', () => {
-    expect(DEFAULT_AMR_RECHARGE_URL).toBe(
-      'https://open-design.ai/amr/dashboard?source=open_design',
-    );
-    expect(amrRechargeUrlForProfile('prod')).toBe(DEFAULT_AMR_RECHARGE_URL);
-    expect(amrRechargeUrlForProfile('test')).toBe(
-      'https://open-design.powerformer.net/cloud/dashboard?source=open_design',
-    );
-    expect(amrRechargeUrlForProfile('local')).toBe(
-      'http://localhost:5173/dashboard?source=open_design',
-    );
-    expect(amrRechargeUrlForProfile(' unknown ')).toBe(DEFAULT_AMR_RECHARGE_URL);
-    expect(amrRechargeUrlForProfile(null)).toBe(DEFAULT_AMR_RECHARGE_URL);
+  // AMR is an upstream paid service this fork does not operate: there is no
+  // built-in console host, so every console link is unavailable (null) until a
+  // console origin is explicitly configured.
+  it('is unavailable on every profile when no console origin is configured', () => {
+    for (const profile of ['prod', 'test', 'feature-test', 'local', ' unknown ', null]) {
+      expect(amrRechargeUrlForProfile(profile)).toBeNull();
+    }
+    expect(amrConsoleUrlForProfile('prod')).toBeNull();
+    expect(amrPlansUrlForProfile('prod')).toBeNull();
+    expect(amrAutoRechargeUrlForProfile('prod')).toBeNull();
   });
 
   it('labels the feature-test profile distinctly', () => {
     expect(amrProfileBadgeLabel('feature-test')).toBe('FEATURE TEST');
   });
 
-  // An internal (non-public) environment has no origin in this bundle at all:
-  // the daemon reports the one its build was given, and until it does the
-  // client shows the public console rather than a guessed internal hostname.
-  it('falls back to the public console for a profile with no runtime origin', () => {
-    expect(amrRechargeUrlForProfile('feature-test')).toBe(DEFAULT_AMR_RECHARGE_URL);
+  // The configured origin applies on every profile, production included.
+  it('targets the configured console dashboard on every profile, prod included', () => {
+    setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
+    for (const profile of ['prod', 'feature-test', ' unknown ', null]) {
+      expect(amrRechargeUrlForProfile(profile)).toBe(
+        `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish`,
+      );
+    }
   });
 
-  it('uses the runtime console origin the daemon reported for a non-prod profile', () => {
-    setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
-    expect(amrRechargeUrlForProfile('feature-test')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design`,
+  it('prefers an explicit status origin over the runtime origin', () => {
+    setRuntimeAmrConsoleOrigin('https://runtime.example.invalid');
+    expect(amrConsoleUrlForProfile('prod', `${RUNTIME_CONSOLE_ORIGIN}/`)).toBe(
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish`,
     );
   });
 
-  it('tolerates a trailing slash and blank runtime origins', () => {
+  it('tolerates a trailing slash and treats blank or non-http origins as unconfigured', () => {
     setRuntimeAmrConsoleOrigin(`${RUNTIME_CONSOLE_ORIGIN}/`);
     expect(amrRechargeUrlForProfile('feature-test')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish`,
     );
     setRuntimeAmrConsoleOrigin('   ');
-    expect(amrRechargeUrlForProfile('feature-test')).toBe(DEFAULT_AMR_RECHARGE_URL);
-  });
-
-  // prod's console is the public product URL. A runtime origin must never be
-  // able to redirect a production user's console/upgrade links elsewhere.
-  it('never lets a runtime origin override the prod console', () => {
-    setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
-    expect(amrRechargeUrlForProfile('prod')).toBe(DEFAULT_AMR_RECHARGE_URL);
-    expect(amrRechargeUrlForProfile(null)).toBe(DEFAULT_AMR_RECHARGE_URL);
-    expect(amrRechargeUrlForProfile(' unknown ')).toBe(DEFAULT_AMR_RECHARGE_URL);
+    expect(amrRechargeUrlForProfile('feature-test')).toBeNull();
+    setRuntimeAmrConsoleOrigin('javascript:alert(1)');
+    expect(amrRechargeUrlForProfile('prod')).toBeNull();
   });
 });
 
-// The web bundle ships publicly, so an environment hostname that is not itself
-// public must not be a literal in it. New environments arrive through the
-// daemon's runtime console origin (OD_VELA_WEB_URL, baked at packaging time
-// from a CI secret) — not by adding a row to the static profile table.
+// The web bundle ships publicly, so no AMR console hostname is a literal in it.
+// Console origins arrive only through explicit configuration.
 describe('amr-guidance origin literals', () => {
-  it('bakes no additional environment origin into the web bundle', () => {
+  it('bakes no console origin into the web bundle', () => {
     const source = readFileSync(
       join(__dirname, '..', '..', 'src', 'runtime', 'amr-guidance.ts'),
       'utf8',
     );
     const origins = [...source.matchAll(/https?:\/\/[^'"`\s)]+/g)].map((match) => match[0]);
-    // Exactly three: the public prod console, the local dev server, and the one
-    // grandfathered internal entry that predates this rule. A fourth means
-    // someone hardcoded an environment hostname instead of injecting it.
-    // (Was four while a public Pricing literal lived here; T54 routed 升级 back
-    // onto the profile's own console and the literal went with it.)
-    expect(origins).toHaveLength(3);
+    expect(origins).toEqual([]);
   });
 });
 
@@ -105,14 +89,20 @@ describe('workspace-scoped AMR URLs', () => {
   it('pins both console links to the workspace', () => {
     setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
     expect(amrConsoleUrlForWorkspace('feature-test', ' workspace-a ')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design&workspaceId=workspace-a`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish&workspaceId=workspace-a`,
     );
     expect(amrPlansUrlForWorkspace('feature-test', ' workspace-a ')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design&workspaceId=workspace-a&billing=plan`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish&workspaceId=workspace-a&billing=plan`,
     );
   });
 
+  it('fails closed when no console origin is configured', () => {
+    expect(amrConsoleUrlForWorkspace('prod', 'workspace-a')).toBeNull();
+    expect(amrPlansUrlForWorkspace('prod', 'workspace-a')).toBeNull();
+  });
+
   it('fails closed when the workspace identity is absent', () => {
+    setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
     expect(amrConsoleUrlForWorkspace('feature-test', null)).toBeNull();
     expect(amrConsoleUrlForWorkspace('feature-test', '   ')).toBeNull();
     expect(amrPlansUrlForWorkspace('feature-test', undefined)).toBeNull();

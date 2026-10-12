@@ -226,7 +226,7 @@ function runCheck(): void {
   }
   const fresh = canonicalJson(buildFromManifest(manifest));
   const committedText = readFileSync(outPath, 'utf8');
-  if (fresh !== committedText) fail('generated/21st-items.json is stale', ['run `pnpm --filter @open-design/21st-catalog run 21st` to refresh it']);
+  if (fresh !== committedText) fail('generated/21st-items.json is stale', ['run `pnpm --filter @mish/21st-catalog run 21st` to refresh it']);
   console.log(`21st-items.json: matches the source kit (${committed.rows.length} rows)`);
 }
 

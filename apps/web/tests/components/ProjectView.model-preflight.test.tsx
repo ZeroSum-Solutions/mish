@@ -19,7 +19,7 @@ import {
   buildWorkspaceSeatSummary,
   type ModelPreflightResult,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { ComponentProps, ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 

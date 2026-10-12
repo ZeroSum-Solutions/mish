@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 // Regression for a daemon-error-contract PR that mechanically inserted
-// `import { readApiErrorMessage } from '@open-design/contracts';` as the
+// `import { readApiErrorMessage } from '@mish/contracts';` as the
 // literal first line of every touched web module, including
 // XaiOAuthControl.tsx — which starts with a doc comment and then `'use
 // client';`. Next's SWC loader requires `'use client'` to be the first

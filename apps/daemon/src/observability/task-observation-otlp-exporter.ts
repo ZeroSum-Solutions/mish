@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import type {
   NormalizedAgentObservationStatusV1,
   NormalizedAgentObservationV1,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import type { TelemetryPrefs } from '../app-config.js';
 import {
@@ -157,11 +157,11 @@ function stableHexId(namespace: string, value: string, length: 16 | 32): string 
 }
 
 export function otlpTaskTraceId(taskExecutionId: string): string {
-  return stableHexId('open-design/task-observation-otlp-trace/v1', taskExecutionId, 32);
+  return stableHexId('mish/task-observation-otlp-trace/v1', taskExecutionId, 32);
 }
 
 export function otlpTaskSpanId(observationId: string): string {
-  return stableHexId('open-design/task-observation-otlp-span/v1', observationId, 16);
+  return stableHexId('mish/task-observation-otlp-span/v1', observationId, 16);
 }
 
 function jsonString(value: unknown): string {
@@ -200,7 +200,7 @@ function taskTraceAttributes(
     taskDeliverableSyntaxTelemetry(aggregate),
   );
   return attributes([
-    ['langfuse.trace.name', 'open-design-strategy-task'],
+    ['langfuse.trace.name', 'mish-strategy-task'],
     ['langfuse.session.id', aggregate.root.conversationId],
     ['user.id', context?.installationId ?? undefined],
     ['langfuse.version', context?.appVersion ?? aggregate.root.strategyVersion],
@@ -364,7 +364,7 @@ function buildRootSpan(
   return {
     traceId,
     spanId: rootSpanId,
-    name: 'open-design-strategy-task',
+    name: 'mish-strategy-task',
     kind: 1,
     startTimeUnixNano: epochNanoseconds(aggregate.root.createdAt),
     endTimeUnixNano: epochNanoseconds(Math.max(aggregate.root.createdAt, aggregate.root.updatedAt)),
@@ -529,13 +529,13 @@ export function buildOtlpTaskObservationPayload(
     resourceSpans: [{
       resource: {
         attributes: attributes([
-          ['service.name', 'open-design-daemon'],
-          ['telemetry.sdk.name', 'open-design-task-observation-exporter'],
+          ['service.name', 'mish-daemon'],
+          ['telemetry.sdk.name', 'mish-task-observation-exporter'],
         ]),
       },
       scopeSpans: [{
         scope: {
-          name: 'open-design.task-observability',
+          name: 'mish.task-observability',
           version: '1',
         },
         spans,
@@ -649,7 +649,7 @@ export function legacyAndOtlpTaskMappingsMatch(
   const legacyTraceMetadata = trace.body.metadata as Record<string, unknown> | undefined;
   const expectedTags = canonicalTaskObservationTraceTags(aggregate, context);
   if (
-    trace.body.name !== 'open-design-strategy-task' ||
+    trace.body.name !== 'mish-strategy-task' ||
     trace.body.sessionId !== aggregate.root.conversationId ||
     trace.body.userId !== (context?.installationId ?? undefined) ||
     trace.body.release !== context?.appVersion ||
@@ -703,7 +703,7 @@ export function legacyAndOtlpTaskMappingsMatch(
     root.parentSpanId !== undefined ||
     root.traceId !== expectedTraceId ||
     root.spanId !== otlpTaskSpanId(aggregate.root.observationId) ||
-    root.name !== 'open-design-strategy-task' ||
+    root.name !== 'mish-strategy-task' ||
     root.status.code !== spanStatus(aggregate.root.status).code ||
     root.status.message !== spanStatus(aggregate.root.status).message ||
     attributeValue(root, 'langfuse.observation.type') !== 'span' ||

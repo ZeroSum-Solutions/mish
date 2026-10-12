@@ -403,8 +403,8 @@ describe('ProjectView auto-open of a finished turn (OPEND-2588)', () => {
     };
     const pluginFiles = [
       {
-        name: 'generated-plugin/open-design.json',
-        path: 'generated-plugin/open-design.json',
+        name: 'generated-plugin/mish.json',
+        path: 'generated-plugin/mish.json',
         size: 30,
         mtime: 2_001,
         kind: 'code',

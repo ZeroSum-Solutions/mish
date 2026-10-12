@@ -38,7 +38,7 @@
 // 把整段闸门删掉也会让 `$1.79` 那几组变绿。
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AmrWalletSnapshot } from '@open-design/contracts';
+import type { AmrWalletSnapshot } from '@mish/contracts';
 import { checkAmrBalanceGate } from '../../src/runtime/amr-balance-gate';
 import {
   fetchAmrWalletSnapshot,
@@ -123,7 +123,7 @@ function authoritativeWorkspaceBillingResponse(
  * localStorage 而不是走已删掉的 setter。
  */
 function seedRetiredOptOut() {
-  window.localStorage.setItem('open-design:amr-low-balance-warn-optout:v1', '1');
+  window.localStorage.setItem('mish:amr-low-balance-warn-optout:v1', '1');
 }
 
 function stubWorkspaceBilling(

@@ -14,8 +14,8 @@ const {
 }));
 
 vi.mock('node:child_process', () => ({ execFile: execFileMock }));
-vi.mock('@open-design/platform', async (importOriginal) => ({
-  ...await importOriginal<typeof import('@open-design/platform')>(),
+vi.mock('@mish/platform', async (importOriginal) => ({
+  ...await importOriginal<typeof import('@mish/platform')>(),
   listProcessSnapshots: listProcessSnapshotsMock,
   stopProcesses: stopProcessesMock,
 }));
@@ -57,8 +57,8 @@ describe('runVelaCommand', () => {
       return { pid: 4321 };
     });
     await expect(runVelaCommand(['team-projects', 'list'], { env: {
-      VELA_BIN: process.execPath, OD_DATA_DIR: '', VELA_WORKSPACE_ID: 'team-1', HTTPS_PROXY: 'http://localhost:7890',
-    } })).rejects.toBe(failure);
+      VELA_BIN: process.execPath, OD_DATA_DIR: '', HTTPS_PROXY: 'http://localhost:7890',
+    }, configuredEnv: { VELA_WORKSPACE_ID: 'team-1' } })).rejects.toBe(failure);
     expect(record).toHaveBeenCalledWith(expect.objectContaining({
       source: 'team-projects', error: failure, workspaceId: 'team-1', env: expect.objectContaining({ HTTPS_PROXY: 'http://localhost:7890' }),
     }));
@@ -94,7 +94,7 @@ describe('runVelaCommand', () => {
       env: {
         ...process.env,
         VELA_BIN: process.execPath,
-        OPEN_DESIGN_AMR_PROFILE: 'feature-test',
+        MISH_AMR_PROFILE: 'feature-test',
         OD_DATA_DIR: '',
       },
     });
@@ -108,7 +108,7 @@ describe('runVelaCommand', () => {
     expect(command).toBe(process.execPath);
     expect(args).toEqual(['resource', 'head', 'project-1']);
     expect(options.env.VELA_PROFILE).toBe('feature-test');
-    expect(options.env.AMR_CLIENT_SOURCE).toBe('open_design');
+    expect(options.env.AMR_CLIENT_SOURCE).toBe('mish');
   });
 
   it('delivers successful stderr diagnostics without changing stdout', async () => {

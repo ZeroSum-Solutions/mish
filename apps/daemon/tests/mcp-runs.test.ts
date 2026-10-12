@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { buildProjectRawFileUrl } from '@open-design/contracts';
+import { buildProjectRawFileUrl } from '@mish/contracts';
 
 import { handleMcpToolCall, localMcpToolDefinitions } from '../src/mcp.js';
 import { _resetMcpWorkspaceContextCacheForTests } from '../src/mcp-workspace-context.js';
@@ -306,36 +306,59 @@ describe('public MCP discovery + generation tools', () => {
     expect(parsed.previewUrl).toBeUndefined();
   });
 
-  it('get_run returns a recharge link and same-request resume instructions', async () => {
-    const fetchMock = vi.fn(async (url: string) => {
-      if (url.endsWith('/api/mcp/install-info')) {
-        return new Response(JSON.stringify({ webBaseUrl: null }), { status: 200 });
-      }
-      return new Response(JSON.stringify({
-        id: 'run-wallet',
-        status: 'failed',
-        projectId: 'project-1',
-        clientRequestId: 'brief-42-cloud',
-        agentId: 'amr',
-        errorCode: 'AMR_INSUFFICIENT_BALANCE',
-        failureAction: 'recharge',
-      }), { status: 200 });
-    });
-    vi.stubGlobal('fetch', withDirectory(fetchMock));
+  describe('get_run with an insufficient-balance failure', () => {
+    const CONSOLE_URL = 'https://amr-console.example.invalid/dashboard?source=mish';
 
-    const result = await handleMcpToolCall(
-      'http://127.0.0.1:17456',
-      'get_run',
-      { runId: 'run-wallet' },
-    );
-    const parsed = JSON.parse(firstText(result));
-    expect(parsed).toMatchObject({
-      status: 'failed',
-      failureAction: 'recharge',
-      rechargeUrl: 'https://open-design.ai/amr/dashboard?source=open_design',
+    async function getWalletRun(consoleUrl: string) {
+      vi.resetModules();
+      vi.stubEnv('MISH_AMR_CONSOLE_URL', consoleUrl);
+      const mod = await import('../src/mcp.js');
+      const fetchMock = vi.fn(async (url: string) => {
+        if (url.endsWith('/api/mcp/install-info')) {
+          return new Response(JSON.stringify({ webBaseUrl: null }), { status: 200 });
+        }
+        return new Response(JSON.stringify({
+          id: 'run-wallet',
+          status: 'failed',
+          projectId: 'project-1',
+          clientRequestId: 'brief-42-cloud',
+          agentId: 'amr',
+          errorCode: 'AMR_INSUFFICIENT_BALANCE',
+          failureAction: 'recharge',
+        }), { status: 200 });
+      });
+      vi.stubGlobal('fetch', withDirectory(fetchMock));
+      const result = await mod.handleMcpToolCall(
+        'http://127.0.0.1:17456',
+        'get_run',
+        { runId: 'run-wallet' },
+      );
+      return JSON.parse(firstText(result));
+    }
+
+    afterEach(() => {
+      vi.unstubAllEnvs();
+      vi.resetModules();
     });
-    expect(parsed.hint).toContain('same requestId');
-    expect(parsed.hint).toContain('resume:true');
+
+    it('omits the recharge link but keeps resume instructions when no console is configured', async () => {
+      const parsed = await getWalletRun('');
+      expect(parsed).toMatchObject({ status: 'failed', failureAction: 'recharge' });
+      expect(parsed.rechargeUrl).toBeUndefined();
+      expect(parsed.hint).toContain('same requestId');
+      expect(parsed.hint).toContain('resume:true');
+    });
+
+    it('returns the recharge link and resume instructions when a console is configured', async () => {
+      const parsed = await getWalletRun(CONSOLE_URL);
+      expect(parsed).toMatchObject({
+        status: 'failed',
+        failureAction: 'recharge',
+        rechargeUrl: CONSOLE_URL,
+      });
+      expect(parsed.hint).toContain('same requestId');
+      expect(parsed.hint).toContain('resume:true');
+    });
   });
 
   // When a run is mid-flight, the outer agent has no in-band signal

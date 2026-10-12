@@ -14,7 +14,7 @@ Before starting:
    cp .env.example .env
    ```
 
-2. Generate a secure token (recommended unless your reverse proxy will both authenticate every request and set `OPEN_DESIGN_DISABLE_API_AUTH=1`):
+2. Generate a secure token (recommended unless your reverse proxy will both authenticate every request and set `MISH_DISABLE_API_AUTH=1`):
 
    ```bash
    openssl rand -hex 32
@@ -22,18 +22,18 @@ Before starting:
 
 3. Open `.env` in your editor and choose one auth mode:
    - default: paste the token into `OD_API_TOKEN=`
-   - trusted reverse proxy that already authenticates every request: leave `OD_API_TOKEN=` empty and set `OPEN_DESIGN_DISABLE_API_AUTH=1`
+   - trusted reverse proxy that already authenticates every request: leave `OD_API_TOKEN=` empty and set `MISH_DISABLE_API_AUTH=1`
 
 Then pull and start the service:
 
 ```bash
 docker login ghcr.io
-OPEN_DESIGN_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose pull
-OPEN_DESIGN_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose up -d --no-build
+MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose pull
+MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose up -d --no-build
 ```
 
-Always set `OPEN_DESIGN_IMAGE`. The Compose default still names the upstream
-`ghcr.io/nexu-io/od` image, which is not Mishh Mashh. Use
+Always set `MISH_IMAGE`. The Compose default still names the upstream
+`ghcr.io/zerosum-solutions/mish` image, which is not Mishh Mashh. Use
 `ghcr.io/zerosum-solutions/od:latest` for the latest release, or
 `ghcr.io/zerosum-solutions/od:<version>` to pin one.
 `.github/workflows/docker-image.yml` publishes this image only on a `v*` release
@@ -41,7 +41,7 @@ tag; until a release exists, build the image locally instead of pulling it.
 
 Open `http://127.0.0.1:7456`. When Docker's bridge makes the browser appear as a
 non-loopback peer, the browser displays its native sign-in dialog. Enter
-`open-design` as the username and the `OD_API_TOKEN` value from `.env` as the
+`mish` as the username and the `OD_API_TOKEN` value from `.env` as the
 password. The browser reuses those credentials for same-origin API requests;
 CLI clients and reverse proxies can continue to send
 `Authorization: Bearer <OD_API_TOKEN>`.
@@ -52,12 +52,12 @@ make the package public.
 
 Defaults:
 
-- Host port: `127.0.0.1:7456` (`OPEN_DESIGN_PORT=8080` to publish on `127.0.0.1:8080`)
+- Host port: `127.0.0.1:7456` (`MISH_PORT=8080` to publish on `127.0.0.1:8080`)
 - Runtime data: before documenting, changing, or choosing persistent daemon
   storage, you MUST read root [`AGENTS.md`](../AGENTS.md) → **Daemon data
   directory contract**. This README MUST NOT restate it.
 - Node heap cap: `--max-old-space-size=192`
-- Compose memory cap: `384m` (`OPEN_DESIGN_MEM_LIMIT=256m` to override)
+- Compose memory cap: `384m` (`MISH_MEM_LIMIT=256m` to override)
 
 Do not publish the daemon directly on a public or shared LAN interface. The shared
 API token is single-tenant authentication, not user-level access control, and both
@@ -66,18 +66,18 @@ should keep Compose bound to localhost and put an authenticated TLS reverse prox
 SSH tunnel, or VPN in front of it.
 
 When exposing the service through an authenticated public IP, domain, or reverse
-proxy, set `OPEN_DESIGN_ALLOWED_ORIGINS` to the exact browser origins that should
+proxy, set `MISH_ALLOWED_ORIGINS` to the exact browser origins that should
 be allowed to call `/api`:
 
 ```bash
-OPEN_DESIGN_ALLOWED_ORIGINS=https://od.example.com,http://203.0.113.10:7456 docker compose up -d --no-build
+MISH_ALLOWED_ORIGINS=https://od.example.com,http://203.0.113.10:7456 docker compose up -d --no-build
 ```
 
 If the reverse proxy already authenticates every request and you do not want it
 to inject `Authorization: Bearer <OD_API_TOKEN>` upstream, set:
 
 ```bash
-OPEN_DESIGN_DISABLE_API_AUTH=1
+MISH_DISABLE_API_AUTH=1
 ```
 
 Use this only for trusted deployments where the daemon is reachable strictly
@@ -88,7 +88,7 @@ Compose variable maps to daemon env `OD_DISABLE_API_AUTH`.
 Pin a specific published image with a digest instead of the mutable `latest` tag:
 
 ```bash
-OPEN_DESIGN_IMAGE=ghcr.io/zerosum-solutions/od@sha256:<digest> docker compose up -d --no-build
+MISH_IMAGE=ghcr.io/zerosum-solutions/od@sha256:<digest> docker compose up -d --no-build
 ```
 The image intentionally does not bundle Claude/Codex/Gemini CLI binaries. Keep
 those outside the image, or build a separate private runtime layer if a server
@@ -104,13 +104,13 @@ Linux; it switches to `network_mode: host` and adds the CLI mounts.
 **1. Build the local image** (adds `libc6-compat` so glibc-linked CLIs run on Alpine):
 
 ```bash
-docker build -t open-design-local -f deploy/Dockerfile.local .
+docker build -t mish-local -f deploy/Dockerfile.local .
 ```
 
 **2. Point `.env` at the local image:**
 
 ```bash
-OPEN_DESIGN_IMAGE=open-design-local
+MISH_IMAGE=mish-local
 ```
 
 **3. Edit `docker-compose.linux.yml`** to match your CLI install paths, then start:
@@ -126,7 +126,7 @@ Common install paths:
 | Claude Code | `~/.local/bin/claude` (symlink) + `~/.local/share/claude` (binaries) |
 | opencode | `~/.opencode/bin/opencode` |
 | Codex | `~/.local/bin/codex` |
-| Vela / AMR | npm package `@powerformer/vela-cli`; `https://open-design.ai/amr` is the browser account/wallet page of the AMR cloud service |
+| Vela / AMR | npm package `@powerformer/vela-cli`; `https://github.com/ZeroSum-Solutions/mish/amr` is the browser account/wallet page of the AMR cloud service |
 
 Vela is published as the `@powerformer/vela-cli` npm package. The
 AMR URL above is not a shell installer. For Linux Docker, install Vela under a
@@ -155,7 +155,7 @@ Once the container is running, inspect both `PATH` discovery and any explicit
 Vela override:
 
 ```bash
-docker compose exec open-design sh -lc 'which vela; echo "$VELA_BIN"'
+docker compose exec mish sh -lc 'which vela; echo "$VELA_BIN"'
 ```
 
 Use either a `vela` launcher discoverable on `PATH` or a `VELA_BIN` path that
@@ -182,7 +182,7 @@ user (e.g. `node`, uid 1000), the data volume may need an ownership fix before t
 can write to it:
 
 ```bash
-docker run --rm -v open-design_open_design_data:/data alpine chown -R 1001:1001 /data
+docker run --rm -v mish_mish_data:/data alpine chown -R 1001:1001 /data
 ```
 
 Pass provider API keys via `.env`:
@@ -222,7 +222,7 @@ deploy/scripts/publish-images.sh --image ghcr.io/your-org/od:0.1.0
 
 The script defaults to:
 
-- `ghcr.io/nexu-io/od:<tag>`
+- `ghcr.io/zerosum-solutions/mish:<tag>`
 - `linux/amd64,linux/arm64`
 - `skopeo` push strategy with registry credentials read from `~/.docker/config.json`
 - preloading base images through `skopeo` to reduce Docker Hub pull flakiness
@@ -280,6 +280,6 @@ custom `COLIMA_BUILD_SWAPFILE`, cleanup refuses to remove it unless
 
 Docker Desktop bridge networking makes host-browser traffic appear to the daemon
 as a non-loopback peer. This is expected: keep the default bridge configuration
-and complete the browser's native sign-in prompt with username `open-design` and
+and complete the browser's native sign-in prompt with username `mish` and
 the `OD_API_TOKEN` value from `.env`. Host networking is no longer required for
 the web UI authentication path.

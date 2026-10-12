@@ -21,7 +21,7 @@ import {
   releaseChannelDescriptor,
   releaseMetadataVersionFields,
   type CountedReleaseChannel,
-} from "@open-design/release";
+} from "@mish/release";
 import {
   parseReleaseNotePublication,
   releaseNoteMetadataFromPublication,

@@ -228,7 +228,7 @@ export async function generateLicensedPackBlobList(options: {
   const { blobs: tree, gitlinks } = await listTreeBlobs(options.repoRoot, ref);
   const oidByPath = new Map(tree.map((blob) => [blob.path, blob.oid]));
   const manifestOids = tree
-    .filter((blob) => blob.path.startsWith("plugins/") && blob.path.endsWith("/open-design.json"))
+    .filter((blob) => blob.path.startsWith("plugins/") && blob.path.endsWith("/mish.json"))
     .map((blob) => blob.oid);
   const manifests = await readBlobs(options.repoRoot, manifestOids);
   const pathMatches = await findLicensedPackPathMatches(

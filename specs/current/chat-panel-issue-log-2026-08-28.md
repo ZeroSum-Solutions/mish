@@ -363,10 +363,10 @@ sh 2033   layoutMax 1450   wheelReached 1449.5   frozen: false
 - Header 成品包实测：378×36、`12px / 600 / 18px`、`#202020`，内距 `9px 11px`、间距 7px；图标 15×15、`#848484`；进度显示为无空格的 `1/3`。
 - Footer 成品包实测：40px 高、`0 11px 8px`、gap 8px；跳过为 `12px / 600`、`4px 0`、透明；上一步为 `12px / 600`、`4px 11px`、透明；下一步为 58×32、`12px / 600`、`4px 11px`、999px 胶囊。
 - 禁用态实测：下一步为 `#ededed / #bdbdbd`，尺寸不变；跳过在会话忙 / 禁用时仍透明，不再长出灰底药丸。
-- 根因：`@open-design/components` 的 esbuild 产物抽出了 `dist/index.css`，却没在 `dist/index.mjs` 保留样式引用；开发态从源码加载所以正常，打包态从 dist 加载所以共享 Button CSS 丢失。已在组件构建入口保留 `import "./index.css"`，生产 Next build 和组件 tarball 均验证通过。
+- 根因：`@mish/components` 的 esbuild 产物抽出了 `dist/index.css`，却没在 `dist/index.mjs` 保留样式引用；开发态从源码加载所以正常，打包态从 dist 加载所以共享 Button CSS 丢失。已在组件构建入口保留 `import "./index.css"`，生产 Next build 和组件 tarball 均验证通过。
 - 聚焦验证：Question Form 4 个测试文件 91 条、daemon prompt 2 个文件 78 条全部通过；daemon / contracts typecheck 通过；web production build 通过。web 单独 typecheck 仍有 3 个与本改动无关的既有测试类型错误（thinking markdown 1 条、artifact-card viewport 2 条）。
 - 安装包验证：`0.21.1-beta.901` / namespace `chatqafix` 已完成 build → install → start，channel=beta；真实 Codex Run 生成 3 步 Question Form，并逐元素读取 packaged Electron computed style 对齐上述数值。
-- 本地 DMG：`/Users/elian/Documents/od-wt-chat-panel/.tmp/tools-pack/out/mac/namespaces/chatqafix/dmg/Open Design-chatqafix.dmg`。
+- 本地 DMG：`/Users/elian/Documents/od-wt-chat-panel/.tmp/tools-pack/out/mac/namespaces/chatqafix/dmg/Mish-chatqafix.dmg`。
 
 #### Chat Panel 全范围 i18n 审计结论
 
@@ -535,7 +535,7 @@ sh 2033   layoutMax 1450   wheelReached 1449.5   frozen: false
 
 - 状态：**channel 历史体检、精确版本回放与隔离 Beta 包验收均已完成；P0 与长消息 DOM P1 已修复，Beta 包另暴露一个与会话长度无关的全页 bootstrap P1，另有 1 个低优先级语义图标问题**。完整截图报告见飞书文档 `Chat Panel Next 旧会话兼容性验收报告（2026-08-29）`。
 - 离线历史重放：只读扫描 dev / stable / legacy-beta / beta / prerelease 共 5 份 channel 数据库，覆盖 95 个会话、243 条 assistant message、126,835 个事件。`buildTurnBlocks` 异常 0、同条消息内重复结论 0；实际 UI / API 重放的 DSML 残留为 0。这里的 channel 目录只能证明数据来源，单条历史消息没有持久化客户端 commit / version，不能据此宣称其精确生成版本。
-- 精确版本回放：分别在 `main@a8ec5784eb13a248f5ff3586800819fa070ea250` 与 `open-design-v0.21.0@dbbd3b42eab9609065637452b347f903d7125ecd` 的 daemon/runtime/parser/DB 持久化链生成同一份确定性 Thinking + Todo + 两次媒体工具调用 fixture，先由当前分支基线 `c90c1e899e` 消费，再由含 P0 / P1 修复的最终提交 `7c971791a5` 复验。producer DB 在复验前记录的 SHA-256 分别为 `aed1a4078f813aac03a59101dcaefc4daeed879fd6a1047c4aed57703fa49e65` 与 `211fb9389ce1a0f7b73d4c8298b1cb771a184435362d693526417d25a6534664`。
+- 精确版本回放：分别在 `main@a8ec5784eb13a248f5ff3586800819fa070ea250` 与 `mish-v0.21.0@dbbd3b42eab9609065637452b347f903d7125ecd` 的 daemon/runtime/parser/DB 持久化链生成同一份确定性 Thinking + Todo + 两次媒体工具调用 fixture，先由当前分支基线 `c90c1e899e` 消费，再由含 P0 / P1 修复的最终提交 `7c971791a5` 复验。producer DB 在复验前记录的 SHA-256 分别为 `aed1a4078f813aac03a59101dcaefc4daeed879fd6a1047c4aed57703fa49e65` 与 `211fb9389ce1a0f7b73d4c8298b1cb771a184435362d693526417d25a6534664`。
 - 精确版本结果：两组在 `7c971791a5` 首次打开时均为 `assistant=1`、外层 `details=1`、未挂载折叠 body、结论 `=1`、DSML `=0`；展开后均完整恢复 `details=5`、body `=4`、消息内图片 `=2`、结论 `=1`、DSML `=0`，一次硬刷新及再次展开数值完全一致。release consumer 首轮曾因隔离副本把 `designSystemId` 从 `"default"` 漂成 `null` 而停在 setup bootstrap；修正测试夹具后通过，确认不是 P1 回归。fixture 故意保留第二项 Todo 为 `in_progress`，因此 footer 显示“已停止，仍有未完成任务”，这验证 unfinished 历史语义，不是回放失败。
 - 组件覆盖：Thinking Markdown、Plan / Todo、读 / 写 / 搜索 / 执行 / 删除 ToolRow、Question Form（待答 / 已答）、产物文件、错误卡、失败 / 手动停止 footer、绝对路径文件链接、附件和结构化 next_steps 均有 channel 历史样本；ImageRow 另有上述两个精确 producer 版本样本。纯 content-only assistant、音频产物、Queue、待发送附件、重连与升级属于样本缺口或瞬时状态，不能从持久化旧会话证明。
 - 组合与刷新：stable 的 Question Form + Plan + ToolRow + 结论 + 错误卡组合、legacy-beta 缺失 `run_status`、beta 手动停止、prerelease 87 个 details 的长执行记录均可打开；多组 2–3 次硬刷新后消息数、结论数、Question Form 数与 terminal footer 稳定，无重复 assistant hash、无协议残留。首次从“手动展开全部 details”进入刷新时 hash 会因折叠状态复位变化，后续轮次稳定，不是正文重复。
@@ -543,12 +543,12 @@ sh 2033   layoutMax 1450   wheelReached 1449.5   frozen: false
 - P0 上线阻断（已修并通过 Beta 包）：设计稿 #16 明确“点击建议只填入输入框，不直接发送”，但原实现会立即持久化 user message 并创建新 run。现已改为 `composerRef.setDraft(prompt, { entryFrom: 'next_step' })`；live 回合与经过 JSON 持久化边界的历史 replay 红绿用例均断言只填草稿、`onSend` 未调用、消息数不变。隔离 Beta 包中点击真实历史建议后，Composer 出现完整建议文案，user / assistant 消息数保持 `1 / 2`，没有自动发送或创建新 run。
 - P1 性能（本地已修）：精确 63,472-event Beta message `ab7ff827…` 中，61,614 条 thinking + 1,771 条 text 在 daemon 归一化后只有 125 events / 2 blocks，parse + normalize + serialize + client parse + build 合计仅十几毫秒；消息 API 热读为 5.6–9.2ms，确认 3 秒以上首开不在 parser / API。补丁把已结束、初始折叠的 ExecutionShell / Thoughts / Plan / Todo / 命令正文改为首次展开再挂 DOM，live / failed / in-progress / default-open 首帧仍挂载，且首次展开后再次折叠不会丢子状态。完全相同的相邻 `TodoWrite` 快照另在 daemon 与 live buffer 两侧窄范围折叠，普通 Bash / 其他工具不做深比较。
 - P1 同机 A/B：同一 Beta 数据副本、同一 63,472-event 会话、同一 Playwright 脚本、均预热排除 Next 冷编译；`c90c1e89` 三次 ready 为 13.35s / 10.75s / 8.02s（中位 10.75s），补丁后为 5.73s / 5.12s / 6.07s（中位 5.73s，约 -46.7%）。目标 assistant 初始后代 DOM 从 2,799 降到 119（约 -95.7%），初始 details 从 29 降到 1。该数据来自 dev runtime，证明方向与量级，不替代 production / Beta 包门槛。
-- Beta 包验收：从 `a57542773e` 构建、DMG 安装并从隔离安装目录启动 `Open Design Beta 0.21.1-beta.999`；packaged app 显示 AMR 余额，`/api/app-config` 确认 `agentId=amr` 且 `OPEN_DESIGN_AMR_PROFILE=test`。长会话 SPA 切换到可见首屏为 307ms，初始仍为 119 个后代节点 / 1 个 details / 0 个折叠 body / DSML 0；完整展开约 377ms，恢复 2,799 个后代节点 / 29 个 details / 203,613 字符 / DSML 0。短会话 SPA 切换为 282ms，说明长会话懒挂载在 production bundle 中生效。
+- Beta 包验收：从 `a57542773e` 构建、DMG 安装并从隔离安装目录启动 `Mish Beta 0.21.1-beta.999`；packaged app 显示 AMR 余额，`/api/app-config` 确认 `agentId=amr` 且 `MISH_AMR_PROFILE=test`。长会话 SPA 切换到可见首屏为 307ms，初始仍为 119 个后代节点 / 1 个 details / 0 个折叠 body / DSML 0；完整展开约 377ms，恢复 2,799 个后代节点 / 29 个 details / 203,613 字符 / DSML 0。短会话 SPA 切换为 282ms，说明长会话懒挂载在 production bundle 中生效。
 - 新 P1（packaged 全页 bootstrap，代码已修）：长会话三次硬刷新到 assistant 可见为 17.91s / 14.95s / 16.62s（中位 16.62s）；只有 7.9KB events 的短会话硬刷新同样为 17.02s，而页面 Navigation Timing 的 `loadEventEnd` 仅约 239ms。根因是 Team authoritative catalog 不可用时被折叠成“共享项目仍在物化”，随后执行 21 次 × 600ms 重试。现在 pull outcome 显式携带 `catalogAvailable`：首次 catalog 不可用立即进入现有 retry UI，不再等待；只有此前已经确认共享的项目才在后续 catalog 短暂不可用时继续保留 materializing 语义。聚焦回归以 21 次配置断言只读本地一次、读 catalog 一次、delay 0 次。真实 Team 权限 Beta namespace 仍需复验实际硬刷新时间。
 - P1 重复快照样本：真实 9,280-event TodoWrite 样本在通用原型中从 9,280 events / 4.19MB 压为 15 events / 2.2KB；最终实现进一步收窄为 TodoWrite-only，测试覆盖 pending→completed 变化、Question Form 文本边界、next_steps 保留以及相同 Bash 不去重，避免普通 same-id/different-state 流的 stringify 退化。
 - P2 语义图标（已修）：ToolRow 的 delete 动作使用独立垃圾桶 icon，不再复用写入铅笔；聚焦测试同时断言 delete 与 write SVG 结构不同。
 - 类型债（已修）：`thinking-markdown.test.tsx` 的 ExecutionShell fixture 与 `artifact-card-desktop-viewport.test.ts` 的 nullable regex capture 均已修正，web typecheck 通过。
-- 验证边界：按用户要求未跑全量测试；本轮使用聚焦测试、typecheck 和 packaged 关键路径。当前源码已成功构建 macOS app 与 DMG，并直接启动该构建产物验证 Electron `od://app/` ready、Beta identity / version / channel 正确；`tools-pack mac install` 仍暴露一个既有 harness 名称不匹配（DMG 内为 `Open Design Beta.app`，install 查找 `Open Design.app`），因此本轮不宣称 installer harness 通过。隔离 package 没有完整 Team authoritative resource 环境，bootstrap P1 仍需真实 Beta namespace 复验。
+- 验证边界：按用户要求未跑全量测试；本轮使用聚焦测试、typecheck 和 packaged 关键路径。当前源码已成功构建 macOS app 与 DMG，并直接启动该构建产物验证 Electron `od://app/` ready、Beta identity / version / channel 正确；`tools-pack mac install` 仍暴露一个既有 harness 名称不匹配（DMG 内为 `Mish Beta.app`，install 查找 `Mish.app`），因此本轮不宣称 installer harness 通过。隔离 package 没有完整 Team authoritative resource 环境，bootstrap P1 仍需真实 Beta namespace 复验。
 
 ### 22. Question Form select 与 Chat 底部滚动 / Plan 浮层
 
@@ -642,7 +642,7 @@ sh 2033   layoutMax 1450   wheelReached 1449.5   frozen: false
 | OPEND-2500 | [ChatPanel] PPT 生成完成后未展示下一步引导 | 未立项 | Medium | 描述为空。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2543 | [ChatPanel] 媒体产物路径变更后缩略图裂图 | 未立项 | High | 媒体路径规范化 / 移动 / 重命名后，会话卡仍请求旧路径并 404；需同步最终地址并容忍注册延迟。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2544 | [ChatPanel] 思考过程中不展示媒体 Retry，避免与 Agent 自动重试冲突 | 进行中 | High | Agent 仍在自动切换 Provider 时不得展示手动 Retry；仅整次 run 终态失败后给一次 Retry。 | API 阻塞，未确认 | API 阻塞，未确认 |
-| OPEND-2545 | [ChatPanel] 图片修改生成后会话产物卡片仍展示旧图 | 未立项 | High | 同一图片修改完成后右侧已是新图、该轮会话卡仍是旧图；要求新旧产物版本语义稳定且点击、预览、导出一致。[诊断包原件](evidence/plane-chatpanel-2026-09-01/attachments/OPEND-2545-01-open-design-diagnostics-2026-09-01T11-09-27Z.zip) | API 阻塞，未确认 | API 阻塞，未确认 |
+| OPEND-2545 | [ChatPanel] 图片修改生成后会话产物卡片仍展示旧图 | 未立项 | High | 同一图片修改完成后右侧已是新图、该轮会话卡仍是旧图；要求新旧产物版本语义稳定且点击、预览、导出一致。[诊断包原件](evidence/plane-chatpanel-2026-09-01/attachments/OPEND-2545-01-mish-diagnostics-2026-09-01T11-09-27Z.zip) | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2546 | [ChatPanel] 重复添加同一文案时提示“会话已添加” | 未立项 | None | 再次添加同一选中文案时无反馈；应去重并显示一致的轻提示。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2547 | [ChatPanel] 9:16 图片在左侧预览卡片中被居中裁剪 | 未立项 | None | 竖图在会话产物卡被横向容器裁掉上下区域；应保持宽高比并以 contain / 留白完整显示。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2548 | [ChatPanel] 侧栏宽度不足时步骤耗时换行显示 | 未立项 | None | 窄栏下 `1m 59s` 被拆成两行；耗时与展开按钮需保留固定空间，标题优先压缩。 | API 阻塞，未确认 | API 阻塞，未确认 |

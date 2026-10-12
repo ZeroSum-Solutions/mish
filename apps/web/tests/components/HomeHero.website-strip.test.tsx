@@ -5,7 +5,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 import { HomeHero } from '../../src/components/HomeHero';
 import { setHomeHeroPrompt } from '../helpers/home-hero-lexical';
@@ -93,8 +93,8 @@ function bundledExample(id: string, title: string): InstalledPluginRecord {
 }
 
 const PLUGINS = [
-  agencyPlugin('watson', 'Watson Trust to Lead'),
-  agencyPlugin('maren', 'Maren Maker Studio'),
+  agencyPlugin('practice', 'Practice Appointments'),
+  agencyPlugin('restaurant', 'Restaurant Reservations'),
   bundledExample('example-pricing-page', 'Pricing Page'),
   bundledExample('example-meeting-notes', 'Meeting Notes'),
 ];
@@ -103,7 +103,7 @@ const ROUTED = designProfileFixture({
   digest: 'digest-routed',
   title: 'Routed reference',
   spine: 'TL',
-  familyId: 'watson',
+  familyId: 'practice',
   meta: {
     total_likes: 500,
     previewImage: 'https://cdn.example.com/routed.jpg',
@@ -205,8 +205,8 @@ describe('HomeHero Prototype website strip', () => {
     renderHero();
     const titles = cardTitles();
     expect(titles).toEqual([
-      'Watson',
-      'Maren',
+      'Restaurant',
+      'Practice',
       'Routed reference',
       'Unrouted reference',
       'Vortex Studio hero',
@@ -231,8 +231,8 @@ describe('HomeHero Prototype website strip', () => {
   it('filters the cards by the picked spine and keeps an unrouted spine under All only', () => {
     renderHero();
     pickSpine('TL');
-    // maren sits on spine TL (registry v7.2), next to watson.
-    expect(cardTitles()).toEqual(['Watson', 'Maren', 'Routed reference']);
+    // practice is the only registry family on spine TL; restaurant is on BA.
+    expect(cardTitles()).toEqual(['Practice', 'Routed reference']);
     expect(cardTitles()).not.toContain('Vortex Studio hero');
 
     pickSpine('TL');
@@ -254,10 +254,10 @@ describe('HomeHero Prototype website strip', () => {
     const cards = screen.getAllByTestId('home-hero-design-reference');
     const routed = cards.find((card) => card.getAttribute('data-reference-id') === 'digest-routed')!;
     expect(within(routed).getByText(/^Reference · /)).toBeTruthy();
-    expect(routed.textContent).toContain('Reference · watson');
-    expect(routed.getAttribute('aria-label')).toContain('TL · Agency, consultancy, or studio · watson');
+    expect(routed.textContent).toContain('Reference · practice');
+    expect(routed.getAttribute('aria-label')).toContain('TL · Agency, consultancy, or studio · practice');
     expect(routed.querySelector('.home-hero__plugin-preset-subtitle')?.getAttribute('title'))
-      .toContain('TL · Agency, consultancy, or studio · watson');
+      .toContain('TL · Agency, consultancy, or studio · practice');
     expect(routed.querySelector('img')?.getAttribute('referrerpolicy')).toBe('no-referrer');
     expect(routed.querySelector('img')?.getAttribute('loading')).toBe('lazy');
 
@@ -386,7 +386,7 @@ describe('HomeHero Prototype website strip', () => {
   it('shows the index notice while the read is in flight and still shows the family cards', () => {
     renderHero({ designIndexProfiles: [], designIndexLoading: true });
     expect(screen.getByTestId('home-hero-website-notice')).toBeTruthy();
-    expect(cardTitles()).toEqual(['Watson', 'Maren']);
+    expect(cardTitles()).toEqual(['Restaurant', 'Practice']);
     // The spine row is static atlas data: it is there before the index is.
     expect(screen.getByTestId('home-hero-subtype-TL')).toBeTruthy();
   });
@@ -395,7 +395,7 @@ describe('HomeHero Prototype website strip', () => {
     renderHero({ designIndexProfiles: [], designIndexFailed: true });
     expect(screen.getByTestId('home-hero-website-notice').textContent)
       .toContain('Could not load the stored websites.');
-    expect(cardTitles()).toEqual(['Watson', 'Maren']);
+    expect(cardTitles()).toEqual(['Restaurant', 'Practice']);
   });
 
   it('binds the routed family and seeds the brief on a routed reference click', () => {
@@ -413,7 +413,7 @@ describe('HomeHero Prototype website strip', () => {
     expect(profile.source.digest).toBe('digest-routed');
     expect(prompt).toContain('Routed reference');
     expect(prompt).toContain('Trust to lead');
-    expect(record?.id).toBe('example-agency-watson');
+    expect(record?.id).toBe('example-agency-practice');
 
     const emissions = vi.mocked(trackHomeChatComposerClick).mock.calls;
     expect(emissions).toHaveLength(1);
@@ -423,8 +423,8 @@ describe('HomeHero Prototype website strip', () => {
       reference_id: 'digest-routed',
       // The family id is the profile's route; the plugin id is the installed
       // generator. They are different strings and both are reported.
-      routed_family_id: 'watson',
-      plugin_id: 'example-agency-watson',
+      routed_family_id: 'practice',
+      plugin_id: 'example-agency-practice',
     });
   });
 
@@ -435,7 +435,7 @@ describe('HomeHero Prototype website strip', () => {
     const onPickDesignReference = vi.fn();
     renderHero({
       onPickDesignReference,
-      pluginOptions: [agencyPlugin('maren', 'Maren Maker Studio')],
+      pluginOptions: [agencyPlugin('restaurant', 'Restaurant Reservations')],
       designIndexProfiles: [ROUTED],
     });
 
@@ -447,7 +447,7 @@ describe('HomeHero Prototype website strip', () => {
     expect(emissions[0]?.[1]).toMatchObject({
       element: 'design_reference',
       reference_id: 'digest-routed',
-      routed_family_id: 'watson',
+      routed_family_id: 'practice',
     });
     expect(emissions[0]?.[1]).not.toHaveProperty('plugin_id');
   });
@@ -515,7 +515,7 @@ describe('HomeHero Prototype website strip', () => {
     renderHero({ onPickExamplePlugin });
 
     const family = screen.getAllByTestId('home-hero-plugin-preset')
-      .find((card) => card.getAttribute('data-plugin-id') === 'example-agency-watson')!;
+      .find((card) => card.getAttribute('data-plugin-id') === 'example-agency-practice')!;
     fireEvent.click(family);
 
     expect(onPickExamplePlugin).toHaveBeenCalledTimes(1);
@@ -652,7 +652,7 @@ describe('HomeHero composer lock while Jev is choosing', () => {
       jevChoosing: locked,
       jevChoosesActive: true,
       stagedFiles: [new File(['x'], 'brief.txt', { type: 'text/plain' })],
-      activePluginTitle: 'Watson Trust to Lead',
+      activePluginTitle: 'Practice Appointments',
       activePluginRecord: PLUGINS[0],
       activePluginIsExplicit: true,
       activeSkillTitle: 'Agency site',
@@ -874,7 +874,7 @@ describe('HomeHero composer lock — the paths that got around it', () => {
       ...handlers,
       jevChoosesActive: true,
       stagedFiles: [new File(['x'], 'brief.txt', { type: 'text/plain' })],
-      activePluginTitle: 'Watson Trust to Lead',
+      activePluginTitle: 'Practice Appointments',
       activePluginRecord: PLUGINS[0],
       activePluginIsExplicit: true,
       activeSkillTitle: 'Agency site',
@@ -1004,10 +1004,10 @@ describe('HomeHero composer lock — surfaces that were already open', () => {
     const onPickPlugin = vi.fn();
     const { rerenderHero } = renderHero({ jevChoosesActive: true, onPickPlugin });
 
-    setHomeHeroPrompt('@Watson');
+    setHomeHeroPrompt('@Practice');
     expect(screen.getByTestId('home-hero-plugin-picker')).toBeTruthy();
 
-    rerenderHero({ jevChoosesActive: true, jevChoosing: true, onPickPlugin, prompt: '@Watson' });
+    rerenderHero({ jevChoosesActive: true, jevChoosing: true, onPickPlugin, prompt: '@Practice' });
 
     expect(screen.queryByTestId('home-hero-plugin-picker')).toBeNull();
     expect(onPickPlugin).not.toHaveBeenCalled();
@@ -1062,7 +1062,7 @@ describe('HomeHero composer lock — the mention picker stays shut', () => {
     rerenderHero({ jevChoosesActive: true, jevChoosing: true, onPickPlugin, onPickSkill });
     // A queued editor update lands after the locked render and reports a new
     // trigger; the dismiss that ran on the lock cannot help here.
-    setHomeHeroPrompt('@Watson');
+    setHomeHeroPrompt('@Practice');
 
     expect(screen.queryByTestId('home-hero-plugin-picker')).toBeNull();
     expect(pickerOptions()).toHaveLength(0);
@@ -1077,11 +1077,11 @@ describe('HomeHero composer lock — the mention picker stays shut', () => {
       jevChoosing: true,
       onPickPlugin,
     });
-    setHomeHeroPrompt('@Watson');
+    setHomeHeroPrompt('@Practice');
     expect(screen.queryByTestId('home-hero-plugin-picker')).toBeNull();
 
-    rerenderHero({ jevChoosesActive: true, onPickPlugin, prompt: '@Watson' });
-    setHomeHeroPrompt('@Wat');
+    rerenderHero({ jevChoosesActive: true, onPickPlugin, prompt: '@Practice' });
+    setHomeHeroPrompt('@Pra');
 
     expect(screen.getByTestId('home-hero-plugin-picker')).toBeTruthy();
     expect(pickerOptions().length).toBeGreaterThan(0);

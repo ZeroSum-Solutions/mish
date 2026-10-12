@@ -200,7 +200,7 @@ const CULT_ADAPTER_ID = /^cult:[a-z0-9][a-z0-9-]*$/;
 let cultRegistry: Promise<CultRegistryModule> | undefined;
 
 function loadCultRegistry(): Promise<CultRegistryModule> {
-  cultRegistry ??= import('@open-design/cult-ui-catalog/generated') as Promise<CultRegistryModule>;
+  cultRegistry ??= import('@mish/cult-ui-catalog/generated') as Promise<CultRegistryModule>;
   return cultRegistry;
 }
 
@@ -212,7 +212,7 @@ export async function listSectionAdapterIds(): Promise<readonly string[]> {
 
 /**
  * Every insertable adapter: the three reviewed HyperUI adapters (`sol-design.md` §2's v1 roster)
- * and every checked Cult adapter in `@open-design/cult-ui-catalog`'s generated registry. Loads
+ * and every checked Cult adapter in `@mish/cult-ui-catalog`'s generated registry. Loads
  * every Cult adapter module; a build that needs one adapter calls `resolveSectionAdapter` instead.
  */
 export async function listSectionAdapters(): Promise<readonly SectionAdapter[]> {

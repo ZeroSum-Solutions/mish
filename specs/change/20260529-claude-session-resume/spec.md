@@ -423,7 +423,7 @@ if (exitedWith('unknown session') && usedResume) {
 
 ### Verification
 
-- `pnpm guard`, `pnpm typecheck`, `pnpm --filter @open-design/daemon test` per
+- `pnpm guard`, `pnpm typecheck`, `pnpm --filter @mish/daemon test` per
   changed surface.
 - Token-savings telemetry (`sessionResumed`, input-token delta) confirms the
   win that motivates the change.

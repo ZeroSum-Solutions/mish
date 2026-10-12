@@ -434,12 +434,12 @@ describe("no unpromoted design-system references in bundled examples/templates",
 
     mkdirSync(path.join(examplesRoot, "example-a"), { recursive: true });
     writeFileSync(
-      path.join(examplesRoot, "example-a", "open-design.json"),
+      path.join(examplesRoot, "example-a", "mish.json"),
       JSON.stringify({ od: { context: { designSystem: { ref: "candidate-system", primary: true } } } }),
     );
     mkdirSync(path.join(templatesRoot, "template-b"), { recursive: true });
     writeFileSync(
-      path.join(templatesRoot, "template-b", "open-design.json"),
+      path.join(templatesRoot, "template-b", "mish.json"),
       JSON.stringify({ od: { context: { designSystem: { ref: "promoted-system", primary: true } } } }),
     );
 
@@ -454,7 +454,7 @@ describe("no unpromoted design-system references in bundled examples/templates",
     const designSystemsRoot = tempDir("ds-systems-");
     mkdirSync(path.join(examplesRoot, "example-a"), { recursive: true });
     writeFileSync(
-      path.join(examplesRoot, "example-a", "open-design.json"),
+      path.join(examplesRoot, "example-a", "mish.json"),
       JSON.stringify({ od: { context: { designSystem: { ref: "does-not-exist" } } } }),
     );
     const violations = await findUnpromotedDesignSystemReferences([examplesRoot], designSystemsRoot);

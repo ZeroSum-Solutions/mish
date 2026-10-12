@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackDesignSystemsTemplatesModalClick,
@@ -106,7 +106,7 @@ function ScopedDesignSystemPreviewModal({ system, onClose, initialViewId = 'show
           trackDesignSystemsTemplatesModalClick(trackRef.current, {
             page_name: 'design_systems',
             area: 'templates_modal',
-            element: viewId === 'kit' ? 'open_design_set' : viewId,
+            element: viewId === 'kit' ? 'mish_set' : viewId,
             templates_id: system.id,
             templates_type: system.source ?? 'library',
           });

@@ -3,7 +3,7 @@ import type {
   TrackingAmrOpenCodeLastEventType,
   TrackingAmrOpenCodeLastToolKind,
   TrackingAmrOpenCodeLastToolStatus,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { redactSecrets } from './redact.js';
 import { isHostSynthesizedAcpEmission } from './agent-protocol/acp/emission-provenance.js';
 

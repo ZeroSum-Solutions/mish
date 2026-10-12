@@ -2,7 +2,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { BriefTransformerStatus } from '@open-design/contracts';
+import type { BriefTransformerStatus } from '@mish/contracts';
 
 import { LabsImprovePromptRow } from '../../src/components/LabsImprovePromptRow';
 import { I18nProvider } from '../../src/i18n';

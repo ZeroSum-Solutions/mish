@@ -23,7 +23,7 @@ import {
   IMAGE_MODELS,
   VIDEO_MODELS,
 } from '../media/models.js';
-import type { ByokMediaDefaults, MediaExecutionPolicy, MediaSurface } from '@open-design/contracts';
+import type { ByokMediaDefaults, MediaExecutionPolicy, MediaSurface } from '@mish/contracts';
 
 function fmtList(ids: string[]): string {
   return ids.map((id) => `\`${id}\``).join(', ');

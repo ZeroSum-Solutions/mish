@@ -25,10 +25,10 @@ function input(overrides: Partial<ReleaseNotificationInput> = {}): ReleaseNotifi
     releaseMode: "publish",
     releaseResult: "success",
     releaseState: "complete",
-    repository: "nexu-io/open-design",
+    repository: "ZeroSum-Solutions/mish",
     runAttempt: "1",
     runNumber: "123",
-    runUrl: "https://github.com/nexu-io/open-design/actions/runs/1",
+    runUrl: "https://github.com/ZeroSum-Solutions/mish/actions/runs/1",
     stream: "release",
     version: "0.19.1-beta.4",
     winX64Smoke: "success",
@@ -142,7 +142,7 @@ describe("release Feishu notification", () => {
           observedAtMs: expect.any(Number),
           pullRequest: {
             number: 6956,
-            url: "https://github.com/nexu-io/open-design/pull/6956",
+            url: "https://github.com/ZeroSum-Solutions/mish/pull/6956",
           },
           queueDurationMs: 0,
           runStartedAtMs: expect.any(Number),
@@ -151,7 +151,7 @@ describe("release Feishu notification", () => {
         warnings: [],
       });
       expect(serialized).toContain("feat/standalone-closure");
-      expect(serialized).toContain("[0123456](https://github.com/nexu-io/open-design/commit/");
+      expect(serialized).toContain("[0123456](https://github.com/ZeroSum-Solutions/mish/commit/");
       expect(serialized).not.toContain("`0123456`");
       expect(serialized).not.toContain("渠道");
       expect(serialized).toContain("触发");
@@ -159,7 +159,7 @@ describe("release Feishu notification", () => {
       expect(serialized).toContain("手动");
       expect(serialized).toContain("publish=true · 晋升 latest");
       expect(serialized).toContain("release-beta #123");
-      expect(serialized).toContain("[PR #6956](https://github.com/nexu-io/open-design/pull/6956)");
+      expect(serialized).toContain("[PR #6956](https://github.com/ZeroSum-Solutions/mish/pull/6956)");
       expect(serialized).toContain("发布");
       expect(serialized).toContain("通知");
       expect(serialized).not.toContain("Closure 冷启动");
@@ -179,7 +179,7 @@ describe("release Feishu notification", () => {
         return Response.json({
           jobs: [{
             conclusion: "failure",
-            html_url: "https://github.com/nexu-io/open-design/actions/runs/1/job/2",
+            html_url: "https://github.com/ZeroSum-Solutions/mish/actions/runs/1/job/2",
             name: "Distribute beta / Build beta mac_x64",
             steps: [{ conclusion: "failure", name: "Accept public mac_x64 beta artifacts" }],
           }],
@@ -193,7 +193,7 @@ describe("release Feishu notification", () => {
     expect(serialized).toContain("Accept public mac");
     expect(serialized).toContain("beta artifacts");
     expect(serialized).not.toContain("https://releases.example/mac-arm64.dmg");
-    expect(serialized).toContain("https://github.com/nexu-io/open-design/actions/runs/1/job/2");
+    expect(serialized).toContain("https://github.com/ZeroSum-Solutions/mish/actions/runs/1/job/2");
   });
 
   it("renders complete, partial, failed, and validation terminal states from one capability", () => {

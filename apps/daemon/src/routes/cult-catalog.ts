@@ -32,11 +32,11 @@ import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { Express } from 'express';
-import type { CultCatalogItem, CultCatalogItemResponse, CultCatalogListResponse } from '@open-design/contracts';
-import { CULT_CATALOG_KIND_FILTERS, CULT_CATALOG_STATES, isCultCatalogState } from '@open-design/contracts';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
-import cultCurationJson from '@open-design/cult-ui-catalog/catalog-curation.json' with { type: 'json' };
-import cultThumbnailsJson from '@open-design/cult-ui-catalog/generated/thumbnails.json' with { type: 'json' };
+import type { CultCatalogItem, CultCatalogItemResponse, CultCatalogListResponse } from '@mish/contracts';
+import { CULT_CATALOG_KIND_FILTERS, CULT_CATALOG_STATES, isCultCatalogState } from '@mish/contracts';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
+import cultCurationJson from '@mish/cult-ui-catalog/catalog-curation.json' with { type: 'json' };
+import cultThumbnailsJson from '@mish/cult-ui-catalog/generated/thumbnails.json' with { type: 'json' };
 import { cultSlugs } from './cult-registry.js';
 import type { RouteDeps } from '../server-context.js';
 import {
@@ -119,7 +119,7 @@ export function findCultCatalogItem(key: string): { item: CultCatalogItem; rowId
  */
 export function cultGeneratedDir(): string {
   const require = createRequire(import.meta.url);
-  return path.join(path.dirname(require.resolve('@open-design/cult-ui-catalog/catalog.json')), 'generated');
+  return path.join(path.dirname(require.resolve('@mish/cult-ui-catalog/catalog.json')), 'generated');
 }
 
 /**

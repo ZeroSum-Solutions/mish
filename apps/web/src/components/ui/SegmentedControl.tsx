@@ -1,5 +1,5 @@
 import { useRef, type KeyboardEvent, type ReactNode } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { SelectionGroup, SelectionIndicator } from './SelectionIndicator';
 import styles from './segmented-control.module.css';
 

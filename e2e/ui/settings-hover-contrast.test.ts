@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 import { openSettingsDialog } from '../lib/playwright/amr.js';
 import { suppressWhatsNew } from '../lib/playwright/mock-factory.js';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 
 // WCAG AA threshold for normal text. We assert against this rather than AAA
 // because the codebase has historically targeted AA for muted-on-subtle

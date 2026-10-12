@@ -1,7 +1,7 @@
 import {
   DELIVERABLE_SYNTAX_REPAIR_SCHEMA,
   type DeliverableSyntaxRepairState as ContractDeliverableSyntaxRepairState,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { DeliverableSyntaxResult } from './deliverable-syntax.js';
 
 export const DEFAULT_DELIVERABLE_SYNTAX_REPAIR_MAX_ATTEMPTS = 3;
@@ -91,13 +91,13 @@ export function renderDeliverableSyntaxRepairPrompt(input: {
     ))
     .join('\n');
   return [
-    `<open_design_deliverable_syntax_repair schema="v1" attempt="${input.attempt}" max_attempts="${input.maxAttempts}">`,
+    `<mish_deliverable_syntax_repair schema="v1" attempt="${input.attempt}" max_attempts="${input.maxAttempts}">`,
     'The host source validator found an error in the final Web deliverable.',
     'Fix only the diagnosed source error in the existing deliverable. Do not redesign, rewrite unrelated content, or create a second deliverable.',
     'Do not perform a self-review, inspect unrelated files, or run manual checks, tests, node --check, or custom validation scripts.',
     'After that single edit, invoke the designated deliverable-syntax wrapper exactly once. If it passes, stop immediately.',
     '',
     escapeXml(diagnostics),
-    '</open_design_deliverable_syntax_repair>',
+    '</mish_deliverable_syntax_repair>',
   ].join('\n');
 }

@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import type { PluginManifest } from '@open-design/contracts';
+import type { PluginManifest } from '@mish/contracts';
 import {
   parseManifest,
   resolveAppliedPipeline,
@@ -283,10 +283,10 @@ describe('OD Next Strategy V2 pre-Build fixture boundary', () => {
 describe('non-OD-Next scenario golden witness', () => {
   it('preserves the current official default and fallback critique pipeline', () => {
     const official = loadManifest(
-      `${repoRoot}/plugins/_official/scenarios/od-new-generation/open-design.json`,
+      `${repoRoot}/plugins/_official/scenarios/od-new-generation/mish.json`,
     );
     const retainedExample = loadManifest(
-      `${repoRoot}/plugins/_official/examples/meeting-notes/open-design.json`,
+      `${repoRoot}/plugins/_official/examples/meeting-notes/mish.json`,
     );
     const inherited = {
       ...retainedExample,

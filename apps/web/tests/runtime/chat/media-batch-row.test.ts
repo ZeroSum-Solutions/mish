@@ -15,7 +15,7 @@
  * 一批一个必须也画对 —— 下面有专门的反向对照。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent, ProjectMediaTask } from '@open-design/contracts';
+import type { PersistedAgentEvent, ProjectMediaTask } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import type { ExecutionShell, ImageRow, ShellItem } from '../../../src/runtime/chat/contract';
 

@@ -3,8 +3,8 @@ import type {
   PluginManifest,
   ProjectExampleBinding,
   ProjectMetadata,
-} from '@open-design/contracts';
-import { resolveLocalizedText } from '@open-design/contracts';
+} from '@mish/contracts';
+import { resolveLocalizedText } from '@mish/contracts';
 
 import { readVerifiedProjectExampleBinding } from '../../plugins/example-binding.js';
 import { renderPluginBriefTemplate } from '../../plugins/share-helpers.js';

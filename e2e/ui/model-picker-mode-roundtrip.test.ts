@@ -4,7 +4,7 @@ import { mkdir, rm } from 'node:fs/promises';
 import { join } from 'node:path';
 import { promisify } from 'node:util';
 import type { Locator, Page } from '@playwright/test';
-import { parseSessionModelChoice, parseSessionModelSnapshot, type SessionModelChoice } from '@open-design/contracts';
+import { parseSessionModelChoice, parseSessionModelSnapshot, type SessionModelChoice } from '@mish/contracts';
 import { clusterTest, expect } from '@/playwright/suite';
 import { createFakeAgentRuntimes } from '@/playwright/fake-agents';
 import { routeUnavailableVelaStatus } from '@/playwright/mock-factory';
@@ -14,7 +14,7 @@ import type { ToolsDevSuite } from '@/tools-dev/types';
 import { T } from '@/timeouts';
 
 const execFileAsync = promisify(execFile);
-const storageKey = 'open-design:config';
+const storageKey = 'mish:config';
 type Runtime = ToolsDevSuite & { failed: boolean };
 type ReadyPage = { page: Page; generationRequests: () => number };
 // The fake binaries enter the isolated daemon environment BEFORE startup.

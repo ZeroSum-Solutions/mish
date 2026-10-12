@@ -22,7 +22,7 @@ import {
   REVIEW_ARIA_ROLES, REVIEW_EVIDENCE_VOCABULARIES, REVIEW_TAG_NAMES, REVIEW_URL_SCHEMES, renderReviewEvidenceMessage, renderReviewEvidenceParam, reviewEvidenceArity,
   WORKBENCH_REVIEW_MAX_PATH_DEPTH, WORKBENCH_REVIEW_PREVIEW_HOST,
   type ReviewEvidenceMessage, type ReviewEvidenceParam, type ReviewEvidenceTemplate, type ReviewEvidenceVocabulary,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /**
  * Review evidence: a structured message (template key plus typed parameters,
@@ -130,7 +130,7 @@ export function readPageText(text: PageText): string {
 
 const KNOWN_TAGS: ReadonlySet<string> = new Set(REVIEW_TAG_NAMES);
 const ARIA_ROLES: ReadonlySet<string> = new Set(REVIEW_ARIA_ROLES);
-export { REVIEW_RESOURCE_TYPES as RESOURCE_TYPES } from '@open-design/contracts';
+export { REVIEW_RESOURCE_TYPES as RESOURCE_TYPES } from '@mish/contracts';
 
 /** A value from a closed vocabulary, or the page-text token. */
 export function evidenceVocabulary(value: PageText, vocabulary: ReviewEvidenceVocabulary): EvidenceParam {

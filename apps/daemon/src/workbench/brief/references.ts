@@ -1,4 +1,4 @@
-import { DESIGN_BRIEF_LIMITS, type DesignBriefReference, type DesignBriefReferenceChange, type ResourceRef } from '@open-design/contracts';
+import { DESIGN_BRIEF_LIMITS, type DesignBriefReference, type DesignBriefReferenceChange, type ResourceRef } from '@mish/contracts';
 import { contrastRatio } from '../review/color.js';
 import type { Rgba } from '../review/types.js';
 import { looksLikeHostInstruction } from './intent.js';

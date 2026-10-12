@@ -594,7 +594,7 @@ export interface DesignSystemsTemplatesModalClickProps {
     | 'showcase'
     | 'tokens'
     | 'design_md'
-    | 'open_design_set'
+    | 'mish_set'
     | 'fullscreen'
     | 'share';
   templates_id?: string;
@@ -896,7 +896,7 @@ export interface NextStepActionClickProps {
     | 'chip'
     | 'toolbox_action'
     | 'toolbox_more'
-    | 'share_to_open_design'
+    | 'share_to_mish'
     /**
      * One of the agent-written follow-up suggestions under a delivered turn.
      * Unlike every element above it, clicking this SENDS the row's sentence as
@@ -958,7 +958,7 @@ export interface QuestionsFormClickProps {
 }
 
 // Hosted-AMR nudge shown under a non-AMR agent's model/auth/quota failure.
-// `go_amr` is the link that opens https://open-design.ai/amr.
+// `go_amr` is the link that opens https://github.com/ZeroSum-Solutions/mish/amr.
 export interface RunFailedToastClickProps {
   page_name: 'chat_panel';
   area: 'chat_panel';
@@ -987,7 +987,7 @@ export interface AmrEntryClickProps {
   element: TrackingAmrEntrySource;
   action: 'click_amr_entry';
   entry_id: string;
-  source_product: 'open_design';
+  source_product: 'mish';
   source_detail: TrackingAmrEntrySource;
   entry_occurred_at: string;
   campaign_id?: TrackingCampaignId;

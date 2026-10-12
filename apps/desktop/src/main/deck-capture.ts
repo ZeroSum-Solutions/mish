@@ -5,11 +5,11 @@ import { gunzip } from "node:zlib";
 import { promisify } from "node:util";
 
 import { BrowserWindow, nativeImage } from "electron";
-import type { DesktopRenderSlidesInput, DesktopRenderSlidesResult } from "@open-design/sidecar-proto";
+import type { DesktopRenderSlidesInput, DesktopRenderSlidesResult } from "@mish/sidecar-proto";
 
 import { waitForPrintableContent } from "./pdf-export.js";
 import { bgraBitmapHasPaint, FROZEN_MOTION_CSS } from "./static-capture.js";
-import { findRealTagEnd, findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealTagEnd, findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 // Re-exported so the long-standing import site (and its tests) keep working
 // after the definition moved to the module both capture paths share.

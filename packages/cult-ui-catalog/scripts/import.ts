@@ -64,9 +64,12 @@ function runImport(): void {
   if (issues.length > 0) fail('Generated catalog is invalid', issues);
   const text = catalogFileText(catalog);
   if (!existsSync(catalogPath) || readFileSync(catalogPath, 'utf8') !== text) writeFileSync(catalogPath, text);
-  const doc = readFileSync(docPath, 'utf8');
-  const nextDoc = spliceSnapshotBlock(doc, catalog.snapshot);
-  if (nextDoc !== doc) writeFileSync(docPath, nextDoc);
+  // The rights doc ships with the private kit; the public repo has none and pins nothing.
+  if (existsSync(docPath)) {
+    const doc = readFileSync(docPath, 'utf8');
+    const nextDoc = spliceSnapshotBlock(doc, catalog.snapshot);
+    if (nextDoc !== doc) writeFileSync(docPath, nextDoc);
+  }
   console.log(`catalog.json: ${catalog.rows.length} rows, snapshot ${catalog.snapshot.id}`);
   console.log(JSON.stringify({ snapshot: catalog.snapshot, ...catalogSummary(catalog) }, null, 2));
 }
@@ -81,9 +84,10 @@ function runCheck(): void {
   } catch (error) {
     fail('reviewed-overrides.json is invalid', [(error as Error).message]);
   }
-  const doc = readFileSync(docPath, 'utf8');
-  if (!doc.includes(renderSnapshotBlock(committed.snapshot))) {
-    fail('docs/legal/cult-ui-pro-rights.md does not pin the catalog snapshot', ['run the importer to re-pin it']);
+  // An empty catalog (the public build) pins no snapshot, so the rights doc is not required.
+  if (committed.rows.length > 0 || existsSync(docPath)) {
+    const doc = existsSync(docPath) ? readFileSync(docPath, 'utf8') : '';
+    if (!doc.includes(renderSnapshotBlock(committed.snapshot))) fail('docs/legal/cult-ui-pro-rights.md does not pin the catalog snapshot', ['run the importer to re-pin it']);
   }
   if (!existsSync(join(kitDir, 'registry', 'index.json'))) {
     if (process.env.CULT_REQUIRE_KIT === '1') fail('Source kit missing', [kitDir]);
@@ -93,7 +97,7 @@ function runCheck(): void {
   const fresh = buildFromKit();
   const drift = catalogDrift(committed, fresh);
   if (drift.length > 0 || catalogFileText(fresh) !== readFileSync(catalogPath, 'utf8')) {
-    fail('catalog.json drifted from the source kit; run `pnpm --filter @open-design/cult-ui-catalog import`', drift.length > 0 ? drift : ['formatting differs']);
+    fail('catalog.json drifted from the source kit; run `pnpm --filter @mish/cult-ui-catalog import`', drift.length > 0 ? drift : ['formatting differs']);
   }
   console.log(`catalog.json matches the source kit (${committed.rows.length} rows, snapshot ${committed.snapshot.id})`);
 }

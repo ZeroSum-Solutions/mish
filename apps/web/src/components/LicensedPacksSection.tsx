@@ -10,8 +10,8 @@ import {
   DialogTitle,
   Input,
   Spinner,
-} from '@open-design/components';
-import type { BadgeTone } from '@open-design/components';
+} from '@mish/components';
+import type { BadgeTone } from '@mish/components';
 import {
   classifyPackSource,
   type InstalledPackStatus,
@@ -22,7 +22,7 @@ import {
   type PackInstallOutcome,
   type PackInstallPhase,
   type PackInstallRequest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { useT } from '../i18n';
 import {

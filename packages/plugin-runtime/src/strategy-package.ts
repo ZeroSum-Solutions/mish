@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-const STRATEGY_PACKAGE_IDENTITY_SCHEMA = 'open-design.strategy-package-identity/v1';
+const STRATEGY_PACKAGE_IDENTITY_SCHEMA = 'mish.strategy-package-identity/v1';
 const SHA256_HEX = /^[a-f0-9]{64}$/;
 
 export interface StrategyPackageAssetInput {

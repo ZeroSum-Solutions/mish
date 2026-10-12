@@ -4,13 +4,13 @@ import path from 'node:path';
 
 import {
   normalizeAgentObservationV1,
-  OpenDesignPlanContractV2Schema,
+  MishPlanContractV2Schema,
   type AppliedPluginSnapshot,
   type NormalizedAgentObservationV1,
   type OdNextRuntimeCapabilitySnapshotV1,
-  type OpenDesignPlanContractV2,
-} from '@open-design/contracts';
-import { strategyPackageHashFromDigests } from '@open-design/plugin-runtime';
+  type MishPlanContractV2,
+} from '@mish/contracts';
+import { strategyPackageHashFromDigests } from '@mish/plugin-runtime';
 import type Database from 'better-sqlite3';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
@@ -65,7 +65,7 @@ function strategyBinding() {
     { path: './assets/task-profiles/prototype.md', sha256: 'b'.repeat(64) },
   ];
   return {
-    schema: 'open-design.applied-strategy/v2' as const,
+    schema: 'mish.applied-strategy/v2' as const,
     id: 'od-next-strategy' as const,
     version: '2.0.0',
     packageHash: strategyPackageHashFromDigests(assetDigests),
@@ -106,7 +106,7 @@ function capabilitySnapshot(
   overrides: Partial<Omit<OdNextRuntimeCapabilitySnapshotV1, 'snapshotHash'>> = {},
 ): OdNextRuntimeCapabilitySnapshotV1 {
   const withoutHash: Omit<OdNextRuntimeCapabilitySnapshotV1, 'snapshotHash'> = {
-    schema: 'open-design.od-next-runtime-capability-snapshot/v1',
+    schema: 'mish.od-next-runtime-capability-snapshot/v1',
     runtimePath: 'codex',
     agentId: AGENT_ID,
     agentCliVersion: 'synthetic-cli-simulating-fixture/1',
@@ -137,10 +137,10 @@ function planContract(
   snapshot: AppliedPluginSnapshot,
   capability = capabilitySnapshot(),
   dependent = true,
-): OpenDesignPlanContractV2 {
+): MishPlanContractV2 {
   const strategy = snapshot.strategy!;
   return {
-    schema: 'open-design.plan-contract/v2',
+    schema: 'mish.plan-contract/v2',
     strategy: {
       id: 'od-next-strategy',
       version: strategy.version,
@@ -266,13 +266,13 @@ function block(tag: string, value: unknown): string {
   return `<${tag}>\n${JSON.stringify(value)}\n</${tag}>`;
 }
 
-function parsedPlanning(plan: OpenDesignPlanContractV2) {
-  OpenDesignPlanContractV2Schema.parse(plan);
+function parsedPlanning(plan: MishPlanContractV2) {
+  MishPlanContractV2Schema.parse(plan);
   const protocol = new OdNextMachineProtocolStream();
   protocol.push([
-    block('open-design-plan-contract', plan),
-    block('open-design-runtime-state', {
-      schema: 'open-design.strategy-state/v2',
+    block('mish-plan-contract', plan),
+    block('mish-runtime-state', {
+      schema: 'mish.strategy-state/v2',
       route: 'full_plan',
       inputStage: 'request',
       outcome: 'plan_ready',
@@ -285,8 +285,8 @@ function parsedPlanning(plan: OpenDesignPlanContractV2) {
 
 function parsedCompletion() {
   const protocol = new OdNextMachineProtocolStream();
-  protocol.push(block('open-design-runtime-state', {
-    schema: 'open-design.strategy-state/v2',
+  protocol.push(block('mish-runtime-state', {
+    schema: 'mish.strategy-state/v2',
     route: 'full_plan',
     inputStage: 'production',
     outcome: 'completed',
@@ -485,7 +485,7 @@ describe('OD Next complex production enforcement', () => {
       agentCliVersion: '2.1.233 (Claude Code)',
       capturedAt: 1,
     }).snapshot!;
-    const plan = OpenDesignPlanContractV2Schema.parse({
+    const plan = MishPlanContractV2Schema.parse({
       ...planContract(snapshot, capability),
       runManifest: {
         ...planContract(snapshot, capability).runManifest,

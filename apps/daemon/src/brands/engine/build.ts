@@ -34,7 +34,7 @@ import { seedFromBrand, seedFromMaterial } from "./seed.js";
 import { tokensToJson, tokensToCssVars, tokensToThemeJson } from "./export.js";
 import { renderKitPage } from "./kit.js";
 import { renderArtifact, renderArtifactGallery, brandFontAssets } from "./artifacts/index.js";
-import { findRealTagEnd, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealTagEnd, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 // ─────────────────────────── slug ───────────────────────────────────────────
 

@@ -10,13 +10,13 @@ import type {
   MediaGenerationResultProps,
   ProjectFile,
   ProjectMediaTaskFile,
-} from '@open-design/contracts';
-import { mediaTaskInterruptReason } from '@open-design/contracts';
+} from '@mish/contracts';
+import { mediaTaskInterruptReason } from '@mish/contracts';
 import type { AnalyticsContext } from '../analytics.js';
 import { defaultMediaExecutionPolicy, mediaPolicyDenial } from '../media/policy.js';
 import { formatMediaTaskDiagnostic } from '../media/diagnostics.js';
 import { startHiggsfieldSubscriptionLogin } from '../media/higgsfield-runtime.js';
-import type { HiggsfieldSubscriptionLoginResponse } from '@open-design/contracts';
+import type { HiggsfieldSubscriptionLoginResponse } from '@mish/contracts';
 import { findMediaModel } from '../media/models.js';
 import type { ImageGenerationRequestSummary } from '../media/image-generation-retry.js';
 import type { RouteDeps } from '../server-context.js';
@@ -1044,7 +1044,7 @@ export function registerMediaRoutes(app: Express, ctx: RegisterMediaRoutesDeps) 
       if (retained.length !== recents.length) {
         await writeAppConfig(RUNTIME_DATA_DIR, { recentLinkedDirs: retained });
       }
-      /** @type {import('@open-design/contracts').RecentLinkedDirsResponse} */
+      /** @type {import('@mish/contracts').RecentLinkedDirsResponse} */
       const body = { dirs: existing };
       res.json(body);
     } catch (err: any) {

@@ -59,7 +59,7 @@ test('[P1] captures the settings AMR account balance surface', async ({ page }) 
     config: {
       agentId: 'amr',
       agentModels: { amr: { model: 'deepseek-v4-flash', reasoning: 'default' } },
-      agentCliEnv: { amr: { OPEN_DESIGN_AMR_PROFILE: 'test' } },
+      agentCliEnv: { amr: { MISH_AMR_PROFILE: 'test' } },
     },
   });
   await mockSignedInVelaAccount(page);
@@ -83,7 +83,7 @@ test('[P1] captures the settings AMR account balance surface', async ({ page }) 
   await expect(dialog.getByTestId('settings-agent-card-amr-upgrade')).toBeVisible();
   await waitForVisualFonts(page);
 
-  await captureVisual(page, 'visual-settings-open-design-account');
+  await captureVisual(page, 'visual-settings-mish-account');
 });
 
 test('[P2] captures the settings local CLI surface', async ({ page }) => {

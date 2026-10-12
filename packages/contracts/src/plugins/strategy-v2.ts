@@ -2,12 +2,12 @@ import { z } from 'zod';
 
 export const OD_NEXT_STRATEGY_ID = 'od-next-strategy' as const;
 export const OD_NEXT_PROMPT_RECIPE_ID = 'od-next-plan-build-v2' as const;
-export const OD_NEXT_APPLIED_STRATEGY_SCHEMA = 'open-design.applied-strategy/v2' as const;
-export const OD_NEXT_PLAN_CONTRACT_SCHEMA = 'open-design.plan-contract/v2' as const;
-export const OD_NEXT_RUNTIME_STATE_SCHEMA = 'open-design.strategy-state/v2' as const;
-export const OD_NEXT_PLAN_CONTRACT_BLOCK = 'open-design-plan-contract' as const;
-export const OD_NEXT_RUNTIME_STATE_BLOCK = 'open-design-runtime-state' as const;
-export const OD_NEXT_BUNDLED_STRATEGY_SCHEMA = 'open-design.bundled-strategy/v2' as const;
+export const OD_NEXT_APPLIED_STRATEGY_SCHEMA = 'mish.applied-strategy/v2' as const;
+export const OD_NEXT_PLAN_CONTRACT_SCHEMA = 'mish.plan-contract/v2' as const;
+export const OD_NEXT_RUNTIME_STATE_SCHEMA = 'mish.strategy-state/v2' as const;
+export const OD_NEXT_PLAN_CONTRACT_BLOCK = 'mish-plan-contract' as const;
+export const OD_NEXT_RUNTIME_STATE_BLOCK = 'mish-runtime-state' as const;
+export const OD_NEXT_BUNDLED_STRATEGY_SCHEMA = 'mish.bundled-strategy/v2' as const;
 
 /**
  * The reason a task carries when the agent itself declared the turn blocked and
@@ -424,7 +424,7 @@ const PlanContractStrategyIdentityV2Schema = z.object({
   snapshotId: z.string().min(1),
 }).strict();
 
-export const OpenDesignPlanContractV2Schema = z.object({
+export const MishPlanContractV2Schema = z.object({
   schema: z.literal(OD_NEXT_PLAN_CONTRACT_SCHEMA),
   strategy: PlanContractStrategyIdentityV2Schema,
   taskProfile: ResolvedTaskProfileV2Schema,
@@ -449,7 +449,7 @@ export const OpenDesignPlanContractV2Schema = z.object({
     openDecisions: z.array(z.string()),
   }).strict(),
 }).strict().superRefine(rejectForbiddenStrategySemantics);
-export type OpenDesignPlanContractV2 = z.infer<typeof OpenDesignPlanContractV2Schema>;
+export type MishPlanContractV2 = z.infer<typeof MishPlanContractV2Schema>;
 
 export const StrategyRuntimeStateV2Schema = z.object({
   schema: z.literal(OD_NEXT_RUNTIME_STATE_SCHEMA),

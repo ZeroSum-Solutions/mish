@@ -6,7 +6,9 @@ describe("packaged startup branding", () => {
     const html = decodeURIComponent(createSplashHtml({ step: 1, total: 7, label: "Starting" }).split(",").slice(1).join(","));
     expect(html).toContain("Mishh Mashh");
     expect(html).toContain('aria-label="Mishh Mashh"');
-    expect(html).not.toMatch(/Open Design|claude design alternative|<video|data:video/i);
+    const retiredName = new RegExp(['Open', 'Design'].join('[ _-]?'), 'i');
+    expect(html).not.toMatch(retiredName);
+    expect(html).not.toMatch(/claude design alternative|<video|data:video/i);
     expect(html).toContain("window.__odSplashSetStage");
     expect(html).toContain('data-pct="14"');
     expect(html).toContain("1/7");

@@ -4,7 +4,7 @@ import { expectAllProjectFilesActive, expectAllProjectFilesInactive, openAllProj
 import type { Locator, Page, Response } from '@playwright/test';
 import { applyStandardMocks, routeSuccessfulRuns, successfulRunEventBody } from '@/playwright/mock-factory';
 
-const CHAT_PANEL_WIDTH_STORAGE_KEY = 'open-design.project.chatPanelWidth';
+const CHAT_PANEL_WIDTH_STORAGE_KEY = 'mish.project.chatPanelWidth';
 
 test.beforeEach(async ({ page }) => {
   await applyStandardMocks(page);

@@ -19,7 +19,7 @@
  * 带时刻的事件仍然优先(它更准),到达时刻只在它更晚时接手。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import type { ExecutionShell } from '../../../src/runtime/chat/contract';
 

@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog, VisuallyHidden } from '@open-design/components';
+import { Button, Dialog, VisuallyHidden } from '@mish/components';
 import { useT } from '../i18n';
 import { useAnalytics } from '../analytics/provider';
 import { getResolvedDeviceId } from '../analytics/client';
@@ -142,7 +142,10 @@ export function AmrArtifactUpgradeDialog({
     };
   }, [dialogId]);
 
+  // No configured AMR console: the plans CTA is unavailable and not rendered.
+  const plansUrl = amrPlansUrlForProfile(profile);
   const openPlans = () => {
+    if (!plansUrl) return;
     const attribution = recordAmrEntry(
       analytics.track,
       'artifact_success_upgrade',
@@ -155,7 +158,7 @@ export function AmrArtifactUpgradeDialog({
       installationId,
     });
     window.open(
-      attributedAmrUrl(amrPlansUrlForProfile(profile), attribution, deviceId),
+      attributedAmrUrl(plansUrl, attribution, deviceId),
       '_blank',
       'noopener,noreferrer',
     );
@@ -241,17 +244,19 @@ export function AmrArtifactUpgradeDialog({
           ))}
         </ul>
         <div className={styles.actions}>
-          <Button
-            variant="primary"
-            className={styles.cta}
-            onClick={openPlans}
-            data-testid="amr-artifact-upgrade-plans"
-          >
-            <span>{t('chat.amrArtifactUpgrade.plansCta')}</span>
-            <VisuallyHidden>
-              {` (${t('common.openInNewTab')})`}
-            </VisuallyHidden>
-          </Button>
+          {plansUrl ? (
+            <Button
+              variant="primary"
+              className={styles.cta}
+              onClick={openPlans}
+              data-testid="amr-artifact-upgrade-plans"
+            >
+              <span>{t('chat.amrArtifactUpgrade.plansCta')}</span>
+              <VisuallyHidden>
+                {` (${t('common.openInNewTab')})`}
+              </VisuallyHidden>
+            </Button>
+          ) : null}
           <Button
             variant="ghost"
             className={styles.later}

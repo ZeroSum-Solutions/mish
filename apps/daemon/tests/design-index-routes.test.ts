@@ -26,14 +26,14 @@ import type {
   DesignJudgment,
   DesignProfile,
   RouteDecision,
-} from '@open-design/contracts';
-import { AGENCY_ROUTE_MAX_CHARS, DESIGN_INDEX_INPUT_MAX_CHARS } from '@open-design/contracts';
-import { loadAtlasData } from '@open-design/agency-fast-lane/atlas';
-import { htmlFacts } from '@open-design/agency-fast-lane/html-facts';
-import { resolveJevKey } from '@open-design/agency-fast-lane/jev';
-import { ProfileError, createJevProfiler, type ProfileInput } from '@open-design/agency-fast-lane/profile';
-import { RouteError, createJevRouter, type RouteInput } from '@open-design/agency-fast-lane/route';
-import { loadDesignTaxonomy } from '@open-design/agency-fast-lane/taxonomy';
+} from '@mish/contracts';
+import { AGENCY_ROUTE_MAX_CHARS, DESIGN_INDEX_INPUT_MAX_CHARS } from '@mish/contracts';
+import { loadAtlasData } from '@mish/agency-fast-lane/atlas';
+import { htmlFacts } from '@mish/agency-fast-lane/html-facts';
+import { resolveJevKey } from '@mish/agency-fast-lane/jev';
+import { ProfileError, createJevProfiler, type ProfileInput } from '@mish/agency-fast-lane/profile';
+import { RouteError, createJevRouter, type RouteInput } from '@mish/agency-fast-lane/route';
+import { loadDesignTaxonomy } from '@mish/agency-fast-lane/taxonomy';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

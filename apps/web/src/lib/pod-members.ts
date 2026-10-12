@@ -1,4 +1,4 @@
-import type { PreviewCommentMember } from '@open-design/contracts';
+import type { PreviewCommentMember } from '@mish/contracts';
 import type { PreviewCommentSnapshot } from '../comments';
 
 export function removePodMember(

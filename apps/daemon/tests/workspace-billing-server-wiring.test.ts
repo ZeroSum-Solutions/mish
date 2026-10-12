@@ -29,7 +29,7 @@ const MANAGED_ENV = [
   'OD_RESOURCE_TRANSPORT',
   'OD_TEAM_PROJECTS_TRANSPORT',
   'OD_WORKSPACE_CONTEXT_SOURCE',
-  'OPEN_DESIGN_AMR_PROFILE',
+  'MISH_AMR_PROFILE',
   'VELA_API_URL',
   'VELA_BIN',
   'VELA_CONTROL_KEY',
@@ -80,7 +80,7 @@ describe('server workspace billing runtime wiring', () => {
     await mkdir(dataDir, { recursive: true });
     await writeFile(join(dataDir, 'app-config.json'), JSON.stringify({
       agentCliEnv: {
-        amr: { OPEN_DESIGN_AMR_PROFILE: 'test' },
+        amr: { MISH_AMR_PROFILE: 'test' },
       },
     }), 'utf8');
     setEnv({
@@ -90,7 +90,7 @@ describe('server workspace billing runtime wiring', () => {
       OD_RESOURCE_TRANSPORT: 'off',
       OD_TEAM_PROJECTS_TRANSPORT: 'off',
       OD_WORKSPACE_CONTEXT_SOURCE: 'vela',
-      OPEN_DESIGN_AMR_PROFILE: 'prod',
+      MISH_AMR_PROFILE: 'prod',
       VELA_API_URL: authorityUrl,
       VELA_BIN: velaBin,
       VELA_CONTROL_KEY: 'billing-wiring-control-key',
@@ -190,9 +190,9 @@ async function writeVelaStub(root: string): Promise<string> {
     script,
     `import { appendFileSync } from 'node:fs';
 const args = process.argv.slice(2);
-appendFileSync(process.env.OD_TEST_VELA_LOG, 'profile=' + (process.env.OPEN_DESIGN_AMR_PROFILE || '') + ' ' + args.join(' ') + '\\n');
+appendFileSync(${JSON.stringify(join(root, 'vela-calls.log'))}, 'profile=' + (process.env.MISH_AMR_PROFILE || '') + ' ' + args.join(' ') + '\\n');
 if (args[0] !== 'billing') process.exit(1);
-if (process.env.OPEN_DESIGN_AMR_PROFILE !== 'test' && args[1] === 'workspace-snapshot') {
+if (process.env.MISH_AMR_PROFILE !== 'test' && args[1] === 'workspace-snapshot') {
   process.stderr.write('API request failed with status 403: workspace_not_authorized\\n');
   process.exit(1);
 }

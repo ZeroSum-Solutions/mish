@@ -3,7 +3,7 @@ import path from 'node:path';
 import {
   workspaceContextHasTeamIdentity,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   runVelaCommand,
   velaWorkspaceCommandOptions,

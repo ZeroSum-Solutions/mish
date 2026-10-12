@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import type { ProjectDesignContextDraft, ProjectRubricDraft } from '@open-design/contracts';
+import type { ProjectDesignContextDraft, ProjectRubricDraft } from '@mish/contracts';
 import { migrateWorkbenchProjectContext, type ProjectContextReferences } from '../../src/workbench/project-context.js';
 
 export function contextDraft(label = 'Book appointment'): ProjectDesignContextDraft {

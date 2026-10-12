@@ -1,4 +1,4 @@
-import { sessionModelChoicesEqual, type SessionModelChoice } from '@open-design/contracts';
+import { sessionModelChoicesEqual, type SessionModelChoice } from '@mish/contracts';
 
 /**
  * AC-R02.3 invariant for a send-time model/attachment preflight: a

@@ -34,7 +34,7 @@ test('[P0] Resources inspect and enlarge the same HTML document across viewport 
   const title = `W1 Form ${name}`;
   const fixture = join(toolsDev.root, 'fixtures', name);
   await mkdir(join(fixture, 'assets'), { recursive: true });
-  await writeFile(join(fixture, 'open-design.json'), JSON.stringify({ name, title, version: '1.0.0', description: 'Local resource preview acceptance fixture', license: 'MIT', tags: ['scenario', 'prototype'], od: { kind: 'scenario', mode: 'prototype', preview: { type: 'html', entry: 'assets/preview.html' } } }));
+  await writeFile(join(fixture, 'mish.json'), JSON.stringify({ name, title, version: '1.0.0', description: 'Local resource preview acceptance fixture', license: 'MIT', tags: ['scenario', 'prototype'], od: { kind: 'scenario', mode: 'prototype', preview: { type: 'html', entry: 'assets/preview.html' } } }));
   await writeFile(join(fixture, 'SKILL.md'), '# Local fixture\nInspect a preview form.');
   await writeFile(join(fixture, 'assets/fixture.css'), '.linked{color:rgb(12,34,56)}');
   await writeFile(join(fixture, 'assets/fixture.svg'), '<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="teal"/></svg>');

@@ -163,7 +163,7 @@ describe('inspiration action prompts', () => {
     const prompt = browserUsePrompt(action!, {
       browserFilePath: 'browser:https://example.com',
       projectId: 'proj-1',
-      resolvedDir: '/tmp/open-design/project',
+      resolvedDir: '/tmp/mish/project',
       tabLabel: 'Example landing',
       title: 'Example',
       url: 'https://example.com',

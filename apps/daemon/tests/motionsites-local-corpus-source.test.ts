@@ -10,7 +10,7 @@ describe('local-corpus-source (real bundled data file)', () => {
   beforeEach(() => resetLocalCorpusCache(null));
   afterEach(() => resetLocalCorpusCache(null));
 
-  it('resolves and reads @open-design/section-catalog/data/zerosum-local-corpus.json and normalizes every row', async () => {
+  it('resolves and reads @mish/section-catalog/data/zerosum-local-corpus.json and normalizes every row', async () => {
     const entries = await getLocalCorpusEntries();
     expect(entries.length).toBeGreaterThan(0);
     for (const entry of entries) {

@@ -60,7 +60,7 @@ describe('web-clone project create skips discovery when a URL is present', () =>
   it('sets skipDiscoveryBrief for a web-clone project whose prompt carries a URL', async () => {
     const metadata = await createProject({
       metadata: { kind: 'prototype', intent: 'web-clone' },
-      pendingPrompt: '想要复刻的网站链接：https://nexu.io',
+      pendingPrompt: '想要复刻的网站链接：https://example.com',
     });
     expect(metadata.skipDiscoveryBrief).toBe(true);
   });
@@ -79,7 +79,7 @@ describe('web-clone project create skips discovery when a URL is present', () =>
   it('lets an explicit client skipDiscoveryBrief=false win over the derivation', async () => {
     const metadata = await createProject({
       metadata: { kind: 'prototype', intent: 'web-clone' },
-      pendingPrompt: 'clone https://nexu.io please',
+      pendingPrompt: 'clone https://example.com please',
       skipDiscoveryBrief: false,
     });
     expect(metadata.skipDiscoveryBrief).toBeUndefined();
@@ -88,7 +88,7 @@ describe('web-clone project create skips discovery when a URL is present', () =>
   it('does not derive the skip for non-web-clone projects with URLs', async () => {
     const metadata = await createProject({
       metadata: { kind: 'prototype' },
-      pendingPrompt: 'build a landing page like https://nexu.io',
+      pendingPrompt: 'build a landing page like https://example.com',
     });
     expect(metadata.skipDiscoveryBrief).toBeUndefined();
   });

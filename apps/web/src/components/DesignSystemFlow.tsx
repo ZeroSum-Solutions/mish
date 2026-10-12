@@ -9,7 +9,7 @@ import { saveCreatedHomeModelHandoff, clearHomeModelHandoff, readHomeModelHandof
 import { InlineModelSwitcher } from './InlineModelSwitcher';
 import { SessionModelStatus, SessionModelPreflightBanner } from './workbench/SessionModelStatus';
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ChangeEvent, type KeyboardEvent, type ReactNode } from 'react';
-import { Button, Textarea } from '@open-design/components';
+import { Button, Textarea } from '@mish/components';
 import type {
   ConnectorConnectResponse,
   ConnectorDetail,
@@ -20,7 +20,7 @@ import type {
   WorkspaceCollabContext,
   SessionModelSnapshot,
   ModelPreflightResult,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { streamViaDaemon } from '../providers/daemon';
 import {
   connectConnector,
@@ -129,7 +129,7 @@ import {
   designSystemModuleType,
   designSystemRepoHostFromUrl,
   designSystemTotalSizeBucket,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import type {
   DesignSystemsCreateClickProps,
   TrackingDesignSystemCreateEntryFrom,
@@ -143,7 +143,7 @@ import type {
   TrackingDesignSystemStatusAction,
   TrackingDesignSystemStatusValue,
   TrackingDesignSystemsEntryFrom,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { useI18n } from '../i18n';
 import { useWorkspaceContext } from '../collab/useWorkspaceContext';
 import { workspaceIdentityCacheKey } from '../collab/workspace-identity';
@@ -2131,7 +2131,7 @@ export function DesignSystemDetailView({
   // copy the caller does not own, which used to leave the Publish toggle and
   // the DESIGN.md Save button live for a plain member here (this view also
   // renders for the direct `/design-systems/:id` route, e.g. from the
-  // Library's "Open design system" link — not just DesignSystemsTab's own
+  // Library's "Open the design system" link — not just DesignSystemsTab's own
   // team tab, which already gates its own copy of these controls). `canMutate`
   // is the daemon's own PATCH/DELETE verdict (`canMutateUserDesignSystem`)
   // mirrored onto the GET response, so this stays in lockstep with whatever

@@ -2,7 +2,7 @@
  * The one-line stage indicator of a staged-drafting turn, as a pure function of
  * the run's `staged` record (from `GET /api/runs/:id`). The component only draws.
  */
-import type { StagedFallbackReason, StagedRunRecord, StagedStopReason } from '@open-design/contracts';
+import type { StagedFallbackReason, StagedRunRecord, StagedStopReason } from '@mish/contracts';
 
 const MODEL_LABELS: Record<string, string> = {
   'claude-haiku-5-5': 'Haiku 5.5',

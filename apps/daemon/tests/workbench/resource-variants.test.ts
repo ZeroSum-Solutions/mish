@@ -6,7 +6,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseResourceDetailResponse, parseResourceSearchResponse } from '@open-design/contracts';
+import { parseResourceDetailResponse, parseResourceSearchResponse } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';

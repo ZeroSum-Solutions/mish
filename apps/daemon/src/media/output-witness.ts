@@ -3,7 +3,7 @@ import { constants } from 'node:fs';
 import { open, unlink } from 'node:fs/promises';
 import path from 'node:path';
 
-import { MEDIA_OUTPUT_SUPERSEDED_CODE, mediaFailureNextStep } from '@open-design/contracts';
+import { MEDIA_OUTPUT_SUPERSEDED_CODE, mediaFailureNextStep } from '@mish/contracts';
 
 import type { MediaTaskError } from './tasks.js';
 

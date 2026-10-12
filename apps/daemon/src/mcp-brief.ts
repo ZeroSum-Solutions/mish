@@ -1,10 +1,10 @@
 import {
-  collectOpenDesignBrief,
-  openDesignBriefCatalog,
-  type OpenDesignBriefAnswers,
-  type OpenDesignBriefArtifactType,
-  type OpenDesignBriefQuestion,
-} from '@open-design/contracts';
+  collectMishBrief,
+  mishBriefCatalog,
+  type MishBriefAnswers,
+  type MishBriefArtifactType,
+  type MishBriefQuestion,
+} from '@mish/contracts';
 import { randomBytes, randomUUID } from 'node:crypto';
 import {
   type ExternalPluginContext,
@@ -18,7 +18,7 @@ type UnknownRecord = Record<string, unknown>;
 export type LocalMcpBriefLocale = 'en' | 'zh-CN' | 'zh-TW' | 'ja';
 
 interface LocalizedBriefCopy {
-  artifactNames: Record<OpenDesignBriefArtifactType, string>;
+  artifactNames: Record<MishBriefArtifactType, string>;
   title: (artifactName: string) => string;
   description: string;
   submitLabel: string;
@@ -35,7 +35,7 @@ type LocalizedDecisionLabels = Record<
   readonly [questionLabel: string, ...optionLabels: string[]]
 >;
 
-const ENGLISH_ARTIFACT_NAMES: Record<OpenDesignBriefArtifactType, string> = {
+const ENGLISH_ARTIFACT_NAMES: Record<MishBriefArtifactType, string> = {
   website: 'website',
   'product-prototype': 'product prototype',
   presentation: 'presentation',
@@ -216,7 +216,7 @@ const LOCALIZED_DECISION_LABELS: Record<
 
 for (const locale of ['zh-CN', 'zh-TW', 'ja'] as const) {
   const labels = LOCALIZED_DECISION_LABELS[locale];
-  for (const questions of Object.values(openDesignBriefCatalog)) {
+  for (const questions of Object.values(mishBriefCatalog)) {
     for (const question of questions) {
       const localized = labels[question.id];
       if (!localized || localized.length !== question.options.length + 1) {
@@ -234,7 +234,7 @@ export interface LocalMcpBriefStoreOptions {
 }
 
 interface StoredBriefDraft {
-  artifactType: OpenDesignBriefArtifactType;
+  artifactType: MishBriefArtifactType;
   projectTitle: string;
   locale: LocalMcpBriefLocale;
   localeSource: 'provided' | 'fallback';
@@ -249,7 +249,7 @@ interface StoredBriefDraft {
 }
 
 export interface LocalMcpBriefQuestionForm {
-  id: 'open-design-brief';
+  id: 'mish-brief';
   title: string;
   description: string;
   submitLabel: string;
@@ -271,7 +271,7 @@ export interface LocalMcpBriefQuestionForm {
 
 export interface LocalMcpBriefForm {
   view: 'brief-form';
-  artifactType: OpenDesignBriefArtifactType;
+  artifactType: MishBriefArtifactType;
   projectTitle: string;
   locale: LocalMcpBriefLocale;
   localeSource: 'provided' | 'fallback';
@@ -286,13 +286,13 @@ export interface LocalMcpBriefForm {
 
 export interface LocalMcpBriefConfirmation {
   view: 'brief-confirmed';
-  artifactType: OpenDesignBriefArtifactType;
+  artifactType: MishBriefArtifactType;
   projectTitle: string;
   locale: LocalMcpBriefLocale;
   briefDraftId: string;
   briefConfirmationId: string;
   confirmedAt: number;
-  answers: OpenDesignBriefAnswers;
+  answers: MishBriefAnswers;
   summary: string;
   pluginWorkflowId?: string;
   externalPluginContext?: ExternalPluginContext;
@@ -377,7 +377,7 @@ export function createLocalMcpBriefStore(
           'pluginWorkflowId requires a validated externalPluginContext',
         );
       }
-      const decision = collectOpenDesignBrief({
+      const decision = collectMishBrief({
         artifactType,
         knownAnswers,
         skip,
@@ -447,7 +447,7 @@ export function createLocalMcpBriefStore(
         ...draft.knownAnswers,
         ...submittedAnswers,
       };
-      const decision = collectOpenDesignBrief({
+      const decision = collectMishBrief({
         artifactType: draft.artifactType,
         knownAnswers: mergedAnswers,
       });
@@ -502,16 +502,16 @@ export function createLocalMcpBriefStore(
   };
 }
 
-function readArtifactType(value: unknown): OpenDesignBriefArtifactType {
+function readArtifactType(value: unknown): MishBriefArtifactType {
   if (
     typeof value !== 'string'
-    || !Object.hasOwn(openDesignBriefCatalog, value)
+    || !Object.hasOwn(mishBriefCatalog, value)
   ) {
     throw new Error(
-      `artifactType must be one of: ${Object.keys(openDesignBriefCatalog).join(', ')}`,
+      `artifactType must be one of: ${Object.keys(mishBriefCatalog).join(', ')}`,
     );
   }
-  return value as OpenDesignBriefArtifactType;
+  return value as MishBriefArtifactType;
 }
 
 export function readBriefLocale(value: unknown): LocalMcpBriefLocale {
@@ -534,7 +534,7 @@ export function readBriefLocale(value: unknown): LocalMcpBriefLocale {
 }
 
 function localizedBriefTitle(
-  artifactType: OpenDesignBriefArtifactType,
+  artifactType: MishBriefArtifactType,
   locale: LocalMcpBriefLocale,
 ): string {
   const copy = BRIEF_COPY[locale];
@@ -542,12 +542,12 @@ function localizedBriefTitle(
 }
 
 function localizedBriefQuestionForm(
-  artifactType: OpenDesignBriefArtifactType,
-  questions: readonly OpenDesignBriefQuestion[],
+  artifactType: MishBriefArtifactType,
+  questions: readonly MishBriefQuestion[],
   locale: LocalMcpBriefLocale,
 ): LocalMcpBriefQuestionForm {
   return {
-    id: 'open-design-brief',
+    id: 'mish-brief',
     title: localizedBriefTitle(artifactType, locale),
     description: BRIEF_COPY[locale].description,
     submitLabel: BRIEF_COPY[locale].submitLabel,
@@ -557,7 +557,7 @@ function localizedBriefQuestionForm(
 }
 
 function localizeBriefQuestion(
-  question: OpenDesignBriefQuestion,
+  question: MishBriefQuestion,
   locale: LocalMcpBriefLocale,
 ): LocalMcpBriefQuestionForm['questions'][number] {
   if (locale === 'en') {
@@ -600,11 +600,11 @@ function localizeBriefQuestion(
 }
 
 function localizedBriefSummary(
-  artifactType: OpenDesignBriefArtifactType,
-  answers: OpenDesignBriefAnswers,
+  artifactType: MishBriefArtifactType,
+  answers: MishBriefAnswers,
   locale: LocalMcpBriefLocale,
 ): string {
-  const lines = openDesignBriefCatalog[artifactType]
+  const lines = mishBriefCatalog[artifactType]
     .map((question) => {
       const selected = answers[question.id]?.[0];
       const selectedIndex = question.options.findIndex(
@@ -657,7 +657,7 @@ function readAnswerRecord(value: unknown, field: string): UnknownRecord {
   return { ...(value as UnknownRecord) };
 }
 
-function stableAnswerDigest(answers: OpenDesignBriefAnswers): string {
+function stableAnswerDigest(answers: MishBriefAnswers): string {
   return JSON.stringify(
     Object.entries(answers)
       .sort(([left], [right]) => left.localeCompare(right))

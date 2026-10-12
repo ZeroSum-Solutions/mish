@@ -12,7 +12,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { loadAtlasData } from '../src/atlas.ts';
+import { loadAtlasData } from './routing-fixture.ts';
 import { legalSpinesForFamily, resolveRoute, DEFAULT_MIN_TRANSFER, type ChoiceAnswer } from '../src/route.ts';
 
 type Stored = { choice: string; confidence: number; probabilities: Record<string, number> };
@@ -49,12 +49,12 @@ test('every routed pick is a legal family for a considered spine, at or above th
     const top = policy.candidates[0];
     assert.ok(top && top.family === policy.family.id, `${name}: routed ${policy.family.id} but top candidate is ${top?.family}`);
   }
-  // Was 15 before maren moved from spine CO/archetype CO.01 to spine TL/archetype TL.06 (G7 task
+  // Was 15 before ownedmaker moved from spine CO/archetype CO.01 to spine TL/archetype TL.06 (G7 task
   // f8 root cause (b) — see atlas.ts and eval-v7/G7-DIAGNOSIS.md). This corpus's own
   // `prompt-hero` profile (a fashion/ecommerce brief, spine CO, archetype CO.01) had captured a
-  // real Jev family answer that put maren ABOVE storefront/halcyon at the time this corpus was
-  // recorded — itself an instance of the exact CO.01 maren/storefront ambiguity the spine move
-  // fixes. With maren no longer reachable from CO, that profile is honestly unrouted (halcyon at
+  // real Jev family answer that put ownedmaker ABOVE storefront/ownedinstitution at the time this corpus was
+  // recorded — itself an instance of the exact CO.01 ownedmaker/storefront ambiguity the spine move
+  // fixes. With ownedmaker no longer reachable from CO, that profile is honestly unrouted (ownedinstitution at
   // p=0.10, well below threshold) instead of landing on a family it was never meant to reach.
   assert.ok(routed >= 14, `expected the 14 known routed profiles, got ${routed}`);
 });

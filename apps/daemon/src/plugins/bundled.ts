@@ -2,7 +2,7 @@
 //
 // On daemon startup, scan `<repo-root>/plugins/_official/**` for
 // folders that look like installable plugin manifests (a SKILL.md
-// + open-design.json pair) and register every match into the
+// + mish.json pair) and register every match into the
 // `installed_plugins` table under `source_kind='bundled'` /
 // `trust='bundled'`. Bundled plugins are the preinstalled cache of the
 // official registry source: they can carry marketplace provenance while
@@ -31,7 +31,7 @@ import {
   upsertInstalledPlugin,
   type RegistryRoots,
 } from './registry.js';
-import type { InstalledPluginRecord, MarketplaceTrust } from '@open-design/contracts';
+import type { InstalledPluginRecord, MarketplaceTrust } from '@mish/contracts';
 import { inspectBundledStrategyProvenanceV2 } from './strategy-provenance.js';
 
 type SqliteDb = Database.Database;
@@ -93,9 +93,9 @@ export async function registerBundledPlugins(
     // We try the direct shape first, then recurse one level if the
     // tier directory itself isn't a manifest folder.
     const tierAbs = path.join(input.bundledRoot, tier.name);
-    const tierManifest = path.join(tierAbs, 'open-design.json');
+    const tierManifest = path.join(tierAbs, 'mish.json');
     if (await pathExists(tierManifest)) {
-      // Direct: <bundledRoot>/<plugin-id>/open-design.json
+      // Direct: <bundledRoot>/<plugin-id>/mish.json
       await registerOne({ folder: tierAbs, folderId: tier.name, out, warnings, seenFolderIds, input });
       continue;
     }
@@ -108,7 +108,7 @@ export async function registerBundledPlugins(
     for (const entry of inner) {
       if (!entry.isDirectory()) continue;
       const folder = path.join(tierAbs, entry.name);
-      const manifest = path.join(folder, 'open-design.json');
+      const manifest = path.join(folder, 'mish.json');
       if (!(await pathExists(manifest))) continue;
       await registerOne({ folder, folderId: entry.name, out, warnings, seenFolderIds, input });
     }
@@ -164,7 +164,7 @@ async function listFilesRecursive(root: string, dir: string): Promise<string[]> 
 }
 
 // Hashes EVERY file under a bundled plugin's folder, not just
-// open-design.json/SKILL.md. A bundled plugin's runtime behavior is served
+// mish.json/SKILL.md. A bundled plugin's runtime behavior is served
 // from far more than its manifest: /api/plugins/:id/preview discovers HTML
 // under assets/, public/, dist/, examples/, preview/, templates/ (see
 // discoverPluginHtmlAssets in routes/plugins/assets.ts), and Community cards

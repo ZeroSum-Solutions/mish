@@ -15,9 +15,9 @@
 // excluded here and nowhere else: it stays installed, stays in the Plugins
 // view, and still appears under its own non-Prototype chip.
 
-import { familyRegistry, shapeAtlas } from '@open-design/agency-fast-lane/data';
-import { isPublicPreviewUrl } from '@open-design/agency-fast-lane/preview-url';
-import type { DesignProfile, InstalledPluginRecord } from '@open-design/contracts';
+import { familyRegistry, shapeAtlas } from '@mish/agency-fast-lane/data';
+import { isPublicPreviewUrl } from '@mish/agency-fast-lane/preview-url';
+import type { DesignProfile, InstalledPluginRecord } from '@mish/contracts';
 
 /** Skill ref every Agency Site family generator declares. */
 export const AGENCY_SITE_SKILL_REF = 'agency-site';

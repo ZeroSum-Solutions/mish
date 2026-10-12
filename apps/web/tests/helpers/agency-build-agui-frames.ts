@@ -1,7 +1,7 @@
 // Drives a fake EventSource the way `GET /api/agency/builds/:id/agui` would: every frame is the
 // default SSE `message` event with an AG-UI payload.
 
-import type { AgencyBuildAguiState, AgencyBuildEvent, AgencyBuildSnapshot } from '@open-design/contracts';
+import type { AgencyBuildAguiState, AgencyBuildEvent, AgencyBuildSnapshot } from '@mish/contracts';
 
 interface FrameSink {
   emit(name: string, data: unknown): void;

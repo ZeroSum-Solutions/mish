@@ -12,7 +12,7 @@ function registry() {
     // Match the existing runs tests: ts-nocheck narrows the null default in the inferred API.
     runsLogDir: runsLogDir as unknown as null });
 }
-const meta = { clientRequestId: 'request', analyticsHints: { externalPluginId: 'open-design', pluginWorkflowId: 'workflow', entrySurface: 'external_mcp' } };
+const meta = { clientRequestId: 'request', analyticsHints: { externalPluginId: 'mish', pluginWorkflowId: 'workflow', entrySurface: 'external_mcp' } };
 
 describe('D11 terminal run retention', () => {
   it('expires request and workflow indexes while preserving durable history', () => {

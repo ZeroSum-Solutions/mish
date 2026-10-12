@@ -1,5 +1,5 @@
 import path from 'node:path';
-import type { ProjectDesignContext, ProjectRubric, ReviewEgressPolicy, RunMechanicalReviewRequest, VerificationBundle, VerificationBundleSummary } from '@open-design/contracts';
+import type { ProjectDesignContext, ProjectRubric, ReviewEgressPolicy, RunMechanicalReviewRequest, VerificationBundle, VerificationBundleSummary } from '@mish/contracts';
 import { createCdpReviewPort } from './cdp-worker.js';
 import { validatedAllowHosts } from './egress.js';
 import { createReviewEvidenceStore } from './evidence-store.js';

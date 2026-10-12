@@ -1,0 +1,30 @@
+{
+  "lanes": {
+    "beta": {
+      "channel": "beta",
+      "storagePrefix": "beta",
+      "productName": "Mish Beta"
+    },
+    "betas": {
+      "channel": "betas",
+      "storagePrefix": "betas",
+      "productName": "Mish Betas",
+      "publicOrigin": "https://mish.invalid/od-releases"
+    },
+    "prerelease": {
+      "channel": "prerelease",
+      "storagePrefix": "prerelease",
+      "productName": "Mish Prerelease"
+    },
+    "preview": {
+      "channel": "preview",
+      "storagePrefix": "preview",
+      "productName": "Mish Preview"
+    },
+    "stable": {
+      "channel": "stable",
+      "storagePrefix": "stable",
+      "productName": "Mish"
+    }
+  }
+}

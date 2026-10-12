@@ -4,7 +4,7 @@ import type { Server } from 'node:http';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { parseResourceDetailResponse, parseResourceSearchResponse, type ResourceDetailResponse, type ResourceSearchResponse } from '@open-design/contracts';
+import { parseResourceDetailResponse, parseResourceSearchResponse, type ResourceDetailResponse, type ResourceSearchResponse } from '@mish/contracts';
 import { startServer } from '../../src/server.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';
 import { eligibleTokenKind } from '../../src/workbench/context-ranking.js';

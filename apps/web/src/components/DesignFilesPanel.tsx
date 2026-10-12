@@ -1,6 +1,6 @@
 import { claimNativeFileDrop } from '../runtime/intake/drop-coordinator';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import type { TrackingProjectKind } from '@open-design/contracts/analytics';
+import type { TrackingProjectKind } from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import { trackFileManagerClick } from '../analytics/events';
 import { useT } from '../i18n';

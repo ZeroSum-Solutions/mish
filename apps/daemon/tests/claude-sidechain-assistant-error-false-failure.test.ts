@@ -72,7 +72,7 @@ describe('claude sub-agent assistant error false failure', () => {
     LANGFUSE_PUBLIC_KEY: process.env.LANGFUSE_PUBLIC_KEY,
     LANGFUSE_SECRET_KEY: process.env.LANGFUSE_SECRET_KEY,
     LANGFUSE_BASE_URL: process.env.LANGFUSE_BASE_URL,
-    OPEN_DESIGN_TELEMETRY_RELAY_URL: process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL,
+    MISH_TELEMETRY_RELAY_URL: process.env.MISH_TELEMETRY_RELAY_URL,
     OD_NEXT_STRATEGY_ROLLOUT: process.env.OD_NEXT_STRATEGY_ROLLOUT,
   };
   let started: StartedServer | null = null;
@@ -102,7 +102,7 @@ describe('claude sub-agent assistant error false failure', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     // This parser regression does not exercise OD Next. Keep the fixture on
     // the ordinary run path even when a mock happens to report a production-
     // verified CLI version; the worker-scoped OD_DATA_DIR from tests/setup.ts

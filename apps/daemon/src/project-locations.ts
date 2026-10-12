@@ -5,7 +5,7 @@ import { expandHomePrefix } from './home-expansion.js';
 import { isSafeId } from './projects.js';
 
 export const BUILT_IN_PROJECT_LOCATION_ID = 'default';
-export const PROJECT_MANIFEST_RELATIVE_PATH = path.join('.open-design', 'project.json');
+export const PROJECT_MANIFEST_RELATIVE_PATH = path.join('.mish', 'project.json');
 
 export interface ProjectLocation extends ProjectLocationPrefs {
   builtIn?: boolean;

@@ -18,8 +18,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { QuestionFormView } from '../../src/components/QuestionForm';
 import type { QuestionForm } from '../../src/artifacts/question-form';
-import { visualStyleCardsForContext } from '../../src/runtime/visual-style-catalog';
+import {
+  setStyleCatalogAssetOrigin,
+  visualStyleCardsForContext,
+} from '../../src/runtime/visual-style-catalog';
 import { VISUAL_STYLE_BATCH_SIZE } from '../../src/runtime/visual-style-deck';
+import { useConfiguredStyleCatalog } from '../helpers/style-catalog';
+
+// No hosted style previews ship with the fork; these tests configure an origin.
+useConfiguredStyleCatalog();
 
 afterEach(cleanup);
 
@@ -74,6 +81,18 @@ describe('direction-cards 由内置目录接管', () => {
     expect((imgs[0] as HTMLImageElement).src).toContain('/style-catalog/v1/prototype-');
     // 占位块那一路一张都不该出
     expect(container.querySelectorAll('.qf-visual-preview-prototype')).toHaveLength(0);
+  });
+
+  it('renders the placeholder preview, not a broken image, when no preview origin is configured', () => {
+    setStyleCatalogAssetOrigin(null);
+    expect(visualStyleCardsForContext('prototype').every((card) => card.preview === undefined)).toBe(true);
+    const { container } = render(
+      <QuestionFormView form={modelAuthored} interactive visualStyleContext="prototype" onSubmit={vi.fn()} />,
+    );
+    const cards = container.querySelectorAll('.qf-visual-card');
+    expect(cards.length).toBe(VISUAL_STYLE_BATCH_SIZE);
+    expect(container.querySelectorAll('img.qf-visual-preview-image')).toHaveLength(0);
+    expect(container.querySelectorAll('.qf-visual-preview').length).toBe(cards.length);
   });
 
   it('是**单选** —— 方向只能挑一个', () => {

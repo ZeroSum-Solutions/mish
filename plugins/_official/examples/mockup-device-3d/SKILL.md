@@ -23,7 +23,7 @@ od:
   surface: web
   platform: desktop
   scenario: product
-  upstream: "https://github.com/nexu-io/html-anything"
+  upstream: "https://github.com/ZeroSum-Solutions/html-anything"
   preview:
     type: html
     entry: index.html

@@ -757,7 +757,7 @@ async function probe(
     ...(runtimeCompanionVersion
       ? {
           runtimeCompanionName: def.id === 'deepseek-harness'
-            ? '@open-design/dsh-runtime'
+            ? '@mish/dsh-runtime'
             : 'runtime-profile',
           runtimeCompanionVersion,
         }

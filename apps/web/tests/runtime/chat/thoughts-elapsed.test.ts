@@ -34,7 +34,7 @@
  * 按 §2.2b 本来就该不显示。那一行是对的,底下的 `ToolSearch 那一行` 用例把它钉住。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { groupThinking, type ThoughtsGroup } from '../../../src/runtime/chat/group-thinking';
 import { formatElapsed, UNKNOWN_ELAPSED_BELOW_MS } from '../../../src/runtime/chat/format';

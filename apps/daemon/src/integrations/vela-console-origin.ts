@@ -8,7 +8,7 @@ type EnvMap = NodeJS.ProcessEnv | Record<string, string | undefined>;
 // site — every consumer concatenates, none resolves against it as a URL base.
 //
 // The test entry moved off `vela.powerformer.net` onto
-// `open-design.powerformer.net/cloud` when vela cut the test Cloud domain over
+// `mish.powerformer.net/cloud` when vela cut the test Cloud domain over
 // (vela #1922 prepare, #1929 finalize). The new host serves the test Landing
 // page at `/` and hands `/cloud*` and `/amr*` to a test-only path proxy; the
 // legacy hostname is no longer a mapped test route and is scheduled for
@@ -19,8 +19,8 @@ type EnvMap = NodeJS.ProcessEnv | Record<string, string | undefined>;
 // OD_VELA_WEB_URLS / OD_VELA_WEB_URL, so an un-injected build resolves nothing
 // for it and the client falls back to the public console instead of guessing.
 const PUBLIC_ORIGINS: Partial<Record<string, string>> = {
-  prod: 'https://open-design.ai/cloud',
-  test: 'https://open-design.powerformer.net/cloud',
+  prod: 'https://github.com/ZeroSum-Solutions/mish/cloud',
+  test: 'https://mish.powerformer.net/cloud',
   local: 'http://localhost:5173',
 };
 
@@ -69,7 +69,7 @@ export function resolveEffectiveVelaConsoleOrigin(
     if (packagedOrigin) return packagedOrigin;
   }
   const hasRuntimeSelection = Boolean(
-    configuredEnv.OPEN_DESIGN_AMR_PROFILE?.trim() || configuredEnv.VELA_PROFILE?.trim(),
+    configuredEnv.MISH_AMR_PROFILE?.trim() || configuredEnv.VELA_PROFILE?.trim(),
   );
   const publicOrigin = hasRuntimeSelection ? PUBLIC_ORIGINS[selectedProfile] : undefined;
   if (publicOrigin) return publicOrigin;

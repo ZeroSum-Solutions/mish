@@ -189,35 +189,35 @@ describe("licensed pack content matcher", () => {
       author: { name: "House Team" },
     });
     const violations = await violationsFor([
-      { path: "plugins/_official/examples/synthetic-landing/open-design.json", text: motionSitesManifest },
+      { path: "plugins/_official/examples/synthetic-landing/mish.json", text: motionSitesManifest },
       { path: "plugins/_official/examples/synthetic-landing/SKILL.md", text: "# Unrelated text" },
       { path: "plugins/_official/examples/synthetic-landing/example.html", text: "<p>unrelated</p>" },
-      { path: "plugins/_official/examples/house-landing/open-design.json", text: otherManifest },
+      { path: "plugins/_official/examples/house-landing/mish.json", text: otherManifest },
       { path: "plugins/_official/examples/house-landing/SKILL.md", text: "# House" },
       // A copy dropped outside the examples folder is still a manifest.
-      { path: "plugins/community/moved/open-design.json", text: motionSitesManifest },
+      { path: "plugins/community/moved/mish.json", text: motionSitesManifest },
       { path: "plugins/community/moved/assets/hero.html", text: "<p>unrelated</p>" },
       // Outside plugins/ no folder rule applies, but the manifest shape still does.
-      { path: "docs/stray/open-design.json", text: motionSitesManifest },
+      { path: "docs/stray/mish.json", text: motionSitesManifest },
       { path: "docs/stray/notes.md", text: "unrelated" },
       // Owner-kept examples carry no MotionSites homepage, so this check never sees them.
       {
-        path: "plugins/_official/examples/velar-luxury-real-estate/open-design.json",
+        path: "plugins/_official/examples/velar-luxury-real-estate/mish.json",
         text: JSON.stringify({ name: "example-velar-luxury-real-estate", author: { name: "House Team" } }),
       },
     ]);
     expect(flaggedPaths(violations)).toEqual([
-      "docs/stray/open-design.json",
+      "docs/stray/mish.json",
       "plugins/_official/examples/synthetic-landing/SKILL.md",
       "plugins/_official/examples/synthetic-landing/example.html",
-      "plugins/_official/examples/synthetic-landing/open-design.json",
+      "plugins/_official/examples/synthetic-landing/mish.json",
       "plugins/community/moved/assets/hero.html",
-      "plugins/community/moved/open-design.json",
+      "plugins/community/moved/mish.json",
     ]);
     expect(reasonsFor(violations, "plugins/_official/examples/synthetic-landing/SKILL.md")).toEqual([
       "path:motionsites-plugin-folder",
     ]);
-    expect(reasonsFor(violations, "docs/stray/open-design.json")).toEqual(["shape:motionsites-manifest"]);
+    expect(reasonsFor(violations, "docs/stray/mish.json")).toEqual(["shape:motionsites-manifest"]);
   });
 
   test("MotionSites manifests match a homepage in any letter case, or a MotionSites author under CC-BY-4.0 without one", async () => {
@@ -226,20 +226,20 @@ describe("licensed pack content matcher", () => {
     const authorOtherLicence = JSON.stringify({ author: { name: MOTIONSITES_AUTHOR }, license: "MIT" });
     const licenceOtherAuthor = JSON.stringify({ author: { name: "Synthetic Author" }, license: "CC-BY-4.0" });
     const violations = await violationsFor([
-      { path: "plugins/_official/examples/upper/open-design.json", text: upperHomepage },
+      { path: "plugins/_official/examples/upper/mish.json", text: upperHomepage },
       { path: "plugins/_official/examples/upper/example.html", text: "<p>unrelated</p>" },
-      { path: "plugins/_official/examples/stripped/open-design.json", text: authorAndLicence },
+      { path: "plugins/_official/examples/stripped/mish.json", text: authorAndLicence },
       { path: "plugins/_official/examples/stripped/SKILL.md", text: "# unrelated" },
-      { path: "plugins/_official/examples/house-one/open-design.json", text: authorOtherLicence },
-      { path: "plugins/_official/examples/house-two/open-design.json", text: licenceOtherAuthor },
+      { path: "plugins/_official/examples/house-one/mish.json", text: authorOtherLicence },
+      { path: "plugins/_official/examples/house-two/mish.json", text: licenceOtherAuthor },
       { path: "docs/stray/manifest.json", text: authorAndLicence },
     ]);
     expect(flaggedPaths(violations)).toEqual([
       "docs/stray/manifest.json",
       "plugins/_official/examples/stripped/SKILL.md",
-      "plugins/_official/examples/stripped/open-design.json",
+      "plugins/_official/examples/stripped/mish.json",
       "plugins/_official/examples/upper/example.html",
-      "plugins/_official/examples/upper/open-design.json",
+      "plugins/_official/examples/upper/mish.json",
     ]);
     expect(reasonsFor(violations, "docs/stray/manifest.json")).toEqual(["shape:motionsites-manifest"]);
   });
@@ -625,7 +625,7 @@ describe("licensed pack guard wrapper", () => {
     const root = await scratchRepo({
       [LICENSED_PACK_BLOB_LIST_PATH]: `${"e".repeat(40)}\n`,
       "apps/web/src/index.ts": "export const ok = true;\n",
-      "plugins/_official/examples/house/open-design.json": JSON.stringify({ homepage: "https://example.test" }),
+      "plugins/_official/examples/house/mish.json": JSON.stringify({ homepage: "https://example.test" }),
     });
     await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(true);
     expect(errors).toEqual([]);

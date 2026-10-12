@@ -109,7 +109,7 @@ describe('archive installer', () => {
     let success = false;
     let error: string | undefined;
     for await (const ev of installPlugin(db, {
-      source: 'github:open-design/sample-plugin',
+      source: 'github:mish/sample-plugin',
       roots: { userPluginsRoot: pluginsRoot },
       fetcher,
     })) {
@@ -120,9 +120,9 @@ describe('archive installer', () => {
       throw new Error(`install failed: ${error}`);
     }
     expect(success).toBe(true);
-    expect(urlSeen).toBe('https://codeload.github.com/open-design/sample-plugin/tar.gz/HEAD');
+    expect(urlSeen).toBe('https://codeload.github.com/mish/sample-plugin/tar.gz/HEAD');
     const row = db.prepare(`SELECT source_kind, source FROM installed_plugins WHERE id = 'sample-plugin'`).get();
-    expect(row).toEqual({ source_kind: 'github', source: 'github:open-design/sample-plugin' });
+    expect(row).toEqual({ source_kind: 'github', source: 'github:mish/sample-plugin' });
   });
 
   it('normalizes a browser GitHub repository URL through the GitHub installer', async () => {
@@ -135,7 +135,7 @@ describe('archive installer', () => {
     let success = false;
     let error: string | undefined;
     for await (const ev of installPlugin(db, {
-      source: 'https://github.com/open-design/sample-plugin/',
+      source: 'https://github.com/mish/sample-plugin/',
       roots: { userPluginsRoot: pluginsRoot },
       fetcher,
     })) {
@@ -146,20 +146,20 @@ describe('archive installer', () => {
       throw new Error(`install failed: ${error}`);
     }
 
-    expect(urlSeen).toBe('https://codeload.github.com/open-design/sample-plugin/tar.gz/HEAD');
+    expect(urlSeen).toBe('https://codeload.github.com/mish/sample-plugin/tar.gz/HEAD');
     const row = db.prepare(
       `SELECT source_kind, source FROM installed_plugins WHERE id = 'sample-plugin'`,
     ).get();
     expect(row).toEqual({
       source_kind: 'github',
-      source: 'github:open-design/sample-plugin',
+      source: 'github:mish/sample-plugin',
     });
   });
 
   it.each([
-    'https://github.com/open-design/sample-plugin/issues',
-    'https://github.com/open-design/sample-plugin/tree/main',
-    'https://github.com/open-design/sample-plugin?tab=readme',
+    'https://github.com/mish/sample-plugin/issues',
+    'https://github.com/mish/sample-plugin/tree/main',
+    'https://github.com/mish/sample-plugin?tab=readme',
   ])('rejects a non-root GitHub browser URL before fetching it: %s', async (source) => {
     let fetched = false;
     let error: string | undefined;
@@ -183,7 +183,7 @@ describe('archive installer', () => {
     const fixtureFiles = await readdir(fixtureSrc);
     const urlsSeen: string[] = [];
     const apiUrl =
-      'https://api.github.com/repos/nexu-io/open-design/contents/plugins/community/registry-starter?ref=garnet-hemisphere';
+      'https://api.github.com/repos/ZeroSum-Solutions/mish/contents/plugins/community/registry-starter?ref=garnet-hemisphere';
     const downloadBase = 'https://raw.example.test/plugins/community/registry-starter';
     const entries = fixtureFiles.map((name) => ({
       type: 'file',
@@ -204,7 +204,7 @@ describe('archive installer', () => {
     };
     let success = false;
     let error: string | undefined;
-    const source = 'github:nexu-io/open-design@garnet-hemisphere/plugins/community/registry-starter';
+    const source = 'github:ZeroSum-Solutions/mish@garnet-hemisphere/plugins/community/registry-starter';
     for await (const ev of installPlugin(db, {
       source,
       roots: { userPluginsRoot: pluginsRoot },
@@ -217,7 +217,7 @@ describe('archive installer', () => {
       throw new Error(`install failed: ${error}`);
     }
     expect(urlsSeen).toContain(apiUrl);
-    expect(urlsSeen).not.toContain('https://codeload.github.com/nexu-io/open-design/tar.gz/garnet-hemisphere');
+    expect(urlsSeen).not.toContain('https://codeload.github.com/ZeroSum-Solutions/mish/tar.gz/garnet-hemisphere');
     const row = db.prepare(`SELECT source_kind, source FROM installed_plugins WHERE id = 'sample-plugin'`).get();
     expect(row).toEqual({ source_kind: 'github', source });
   });
@@ -227,13 +227,13 @@ describe('archive installer', () => {
     [429, 'Too Many Requests', 'too many requests'],
   ])('falls back to codeload when GitHub contents returns %i for a plugin subpath', async (status, statusText, body) => {
     const tarball = await buildFixtureTarball({
-      rootPrefix: 'open-design-main',
+      rootPrefix: 'mish-main',
       pluginSubpath: 'plugins/community/import-smoke-test',
     });
     const urlsSeen: string[] = [];
     const contentsUrl =
-      'https://api.github.com/repos/nexu-io/open-design/contents/plugins/community/import-smoke-test?ref=main';
-    const tarballUrl = 'https://codeload.github.com/nexu-io/open-design/tar.gz/main';
+      'https://api.github.com/repos/ZeroSum-Solutions/mish/contents/plugins/community/import-smoke-test?ref=main';
+    const tarballUrl = 'https://codeload.github.com/ZeroSum-Solutions/mish/tar.gz/main';
     const fetcher: ArchiveFetcher = async (u) => {
       urlsSeen.push(u);
       if (u === contentsUrl) {
@@ -245,7 +245,7 @@ describe('archive installer', () => {
 
     let success = false;
     let error: string | undefined;
-    const source = 'github:nexu-io/open-design@main/plugins/community/import-smoke-test';
+    const source = 'github:ZeroSum-Solutions/mish@main/plugins/community/import-smoke-test';
     for await (const ev of installPlugin(db, {
       source,
       roots: { userPluginsRoot: pluginsRoot },
@@ -266,8 +266,8 @@ describe('archive installer', () => {
   it('reports both GitHub contents and codeload URLs when subpath fallback fails', async () => {
     const urlsSeen: string[] = [];
     const contentsUrl =
-      'https://api.github.com/repos/nexu-io/open-design/contents/plugins/community/import-smoke-test?ref=main';
-    const tarballUrl = 'https://codeload.github.com/nexu-io/open-design/tar.gz/main';
+      'https://api.github.com/repos/ZeroSum-Solutions/mish/contents/plugins/community/import-smoke-test?ref=main';
+    const tarballUrl = 'https://codeload.github.com/ZeroSum-Solutions/mish/tar.gz/main';
     const fetcher: ArchiveFetcher = async (u) => {
       urlsSeen.push(u);
       if (u === contentsUrl) {
@@ -278,7 +278,7 @@ describe('archive installer', () => {
     };
 
     let error: string | undefined;
-    const source = 'github:nexu-io/open-design@main/plugins/community/import-smoke-test';
+    const source = 'github:ZeroSum-Solutions/mish@main/plugins/community/import-smoke-test';
     for await (const ev of installPlugin(db, {
       source,
       roots: { userPluginsRoot: pluginsRoot },

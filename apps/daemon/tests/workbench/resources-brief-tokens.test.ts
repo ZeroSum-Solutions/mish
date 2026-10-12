@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseResourceSearchRequest } from '@open-design/contracts';
+import { parseResourceSearchRequest } from '@mish/contracts';
 import { createLocalResourceSources, inspectResource, searchResources } from '../../src/workbench/resources.js';
 import { createBriefTokensSource, deriveBriefTokens } from '../../src/workbench/resources-tokens.js';
 import { CONTRAST_EVIDENCE_STYLE_TAG, eligibleTokenKind } from '../../src/workbench/context-ranking.js';

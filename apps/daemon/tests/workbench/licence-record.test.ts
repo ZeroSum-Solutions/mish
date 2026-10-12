@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { SOURCE_OPERATIONS } from '@open-design/contracts';
+import { SOURCE_OPERATIONS } from '@mish/contracts';
 import { LicenceRecordError, migrateWorkbenchLicenceRecords, putLicenceRecord, readLicenceRecord } from '../../src/workbench/licence-record.js';
 
 let db: Database.Database;

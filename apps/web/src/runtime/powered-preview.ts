@@ -18,7 +18,7 @@
  * WHEN to use it and builds the URL.
  */
 
-import { buildProjectPoweredFileUrl, type ProjectPreviewIsolationResponse } from '@open-design/contracts';
+import { buildProjectPoweredFileUrl, type ProjectPreviewIsolationResponse } from '@mish/contracts';
 
 let isolationProbe: Promise<ProjectPreviewIsolationResponse | null> | null = null;
 

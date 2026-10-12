@@ -6,7 +6,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { GenuiCatalogEntry, GenuiCatalogResponse } from '@open-design/contracts';
+import type { GenuiCatalogEntry, GenuiCatalogResponse } from '@mish/contracts';
 
 import { CatalogView } from '../../src/components/CatalogView';
 

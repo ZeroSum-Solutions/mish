@@ -3,7 +3,7 @@ import {
   LICENCE_RECORD_SOURCES, licenceOperationStatuses, licenceScopeViolations, materializeLicenceDraft, parseLicenceRecord,
   parseLicenceRecordSnapshot, parsePutLicenceRecord, unreadableLicenceStatuses,
   type ApiErrorCode, type LicenceRecord, type LicenceRecordSnapshot, type LicenceScopeViolation, type LicenceWriteSurface,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 type Db = Database.Database;
 type SourceId = (typeof LICENCE_RECORD_SOURCES)[number];

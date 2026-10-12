@@ -1,4 +1,4 @@
-import type { DeliverableSyntaxSafeFixRule } from '@open-design/contracts';
+import type { DeliverableSyntaxSafeFixRule } from '@mish/contracts';
 import { parse, type Token } from 'acorn';
 
 const MAX_LITERAL_LENGTH = 4096;

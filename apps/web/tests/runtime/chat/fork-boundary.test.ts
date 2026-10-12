@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { ChatMessage } from '@open-design/contracts';
+import type { ChatMessage } from '@mish/contracts';
 
 import { forkBoundaryMessageIndex } from '../../../src/runtime/chat/fork-boundary';
 

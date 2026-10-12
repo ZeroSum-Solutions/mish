@@ -8,7 +8,7 @@ import path from 'node:path';
 // @ts-expect-error -- jsdom has no bundled declarations in the Node-only daemon test program.
 import { JSDOM } from 'jsdom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { type ReusableUnitManifest } from '@open-design/contracts';
+import { type ReusableUnitManifest } from '@mish/contracts';
 import { registerWorkbenchCaptureRoutes } from '../../src/routes/workbench-capture.js';
 import { createCaptureService } from '../../src/workbench/capture/capture-service.js';
 import { createUnitService } from '../../src/workbench/units/unit-service.js';

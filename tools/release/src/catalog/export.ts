@@ -32,7 +32,7 @@ import { loadCatalogSystemTokens } from "./system-tokens.ts";
 
 const REPO_TREE = "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main";
 const REPO_BLOB = "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/blob/main";
-const PLUGIN_PREVIEWS_BASE_URL = "https://repo-assets.open-design.ai/plugin-previews";
+const PLUGIN_PREVIEWS_BASE_URL = "https://repo-assets.mish.invalid/plugin-previews";
 
 const OFFICIAL_BUCKETS = [
   "examples",
@@ -384,7 +384,7 @@ function exportPlugins(repoRoot: string): CatalogPluginRecord[] {
     const dir = join(officialRoot, bucket);
     for (const name of listDirs(dir)) {
       const record = loadPlugin({
-        manifestPath: join(dir, name, "open-design.json"),
+        manifestPath: join(dir, name, "mish.json"),
         slug: name,
         bucket,
         sourceUrl: `${REPO_TREE}/plugins/_official/${bucket}/${name}`,
@@ -398,7 +398,7 @@ function exportPlugins(repoRoot: string): CatalogPluginRecord[] {
   const communityRoot = join(repoRoot, "plugins/community");
   for (const name of listDirs(communityRoot)) {
     const record = loadPlugin({
-      manifestPath: join(communityRoot, name, "open-design.json"),
+      manifestPath: join(communityRoot, name, "mish.json"),
       slug: name,
       bucket: "community",
       routeId: `community/${name}`,

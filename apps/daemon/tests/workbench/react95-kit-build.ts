@@ -31,7 +31,7 @@ import { typecheckUnit } from './react95-typecheck.js';
  * - the two authored templates from `apps/daemon/kits/react95/templates/`.
  *
  * Regenerate with
- * `OD_REACT95_UPSTREAM_ARCHIVE=<path to the .tar.gz> pnpm --filter @open-design/daemon exec vitest run tests/workbench/react95-kit-source.test.ts`.
+ * `OD_REACT95_UPSTREAM_ARCHIVE=<path to the .tar.gz> pnpm --filter @mish/daemon exec vitest run tests/workbench/react95-kit-source.test.ts`.
  */
 export const REACT95_REPOSITORY = 'https://github.com/react95-io/React95';
 export const REACT95_COMMIT = '871d5335daebdda1469f66f81266523f4191a595';

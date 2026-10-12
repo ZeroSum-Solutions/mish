@@ -165,12 +165,12 @@ contract everything else (coupling, GC safety, rollback) rests on.
   `plugin-previews/`:
   ```
   base URL (daemon default, unchanged):
-    OD_PLUGIN_PREVIEWS_BASE_URL = https://repo-assets.open-design.ai/plugin-previews
+    OD_PLUGIN_PREVIEWS_BASE_URL = https://repo-assets.mish.invalid/plugin-previews
   manifest stores (prefix-relative key):
     <pluginKey>/<fingerprint>/preview.mp4
     <pluginKey>/<fingerprint>/poster.jpg
   resolved URL = base + "/" + key:
-    https://repo-assets.open-design.ai/plugin-previews/<pluginKey>/<fingerprint>/preview.mp4
+    https://repo-assets.mish.invalid/plugin-previews/<pluginKey>/<fingerprint>/preview.mp4
   bucket object path (what aws s3 cp writes):
     plugin-previews/<pluginKey>/<fingerprint>/preview.mp4
   ```
@@ -239,7 +239,7 @@ github.repository`** (same-repo branches have secrets; forks do not):
     explicit `git fetch origin ${{ github.event.pull_request.head.sha }}` before
     the check, then `test "$(git log -1 --format='%ae' ${{
     github.event.pull_request.head.sha }})" != "$BAKE_BOT_EMAIL"` (the bake push
-    already sets `git config user.email "bot@open-design.ai"`). `github.actor` is
+    already sets `git config user.email "bot@mish.invalid"`). `github.actor` is
     an alternative only if the bake push token carries a stable bot identity.
   - **compute the manifest diff and only commit when a `previews` entry actually
     changed** (no-op-diff guard — same helper as the `generatedAt` fix), so a
@@ -432,7 +432,7 @@ comfortably).
   single no-op and stops (no second manifest commit, no run storm). Assert the
   guard reads the **head commit author** (`git log -1 --format='%ae'` of
   `head.sha`), not `pull_request.head.user.login`: a synchronize whose head
-  commit author is `bot@open-design.ai` → `shouldCommit === false`, while one
+  commit author is `bot@mish.invalid` → `shouldCommit === false`, while one
   authored by a human contributor with a real `previews` delta → `true`.
 - **No noise:** a nightly run where no plugin content changed opens **no** PR
   (red test today: #4261 was a timestamp-only PR). Encode as a unit test over

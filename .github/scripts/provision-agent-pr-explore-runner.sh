@@ -42,13 +42,13 @@
 set -uo pipefail
 
 # --- config (override via env) -----------------------------------------------
-BASE_REPO="${BASE_REPO:-nexu-io/open-design}"
+BASE_REPO="${BASE_REPO:-ZeroSum-Solutions/mish}"
 CODEX_MODEL="${CODEX_MODEL:-gpt-5.4}"
 ACP_VERSION="${ACP_VERSION:-0.15.0}"
 ACP_ARCH_PKG="${ACP_ARCH_PKG:-@zed-industries/codex-acp-darwin-arm64}"  # match the runner arch
 NPM_MIRROR="${NPM_MIRROR:-https://registry.npmmirror.com}"
 DEPLOY_KEY="${DEPLOY_KEY:-$HOME/.ssh/od_agent_deploy}"
-MIRROR_DIR="${OD_SANDBOX_REPO_MIRROR:-$HOME/.cache/agent-pr-explore/open-design.git}"
+MIRROR_DIR="${OD_SANDBOX_REPO_MIRROR:-$HOME/.cache/agent-pr-explore/mish.git}"
 TOOLS_DIR="$HOME/agent-pr-explore-tools"
 export PATH="$TOOLS_DIR/lima-2.1.1/bin:$HOME/agent-pr-explore-bin:$HOME/.npm-global/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 

@@ -1,4 +1,4 @@
-import { mediaFailureNextStep, mediaSafetyCategory } from '@open-design/contracts';
+import { mediaFailureNextStep, mediaSafetyCategory } from '@mish/contracts';
 
 import { redactMediaErrorText } from './redact.js';
 import type { MediaTaskError } from './tasks.js';

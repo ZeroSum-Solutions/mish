@@ -1,6 +1,6 @@
 import { useId } from 'react';
-import { Select } from '@open-design/components';
-import type { ResourceTargetDependency, ResourceVariantOption } from '@open-design/contracts';
+import { Select } from '@mish/components';
+import type { ResourceTargetDependency, ResourceVariantOption } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { SegmentedControl } from '../ui/SegmentedControl';
 import styles from './workbench.module.css';

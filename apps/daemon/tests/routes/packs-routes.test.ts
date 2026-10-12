@@ -15,7 +15,7 @@ import {
   parsePackGithubAccessStatus,
   parsePackListResponse,
   type PackInstallEvent,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { sendApiError } from '../../src/http/api-errors.js';
 import { requireLocalDaemonRequest } from '../../src/http/local-daemon-request.js';
@@ -33,7 +33,7 @@ import {
   writeSidecar,
   type FixturePackOptions,
 } from '../fixtures/licensed-pack/pack-fixture.js';
-import { parsePackManifest } from '@open-design/contracts';
+import { parsePackManifest } from '@mish/contracts';
 
 const cleanup: string[] = [];
 const servers: http.Server[] = [];

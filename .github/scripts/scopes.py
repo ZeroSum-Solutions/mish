@@ -257,7 +257,7 @@ def event_payload():
 
 
 def run_gh(args):
-    override = os.environ.get("OPEN_DESIGN_GH_NODE_SCRIPT")
+    override = os.environ.get("MISH_GH_NODE_SCRIPT")
     command = (["node", override] if override else ["gh"]) + args
     return subprocess.run(command, check=True, text=True, stdout=subprocess.PIPE).stdout
 
@@ -306,6 +306,7 @@ def emit_plan(plan, output_path=None):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     append_outputs({
+        "run": compact_json(plan["enabled"]),
         "scopes": compact_json(plan["scopes"]),
         "ui_p0_matrix": compact_json(plan["matrices"]["ui_p0"]),
         "visual_matrix": compact_json(plan["matrices"]["visual"]),

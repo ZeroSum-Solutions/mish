@@ -62,7 +62,6 @@ const PRODUCT_ROOT_FILES = new Set([
   'official_badge.svg',
   'remixicon.ttf',
   'remixicon.woff2',
-  'startup-animation.webm',
 ]);
 
 const SAFE_RESOURCE_EXTENSIONS = new Set([

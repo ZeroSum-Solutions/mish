@@ -1,4 +1,3 @@
-import { useId } from 'react';
 import { Icon } from './Icon';
 
 interface Props {
@@ -8,63 +7,22 @@ interface Props {
   onCreate: () => void;
 }
 
-/**
- * Inline SVG remake of the old `/drafts-empty-mark.png` mark (sans the PNG's
- * blueprint guide lines — product dropped them). Geometry is lifted from
- * `clipper/assets/mark.svg`; the gradient axis and stops are sampled from the
- * PNG so the resting frame is pixel-faithful. Being real strokes (normalized
- * via pathLength) lets hover replay a draw-on demo that always settles back
- * to this exact resting frame. The viewBox keeps the PNG's framing so the
- * mark's on-page size and position are unchanged.
- */
+/** The Mish mark, drawn inline so it inherits the empty-state sizing. */
 function BlankMark() {
-  const gradientId = useId();
   return (
     <svg
       className="entry-blank__mark"
-      viewBox="-6 -5.9 104.7 104.7"
+      viewBox="340 600 1368 850"
       width="168"
       height="168"
-      fill="none"
+      fill="currentColor"
       aria-hidden
     >
-      <defs>
-        <linearGradient
-          id={gradientId}
-          gradientUnits="userSpaceOnUse"
-          x1="46.4"
-          y1="75.9"
-          x2="75.1"
-          y2="46.4"
-        >
-          <stop offset="0" stopColor="#01220b" />
-          <stop offset="0.5" stopColor="#016a21" />
-          <stop offset="1" stopColor="#00b238" />
-        </linearGradient>
-      </defs>
-      <g
-        stroke={`url(#${gradientId})`}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path
-          className="entry-blank__mark-line"
-          pathLength={1}
-          d="M46.3765 17.8047C62.2253 17.8047 75.0733 30.6527 75.0733 46.5015C75.0732 62.3503 62.2253 75.1983 46.3765 75.1983H21.4977C19.3845 75.1983 17.6798 73.4938 17.6798 71.3806C17.6798 64.9804 17.6797 52.2256 17.6797 46.5015C17.6797 30.6527 30.5277 17.8047 46.3765 17.8047Z"
-        />
-        <circle
-          className="entry-blank__mark-line"
-          pathLength={1}
-          cx="46.3766"
-          cy="46.5016"
-          r="22.9575"
-        />
-        <path
-          className="entry-blank__mark-line entry-blank__mark-line--cursor"
-          pathLength={1}
-          d="M44.5871 59.9762L35.8379 36.9521C35.5548 36.207 36.2825 35.4765 37.0227 35.7628L60.0576 44.6746C61.0056 45.0413 60.7444 46.4564 59.7287 46.4564H46.3592V59.6471C46.3592 60.6699 44.9502 60.9315 44.5871 59.9762Z"
-        />
-      </g>
+      <path className="entry-blank__mark-line" d="M 1438.61 689.472 C 1445.77 693.501 1481.13 725.102 1489.31 732.22 C 1527.98 766.459 1567.08 800.201 1606.62 833.437 C 1593.64 852.083 1574.67 875.554 1560.49 893.614 L 1493.87 979.327 L 1349.77 1167.69 C 1302.41 1229.17 1252.96 1292.04 1207.11 1354.47 C 1206.87 1354.74 1205.58 1355.47 1205.21 1355.69 C 1189.19 1339.57 1160.75 1316.32 1142.75 1300.92 L 1041.7 1214.38 C 1046.27 1206.03 1054.57 1195.25 1060.29 1187.36 C 1070.91 1172.6 1081.73 1157.98 1092.72 1143.49 L 1169.19 1041.93 L 1438.61 689.472 z" />
+      <path className="entry-blank__mark-line" d="M 1127.65 693.457 C 1132.61 695.449 1173.68 732.312 1180.36 738.119 L 1295.95 838.444 C 1283.17 857.67 1265.58 879.343 1251.3 897.733 L 1183.65 985.126 L 983.27 1247.25 C 956.664 1282.39 926.202 1319.56 900.853 1355.15 L 899.003 1356.67 C 891.64 1353.96 753.332 1232.11 735.97 1216.23 C 747.094 1199.17 762.662 1179.09 774.906 1162.47 L 855.364 1054.34 C 945.08 933.258 1035.85 812.96 1127.65 693.457 z" />
+      <path className="entry-blank__mark-line" d="M 797.842 713.795 C 799.964 715.963 799.089 748.117 799.084 753.92 L 798.996 830.772 L 798.723 1092.35 C 749.881 1157.91 697.11 1222.5 648.664 1288.59 C 632.079 1311.22 612.77 1334.19 597.182 1357.23 C 570.124 1332.48 537.221 1306.01 508.998 1281.3 C 482.076 1258.89 454.4 1234.23 427.836 1211.24 L 797.842 713.795 z" />
+      <path className="entry-blank__mark-line" d="M 1615.65 841.765 C 1620.13 847.604 1610.95 1309.51 1611.38 1358.05 L 1385.1 1358 C 1382.78 1349.19 1384.38 1284.72 1384.49 1272.52 L 1385 1140.99 L 1615.65 841.765 z" />
+      <path className="entry-blank__mark-line" d="M 812.464 694.663 C 823.636 702.363 839.562 717.778 850.665 727.108 C 878.412 750.616 905.964 774.353 933.318 798.318 C 952.568 815.145 971.996 832.816 992.248 848.322 C 982.97 861.664 972.932 874.511 963.43 887.714 C 938.655 922.719 913.313 957.318 887.414 991.5 C 861.288 1026.57 835.437 1061.84 809.862 1097.32 C 811.18 1083.04 810.882 1064.99 810.919 1050.33 L 810.959 978.283 L 811.272 821 C 811.274 780.686 810.839 734.726 812.464 694.663 z" />
     </svg>
   );
 }

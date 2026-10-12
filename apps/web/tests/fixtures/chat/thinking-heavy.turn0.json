@@ -371,7 +371,7 @@
   {
    "kind": "tool_result",
    "toolUseId": "toolu_01TBfQqYd4wEJjfmKqZP8a7R",
-   "content": "{\"error\":{\"code\":\"UPSTREAM_UNAVAILABLE\",\"message\":\"desktop renderer unavailable: connect ENOENT /tmp/open-design/ipc/default/desktop.sock\",\"data\":{}}}",
+   "content": "{\"error\":{\"code\":\"UPSTREAM_UNAVAILABLE\",\"message\":\"desktop renderer unavailable: connect ENOENT /tmp/mish/ipc/default/desktop.sock\",\"data\":{}}}",
    "isError": false,
    "completedAt": 1787828875137
   },

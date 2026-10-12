@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, expect, it, vi } from 'vitest';
 import { register } from 'prom-client';
-import { parseResourceSearchResponse } from '@open-design/contracts';
+import { parseResourceSearchResponse } from '@mish/contracts';
 import { designSystemRevision, setDesignSystemApproval, syncPublishedDesignSystemApproval } from '../../src/design-systems/approval.js';
 import { createTeamResourceShareService, type TeamResourceRequestScope } from '../../src/collab/team-resource-share.js';
 import { materializeWorkspaceScopedTeamResource, teamResourceWorkspaceRoot } from '../../src/collab/team-resource-materialization.js';

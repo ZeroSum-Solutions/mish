@@ -5,7 +5,7 @@
 // A fresh/restarted daemon is not enough: the regression fixed by #6335 lived
 // in stale local materialization state and delayed positive hub reads.
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { afterEach, describe, expect, test } from 'vitest';
@@ -96,7 +96,7 @@ describe('workspace Team plugin retraction', () => {
       const pluginSource = join(ownerSuite.scratchDir, 'workspace-retraction-plugin-source');
       await mkdir(pluginSource, { recursive: true });
       await writeFile(
-        join(pluginSource, 'open-design.json'),
+        join(pluginSource, 'mish.json'),
         JSON.stringify({
           name: PLUGIN_ID,
           version: '1.0.0',
@@ -119,6 +119,19 @@ describe('workspace Team plugin retraction', () => {
         clients: [OWNER, MEMBER],
       });
       const velaBin = await hub.writeVelaBin(join(ownerSuite.scratchDir, 'fake-vela-plugin'));
+      const memberVelaBin = await hub.writeVelaBin(join(memberSuite.scratchDir, 'fake-vela-plugin'));
+      for (const [bin, key] of [[velaBin, OWNER.controlKey], [memberVelaBin, MEMBER.controlKey]] as const) {
+        const script = await readFile(bin, 'utf8');
+        expect(script).toContain('process.env.VELA_CONTROL_KEY');
+        const configured = script.replaceAll('process.env.VELA_CONTROL_KEY', JSON.stringify(key));
+        expect(configured).not.toContain('process.env.VELA_CONTROL_KEY');
+        await writeFile(bin, configured, 'utf8');
+      }
+      for (const [suite, identity] of [[ownerSuite, OWNER], [memberSuite, MEMBER]] as const) {
+        const home = join(suite.scratchDir, 'empty-amr-home');
+        await mkdir(home, { recursive: true });
+        await writeFile(join(home, 'config.json'), JSON.stringify({ profiles: { prod: { controlKey: identity.controlKey, apiUrl: hub.url } } }), 'utf8');
+      }
       const commonEnv = {
         OD_COLLAB_TRANSPORT: 'vela-cli',
         OD_RESOURCE_TRANSPORT: 'vela-cli',
@@ -205,7 +218,7 @@ describe('workspace Team plugin retraction', () => {
               env: {
                 ...commonEnv,
                 AMR_HOME: join(memberSuite.scratchDir, 'empty-amr-home'),
-                VELA_CONTROL_KEY: MEMBER.controlKey,
+                VELA_BIN: memberVelaBin,
               },
             },
           );
@@ -214,7 +227,6 @@ describe('workspace Team plugin retraction', () => {
           env: {
             ...commonEnv,
             AMR_HOME: join(ownerSuite.scratchDir, 'empty-amr-home'),
-            VELA_CONTROL_KEY: OWNER.controlKey,
           },
         },
       );

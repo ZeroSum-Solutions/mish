@@ -8,7 +8,7 @@
  * `sectionSelection.entryId` maps it back.
  */
 
-import cultSlugsJson from '@open-design/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
+import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
 
 const SLUGS = (cultSlugsJson as unknown as { items: Record<string, string> }).items;
 const PUBLIC_BY_INTERNAL = new Map(Object.entries(SLUGS).map(([id, slug]) => [id, `cult:${slug}`]));

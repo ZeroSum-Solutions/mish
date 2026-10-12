@@ -1,4 +1,4 @@
-import type { TrackingRunTerminalTrigger } from '@open-design/contracts/analytics';
+import type { TrackingRunTerminalTrigger } from '@mish/contracts/analytics';
 
 const TERMINAL_STATUSES = new Set(['succeeded', 'failed', 'canceled']);
 

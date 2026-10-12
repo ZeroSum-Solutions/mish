@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { constants } from 'node:fs';
 import { lstat, open, realpath } from 'node:fs/promises';
 import path from 'node:path';
-import { WORKBENCH_UNIT_LIMITS } from '@open-design/contracts';
+import { WORKBENCH_UNIT_LIMITS } from '@mish/contracts';
 
 export class UnitError extends Error {
   constructor(

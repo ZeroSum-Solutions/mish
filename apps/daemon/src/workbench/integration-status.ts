@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { integrationTestability, parseIntegrationRuntime, type IntegrationRoster, type IntegrationRosterEntry, type IntegrationRuntime } from '@open-design/contracts';
+import { integrationTestability, parseIntegrationRuntime, type IntegrationRoster, type IntegrationRosterEntry, type IntegrationRuntime } from '@mish/contracts';
 import { PRODUCT_AGENT_DEFS } from '../runtimes/registry.js';
 import { RUNTIME_INTEGRATION_ROWS } from './integration-roster-data.js';
 

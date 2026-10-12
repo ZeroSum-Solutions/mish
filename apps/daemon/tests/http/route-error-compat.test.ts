@@ -1,5 +1,5 @@
 import express from 'express';
-import { ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError } from '@open-design/agency-fast-lane/deepseek';
+import { ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError } from '@mish/agency-fast-lane/deepseek';
 import type { Server } from 'node:http';
 import os from 'node:os';
 import { renderKieImage } from '../../src/media/kie.js';

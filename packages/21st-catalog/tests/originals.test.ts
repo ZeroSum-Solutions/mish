@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { test } from 'node:test';
 import originals from '../generated/21st-originals.json' with {type:'json'};
 import upstream from '../generated/21st-items.json' with {type:'json'};
-import { parseTwenty1stSourceResponse } from '@open-design/contracts';
+import { parseTwenty1stSourceResponse } from '@mish/contracts';
 const sha = (value:string) => createHash('sha256').update(value).digest('hex');
 test('every saved reference has a distinct independently authored, executable source bundle', () => {
   assert.equal(originals.items.length, 22);

@@ -28,7 +28,7 @@ import { T } from '../../lib/timeouts.ts';
 test('records five widths, section crops and failed interaction/resource evidence without judging', async () => {
   expect(VIEWPORTS).toEqual([{ width: 320, height: 640 }, { width: 375, height: 812 }, { width: 390, height: 844 }, { width: 768, height: 1024 }, { width: 1440, height: 900 }]);
   const root = await mkdtemp(join(tmpdir(), 'quality-capture-'));
-  const font = await readFile(new URL('../../../plugins/_official/examples/agency-maren/families/maren/assets/archivo-latin.woff2', import.meta.url));
+  const font = await readFile(new URL('../../../apps/web/public/fonts/IBMPlexMono-400-latin.woff2', import.meta.url));
   const stub = await startStub({ files: { 'assets/local.woff2': font }, htmlSuffix: `<style>
     @font-face{font-family:Local;src:url(assets/local.woff2)} .local{font-family:Local}
     @font-face{font-family:Missing;src:url(missing.woff2)} h1{font-family:Missing,serif}

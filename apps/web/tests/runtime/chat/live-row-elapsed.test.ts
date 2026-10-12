@@ -29,7 +29,7 @@
  * 渲染面的断言在 `tests/components/chat/live-row-elapsed.test.tsx`。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent, ProjectMediaTask } from '@open-design/contracts';
+import type { PersistedAgentEvent, ProjectMediaTask } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { groupThinking, type ThoughtsGroup } from '../../../src/runtime/chat/group-thinking';
 import type {

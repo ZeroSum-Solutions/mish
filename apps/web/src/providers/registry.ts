@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 import { readApiErrorBody } from './api-error';
 export { createIntakeBatch, listIntakeBatches, getIntakeBatch, putIntakeFile, clearIntakeBatch, attachIntakeBatch, intakeFileDownloadUrl } from './intake';
 import type {
@@ -17,14 +17,14 @@ import type {
   AgencyFamilyEffectsResponse,
   AgencyOutputScope,
   DesignSystemWorkspaceResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   parseAgencyFamilyEffectsResponse,
   PUBLIC_FILE_MANUAL_REVOKE_REQUIRED,
   workspaceContextHasTeamIdentity,
   type PublicFileManualRevokeRequiredData,
   type PublicProjectFilePublication,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   parseSectionCatalogResponse,
   type SectionCatalogDirectionOption,
@@ -32,7 +32,7 @@ import {
   type SectionCatalogSectionKind,
   type SectionCatalogSpineCode,
   type SectionsListResponse,
-} from '@open-design/contracts/api/section-catalog';
+} from '@mish/contracts/api/section-catalog';
 import { boundedRequestErrorCode } from '../analytics/workspace';
 import { createConnectorCallbackNonce } from '../runtime/connector-callback-trust';
 import type {
@@ -49,7 +49,7 @@ import type {
   ImportGitHubDesignSystemResponse,
   ImportShadcnDesignSystemRequest,
   ImportShadcnDesignSystemResponse,
-  OpenDesignGithubLatestReleaseResponse,
+  MishGithubLatestReleaseResponse,
   ImportLocalDesignSystemRequest,
   ImportLocalDesignSystemResponse,
   ReplaceProjectWorkingDirResponse,
@@ -66,7 +66,7 @@ import type {
   SocialShareRequest,
   SocialShareResponse,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   AgentInfo,
   AppVersionInfo,
@@ -117,9 +117,9 @@ import type {
 import type { ArtifactManifest } from '../artifacts/types';
 import { GENERIC_DEPLOY_ENVELOPE_CODES } from '../analytics/deploy-error-code';
 import {
-  isOpenDesignHostAvailable,
+  isMishHostAvailable,
   openHostExternalUrl,
-} from '@open-design/host';
+} from '@mish/host';
 import {
   coalescedGet,
   evictCoalescedGet,
@@ -1415,7 +1415,7 @@ function popupBlockedMessage(): string {
 export async function openExternalUrl(url: string): Promise<boolean> {
   const bridgedUrl = await bridgeFirstPartyUrl(url);
   const targetUrl = bridgedUrl ?? url;
-  if (isOpenDesignHostAvailable()) {
+  if (isMishHostAvailable()) {
     const opened = await openHostExternalUrl(targetUrl);
     if (opened.ok) return true;
   }
@@ -1443,7 +1443,7 @@ export async function openExternalUrl(url: string): Promise<boolean> {
 async function bridgeFirstPartyUrl(url: string): Promise<string | null> {
   try {
     const target = new URL(url);
-    if (!['open-design.ai', 'www.open-design.ai', 'staging.open-design.ai'].includes(target.hostname)) return null;
+    if (!['mish.invalid', 'www.mish.invalid', 'staging.mish.invalid'].includes(target.hostname)) return null;
     const resp = await fetch('/api/attribution/bridge-url', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1468,7 +1468,7 @@ async function decodeConnectorError(resp: Response): Promise<string> {
 
 export async function connectConnector(connectorId: string): Promise<ConnectorActionResult> {
   let authWindow: Window | null = null;
-  const useExternalBrowser = isOpenDesignHostAvailable();
+  const useExternalBrowser = isMishHostAvailable();
   try {
     if (!useExternalBrowser) {
       authWindow = window.open('about:blank', '_blank');
@@ -1751,9 +1751,9 @@ export type LatestGithubReleaseInfo = {
 
 export async function fetchLatestGithubReleaseInfo(): Promise<LatestGithubReleaseInfo | null> {
   try {
-    const resp = await fetch('/api/github/open-design/releases/latest');
+    const resp = await fetch('/api/github/mish/releases/latest');
     if (!resp.ok) return null;
-    const json = (await resp.json()) as Partial<OpenDesignGithubLatestReleaseResponse>;
+    const json = (await resp.json()) as Partial<MishGithubLatestReleaseResponse>;
     if (typeof json.tag_name !== 'string' || typeof json.html_url !== 'string') return null;
     return {
       tagName: json.tag_name,
@@ -2222,8 +2222,8 @@ export async function fetchProjectFiles(
   }
 }
 
-export type ProjectDesignTokenSuggestion = import('@open-design/contracts').ProjectDesignTokenSuggestion;
-export type ProjectDesignTokenSuggestionProp = import('@open-design/contracts').ProjectDesignTokenSuggestionProp;
+export type ProjectDesignTokenSuggestion = import('@mish/contracts').ProjectDesignTokenSuggestion;
+export type ProjectDesignTokenSuggestionProp = import('@mish/contracts').ProjectDesignTokenSuggestionProp;
 
 export async function fetchProjectDesignTokenSuggestions(
   projectId: string,
@@ -2603,7 +2603,7 @@ const LEGACY_PREVIEW_SCOPE_REFRESH_MS = 45 * 60 * 1000;
 function previewCapabilityHref(pathname: string): string {
   const runtimeHref = typeof globalThis.location?.href === 'string'
     ? globalThis.location.href
-    : 'http://open-design.local/';
+    : 'http://mish.local/';
   return new URL(pathname, runtimeHref).href;
 }
 
@@ -2622,7 +2622,7 @@ export async function fetchProjectPreviewBaseHref(
     if (!response.ok) return null;
     const body = (await response.json()) as ProjectPreviewUrlResponse;
     if (typeof body.url !== 'string' || !body.url.startsWith('/')) return null;
-    const parsed = new URL(body.url, 'http://open-design.local');
+    const parsed = new URL(body.url, 'http://mish.local');
     const expectedPrefix = `/api/projects/${encodeURIComponent(projectId)}/preview/`;
     if (!parsed.pathname.startsWith(expectedPrefix)) return null;
     const directoryEnd = parsed.pathname.lastIndexOf('/') + 1;
@@ -2648,7 +2648,7 @@ export async function renewProjectPreviewBaseScope(
   href: string,
 ): Promise<number | null> {
   try {
-    const parsed = new URL(href, 'http://open-design.local');
+    const parsed = new URL(href, 'http://mish.local');
     const expectedPrefix = `/api/projects/${encodeURIComponent(projectId)}/preview/`;
     if (!parsed.pathname.startsWith(expectedPrefix)) return null;
     const scopeEnd = parsed.pathname.indexOf('/', expectedPrefix.length);
@@ -3481,14 +3481,14 @@ export async function replaceProjectWorkingDir(
 // editors on demand (PATH probe + macOS bundle scan), and the POST
 // endpoint spawns the chosen app with the project's resolvedDir.
 export async function fetchHostEditors(): Promise<
-  import('@open-design/contracts').HostEditorsResponse
+  import('@mish/contracts').HostEditorsResponse
 > {
   return coalescedGet(
     'host-editors',
     async () => {
       const resp = await fetch('/api/editors');
       if (!resp.ok) throw new Error(`GET /api/editors failed: ${resp.status}`);
-      return (await resp.json()) as import('@open-design/contracts').HostEditorsResponse;
+      return (await resp.json()) as import('@mish/contracts').HostEditorsResponse;
     },
     IN_FLIGHT_SHARE_ONLY_MS,
   );
@@ -3496,9 +3496,9 @@ export async function fetchHostEditors(): Promise<
 
 export async function openProjectInEditor(
   projectId: string,
-  editorId: import('@open-design/contracts').HostEditorId,
+  editorId: import('@mish/contracts').HostEditorId,
   workspaceContext?: WorkspaceCollabContext | null,
-): Promise<import('@open-design/contracts').OpenProjectInEditorResponse> {
+): Promise<import('@mish/contracts').OpenProjectInEditorResponse> {
   const resp = await fetch(
     `/api/projects/${encodeURIComponent(projectId)}/open-in`,
     {
@@ -3514,7 +3514,7 @@ export async function openProjectInEditor(
     const body = await readApiErrorBody(resp);
     throw new Error(body.message);
   }
-  return (await resp.json()) as import('@open-design/contracts').OpenProjectInEditorResponse;
+  return (await resp.json()) as import('@mish/contracts').OpenProjectInEditorResponse;
 }
 
 export async function fetchDesignSystemPreview(
@@ -3740,8 +3740,8 @@ import type {
   LibraryIngestResponse,
   LibraryPairingStartResponse,
   LibrarySyncResponse,
-} from '@open-design/contracts';
-import { LIBRARY_UPLOAD_MAX_BYTES, isLibraryUploadMimeAllowed } from '@open-design/contracts';
+} from '@mish/contracts';
+import { LIBRARY_UPLOAD_MAX_BYTES, isLibraryUploadMimeAllowed } from '@mish/contracts';
 
 /** Raw bytes URL for a library asset (image src / download href). */
 export function libraryAssetRawUrl(id: string): string {
@@ -4434,7 +4434,7 @@ export function agencyBuildEvents(
 /** Approve exactly the revision shown by the picker; a changed kit requires reinspection. */
 export async function setDesignSystemApproval(
   id: string,
-  input: import('@open-design/contracts').SetDesignSystemApprovalRequest,
+  input: import('@mish/contracts').SetDesignSystemApprovalRequest,
   workspaceContext?: WorkspaceCollabContext | null,
 ): Promise<DesignSystemSummary | null> {
   try {

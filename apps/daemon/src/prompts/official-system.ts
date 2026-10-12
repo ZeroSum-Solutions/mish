@@ -8,10 +8,10 @@
  *
  * Composer in `system.ts` stacks active design system + active skill on top.
  */
-import type { ExecutionProfile } from '@open-design/contracts';
+import type { ExecutionProfile } from '@mish/contracts';
 
-const EXECUTION_CONTEXT_PLACEHOLDER = '%%OPEN_DESIGN_EXECUTION_CONTEXT%%';
-const WORKFLOW_HANDOFF_PLACEHOLDER = '%%OPEN_DESIGN_WORKFLOW_HANDOFF%%';
+const EXECUTION_CONTEXT_PLACEHOLDER = '%%MISH_EXECUTION_CONTEXT%%';
+const WORKFLOW_HANDOFF_PLACEHOLDER = '%%MISH_WORKFLOW_HANDOFF%%';
 
 export const OFFICIAL_DESIGNER_PROMPT = `You are an expert designer working with the user as a manager. You produce design artifacts on behalf of the user using HTML.
 

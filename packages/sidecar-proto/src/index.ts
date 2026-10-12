@@ -1,4 +1,4 @@
-import { RELEASE_CHANNELS, type ReleaseChannel } from "@open-design/release";
+import { RELEASE_CHANNELS, type ReleaseChannel } from "@mish/release";
 
 export const APP_KEYS = Object.freeze({
   DAEMON: "daemon",
@@ -63,13 +63,13 @@ export const SIDECAR_STAMP_FIELDS = ["app", "mode", "namespace", "ipc", "source"
 
 export const SIDECAR_DEFAULTS = Object.freeze({
   host: "127.0.0.1",
-  ipcBase: "/tmp/open-design/ipc",
+  ipcBase: "/tmp/mish/ipc",
   namespace: "default",
   projectTmpDirName: ".tmp",
-  windowsPipePrefix: "open-design",
+  windowsPipePrefix: "mish",
 } as const);
 
-export const OPEN_DESIGN_PRODUCT_NAME = "Open Design";
+export const MISH_PRODUCT_NAME = "Mish";
 
 export function resolveWindowsReleaseNamespaceToken(value: string): string {
   return value.replace(/[^A-Za-z0-9._-]+/g, "-");
@@ -77,7 +77,7 @@ export function resolveWindowsReleaseNamespaceToken(value: string): string {
 
 export function resolveWindowsUninstallRegistryKey(namespace: string): string {
   const namespaceToken = resolveWindowsReleaseNamespaceToken(namespace);
-  return `Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${OPEN_DESIGN_PRODUCT_NAME}-${namespaceToken}`;
+  return `Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${MISH_PRODUCT_NAME}-${namespaceToken}`;
 }
 
 export const SIDECAR_MESSAGES = Object.freeze({
@@ -691,7 +691,7 @@ export type ShutdownResult = {
 
 /**
  * Legacy runtime-layout descriptor retained for the generic path/bootstrap
- * contract. This is not sidecar process identity: `@open-design/sidecar` owns
+ * contract. This is not sidecar process identity: `@mish/sidecar` owns
  * the authoritative five-field argv stamp, and IPC is private transport state.
  */
 export type LegacySidecarRuntimeLayout = {
@@ -705,7 +705,7 @@ export type LegacySidecarRuntimeLayout = {
 type LegacySidecarRuntimeLayoutInput = Partial<Record<(typeof SIDECAR_STAMP_FIELDS)[number], unknown>>;
 type LegacySidecarRuntimeLayoutCriteria = Partial<LegacySidecarRuntimeLayout>;
 
-export type OpenDesignSidecarContract = {
+export type MishSidecarContract = {
   appKeys: typeof APP_KEYS;
   defaults: typeof SIDECAR_DEFAULTS;
   env: typeof SIDECAR_RUNTIME_ENV;
@@ -1065,8 +1065,8 @@ function normalizeDesktopShowInput(input: unknown): DesktopShowInput {
   assertKnownKeys(value, ["deeplinkUrl"], "desktop show input");
   if (value.deeplinkUrl == null) return {};
   const deeplinkUrl = normalizeNonEmptyString(value.deeplinkUrl, "desktop show deeplinkUrl");
-  if (!deeplinkUrl.startsWith("opendesign://")) {
-    throw new Error("desktop show deeplinkUrl must use the opendesign scheme");
+  if (!deeplinkUrl.startsWith("mish://")) {
+    throw new Error("desktop show deeplinkUrl must use the mish scheme");
   }
   return { deeplinkUrl };
 }
@@ -1153,7 +1153,7 @@ export function normalizeDesktopSidecarMessage(input: unknown): DesktopSidecarMe
   }
 }
 
-export const OPEN_DESIGN_SIDECAR_CONTRACT = Object.freeze({
+export const MISH_SIDECAR_CONTRACT = Object.freeze({
   appKeys: APP_KEYS,
   defaults: SIDECAR_DEFAULTS,
   env: SIDECAR_RUNTIME_ENV,
@@ -1172,4 +1172,4 @@ export const OPEN_DESIGN_SIDECAR_CONTRACT = Object.freeze({
   updateChannels: DESKTOP_UPDATE_CHANNELS,
   updateModes: DESKTOP_UPDATE_MODES,
   updateStates: DESKTOP_UPDATE_STATES,
-} as const satisfies OpenDesignSidecarContract);
+} as const satisfies MishSidecarContract);

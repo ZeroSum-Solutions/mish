@@ -1,43 +1,43 @@
-import type { ReleaseChannel } from "@open-design/release";
+import type { ReleaseChannel } from "@mish/release";
 
 /**
  * @module protocol
  *
  * The Mishh Mashh renderer host-bridge wire contract: the injected-global name
  * and version, client/updater constant registries, and every request/result
- * type that crosses the host bridge — including the {@link OpenDesignHostBridge}
+ * type that crosses the host bridge — including the {@link MishHostBridge}
  * shape itself. Pure declarations only; depends on nothing else in the package.
  */
 
-export const OPEN_DESIGN_HOST_GLOBAL = "__od__";
-export const OPEN_DESIGN_HOST_VERSION = 2;
+export const MISH_HOST_GLOBAL = "__od__";
+export const MISH_HOST_VERSION = 2;
 
-export const OPEN_DESIGN_HOST_CLIENT_TYPES = Object.freeze({
+export const MISH_HOST_CLIENT_TYPES = Object.freeze({
   DESKTOP: "desktop",
 } as const);
 
-export type OpenDesignHostClientType =
-  (typeof OPEN_DESIGN_HOST_CLIENT_TYPES)[keyof typeof OPEN_DESIGN_HOST_CLIENT_TYPES];
+export type MishHostClientType =
+  (typeof MISH_HOST_CLIENT_TYPES)[keyof typeof MISH_HOST_CLIENT_TYPES];
 
-export type OpenDesignHostClient = {
+export type MishHostClient = {
   // BCP-47 locale string (e.g. "zh-CN", "pt-BR") the host process read from
   // the OS at startup. The renderer uses this so the packaged desktop app
   // can follow the OS language even when Chromium's built-in
   // `navigator.language` would have defaulted to en-US.
   osLocale?: string;
   platform?: string;
-  type: OpenDesignHostClientType;
+  type: MishHostClientType;
 };
 
-export type OpenDesignHostFailure = {
+export type MishHostFailure = {
   details?: unknown;
   ok: false;
   reason: string;
 };
 
-export type OpenDesignHostActionResult =
+export type MishHostActionResult =
   | { ok: true }
-  | OpenDesignHostFailure;
+  | MishHostFailure;
 
 /**
  * The workspace attribution the renderer gives the host so a folder import
@@ -57,7 +57,7 @@ export type OpenDesignHostActionResult =
  * it would reject the very `WorkspaceCollabContext` callers pass. Callers hand
  * over a variable, not a fresh literal, so the extra fields ride along fine.
  */
-export type OpenDesignHostWorkspaceContext = {
+export type MishHostWorkspaceContext = {
   lifecycleState: string;
   memberStatus: string;
   permissions: {
@@ -70,43 +70,43 @@ export type OpenDesignHostWorkspaceContext = {
   workspaceType: string;
 };
 
-export type OpenDesignHostProjectImportInit = {
+export type MishHostProjectImportInit = {
   designSystemId?: string | null;
   name?: string;
   skillId?: string | null;
-  workspaceContext?: OpenDesignHostWorkspaceContext | null;
+  workspaceContext?: MishHostWorkspaceContext | null;
 };
 
-export type OpenDesignHostProjectImportSuccess = {
+export type MishHostProjectImportSuccess = {
   conversationId: string;
   entryFile: string | null;
   ok: true;
   projectId: string;
 };
 
-export type OpenDesignHostProjectImportResult =
-  | OpenDesignHostProjectImportSuccess
+export type MishHostProjectImportResult =
+  | MishHostProjectImportSuccess
   | {
       canceled: true;
       ok: false;
     }
-  | OpenDesignHostFailure;
+  | MishHostFailure;
 
-export type OpenDesignHostProjectReplaceWorkingDirSuccess = {
+export type MishHostProjectReplaceWorkingDirSuccess = {
   baseDir: string;
   entryFile: string | null;
   ok: true;
 };
 
-export type OpenDesignHostProjectReplaceWorkingDirResult =
-  | OpenDesignHostProjectReplaceWorkingDirSuccess
+export type MishHostProjectReplaceWorkingDirResult =
+  | MishHostProjectReplaceWorkingDirSuccess
   | {
       canceled: true;
       ok: false;
     }
-  | OpenDesignHostFailure;
+  | MishHostFailure;
 
-export type OpenDesignHostPickWorkingDirSuccess = {
+export type MishHostPickWorkingDirSuccess = {
   baseDir: string;
   ok: true;
   // Single-use HMAC token (minted by the host main process for `baseDir`)
@@ -116,24 +116,24 @@ export type OpenDesignHostPickWorkingDirSuccess = {
   token: string;
 };
 
-export type OpenDesignHostPickWorkingDirResult =
-  | OpenDesignHostPickWorkingDirSuccess
+export type MishHostPickWorkingDirResult =
+  | MishHostPickWorkingDirSuccess
   | {
       canceled: true;
       ok: false;
     }
-  | OpenDesignHostFailure;
+  | MishHostFailure;
 
-export type OpenDesignHostPdfPrintOptions = {
+export type MishHostPdfPrintOptions = {
   deck?: boolean;
 };
 
-export type OpenDesignHostCaptureClip = { x: number; y: number; width: number; height: number };
-export type OpenDesignHostCaptureOptions = { clip?: OpenDesignHostCaptureClip };
-export type OpenDesignHostCaptureSuccess = { dataUrl: string; h: number; ok: true; w: number };
-export type OpenDesignHostCaptureResult = OpenDesignHostCaptureSuccess | OpenDesignHostFailure;
+export type MishHostCaptureClip = { x: number; y: number; width: number; height: number };
+export type MishHostCaptureOptions = { clip?: MishHostCaptureClip };
+export type MishHostCaptureSuccess = { dataUrl: string; h: number; ok: true; w: number };
+export type MishHostCaptureResult = MishHostCaptureSuccess | MishHostFailure;
 
-export type OpenDesignHostPreviewNavigationFailure = {
+export type MishHostPreviewNavigationFailure = {
   errorCode: number;
   eventId: number;
   frameName?: string;
@@ -141,11 +141,11 @@ export type OpenDesignHostPreviewNavigationFailure = {
   validatedUrl: string;
 };
 
-export type OpenDesignHostPreviewNavigationFailureListener = (
-  failure: OpenDesignHostPreviewNavigationFailure,
+export type MishHostPreviewNavigationFailureListener = (
+  failure: MishHostPreviewNavigationFailure,
 ) => void;
 
-export type OpenDesignHostBrowserClearDataOptions = {
+export type MishHostBrowserClearDataOptions = {
   cookies?: boolean;
   storage?: boolean;
 };
@@ -157,16 +157,16 @@ export type OpenDesignHostBrowserClearDataOptions = {
  * muddy gray when the OS is dark but the app theme is explicitly light);
  * `system` restores following the OS.
  */
-export const OPEN_DESIGN_HOST_APPEARANCE_THEMES = Object.freeze({
+export const MISH_HOST_APPEARANCE_THEMES = Object.freeze({
   DARK: "dark",
   LIGHT: "light",
   SYSTEM: "system",
 } as const);
 
-export type OpenDesignHostAppearanceTheme =
-  (typeof OPEN_DESIGN_HOST_APPEARANCE_THEMES)[keyof typeof OPEN_DESIGN_HOST_APPEARANCE_THEMES];
+export type MishHostAppearanceTheme =
+  (typeof MISH_HOST_APPEARANCE_THEMES)[keyof typeof MISH_HOST_APPEARANCE_THEMES];
 
-export const OPEN_DESIGN_HOST_UPDATER_ACTIONS = Object.freeze({
+export const MISH_HOST_UPDATER_ACTIONS = Object.freeze({
   CHECK: "check",
   CLEAR_CACHE: "clear-cache",
   DOWNLOAD: "download",
@@ -175,16 +175,16 @@ export const OPEN_DESIGN_HOST_UPDATER_ACTIONS = Object.freeze({
   STATUS: "status",
 } as const);
 
-export type OpenDesignHostUpdaterAction =
-  (typeof OPEN_DESIGN_HOST_UPDATER_ACTIONS)[keyof typeof OPEN_DESIGN_HOST_UPDATER_ACTIONS];
+export type MishHostUpdaterAction =
+  (typeof MISH_HOST_UPDATER_ACTIONS)[keyof typeof MISH_HOST_UPDATER_ACTIONS];
 
 /** @internal Updater actions that return a status snapshot (every action except `quit`). */
-export type OpenDesignHostUpdaterStatusAction = Exclude<
-  OpenDesignHostUpdaterAction,
-  typeof OPEN_DESIGN_HOST_UPDATER_ACTIONS.QUIT
+export type MishHostUpdaterStatusAction = Exclude<
+  MishHostUpdaterAction,
+  typeof MISH_HOST_UPDATER_ACTIONS.QUIT
 >;
 
-export const OPEN_DESIGN_HOST_UPDATER_STATES = Object.freeze({
+export const MISH_HOST_UPDATER_STATES = Object.freeze({
   AVAILABLE: "available",
   CHECKING: "checking",
   DOWNLOADED: "downloaded",
@@ -196,35 +196,35 @@ export const OPEN_DESIGN_HOST_UPDATER_STATES = Object.freeze({
   UNSUPPORTED: "unsupported",
 } as const);
 
-export type OpenDesignHostUpdaterState =
-  (typeof OPEN_DESIGN_HOST_UPDATER_STATES)[keyof typeof OPEN_DESIGN_HOST_UPDATER_STATES];
+export type MishHostUpdaterState =
+  (typeof MISH_HOST_UPDATER_STATES)[keyof typeof MISH_HOST_UPDATER_STATES];
 
-export type OpenDesignHostUpdaterMode = "js-incremental" | "package-launcher";
-export type OpenDesignHostUpdaterChannel = ReleaseChannel;
+export type MishHostUpdaterMode = "js-incremental" | "package-launcher";
+export type MishHostUpdaterChannel = ReleaseChannel;
 
-export type OpenDesignHostUpdaterActionOptions = {
+export type MishHostUpdaterActionOptions = {
   payload?: Record<string, unknown>;
 };
 
-export type OpenDesignHostUpdaterCapabilitySet = {
+export type MishHostUpdaterCapabilitySet = {
   canApplyInPlace: boolean;
   canDownload: boolean;
   canOpenInstaller: boolean;
   requiresManualInstall: boolean;
 };
 
-export type OpenDesignHostUpdaterPathSnapshot = {
+export type MishHostUpdaterPathSnapshot = {
   downloadRoot?: string;
   manifestPath?: string;
 };
 
-export type OpenDesignHostUpdaterChecksumSnapshot = {
+export type MishHostUpdaterChecksumSnapshot = {
   algorithm: "sha256" | "sha512";
   url?: string;
   value?: string;
 };
 
-export type OpenDesignHostUpdaterArtifactSnapshot = {
+export type MishHostUpdaterArtifactSnapshot = {
   name?: string;
   platformKey?: string;
   size?: number;
@@ -232,18 +232,18 @@ export type OpenDesignHostUpdaterArtifactSnapshot = {
   url: string;
 };
 
-export type OpenDesignHostUpdaterProgressSnapshot = {
+export type MishHostUpdaterProgressSnapshot = {
   receivedBytes: number;
   totalBytes?: number;
 };
 
-export type OpenDesignHostUpdaterErrorSnapshot = {
+export type MishHostUpdaterErrorSnapshot = {
   code: string;
   details?: unknown;
   message: string;
 };
 
-export type OpenDesignHostUpdaterInstallResult = {
+export type MishHostUpdaterInstallResult = {
   activeVersion?: string;
   artifactPath?: string;
   dryRun?: boolean;
@@ -254,11 +254,11 @@ export type OpenDesignHostUpdaterInstallResult = {
   path: string;
 };
 
-export type OpenDesignHostUpdaterReleaseSnapshot = {
+export type MishHostUpdaterReleaseSnapshot = {
   arch: string;
-  artifact: OpenDesignHostUpdaterArtifactSnapshot;
-  checksum: OpenDesignHostUpdaterChecksumSnapshot;
-  channel: OpenDesignHostUpdaterChannel;
+  artifact: MishHostUpdaterArtifactSnapshot;
+  checksum: MishHostUpdaterChecksumSnapshot;
+  channel: MishHostUpdaterChannel;
   downloadedAt: string;
   key: string;
   metadata?: Record<string, unknown>;
@@ -267,29 +267,29 @@ export type OpenDesignHostUpdaterReleaseSnapshot = {
   version: string;
 };
 
-export type OpenDesignHostUpdaterIncomingSnapshot = {
+export type MishHostUpdaterIncomingSnapshot = {
   arch: string;
-  artifact: OpenDesignHostUpdaterArtifactSnapshot;
-  channel: OpenDesignHostUpdaterChannel;
+  artifact: MishHostUpdaterArtifactSnapshot;
+  channel: MishHostUpdaterChannel;
   key?: string;
   metadata?: Record<string, unknown>;
-  progress?: OpenDesignHostUpdaterProgressSnapshot;
+  progress?: MishHostUpdaterProgressSnapshot;
   startedAt: string;
   version: string;
 };
 
-export type OpenDesignHostUpdaterCacheLifecycleTrigger = "cold-start" | "manual" | "next-version-ready";
+export type MishHostUpdaterCacheLifecycleTrigger = "cold-start" | "manual" | "next-version-ready";
 
-export type OpenDesignHostUpdaterReleaseLifecycleState =
+export type MishHostUpdaterReleaseLifecycleState =
   | "cleanup-deferred"
   | "cleanup-removed"
   | "deprecated"
   | "retained"
   | "unknown";
 
-export type OpenDesignHostUpdaterCacheLifecycleSummary = {
+export type MishHostUpdaterCacheLifecycleSummary = {
   lastRunAt?: string;
-  lastTrigger?: OpenDesignHostUpdaterCacheLifecycleTrigger;
+  lastTrigger?: MishHostUpdaterCacheLifecycleTrigger;
   platform: string;
   releases: {
     cleanupDeferred: number;
@@ -302,11 +302,11 @@ export type OpenDesignHostUpdaterCacheLifecycleSummary = {
   };
 };
 
-export type OpenDesignHostUpdaterCacheSnapshot = {
-  lifecycle?: OpenDesignHostUpdaterCacheLifecycleSummary;
+export type MishHostUpdaterCacheSnapshot = {
+  lifecycle?: MishHostUpdaterCacheLifecycleSummary;
 };
 
-export type OpenDesignHostUpdaterReinstallReason =
+export type MishHostUpdaterReinstallReason =
   | "launcher-schema"
   | "outer-below-min"
   | "outer-version-unreadable";
@@ -317,47 +317,47 @@ export type OpenDesignHostUpdaterReinstallReason =
  * outer package version; `url` is an optional operator-supplied explanation
  * link.
  */
-export type OpenDesignHostUpdaterReinstallSnapshot = {
+export type MishHostUpdaterReinstallSnapshot = {
   installedVersion?: string;
   minVersion?: string;
-  reason: OpenDesignHostUpdaterReinstallReason;
+  reason: MishHostUpdaterReinstallReason;
   url?: string;
 };
 
-export type OpenDesignHostUpdaterStatusSnapshot = {
-  active?: OpenDesignHostUpdaterReleaseSnapshot;
+export type MishHostUpdaterStatusSnapshot = {
+  active?: MishHostUpdaterReleaseSnapshot;
   arch: string;
-  artifact?: OpenDesignHostUpdaterArtifactSnapshot;
+  artifact?: MishHostUpdaterArtifactSnapshot;
   artifactUrl?: string;
   availableVersion?: string;
-  cache?: OpenDesignHostUpdaterCacheSnapshot;
-  capabilities: OpenDesignHostUpdaterCapabilitySet;
-  channel: OpenDesignHostUpdaterChannel;
-  checksum?: OpenDesignHostUpdaterChecksumSnapshot;
+  cache?: MishHostUpdaterCacheSnapshot;
+  capabilities: MishHostUpdaterCapabilitySet;
+  channel: MishHostUpdaterChannel;
+  checksum?: MishHostUpdaterChecksumSnapshot;
   currentVersion: string;
   downloadPath?: string;
   enabled: boolean;
-  error?: OpenDesignHostUpdaterErrorSnapshot;
-  incoming?: OpenDesignHostUpdaterIncomingSnapshot;
-  installResult?: OpenDesignHostUpdaterInstallResult;
+  error?: MishHostUpdaterErrorSnapshot;
+  incoming?: MishHostUpdaterIncomingSnapshot;
+  installResult?: MishHostUpdaterInstallResult;
   lastCheckedAt?: string;
   metadata?: Record<string, unknown>;
-  mode: OpenDesignHostUpdaterMode;
-  paths?: OpenDesignHostUpdaterPathSnapshot;
+  mode: MishHostUpdaterMode;
+  paths?: MishHostUpdaterPathSnapshot;
   platform: string;
-  progress?: OpenDesignHostUpdaterProgressSnapshot;
-  reinstall?: OpenDesignHostUpdaterReinstallSnapshot;
-  state: OpenDesignHostUpdaterState;
+  progress?: MishHostUpdaterProgressSnapshot;
+  reinstall?: MishHostUpdaterReinstallSnapshot;
+  state: MishHostUpdaterState;
   supported: boolean;
 };
 
-export type OpenDesignHostUpdaterResult =
-  | { ok: true; status: OpenDesignHostUpdaterStatusSnapshot }
-  | OpenDesignHostFailure;
+export type MishHostUpdaterResult =
+  | { ok: true; status: MishHostUpdaterStatusSnapshot }
+  | MishHostFailure;
 
-export type OpenDesignHostUpdaterStatusListener = (status: OpenDesignHostUpdaterStatusSnapshot) => void;
+export type MishHostUpdaterStatusListener = (status: MishHostUpdaterStatusSnapshot) => void;
 
-export type OpenDesignHostUpdaterMenuLabels = {
+export type MishHostUpdaterMenuLabels = {
   check: string;
   checking: string;
   downloading: string;
@@ -366,46 +366,46 @@ export type OpenDesignHostUpdaterMenuLabels = {
   restart: string;
 };
 
-export type OpenDesignHostUpdaterOpenDialogRequest = {
+export type MishHostUpdaterOpenDialogRequest = {
   source: string;
 };
 
-export type OpenDesignHostUpdaterOpenDialogListener = (request: OpenDesignHostUpdaterOpenDialogRequest) => void;
+export type MishHostUpdaterOpenDialogListener = (request: MishHostUpdaterOpenDialogRequest) => void;
 
 /**
  * Native folder-drop listing (AC-R01.1). Tree-relative paths only: absolute
  * native paths never cross into the page. `refused` reports every entry that
  * will not be uploaded; `relativePath: ""` denotes the dropped root itself.
  */
-export type OpenDesignHostDroppedDirectoryRefusal =
+export type MishHostDroppedDirectoryRefusal =
   | "symlink-outside-tree"
   | "symlink-directory"
   | "bundle"
   | "permission"
   | "unsupported";
 
-export type OpenDesignHostDroppedDirectoryListing = {
+export type MishHostDroppedDirectoryListing = {
   rootName: string;
   files: Array<{ relativePath: string; size: number }>;
-  refused: Array<{ relativePath: string; reason: OpenDesignHostDroppedDirectoryRefusal }>;
+  refused: Array<{ relativePath: string; reason: MishHostDroppedDirectoryRefusal }>;
   truncated: boolean;
 };
 
-export type OpenDesignHostBridge = {
+export type MishHostBridge = {
   // Optional so older host builds still satisfy the bridge shape; callers
   // must feature-detect before invoking.
   appearance?: {
-    setTheme(theme: OpenDesignHostAppearanceTheme): void;
+    setTheme(theme: MishHostAppearanceTheme): void;
   };
   browser: {
-    clearData(options?: OpenDesignHostBrowserClearDataOptions): Promise<OpenDesignHostActionResult>;
+    clearData(options?: MishHostBrowserClearDataOptions): Promise<MishHostActionResult>;
   };
   capture: {
-    page(options?: OpenDesignHostCaptureOptions): Promise<OpenDesignHostCaptureResult>;
+    page(options?: MishHostCaptureOptions): Promise<MishHostCaptureResult>;
   };
-  client: OpenDesignHostClient;
+  client: MishHostClient;
   pdf: {
-    print(html: string, nonce?: string, options?: OpenDesignHostPdfPrintOptions): Promise<OpenDesignHostActionResult>;
+    print(html: string, nonce?: string, options?: MishHostPdfPrintOptions): Promise<MishHostActionResult>;
   };
   pet: {
     setVisible(visible: boolean): void;
@@ -415,40 +415,40 @@ export type OpenDesignHostBridge = {
   // `File` from a drop gesture (typed `unknown` because this package has no
   // DOM lib) and resolves `null` when the File has no native path.
   intake?: {
-    listDroppedDirectory(file: unknown): Promise<OpenDesignHostDroppedDirectoryListing | null>;
+    listDroppedDirectory(file: unknown): Promise<MishHostDroppedDirectoryListing | null>;
   };
   // Optional so web builds and older desktop hosts keep the same contract.
   // Electron is the only layer that can observe a compositor-affecting
   // subframe navigation failure after the iframe DOM remains healthy.
   preview?: {
-    getLatestNavigationFailure(): OpenDesignHostPreviewNavigationFailure | null;
-    subscribeNavigationFailure(listener: OpenDesignHostPreviewNavigationFailureListener): () => void;
+    getLatestNavigationFailure(): MishHostPreviewNavigationFailure | null;
+    subscribeNavigationFailure(listener: MishHostPreviewNavigationFailureListener): () => void;
   };
   project: {
-    pickAndImport(init?: OpenDesignHostProjectImportInit): Promise<OpenDesignHostProjectImportResult>;
-    pickAndReplaceWorkingDir(projectId: string): Promise<OpenDesignHostProjectReplaceWorkingDirResult>;
+    pickAndImport(init?: MishHostProjectImportInit): Promise<MishHostProjectImportResult>;
+    pickAndReplaceWorkingDir(projectId: string): Promise<MishHostProjectReplaceWorkingDirResult>;
     // Optional so older host builds still satisfy the bridge shape; callers
     // must feature-detect before invoking.
-    pickWorkingDir?(): Promise<OpenDesignHostPickWorkingDirResult>;
+    pickWorkingDir?(): Promise<MishHostPickWorkingDirResult>;
   };
   shell: {
-    openExternal(url: string): Promise<OpenDesignHostActionResult>;
-    openPath(projectId: string): Promise<OpenDesignHostActionResult>;
+    openExternal(url: string): Promise<MishHostActionResult>;
+    openPath(projectId: string): Promise<MishHostActionResult>;
   };
   updater: {
-    check(options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot>;
-    "clear-cache"(options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot>;
-    download(options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot>;
-    install(options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot>;
-    quit(options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostActionResult>;
-    setMenuLabels(labels: OpenDesignHostUpdaterMenuLabels): Promise<OpenDesignHostActionResult>;
-    status(options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot>;
-    subscribe(listener: OpenDesignHostUpdaterStatusListener): () => void;
-    subscribeOpenDialog(listener: OpenDesignHostUpdaterOpenDialogListener): () => void;
+    check(options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot>;
+    "clear-cache"(options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot>;
+    download(options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot>;
+    install(options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot>;
+    quit(options?: MishHostUpdaterActionOptions): Promise<MishHostActionResult>;
+    setMenuLabels(labels: MishHostUpdaterMenuLabels): Promise<MishHostActionResult>;
+    status(options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot>;
+    subscribe(listener: MishHostUpdaterStatusListener): () => void;
+    subscribeOpenDialog(listener: MishHostUpdaterOpenDialogListener): () => void;
   };
-  version: typeof OPEN_DESIGN_HOST_VERSION;
+  version: typeof MISH_HOST_VERSION;
 };
 
-export type OpenDesignHostGlobalScope = Record<string, unknown> & {
+export type MishHostGlobalScope = Record<string, unknown> & {
   window?: unknown;
 };

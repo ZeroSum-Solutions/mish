@@ -20,15 +20,15 @@ describe('stripInternalControlMarkers', () => {
   it('removes OD Next machine protocol blocks', () => {
     const text = [
       'Here is the plan.',
-      '<open-design-plan-contract>{"schema":"open-design.plan-contract/v2"}</open-design-plan-contract>',
-      '<open-design-runtime-state>{"schema":"open-design.strategy-state/v2"}</open-design-runtime-state>',
+      '<mish-plan-contract>{"schema":"mish.plan-contract/v2"}</mish-plan-contract>',
+      '<mish-runtime-state>{"schema":"mish.strategy-state/v2"}</mish-runtime-state>',
       'Done.',
     ].join('\n');
 
     const out = stripInternalControlMarkers(text);
 
-    expect(out).not.toContain('open-design-plan-contract');
-    expect(out).not.toContain('open-design-runtime-state');
+    expect(out).not.toContain('mish-plan-contract');
+    expect(out).not.toContain('mish-runtime-state');
     expect(out).not.toContain('plan-contract/v2');
     expect(out).toContain('Here is the plan.');
     expect(out).toContain('Done.');

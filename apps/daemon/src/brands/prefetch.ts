@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { harvestFonts, type FontFile } from "./fonts.js";
 import { fetchExternalBrandAsset } from "./safe-fetch.js";
-import { findRealElementRange, findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealElementRange, findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 /**
  * Deterministic brand-material prefetch. Given a site URL, fetch the HTML +
@@ -12,7 +12,7 @@ import { findRealElementRange, findRealTagOffset, HTML_TAG_PATTERNS } from '@ope
  * voice analysis. The output is a compact `material.md` digest that gets
  * inlined into a SINGLE agent prompt — the agent never needs WebFetch/Bash
  * in the happy path. This is what makes extraction take ~30s instead of the
- * 2–3 min multi-turn agent-driven flow in open-design.
+ * 2–3 min multi-turn agent-driven flow in mish.
  *
  * No headless browser, no cheerio — regex over HTML at this fidelity is
  * fine; the LLM downstream is tolerant of harvest noise.

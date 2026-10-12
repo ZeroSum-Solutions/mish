@@ -1,8 +1,8 @@
 // The packaged daemon reads the Website Shape Atlas, the family registry and the design taxonomy
-// through `@open-design/agency-fast-lane/data` rather than the package's own file loaders.
+// through `@mish/agency-fast-lane/data` rather than the package's own file loaders.
 //
 // The reason is this file. The mac and Windows daemon prebundles inline every workspace package
-// except `@open-design/sidecar`, and the fast lane's loaders build their default paths from
+// except `@mish/sidecar`, and the fast lane's loaders build their default paths from
 // `import.meta.dirname`. Inlined, that directory is the prebundle's, not the package's, so the
 // `atlas/` and `taxonomy/` JSON directories are simply not there and the loaders throw at daemon
 // startup — in a packaged build only, while dev and the Linux lane stay green.
@@ -40,9 +40,9 @@ const BUNDLED_PLUGINS_ROOT = join(workspaceRoot, "plugins", "_official");
  * package anywhere beneath it, then runs it. Returns stdout, or the failure the bundle produced.
  */
 async function bundleAndRun(source: string): Promise<{ ok: boolean; output: string }> {
-  temporaryRoot = await mkdtemp(join(tmpdir(), "open-design-fast-lane-data-"));
+  temporaryRoot = await mkdtemp(join(tmpdir(), "mish-fast-lane-data-"));
   const outfile = join(temporaryRoot, "bundle.mjs");
-  // `resolveDir` is apps/daemon, so `@open-design/agency-fast-lane` resolves through the same
+  // `resolveDir` is apps/daemon, so `@mish/agency-fast-lane` resolves through the same
   // workspace link the real daemon prebundle uses. Only the OUTPUT lands elsewhere, which is the
   // whole point: a bundle does not carry its inputs' directories with it.
   await build({
@@ -72,7 +72,7 @@ async function bundleAndRun(source: string): Promise<{ ok: boolean; output: stri
 describe("fast-lane design data inside a daemon prebundle", () => {
   it("resolves through the data module when the package's JSON is nowhere near the bundle", async () => {
     const result = await bundleAndRun(`
-      import { designTaxonomy, familyRegistry, shapeAtlas } from "@open-design/agency-fast-lane/data";
+      import { designTaxonomy, familyRegistry, shapeAtlas } from "@mish/agency-fast-lane/data";
       process.stdout.write(JSON.stringify({
         version: designTaxonomy.version,
         spines: shapeAtlas.spines.length,
@@ -100,8 +100,8 @@ describe("fast-lane design data inside a daemon prebundle", () => {
     // them: given the data module's objects, the whole path has to survive the bundle that the
     // loaders below do not. The router is faked, so this asserts the bundling, not the network.
     const result = await bundleAndRun(`
-      import { routeBuild } from "@open-design/agency-fast-lane/build";
-      import { familyRegistry, shapeAtlas } from "@open-design/agency-fast-lane/data";
+      import { routeBuild } from "@mish/agency-fast-lane/build";
+      import { familyRegistry, shapeAtlas } from "@mish/agency-fast-lane/data";
       const decision = await routeBuild(
         { brief: "A family dental practice in Boise.", atlas: shapeAtlas, registry: familyRegistry, jevKey: async () => "fake-key" },
         { createJevRouter: () => ({ route: async (input) => ({ decision: "unrouted", reason: "faked", spine: { code: "none", name: "none", confidence: 0, probabilities: {} }, spines: [], candidates: [], warnings: [], ms: 1, calls: 1, model: "fake", atlasSpines: input.atlas.spines.length, registryFamilies: input.registry.families.length }) }) },
@@ -124,30 +124,30 @@ describe("fast-lane design data inside a daemon prebundle", () => {
     // again through the daemon's `BUNDLED_PLUGINS_DIR`.
     //
     // So the workspace tree is not what is loaded here. `plugins/_official/examples/agency-
-    // wrenfield` is COPIED into a fresh root first — the copy `copyBundledResourceTrees` makes —
+    // practice` is COPIED into a fresh root first — the copy `copyBundledResourceTrees` makes —
     // and the bundle loads it from there, joining the path exactly as the daemon's
     // `familyPackageDir` does. Reading the live workspace path instead would prove only that the
     // repo is on this disk, which a packaged machine's is not.
-    const resourceRoot = await mkdtemp(join(tmpdir(), "open-design-family-resources-"));
+    const resourceRoot = await mkdtemp(join(tmpdir(), "mish-family-resources-"));
     try {
       await cp(
-        join(BUNDLED_PLUGINS_ROOT, "examples", "agency-wrenfield"),
-        join(resourceRoot, "plugins", "_official", "examples", "agency-wrenfield"),
+        join(BUNDLED_PLUGINS_ROOT, "examples", "agency-practice"),
+        join(resourceRoot, "plugins", "_official", "examples", "agency-practice"),
         { recursive: true },
       );
       const bundledPluginsDir = join(resourceRoot, "plugins", "_official");
       const result = await bundleAndRun(`
         import { join } from "node:path";
-        import { loadFamilyPackage } from "@open-design/agency-fast-lane/family";
+        import { loadFamilyPackage } from "@mish/agency-fast-lane/family";
         // familyPackageDir(bundledPluginsRoot, family), inlined: the daemon's own composition is
         // asserted against this same layout in apps/daemon/tests/agency-build-routes.test.ts.
-        const dir = join(${JSON.stringify(bundledPluginsDir)}, "examples", "agency-wrenfield");
-        const pkg = await loadFamilyPackage(dir, "wrenfield");
+        const dir = join(${JSON.stringify(bundledPluginsDir)}, "examples", "agency-practice");
+        const pkg = await loadFamilyPackage(dir, "practice");
         process.stdout.write(JSON.stringify({ family: pkg.family, render: typeof pkg.render, fromWorkspace: dir.startsWith(${JSON.stringify(BUNDLED_PLUGINS_ROOT)}) }));
       `);
 
       expect(result.ok, result.output).toBe(true);
-      expect(JSON.parse(result.output)).toEqual({ family: "wrenfield", render: "function", fromWorkspace: false });
+      expect(JSON.parse(result.output)).toEqual({ family: "practice", render: "function", fromWorkspace: false });
     } finally {
       await rm(resourceRoot, { force: true, recursive: true });
     }
@@ -158,8 +158,8 @@ describe("fast-lane design data inside a daemon prebundle", () => {
     // points at the bundle's own directory — the same failure the loaders below have. A daemon
     // wired to it answers 202 and then fails the build at `prepare` time, in packaged builds only.
     const result = await bundleAndRun(`
-      import { defaultPackageDir, loadFamilyPackage } from "@open-design/agency-fast-lane/family";
-      await loadFamilyPackage(defaultPackageDir("wrenfield"), "wrenfield");
+      import { defaultPackageDir, loadFamilyPackage } from "@mish/agency-fast-lane/family";
+      await loadFamilyPackage(defaultPackageDir("practice"), "practice");
       process.stdout.write("loaded");
     `);
 
@@ -167,13 +167,13 @@ describe("fast-lane design data inside a daemon prebundle", () => {
     // It looked for the package three directories above the BUNDLE, not above the package: the
     // path it names is somewhere under the temp root, and never the workspace tree that holds the
     // real family. Which file it misses first (the compiler here) is incidental.
-    expect(result.output).toContain("agency-wrenfield");
+    expect(result.output).toContain("agency-practice");
     expect(result.output).not.toContain(BUNDLED_PLUGINS_ROOT);
   }, 60_000);
 
   it("would fail through the file loaders, which is why the daemon does not use them", async () => {
     const result = await bundleAndRun(`
-      import { loadDesignTaxonomy } from "@open-design/agency-fast-lane/taxonomy";
+      import { loadDesignTaxonomy } from "@mish/agency-fast-lane/taxonomy";
       const taxonomy = await loadDesignTaxonomy();
       process.stdout.write(taxonomy.version);
     `);

@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { installDesignSystem, uninstallDesignSystem, uninstallSkill, syncCommunityPets } from '../../src/providers/registry';
 import { finalizeBrandProject, extractBrandFromHtml, continueBrandExtraction, cancelBrandExtraction } from '../../src/runtime/brands';
-import { publishGeneratedPluginToGitHub, contributeGeneratedPluginToOpenDesign } from '../../src/state/projects';
+import { publishGeneratedPluginToGitHub, contributeGeneratedPluginToMish } from '../../src/state/projects';
 import { startMcpOAuth } from '../../src/state/mcp';
 import { startVelaLogin } from '../../src/providers/daemon';
 import { fetchElevenLabsVoiceOptions } from '../../src/providers/elevenlabs-voices';
@@ -28,7 +28,7 @@ describe('daemon contract error consumers', () => {
   });
   it.each([400, 404, 500])('plugin share actions preserve typed %s reasons and codes', async (status) => {
     fail('PLUGIN_FOLDER_NOT_FOUND', status);
-    for (const operation of [publishGeneratedPluginToGitHub, contributeGeneratedPluginToOpenDesign]) {
+    for (const operation of [publishGeneratedPluginToGitHub, contributeGeneratedPluginToMish]) {
       expect(await operation('project', 'plugin')).toMatchObject({ ok: false, code: 'PLUGIN_FOLDER_NOT_FOUND', message: 'safe failure reason' });
     }
   });

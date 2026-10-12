@@ -5,8 +5,8 @@ import {
   useState,
   type CSSProperties,
 } from 'react';
-import { Button } from '@open-design/components';
-import type { SkillDetail, SkillSummary } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import type { SkillDetail, SkillSummary } from '@mish/contracts';
 import { renderMarkdownToSafeHtml } from '../artifacts/markdown';
 import { useI18n } from '../i18n';
 import {

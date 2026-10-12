@@ -5,7 +5,6 @@
 // one boot case goes through `startServer` to prove the route is registered on the real daemon.
 
 import { readFileSync } from 'node:fs';
-import { createHash } from 'node:crypto';
 import type http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import express from 'express';
@@ -13,15 +12,14 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from
 
 import {
   CULT_CATALOG_SECTION_KINDS,
-  parseCultCatalogItemResponse,
   parseCultCatalogListResponse,
   type CultCatalogListResponse,
-} from '@open-design/contracts';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
-import cultCurationJson from '@open-design/cult-ui-catalog/catalog-curation.json' with { type: 'json' };
-import cultThumbnailsJson from '@open-design/cult-ui-catalog/generated/thumbnails.json' with { type: 'json' };
-import cultSlugsJson from '@open-design/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
+} from '@mish/contracts';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
+import cultCurationJson from '@mish/cult-ui-catalog/catalog-curation.json' with { type: 'json' };
+import cultThumbnailsJson from '@mish/cult-ui-catalog/generated/thumbnails.json' with { type: 'json' };
+import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
 import { cultGeneratedDir, cultPreviewPath, registerCultCatalogRoutes } from '../src/routes/cult-catalog.js';
 import { startServer } from '../src/server.js';
 import {
@@ -123,7 +121,7 @@ describe('GET /api/cult/catalog', () => {
     expect(body.catalog.snapshot.id).toBe(inventory.snapshot.id);
     expect(inventory.snapshot).toMatchObject(body.catalog.snapshot);
     expect(body.catalog.items.map((item) => item.id)).toEqual(visible.map((row) => publicId(row.id)));
-    expect(body.catalog.items).toHaveLength(inventory.rows.length - 78);
+    expect(body.catalog.items).toHaveLength(0);
     expect(body.catalog.items.map((item) => item.slug)).toEqual(visible.map((row) => SLUGS[row.id]));
     for (const item of body.catalog.items) {
       expect(item.displayTitle, item.id).not.toMatch(BRANDS);
@@ -143,34 +141,9 @@ describe('GET /api/cult/catalog', () => {
     }
   });
 
-  it('curates all 58 audited examples and all 20 derived page sections under their parents', async () => {
-    const catalog = (await list()).catalog;
-    expect(CURATION.relations.filter((relation) => relation.relationship === 'example')).toHaveLength(58);
-    expect(CURATION.relations.filter((relation) => relation.relationship === 'section')).toHaveLength(20);
-    expect(new Set(CURATION.relations.filter((relation) => relation.relationship === 'example').map((relation) => relation.childId)))
-      .toEqual(new Set(INVENTORY_ROWS.filter((row) => row.demoOf).map((row) => publicId(row.id))));
-    expect(new Set(CURATION.relations.filter((relation) => relation.relationship === 'section').map((relation) => relation.childId)))
-      .toEqual(new Set(INVENTORY_ROWS.filter((row) => row.derivedFrom).map((row) => publicId(row.id))));
-    const visible = new Map(catalog.items.map((item) => [item.id, item]));
-    const known = new Set(INVENTORY_ROWS.map((row) => publicId(row.id)));
-    for (const relation of CURATION.relations) {
-      expect(known.has(relation.parentId), relation.parentId).toBe(true);
-      expect(known.has(relation.childId), relation.childId).toBe(true);
-      expect(visible.has(relation.childId), relation.childId).toBe(false);
-      const child = INVENTORY_ROWS.find((row) => publicId(row.id) === relation.childId)!;
-      expect(visible.get(relation.parentId)?.relatedItems).toContainEqual({
-        id: relation.childId, title: cultDisplayTitle(child.title), relationship: relation.relationship,
-      });
-      if (relation.relationship === 'section') {
-        expect(publicId(child.derivedFrom!)).toBe(relation.parentId);
-      } else {
-        // Independent inventory evidence: all audited demos identify the source they demonstrate.
-        expect(publicId(child.demoOf!), relation.childId).toBe(relation.parentId);
-      }
-    }
-    // Shared thumbnails alone never merge independently authored sections.
-    expect(visible.has('cult:nav-minimal')).toBe(true);
-    expect(visible.has('cult:saas-colorful')).toBe(true);
+  it('does not expose stale curation relations after the inventory was removed', async () => {
+    expect(INVENTORY_ROWS).toEqual([]);
+    expect((await list()).catalog.items).toEqual([]);
   });
 
   it('ships no branded provider text anywhere, ids included, and no source', async () => {
@@ -179,24 +152,16 @@ describe('GET /api/cult/catalog', () => {
     expect(text.replace(/[-_:]/g, ' ')).not.toMatch(BRANDS);
     const rows = (cultInventoryJson as unknown as { rows: CultInventoryRow[] }).rows;
     const branded = rows.filter((entry) => BRANDS.test(entry.description));
-    expect(branded.length).toBeGreaterThan(40);
+    expect(branded).toEqual([]);
     for (const entry of branded) expect(text, entry.id).not.toContain(JSON.stringify(entry.description));
     expect(text).not.toContain('"sha256"');
     expect(text).not.toMatch(/<script/i);
   });
 
-  it('filters by kind group and by state', async () => {
-    const blocks = await list('?kind=blocks');
-    expect(blocks.catalog.items.length).toBeGreaterThan(0);
-    expect(new Set(blocks.catalog.items.map((item) => item.assetKind))).toEqual(new Set(['section', 'page']));
-    const apps = await list('?kind=app&state=app-only');
-    expect(apps.catalog.items.length).toBeGreaterThan(0);
-    for (const item of apps.catalog.items) {
-      expect(item.assetKind).toBe('app');
-      expect(item.state).toBe('app-only');
+  it('returns an empty inventory for every valid kind and state filter', async () => {
+    for (const query of ['?kind=blocks', '?kind=app&state=app-only', '?kind=components']) {
+      expect((await list(query)).catalog.items).toEqual([]);
     }
-    const components = await list('?kind=components');
-    expect(blocks.catalog.items.length + components.catalog.items.length).toBe((await list()).catalog.items.length);
   });
 
   it('rejects an unknown kind or state', async () => {
@@ -207,81 +172,50 @@ describe('GET /api/cult/catalog', () => {
 });
 
 describe('GET /api/cult/catalog/:id', () => {
-  it('serves one item and 404s an unknown id', async () => {
-    const resp = await fetch(`${baseUrl}/api/cult/catalog/${encodeURIComponent('cult:pricing-series-v')}`);
-    expect(resp.status).toBe(200);
-    const { item } = parseCultCatalogItemResponse(await resp.json());
-    expect(item.id).toBe('cult:pricing-series-v');
-    expect(item.slug).toBe('pricing-series-v');
-    expect(item.displayTitle).toBe('Pricing (series V)');
-    expect(item.assetKind).toBe('section');
-    expect(item.sectionKind).toBe('pricing');
-    expect((await fetch(`${baseUrl}/api/cult/catalog/cult%3Anope`)).status).toBe(404);
+  it('404s removed and unknown catalog items', async () => {
+    for (const id of ['cult:pricing-series-v', 'cult:nope']) {
+      const resp = await fetch(`${baseUrl}/api/cult/catalog/${encodeURIComponent(id)}`);
+      expect(resp.status).toBe(404);
+      expect(await resp.json()).toMatchObject({ error: { code: 'NOT_FOUND' } });
+    }
   });
 
-  it('keeps each hidden example and section addressable by all aliases, with the same preview bytes', async () => {
+  it('does not make removed curated children or their previews addressable', async () => {
     for (const relation of CURATION.relations) {
-      const inventoryRow = INVENTORY_ROWS.find((row) => publicId(row.id) === relation.childId)!;
-      for (const key of [relation.childId, SLUGS[inventoryRow.id]!, inventoryRow.id, inventoryRow.name]) {
-        const response = await fetch(`${baseUrl}/api/cult/catalog/${encodeURIComponent(key)}`);
-        expect(response.status, key).toBe(200);
-        const { item } = parseCultCatalogItemResponse(await response.json());
-        expect(item.id, key).toBe(relation.childId);
+      for (const suffix of ['', '/preview']) {
+        const response = await fetch(`${baseUrl}/api/cult/catalog/${encodeURIComponent(relation.childId)}${suffix}`);
+        expect(response.status, relation.childId).toBe(404);
       }
-      const image = await fetch(`${baseUrl}/api/cult/catalog/${encodeURIComponent(relation.childId)}/preview`);
-      expect(image.status, relation.childId).toBe(200);
-      const aliasImage = await fetch(`${baseUrl}/api/cult/catalog/${encodeURIComponent(inventoryRow.id)}/preview`);
-      expect(aliasImage.status, inventoryRow.id).toBe(200);
-      expect(Buffer.from(await image.arrayBuffer())).toEqual(Buffer.from(await aliasImage.arrayBuffer()));
     }
-  }, 15_000);
+  });
 
-  it('resolves a bare slug and the old internal id or name as aliases, and answers with the public id', async () => {
+  it('404s removed public and historical aliases without echoing branded ids', async () => {
     for (const key of ['pricing-series-v', 'cult:marketing-pricing-vercel', 'marketing-pricing-vercel']) {
       const resp = await fetch(`${baseUrl}/api/cult/catalog/${encodeURIComponent(key)}`);
-      expect(resp.status, key).toBe(200);
-      const text = await resp.text();
-      expect(text, key).not.toContain('vercel');
-      expect(parseCultCatalogItemResponse(JSON.parse(text)).item.id).toBe('cult:pricing-series-v');
+      expect(resp.status, key).toBe(404);
+      expect(await resp.text(), key).not.toContain('vercel');
     }
-    const missing = await fetch(`${baseUrl}/api/cult/catalog/cult%3Avercel-nope`);
-    expect(await missing.text()).not.toContain('vercel');
   });
 });
 
 describe('GET /api/cult/catalog/:id/preview', () => {
   const preview = (id: string) => fetch(`${baseUrl}/api/cult/catalog/${encodeURIComponent(id)}/preview`);
-  const isWebp = (bytes: Uint8Array) =>
-    Buffer.from(bytes.subarray(0, 4)).toString('ascii') === 'RIFF' && Buffer.from(bytes.subarray(8, 12)).toString('ascii') === 'WEBP';
 
-  it('serves a converter preview as a cacheable WebP', async () => {
-    const withPreview = INVENTORY_ROWS.find((entry) => typeof entry.previewId === 'string')!;
-    const resp = await preview(publicId(withPreview.id));
-    expect(resp.status).toBe(200);
-    expect(resp.headers.get('content-type')).toBe('image/webp');
-    expect(resp.headers.get('cache-control')).toBe('public, max-age=86400');
-    expect(resp.headers.get('x-content-type-options')).toBe('nosniff');
-    expect(resp.headers.get('etag')).toBeTruthy();
-    expect(isWebp(new Uint8Array(await resp.arrayBuffer()))).toBe(true);
+  it('does not serve a removed converter preview', async () => {
+    const response = await preview('cult:pricing-series-v');
+    expect(response.status).toBe(404);
+    expect(response.headers.get('content-type')).not.toBe('image/webp');
   });
 
-  it('serves a rendered thumbnail for a row without a converter preview', async () => {
-    const [id] = Object.entries(THUMBNAILS.items).find(([, entry]) => typeof entry.file === 'string')!;
-    const resp = await preview(publicId(id));
-    expect(resp.status).toBe(200);
-    expect(resp.headers.get('content-type')).toBe('image/webp');
-    expect(isWebp(new Uint8Array(await resp.arrayBuffer()))).toBe(true);
+  it('does not serve removed rendered thumbnails', async () => {
+    expect(THUMBNAILS.items).toEqual({});
+    expect(cultPreviewIndex({ rows: INVENTORY_ROWS }, THUMBNAILS).size).toBe(0);
   });
 
-  it('serves every committed image, including from hidden checkout ancestors', async () => {
-    for (const item of (await list()).catalog.items) {
-      expect(item.preview.kind, item.id).toBe('image');
-      const response = await preview(item.id);
-      expect(response.status, item.id).toBe(200);
-      const bytes = new Uint8Array(await response.arrayBuffer());
-      expect(isWebp(bytes), item.id).toBe(true);
-      if (item.preview.kind === 'image') expect(item.preview.revision).toBe(createHash('sha256').update(bytes).digest('hex'));
-    }
+  it('publishes no preview images from the empty public inventory', async () => {
+    expect((await list()).catalog.items).toEqual([]);
+    expect(cultPreviewIndex({ rows: INVENTORY_ROWS }, THUMBNAILS).size).toBe(0);
+
   }, 15_000);
 
   it('404s an unknown id and a row without an image', async () => {
@@ -363,11 +297,10 @@ describe('Cult display projection', () => {
     expect(() => cultPreviewIndex({ rows }, { schema: 'cult-thumbnails/9', items: {} })).toThrow('unexpected schema');
   });
 
-  it('titles every projected section and page exactly as the section catalog does', () => {
+  it('contains no licensed sections or pages in the public section catalog', () => {
     const entries = (sectionCatalogJson as { entries: Array<{ sourceKind: string; title: string; content: { sourceTitle?: string } }> }).entries
       .filter((entry) => entry.sourceKind === 'cult-pro');
-    expect(entries.length).toBeGreaterThan(100);
-    for (const entry of entries) expect(cultDisplayTitle(entry.content.sourceTitle ?? '')).toBe(entry.title);
+    expect(entries).toEqual([]);
   });
 
   it('replaces brand labels with a series letter', () => {

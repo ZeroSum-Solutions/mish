@@ -104,7 +104,7 @@ const MAX_TAG_PAGES = 10;
 const TAGS_PAGE_MAX_BYTES = 1024 * 1024;
 const COMMIT_SHA_MAX_BYTES = 1024;
 const PROGRESS_STEP_BYTES = 1024 * 1024;
-const USER_AGENT = 'open-design-pack-fetcher';
+const USER_AGENT = 'mish-pack-fetcher';
 const GITHUB_API_VERSION = '2022-11-28';
 
 const ACCEPT_JSON = 'application/vnd.github+json';

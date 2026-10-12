@@ -5,7 +5,7 @@ import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseVerificationBundle } from '@open-design/contracts';
+import { parseVerificationBundle } from '@mish/contracts';
 import { registerWorkbenchReviewRoutes } from '../../src/routes/workbench-review.js';
 import { ProjectContextError } from '../../src/workbench/project-context.js';
 import { runReviewCli } from '../../src/workbench/review-cli.js';

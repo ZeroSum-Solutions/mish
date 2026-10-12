@@ -1,4 +1,4 @@
-import { UPDATE_LIFECYCLE_STAGES, parseUpdateLifecycleObservation, type UpdateLifecycleObservedProps } from '@open-design/contracts/analytics';
+import { UPDATE_LIFECYCLE_STAGES, parseUpdateLifecycleObservation, type UpdateLifecycleObservedProps } from '@mish/contracts/analytics';
 import { readdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -7,12 +7,12 @@ import type {
   TrackingUpdateApplyReason,
   TrackingUpdateApplyResult,
   UpdateApplyObservedProps,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import {
   isReleaseChannel,
   releaseChannelFromVersion,
   type ReleaseChannel,
-} from '@open-design/release';
+} from '@mish/release';
 
 import type { AnalyticsContext, AnalyticsService } from '../analytics.js';
 import { readPosthogConfig } from '../analytics.js';
@@ -297,7 +297,7 @@ export async function observePendingInstallerApplyAttempts(
           insertId,
         });
       } catch (error) {
-        options.logger?.warn?.('[open-design updater] failed to submit update apply observation', error);
+        options.logger?.warn?.('[mish updater] failed to submit update apply observation', error);
         next.delivery = { eventName: 'update_apply_observed', status: 'failed', updatedAt: observedAt };
       }
     }

@@ -3,7 +3,7 @@ import { load } from 'cheerio';
 import {
   parseReusableUnitManifest, parseUnitSavePlan, WORKBENCH_UNIT_STANDALONE_TARGET_KINDS,
   type UnitInsertRequest, type CaptureRecord, type ReusableUnitManifest, type UnitSavePlan, type UnitSaveRequest, type WorkbenchDeclarationSurface,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { analyzeCss, analyzeHtml, analyzeJs, emptyAnalysis, mergeAnalysis } from './unit-analysis.js';
 import { isEditableSource, readUnitSourceFiles, UnitError, type UnitSourceFile } from './unit-files.js';
 import { computeRights } from './unit-rights.js';

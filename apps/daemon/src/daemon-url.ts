@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 import {
   APP_KEYS,
   type DaemonStatusSnapshot,
-} from "@open-design/sidecar-proto";
-import { SidecarFactory } from "@open-design/sidecar";
+} from "@mish/sidecar-proto";
+import { SidecarFactory } from "@mish/sidecar";
 
 export const DEFAULT_DAEMON_URL = "http://127.0.0.1:7456";
 

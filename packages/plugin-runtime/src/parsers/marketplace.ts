@@ -1,4 +1,4 @@
-import { MarketplaceManifestSchema, type MarketplaceManifest } from '@open-design/contracts';
+import { MarketplaceManifestSchema, type MarketplaceManifest } from '@mish/contracts';
 
 export interface MarketplaceParseSuccess {
   ok: true;
@@ -17,7 +17,7 @@ export function parseMarketplace(raw: string): MarketplaceParseResult {
   try {
     json = JSON.parse(raw);
   } catch (err) {
-    return { ok: false, errors: [`open-design-marketplace.json is not valid JSON: ${(err as Error).message}`] };
+    return { ok: false, errors: [`mish-marketplace.json is not valid JSON: ${(err as Error).message}`] };
   }
   const result = MarketplaceManifestSchema.safeParse(json);
   if (!result.success) {

@@ -1,4 +1,4 @@
-import { WORKBENCH_MANDATORY_CRITERION_IDS, WORKBENCH_MOTION_DEFAULT_VIEWPORTS, type ProjectDesignContext, type ProjectRubric } from '@open-design/contracts';
+import { WORKBENCH_MANDATORY_CRITERION_IDS, WORKBENCH_MOTION_DEFAULT_VIEWPORTS, type ProjectDesignContext, type ProjectRubric } from '@mish/contracts';
 import { canonicalRubricKey } from './evidence.js';
 import type { MotionRequest, TargetRequest } from './types.js';
 

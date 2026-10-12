@@ -10,7 +10,7 @@
 
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
 import { pathToFileURL } from 'node:url';
@@ -25,8 +25,16 @@ const { findRealTagOffset, HTML_TAG_PATTERNS } = await importFrom(path.join(repo
 // reviewed effect, not the two-placement/maxEffects-2 shape this generic test hardcodes), so each
 // has its own family-specific effects assertions elsewhere (see `render.test.ts`) rather than
 // being forced into this shared test's fixed expectation.
-const SITE_FAMILIES = ['watson', 'fervor', 'wrenfield', 'maben', 'halcyon', 'maren', 'emmpo', 'marketing-site', 'listings', 'publication', 'nonprofit', 'restaurant', 'community', 'docs-hub', 'storefront'];
-const INLINE_FAMILIES = new Set(['watson', 'fervor', 'wrenfield', 'maben', 'halcyon', 'maren', 'emmpo']);
+// Derived from the family packages present in the repository (kind families without effects are
+// checked separately below).
+const KIND_FAMILIES_WITHOUT_EFFECTS = ['app-shell', 'crm-dashboard'];
+const SINGLE_EFFECT_FAMILIES = ['practice', 'guide'];
+const SITE_FAMILIES = readdirSync(path.join(repoRoot, 'plugins/_official/examples'))
+  .filter((name) => name.startsWith('agency-'))
+  .map((name) => name.slice('agency-'.length))
+  .filter((family) => !KIND_FAMILIES_WITHOUT_EFFECTS.includes(family) && !SINGLE_EFFECT_FAMILIES.includes(family))
+  .sort();
+const INLINE_FAMILIES = new Set<string>();
 /** Components that need their own child markup: never allowed on an automatic placement. */
 const STRUCTURAL = ['accordion-gallery', 'scroll-locked-video-hero', 'scroll-choreography', 'handwriting-svg', 'ai-chat-input', 'chroma-grid', 'card-swap', 'stack', 'decay-card', 'ripple-distortion'];
 
@@ -61,13 +69,15 @@ const cspOf = (html: string) => /<meta http-equiv="Content-Security-Policy" cont
 const scriptText = (html: string, id: string) => new RegExp(`<script type="module" data-genui-script="${id}">([\\s\\S]*?)</script>`).exec(html)?.[1];
 const openTagWith = (html: string, attribute: string) => html.match(new RegExp(`<[a-z0-9]+ [^>]*${attribute}[^>]*>`, 'g')) ?? [];
 
+const tinyPage = (cspScript: string, host: string) => `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none';${cspScript}"></head><body>${host}</body></html>`;
+
 test('every site family declares reviewed placements whose hosts render once and accept each allowed id', async () => {
   for (const family of SITE_FAMILIES) {
     const effects = await effectsOf(family);
     const declaration = effects.readFamilyEffectDeclaration(family);
     assert.ok(declaration, `${family} declares effects`);
     assert.equal(declaration.scriptPolicy, INLINE_FAMILIES.has(family) ? 'inline' : 'hash', family);
-    assert.equal(declaration.maxEffects, family === 'emmpo' ? 1 : 2, family);
+    assert.equal(declaration.maxEffects, 2, family);
     const html = await referencePage(family);
     for (const [placement, entry] of Object.entries(declaration.placements)) {
       for (const id of entry.allow) {
@@ -78,7 +88,7 @@ test('every site family declares reviewed placements whose hosts render once and
       }
     }
   }
-  for (const family of ['app-shell', 'crm-dashboard']) assert.equal((await effectsOf(family)).readFamilyEffectDeclaration(family), null, family);
+  for (const family of KIND_FAMILIES_WITHOUT_EFFECTS) assert.equal((await effectsOf(family)).readFamilyEffectDeclaration(family), null, family);
 });
 
 test('marketing-site: renderFamily decorates the host, inlines each asset once and allows the script by hash', async () => {
@@ -135,15 +145,21 @@ test('every inlined stylesheet carries a reduced-motion block', async () => {
   }
 });
 
-test('watson: a component the family already inlines is reused, not inlined twice, under its own CSP', async () => {
-  const effects = await effectsOf('watson');
-  const html = await referencePage('watson');
-  assert.equal(count(html, '<style data-genui-style="scroll-reveal">'), 1, 'the family already ships scroll-reveal');
-  const { html: out, report } = effects.applyEffectPlan(html, plan(['section-reveal', 'scroll-reveal']), effects.readFamilyEffectDeclaration('watson'));
+test('a component the page already inlines is reused, not inlined twice, under an inline policy', async () => {
+  const effects = await effectsOf('marketing-site');
+  const probe = effects.applyEffectPlan(tinyPage(" script-src 'none'", '<p id="r">Reveal me</p>'), plan(['section-reveal', 'scroll-reveal']), {
+    scriptPolicy: 'hash', maxEffects: 2, placements: { 'section-reveal': { host: { id: 'r' }, allow: ['scroll-reveal'] } },
+  }).html;
+  const style = /<style data-genui-style="scroll-reveal">[\s\S]*?<\/style>/.exec(probe)![0];
+  const script = /<script type="module" data-genui-script="scroll-reveal">[\s\S]*?<\/script>/.exec(probe)![0];
+  const html = tinyPage(" script-src 'unsafe-inline'", `<span id="r">Reveal me</span>${style}${script}`);
+  const declaration: Declaration = { scriptPolicy: 'inline', maxEffects: 2, placements: { 'section-reveal': { host: { id: 'r' }, allow: ['scroll-reveal'] } } };
+  const { html: out, report } = effects.applyEffectPlan(html, plan(['section-reveal', 'scroll-reveal']), declaration);
   assert.deepEqual(report.applied, [{ placement: 'section-reveal', componentId: 'scroll-reveal', kind: 'js', source: 'hint' }]);
-  const hosts = openTagWith(out, 'data-od-id="watson-footer:network"');
+  const hosts = openTagWith(out, 'id="r"');
   assert.equal(hosts.length, 1);
-  assert.match(hosts[0]!, /^<span class="genui-scroll-reveal" data-genui="scroll-reveal" data-od-id="watson-footer:network">$/);
+  assert.match(hosts[0]!, /class="genui-scroll-reveal"/);
+  assert.match(hosts[0]!, /data-genui="scroll-reveal"/);
   assert.equal(count(out, '<style data-genui-style="scroll-reveal">'), 1, 'CSS inlined once');
   assert.equal(count(out, 'data-genui-script="scroll-reveal"'), 1, 'JS inlined once');
   assert.equal(cspOf(out), cspOf(html), 'inline policy: CSP untouched');
@@ -216,8 +232,6 @@ test('byte budget: the final page stays below the limit by dropping the lowest-p
   const over = shell(effects.PAGE_BYTE_LIMIT - Buffer.byteLength(shell(0)));
   assert.throws(() => effects.applyEffectPlan(over, all, declaration), (error: Error & { code?: string; bytes?: number }) => error.code === 'page-too-large' && error.bytes === 204800 && /base page is 204800 bytes/.test(error.message));
 });
-
-const tinyPage = (cspScript: string, host: string) => `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src 'none';${cspScript}"></head><body>${host}</body></html>`;
 
 test('a host a family mounted by its genui-<id> class alone is occupied', async () => {
   const effects = await effectsOf('marketing-site');

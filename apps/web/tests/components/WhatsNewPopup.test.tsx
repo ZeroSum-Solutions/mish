@@ -319,19 +319,19 @@ describe('WhatsNewPopup actions', () => {
   });
 
   it.each([
-    ['en', 'View Arena', 'https://open-design.ai/llm-arena-for-design/'],
-    ['zh-CN', '查看评测站', 'https://open-design.ai/zh/llm-arena-for-design/'],
+    ['en', 'View Arena', 'https://mish.invalid/llm-arena-for-design/'],
+    ['zh-CN', '查看评测站', 'https://mish.invalid/zh/llm-arena-for-design/'],
   ])('suppresses the configured %s CTA when it points to an upstream destination', async (locale, label) => {
-    window.localStorage.setItem('open-design:locale', locale!);
-    window.localStorage.setItem('open-design:locale-source', 'manual');
+    window.localStorage.setItem('mish:locale', locale!);
+    window.localStorage.setItem('mish:locale-source', 'manual');
     mockedFetchWhatsNew.mockResolvedValue({
       ...SHOW_PAYLOAD,
       content: {
         ...SHOW_PAYLOAD.content!,
         ctaLabel: 'View Arena',
-        linkUrl: 'https://open-design.ai/llm-arena-for-design/',
+        linkUrl: 'https://mish.invalid/llm-arena-for-design/',
         locales: {
-          'zh-CN': { ctaLabel: '查看评测站', linkUrl: 'https://open-design.ai/zh/llm-arena-for-design/' },
+          'zh-CN': { ctaLabel: '查看评测站', linkUrl: 'https://mish.invalid/zh/llm-arena-for-design/' },
         },
       },
     });

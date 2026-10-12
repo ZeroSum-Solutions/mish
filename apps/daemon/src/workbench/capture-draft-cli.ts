@@ -3,7 +3,7 @@ import { readFile, stat } from 'node:fs/promises';
 import {
   createCaptureDraftRequestSchema, parseCaptureDraftList, parseCaptureDraftRevision, WORKBENCH_CAPTURE_DRAFT_ID_PATTERN,
   type CaptureDraftRevision, type CreateCaptureDraftRequest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { mayForwardScopedToolToken, resolveDaemonUrl } from '../daemon-url.js';
 import type { WorkbenchCliOptions } from '../workbench-cli.js';
 

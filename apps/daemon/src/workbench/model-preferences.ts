@@ -1,4 +1,4 @@
-import type { SessionExecutionChoice } from '@open-design/contracts';
+import type { SessionExecutionChoice } from '@mish/contracts';
 import type { AgentModelPrefs } from '../app-config.js';
 import type { RuntimeAgentDef } from '../runtimes/types.js';
 import { getRememberedLiveModels, isKnownModel, isKnownReasoningEffort, isKnownServiceTier, resolveDefaultModelFromOptions, resolveModelForAgent, resolveModelForServiceTier, sanitizeCustomModel } from '../runtimes/models.js';

@@ -6,7 +6,7 @@ import { DesignSystemApprovalBrowser } from './DesignSystemApprovalBrowser';
 import { Icon } from './Icon';
 import { useWorkspaceContext } from '../collab/useWorkspaceContext';
 import { workspaceIdentityCacheKey } from '../collab/workspace-identity';
-import { matchesDesignSystemQuery } from '@open-design/contracts';
+import { matchesDesignSystemQuery } from '@mish/contracts';
 import { isSelectableDesignSystem } from '../runtime/design-system-selection';
 import { useI18n } from '../i18n';
 import { localizeDesignSystemCategory, localizeDesignSystemSummary } from '../i18n/content';

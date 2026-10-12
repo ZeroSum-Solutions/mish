@@ -1,30 +1,30 @@
 import {
-  OPEN_DESIGN_HOST_GLOBAL,
-  OPEN_DESIGN_HOST_VERSION,
-  type OpenDesignHostBridge,
-  type OpenDesignHostGlobalScope,
-  type OpenDesignHostUpdaterStatusSnapshot,
+  MISH_HOST_GLOBAL,
+  MISH_HOST_VERSION,
+  type MishHostBridge,
+  type MishHostGlobalScope,
+  type MishHostUpdaterStatusSnapshot,
 } from "./index.js";
 
-export type MockOpenDesignHost = Partial<Omit<OpenDesignHostBridge, "capture" | "client" | "pdf" | "pet" | "preview" | "project" | "shell" | "updater">> & {
-  browser?: Partial<OpenDesignHostBridge["browser"]>;
-  capture?: Partial<OpenDesignHostBridge["capture"]>;
-  client?: Partial<OpenDesignHostBridge["client"]>;
-  pdf?: Partial<OpenDesignHostBridge["pdf"]>;
-  pet?: Partial<OpenDesignHostBridge["pet"]>;
-  preview?: Partial<NonNullable<OpenDesignHostBridge["preview"]>>;
-  project?: Partial<OpenDesignHostBridge["project"]>;
-  shell?: Partial<OpenDesignHostBridge["shell"]>;
-  updater?: Partial<OpenDesignHostBridge["updater"]>;
+export type MockMishHost = Partial<Omit<MishHostBridge, "capture" | "client" | "pdf" | "pet" | "preview" | "project" | "shell" | "updater">> & {
+  browser?: Partial<MishHostBridge["browser"]>;
+  capture?: Partial<MishHostBridge["capture"]>;
+  client?: Partial<MishHostBridge["client"]>;
+  pdf?: Partial<MishHostBridge["pdf"]>;
+  pet?: Partial<MishHostBridge["pet"]>;
+  preview?: Partial<NonNullable<MishHostBridge["preview"]>>;
+  project?: Partial<MishHostBridge["project"]>;
+  shell?: Partial<MishHostBridge["shell"]>;
+  updater?: Partial<MishHostBridge["updater"]>;
 };
 
-export type MockOpenDesignHostOptions = {
-  host?: MockOpenDesignHost;
-  scope?: OpenDesignHostGlobalScope;
+export type MockMishHostOptions = {
+  host?: MockMishHost;
+  scope?: MishHostGlobalScope;
 };
 
-function defaultHost(): OpenDesignHostBridge {
-  const updaterStatus: OpenDesignHostUpdaterStatusSnapshot = {
+function defaultHost(): MishHostBridge {
+  const updaterStatus: MishHostUpdaterStatusSnapshot = {
     arch: "arm64",
     capabilities: {
       canApplyInPlace: false,
@@ -41,7 +41,7 @@ function defaultHost(): OpenDesignHostBridge {
     supported: true,
   };
   return {
-    version: OPEN_DESIGN_HOST_VERSION,
+    version: MISH_HOST_VERSION,
     browser: {
       clearData: async () => ({ ok: true }),
     },
@@ -65,7 +65,7 @@ function defaultHost(): OpenDesignHostBridge {
       }),
       pickAndReplaceWorkingDir: async () => ({
         ok: true,
-        baseDir: "/tmp/open-design-test",
+        baseDir: "/tmp/mish-test",
         entryFile: null,
       }),
     },
@@ -93,7 +93,7 @@ function defaultHost(): OpenDesignHostBridge {
   };
 }
 
-export function createMockOpenDesignHost(overrides: MockOpenDesignHost = {}): OpenDesignHostBridge {
+export function createMockMishHost(overrides: MockMishHost = {}): MishHostBridge {
   const base = defaultHost();
   return {
     ...base,
@@ -117,24 +117,24 @@ export function createMockOpenDesignHost(overrides: MockOpenDesignHost = {}): Op
   };
 }
 
-export function installMockOpenDesignHost(options: MockOpenDesignHostOptions = {}): () => void {
-  const scope = (options.scope ?? globalThis) as OpenDesignHostGlobalScope;
-  const host = createMockOpenDesignHost(options.host);
+export function installMockMishHost(options: MockMishHostOptions = {}): () => void {
+  const scope = (options.scope ?? globalThis) as MishHostGlobalScope;
+  const host = createMockMishHost(options.host);
   const windowValue = scope.window;
   const targets = [
     scope,
     ...(typeof windowValue === "object" && windowValue != null && windowValue !== scope
-      ? [windowValue as OpenDesignHostGlobalScope]
+      ? [windowValue as MishHostGlobalScope]
       : []),
   ];
   const previous = targets.map((target) => ({
-    had: Object.prototype.hasOwnProperty.call(target, OPEN_DESIGN_HOST_GLOBAL),
+    had: Object.prototype.hasOwnProperty.call(target, MISH_HOST_GLOBAL),
     target,
-    value: target[OPEN_DESIGN_HOST_GLOBAL],
+    value: target[MISH_HOST_GLOBAL],
   }));
 
   for (const target of targets) {
-    Object.defineProperty(target, OPEN_DESIGN_HOST_GLOBAL, {
+    Object.defineProperty(target, MISH_HOST_GLOBAL, {
       configurable: true,
       value: host,
       writable: true,
@@ -144,13 +144,13 @@ export function installMockOpenDesignHost(options: MockOpenDesignHostOptions = {
   return () => {
     for (const entry of previous) {
       if (entry.had) {
-        Object.defineProperty(entry.target, OPEN_DESIGN_HOST_GLOBAL, {
+        Object.defineProperty(entry.target, MISH_HOST_GLOBAL, {
           configurable: true,
           value: entry.value,
           writable: true,
         });
       } else {
-        delete entry.target[OPEN_DESIGN_HOST_GLOBAL];
+        delete entry.target[MISH_HOST_GLOBAL];
       }
     }
   };

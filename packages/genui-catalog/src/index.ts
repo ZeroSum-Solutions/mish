@@ -1,10 +1,10 @@
 /**
- * @open-design/genui-catalog: the owned GenUI component catalog.
+ * @mish/genui-catalog: the owned GenUI component catalog.
  *
  * `loadCatalog()` returns catalog.json, validated against schema/catalog.schema.json. The JSON is
  * imported, so a bundler inlines it and the call needs no filesystem. The component sources and
- * their built JS/CSS travel through `@open-design/genui-catalog/data` (generated literals) and
- * `@open-design/genui-catalog/components/<id>`.
+ * their built JS/CSS travel through `@mish/genui-catalog/data` (generated literals) and
+ * `@mish/genui-catalog/components/<id>`.
  */
 
 import catalogJson from '../catalog.json' with { type: 'json' };

@@ -135,7 +135,7 @@ export function productAdapterSource(kitSource: string, name: string): string {
   // The converter already names the source block by its catalog id; refuse anything else.
   replaceOnce(out, `\n  sourceBlockId: "${cultAdapterId(name)}",\n`, '', `sourceBlockId "${cultAdapterId(name)}"`);
   const header = '// Copied by packages/cult-ui-catalog/scripts/adapters.ts: only the import path and the id differ\n'
-    + `// from the kit's converted/${name}/adapter.ts. Do not edit; re-run \`pnpm --filter @open-design/cult-ui-catalog adapters\`.\n`;
+    + `// from the kit's converted/${name}/adapter.ts. Do not edit; re-run \`pnpm --filter @mish/cult-ui-catalog adapters\`.\n`;
   return header + out;
 }
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { ResourceCandidate, ResourceRequestContext } from '@open-design/contracts';
-import { parseResourceSearchRequest, parseResourceSearchResponse } from '@open-design/contracts';
+import type { ResourceCandidate, ResourceRequestContext } from '@mish/contracts';
+import { parseResourceSearchRequest, parseResourceSearchResponse } from '@mish/contracts';
 import { searchResources, inspectResource, createLocalResourceSources, type ResourceSourceAdapter } from '../src/workbench/resources.js';
 const context = { principalId: 'local-daemon', projectId: 'p1' };
 const candidate = (id: string, digest = 'sha256:one'): ResourceCandidate => ({
@@ -62,7 +62,7 @@ describe('resource federation', () => {
     const all = [...page.results]; let cursor = page.nextCursor;
     while (cursor) { const next = await searchResources(parseResourceSearchRequest({ limit: 100, cursor }), { principalId: 'local-daemon' }, createLocalResourceSources({ listPlugins: async () => [] })); all.push(...next.results); cursor = next.nextCursor; }
     const cult = all.filter(r => r.ref.itemId.startsWith('cult:'));
-    expect(cult.length).toBeGreaterThan(0);
+    expect(cult).toEqual([]);
     expect(JSON.stringify(cult)).not.toMatch(/cult:.*(?:linear|stripe|apple)/);
     expect(all.some(r => r.ref.sourceType === 'genui' && r.previewCapability.available)).toBe(true);
   });
@@ -72,7 +72,7 @@ it('invalidates refs and cursors when authorized plugin preview bytes change', a
   const { mkdtemp, writeFile, rm } = await import('node:fs/promises');
   const { tmpdir } = await import('node:os');
   const { join } = await import('node:path');
-  const { InstalledPluginRecordSchema } = await import('@open-design/contracts');
+  const { InstalledPluginRecordSchema } = await import('@mish/contracts');
   const root = await mkdtemp(join(tmpdir(),'workbench-plugin-'));
   try {
     await writeFile(join(root,'index.html'),'<button>Before</button>');
@@ -112,7 +112,7 @@ it('isolates invalid candidate metadata without hiding authorized valid resource
 });
 
 it('normalizes plugin tags permitted by the manifest without degrading the cohort', async () => {
-  const {InstalledPluginRecordSchema} = await import('@open-design/contracts');
+  const {InstalledPluginRecordSchema} = await import('@mish/contracts');
   const plugin = InstalledPluginRecordSchema.parse({id:'tags-plugin',title:'Tagged plugin',version:'1.0.0',sourceKind:'local',source:'local:test',trust:'restricted',capabilitiesGranted:[],fsPath:'/missing-workbench-plugin-fixture',installedAt:0,updatedAt:0,manifest:{name:'tags-plugin',version:'1.0.0',title:'Tagged plugin',description:'Test',tags:['','  ',' motion ','motion','layout']}});
   const page = await searchResources(parseResourceSearchRequest({facets:{sourceIds:['plugins']}}),context,createLocalResourceSources({listPlugins:async () => [plugin,{...plugin,id:'valid-plugin',manifest:{...plugin.manifest,tags:['valid']}}]}));
   expect(page.results).toHaveLength(2);

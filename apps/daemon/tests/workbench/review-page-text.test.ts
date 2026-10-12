@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import { declaredFrameSources } from '../../src/workbench/review/cdp-worker.js';
-import { renderReviewEvidenceMessage, renderReviewEvidenceParam } from '@open-design/contracts';
+import { renderReviewEvidenceMessage, renderReviewEvidenceParam } from '@mish/contracts';
 import {
   ev, evidenceRole, evidenceSelector, evidenceUrl, evidenceVocabulary, PageText, pathDepthOf, readPageText, UNVERIFIED, type EvidenceContext, type EvidenceParam, type EvidenceText,
 } from '../../src/workbench/review/evidence.js';

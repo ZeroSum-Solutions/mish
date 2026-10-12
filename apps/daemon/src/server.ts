@@ -4,7 +4,7 @@ import { McpCredentialFileError, writePrivateMcpFile } from './mcp-private-file.
 import { openUniqueUploadFile } from './project-upload-file.js';
 import { syncPublishedDesignSystemApproval } from './design-systems/approval.js';
 import { sendInternalError } from './http/api-errors.js';
-import { FILE_UPLOAD_MAX_BYTES } from '@open-design/contracts';
+import { FILE_UPLOAD_MAX_BYTES } from '@mish/contracts';
 import type {
   DesktopExportArtifactInput,
   DesktopExportArtifactResult,
@@ -14,7 +14,7 @@ import type {
   DesktopRenderFramesResult,
   DesktopRenderSlidesInput,
   DesktopRenderSlidesResult,
-} from '@open-design/sidecar-proto';
+} from '@mish/sidecar-proto';
 import express from 'express';
 import type { Request, Response } from 'express';
 import multer from 'multer';
@@ -36,29 +36,29 @@ import {
   executionProfileFromStreamFormat,
   renderChatTurnHostProtocolInstructions,
   resolveOdNextDeckFrameworkMode,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   advanceAuthenticatedDoneCapture,
   isTodoWriteToolName,
   stopReasonIsTruncation,
   todoItemsFromTodoWriteInput,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   renderUnfinishedTodoRecall,
   recalledTodosFromTodoWriteInput,
   type RecalledTodo,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   CollabCloudMemberDirectoryEntry,
   TeamProject,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   detectOdNextDevicePlatformFromText,
   resolveOdNextDevicePlatform,
   selectOdNextDeviceFrameContextV2,
   selectOdNextLayoutPrimitivesCss,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   loadOdNextTaskResourcesForSnapshot,
   materializeOdNextDeviceFrames,
@@ -97,7 +97,7 @@ import type { PlacementProjectWriteLease } from './workbench/placement/project-w
 import { PlacementCoordinationError } from './workbench/placement/write-coordinator.js';
 import { Transform } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
-import { OPEN_DESIGN_PLUGIN_ID } from './mcp-observability.js';
+import { MISH_PLUGIN_ID } from './mcp-observability.js';
 import {
   resolveDaemonCliPath,
   resolveDaemonPluginPreviewsDir,
@@ -259,8 +259,8 @@ export {
 } from './runtimes/run-lifecycle-analytics.js';
 
 export { resolveProjectRoot };
-import { createCommandInvocation } from '@open-design/platform';
-import { SIDECAR_ENV } from '@open-design/sidecar-proto';
+import { createCommandInvocation } from '@mish/platform';
+import { SIDECAR_ENV } from '@mish/sidecar-proto';
 import {
   buildLiveArtifactsMcpServersForAgent,
   checkPromptArgvBudget,
@@ -272,8 +272,8 @@ import {
   isKnownModel,
   isKnownReasoningEffort,
   isKnownServiceTier,
-  openDesignAmrRunAttempt,
-  openDesignAmrTraceEnv,
+  mishAmrRunAttempt,
+  mishAmrTraceEnv,
   applyAgentLaunchEnv,
   resolveAgentLaunch,
   sanitizeCustomModel,
@@ -667,7 +667,7 @@ import { newInsertId, readAnalyticsContext, type AnalyticsContext, type Analytic
 import {
   agentIdToTracking,
   modelIdForTracking,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import {
   mergeNoProxyWithLoopbackDefaults,
   redactSecrets,
@@ -759,7 +759,7 @@ import {
   chatScrollForensicsBodyParser,
   chatScrollForensicsHandler,
 } from './diagnostics-client-evidence.js';
-import { DIAGNOSTICS_EXPORT_PATH } from '@open-design/diagnostics';
+import { DIAGNOSTICS_EXPORT_PATH } from '@mish/diagnostics';
 import {
   createProjectArchiveStream,
   createBatchArchiveStream,
@@ -933,15 +933,15 @@ import { jevKeyResolver, registerDesignIndexRoutes } from './routes/design-index
 import { provisionBundledTeamAccess } from './services/team-access.js';
 import { configureDeployDataDir } from './deploy.js';
 import { createAgencyJevKeyStore, freshPerGeneration } from './storage/agency-config.js';
-import { buildSite, createJevEffectJudge, createJevSectionJudge } from '@open-design/agency-fast-lane/build';
-import { createJevBlockPlanner } from '@open-design/agency-fast-lane/block-plan';
-import { designTaxonomy, familyRegistry as designFamilyRegistry, shapeAtlas as designAtlas } from '@open-design/agency-fast-lane/data';
-import { PROVIDERS, createModelCaller, vaultSecret } from '@open-design/agency-fast-lane/deepseek';
-import { loadFamilyPackage } from '@open-design/agency-fast-lane/family';
-import { genuiCatalog } from '@open-design/genui-catalog/data';
-import { createJevChecker } from '@open-design/agency-fast-lane/jev';
-import { createJevProfiler } from '@open-design/agency-fast-lane/profile';
-import { createJevRouter } from '@open-design/agency-fast-lane/route';
+import { buildSite, createJevEffectJudge, createJevSectionJudge } from '@mish/agency-fast-lane/build';
+import { createJevBlockPlanner } from '@mish/agency-fast-lane/block-plan';
+import { designTaxonomy, familyRegistry as designFamilyRegistry, shapeAtlas as designAtlas } from '@mish/agency-fast-lane/data';
+import { PROVIDERS, createModelCaller, vaultSecret } from '@mish/agency-fast-lane/deepseek';
+import { loadFamilyPackage } from '@mish/agency-fast-lane/family';
+import { genuiCatalog } from '@mish/genui-catalog/data';
+import { createJevChecker } from '@mish/agency-fast-lane/jev';
+import { createJevProfiler } from '@mish/agency-fast-lane/profile';
+import { createJevRouter } from '@mish/agency-fast-lane/route';
 import { registerMediaRoutes } from './routes/media.js';
 import { registerProjectRoutes, registerProjectArtifactRoutes, registerProjectFileRoutes, registerProjectUploadRoutes, createEnforceWorkspaceProjectMutation, createRunProjectWriteBorrower } from './routes/project/index.js';
 import { registerProjectChatArtifactRoutes } from './routes/project/chat-artifacts.js';
@@ -974,7 +974,7 @@ import { registerBrowserSessionRoutes } from './routes/browser-sessions.js';
 import { createTerminalService } from './terminals.js';
 import { createBrowserSessionService } from './browser-sessions.js';
 import { registerSocialShareRoutes } from './routes/social-share.js';
-import { registerOpenDesignPublicMetadataRoutes } from './routes/open-design-public-metadata.js';
+import { registerMishPublicMetadataRoutes } from './routes/mish-public-metadata.js';
 import { registerWhatsNewRoutes } from './routes/whats-new.js';
 import { registerGenuiCatalogRoutes } from './routes/genui-catalog.js';
 import { registerWorkbenchIntakeRoutes } from './routes/workbench-intake.js';
@@ -1088,7 +1088,7 @@ import {
 import { resolveWorkspaceScope } from './collab/workspace-scope.js';
 import {
   AmrWorkspaceScopeRequiredError,
-  openDesignAmrTraceEnvForRun,
+  mishAmrTraceEnvForRun,
   pinRunWorkspaceScopeForProject,
   type RunWorkspaceScope,
 } from './runtimes/project-amr-trace-env.js';
@@ -1313,7 +1313,7 @@ import {
   isApiAuthDisabled,
   isApiTokenMiddlewareEnabled,
 } from './api-token-auth.js';
-import { createOpenDesignPublicMetadataService } from './services/open-design-public-metadata.js';
+import { createMishPublicMetadataService } from './services/mish-public-metadata.js';
 import { createWhatsNewService } from './services/whats-new.js';
 import { execCommandViaLoginShell } from './services/login-shell.js';
 import {
@@ -1345,14 +1345,14 @@ import {
 import { renderOAuthResultPage } from './http/oauth-result-page.js';
 import { bearerTokenFromRequest, createToolRequestAuth } from './http/tool-request-auth.js';
 
-/** @typedef {import('@open-design/contracts').ApiErrorCode} ApiErrorCode */
-/** @typedef {import('@open-design/contracts').ApiError} ApiError */
-/** @typedef {import('@open-design/contracts').ApiErrorResponse} ApiErrorResponse */
-/** @typedef {import('@open-design/contracts').ChatRequest} ChatRequest */
-/** @typedef {import('@open-design/contracts').ChatSseEvent} ChatSseEvent */
-/** @typedef {import('@open-design/contracts').ProxyStreamRequest} ProxyStreamRequest */
-/** @typedef {import('@open-design/contracts').ProxySseEvent} ProxySseEvent */
-/** @typedef {import('@open-design/contracts').ProjectConversationCreatedSsePayload} ProjectConversationCreatedSsePayload */
+/** @typedef {import('@mish/contracts').ApiErrorCode} ApiErrorCode */
+/** @typedef {import('@mish/contracts').ApiError} ApiError */
+/** @typedef {import('@mish/contracts').ApiErrorResponse} ApiErrorResponse */
+/** @typedef {import('@mish/contracts').ChatRequest} ChatRequest */
+/** @typedef {import('@mish/contracts').ChatSseEvent} ChatSseEvent */
+/** @typedef {import('@mish/contracts').ProxyStreamRequest} ProxyStreamRequest */
+/** @typedef {import('@mish/contracts').ProxySseEvent} ProxySseEvent */
+/** @typedef {import('@mish/contracts').ProjectConversationCreatedSsePayload} ProjectConversationCreatedSsePayload */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1387,7 +1387,7 @@ const PLUGIN_PREVIEWS_DIR = resolveDaemonPluginPreviewsDir({
   projectRoot: PROJECT_ROOT,
 });
 const OD_BIN = resolveDaemonCliPath();
-export function resolveOpenDesignNodeBin({
+export function resolveMishNodeBin({
   env = process.env,
   execPath = process.execPath,
   platform = process.platform,
@@ -1412,7 +1412,7 @@ export function resolveOpenDesignNodeBin({
   return execPath;
 }
 
-const OD_NODE_BIN = resolveOpenDesignNodeBin();
+const OD_NODE_BIN = resolveMishNodeBin();
 const SKILLS_DIR = resolveDaemonResourceDir(
   DAEMON_RESOURCE_ROOT,
   'skills',
@@ -2057,7 +2057,7 @@ export function createAgentRuntimeToolPrompt(
   ].join('\n');
 }
 
-export function createOpenDesignToolEnv({
+export function createMishToolEnv({
   daemonUrl,
   hyperFramesBin = resolveHyperFramesCliPath(),
   projectDir,
@@ -2233,7 +2233,7 @@ export function telemetryPromptFromRunRequest(message, currentPrompt) {
   return typeof currentPrompt === 'string' ? currentPrompt : message;
 }
 
-// Keep this header grammar aligned with parseFormAnswers in @open-design/contracts.
+// Keep this header grammar aligned with parseFormAnswers in @mish/contracts.
 const FORM_ANSWERS_HEADER_RE =
   /^\s*\[form answers(?:\s*[\u2014\-:]\s*([^\]\r\n]+))?\]\s*(?:\r?\n|$)/i;
 
@@ -3584,7 +3584,7 @@ export async function startServer({
 
       res.setHeader('WWW-Authenticate', API_TOKEN_BASIC_CHALLENGE);
       return res.status(401).type('text/plain').send(
-        'Mishh Mashh authentication required. Use username "open-design" and OD_API_TOKEN as the password.',
+        'Mishh Mashh authentication required. Use username "mish" and OD_API_TOKEN as the password.',
       );
     });
   }
@@ -4001,18 +4001,18 @@ export async function startServer({
       marketplaceProvenance: {
         sourceMarketplaceId: OFFICIAL_MARKETPLACE_ID,
         marketplaceTrust:    'official',
-        entryNamePrefix:     'open-design',
+        entryNamePrefix:     'mish',
       },
     });
     bundledMarketplaceEntries = result.registered.map((plugin) => ({
-      name:        `open-design/${plugin.id}`,
+      name:        `mish/${plugin.id}`,
       title:       plugin.title,
       title_i18n:  plugin.manifest.title_i18n,
       description: plugin.manifest.description,
       description_i18n: plugin.manifest.description_i18n,
       version:     plugin.version,
       source:      bundledPluginRegistrySource(plugin.source),
-      publisher:   { id: 'open-design', url: 'https://open-design.ai' },
+      publisher:   { id: 'mish', url: 'https://github.com/ZeroSum-Solutions/mish' },
       homepage:    plugin.manifest.homepage,
       license:     plugin.manifest.license,
       tags:        plugin.manifest.tags,
@@ -5880,7 +5880,7 @@ export async function startServer({
       const project = getProject(db, projectId);
       if (!project) return false;
       // Authorized Vela mirrors contain the shared project files, not the
-      // local-only `.open-design/project.json`. Their exact-scope receipt is
+      // local-only `.mish/project.json`. Their exact-scope receipt is
       // the durable version proof; the live directory proves the promoted
       // namespace still exists. Both are required so a deleted tree heals,
       // while another workspace/owner's receipt can never satisfy this pull.
@@ -8581,7 +8581,7 @@ export async function startServer({
     const reportHost = reportHostForPoweredPreview();
     const baseOrigin = resolvedPort ? `http://${reportHost}:${resolvedPort}` : null;
     res.setHeader('Cache-Control', 'no-store');
-    /** @type {import('@open-design/contracts').ProjectPreviewIsolationResponse} */
+    /** @type {import('@mish/contracts').ProjectPreviewIsolationResponse} */
     const body = {
       supported: Boolean(baseOrigin),
       baseOrigin,
@@ -8605,10 +8605,10 @@ export async function startServer({
     env: process.env,
   });
 
-  const openDesignPublicMetadata = createOpenDesignPublicMetadataService();
-  registerOpenDesignPublicMetadataRoutes(app, {
+  const mishPublicMetadata = createMishPublicMetadataService();
+  registerMishPublicMetadataRoutes(app, {
     http: httpDeps,
-    openDesignPublicMetadata,
+    mishPublicMetadata,
   });
 
   registerWhatsNewRoutes(app, {
@@ -9904,7 +9904,7 @@ export async function startServer({
       try { const project = getProject(db, req.params.id); if (!project) return sendApiError(res, 404, 'PROJECT_NOT_FOUND', 'project not found'); const projectBinding = getWorkspaceProjectByProjectId(db, req.params.id); if (!projectBinding?.workspaceId || !projectBinding.createdByWorkspaceMemberId) return sendApiError(res, 409, 'WORKSPACE_PROJECT_UNBOUND', 'project must have an exact workspace owner before installing a plugin'); const installScope = { workspaceId: String(projectBinding.workspaceId), workspaceMemberId: String(projectBinding.createdByWorkspaceMemberId) }; const body = req.body && typeof req.body === 'object' ? req.body : {}; const relativePath = normalizeProjectPluginFolderPath(body.path); const projectRoot = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata); const folder = await resolveProjectChildDirectory(projectRoot, relativePath); const warnings = []; const log = []; let plugin = null; let message = 'Install finished.'; for await (const ev of installPlugin(db, { source: folder, roots: PLUGIN_REGISTRY_ROOTS, allowReplacePlugin: (pluginId) => allowScopedPluginReplace(installScope, pluginId) })) { if (ev.message) log.push(ev.message); if (Array.isArray(ev.warnings)) warnings.splice(0, warnings.length, ...ev.warnings); if (ev.kind === 'success') { plugin = ev.plugin; ensureWorkspaceResource(db, 'plugin', installScope.workspaceId, ev.plugin.id, { visibility: 'personal', resourceState: 'active', createdByWorkspaceMemberId: installScope.workspaceMemberId, updatedByWorkspaceMemberId: installScope.workspaceMemberId }); message = `Installed ${ev.plugin.title}.`; break; } if (ev.kind === 'error') { message = ev.message; break; } } res.status(plugin ? 200 : 400).json({ ok: Boolean(plugin), plugin, warnings, message, log }); } catch (err) { sendProjectPluginFolderError(res, err); }
     },
     handleProjectPluginCli: async (req, res, action) => {
-      try { const project = getProject(db, req.params.id); if (!project) return sendApiError(res, 404, 'PROJECT_NOT_FOUND', 'project not found'); const body = req.body && typeof req.body === 'object' ? req.body : {}; const relativePath = normalizeProjectPluginFolderPath(body.path); const projectRoot = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata); const folder = await resolveProjectChildDirectory(projectRoot, relativePath); const subcommand = action === 'publish-github' ? 'publish-repo' : 'open-design-pr'; const timeout = action === 'publish-github' ? 240_000 : 300_000; const result = await execCommandViaLoginShell(OD_NODE_BIN, [OD_BIN, 'plugin', subcommand, folder, '--json'], { timeout }); const payload = result.stdout ? JSON.parse(result.stdout) : null; if (!result.ok || !payload?.ok) return res.status(500).json({ ok: false, code: payload?.error?.label || (action === 'publish-github' ? 'publish-repo-failed' : 'open-design-pr-failed'), message: payload?.error?.stderr || payload?.error?.stdout || (action === 'publish-github' ? 'GitHub repo publish failed.' : 'Mishh Mashh PR creation failed.'), log: payload?.steps?.map((step) => step.stderr || step.stdout || step.command).filter(Boolean) ?? [result.stderr || result.stdout || `${subcommand} failed`] }); res.json({ ok: true, message: action === 'publish-github' ? (payload.repoUrl ? `Published plugin to ${payload.repoUrl}.` : 'Published plugin to GitHub.') : (payload.prUrl ? `Opened Mishh Mashh PR flow at ${payload.prUrl}.` : 'Opened Mishh Mashh PR flow.'), ...(payload.repoUrl ? { url: payload.repoUrl } : {}), ...(payload.prUrl ? { url: payload.prUrl } : {}), log: payload.steps?.map((step) => step.stderr || step.stdout || step.command).filter(Boolean) ?? [] }); } catch (err) { sendProjectPluginFolderError(res, err); }
+      try { const project = getProject(db, req.params.id); if (!project) return sendApiError(res, 404, 'PROJECT_NOT_FOUND', 'project not found'); const body = req.body && typeof req.body === 'object' ? req.body : {}; const relativePath = normalizeProjectPluginFolderPath(body.path); const projectRoot = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata); const folder = await resolveProjectChildDirectory(projectRoot, relativePath); const subcommand = action === 'publish-github' ? 'publish-repo' : 'mish-pr'; const timeout = action === 'publish-github' ? 240_000 : 300_000; const result = await execCommandViaLoginShell(OD_NODE_BIN, [OD_BIN, 'plugin', subcommand, folder, '--json'], { timeout }); const payload = result.stdout ? JSON.parse(result.stdout) : null; if (!result.ok || !payload?.ok) return res.status(500).json({ ok: false, code: payload?.error?.label || (action === 'publish-github' ? 'publish-repo-failed' : 'mish-pr-failed'), message: payload?.error?.stderr || payload?.error?.stdout || (action === 'publish-github' ? 'GitHub repo publish failed.' : 'Mishh Mashh PR creation failed.'), log: payload?.steps?.map((step) => step.stderr || step.stdout || step.command).filter(Boolean) ?? [result.stderr || result.stdout || `${subcommand} failed`] }); res.json({ ok: true, message: action === 'publish-github' ? (payload.repoUrl ? `Published plugin to ${payload.repoUrl}.` : 'Published plugin to GitHub.') : (payload.prUrl ? `Opened Mishh Mashh PR flow at ${payload.prUrl}.` : 'Opened Mishh Mashh PR flow.'), ...(payload.repoUrl ? { url: payload.repoUrl } : {}), ...(payload.prUrl ? { url: payload.prUrl } : {}), log: payload.steps?.map((step) => step.stderr || step.stdout || step.command).filter(Boolean) ?? [] }); } catch (err) { sendProjectPluginFolderError(res, err); }
     },
     handleCandidateDraft: async (req, res) => {
       if (!isLocalSameOrigin(req, resolvedPort)) return res.status(403).json({ error: 'cross-origin request rejected' });
@@ -9912,11 +9912,11 @@ export async function startServer({
     },
     handleCandidateShareTask: async (req, res) => {
       if (!isLocalSameOrigin(req, resolvedPort)) return res.status(403).json({ error: 'cross-origin request rejected' });
-      try { const project = getProject(db, req.params.id); if (!project) return sendApiError(res, 404, 'PROJECT_NOT_FOUND', 'project not found'); const body = req.body && typeof req.body === 'object' ? req.body : {}; const action = body.action === 'publish-github' || body.action === 'contribute-open-design' ? body.action : null; if (!action) return sendApiError(res, 400, 'BAD_REQUEST', 'plugin share action is required'); const projectRoot = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata); const draft = await generateSkillPluginDraft(db, projectRoot, req.params.id, req.params.candidateId); if (!draft) return sendApiError(res, 404, 'NOT_FOUND', 'plugin candidate not found'); if (!draft.validation.ok) return res.status(422).json({ ok: false, code: 'plugin-draft-invalid', message: 'Generated plugin draft is invalid.', draft }); const task = pluginShareTaskStore.createAndStart(req.params.id, { action, path: draft.draftPath }, draft.folder); res.status(202).json({ taskId: task.id, action, path: draft.draftPath, status: task.status, startedAt: task.startedAt, draft }); } catch (err) { res.status(400).json({ ok: false, message: String(err?.message || err) }); }
+      try { const project = getProject(db, req.params.id); if (!project) return sendApiError(res, 404, 'PROJECT_NOT_FOUND', 'project not found'); const body = req.body && typeof req.body === 'object' ? req.body : {}; const action = body.action === 'publish-github' || body.action === 'contribute-mish' ? body.action : null; if (!action) return sendApiError(res, 400, 'BAD_REQUEST', 'plugin share action is required'); const projectRoot = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata); const draft = await generateSkillPluginDraft(db, projectRoot, req.params.id, req.params.candidateId); if (!draft) return sendApiError(res, 404, 'NOT_FOUND', 'plugin candidate not found'); if (!draft.validation.ok) return res.status(422).json({ ok: false, code: 'plugin-draft-invalid', message: 'Generated plugin draft is invalid.', draft }); const task = pluginShareTaskStore.createAndStart(req.params.id, { action, path: draft.draftPath }, draft.folder); res.status(202).json({ taskId: task.id, action, path: draft.draftPath, status: task.status, startedAt: task.startedAt, draft }); } catch (err) { res.status(400).json({ ok: false, message: String(err?.message || err) }); }
     },
     handleProjectShareTask: async (req, res) => {
       if (!isLocalSameOrigin(req, resolvedPort)) return res.status(403).json({ error: 'cross-origin request rejected' });
-      try { const project = getProject(db, req.params.id); if (!project) return sendApiError(res, 404, 'PROJECT_NOT_FOUND', 'project not found'); const body = req.body && typeof req.body === 'object' ? req.body : {}; const action: PluginShareAction | null = body.action === 'publish-github' || body.action === 'contribute-open-design' ? body.action : null; if (!action) return sendApiError(res, 400, 'BAD_REQUEST', 'plugin share action is required'); const relativePath = normalizeProjectPluginFolderPath(body.path); const projectRoot = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata); const folder = await resolveProjectChildDirectory(projectRoot, relativePath); const task = pluginShareTaskStore.createAndStart(req.params.id, { action, path: relativePath }, folder); res.status(202).json({ taskId: task.id, action, path: relativePath, status: task.status, startedAt: task.startedAt }); } catch (err) { sendProjectPluginFolderError(res, err); }
+      try { const project = getProject(db, req.params.id); if (!project) return sendApiError(res, 404, 'PROJECT_NOT_FOUND', 'project not found'); const body = req.body && typeof req.body === 'object' ? req.body : {}; const action: PluginShareAction | null = body.action === 'publish-github' || body.action === 'contribute-mish' ? body.action : null; if (!action) return sendApiError(res, 400, 'BAD_REQUEST', 'plugin share action is required'); const relativePath = normalizeProjectPluginFolderPath(body.path); const projectRoot = resolveProjectDir(PROJECTS_DIR, req.params.id, project.metadata); const folder = await resolveProjectChildDirectory(projectRoot, relativePath); const task = pluginShareTaskStore.createAndStart(req.params.id, { action, path: relativePath }, folder); res.status(202).json({ taskId: task.id, action, path: relativePath, status: task.status, startedAt: task.startedAt }); } catch (err) { sendProjectPluginFolderError(res, err); }
     },
   };
 
@@ -9974,7 +9974,7 @@ export async function startServer({
     type ScenarioEntry = {
       id: string;
       taskKind: 'new-generation' | 'figma-migration' | 'code-migration' | 'tune-collab';
-      pipeline: NonNullable<NonNullable<import('@open-design/contracts').PluginManifest['od']>['pipeline']>;
+      pipeline: NonNullable<NonNullable<import('@mish/contracts').PluginManifest['od']>['pipeline']>;
     };
     const byTaskKind = new Map<ScenarioEntry['taskKind'], ScenarioEntry>();
     try {
@@ -11139,7 +11139,7 @@ export async function startServer({
         // legacy warn/fallback path only for ordinary snapshots.
         if (!snap?.strategy && stages.length > 0) {
           const { loadAtomBodies } = await import('./plugins/atom-bodies.js');
-          const { renderActiveStageBlocks } = await import('@open-design/contracts');
+          const { renderActiveStageBlocks } = await import('@mish/contracts');
           const { atomsForPrompt } = await import('./plugins/critique-prompt-gate.js');
           const stageViews = [];
           for (const stage of stages) {
@@ -12820,7 +12820,7 @@ export async function startServer({
       strategyTaskAtStart
       && strategyTaskAtStart.inputStage !== 'request'
       && !agentResumeCtx.isResuming
-      && !canStartFreshLockedContinuation(db, run.modelAdmission, strategyRunMapping?.sourceRunId, persistedStrategyFinalText, openDesignAmrRunAttempt({ cumulativeRetryAttemptCount: run.cumulativeRetryAttemptCount, retryAttemptCount: run.retryAttemptCount, manualResumeAttemptCount: run.manualResumeAttemptCount }) + 1)
+      && !canStartFreshLockedContinuation(db, run.modelAdmission, strategyRunMapping?.sourceRunId, persistedStrategyFinalText, mishAmrRunAttempt({ cumulativeRetryAttemptCount: run.cumulativeRetryAttemptCount, retryAttemptCount: run.retryAttemptCount, manualResumeAttemptCount: run.manualResumeAttemptCount }) + 1)
     ) {
       const blocked = blockAutomaticContinuation(db, { runId: run.id });
       if (blocked) run.strategyTask = projectStrategyTask(blocked, run.id);
@@ -13104,7 +13104,7 @@ export async function startServer({
           strategyTaskAtStart?.frozenSkillPackage
             ? renderFrozenSkillRosterContext(strategyTaskAtStart.frozenSkillPackage)
             : JSON.stringify({
-                schema: 'open-design.od-next-frozen-skill-package/v1',
+                schema: 'mish.od-next-frozen-skill-package/v1',
                 state: 'missing',
               }),
           odNextTaskInputSnapshot?.requestInputText ?? '',
@@ -14527,7 +14527,7 @@ export async function startServer({
           disablePlugins:
             def.id === 'codex'
             && run.externalPluginAnalytics?.externalPluginId
-              === OPEN_DESIGN_PLUGIN_ID,
+              === MISH_PLUGIN_ID,
           ...(nativeBuildPackageBindings.length > 0
             ? { nativeBuildPackageBindings }
             : {}),
@@ -15062,7 +15062,7 @@ export async function startServer({
         return finishStrategyAwarePhysicalRun('failed', 1, null);
       }
     }
-    const odMediaEnv = createOpenDesignToolEnv({
+    const odMediaEnv = createMishToolEnv({
       daemonUrl,
       projectDir: cwd,
       projectId: typeof projectId === 'string' ? projectId : null,
@@ -15175,11 +15175,11 @@ export async function startServer({
         ...(mmdRouteLaunchEnv || {}),
         ...odMediaEnv,
         ...(byokOpenCodeProvider ? byokOpenCodeProvider.env : {}),
-        ...await openDesignAmrTraceEnvForRun({
+        ...await mishAmrTraceEnvForRun({
           agentId: def.id,
           runId: run.id,
           conversationId: run.conversationId,
-          runAttempt: openDesignAmrRunAttempt({
+          runAttempt: mishAmrRunAttempt({
             cumulativeRetryAttemptCount: run.cumulativeRetryAttemptCount,
             retryAttemptCount: run.retryAttemptCount,
             manualResumeAttemptCount: run.manualResumeAttemptCount,
@@ -17673,7 +17673,7 @@ export async function startServer({
               ? { chunk: tail }
               : { type: 'text_delta', delta: tail };
             // The protocol withholds any text that might still turn out to be
-            // a reserved `<open-design-…>` block; `finish()` is what finally
+            // a reserved `<mish-…>` block; `finish()` is what finally
             // rules that out, so this tail is the first moment those bytes are
             // user-visible. It cannot go back through `send` — `push` throws
             // once the protocol is finished — so it applies the same visible
@@ -19101,7 +19101,7 @@ export async function startServer({
     },
     agents: agentDeps,
     critique: critiqueDeps,
-    openDesignPublicMetadata,
+    mishPublicMetadata,
     lifecycle: { isDaemonShuttingDown: () => daemonShuttingDown },
   });
 

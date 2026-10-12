@@ -9,16 +9,13 @@ import { ANCHOR_KEY, isObject, type Json, type JsonObject } from '../src/spine.t
 import { clipWholeWords } from '../src/text-clip.ts';
 import { HOURS_LABEL_PLACEHOLDER, HOURS_ROW_PLACEHOLDER } from '../src/prompt.ts';
 
-const EXAMPLES = path.resolve(import.meta.dirname, '../../../plugins/_official/examples');
-export const MABEN_DIR = path.join(EXAMPLES, 'agency-maben');
-export const WATSON_DIR = path.join(EXAMPLES, 'agency-watson');
-export const WRENFIELD_DIR = path.join(EXAMPLES, 'agency-wrenfield');
-export const FERVOR_DIR = path.join(EXAMPLES, 'agency-fervor');
-export const HALCYON_DIR = path.join(EXAMPLES, 'agency-halcyon');
-export const MAREN_DIR = path.join(EXAMPLES, 'agency-maren');
-export const EMMPO_DIR = path.join(EXAMPLES, 'agency-emmpo');
+const EXAMPLES = path.resolve(import.meta.dirname, 'fixtures');
+export const TEST_SITE_DIR = path.join(EXAMPLES, 'ownedsite');
+export const TEST_EDITORIAL_DIR = path.join(EXAMPLES, 'ownededitorial');
+export const TEST_CONTRACTOR_DIR = path.join(EXAMPLES, 'ownedcontractor');
+export const TEST_INSTITUTION_DIR = path.join(EXAMPLES, 'ownedinstitution');
 
-export const loadMaben = (): Promise<FamilyPackage> => loadFamilyPackage(MABEN_DIR, 'maben');
+export const loadTestSite = (): Promise<FamilyPackage> => loadFamilyPackage(TEST_SITE_DIR, 'ownedsite');
 
 export async function readJson(file: string): Promise<JsonObject> {
   const value = JSON.parse(await readFile(file, 'utf8')) as Json;

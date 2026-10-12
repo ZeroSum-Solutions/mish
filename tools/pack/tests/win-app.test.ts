@@ -60,7 +60,7 @@ function createConfig(root: string, webOutputMode: ToolPackConfig["webOutputMode
 
 describe("createWorkspaceTarballsCacheKey", () => {
   it("invalidates when any packed package source changes", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-app-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-app-"));
 
     try {
       await writeWorkspace(root);
@@ -79,7 +79,7 @@ describe("createWorkspaceTarballsCacheKey", () => {
   });
 
   it("invalidates when package manager or lockfile inputs change", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-app-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-app-"));
 
     try {
       await writeWorkspace(root);
@@ -106,7 +106,7 @@ describe("createWorkspaceTarballsCacheKey", () => {
   });
 
   it("invalidates when the upstream workspace build key changes", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-app-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-app-"));
 
     try {
       await writeWorkspace(root);
@@ -121,7 +121,7 @@ describe("createWorkspaceTarballsCacheKey", () => {
   });
 
   it("invalidates when the web output mode changes", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-app-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-app-"));
 
     try {
       await writeWorkspace(root);
@@ -135,7 +135,7 @@ describe("createWorkspaceTarballsCacheKey", () => {
   });
 
   it("ignores packed package build outputs because the upstream key carries their identity", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-app-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-app-"));
 
     try {
       await writeWorkspace(root);
@@ -154,11 +154,11 @@ describe("createWorkspaceTarballsCacheKey", () => {
 
 describe("createWinPackagedAppCacheKey", () => {
   const packedTarballs = [
-    { fileName: "contracts.tgz", packageName: "@open-design/contracts" },
+    { fileName: "contracts.tgz", packageName: "@mish/contracts" },
   ] satisfies PackedTarballInfo[];
 
   it("covers every mutable packaged-app input", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-packaged-app-key-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-packaged-app-key-"));
 
     try {
       const config = createConfig(root, "standalone");
@@ -172,7 +172,7 @@ describe("createWinPackagedAppCacheKey", () => {
       await expect(createWinPackagedAppCacheKey(config, "tarballs-b", packedTarballs)).resolves.not.toBe(baseline);
       await expect(createWinPackagedAppCacheKey(config, "tarballs-a", [
         ...packedTarballs,
-        { fileName: "platform.tgz", packageName: "@open-design/platform" },
+        { fileName: "platform.tgz", packageName: "@mish/platform" },
       ])).resolves.not.toBe(baseline);
       await expect(createWinPackagedAppCacheKey(config, "tarballs-a", packedTarballs, {
         "hyperframes": "0.8.1",
@@ -189,7 +189,7 @@ describe("createWinPackagedAppCacheKey", () => {
   });
 
   it("ignores namespace because it is applied after the cached app is materialized", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-packaged-app-key-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-packaged-app-key-"));
 
     try {
       const config = createConfig(root, "standalone");

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import type { StagedDraftingResponse, StagedDraftingStatus } from '@open-design/contracts';
+import type { StagedDraftingResponse, StagedDraftingStatus } from '@mish/contracts';
 
 import { useT } from '../i18n';
 import { Icon } from './Icon';

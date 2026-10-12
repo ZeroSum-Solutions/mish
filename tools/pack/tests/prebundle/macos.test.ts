@@ -28,7 +28,7 @@ import {
 describe("mac standalone prebundle policy", () => {
   it("runs JSONC parse and modify after the daemon bundle is relocated", async () => {
     const workspaceRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../../..");
-    const root = await mkdtemp(join(tmpdir(), "open-design-mac-jsonc-prebundle-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-mac-jsonc-prebundle-"));
     const outputRoot = join(root, "build");
     const installedRoot = join(root, "installed");
     try {
@@ -81,13 +81,13 @@ describe("mac standalone prebundle policy", () => {
   it("keeps server-mode package topology unchanged", () => {
     expect(
       shouldInstallInternalPackageForMacPrebundle({
-        packageName: "@open-design/web",
+        packageName: "@mish/web",
         webOutputMode: "server",
       }),
     ).toBe(true);
     expect(
       shouldInstallInternalPackageForMacPrebundle({
-        packageName: "@open-design/packaged",
+        packageName: "@mish/packaged",
         webOutputMode: "server",
       }),
     ).toBe(true);
@@ -95,11 +95,11 @@ describe("mac standalone prebundle policy", () => {
 
   it("excludes internal packages replaced by mac standalone prebundles", () => {
     for (const packageName of [
-      "@open-design/daemon",
-      "@open-design/desktop",
-      "@open-design/packaged",
-      "@open-design/sidecar-proto",
-      "@open-design/web",
+      "@mish/daemon",
+      "@mish/desktop",
+      "@mish/packaged",
+      "@mish/sidecar-proto",
+      "@mish/web",
     ]) {
       expect(
         shouldInstallInternalPackageForMacPrebundle({
@@ -109,9 +109,9 @@ describe("mac standalone prebundle policy", () => {
       ).toBe(false);
     }
     for (const packageName of [
-      "@open-design/contracts",
-      "@open-design/platform",
-      "@open-design/sidecar",
+      "@mish/contracts",
+      "@mish/platform",
+      "@mish/sidecar",
     ]) {
       expect(
         shouldInstallInternalPackageForMacPrebundle({ packageName, webOutputMode: "standalone" }),
@@ -121,10 +121,10 @@ describe("mac standalone prebundle policy", () => {
 
   it("documents the explicit code-level bundle boundaries", () => {
     expect(MAC_PREBUNDLE_ESBUILD_TARGET).toBe("node24");
-    expect(MAC_PREBUNDLE_POLICIES.packagedMain.externals).toEqual(["@open-design/sidecar", "electron"]);
+    expect(MAC_PREBUNDLE_POLICIES.packagedMain.externals).toEqual(["@mish/sidecar", "electron"]);
     expect(MAC_PREBUNDLE_POLICIES.daemonCli.externals).toEqual([
       "@ffmpeg-installer/ffmpeg",
-      "@open-design/sidecar",
+      "@mish/sidecar",
       "better-sqlite3",
       "blake3-wasm",
       "fsevents",
@@ -134,7 +134,7 @@ describe("mac standalone prebundle policy", () => {
     ]);
     expect(MAC_PREBUNDLE_POLICIES.daemonSidecar.externals).toEqual([
       "@ffmpeg-installer/ffmpeg",
-      "@open-design/sidecar",
+      "@mish/sidecar",
       "better-sqlite3",
       "blake3-wasm",
       "fsevents",
@@ -142,7 +142,7 @@ describe("mac standalone prebundle policy", () => {
       "hyperframes",
       "node-pty",
     ]);
-    expect(MAC_PREBUNDLE_POLICIES.webSidecar.externals).toEqual(["@open-design/sidecar"]);
+    expect(MAC_PREBUNDLE_POLICIES.webSidecar.externals).toEqual(["@mish/sidecar"]);
     expect(MAC_DAEMON_PREBUNDLE_ESM_REQUIRE_BANNER).toContain("createRequire");
     // Must match apps/daemon/package.json / the pnpm lockfile, or
     // electron-builder's collector drops the module from the shipped app and
@@ -234,7 +234,7 @@ describe("findForbiddenMacPrebundleInputs", () => {
 
 describe("assertMacPrebundleMetafile", () => {
   it("accepts a safe web sidecar metafile", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-mac-prebundle-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-mac-prebundle-"));
     const metafilePath = join(root, "safe.json");
 
     try {
@@ -253,13 +253,13 @@ describe("assertMacPrebundleMetafile", () => {
   });
 
   it("rejects a packaged main metafile that pulled in web runtime closure", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-mac-prebundle-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-mac-prebundle-"));
     const metafilePath = join(root, "unsafe.json");
 
     try {
       await writeFile(
         metafilePath,
-        JSON.stringify({ inputs: { "/repo/node_modules/@open-design/web/dist/sidecar/index.js": {} } }),
+        JSON.stringify({ inputs: { "/repo/node_modules/@mish/web/dist/sidecar/index.js": {} } }),
         "utf8",
       );
 
@@ -272,7 +272,7 @@ describe("assertMacPrebundleMetafile", () => {
   });
 
   it("rejects a daemon metafile that bundled wasm-backed runtime dependencies", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-mac-prebundle-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-mac-prebundle-"));
     const metafilePath = join(root, "unsafe-daemon.json");
 
     try {
@@ -291,7 +291,7 @@ describe("assertMacPrebundleMetafile", () => {
   });
 
   it("rejects a daemon metafile that bundled native runtime dependencies", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-mac-prebundle-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-mac-prebundle-"));
     const metafilePath = join(root, "unsafe-native-daemon.json");
 
     try {
@@ -318,11 +318,11 @@ describe("assertMacPrebundleMetafile", () => {
 describe("renderMacPackagedMainEntry", () => {
   it("renders the prebundled runtime entry shim", () => {
     expect(renderMacPackagedMainEntry(true)).toContain("./prebundled/packaged-main.mjs");
-    expect(renderMacPackagedMainEntry(true)).not.toContain("@open-design/packaged");
+    expect(renderMacPackagedMainEntry(true)).not.toContain("@mish/packaged");
   });
 
   it("renders the package entry shim for non-prebundled mode", () => {
-    expect(renderMacPackagedMainEntry(false)).toContain("@open-design/packaged");
+    expect(renderMacPackagedMainEntry(false)).toContain("@mish/packaged");
     expect(renderMacPackagedMainEntry(false)).not.toContain("./prebundled/packaged-main.mjs");
   });
 });

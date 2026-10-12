@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { demoDocument } from '@open-design/genui-catalog/data';
+import { demoDocument } from '@mish/genui-catalog/data';
 import { createLocalResourceSources } from '../../src/workbench/resources.js';
 
 /**

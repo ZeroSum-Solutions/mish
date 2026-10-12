@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import * as contracts from '@open-design/contracts';
+import * as contracts from '@mish/contracts';
 
 afterEach(() => vi.unstubAllGlobals());
 

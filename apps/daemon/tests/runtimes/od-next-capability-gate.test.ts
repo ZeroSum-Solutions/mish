@@ -9,7 +9,7 @@ import {
   RuntimeCapabilityFixtureManifestV1Schema,
   type RuntimeCapabilityFixtureManifestV1,
   type RuntimeCapabilityRegistryEntryV1,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   CODEX_0_147_0_BEST_EFFORT_MANIFEST,
   CLAUDE_2_1_233_BEST_EFFORT_MANIFEST,
@@ -183,7 +183,7 @@ describe('OD Next runtime capability gate', () => {
     expect(seed.cases.every(({ outcome }) => outcome === 'passed')).toBe(true);
     expect(CLAUDE_2_1_233_BEST_EFFORT_MANIFEST.provenance).toMatchObject({
       kind: 'sanitized_real',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
       recordingDigest: digest,
     });
 
@@ -226,7 +226,7 @@ describe('OD Next runtime capability gate', () => {
     )) as { recordingDigest: string };
     expect(VELA_OPENCODE_LOCAL_BEST_EFFORT_MANIFEST.provenance).toMatchObject({
       kind: 'sanitized_real',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
       recordingDigest: seed.recordingDigest,
     });
     expect(resolveOdNextRuntimeCapability({
@@ -264,7 +264,7 @@ describe('OD Next runtime capability gate', () => {
     )) as { recordingDigest: string };
     expect(CODEX_0_147_0_BEST_EFFORT_MANIFEST.provenance).toMatchObject({
       kind: 'sanitized_real',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
       recordingDigest: seed.recordingDigest,
     });
     const exact = resolveOdNextRuntimeCapability({
@@ -358,7 +358,7 @@ describe('OD Next runtime capability gate', () => {
     )) as { recordingDigest: string };
     expect(OPENCODE_1_18_18_BEST_EFFORT_MANIFEST.provenance).toMatchObject({
       kind: 'sanitized_real',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
       recordingDigest: seed.recordingDigest,
     });
     const exact = resolveOdNextRuntimeCapability({

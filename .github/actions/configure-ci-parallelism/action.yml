@@ -28,8 +28,8 @@ runs:
         fi
 
         {
-          echo "OPEN_DESIGN_POSTINSTALL_CONCURRENCY=$workers"
-          echo "OPEN_DESIGN_WORKSPACE_CONCURRENCY=$workers"
+          echo "MISH_POSTINSTALL_CONCURRENCY=$workers"
+          echo "MISH_WORKSPACE_CONCURRENCY=$workers"
           echo "OD_CI_DAEMON_MAX_WORKERS=$workers"
           echo "OD_E2E_VITEST_MAX_WORKERS=$workers"
           echo "OD_PLAYWRIGHT_WORKERS=$playwright_workers"

@@ -744,7 +744,7 @@
       "sourceUrl": "https://21st.dev/",
       "licenceDecision": "clean-room",
       "verdict": "keep",
-      "rationale": "Clean-room implementation from component-specs.md \u00a79 prose only; no 21st.dev source was fetched or read.",
+      "rationale": "Clean-room implementation from component-specs.md §9 prose only; no 21st.dev source was fetched or read.",
       "tier": 1,
       "tierNote": "Tier 1",
       "portDifficulty": "Medium",
@@ -1124,7 +1124,7 @@
             "type": "number",
             "default": 60,
             "minimum": 0,
-            "description": "Delay between each revealed item, in ms \u2014 by intersection order, not DOM index."
+            "description": "Delay between each revealed item, in ms — by intersection order, not DOM index."
           },
           "duration": {
             "type": "number",
@@ -3184,7 +3184,7 @@
               "type": "string"
             },
             "default": [
-              "Ask anything\u2026"
+              "Ask anything…"
             ],
             "description": "Placeholder strings the field cycles through while empty and unfocused."
           },
@@ -3253,7 +3253,7 @@
         "The field requires a real `<label>` from the host, visible or visually hidden; the placeholder is never the field's only label.",
         "The send button has `aria-label=\"Send\"`, which switches to `\"Stop\"` together with `aria-busy=\"true\"` while busy.",
         "Suggestion chips are real `<button>`s, reachable and activatable by keyboard.",
-        "A visually-hidden `aria-live=\"polite\"` status region announces \"Sending\u2026\" while busy.",
+        "A visually-hidden `aria-live=\"polite\"` status region announces \"Sending…\" while busy.",
         "Focus rings are visible on the field, send button and chips; the default theme keeps at least 4.5:1 contrast.",
         "Enter submits and Shift+Enter inserts a newline; IME composition (`isComposing`) is respected so composing text never submits early."
       ],

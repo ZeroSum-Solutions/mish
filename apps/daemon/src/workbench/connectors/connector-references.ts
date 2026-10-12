@@ -1,4 +1,4 @@
-import { CONNECTOR_IDS, connectorResourceRef, type ConnectorId, type ResourceRef } from '@open-design/contracts';
+import { CONNECTOR_IDS, connectorResourceRef, type ConnectorId, type ResourceRef } from '@mish/contracts';
 import { ReferenceSelectionError, type DesignReferenceSource } from '../brief/references.js';
 import { ConnectorError, connectorDeriveDecision, type ConnectorProxy } from './connector-proxy.js';
 

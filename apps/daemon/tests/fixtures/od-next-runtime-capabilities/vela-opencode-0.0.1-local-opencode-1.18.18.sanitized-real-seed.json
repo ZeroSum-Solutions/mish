@@ -7,8 +7,8 @@
   "model": "gpt-5.6-terra",
   "recordingDigest": "sha256:6fe49f1e0946b2220052b2239494786879c03c972b5be12dee30a7973872f6aa",
   "anonymizationVersion": "od-runtime-evidence/v1",
-  "evidenceReview": "open_design_best_effort",
-  "note": "Open Design-local provider-backed replay of the unpublished Vela candidate. Identifiers are anonymized, Prompt bodies are excluded, and this evidence does not make the candidate a published production tuple.",
+  "evidenceReview": "mish_best_effort",
+  "note": "Mish-local provider-backed replay of the unpublished Vela candidate. Identifiers are anonymized, Prompt bodies are excluded, and this evidence does not make the candidate a published production tuple.",
   "caseCoverage": [
     {
       "caseId": "main_run",

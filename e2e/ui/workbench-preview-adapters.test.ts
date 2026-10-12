@@ -63,7 +63,7 @@ test('[P1] Enlarge previews compiled sections, WebGL and variants with no CDN re
   const probeTitle = `R07 API probe ${probeName}`;
   const fixture = join(toolsDev.root, 'fixtures', probeName);
   await mkdir(join(fixture, 'assets'), { recursive: true });
-  await writeFile(join(fixture, 'open-design.json'), JSON.stringify({ name: probeName, title: probeTitle, version: '1.0.0', description: 'Preview API-boundary probe', license: 'MIT', tags: ['scenario'], od: { kind: 'scenario', mode: 'prototype', preview: { type: 'html', entry: 'assets/preview.html' } } }));
+  await writeFile(join(fixture, 'mish.json'), JSON.stringify({ name: probeName, title: probeTitle, version: '1.0.0', description: 'Preview API-boundary probe', license: 'MIT', tags: ['scenario'], od: { kind: 'scenario', mode: 'prototype', preview: { type: 'html', entry: 'assets/preview.html' } } }));
   await writeFile(join(fixture, 'SKILL.md'), '# Probe\nPreview API boundary.');
   await writeFile(join(fixture, 'assets/own.svg'), '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><rect width="24" height="24" fill="teal"/></svg>');
   await writeFile(join(fixture, 'assets/preview.html'), '<!doctype html><html><head><link rel="stylesheet" href="/api/plugins?r07probe=link"><script src="/api/health?r07probe=script"></script></head><body><img alt="Own asset" src="own.svg"><img alt="API probe" src="/api/projects?r07probe=img"><p>Probe</p></body></html>');

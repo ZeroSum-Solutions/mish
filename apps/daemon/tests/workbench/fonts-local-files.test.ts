@@ -2,9 +2,9 @@ import { mkdtempSync, rmSync, symlinkSync, writeFileSync, readFileSync } from 'n
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
+import { createFontsResourceSource } from '../fixtures/daemon-b/fonts.js';
 import { FONT_FILE_LIMIT } from '../../src/fonts/local-files.js';
-import { REPO_BUNDLED_PLUGINS_ROOT, authority, catalogueCopy, copiedFontRoot } from './fonts-fixture.js';
+import { REPO_BUNDLED_PLUGINS_ROOT, authority, catalogueCopy, copiedFontRoot } from '../fixtures/daemon-b/fonts.js';
 
 const plexFiles = () => catalogueCopy().families.find(family => family.id === 'ibm-plex-mono')!.localFiles;
 async function plex(root: string) {

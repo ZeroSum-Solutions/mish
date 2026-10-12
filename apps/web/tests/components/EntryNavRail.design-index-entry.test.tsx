@@ -7,7 +7,7 @@
 // click lands on the view rather than on some near-miss route.
 
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { EntryNavRail } from '../../src/components/EntryNavRail';

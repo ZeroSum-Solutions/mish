@@ -7,7 +7,7 @@
  * connectionTest.ts and server.ts (via the acp/ barrel).
  */
 import path from 'node:path';
-import type { ExecutionProfile } from '@open-design/contracts';
+import type { ExecutionProfile } from '@mish/contracts';
 import {
   createDsmlArtifactTextSuppressor,
   createToolCallTextSuppressor,
@@ -194,7 +194,7 @@ export function attachAcpSession({
   envFormat = 'array',
   stdioMcpRemovedInVersion,
   send,
-  clientName = 'open-design',
+  clientName = 'mish',
   clientVersion = 'runtime-adapter',
   stageTimeoutMs = DEFAULT_STAGE_TIMEOUT_MS,
   executionProfile = 'filesystem',

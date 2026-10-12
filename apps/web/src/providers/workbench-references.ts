@@ -1,7 +1,7 @@
 import {
   parseReferenceFanoutRequest, parseReferenceFanoutResponse,
   type ReferenceFanoutRequest, type ReferenceFanoutResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { checkedWorkbenchResponse } from './workbench-connectors';
 
 export type ReferenceFanoutInput = Omit<ReferenceFanoutRequest, 'limit'> & { limit?: number };

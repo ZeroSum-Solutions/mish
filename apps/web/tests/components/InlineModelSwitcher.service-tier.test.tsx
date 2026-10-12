@@ -8,7 +8,7 @@ import { useSessionModel } from '../../src/runtime/workbench/use-session-model';
 import { DEFAULT_CONFIG } from '../../src/state/config';
 import { resetWorkspaceContextCache } from '../../src/collab/useWorkspaceContext';
 import type { AgentInfo, AppConfig } from '../../src/types';
-import { parsePutSessionModel, sessionModelChoicesEqual } from '@open-design/contracts';
+import { parsePutSessionModel, sessionModelChoicesEqual } from '@mish/contracts';
 import { putSessionModel } from '../../src/providers/workbench';
 import { getSessionModelFixture, putSessionModelFixture, resetSessionModelApiFixture } from '../fixtures/session-model-api';
 

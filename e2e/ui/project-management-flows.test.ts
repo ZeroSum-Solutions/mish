@@ -5,7 +5,7 @@ import { ensureRailOpen, openNewProjectModal } from '@/playwright/rail';
 import { openAllProjectFiles } from '@/playwright/workspace';
 import { T } from '@/timeouts';
 import type { Locator, Page, Request } from '@playwright/test';
-import { parseSessionModelSnapshot, type SessionModelSnapshot, type DesignSystemSummary } from '@open-design/contracts';
+import { parseSessionModelSnapshot, type SessionModelSnapshot, type DesignSystemSummary } from '@mish/contracts';
 import { routeAgents, routeSuccessfulRuns, suppressWhatsNew } from '../lib/playwright/mock-factory.js';
 import {
   AMR_PERSONAL_WORKSPACE_CONTEXT,
@@ -30,7 +30,7 @@ async function stubCatalogsEmpty(page: Page): Promise<void> {
   });
 }
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 function projectDesignSystemTrigger(page: Page): Locator {
   return page
     .getByTestId('chat-composer')
@@ -787,7 +787,7 @@ test('[P1] project detail composer plus menu opens project, local code, Figma he
     await route.fulfill({
       json: {
         project: referenceProject,
-        resolvedDir: '/tmp/open-design/reference-project-context',
+        resolvedDir: '/tmp/mish/reference-project-context',
       },
     });
   });
@@ -814,7 +814,7 @@ test('[P1] project detail composer plus menu opens project, local code, Figma he
     });
   });
   await page.route('**/api/dialog/open-folder', async (route) => {
-    await route.fulfill({ json: { path: '/tmp/open-design/local-code-project' } });
+    await route.fulfill({ json: { path: '/tmp/mish/local-code-project' } });
   });
   await page.route('**/api/dir-exists', async (route) => {
     await route.fulfill({ json: { exists: true } });
@@ -985,7 +985,7 @@ test('[P1] project detail composer sends referenced workspace contexts into the 
     await route.fulfill({
       json: {
         project: referenceProject,
-        resolvedDir: '/tmp/open-design/reference-project-payload',
+        resolvedDir: '/tmp/mish/reference-project-payload',
       },
     });
   });
@@ -1008,7 +1008,7 @@ test('[P1] project detail composer sends referenced workspace contexts into the 
     await route.fallback();
   });
   await page.route('**/api/dialog/open-folder', async (route) => {
-    await route.fulfill({ json: { path: '/tmp/open-design/local-code-project-payload' } });
+    await route.fulfill({ json: { path: '/tmp/mish/local-code-project-payload' } });
   });
   await page.route('**/api/dir-exists', async (route) => {
     await route.fulfill({ json: { exists: true } });
@@ -1047,12 +1047,12 @@ test('[P1] project detail composer sends referenced workspace contexts into the 
       expect.objectContaining({
         id: 'project:ref-project-payload',
         label: 'Reference Project Payload',
-        absolutePath: '/tmp/open-design/reference-project-payload',
+        absolutePath: '/tmp/mish/reference-project-payload',
       }),
       expect.objectContaining({
-        id: 'local-code:/tmp/open-design/local-code-project-payload',
+        id: 'local-code:/tmp/mish/local-code-project-payload',
         label: 'local-code-project-payload',
-        absolutePath: '/tmp/open-design/local-code-project-payload',
+        absolutePath: '/tmp/mish/local-code-project-payload',
       }),
     ]),
   );
@@ -1065,7 +1065,7 @@ test('[P1] project detail composer removing local-code context updates metadata 
   await routeComposerPlusFixtures(page);
   await routeSuccessfulRuns(page, { bodies: runRequestBodies, runIdPrefix: 'workspace-context-remove-run' });
   await page.route('**/api/dialog/open-folder', async (route) => {
-    await route.fulfill({ json: { path: '/tmp/open-design/local-code-remove' } });
+    await route.fulfill({ json: { path: '/tmp/mish/local-code-remove' } });
   });
   await page.route('**/api/dir-exists', async (route) => {
     await route.fulfill({ json: { exists: true } });
@@ -1126,7 +1126,7 @@ test('[P1] project detail keeps local-code context when linkedDirs PATCH removal
   await routeComposerPlusFixtures(page);
   await routeSuccessfulRuns(page, { bodies: runRequestBodies, runIdPrefix: 'workspace-context-remove-failure-run' });
   await page.route('**/api/dialog/open-folder', async (route) => {
-    await route.fulfill({ json: { path: '/tmp/open-design/local-code-persist' } });
+    await route.fulfill({ json: { path: '/tmp/mish/local-code-persist' } });
   });
   await page.route('**/api/dir-exists', async (route) => {
     await route.fulfill({ json: { exists: true } });
@@ -1188,7 +1188,7 @@ test('[P1] project detail keeps local-code context when linkedDirs PATCH removal
     expect.arrayContaining([
       expect.objectContaining({
         label: 'local-code-persist',
-        absolutePath: '/tmp/open-design/local-code-persist',
+        absolutePath: '/tmp/mish/local-code-persist',
       }),
     ]),
   );
@@ -1227,18 +1227,18 @@ test('[P1] project detail composer context actions emit analytics event fields',
         enabled: true,
         env: 'e2e',
         key: 'phc_e2e',
-        host: 'https://analytics.open-design.test',
+        host: 'https://analytics.mish.test',
         installationId: 'e2e-installation',
       },
     });
   });
-  await page.route('https://analytics.open-design.test/**', async (route) => {
+  await page.route('https://analytics.mish.test/**', async (route) => {
     analyticsBodies.push(route.request().postData() ?? '');
     await route.fulfill({ status: 200, json: { status: 1 } });
   });
   await routeComposerPlusFixtures(page);
   await page.route('**/api/dialog/open-folder', async (route) => {
-    await route.fulfill({ json: { path: '/tmp/open-design/local-code-analytics' } });
+    await route.fulfill({ json: { path: '/tmp/mish/local-code-analytics' } });
   });
   await page.route('**/api/dir-exists', async (route) => {
     await route.fulfill({ json: { exists: true } });
@@ -2015,9 +2015,15 @@ test('[P0] clearing the project design system removes designSystemId from the ne
     await route.continue();
   });
   await routeSuccessfulRuns(page, { bodies: runRequestBodies, runId: 'design-system-clear-run' });
+  // This helper creates through APIRequestContext, bypassing the browser-side
+  // same-session creation witness. Pin the scenario to an exact writable
+  // Personal owner so a slow catalog/status read cannot turn it viewer-only.
+  await mockWritablePersonalProjectScope(page);
 
   await page.goto('/');
-  await createProject(page, 'Header design system clear run context');
+  await createProject(page, 'Header design system clear run context', {
+    headers: AMR_PERSONAL_WORKSPACE_HEADERS,
+  });
   await expectWorkspaceReady(page);
 
   const trigger = projectDesignSystemTrigger(page);
@@ -2844,12 +2850,12 @@ test('[P1] project detail fork emits correlated click and result analytics', asy
         enabled: true,
         env: 'e2e',
         key: 'phc_e2e',
-        host: 'https://analytics.open-design.test',
+        host: 'https://analytics.mish.test',
         installationId: 'e2e-installation',
       },
     });
   });
-  await page.route('https://analytics.open-design.test/**', async (route) => {
+  await page.route('https://analytics.mish.test/**', async (route) => {
     analyticsBodies.push(route.request().postData() ?? '');
     await route.fulfill({ status: 200, json: { status: 1 } });
   });

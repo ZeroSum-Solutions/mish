@@ -13,7 +13,7 @@
 // profile digest.
 
 import type { CSSProperties } from 'react';
-import type { DesignProfile } from '@open-design/contracts';
+import type { DesignProfile } from '@mish/contracts';
 import {
   archetypeNameForId,
   referenceArchetypeId,

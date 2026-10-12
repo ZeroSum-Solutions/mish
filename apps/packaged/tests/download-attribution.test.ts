@@ -19,12 +19,12 @@ describe("download attribution token extraction", () => {
   it("extracts the token from the distributor path segment", () => {
     expect(
       extractDownloadAttributionTokenFromUrl(
-        "https://download.open-design.ai/mac/arm64/oddl_Abc12345/Open-Design.dmg",
+        "https://download.mish.invalid/mac/arm64/oddl_Abc12345/Mish.dmg",
       ),
     ).toBe("oddl_Abc12345");
     expect(
       extractDownloadAttributionTokenFromUrl(
-        "https://download.open-design.ai/windows/x64/token-123456/Open%20Design-setup.exe",
+        "https://download.mish.invalid/windows/x64/token-123456/Open%20Design-setup.exe",
       ),
     ).toBe("token-123456");
   });
@@ -32,7 +32,7 @@ describe("download attribution token extraction", () => {
   it("does not treat GitHub release paths as attributed download URLs", () => {
     expect(
       extractDownloadAttributionTokenFromUrl(
-        "https://github.com/nexu-io/open-design/releases/download/open-design-v1/Open-Design-mac-arm64.dmg",
+        "https://github.com/ZeroSum-Solutions/mish/releases/download/mish-v1/Mish-mac-arm64.dmg",
       ),
     ).toBeNull();
   });
@@ -41,7 +41,7 @@ describe("download attribution token extraction", () => {
 describe("packaged download attribution lifecycle", () => {
   it("does not re-submit a terminal installer observation on the next launch", async () => {
     const installerObservationRoot = await mkdtemp(join(tmpdir(), "od-download-attribution-"));
-    const rawUrl = "https://download.open-design.ai/windows/x64/oddl_terminal_123/Open-Design-setup.exe";
+    const rawUrl = "https://download.mish.invalid/windows/x64/oddl_terminal_123/Mish-setup.exe";
     await writeFile(join(installerObservationRoot, "download-attribution.json"), JSON.stringify({
       token: "oddl_terminal_123", rawUrl,
     }));

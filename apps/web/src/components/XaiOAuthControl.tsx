@@ -13,7 +13,7 @@
 
 'use client';
 
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 import { useEffect, useRef, useState } from 'react';
 
 interface XaiAuthStatus {

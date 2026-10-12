@@ -1,5 +1,5 @@
-import { createModelCaller, ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError, type ModelCall } from '@open-design/agency-fast-lane/deepseek';
-import type { ReviewerReasonCode } from '@open-design/contracts';
+import { createModelCaller, ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError, type ModelCall } from '@mish/agency-fast-lane/deepseek';
+import type { ReviewerReasonCode } from '@mish/contracts';
 import { textReviewerSplit } from './abstain.js';
 import { buildReviewPrompt, parseVerdicts } from './prompt.js';
 import { ReviewerCallError, type ReviewerAdapter, type ReviewerResult } from './types.js';

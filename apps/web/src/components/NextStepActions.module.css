@@ -462,12 +462,12 @@
   background: var(--border-soft);
 }
 
-.openDesignRow {
+.mishRow {
   display: flex;
   align-items: center;
 }
 
-.openDesignButton {
+.mishButton {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -483,12 +483,12 @@
     border-color 140ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-.openDesignButton:hover:not(:disabled) {
+.mishButton:hover:not(:disabled) {
   background: var(--bg-default);
   border-color: var(--border-soft);
 }
 
-.openDesignButton:disabled {
+.mishButton:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }

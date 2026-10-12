@@ -76,8 +76,8 @@ if (buildRef !== "main") {
 
 const packagedVersion = readPackagedVersion();
 const packagedBase = parseReleaseBaseVersion(packagedVersion, "packaged version");
-const metadataUrl = new URL(requiredEnv("OPEN_DESIGN_BETA_METADATA_URL"));
-if (metadataUrl.protocol !== "https:") fail("OPEN_DESIGN_BETA_METADATA_URL must use https");
+const metadataUrl = new URL(requiredEnv("MISH_BETA_METADATA_URL"));
+if (metadataUrl.protocol !== "https:") fail("MISH_BETA_METADATA_URL must use https");
 
 const response = await fetch(metadataUrl, {
   headers: { accept: "application/json" },

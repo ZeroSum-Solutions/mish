@@ -28,7 +28,7 @@ import {
   type StrategyTaskProjectionV2,
   type ProjectMetadata as ContractProjectMetadata,
   type RunResultPackageResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   buildRunCreatedV4Aliases,
   buildRunFinishedV4Aliases,
@@ -41,11 +41,11 @@ import {
   type TrackingDesignSystemEditSurface,
   type RunTaskLineageProps,
   type TrackingRunRecoveryActionType,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { resolveRunDesignBrief } from '../workbench/brief/run-binding.js';
 import type { DesignBriefService } from '../workbench/brief/service.js';
-import type { DesignBrief } from '@open-design/contracts';
-import type { OdNativeEvent } from '@open-design/agui-adapter';
+import type { DesignBrief } from '@mish/contracts';
+import type { OdNativeEvent } from '@mish/agui-adapter';
 import { newInsertId, readAnalyticsContext } from '../analytics.js';
 import type { AnalyticsContext } from '../analytics.js';
 import { spawnEnvForAgent } from '../agents.js';
@@ -89,7 +89,7 @@ import { parseMediaExecutionPolicyInput } from '../media/policy.js';
 import { isManagedProjectCwd } from '../mcp-config.js';
 import {
   normalizeExternalPluginRunAnalyticsHints,
-  OPEN_DESIGN_PLUGIN_ID,
+  MISH_PLUGIN_ID,
   resolvePluginGenerationSloWindowMs,
   validatePluginWorkflowId,
 } from '../mcp-observability.js';
@@ -902,8 +902,8 @@ function externalPluginAttributionMismatch(
       ? (incoming as Record<string, unknown>)
       : null;
   const existingIsPlugin =
-    existing?.externalPluginId === OPEN_DESIGN_PLUGIN_ID;
-  const nextIsPlugin = next?.externalPluginId === OPEN_DESIGN_PLUGIN_ID;
+    existing?.externalPluginId === MISH_PLUGIN_ID;
+  const nextIsPlugin = next?.externalPluginId === MISH_PLUGIN_ID;
   if (!existingIsPlugin && !nextIsPlugin) return false;
   if (!existingIsPlugin || !nextIsPlugin) return true;
   return EXTERNAL_PLUGIN_ANALYTICS_KEYS.some(
@@ -3471,7 +3471,7 @@ export function registerRunRoutes(app: Express, ctx: RegisterRunRoutesDeps) {
     const analytics =
       run?.externalPluginAnalytics
       && run.externalPluginAnalytics.externalPluginId
-        === OPEN_DESIGN_PLUGIN_ID
+        === MISH_PLUGIN_ID
         ? run.externalPluginAnalytics
         : null;
     if (!run || !analytics) {
@@ -3684,7 +3684,7 @@ export function registerRunRoutes(app: Express, ctx: RegisterRunRoutesDeps) {
       run,
       { mode: 'read', allowNavigationQuery: true },
     )) return;
-    const { encodeOdEventForAgui } = await import('@open-design/agui-adapter');
+    const { encodeOdEventForAgui } = await import('@mish/agui-adapter');
     const sse = createSseResponse(res);
     const lastEventId = Number(req.get('Last-Event-ID') || req.query.after || 0);
     const mapRecord = (record: RunEventRecord) => {

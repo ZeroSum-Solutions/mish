@@ -10,12 +10,12 @@ Mishh Mashh runs on Windows natively, but the path is less travelled than macOS,
 
 ### Symptom
 
-When you run the downloaded installer (for example `open-design-0.11.0-win-x64-setup.exe`), a blue Windows Defender SmartScreen dialog appears:
+When you run the downloaded installer (for example `mish-0.11.0-win-x64-setup.exe`), a blue Windows Defender SmartScreen dialog appears:
 
 ```text
 Windows protected your PC
 Microsoft Defender SmartScreen prevented an unrecognized app from starting.
-App:       open-design-x.y.z-win-x64-setup.exe
+App:       mish-x.y.z-win-x64-setup.exe
 Publisher: Unknown publisher
 ```
 
@@ -42,7 +42,7 @@ Only run the installer if you got it from an official source:
 Do not run an installer from a mirror, a re-upload, or a link you cannot trace back to one of those two sources. If a release publishes a SHA-256 checksum, you can confirm the file is intact before running it:
 
 ```powershell
-Get-FileHash .\open-design-x.y.z-win-x64-setup.exe -Algorithm SHA256
+Get-FileHash .\mish-x.y.z-win-x64-setup.exe -Algorithm SHA256
 ```
 
 Compare the printed hash against the checksum listed on the release page. They must match exactly.

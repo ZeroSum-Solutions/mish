@@ -5,7 +5,7 @@ import {
   type NormalizedUsageEvidenceV1,
   type SafeRunQualityV1,
   type StrategyInputStageV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   structuredPromptStackInput,
@@ -47,7 +47,7 @@ export interface StructuredMainRunObservationV1Input {
 }
 
 interface SafeOdNextHostComposedPromptV1 extends Record<string, unknown> {
-  type: 'open-design.od-next-host-composed-prompt';
+  type: 'mish.od-next-host-composed-prompt';
   schema: OdNextExactSendPromptEvidenceV1['schema'];
   boundary: OdNextExactSendPromptEvidenceV1['boundary'];
   kind: OdNextExactSendPromptEvidenceV1['kind'];
@@ -68,7 +68,7 @@ function safeOdNextHostComposedPrompt(
     throw new Error('OD Next exact-send Prompt stage does not match its task Run mapping.');
   }
   return {
-    type: 'open-design.od-next-host-composed-prompt',
+    type: 'mish.od-next-host-composed-prompt',
     schema: exact.schema,
     boundary: exact.boundary,
     kind: exact.kind,

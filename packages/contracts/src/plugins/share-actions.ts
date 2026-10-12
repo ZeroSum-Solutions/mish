@@ -1,6 +1,6 @@
 export const PLUGIN_SHARE_ACTIONS = [
   'publish-github',
-  'contribute-open-design',
+  'contribute-mish',
 ] as const;
 
 export type PluginShareAction = (typeof PLUGIN_SHARE_ACTIONS)[number];

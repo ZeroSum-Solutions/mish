@@ -343,8 +343,8 @@ Branch state:
 Local checks:
 
 - `pnpm install`
-- `pnpm --filter @open-design/daemon exec vitest run -c vitest.config.ts tests/langfuse-trace.test.ts tests/langfuse-bridge.test.ts tests/claude-stream-thinking.test.ts`
-- `pnpm --filter @open-design/daemon typecheck`
+- `pnpm --filter @mish/daemon exec vitest run -c vitest.config.ts tests/langfuse-trace.test.ts tests/langfuse-bridge.test.ts tests/claude-stream-thinking.test.ts`
+- `pnpm --filter @mish/daemon typecheck`
 - `pnpm guard`
 
 End-to-end validation:

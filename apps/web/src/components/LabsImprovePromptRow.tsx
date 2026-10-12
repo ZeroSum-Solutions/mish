@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
-import type { BriefTransformerStatus, BriefTransformerStatusResponse } from '@open-design/contracts';
+import type { BriefTransformerStatus, BriefTransformerStatusResponse } from '@mish/contracts';
 
 import { useT } from '../i18n';
 import { Icon } from './Icon';

@@ -5,7 +5,7 @@
 // labels and the outdated marker, and runs U1's mechanical-only check.
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ReviewRunView } from '@open-design/contracts';
+import type { ReviewRunView } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchReviewRun } from '../../../src/components/workbench/WorkbenchReviewRun';
 import { WorkbenchReviewPanel } from '../../../src/components/workbench/WorkbenchReviewPanel';

@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import { agentIdToTracking } from '@open-design/contracts/analytics';
+import { agentIdToTracking } from '@mish/contracts/analytics';
 import { SHIPPED_AGENT_DEFS } from '../../src/runtimes/registry.js';
 
 // `other` is the honest answer for an agent id analytics has never heard of.

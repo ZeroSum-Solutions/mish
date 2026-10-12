@@ -3,7 +3,7 @@
   "generated_at": "2026-05-29T06:21:39.088Z",
   "storage": {
     "provider": "cloudflare-r2",
-    "bucket": "open-design-mocks",
+    "bucket": "mish-mocks",
     "public_url_base": "https://pub-89c3624d8b4a48018c37b212dbc4b945.r2.dev",
     "object_prefix": "recordings/v1/"
   },

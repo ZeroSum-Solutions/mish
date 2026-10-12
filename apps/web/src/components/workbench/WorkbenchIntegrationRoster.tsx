@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
-import { Badge, Button, DisclosureRow, Input, Select } from '@open-design/components';
+import { Badge, Button, DisclosureRow, Input, Select } from '@mish/components';
 import {
   SOURCE_OPERATIONS, integrationTestability, parseLicenceRecordSnapshot,
   type IntegrationRoster, type IntegrationRosterEntry, type LicenceDraft, type LicenceRecord, type LicenceRecordSnapshot,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useT } from '../../i18n';
 import { getIntegrationRoster, putLicenceRecord, testIntegration } from '../../providers/workbench-integrations';
 import { WorkbenchRequestError } from '../../providers/workbench';

@@ -13,7 +13,7 @@ import {
   type PromptBoundaryEvidenceV1,
   type SafeDeliverableSyntaxTelemetryV1,
   type StrategyInputStageV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type Database from 'better-sqlite3';
 
 import type { TelemetryPrefs } from '../app-config.js';
@@ -149,7 +149,7 @@ function distinctRuntimeVersions(
 }
 
 export interface StrategyTaskObservationAggregateV1 {
-  schema: 'open-design.strategy-task-observation/v1';
+  schema: 'mish.strategy-task-observation/v1';
   root: StrategyTaskObservationRootV1;
   observations: NormalizedAgentObservationV1[];
   coverage: TaskObservationCoverageV1;
@@ -158,8 +158,8 @@ export interface StrategyTaskObservationAggregateV1 {
 }
 
 export const TASK_OBSERVATION_SCHEMA_CAPABILITY_V1 = {
-  schema: 'open-design.task-observation-schema-capability/v1',
-  aggregateSchema: 'open-design.strategy-task-observation/v1',
+  schema: 'mish.task-observation-schema-capability/v1',
+  aggregateSchema: 'mish.strategy-task-observation/v1',
   normalizedObservationSchema: NORMALIZED_AGENT_OBSERVATION_V1_SCHEMA,
   safeRunQualitySchema: SAFE_RUN_QUALITY_V1_SCHEMA,
   safeQualityFields: [
@@ -225,7 +225,7 @@ export function strategyTaskRunObservationId(
 
 function stableLegacyEventId(type: string, bodyId: string): string {
   return `od-${createHash('sha256')
-    .update(`open-design/task-observation-legacy/v1\n${type}\n${bodyId}`, 'utf8')
+    .update(`mish/task-observation-legacy/v1\n${type}\n${bodyId}`, 'utf8')
     .digest('hex')}`;
 }
 
@@ -652,7 +652,7 @@ export function aggregateStrategyTaskObservations(input: {
   });
 
   return {
-    schema: 'open-design.strategy-task-observation/v1',
+    schema: 'mish.strategy-task-observation/v1',
     root: {
       observationId: rootObservationId,
       taskExecutionId: input.task.taskExecutionId,
@@ -1094,7 +1094,7 @@ export function buildLegacyTaskObservationPayload(
   };
   pushEvent('trace-create', {
     id: traceId,
-    name: 'open-design-strategy-task',
+    name: 'mish-strategy-task',
     sessionId: aggregate.root.conversationId,
     userId: context?.installationId ?? undefined,
     release: context?.appVersion,

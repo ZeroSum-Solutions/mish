@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AgentInfo } from '@open-design/contracts';
+import type { AgentInfo } from '@mish/contracts';
 import {
   reportAgentDetectDiagnostics,
   resetAgentDetectDiagnosticReporting,

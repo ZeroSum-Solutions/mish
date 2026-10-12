@@ -23,7 +23,7 @@ import { createPortal } from 'react-dom';
 import {
   Button, Chip, PreviewCard, PreviewCardMedia, PreviewCardCaption, PreviewCardTitle,
   PreviewCardDescription, VisuallyHidden,
-} from '@open-design/components';
+} from '@mish/components';
 import type {
   CSSProperties,
   DragEvent as ReactDragEvent,
@@ -42,7 +42,7 @@ import type {
   McpServerConfig,
   WorkspaceCollabContext,
   WorkspaceContextItem,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { DesignSystemPicker } from './DesignSystemPicker';
 import type { SkillSummary } from '../types';
 import { Icon, type IconName } from './Icon';
@@ -122,7 +122,7 @@ import { TypePillRow } from './home-hero/TypePillRow';
 import { LibraryPicker } from './LibraryPicker';
 import { assetTitle } from './LibraryAssetMeta';
 import { libraryAssetRawUrl } from '../providers/registry';
-import type { LibraryAsset } from '@open-design/contracts';
+import type { LibraryAsset } from '@mish/contracts';
 import { WorkingDirPicker } from './WorkingDirPicker';
 import {
   ProjectReferenceModal,
@@ -1202,7 +1202,7 @@ export const HomeHero = forwardRef<HomeHeroHandle, Props>(function HomeHero(
     });
   }
 
-  function openDesignSystemPicker() {
+  function mishSystemPicker() {
     const trigger = homeHeroRef.current?.querySelector<HTMLButtonElement>(
       '[data-testid="home-hero-design-system-trigger"]',
     );
@@ -2168,13 +2168,13 @@ export const HomeHero = forwardRef<HomeHeroHandle, Props>(function HomeHero(
                 });
                 setFigmaHelpOpen(true);
               }}
-              onOpenDesignSystems={onDesignSystemChange ? () => {
+              onMishSystems={onDesignSystemChange ? () => {
                 trackHomeChatComposerClick(analytics.track, {
                   page_name: 'home',
                   area: 'chat_composer',
                   element: 'design_system_open',
                 });
-                openDesignSystemPicker();
+                mishSystemPicker();
               } : undefined}
             />
             {libraryPickerOpen ? (

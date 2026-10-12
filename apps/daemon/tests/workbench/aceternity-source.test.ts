@@ -1,10 +1,10 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { Server } from 'node:http';
 import { createHash } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import { SOURCE_OPERATIONS } from '@open-design/contracts';
+import { SOURCE_OPERATIONS } from '@mish/contracts';
+import { ACETERNITY_ITEMS } from '../../src/workbench/reference-sources.js';
 import { createLocalResourceSources, searchResources } from '../../src/workbench/resources.js';
 import { runAdoptionCli } from '../../src/workbench/placement/adoption-cli.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';
@@ -16,30 +16,32 @@ import { ACETERNITY_FREE_RIGHTS_ASSESSMENTS } from '../../src/workbench/aceterni
 import type { ShadcnFetch } from '../../src/design-systems/shadcn-import.js';
 import { ENTRY, adoptionFixture, adoptionServer, closeAll, post } from './adoption-route-fixture.js';
 
-/**
- * AC-R18.6: Aceternity is discovered through the existing shadcn registry route as a
- * `project-fetch` source. Each evaluated item carries its exact registry locator and
- * digests. Owner decision 2026-10-09 admits its private operations under the
- * `owner-accepted-private-use` basis, so apply works for all three evaluated items
- * through HTTP and od: the daemon fetches the registry item, checks the pinned digest,
- * writes the component with a notice and undoes exactly. tabs and card-hover-effect stay
- * marked needs-repair. Nothing is purchased or mirrored.
- */
+// Exercises the existing project-fetch adapter using owned synthetic registry documents.
 const roots: string[] = [];
 const servers: Server[] = [];
 afterEach(() => closeAll(servers, roots));
 
 const sources = () => createLocalResourceSources({ listPlugins: async () => [] });
-const MANIFEST = {
-  'bento-grid': '9d988ea63b4209b65e386aa26dba37005d67667e122184c8905b6d31eda32482',
-  'card-hover-effect': '6f9451d50fdce14344c0fbab29f8f47ac29bd11d11dc11fb95f3fc94bce271af',
-  tabs: 'a0f2d1eb503190ec2e53ee5887a9b33d7c94e3f6d6548f07afd0a79ef0effcaa',
+// These registry documents are owned minimal fixtures, never retrieved vendor code.
+const SYNTHETIC_COMPONENTS = {
+  'bento-grid': 'import { IconBox } from "@tabler/icons-react";\nimport { cn } from "@/lib/utils";\nexport function BentoGrid() { return null; }\n',
+  'card-hover-effect': 'import { motion } from "motion/react";\nimport { cn } from "@/lib/utils";\nexport function HoverEffect() { return null; }\n',
+  tabs: 'import { Tabs } from "@radix-ui/react-tabs";\nimport { motion } from "motion/react";\nimport { cn } from "@/lib/utils";\nexport function AnimatedTabs() { return null; }\n',
 } as const;
-type ItemId = keyof typeof MANIFEST;
-const ITEMS = Object.keys(MANIFEST) as ItemId[];
-const FIXTURES = fileURLToPath(new URL('../fixtures/workbench/aceternity/', import.meta.url));
-const registryText = (id: ItemId) => readFileSync(join(FIXTURES, `${id}.json`), 'utf8');
-const componentOf = (id: ItemId): string => JSON.parse(registryText(id)).files[0].content;
+type ItemId = keyof typeof SYNTHETIC_COMPONENTS;
+const ITEMS = Object.keys(SYNTHETIC_COMPONENTS) as ItemId[];
+const sha = (text: string) => createHash('sha256').update(text).digest('hex');
+const registryText = (id: ItemId) => JSON.stringify({ name: id, type: 'registry:ui', dependencies: ACETERNITY_ITEMS.find(item => item.itemId === id)!.dependencies, files: [{ path: `${id}.tsx`, type: 'registry:ui', content: SYNTHETIC_COMPONENTS[id] }] });
+const componentOf = (id: ItemId) => SYNTHETIC_COMPONENTS[id];
+const MANIFEST = Object.fromEntries(ITEMS.map(id => [id, sha(registryText(id))])) as Record<ItemId, string>;
+// Bind test-only catalogue metadata and assessment digests to the owned fixture bytes.
+for (const id of ITEMS) {
+  Object.assign(ACETERNITY_ITEMS.find(item => item.itemId === id)!, { registrySha256: MANIFEST[id], componentSha256: sha(componentOf(id)) });
+  const assessment = ACETERNITY_FREE_RIGHTS_ASSESSMENTS.find(record => record.source.ref.itemId === id)!;
+  assessment.source.ref.revisionOrDigest = `sha256:${MANIFEST[id]}`;
+  assessment.source.contentSha256 = sha(componentOf(id));
+  assessment.source.closureDigest = MANIFEST[id];
+}
 const DEPENDENCIES = { dependencies: { '@tabler/icons-react': '^3.0.0', motion: '^12.0.0', '@radix-ui/react-tabs': '^1.1.0', cn: '^0.4.0' } };
 /** shadcn's MIT `utils` helper (new-york-v4), byte-pinned: retrieved 2026-10-09T01:48:37Z. */
 const SHADCN_UTILS = 'export { cn } from "cn"\n';

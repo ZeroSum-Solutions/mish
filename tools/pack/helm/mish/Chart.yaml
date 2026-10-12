@@ -1,0 +1,22 @@
+apiVersion: v2
+name: mish
+description: |
+  Mishh Mashh daemon Helm chart. Spec §15.5 reference deployment for
+  AWS / GCP / Azure / Aliyun / Tencent / Huawei / self-hosted Kubernetes.
+  Pairs with `tools/pack/docker-compose.yml` as the docker-only entry
+  point.
+type: application
+version: 0.1.0
+appVersion: "0.5.0"
+icon: https://github.com/ZeroSum-Solutions/mish/favicon.png
+keywords:
+  - mish
+  - design-agent
+  - generative-ui
+  - plugins
+  - skills
+home: https://github.com/ZeroSum-Solutions/Mishh-Mashh-2
+sources:
+  - https://github.com/ZeroSum-Solutions/Mishh-Mashh-2
+maintainers:
+  - name: ZeroSum Solutions

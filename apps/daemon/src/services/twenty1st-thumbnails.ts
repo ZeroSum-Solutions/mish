@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, realpathSync } from 'node:fs';
 import path from 'node:path';
-import type { Twenty1stItem } from '@open-design/contracts';
+import type { Twenty1stItem } from '@mish/contracts';
 
 export interface Twenty1stLiveThumbnail { file: string; revision: string; }
 const SHA256 = /^[a-f0-9]{64}$/;

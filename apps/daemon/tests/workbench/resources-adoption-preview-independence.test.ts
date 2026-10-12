@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { parseResourceSearchResponse, type ResourceResult } from '@open-design/contracts';
+import { parseResourceSearchResponse, type ResourceResult } from '@mish/contracts';
 import { localInventorySources, searchEveryPage } from './resources-inventory-fixture.js';
 
 describe('AC-R04.1 preview capability and adoption permission', () => {
   it('offers previews without granting adoption, across every local source that previews', async () => {
     const { results } = await searchEveryPage(localInventorySources());
     const previewable = results.filter(item => item.previewCapability.available);
-    expect(new Set(previewable.map(item => item.ref.sourceId))).toEqual(new Set(['genui', 'design-systems', 'fonts']));
+    expect(new Set(previewable.map(item => item.ref.sourceId))).toEqual(new Set(['genui', 'design-systems']));
+    for (const font of results.filter(item => item.ref.sourceId === 'fonts' && item.fontProfile!.localFiles.every(file => file.state === 'unavailable'))) expect(font.previewCapability.available).toBe(false);
     for (const item of previewable) {
       expect(item.adoptionCapability.available).toBe(false);
       expect(item.adoptionCapability.reason).toBeTruthy();

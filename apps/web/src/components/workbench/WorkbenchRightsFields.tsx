@@ -1,6 +1,6 @@
 import { useId } from 'react';
-import { Textarea } from '@open-design/components';
-import type { RightsDeclaration } from '@open-design/contracts';
+import { Textarea } from '@mish/components';
+import type { RightsDeclaration } from '@mish/contracts';
 import { useT } from '../../i18n';
 import styles from './WorkbenchCapture.module.css';
 

@@ -9,19 +9,19 @@ import {
   renameWorkspaceArtifactPath,
 } from '../../chat-artifacts/store.js';
 import type { Express, Request, Response } from 'express';
-import type { LintArtifactRequest, LintArtifactResponse, ProjectResponse } from '@open-design/contracts';
+import type { LintArtifactRequest, LintArtifactResponse, ProjectResponse } from '@mish/contracts';
 import {
   PREVIEW_OBSERVABILITY_BRIDGE_MARKER,
   buildPreviewBaseHrefBridge,
   buildPreviewObservabilityBridge,
-} from '@open-design/contracts/runtime/preview-observability';
+} from '@mish/contracts/runtime/preview-observability';
 import {
   buildPreviewFocusGuard,
   buildPreviewRedirectGuard,
   buildPreviewSandboxShim,
   PREVIEW_URL_GUARD_MAX_HTML_BYTES,
   previewHtmlHasLoadTimeLocationNavigation,
-} from '@open-design/contracts/runtime/preview-guards';
+} from '@mish/contracts/runtime/preview-guards';
 import {
   endOfTag,
   findRealElementRange,
@@ -29,11 +29,11 @@ import {
   findRealTagOffset,
   HTML_TAG_PATTERNS,
   prependAfterDoctype,
-} from '@open-design/contracts/runtime/html-injection-points';
+} from '@mish/contracts/runtime/html-injection-points';
 import {
   PREVIEW_RUNTIME_STATE_LIMITS,
   PREVIEW_RUNTIME_STATE_VERSION,
-} from '@open-design/contracts/runtime/preview-runtime-state';
+} from '@mish/contracts/runtime/preview-runtime-state';
 import {
   automaticStrategyTaskProfileForProjectMetadata,
   defaultScenarioPluginIdForProjectMetadata,
@@ -54,7 +54,7 @@ import {
   type RestoreProjectAutomaticScenarioResponse,
   type ProjectSyncState,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { readMeta as readBrandMeta } from '../../brands/store.js';
 import { webCloneTargetRefusal } from '../../web-clone-target-check.js';
 import { createProjectArtifactFile } from '../../artifacts/create.js';
@@ -3179,7 +3179,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
   app.get('/api/project-locations', async (_req, res) => {
     try {
       const locations = await configuredProjectLocations();
-      /** @type {import('@open-design/contracts').ProjectLocationsResponse} */
+      /** @type {import('@mish/contracts').ProjectLocationsResponse} */
       const body = { locations };
       res.json(body);
     } catch (err: any) {
@@ -3210,7 +3210,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
       const config = await writeAppConfig(ctx.paths.RUNTIME_DATA_DIR, { projectLocations: prepared });
       const locations = allProjectLocations(PROJECTS_DIR, config.projectLocations);
       const removedProjectIds = unregisterProjectsForRemovedLocations(previousLocations, config.projectLocations ?? []);
-      /** @type {import('@open-design/contracts').ProjectLocationsResponse} */
+      /** @type {import('@mish/contracts').ProjectLocationsResponse} */
       const body = { locations, removedProjectIds };
       res.json(body);
     } catch (err: any) {
@@ -3287,7 +3287,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
           }
         }
       }
-      /** @type {import('@open-design/contracts').ScanProjectLocationsResponse} */
+      /** @type {import('@mish/contracts').ScanProjectLocationsResponse} */
       const body = { scanned, imported, existing, skipped };
       res.json(body);
     } catch (err: any) {
@@ -3337,7 +3337,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
       // construction, unbound — so `workspaceId` is always `null`; no binding
       // lookup needed (a `listWorkspaceProjectBindings` scan here would only
       // ever resolve to misses).
-      /** @type {import('@open-design/contracts').ProjectsResponse} */
+      /** @type {import('@mish/contracts').ProjectsResponse} */
       const body = {
         projects: listUnboundProjects(db)
           .filter((project: any) => projectVisibleForLocations(project, locations))
@@ -3383,7 +3383,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
           }
         : authoritativeCtx;
       if (ctx.memberStatus === 'removed') {
-        /** @type {import('@open-design/contracts').WorkspaceProjectsResponse} */
+        /** @type {import('@mish/contracts').WorkspaceProjectsResponse} */
         const body = { projects: [] };
         return res.json(body);
       }
@@ -3454,7 +3454,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
           groupCountProperties,
         );
       }
-      /** @type {import('@open-design/contracts').WorkspaceProjectsResponse} */
+      /** @type {import('@mish/contracts').WorkspaceProjectsResponse} */
       const body = { projects };
       res.json(body);
     } catch (err: any) {
@@ -4383,7 +4383,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
           }
         }
       }
-      /** @type {import('@open-design/contracts').CreateProjectResponse} */
+      /** @type {import('@mish/contracts').CreateProjectResponse} */
       const createdProject = pluginResolutionState.snapshot
         ? getProject(db, id) ?? project
         : project;
@@ -4706,7 +4706,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
           // Open-tabs state is convenience metadata; file duplication succeeds
           // without it.
         }
-        /** @type {import('@open-design/contracts').DuplicateProjectResponse} */
+        /** @type {import('@mish/contracts').DuplicateProjectResponse} */
         const body = {
           project: createHome
             ? { ...project, workspaceId: createHome.workspaceId }
@@ -4878,7 +4878,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
           metadata,
         );
         await linkUserDesignSystemProject(USER_DESIGN_SYSTEMS_DIR, designSystem.id, targetProjectId);
-        /** @type {import('@open-design/contracts').CreateDesignSystemProjectFromProjectResponse} */
+        /** @type {import('@mish/contracts').CreateDesignSystemProjectFromProjectResponse} */
         const body = {
           project: createHome
             ? { ...project, workspaceId: createHome.workspaceId }
@@ -4933,7 +4933,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
     }
     const resolvedDir = projectDetailResolvedDir(PROJECTS_DIR, project, resolveProjectDir);
     const binding = getWorkspaceProjectByProjectId(db, project.id);
-    /** @type {import('@open-design/contracts').ProjectResponse} */
+    /** @type {import('@mish/contracts').ProjectResponse} */
     const body = {
       project: {
         ...project,
@@ -4975,7 +4975,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
       knownWorkspaceType: workspaceTypes?.typeOf(binding?.workspaceId) ?? null,
       ...(ctx.configuredEnv ? { configuredEnv: ctx.configuredEnv() } : {}),
     });
-    /** @type {import('@open-design/contracts').ProjectWorkspaceScopeResponse} */
+    /** @type {import('@mish/contracts').ProjectWorkspaceScopeResponse} */
     const body = { scope };
     res.json(body);
   });
@@ -5393,7 +5393,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
         // reached teammates after the NEXT file edit — or never.
         ctx.collabSync.refreshTeamProjectMetadata(req.params.id);
       }
-      /** @type {import('@open-design/contracts').ProjectResponse} */
+      /** @type {import('@mish/contracts').ProjectResponse} */
       const body: ProjectResponse = { project, ...(linkedDirResolutions ? { linkedDirResolutions } : {}) };
       res.json(body);
     } catch (err: any) {
@@ -5457,7 +5457,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
       if (!ifIdle) await cancelRunsOwnedBy(design.runs, { projectId: project.id });
       dbDeleteProject(db, req.params.id);
       await removeProjectDir(PROJECTS_DIR, req.params.id).catch(() => {});
-      /** @type {import('@open-design/contracts').OkResponse} */
+      /** @type {import('@mish/contracts').OkResponse} */
       const body = { ok: true };
       res.json(body);
     } catch (err: any) {
@@ -6586,7 +6586,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
       // request-coalescing window, so transport caches must always revalidate
       // this dynamic inventory.
       res.setHeader('Cache-Control', 'no-store');
-      /** @type {import('@open-design/contracts').ProjectFilesResponse} */
+      /** @type {import('@mish/contracts').ProjectFilesResponse} */
       const body = { files };
       res.json(body);
     } catch (err: any) {
@@ -6692,7 +6692,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
       const folders = await listProjectFolders(PROJECTS_DIR, req.params.id, {
         metadata: project.metadata,
       });
-      /** @type {import('@open-design/contracts').ProjectFoldersResponse} */
+      /** @type {import('@mish/contracts').ProjectFoldersResponse} */
       const body = { folders };
       res.json(body);
     } catch (err: any) {
@@ -6726,7 +6726,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
         name,
         project.metadata,
       );
-      /** @type {import('@open-design/contracts').ProjectFolderResponse} */
+      /** @type {import('@mish/contracts').ProjectFolderResponse} */
       const body = { folder };
       res.json(body);
     } catch (err: any) {
@@ -6760,7 +6760,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
         folderPath,
         project.metadata,
       );
-      /** @type {import('@open-design/contracts').DeleteProjectFolderResponse} */
+      /** @type {import('@mish/contracts').DeleteProjectFolderResponse} */
       const body = { ok: true };
       res.json(body);
     } catch (err: any) {
@@ -6815,7 +6815,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
         sendApiError(res, 503, 'PREVIEW_SCOPE_NOT_FOUND', 'preview scope not found');
         return;
       }
-      /** @type {import('@open-design/contracts').ProjectPreviewUrlResponse} */
+      /** @type {import('@mish/contracts').ProjectPreviewUrlResponse} */
       const body = {
         url: `/api/projects/${encodeURIComponent(project.id)}/preview/${scope}/${encodeProjectPathForUrl(meta.name)}`,
         file: meta.name,
@@ -6883,7 +6883,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
         sendApiError(res, 404, 'PREVIEW_SCOPE_NOT_FOUND', 'preview scope not found');
         return;
       }
-      /** @type {import('@open-design/contracts').ProjectPreviewScopeRenewResponse} */
+      /** @type {import('@mish/contracts').ProjectPreviewScopeRenewResponse} */
       const body = { expiresAt };
       res.setHeader('Cache-Control', 'no-store');
       res.json(body);
@@ -7253,7 +7253,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
           console.warn('[chat-artifacts] delete bookkeeping failed', error);
         }
       }, { signal: projectWriteSignal(res) });
-      /** @type {import('@open-design/contracts').DeleteProjectFileResponse} */
+      /** @type {import('@mish/contracts').DeleteProjectFileResponse} */
       const body = { ok: true };
       res.json(body);
     } catch (err: any) {
@@ -7412,7 +7412,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
       if (!file) {
         return sendApiError(res, 404, 'FILE_NOT_FOUND', 'file not found');
       }
-      /** @type {import('@open-design/contracts').ProjectFileVersionsResponse} */
+      /** @type {import('@mish/contracts').ProjectFileVersionsResponse} */
       const body = { file, versions };
       res.setHeader('Cache-Control', 'no-store');
       res.json(body);
@@ -7510,7 +7510,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
       if (!version) {
         return sendApiError(res, 400, 'BAD_REQUEST', 'version could not be created');
       }
-      /** @type {import('@open-design/contracts').CreateProjectFileVersionResponse} */
+      /** @type {import('@mish/contracts').CreateProjectFileVersionResponse} */
       const body = { version };
       res.json(body);
     } catch (err: any) {
@@ -7590,7 +7590,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
         },
         finalIO,
       ), { signal: projectWriteSignal(res) });
-      /** @type {import('@open-design/contracts').RestoreProjectFileVersionResponse} */
+      /** @type {import('@mish/contracts').RestoreProjectFileVersionResponse} */
       const body = { file, version, ...(versionWarning ? { versionWarning } : {}) };
       res.json(body);
     } catch (err: any) {
@@ -7624,7 +7624,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
         versionId,
         project.metadata,
       );
-      /** @type {import('@open-design/contracts').ProjectFileVersionResponse} */
+      /** @type {import('@mish/contracts').ProjectFileVersionResponse} */
       const typedBody = body;
       res.setHeader('Cache-Control', 'no-store');
       res.json(typedBody);
@@ -7779,7 +7779,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
                   finalIO,
                 )
                 : await writeAndCapture();
-              /** @type {import('@open-design/contracts').ProjectFileResponse} */
+              /** @type {import('@mish/contracts').ProjectFileResponse} */
               const body = {
                 file: meta,
                 ...(versionCapture ? { version: versionCapture.version } : {}),
@@ -7909,7 +7909,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
               finalIO,
             )
             : await writeAndCapture();
-          /** @type {import('@open-design/contracts').ProjectFileResponse} */
+          /** @type {import('@mish/contracts').ProjectFileResponse} */
           const body = {
             file: meta,
             ...(versionCapture ? { version: versionCapture.version } : {}),
@@ -8003,7 +8003,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
         }
         return renamed;
       }, { signal: projectWriteSignal(res) });
-      /** @type {import('@open-design/contracts').RenameProjectFileResponse} */
+      /** @type {import('@mish/contracts').RenameProjectFileResponse} */
       const body = result;
       res.json(body);
     } catch (err: any) {
@@ -8045,7 +8045,7 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
           console.warn('[chat-artifacts] delete bookkeeping failed', error);
         }
       }, { signal: projectWriteSignal(res) });
-      /** @type {import('@open-design/contracts').DeleteProjectFileResponse} */
+      /** @type {import('@mish/contracts').DeleteProjectFileResponse} */
       const body = { ok: true };
       res.json(body);
     } catch (err: any) {
@@ -8211,7 +8211,7 @@ export function registerProjectUploadRoutes(app: Express, ctx: RegisterProjectUp
             }
           }
         });
-        /** @type {import('@open-design/contracts').UploadProjectFilesResponse} */
+        /** @type {import('@mish/contracts').UploadProjectFilesResponse} */
         const body = { files: out };
         res.json(body);
       } catch (err: any) {

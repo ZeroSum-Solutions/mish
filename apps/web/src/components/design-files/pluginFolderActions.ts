@@ -15,7 +15,7 @@ export function buildPluginFolderAgentActionPrompt(
     INSTALL_TITLE,
     '',
     `Plugin folder: \`${folderPath}\``,
-    `Manifest: \`${folderPath}/open-design.json\``,
+    `Manifest: \`${folderPath}/mish.json\``,
     '',
     'Please do this through the `od` CLI from the current project workspace, not through hidden UI APIs.',
     INSTALL_NOTE,
@@ -41,11 +41,11 @@ function buildContributePrompt(folderPath: string): string {
     'The goal is to end this turn with a single PR URL the user can click in their browser to review the pre-filled form and press Create.',
     '',
     `Plugin folder: \`${folderPath}\``,
-    `Manifest: \`${folderPath}/open-design.json\``,
+    `Manifest: \`${folderPath}/mish.json\``,
     '',
     'Run this deterministic Mishh Mashh CLI workflow from the current project workspace:',
     '',
-    `\`"$OD_NODE_BIN" "$OD_BIN" plugin open-design-pr ${folderPath}\``,
+    `\`"$OD_NODE_BIN" "$OD_BIN" plugin mish-pr ${folderPath}\``,
     '',
     'The CLI owns the GitHub auth gate and owner resolution: `--owner` if supplied, otherwise local `gh auth status`, with `gh api user --jq .login` only as a last-resort fallback. It then runs fork/clone/copy/branch/push and `gh pr create --web`. It must open the GitHub PR-create form in the browser; the author reviews and clicks Create themselves.',
     'Report the exact command, any structured CLI error, and the final PR URL printed by the CLI. Stop on failure; do not recreate the git/gh workflow manually.',
@@ -55,13 +55,13 @@ function buildContributePrompt(folderPath: string): string {
     '- Do NOT try to install `gh`, `git`, or any other binary. Detect-and-instruct only.',
     '- Do NOT auto-submit the PR. The final Create click is the author\'s.',
     '- Do NOT retry a failed step. Report the error and stop.',
-    '- Do NOT call the legacy `od plugin publish --to open-design` CLI — that flow produces an issue URL, which is the old path we are replacing.',
+    '- Do NOT call the legacy `od plugin publish --to mish` CLI — that flow produces an issue URL, which is the old path we are replacing.',
   ].join('\n');
 }
 
 // `publish` pushes the generated plugin to the author's own public GitHub
 // repository named by manifest `plugin.repo`. It is NOT the registry
-// submission path — `od plugin publish --to open-design` produces an
+// submission path — `od plugin publish --to mish` produces an
 // Mishh Mashh issue URL and belongs to the "Mishh Mashh PR" button. Before
 // this rewrite the prompt said "Use the supported `od plugin publish` or
 // repository-publish flow", which let the agent route through the legacy
@@ -74,9 +74,9 @@ function buildPublishPrompt(folderPath: string): string {
     'The goal is to end this turn with a single repo URL the user can open in their browser to verify the published plugin code.',
     '',
     `Plugin folder: \`${folderPath}\``,
-    `Manifest: \`${folderPath}/open-design.json\``,
+    `Manifest: \`${folderPath}/mish.json\``,
     '',
-    'This is the **repository publish** action, NOT the registry-submission action — do NOT route through `od plugin publish --to open-design`. That command emits a Mishh Mashh issue URL and belongs to the "Mishh Mashh PR" button.',
+    'This is the **repository publish** action, NOT the registry-submission action — do NOT route through `od plugin publish --to mish`. That command emits a Mishh Mashh issue URL and belongs to the "Mishh Mashh PR" button.',
     '',
     'Run this deterministic Mishh Mashh CLI workflow from the current project workspace:',
     '',
@@ -86,7 +86,7 @@ function buildPublishPrompt(folderPath: string): string {
     'Report the exact command, any structured CLI error, and the final repo URL printed by the CLI. Stop on failure; do not recreate the git/gh workflow manually.',
     '',
     '**Hard constraints.** Treat these as inviolable:',
-    '- Do NOT call `od plugin publish --to open-design` (or any `--to <catalog>` variant). That is the registry-submission flow, not the repository-publish flow.',
+    '- Do NOT call `od plugin publish --to mish` (or any `--to <catalog>` variant). That is the registry-submission flow, not the repository-publish flow.',
     '- Do NOT emit a `<question-form>` or any clarification UI that waits for the user. Fire-and-forget.',
     '- Do NOT try to install `gh`, `git`, or any other binary. Detect-and-instruct only.',
     '- Do NOT force-push (`--force` / `--force-with-lease`) and do NOT overwrite an existing tag. Fail and report instead.',

@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { CultCatalogItem, CultCatalogListResponse } from '@open-design/contracts';
+import type { CultCatalogItem, CultCatalogListResponse } from '@mish/contracts';
 
 const execFileP = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));

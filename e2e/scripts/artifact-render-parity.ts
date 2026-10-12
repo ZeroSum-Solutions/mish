@@ -765,7 +765,7 @@ function remainingTimeout(startedAt: number, timeoutMs: number): number {
 
 function usage(): string {
   return `Usage:
-  pnpm --filter @open-design/e2e exec tsx scripts/artifact-render-parity.ts \\
+  pnpm --filter @mish/e2e exec tsx scripts/artifact-render-parity.ts \\
     --corpus-dir /path/to/local/html-corpus \\
     [--output-dir /private/tmp/render-parity] [--limit 50] [--headed]
 

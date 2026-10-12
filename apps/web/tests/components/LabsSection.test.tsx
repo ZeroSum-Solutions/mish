@@ -6,7 +6,7 @@ import type {
   OdNextRolloutControlStatus,
   OdNextRolloutMode,
   OdNextRolloutModeSource,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { LabsSection } from '../../src/components/LabsSection';
 import { I18nProvider } from '../../src/i18n';

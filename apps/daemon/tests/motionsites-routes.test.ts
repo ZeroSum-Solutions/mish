@@ -13,13 +13,13 @@ import path from 'node:path';
 import express from 'express';
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
-import type { MotionSitesCatalogResponse, MotionSitesConnectionStatusDto, MotionSitesStartingPointsResponse } from '@open-design/contracts/api/motionsites';
+import type { MotionSitesCatalogResponse, MotionSitesConnectionStatusDto, MotionSitesStartingPointsResponse } from '@mish/contracts/api/motionsites';
 import { sendApiError } from '../src/http/api-errors.js';
 import { registerMotionSitesRoutes } from '../src/routes/motionsites.js';
 import { setToken } from '../src/mcp-tokens.js';
 import { MOTIONSITES_MCP_SERVER_ID, MOTIONSITES_MCP_URL } from '../src/motionsites/config.js';
 import { resetLocalCorpusCache } from '../src/motionsites/local-corpus-source.js';
-import type { LocalCorpusRow } from '@open-design/section-catalog/local-corpus';
+import type { LocalCorpusRow } from '@mish/section-catalog/local-corpus';
 
 const ZEROSUM_ROW: LocalCorpusRow = {
   id: 'zs-route-fixture-01',

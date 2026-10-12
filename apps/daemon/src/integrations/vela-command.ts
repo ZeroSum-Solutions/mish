@@ -7,7 +7,7 @@ import {
   createCommandInvocation,
   listProcessSnapshots,
   stopProcesses,
-} from '@open-design/platform';
+} from '@mish/platform';
 
 import {
   agentCliEnvForAgent,
@@ -157,7 +157,7 @@ export function velaWorkspaceCommandOptions(
   const requestedWorkspaceId = workspaceId?.trim();
   return {
     configuredEnv: {
-      VELA_INVOCATION_SOURCE: 'open-design',
+      VELA_INVOCATION_SOURCE: 'mish',
       ...(requestedWorkspaceId
         ? { VELA_WORKSPACE_ID: requestedWorkspaceId }
         : {}),

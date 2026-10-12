@@ -1,6 +1,6 @@
 import path from 'node:path';
 import { load } from 'cheerio';
-import type { ReusableUnitManifest } from '@open-design/contracts';
+import type { ReusableUnitManifest } from '@mish/contracts';
 
 type Dependency = ReusableUnitManifest['dependencies'][number];
 type Capability = ReusableUnitManifest['capabilities'][number];

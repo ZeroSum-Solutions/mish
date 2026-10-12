@@ -100,7 +100,7 @@ const STATUS_PNPM = [
   'case "$*" in',
   '  "--silent tools-dev status web --namespace team --json") ;;',
   '  "--silent tools-dev status daemon --namespace team --json") ;;',
-  '  "install" | "--filter @open-design/daemon build" | "tools-dev start web --namespace team") exit 0 ;;',
+  '  "install" | "--filter @mish/daemon build" | "tools-dev start web --namespace team") exit 0 ;;',
   '  "exec tsx scripts/team-setup-report.ts --daemon-url http://127.0.0.1:43216" | \\',
   '  "exec tsx scripts/team-setup-report.ts --daemon-url http://127.0.0.1:43216 --adoption") exit 0 ;;',
   '  *) echo "pnpm stub: unexpected args: $*" >&2; exit 2 ;;',
@@ -274,7 +274,7 @@ describe("team-setup.sh full run", () => {
     expect(ordered).toEqual([
       "mise install",
       "pnpm install",
-      "pnpm --filter @open-design/daemon build",
+      "pnpm --filter @mish/daemon build",
       "pnpm tools-dev start web --namespace team",
       "pnpm --silent tools-dev status web --namespace team --json",
       "pnpm --silent tools-dev status daemon --namespace team --json",

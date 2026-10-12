@@ -1,65 +1,14 @@
-/* ───────────────────────────────────────────────────────────────────
- * Guard: the trust boundary of the "What's New" publish workflow.
+/**
+ * CI guard for the optional What's New publishing workflow.
  *
- * The card is visible to every installed client the moment it lands, so
- * "published" has to imply "reviewed". Nothing written inside
- * `.github/workflows/whats-new-publish.yml` can enforce that on its own:
- * `workflow_dispatch` runs the workflow file *from the ref it is dispatched
- * against*, so every check in that file is editable by whoever triggers it.
+ * The public fork deliberately retires that workflow. Absence is valid; other
+ * read errors fail. If restored, publishing must remain behind its protected
+ * environment and a successful validation job. YAML parsing preserves the
+ * secret-access checks across quoted and escaped expression forms.
  *
- * The control is the `whats-new-publish` GitHub environment — its
- * deployment-branch policy allows `main` and trusted `release/v*` branches,
- * and the R2 credentials are secrets on it. That control only holds while
- * the workflow keeps a specific shape:
- *
- *   the job that can reach the credentials is the job that declares the
- *   environment, and it cannot start unless validation succeeded first.
- *
- * Move `environment:` or a secret onto the job that runs from arbitrary refs
- * and the boundary is gone, with no failing test and no visible symptom — the
- * workflow still publishes correctly from `main`. This guard is what makes
- * that edit red.
- *
- * It runs in `pnpm guard`, which CI invokes from the `preflight` job. That job
- * is enabled unconditionally in `.github/scripts/scopes.py` and its guard step
- * carries no `if`, so it runs on every pull request. That is load-bearing here
- * for the same reason it is for `check-whats-new-document.ts`: an edit to
- * `.github/workflows/whats-new-publish.yml` selects neither `web_tests_required`
- * nor `ui_p0_validation_required`, so the `e2e_vitest` workload does not run
- * for it. A lane-routed assertion would be skipped for exactly the change class
- * it exists to catch.
- *
- * ── Why this reads the document as YAML, not as text ──────────────────
- *
- * The first version matched `${{ secrets.NAME }}` with a regex over the raw
- * file. That is a detector built from a list of shapes someone thought of, and
- * it is only as good as the list. Verified bypasses of it, all of which reached
- * a secret into the arbitrary-ref job while the check returned no violations:
- * `secrets['NAME']`, `secrets["NAME"]`, `secrets [ 'NAME' ]`,
- * `secrets . NAME`, `toJSON(secrets)`, a bare `secrets`, and
- * `fromJSON(toJSON(secrets)).NAME`.
- *
- * One of them cannot be fixed by a better regex at all. A double-quoted YAML
- * scalar may carry a backslash line continuation, so
- *
- *     STOLEN: "${{ sec\
- *       rets.NAME }}"
- *
- * parses to `${{ secrets.NAME }}` while the *source text* contains no such
- * substring. Any raw-text scanner is blind to it by construction. Reading the
- * document through a YAML parser is what closes that class, and it removes the
- * hand-rolled job splitter along with its own failure modes (flow-style
- * mappings, quoted job keys, unusual indentation).
- *
- * Detection is then one rule rather than a shape list: GitHub's expression
- * language has no string-to-context evaluation, so a secret cannot be reached
- * without naming the `secrets` context as an identifier. Finding that
- * identifier inside any `${{ … }}` expression catches every access form,
- * including ones nobody has thought of yet.
- *
- * Run standalone: `pnpm exec tsx scripts/check-whats-new-publish-workflow.ts`
- * Or as part of `pnpm guard` (registered in scripts/guard.ts).
- * ─────────────────────────────────────────────────────────────────── */
+ * Run standalone with pnpm exec tsx scripts/check-whats-new-publish-workflow.ts.
+ * The preflight pnpm guard entrypoint also invokes this check.
+ */
 
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -381,6 +330,11 @@ export async function checkWhatsNewPublishWorkflow(root: string = repoRoot): Pro
   try {
     workflow = await readFile(workflowPath, "utf8");
   } catch (error) {
+    // The public fork retains only ci.yml; no publisher means no publishing surface.
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+      console.log("What's New publish workflow is retired; no publishing surface to check.");
+      return true;
+    }
     console.error(`What's New publish workflow check failed: cannot read ${WHATS_NEW_WORKFLOW_PATH}`);
     console.error(error);
     return false;

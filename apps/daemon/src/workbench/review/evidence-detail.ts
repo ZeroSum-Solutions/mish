@@ -7,7 +7,7 @@
 // vocabulary value, a structural selector, a reduced location or a page-text
 // token. Page-chosen strings (font names, lang, selectors) pass only through a
 // vocabulary or evidenceSelector; anything else becomes its token.
-import { REVIEW_FONT_FAMILIES, REVIEW_LANGUAGES, type VerificationEvidence } from '@open-design/contracts';
+import { REVIEW_FONT_FAMILIES, REVIEW_LANGUAGES, type VerificationEvidence } from '@mish/contracts';
 import { composite, contrastRatio, isLargeText } from './color.js';
 import { ctaActionsInScope, ctaKindAllowed, inScope } from './evaluate.js';
 import { ev, evidenceKey, evidenceSelector, list, num, PageText, readPageText, rubricKey, vocab, type EvidenceParam, type EvidenceText } from './evidence.js';

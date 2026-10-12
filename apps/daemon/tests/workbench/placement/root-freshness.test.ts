@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { chmodSync, existsSync, lstatSync, mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { WORKBENCH_ADOPTION_HELPER_LAYOUT, WORKBENCH_ADOPTION_ROOT_RECORD } from '@open-design/contracts';
+import { WORKBENCH_ADOPTION_HELPER_LAYOUT, WORKBENCH_ADOPTION_ROOT_RECORD } from '@mish/contracts';
 import { consumeRootCreationRecord, proveRecordedFreshRoot } from '../../../src/workbench/placement/root-freshness.js';
 
 /**

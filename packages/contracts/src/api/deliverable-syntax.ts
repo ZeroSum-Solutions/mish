@@ -4,11 +4,11 @@
 // evaluators do not have to infer the repair lifecycle from daemon internals.
 
 export const DELIVERABLE_SYNTAX_TOOL_SCHEMA =
-  'open-design.deliverable-syntax-tool/v1' as const;
+  'mish.deliverable-syntax-tool/v1' as const;
 export const DELIVERABLE_SYNTAX_REPAIR_SCHEMA =
-  'open-design.deliverable-syntax-repair/v1' as const;
+  'mish.deliverable-syntax-repair/v1' as const;
 export const DELIVERABLE_SYNTAX_METRICS_SCHEMA =
-  'open-design.deliverable-syntax-metrics/v1' as const;
+  'mish.deliverable-syntax-metrics/v1' as const;
 export const DELIVERABLE_SYNTAX_CHECKER = 'web-syntax@2' as const;
 
 /** Historical run evidence remains readable after the checker rules change. */

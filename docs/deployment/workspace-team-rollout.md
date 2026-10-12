@@ -48,7 +48,7 @@ git diff --name-status origin/main...origin/feat/workspace-team -- db/schema db/
 
 - `apps/packaged/src/workspace-team.ts` 的 `WORKSPACE_TEAM_AMR_PROFILES` 和 `workspaceTeamTransportEnv`
 - `apps/packaged/tests/sidecars.test.ts` 的 prod + origin 开启、prod 缺 origin 关闭和 local/无 profile 关闭用例
-- [`.github/workflows/release-stable.yml`](../../.github/workflows/release-stable.yml) 固定 `OPEN_DESIGN_AMR_PROFILE: prod`，从 `VELA_WEB_URL_PROD` Secret 注入 origin
+- [`.github/workflows/release-stable.yml`](../../.github/workflows/release-stable.yml) 固定 `MISH_AMR_PROFILE: prod`，从 `VELA_WEB_URL_PROD` Secret 注入 origin
 - [`.github/workflows/release-beta.yml`](../../.github/workflows/release-beta.yml) 和 [`.github/workflows/release-prerelease.yml`](../../.github/workflows/release-prerelease.yml) 按所选 profile 从对应 Secret 注入 origin；beta 未选择 profile 时使用 `prod` 和 production origin，prerelease 未选择 profile 时不注入 origin
 
 这些源码和测试说明客户端的启用条件，不证明某次生产部署已通过验收。发布前仍需：
@@ -197,7 +197,7 @@ gh workflow run release-beta.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
   -f win_x64_smoke_mode=full
 ```
 
-`release-beta` 必须报告 `release_state=complete`。核对 beta metadata 的 `github.commit` 等于冻结的 Mishh Mashh SHA，平台 artifact 均有 checksum；应用身份必须是 `Open Design Beta`。
+`release-beta` 必须报告 `release_state=complete`。核对 beta metadata 的 `github.commit` 等于冻结的 Mishh Mashh SHA，平台 artifact 均有 checksum；应用身份必须是 `Mish Beta`。
 
 ## 6. Test
 
@@ -328,7 +328,7 @@ gh workflow run release-stable.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
 
 - Grafana：API/Link 5xx、延迟、模型成功率、TTFT、CPU/内存、Pod restart/unavailable。
 - Loki：Workspace scope、billing、Stripe webhook、catalog、collab/presence/comment、TLS 和 timeout 错误。
-- Tempo：按 `open_design.run_id` 核对 CLI -> API -> Link trace 和 Workspace 计费归属。
+- Tempo：按 `mish.run_id` 核对 CLI -> API -> Link trace 和 Workspace 计费归属。
 - Postgres/账本只读查询：重复 grant、负余额、错 Workspace、Webhook backlog、outbox/retry backlog。
 - GitHub Actions/GitOps：built SHA、image digest、GitOps commit 与 ready Pod 完全一致。
 

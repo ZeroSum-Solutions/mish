@@ -10,7 +10,7 @@
 
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 import { PluginDetailsModal } from '../../src/components/PluginDetailsModal';
 import { PluginMetaSections } from '../../src/components/plugin-details/PluginMetaSections';
@@ -445,8 +445,8 @@ describe('PluginDetailsModal common metadata coverage', () => {
     );
 
     expect(html).toContain('Mishh Mashh');
-    expect(html).not.toContain('href="https://github.com/nexu-io/open-design"');
-    expect(html).not.toContain('nexu-io/open-design');
+    expect(html).not.toContain('href="https://github.com/ZeroSum-Solutions/mish"');
+    expect(html).not.toContain('ZeroSum-Solutions/mish');
     expect(html).toContain('Official');
   });
 });

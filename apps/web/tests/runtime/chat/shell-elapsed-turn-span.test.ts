@@ -17,7 +17,7 @@
  *    两张写同一个数正是 T34 那张坏画面(`chat-panel-feedback.md`「被推翻的两条」)。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { formatShellElapsed } from '../../../src/runtime/chat/format';
 import type { BuildTurnInput, ExecutionShell } from '../../../src/runtime/chat/contract';

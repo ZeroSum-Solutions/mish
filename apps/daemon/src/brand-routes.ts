@@ -46,7 +46,7 @@ import {
   startBrandExtraction,
 } from './brands/index.js';
 import { patchMeta } from './brands/store.js';
-import type { BrandDetailResponse, BrandMeta, BrandSummary } from '@open-design/contracts';
+import type { BrandDetailResponse, BrandMeta, BrandSummary } from '@mish/contracts';
 
 export interface BrandRoutesDeps {
   /** `<dataDir>/brands` — root of all brand directories. */

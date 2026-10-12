@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { useT } from '../../i18n';
 import styles from './workbench.module.css';
 

@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 // Automations tab: one surface for scheduled routines, Orbit-style digests,
 // and live artifact refreshers. The daemon still stores these as routines;
 // the UI presents them as scheduled agent conversations.
@@ -14,7 +14,7 @@ import type {
   Routine,
   RoutineRun,
   RoutineRunCrystallizeResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { Icon, type IconName } from './Icon';
 import { navigate } from '../router';
@@ -36,7 +36,7 @@ import {
   workspaceIdentityCacheKey,
   workspaceProjectHeaders,
 } from '../collab/workspace-identity';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 
 type ProjectSummary = { id: string; name: string };
 type TemplateFilter =

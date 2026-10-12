@@ -13,7 +13,7 @@ import { effectiveMcpAuthMode, readMcpConfig, writeMcpConfig, type McpServerConf
 import { MOTIONSITES_MCP_SERVER_ID, MOTIONSITES_MCP_TEMPLATE, MOTIONSITES_MCP_URL } from './config.js';
 import { MotionSitesLoginRequiredError } from './errors.js';
 import { McpHttpTransportError } from './mcp-client.js';
-import type { MotionSitesConnectionStatusDto } from '@open-design/contracts/api/motionsites';
+import type { MotionSitesConnectionStatusDto } from '@mish/contracts/api/motionsites';
 
 /**
  * Idempotently registers the built-in MotionSites server entry in `mcp-config.json` if the user's

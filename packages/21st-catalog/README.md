@@ -21,10 +21,10 @@ never part of this repository or a public build.
 Run the pinned workspace runtime:
 
 ```sh
-mise exec -- corepack pnpm --filter @open-design/21st-catalog check
-mise exec -- corepack pnpm --filter @open-design/21st-catalog test
-mise exec -- corepack pnpm --filter @open-design/21st-catalog typecheck
-mise exec -- corepack pnpm --filter @open-design/21st-catalog originals
+mise exec -- corepack pnpm --filter @mish/21st-catalog check
+mise exec -- corepack pnpm --filter @mish/21st-catalog test
+mise exec -- corepack pnpm --filter @mish/21st-catalog typecheck
+mise exec -- corepack pnpm --filter @mish/21st-catalog originals
 ```
 
 `21st` and `21st-thumbnails` refresh the metadata and MIT preview images from a local copy of the

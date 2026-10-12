@@ -44,10 +44,10 @@ describe("packaged daemon ships the pinned gsap runtime (AC-R08.5)", () => {
   });
 
   it("win.packaged-app key witnesses gsap through the runtime dependency constant", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-gsap-key-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-gsap-key-"));
     try {
       const config = { webOutputMode: "standalone", electronVersion: "41.3.0" } as ToolPackConfig;
-      const packed = [{ fileName: "contracts.tgz", packageName: "@open-design/contracts" }] satisfies PackedTarballInfo[];
+      const packed = [{ fileName: "contracts.tgz", packageName: "@mish/contracts" }] satisfies PackedTarballInfo[];
       const withGsap = await createWinPackagedAppCacheKey(config, "tarballs-a", packed);
       const { gsap: _gsap, ...withoutGsap } = WIN_PREBUNDLE_RUNTIME_DEPENDENCIES as Record<string, string>;
       await expect(createWinPackagedAppCacheKey(config, "tarballs-a", packed, withoutGsap)).resolves.not.toBe(withGsap);

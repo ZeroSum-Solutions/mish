@@ -31,7 +31,7 @@ not because every Harness capability is exposed.
 3. The user configures a DeepSeek credential through Harness or the process
    environment.
 4. OD detects `dsh`, verifies `--version`, and runs
-   `dsh --profile open-design --probe`.
+   `dsh --profile mish --probe`.
 5. OD rescans, selects, and connection-tests DeepSeek Harness. A compatible
    pre-existing profile skips the dialog and selects immediately.
 6. A first request creates an HTML artifact in the OD project and OD previews
@@ -52,7 +52,7 @@ storage, MCP injection, and automatic background maintenance deferred.
 - detect the user's official `dsh`, including `DSH_BIN`;
 - probe a usable version;
 - treat untested parseable versions as available with a warning;
-- require a compatible `open-design --probe` response;
+- require a compatible `mish --probe` response;
 - build an OD profile bundle compatible with the tested official DSH family;
 - keep the bundle source, daemon protocol types, and fixtures in the same
   repository and embed its exact packed artifact in each OD build;
@@ -78,7 +78,7 @@ storage, MCP injection, and automatic background maintenance deferred.
 
 ### Runtime protocol
 
-- `dsh --profile open-design --stdio`;
+- `dsh --profile mish --stdio`;
 - generation-1 JSONL `ready`, `execute`, `cancel`, `session`, `thinking`,
   `text`, `tool_call`, `tool_result`, `usage`, `result`, and
   `protocol_error` frames;
@@ -153,7 +153,7 @@ These are deferred without changing the chosen architecture.
 | display name | `DeepSeek Harness` |
 | executable | user-installed `dsh` |
 | override | `DSH_BIN` |
-| profile | `open-design` |
+| profile | `mish` |
 | stream format | `dsh-profile-jsonl` |
 | protocol generation | `1` |
 | process model | one child per OD run |
@@ -202,7 +202,7 @@ Retain:
 
 Replace:
 
-- `--profile headless -- -- <prompt>` with `--profile open-design --stdio`;
+- `--profile headless -- -- <prompt>` with `--profile mish --stdio`;
 - positional prompt and 30 KB argv budget with stdin JSONL;
 - `plain` output with structured frames;
 - fresh full-transcript turns with stable cold resume;
@@ -349,8 +349,8 @@ HTTP/UI/CLI closure, with CLI secrets accepted through stdin or a key file.
 Before Checkpoint A handoff:
 
 ```text
-pnpm --filter @open-design/daemon typecheck
-pnpm --filter @open-design/contracts typecheck
+pnpm --filter @mish/daemon typecheck
+pnpm --filter @mish/contracts typecheck
 focused daemon protocol and detection tests
 git diff --check
 ```
@@ -360,7 +360,7 @@ Before phase-one completion:
 ```text
 pnpm guard
 pnpm typecheck
-pnpm --filter @open-design/daemon test
+pnpm --filter @mish/daemon test
 profile package/install/probe smoke
 macOS/Linux real two-process smoke
 Windows process-tree smoke

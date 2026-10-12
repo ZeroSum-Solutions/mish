@@ -1,7 +1,7 @@
 import { mkdirSync, symlinkSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { parseResourceSearchRequest } from '@open-design/contracts';
+import { parseResourceSearchRequest } from '@mish/contracts';
 import { inspectResource, searchResources, ResourceError } from '../../src/workbench/resources.js';
 import { createDesignSystemsResourceSource } from '../../src/workbench/resources-design-systems.js';
 import { REPO_DESIGN_SYSTEMS_ROOT, authority, designSystemFixtureRoot } from './resources-inventory-fixture.js';

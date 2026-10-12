@@ -4,7 +4,7 @@ import type {
   TrackingCampaignConversionSource,
   TrackingCampaignId,
   TrackingPageName,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import {
   readOnboardingProfile,
   type OnboardingProfile,
@@ -30,7 +30,7 @@ interface SyncAmrProfileOptions {
   now?: Date;
 }
 
-const AMR_ATTRIBUTION_STORAGE_KEY = 'open-design:amr-entry-attribution:v1';
+const AMR_ATTRIBUTION_STORAGE_KEY = 'mish:amr-entry-attribution:v1';
 const AMR_ATTRIBUTION_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
@@ -119,7 +119,7 @@ export function recordAmrEntry(
   const profile = readOnboardingProfile();
   const attribution: AmrEntryAttribution = {
     entryId: `od-amr-${randomId()}`,
-    sourceProduct: 'open_design',
+    sourceProduct: 'mish',
     sourceDetail,
     occurredAt: now.toISOString(),
     ...(options.campaignId ? { campaignId: options.campaignId } : {}),
@@ -317,7 +317,7 @@ async function mirrorAmrEntryToAmrAnalytics(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         payload: {
-          pageName: 'open_design',
+          pageName: 'mish',
           sourcePageName,
           area: 'amr_entry',
           element: attribution.sourceDetail,
@@ -358,7 +358,7 @@ async function mirrorAmrOnboardingProfileToAmrAnalytics(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         payload: {
-          pageName: 'open_design',
+          pageName: 'mish',
           sourcePageName: 'onboarding',
           area: 'onboarding',
           element: 'about_you_submit',
@@ -386,7 +386,7 @@ async function mirrorAmrOnboardingProfileToAmrAnalytics(
 }
 
 function isValidAmrAttribution(value: Partial<AmrEntryAttribution>): value is AmrEntryAttribution {
-  return value.sourceProduct === 'open_design'
+  return value.sourceProduct === 'mish'
     && typeof value.entryId === 'string'
     && value.entryId.length > 0
     && typeof value.sourceDetail === 'string'

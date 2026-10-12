@@ -1,4 +1,4 @@
-import type { CatalogueDependencyReport } from '@open-design/contracts';
+import type { CatalogueDependencyReport } from '@mish/contracts';
 import type { CatalogueDependency } from './catalogue-material.js';
 
 export interface DependencyCheck extends CatalogueDependencyReport {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 import {
   buildWebsiteCards,
   familyCardLine,
@@ -39,14 +39,14 @@ function bundledExample(id: string, title: string): InstalledPluginRecord {
 
 const PLUGINS = [
   bundledExample('example-pricing-page', 'Pricing Page'),
-  agencyPlugin('watson', 'Watson Trust to Lead'),
+  agencyPlugin('practice', 'Practice Appointments'),
   bundledExample('example-meeting-notes', 'Meeting Notes'),
-  agencyPlugin('maren', 'Maren Maker Studio'),
+  agencyPlugin('restaurant', 'Restaurant Reservations'),
   bundledExample('example-velar-luxury-real-estate', 'Velar'),
 ];
 
 const REFERENCES = [
-  designProfileFixture({ digest: 'ref-tl', spine: 'TL', familyId: 'watson', meta: { total_likes: 10 } }),
+  designProfileFixture({ digest: 'ref-tl', spine: 'TL', familyId: 'practice', meta: { total_likes: 10 } }),
   designProfileFixture({ digest: 'ref-co', spine: 'CO', familyId: null, meta: { total_likes: 99 } }),
   designProfileFixture({ digest: 'ref-none', spine: 'none', archetype: null, familyId: null }),
 ];
@@ -57,7 +57,8 @@ describe('buildWebsiteCards', () => {
     const familyIds = cards
       .filter((card) => card.kind === 'family')
       .map((card) => (card.kind === 'family' ? card.record.id : ''));
-    expect(familyIds).toEqual(['example-agency-watson', 'example-agency-maren']);
+    // Registry order: restaurant precedes practice.
+    expect(familyIds).toEqual(['example-agency-restaurant', 'example-agency-practice']);
     // Every other bundled example is excluded here, and only here: nothing is
     // uninstalled and nothing is hidden.
     for (const excluded of ['example-pricing-page', 'example-meeting-notes', 'example-velar-luxury-real-estate']) {
@@ -68,10 +69,10 @@ describe('buildWebsiteCards', () => {
 
   it('annotates a family card from the registry', () => {
     const cards = buildWebsiteCards(PLUGINS, []);
-    const watson = cards.find((card) => card.kind === 'family' && card.record.id === 'example-agency-watson');
-    expect(watson).toMatchObject({ kind: 'family', spine: 'TL', archetype: 'TL.05', skin: 'Editorial' });
-    const maren = cards.find((card) => card.kind === 'family' && card.record.id === 'example-agency-maren');
-    expect(maren).toMatchObject({ kind: 'family', spine: 'TL', archetype: 'TL.06' });
+    const practice = cards.find((card) => card.kind === 'family' && card.record.id === 'example-agency-practice');
+    expect(practice).toMatchObject({ kind: 'family', spine: 'TL', archetype: 'TL.01', skin: 'Corporate and institutional' });
+    const restaurant = cards.find((card) => card.kind === 'family' && card.record.id === 'example-agency-restaurant');
+    expect(restaurant).toMatchObject({ kind: 'family', spine: 'BA', archetype: 'BA.02' });
   });
 
   it('orders family cards first, then references by likes, title and digest', () => {
@@ -80,7 +81,7 @@ describe('buildWebsiteCards', () => {
       designProfileFixture({ digest: 'a-digest', title: 'Same title', spine: 'TL' }),
       designProfileFixture({ digest: 'c-digest', title: 'Another', spine: 'TL', meta: { total_likes: 'many' } }),
     ];
-    const cards = buildWebsiteCards([agencyPlugin('watson', 'Watson')], tie);
+    const cards = buildWebsiteCards([agencyPlugin('practice', 'Practice')], tie);
     expect(cards[0]?.kind).toBe('family');
     const digests = cards
       .filter((card) => card.kind === 'reference')
@@ -99,10 +100,13 @@ describe('websiteCardsForSpine', () => {
 
   it('shows a spine tab only the cards on that spine', () => {
     const tl = websiteCardsForSpine(cards, 'TL');
-    expect(tl).toHaveLength(3);
-    expect(tl.some((card) => card.kind === 'family' && card.record.id === 'example-agency-watson')).toBe(true);
-    expect(tl.some((card) => card.kind === 'family' && card.record.id === 'example-agency-maren')).toBe(true);
+    expect(tl).toHaveLength(2);
+    expect(tl.some((card) => card.kind === 'family' && card.record.id === 'example-agency-practice')).toBe(true);
     expect(tl.some((card) => card.kind === 'reference' && card.profile.source.digest === 'ref-tl')).toBe(true);
+
+    const ba = websiteCardsForSpine(cards, 'BA');
+    expect(ba.map((card) => (card.kind === 'family' ? card.record.id : card.profile.source.digest)))
+      .toEqual(['example-agency-restaurant']);
 
     const co = websiteCardsForSpine(cards, 'CO');
     expect(co.map((card) => (card.kind === 'family' ? card.record.id : card.profile.source.digest)))
@@ -125,12 +129,12 @@ describe('websiteCardsForSpine', () => {
 
 describe('familyPluginRecord', () => {
   it('matches only the exact installed generator for a routed family', () => {
-    expect(familyPluginRecord(PLUGINS, 'watson')?.id).toBe('example-agency-watson');
-    expect(familyPluginRecord(PLUGINS, 'halcyon')).toBeNull();
+    expect(familyPluginRecord(PLUGINS, 'practice')?.id).toBe('example-agency-practice');
+    expect(familyPluginRecord(PLUGINS, 'nonprofit')).toBeNull();
     expect(familyPluginRecord(PLUGINS, null)).toBeNull();
     // A plugin that merely carries the name is not a family generator.
-    const impostor = bundledExample('example-agency-watson', 'Not a family');
-    expect(familyPluginRecord([impostor], 'watson')).toBeNull();
+    const impostor = bundledExample('example-agency-practice', 'Not a family');
+    expect(familyPluginRecord([impostor], 'practice')).toBeNull();
   });
 });
 
@@ -185,11 +189,11 @@ describe('familyCardLine', () => {
   }
 
   it('reads spine, archetype name and skin from the registry', () => {
-    expect(familyCardLine(familyCard('fervor'))).toBe(
-      'TL · Agency, consultancy, or studio · Cinematic and immersive',
+    expect(familyCardLine(familyCard('restaurant'))).toBe(
+      'BA · Restaurant or food business · Heritage and craft',
     );
-    expect(familyCardLine(familyCard('watson'))).toBe(
-      'TL · Agency, consultancy, or studio · Editorial',
+    expect(familyCardLine(familyCard('practice'))).toBe(
+      'TL · Local appointment business · Corporate and institutional',
     );
   });
 

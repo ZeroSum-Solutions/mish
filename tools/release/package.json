@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/tools-release",
+  "name": "@mish/tools-release",
   "version": "0.22.1",
   "private": true,
   "type": "module",
@@ -13,8 +13,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tests.json --noEmit"
   },
   "dependencies": {
-    "@open-design/launcher-proto": "workspace:*",
-    "@open-design/release": "workspace:*",
+    "@mish/launcher-proto": "workspace:*",
+    "@mish/release": "workspace:*",
     "cac": "6.7.14",
     "sharp": "0.35.3",
     "yaml": "2.9.0"

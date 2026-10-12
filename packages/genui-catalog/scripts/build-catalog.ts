@@ -61,7 +61,9 @@ export function readCsvSeed(): SeedRow[] {
 
 /** Catalog order: the frozen CSV, licensed Cult UI Pro rows, then the owned harvest. */
 export function readSeed(): SeedRow[] {
-  return [...readCsvSeed(), ...readJson<{ components: SeedRow[] }>(cultSeedPath).components,
+  // The licensed Cult UI Pro seed is not part of the public repository: a missing file means zero licensed rows.
+  const cult = existsSync(cultSeedPath) ? readJson<{ components: SeedRow[] }>(cultSeedPath).components : [];
+  return [...readCsvSeed(), ...cult,
     ...readJson<{ components: SeedRow[] }>(harvestSeedPath).components];
 }
 
@@ -178,7 +180,7 @@ async function main(): Promise<void> {
   const current = existsSync(catalogPath) ? readFileSync(catalogPath, 'utf8') : '';
   if (check) {
     if (current !== text) {
-      console.error('build-catalog: catalog.json is stale. Run `pnpm --filter @open-design/genui-catalog catalog` and commit the result.');
+      console.error('build-catalog: catalog.json is stale. Run `pnpm --filter @mish/genui-catalog catalog` and commit the result.');
       process.exitCode = 1;
       return;
     }

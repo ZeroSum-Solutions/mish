@@ -1,4 +1,4 @@
-import { RESOURCE_SOURCE_IDS } from '@open-design/contracts';
+import { RESOURCE_SOURCE_IDS } from '@mish/contracts';
 import { checkG02ReactReceipt } from './targets/react/receipt.js';
 import { createHash } from 'node:crypto';
 import { lstat, readdir, realpath } from 'node:fs/promises';

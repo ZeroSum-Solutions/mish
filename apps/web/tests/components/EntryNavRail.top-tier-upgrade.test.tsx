@@ -16,11 +16,15 @@
 // plan they already hold.
 
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@mish/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EntryNavRail, resetWorkspaceDirectoryCache } from '../../src/components/EntryNavRail';
 import { I18nProvider } from '../../src/i18n';
+import { useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const originalFetch = globalThis.fetch;
 

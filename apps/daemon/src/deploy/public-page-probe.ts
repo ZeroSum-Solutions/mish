@@ -32,7 +32,7 @@ import { isIP } from 'node:net';
 import type { LookupFunction } from 'node:net';
 
 import { Agent } from 'undici';
-import { findRealElementRange, findRealTagEnd, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealElementRange, findRealTagEnd, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 export const MAX_REDIRECT_HOPS = 5;
 /** Bytes of response body the probe reads; a larger body is not proof. */
@@ -282,7 +282,7 @@ type ResolveHost = (host: string) => Promise<string[]>;
  * Tests replace name resolution through this global slot (tests/setup.ts), so
  * no daemon test depends on real DNS. Production never sets it.
  */
-const RESOLVER_SYMBOL = Symbol.for('open-design.daemon.publicProbeResolveHost');
+const RESOLVER_SYMBOL = Symbol.for('mish.daemon.publicProbeResolveHost');
 
 const defaultResolveHost: ResolveHost = async (host) => (await lookup(host, { all: true, verbatim: true })).map((entry) => entry.address);
 

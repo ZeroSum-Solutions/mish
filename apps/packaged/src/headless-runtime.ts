@@ -3,7 +3,7 @@ import { mkdir } from "node:fs/promises";
 import {
   APP_KEYS,
   SIDECAR_SOURCES,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   getSidecarStatus,
   registerSidecarProcess,
@@ -12,8 +12,8 @@ import {
   type SidecarClient,
   type SidecarRuntimeContext,
   type SidecarStamp,
-} from "@open-design/sidecar";
-import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@open-design/release";
+} from "@mish/sidecar";
+import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@mish/release";
 
 import type { PackagedConfig } from "./config.js";
 import { confirmPackagedLauncherRuntime, resolvePackagedLauncherRuntime } from "./launcher-runtime.js";

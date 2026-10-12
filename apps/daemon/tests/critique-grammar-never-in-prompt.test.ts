@@ -41,7 +41,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
-import { renderActiveStageBlocks } from '@open-design/contracts';
+import { renderActiveStageBlocks } from '@mish/contracts';
 import { composeSystemPrompt } from '../src/prompts/system.js';
 import { atomsForPrompt, CRITIQUE_THEATER_ATOM_ID } from '../src/plugins/critique-prompt-gate.js';
 
@@ -90,7 +90,7 @@ async function readAtomBody(atomId: string): Promise<string> {
 async function readScenarioStages(
   scenario: string,
 ): Promise<Array<{ id: string; atoms: string[] }>> {
-  const file = path.join(REPO_ROOT, 'plugins/_official/scenarios', scenario, 'open-design.json');
+  const file = path.join(REPO_ROOT, 'plugins/_official/scenarios', scenario, 'mish.json');
   const manifest = JSON.parse(await fsp.readFile(file, 'utf8'));
   return manifest?.od?.pipeline?.stages ?? [];
 }

@@ -1,0 +1,49 @@
+{
+  "$schema": "https://github.com/ZeroSum-Solutions/mish/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "example-agency-publication",
+  "title": "publication page kind",
+  "version": "0.1.0",
+  "publishedAt": "2026-09-23T23:56:26Z",
+  "description": "A static publication or media page kind: masthead, lead story, topics, latest stories, running series, archive, optional contributors, newsletter sign-up and membership. Fits magazines, newsletters, independent media and blogs. Composed from ten vendored HyperUI blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "tags": [
+    "example",
+    "first-party",
+    "page-kind",
+    "publication",
+    "magazine",
+    "newsletter"
+  ],
+  "od": {
+    "kind": "scenario",
+    "mode": "prototype",
+    "taskKind": "new-generation",
+    "useCase": {
+      "query": {
+        "en": "Use the publication family for a static publication or media mock (a magazine, newsletter, independent media title or blog): masthead, lead story, topics, latest stories, series, archive, optional contributors, a newsletter sign-up and membership. Ask for the title, what it covers and who it is for, generate a schemaVersion 2 publication typed recipe through the bundled trusted compiler, and render it. This is a page kind, not a decoded client site: every business fact in the reference fixture is a placeholder."
+      }
+    },
+    "context": {
+      "skills": [
+        {
+          "path": "./SKILL.md"
+        }
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ]
+  }
+}

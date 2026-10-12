@@ -68,15 +68,15 @@ done
 [ "$("$node_root/bin/node" --version)" = "v$node_version" ] || fail "official Node version mismatch"
 
 mkdir -p "$stage/carrier" "$stage/runtime/standalone" \
-  "$stage/runtime/node_modules/@open-design/sidecar/dist" \
-  "$stage/runtime/node_modules/@open-design/platform/dist" \
+  "$stage/runtime/node_modules/@mish/sidecar/dist" \
+  "$stage/runtime/node_modules/@mish/platform/dist" \
   "$stage/seed" "$stage/sh" "$stage/ps1" "$stage/contract"
 mv "$node_root" "$stage/carrier/node"
 cp "$standalone_directory/index.mjs" "$stage/runtime/standalone/index.mjs"
-cp "$sidecar_directory/index.mjs" "$sidecar_directory/supervisor.mjs" "$stage/runtime/node_modules/@open-design/sidecar/dist/"
-cp "$platform_directory/index.mjs" "$stage/runtime/node_modules/@open-design/platform/dist/index.mjs"
-printf '%s\n' '{"name":"@open-design/sidecar","type":"module","exports":{".":"./dist/index.mjs"}}' > "$stage/runtime/node_modules/@open-design/sidecar/package.json"
-printf '%s\n' '{"name":"@open-design/platform","type":"module","exports":{".":"./dist/index.mjs"}}' > "$stage/runtime/node_modules/@open-design/platform/package.json"
+cp "$sidecar_directory/index.mjs" "$sidecar_directory/supervisor.mjs" "$stage/runtime/node_modules/@mish/sidecar/dist/"
+cp "$platform_directory/index.mjs" "$stage/runtime/node_modules/@mish/platform/dist/index.mjs"
+printf '%s\n' '{"name":"@mish/sidecar","type":"module","exports":{".":"./dist/index.mjs"}}' > "$stage/runtime/node_modules/@mish/sidecar/package.json"
+printf '%s\n' '{"name":"@mish/platform","type":"module","exports":{".":"./dist/index.mjs"}}' > "$stage/runtime/node_modules/@mish/platform/package.json"
 cp "$closure_file" "$stage/seed/closure.mjs"
 cp "$terminal_source/runtime/fossil.mjs" "$terminal_source/runtime/sidecar-bootstrap.mjs" "$terminal_source/runtime/sidecar-host.mjs" "$terminal_source/runtime/fixture-lifecycle.mjs" "$terminal_source/runtime/fixture-shell-updater.mjs" "$stage/runtime/"
 cp "$terminal_source/sh/terminal.sh" "$terminal_source/sh/install.sh" "$stage/sh/"
@@ -93,11 +93,11 @@ closure_sha=$(sha256_file "$stage/seed/closure.mjs")
 printf '{"files":[' > "$stage/runtime/modules.json"
 first=true
 for module_file in \
-  runtime/node_modules/@open-design/platform/dist/index.mjs \
-  runtime/node_modules/@open-design/platform/package.json \
-  runtime/node_modules/@open-design/sidecar/dist/index.mjs \
-  runtime/node_modules/@open-design/sidecar/dist/supervisor.mjs \
-  runtime/node_modules/@open-design/sidecar/package.json; do
+  runtime/node_modules/@mish/platform/dist/index.mjs \
+  runtime/node_modules/@mish/platform/package.json \
+  runtime/node_modules/@mish/sidecar/dist/index.mjs \
+  runtime/node_modules/@mish/sidecar/dist/supervisor.mjs \
+  runtime/node_modules/@mish/sidecar/package.json; do
   if [ "$first" = true ]; then first=false; else printf ',' >> "$stage/runtime/modules.json"; fi
   printf '{"file":"%s","sha256":"%s"}' "$module_file" "$(sha256_file "$stage/$module_file")" >> "$stage/runtime/modules.json"
 done

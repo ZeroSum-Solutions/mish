@@ -246,7 +246,6 @@ describe("workflow scope planner", () => {
       ".github/scripts/lib/config.py",
       ".github/scripts/lib/github.py",
       ".github/scripts/lib/r2.py",
-      ".github/workflows/convergence.atom.yml",
     ];
     for (const file of controlPlaneFiles) {
       expect(plan("pr", [file]), file).toMatchObject({
@@ -257,15 +256,13 @@ describe("workflow scope planner", () => {
     }
   });
 
-  test("keeps Terminal exact sources on the independent release validation line", () => {
+  test("keeps Terminal source routing unchanged", () => {
     for (const file of [
       "apps/closure/src/index.ts",
       "packages/standalone/src/store.ts",
       "shells/terminal/src/cli.ts",
       ".github/scripts/pack.py",
       ".github/scripts/release.py",
-      ".github/workflows/convergence-exact.atom.yml",
-      ".github/workflows/release-exact.yml",
     ]) {
       const prPlan = plan("pr", [file]);
       expect(prPlan, file).toMatchObject({

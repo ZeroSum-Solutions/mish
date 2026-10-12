@@ -3,7 +3,7 @@
 // signal, the process's own stderr, a start-up timeout) into a closed enum
 // with a class-specific recovery. The raw stderr goes to the local daemon log
 // and never into a bundle.
-import type { REVIEW_EVIDENCE_VOCABULARIES } from '@open-design/contracts';
+import type { REVIEW_EVIDENCE_VOCABULARIES } from '@mish/contracts';
 
 export type StartupFailure = (typeof REVIEW_EVIDENCE_VOCABULARIES)['startupFailure'][number];
 

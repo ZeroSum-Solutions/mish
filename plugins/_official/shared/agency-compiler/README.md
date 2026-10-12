@@ -167,9 +167,9 @@ never frozen.
   above), not an authoring surface. `registry.ts` sits beside these, never inside one.
 - `compiler/FAMILY-PATCH.json` — the reviewed patch record for family sources. It records no
   shared-file hash, so the sync script leaves it alone.
-- `families/`, `preview/`, `assets/`, `README.md`, `SKILL.md`, `open-design.json`.
+- `families/`, `preview/`, `assets/`, `README.md`, `SKILL.md`, `mish.json`.
 
-This folder is not a plugin: it has no `open-design.json`, so the daemon's bundled-plugin walker
+This folder is not a plugin: it has no `mish.json`, so the daemon's bundled-plugin walker
 (`apps/daemon/src/plugins/bundled.ts`) never registers it. It is also not runnable on its own —
 `family.ts` imports the `families/registry.ts` that only exists in a copy.
 

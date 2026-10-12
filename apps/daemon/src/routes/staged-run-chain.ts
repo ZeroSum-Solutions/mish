@@ -13,7 +13,7 @@ import type {
   StagedStageKind,
   StagedStageRecord,
   StagedStopReason,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { INTERRUPTED_MESSAGE, STAGED_FALLBACK_MESSAGES } from '../staged-routing.js';
 

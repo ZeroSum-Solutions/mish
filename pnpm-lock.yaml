@@ -23,22 +23,22 @@ importers:
 
   .:
     devDependencies:
-      '@open-design/components':
+      '@mish/components':
         specifier: workspace:*
         version: link:packages/components
-      '@open-design/daemon':
+      '@mish/daemon':
         specifier: workspace:*
         version: link:apps/daemon
-      '@open-design/tools-dev':
+      '@mish/tools-dev':
         specifier: workspace:*
         version: link:tools/dev
-      '@open-design/tools-pack':
+      '@mish/tools-pack':
         specifier: workspace:*
         version: link:tools/pack
-      '@open-design/tools-release':
+      '@mish/tools-release':
         specifier: workspace:*
         version: link:tools/release
-      '@open-design/tools-serve':
+      '@mish/tools-serve':
         specifier: workspace:*
         version: link:tools/serve
       '@types/node':
@@ -56,7 +56,7 @@ importers:
 
   apps/closure:
     dependencies:
-      '@open-design/standalone':
+      '@mish/standalone':
         specifier: workspace:*
         version: link:../../packages/standalone
     devDependencies:
@@ -90,49 +90,49 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: 1.29.0
         version: 1.29.0(zod@4.4.2)
-      '@open-design/21st-catalog':
+      '@mish/21st-catalog':
         specifier: workspace:*
         version: link:../../packages/21st-catalog
-      '@open-design/agency-fast-lane':
+      '@mish/agency-fast-lane':
         specifier: workspace:*
         version: link:../../packages/agency-fast-lane
-      '@open-design/agui-adapter':
+      '@mish/agui-adapter':
         specifier: workspace:*
         version: link:../../packages/agui-adapter
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@open-design/cult-ui-catalog':
+      '@mish/cult-ui-catalog':
         specifier: workspace:*
         version: link:../../packages/cult-ui-catalog
-      '@open-design/diagnostics':
+      '@mish/diagnostics':
         specifier: workspace:*
         version: link:../../packages/diagnostics
-      '@open-design/genui-catalog':
+      '@mish/genui-catalog':
         specifier: workspace:*
         version: link:../../packages/genui-catalog
-      '@open-design/launcher-proto':
+      '@mish/launcher-proto':
         specifier: workspace:*
         version: link:../../packages/launcher-proto
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform
-      '@open-design/plugin-runtime':
+      '@mish/plugin-runtime':
         specifier: workspace:*
         version: link:../../packages/plugin-runtime
-      '@open-design/registry-protocol':
+      '@mish/registry-protocol':
         specifier: workspace:*
         version: link:../../packages/registry-protocol
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../../packages/release
-      '@open-design/section-catalog':
+      '@mish/section-catalog':
         specifier: workspace:*
         version: link:../../packages/section-catalog
-      '@open-design/sidecar':
+      '@mish/sidecar':
         specifier: workspace:*
         version: link:../../packages/sidecar
-      '@open-design/sidecar-proto':
+      '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../../packages/sidecar-proto
       '@opentelemetry/api':
@@ -259,31 +259,31 @@ importers:
 
   apps/desktop:
     dependencies:
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@open-design/diagnostics':
+      '@mish/diagnostics':
         specifier: workspace:*
         version: link:../../packages/diagnostics
-      '@open-design/download':
+      '@mish/download':
         specifier: workspace:*
         version: link:../../packages/download
-      '@open-design/host':
+      '@mish/host':
         specifier: workspace:*
         version: link:../../packages/host
-      '@open-design/launcher-proto':
+      '@mish/launcher-proto':
         specifier: workspace:*
         version: link:../../packages/launcher-proto
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../../packages/release
-      '@open-design/sidecar':
+      '@mish/sidecar':
         specifier: workspace:*
         version: link:../../packages/sidecar
-      '@open-design/sidecar-proto':
+      '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../../packages/sidecar-proto
     devDependencies:
@@ -302,31 +302,31 @@ importers:
 
   apps/packaged:
     dependencies:
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@open-design/daemon':
+      '@mish/daemon':
         specifier: workspace:*
         version: link:../daemon
-      '@open-design/desktop':
+      '@mish/desktop':
         specifier: workspace:*
         version: link:../desktop
-      '@open-design/launcher-proto':
+      '@mish/launcher-proto':
         specifier: workspace:*
         version: link:../../packages/launcher-proto
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../../packages/release
-      '@open-design/sidecar':
+      '@mish/sidecar':
         specifier: workspace:*
         version: link:../../packages/sidecar
-      '@open-design/sidecar-proto':
+      '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../../packages/sidecar-proto
-      '@open-design/web':
+      '@mish/web':
         specifier: workspace:*
         version: link:../web
     devDependencies:
@@ -363,28 +363,28 @@ importers:
       '@lexical/utils':
         specifier: 0.36.2
         version: 0.36.2
-      '@open-design/agency-fast-lane':
+      '@mish/agency-fast-lane':
         specifier: workspace:*
         version: link:../../packages/agency-fast-lane
-      '@open-design/components':
+      '@mish/components':
         specifier: workspace:*
         version: link:../../packages/components
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@open-design/genui-catalog':
+      '@mish/genui-catalog':
         specifier: workspace:*
         version: link:../../packages/genui-catalog
-      '@open-design/host':
+      '@mish/host':
         specifier: workspace:*
         version: link:../../packages/host
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform
-      '@open-design/sidecar':
+      '@mish/sidecar':
         specifier: workspace:*
         version: link:../../packages/sidecar
-      '@open-design/sidecar-proto':
+      '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../../packages/sidecar-proto
       '@xterm/addon-fit':
@@ -490,16 +490,16 @@ importers:
       '@ffprobe-installer/ffprobe':
         specifier: 2.1.2
         version: 2.1.2
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../packages/contracts
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../packages/release
-      '@open-design/sidecar':
+      '@mish/sidecar':
         specifier: workspace:*
         version: link:../packages/sidecar
-      '@open-design/sidecar-proto':
+      '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../packages/sidecar-proto
       '@playwright/test':
@@ -529,7 +529,7 @@ importers:
 
   packages/21st-catalog:
     devDependencies:
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../contracts
       '@types/node':
@@ -544,7 +544,7 @@ importers:
 
   packages/agency-fast-lane:
     dependencies:
-      '@open-design/cult-ui-catalog':
+      '@mish/cult-ui-catalog':
         specifier: workspace:*
         version: link:../cult-ui-catalog
     devDependencies:
@@ -557,7 +557,7 @@ importers:
 
   packages/agui-adapter:
     dependencies:
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../contracts
     devDependencies:
@@ -606,7 +606,7 @@ importers:
 
   packages/contracts:
     dependencies:
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../release
       zod:
@@ -628,7 +628,7 @@ importers:
 
   packages/cult-ui-catalog:
     devDependencies:
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../contracts
       '@types/node':
@@ -668,7 +668,7 @@ importers:
 
   packages/download:
     dependencies:
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../platform
     devDependencies:
@@ -751,7 +751,7 @@ importers:
 
   packages/host:
     dependencies:
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../release
     devDependencies:
@@ -770,10 +770,10 @@ importers:
 
   packages/launcher-proto:
     dependencies:
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../release
-      '@open-design/sidecar-proto':
+      '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../sidecar-proto
     devDependencies:
@@ -826,7 +826,7 @@ importers:
 
   packages/plugin-runtime:
     dependencies:
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../contracts
       zod:
@@ -894,7 +894,7 @@ importers:
 
   packages/sidecar:
     dependencies:
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../platform
     devDependencies:
@@ -913,7 +913,7 @@ importers:
 
   packages/sidecar-proto:
     dependencies:
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../release
     devDependencies:
@@ -932,7 +932,7 @@ importers:
 
   packages/standalone:
     dependencies:
-      '@open-design/download':
+      '@mish/download':
         specifier: workspace:*
         version: link:../download
       jszip:
@@ -957,13 +957,13 @@ importers:
 
   shells/terminal:
     devDependencies:
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform
-      '@open-design/sidecar':
+      '@mish/sidecar':
         specifier: workspace:*
         version: link:../../packages/sidecar
-      '@open-design/standalone':
+      '@mish/standalone':
         specifier: workspace:*
         version: link:../../packages/standalone
       '@types/node':
@@ -978,13 +978,13 @@ importers:
 
   tools/dev:
     dependencies:
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform
-      '@open-design/sidecar':
+      '@mish/sidecar':
         specifier: workspace:*
         version: link:../../packages/sidecar
-      '@open-design/sidecar-proto':
+      '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../../packages/sidecar-proto
       cac:
@@ -1012,22 +1012,22 @@ importers:
       '@electron/rebuild':
         specifier: 4.0.4
         version: 4.0.4
-      '@open-design/contracts':
+      '@mish/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
-      '@open-design/launcher-proto':
+      '@mish/launcher-proto':
         specifier: workspace:*
         version: link:../../packages/launcher-proto
-      '@open-design/platform':
+      '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../../packages/release
-      '@open-design/sidecar':
+      '@mish/sidecar':
         specifier: workspace:*
         version: link:../../packages/sidecar
-      '@open-design/sidecar-proto':
+      '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../../packages/sidecar-proto
       cac:
@@ -1062,10 +1062,10 @@ importers:
 
   tools/release:
     dependencies:
-      '@open-design/launcher-proto':
+      '@mish/launcher-proto':
         specifier: workspace:*
         version: link:../../packages/launcher-proto
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../../packages/release
       cac:
@@ -1100,7 +1100,7 @@ importers:
 
   tools/serve:
     dependencies:
-      '@open-design/release':
+      '@mish/release':
         specifier: workspace:*
         version: link:../../packages/release
       cac:

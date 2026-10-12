@@ -4,7 +4,7 @@
 import { rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseReviewRunView } from '@open-design/contracts';
+import { parseReviewRunView } from '@mish/contracts';
 import { knownGoodCapture, page } from './review-capture-fixture.js';
 import { bootReviewRuns, fakeReviewer, PNG_BASE64 } from './review-run-fixture.js';
 import { consoleRecord } from '../../src/workbench/review/page-text.js';

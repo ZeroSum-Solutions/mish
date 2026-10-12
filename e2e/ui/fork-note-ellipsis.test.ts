@@ -61,8 +61,8 @@ const CHAT_PANEL_WIDTH_PX = 220;
 
 async function seedForkedConversation(page: Page): Promise<Locator> {
   await page.addInitScript((locale) => {
-    window.localStorage.setItem('open-design:locale', locale);
-    window.localStorage.setItem('open-design:locale-source', 'manual');
+    window.localStorage.setItem('mish:locale', locale);
+    window.localStorage.setItem('mish:locale-source', 'manual');
   }, LOCALE);
   await routeAgents(page, [AGENT]);
 

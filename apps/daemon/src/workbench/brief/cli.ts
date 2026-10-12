@@ -3,7 +3,7 @@ import {
   isBriefTransformerLane, type BriefTransformerStatusResponse,
   parseDesignBriefPreview, parsePreviewDesignBriefRequest, parseAttachDesignBriefRequest, parseCreateDesignBriefRequest, parseDesignBriefRecordView, parsePatchDesignBriefRequest, parseRunDesignBriefBinding,
   type DesignBriefRecordView, type RunDesignBriefBinding,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../../daemon-url.js';
 import type { WorkbenchCliOptions } from '../../workbench-cli.js';
 

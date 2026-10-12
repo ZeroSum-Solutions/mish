@@ -8,7 +8,7 @@ import { BrowserWindow, Menu, app, dialog, globalShortcut, shell, type MenuItemC
 
 import {
   APP_KEYS,
-  OPEN_DESIGN_SIDECAR_CONTRACT,
+  MISH_SIDECAR_CONTRACT,
   SIDECAR_MESSAGES,
   SIDECAR_MODES,
   SIDECAR_SOURCES,
@@ -29,7 +29,7 @@ import {
   type RegisterDesktopAuthResult,
   type LegacySidecarRuntimeLayout,
   type WebStatusSnapshot,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import { dirname, join } from "node:path";
 
 import {
@@ -38,7 +38,7 @@ import {
   SidecarFactory,
   type SidecarClient,
   type SidecarRuntimeContext,
-} from "@open-design/sidecar";
+} from "@mish/sidecar";
 
 import { createDesktopRuntime, type DesktopRuntime } from "./runtime.js";
 import { dispatchInviteDeeplink, registerInviteDeeplink } from "./invite-deeplink.js";
@@ -105,7 +105,7 @@ export {
   type PickAndImportFolderResult,
 } from "./runtime.js";
 
-const AMR_PROFILE_ENV_KEY = "OPEN_DESIGN_AMR_PROFILE";
+const AMR_PROFILE_ENV_KEY = "MISH_AMR_PROFILE";
 const AMR_PROFILE_AGENT_ID = "amr";
 const AMR_ENVIRONMENT_PROFILES = ["prod", "test", "feature-test", "local"] as const;
 const APP_CONFIG_CHANGED_IPC_CHANNEL = "od:app-config-changed";
@@ -208,7 +208,7 @@ export type DesktopMainOptions = {
    */
   discoverDaemonUrl: () => Promise<string | null>;
   registerDesktopAuth: (secret: Buffer) => Promise<boolean>;
-  /** Stable installed launcher used for Windows opendesign:// registration. */
+  /** Stable installed launcher used for Windows mish:// registration. */
   inviteProtocolClientPath?: string | null;
   preloadPath?: string;
   windowTitle?: string;
@@ -590,7 +590,7 @@ function installDesktopMenu(
   });
   const registered = globalShortcut.register(developMenuAccelerator, toggleDevelopMenu);
   if (!registered) {
-    console.warn("[open-design desktop] develop menu shortcut unavailable", { accelerator: developMenuAccelerator });
+    console.warn("[mish desktop] develop menu shortcut unavailable", { accelerator: developMenuAccelerator });
   }
   return {
     dispose() {
@@ -667,7 +667,7 @@ export async function runDesktopMain(
 
   const observeDevelopmentProfile = (phase: string) => {
     if (runtime.source !== SIDECAR_SOURCES.TOOLS_DEV || !app.commandLine.hasSwitch("user-data-dir")) return;
-    console.info("[open-design desktop] explicit development profile", {
+    console.info("[mish desktop] explicit development profile", {
       phase, pid: process.pid, userData: app.getPath("userData"), sessionData: app.getPath("sessionData"),
     });
   };
@@ -698,7 +698,7 @@ export async function runDesktopMain(
   const registered = await options.registerDesktopAuth(desktopAuthSecret);
   if (!registered) {
     console.warn(
-      "[open-design desktop] initial import-token handshake with daemon did not complete; " +
+      "[mish desktop] initial import-token handshake with daemon did not complete; " +
         "first folder-import attempt will lazily retry registration before failing",
     );
   }
@@ -726,13 +726,13 @@ export async function runDesktopMain(
   // reader never looks in. Keeping both sides on `resolveRuntimeNamespaceRoot`
   // co-locates renderer.log with the desktop log dir AND keeps it captured.
   const namespaceRoot = resolveRuntimeNamespaceRoot({
-    contract: OPEN_DESIGN_SIDECAR_CONTRACT,
+    contract: MISH_SIDECAR_CONTRACT,
     runtime,
     runtimeMode: SIDECAR_MODES.RUNTIME,
   });
   const desktopLogPath = resolveLogFilePath({
     app: APP_KEYS.DESKTOP,
-    contract: OPEN_DESIGN_SIDECAR_CONTRACT,
+    contract: MISH_SIDECAR_CONTRACT,
     runtimeRoot: namespaceRoot,
   });
   const rendererLogPath = join(dirname(desktopLogPath), "renderer.log");
@@ -822,20 +822,20 @@ export async function runDesktopMain(
     shutdownPromise ??= Promise.resolve().then(async () => {
       const startedAt = Date.now();
       let shutdownFailed = false;
-      console.info("[open-design desktop] shutdown started");
+      console.info("[mish desktop] shutdown started");
       updateScheduler?.stop("shutdown");
       await updater.recordLifecycle?.({ stage: "shutdown_started", outcome: "started" });
       await options.beforeShutdown?.((event) => updater.recordLifecycle?.(event) ?? Promise.resolve()).catch((error: unknown) => {
         shutdownFailed = true;
         console.error("desktop beforeShutdown failed", error);
       });
-      console.info("[open-design desktop] shutdown sidecars settled", { durationMs: Date.now() - startedAt });
+      console.info("[mish desktop] shutdown sidecars settled", { durationMs: Date.now() - startedAt });
       disposeMenu();
       removeDiagnosticsIpc();
       await desktop?.close().catch(() => { shutdownFailed = true; });
       // Mark clean only after teardown; a stalled cleanup is not a clean exit.
       endDesktopSessionCleanly({ stateFilePath: sessionStatePath });
-      console.info("[open-design desktop] shutdown completed", { durationMs: Date.now() - startedAt });
+      console.info("[mish desktop] shutdown completed", { durationMs: Date.now() - startedAt });
       await updater.recordLifecycle?.({ stage: "shutdown_completed", outcome: shutdownFailed ? "failed" : "completed", duration_ms: Date.now() - startedAt, repeated_quit_count: shutdownRequestCount - 1 });
       shutdownComplete = true;
       app.quit();
@@ -854,7 +854,7 @@ export async function runDesktopMain(
       });
       const startedAt = Date.now();
       const input = "input" in request ? summarizeDesktopIpcInput(request.input) : null;
-      console.info("[open-design desktop] sidecar action start", { input, type: request.type });
+      console.info("[mish desktop] sidecar action start", { input, type: request.type });
       try {
         const activeDesktop = desktop;
         switch (request.type) {
@@ -892,14 +892,14 @@ export async function runDesktopMain(
             return await updater.handle((request.input as DesktopUpdateInput).action);
         }
       } catch (error) {
-        console.error("[open-design desktop] sidecar action failed", {
+        console.error("[mish desktop] sidecar action failed", {
           durationMs: Date.now() - startedAt,
           error: error instanceof Error ? error.message : String(error),
           type: request.type,
         });
         throw error;
       } finally {
-        console.info("[open-design desktop] sidecar action end", {
+        console.info("[mish desktop] sidecar action end", {
           durationMs: Date.now() - startedAt,
           type: request.type,
         });
@@ -919,7 +919,7 @@ export async function runDesktopMain(
   });
   disposeMenu = menuController.dispose;
 
-  console.info("[open-design desktop] creating desktop runtime");
+  console.info("[mish desktop] creating desktop runtime");
   desktop = await createDesktopRuntime({
     desktopAuthSecret,
     discoverUrl: options.discoverWebUrl,
@@ -953,7 +953,7 @@ export async function runDesktopMain(
     pendingUpdateDialogRequest = false;
     desktop.openUpdateDialog({ source: "mac-app-menu" });
   }
-  console.info("[open-design desktop] desktop runtime created");
+  console.info("[mish desktop] desktop runtime created");
   options.onDesktopReady?.({
     dispatchInviteDeeplink,
     show: () => {
@@ -966,7 +966,7 @@ export async function runDesktopMain(
   // it (best-effort; the events carry no user content). Each is dropped from the
   // queue only once the daemon acks it, so a failed report is retried next launch.
   if (previousUncleanSessions.length > 0) {
-    console.warn("[open-design desktop] prior session(s) ended abnormally (no clean shutdown)", {
+    console.warn("[mish desktop] prior session(s) ended abnormally (no clean shutdown)", {
       count: previousUncleanSessions.length,
     });
     void reportPriorDesktopUncleanExits({
@@ -987,12 +987,12 @@ export async function runDesktopMain(
   removeDiagnosticsIpc = registerDesktopDiagnosticsIpc({
     discoverDaemonBaseUrl: resolveDaemonBaseUrl(options),
   });
-  // Route opendesign:// team-invite deeplinks to the daemon (desktop wake-up).
+  // Route mish:// team-invite deeplinks to the daemon (desktop wake-up).
   registerInviteDeeplink({
     resolveDaemonBaseUrl: resolveDaemonBaseUrl(options),
     focus: () => focusDesktopForDeeplink(desktop),
     onCompleted: (outcome) => {
-      console.info("[open-design desktop] invite deeplink continuation completed", outcome);
+      console.info("[mish desktop] invite deeplink continuation completed", outcome);
     },
     protocolClientPath: options.inviteProtocolClientPath,
   });

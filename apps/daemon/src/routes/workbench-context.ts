@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import { parsePutProjectDesignContext, parsePutProjectRubric, parsePutWorkbenchPreferences } from '@open-design/contracts';
+import { parsePutProjectDesignContext, parsePutProjectRubric, parsePutWorkbenchPreferences } from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
 import type { AuthorizeProjectRequest, AuthorizeProjectRequestSync } from '../collab/project-request-authority.js';
 import { resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';

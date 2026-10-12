@@ -1,4 +1,4 @@
-import type { BuildOnBrandResult, SiteCheckResult } from '@open-design/contracts';
+import type { BuildOnBrandResult, SiteCheckResult } from '@mish/contracts';
 export type Grade = 'A' | 'B' | 'C' | 'D' | 'E' | 'F';
 export interface Conversion {
   action: string; labels: string[]; destinationRoles: string[]; demoOnly: boolean;

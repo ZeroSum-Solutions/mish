@@ -48,8 +48,8 @@ function textOf(text: string) {
 
 beforeEach(() => {
   window.localStorage.clear();
-  window.localStorage.setItem('open-design:locale', "en");
-  window.localStorage.setItem('open-design:locale-source', 'manual');
+  window.localStorage.setItem('mish:locale', "en");
+  window.localStorage.setItem('mish:locale-source', 'manual');
 });
 
 afterEach(() => {
@@ -110,6 +110,6 @@ describe('AmrOwnerTopUpDialog 只有一颗按钮', () => {
       .filter((label) => label.length > 0);
     expect(actionLabels).toEqual(["Got it"]);
     // 那句「可以直接发给所有者的话」是复制机制的载荷,一并撤掉。
-    expect(container.textContent).not.toContain('Open Design 控制台');
+    expect(container.textContent).not.toContain('Mish 控制台');
   });
 });

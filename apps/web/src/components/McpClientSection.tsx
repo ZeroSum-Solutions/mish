@@ -13,14 +13,14 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackIntegrationsMcpTabClick,
   trackSettingsExternalMcpClick,
 } from '../analytics/events';
-import type { TrackingExternalMcpElement } from '@open-design/contracts/analytics';
-import { MCP_SECRET_MASK } from '@open-design/contracts';
+import type { TrackingExternalMcpElement } from '@mish/contracts/analytics';
+import { MCP_SECRET_MASK } from '@mish/contracts';
 import {
   disconnectMcpOAuth,
   fetchMcpOAuthStatus,
@@ -1249,7 +1249,7 @@ function McpOAuthControl({ serverId }: { serverId: string }) {
     window.addEventListener('message', onMessage);
     let bc: BroadcastChannel | null = null;
     if (typeof BroadcastChannel !== 'undefined') {
-      bc = new BroadcastChannel('open-design-mcp-oauth');
+      bc = new BroadcastChannel('mish-mcp-oauth');
       bc.onmessage = (ev) => onMessage(ev as MessageEvent);
     }
     return () => {

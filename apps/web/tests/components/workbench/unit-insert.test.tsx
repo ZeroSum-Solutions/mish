@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ReusableUnitManifest, UnitInsertReceipt } from '@open-design/contracts';
+import type { ReusableUnitManifest, UnitInsertReceipt } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchUnitInsert } from '../../../src/components/workbench/WorkbenchUnitInsert';
 import { CaptureRequestError, unitApi } from '../../../src/providers/workbench-capture';

@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { parseSessionExecutionChoice, type SessionRunAdmission } from '@open-design/contracts';
+import { parseSessionExecutionChoice, type SessionRunAdmission } from '@mish/contracts';
 import { agentCliEnvForAgent, readAppConfig } from '../app-config.js';
 import { resolveAmrProfile } from '../integrations/vela.js';
 import { fetchVelaPresetModels, fetchVelaRemoteModelsWithRetry } from '../runtimes/defs/amr.js';

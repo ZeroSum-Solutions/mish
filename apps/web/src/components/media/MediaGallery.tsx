@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { Button, Chip, Input, Select, Spinner } from '@open-design/components';
+import { Button, Chip, Input, Select, Spinner } from '@mish/components';
 import {
   MEDIA_TASK_STATUSES,
   type MediaGalleryEntry,
   type MediaSurface,
   type MediaTaskStatus,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useT } from '../../i18n';
 import { listProjects } from '../../state/projects';
 import type { Project } from '../../types';

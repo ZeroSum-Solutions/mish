@@ -2,13 +2,13 @@ import express from 'express';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseFontCheckResponse, type ResourceDetailResponse, type ResourceSearchResponse } from '@open-design/contracts';
+import { parseFontCheckResponse, type ResourceDetailResponse, type ResourceSearchResponse } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { registerWorkbenchFontRoutes } from '../../src/routes/workbench-fonts.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';
-import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
-import { REPO_BUNDLED_PLUGINS_ROOT } from './fonts-fixture.js';
+import { createFontsResourceSource } from '../fixtures/daemon-b/fonts.js';
+import { REPO_BUNDLED_PLUGINS_ROOT } from '../fixtures/daemon-b/fonts.js';
 import { savedContext, projectState } from './context-ranking-fixture.js';
 
 let server: Server | undefined;

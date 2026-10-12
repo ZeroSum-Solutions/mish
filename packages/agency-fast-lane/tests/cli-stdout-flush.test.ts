@@ -42,7 +42,7 @@ test('a real spawned CLI process flushes a large stderr message fully before it 
   const expectedMessage = `--asset expects id=path, received ${hugeAssetValue}\n`;
 
   const { exitCode, stdout, stderr } = await spawnThrottled(process.execPath, [
-    '--experimental-strip-types', cliEntry, '--family', 'maben', '--brief', briefPath, '--verify-mode', 'off', '--asset', hugeAssetValue,
+    '--experimental-strip-types', cliEntry, '--family', 'ownedsite', '--brief', briefPath, '--verify-mode', 'off', '--asset', hugeAssetValue,
   ]);
 
   assert.equal(exitCode, 1, 'a malformed --asset value is a usage error (exit 1)');

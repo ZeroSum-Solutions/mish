@@ -1,7 +1,7 @@
 import { readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseReviewRunView, type ProjectDesignContext, type ProjectRubric, type ReviewRunView } from '@open-design/contracts';
+import { parseReviewRunView, type ProjectDesignContext, type ProjectRubric, type ReviewRunView } from '@mish/contracts';
 import { checklistRubricCheck } from '../../src/workbench/review/checklist-criteria.js';
 import { PageText } from '../../src/workbench/review/evidence.js';
 import { knownGoodCapture } from './review-capture-fixture.js';

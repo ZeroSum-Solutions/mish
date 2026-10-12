@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, DialogTitle, Select, Textarea } from '@open-design/components';
-import type { CaptureDraftRevision, CaptureView, WorkspaceCollabContext } from '@open-design/contracts';
+import { Button, Dialog, DialogBody, DialogFooter, DialogHeader, DialogTitle, Select, Textarea } from '@mish/components';
+import type { CaptureDraftRevision, CaptureView, WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { workspaceResourceUrl } from '../../collab/workspace-identity';
 import { captureDraftApi, captureDraftPreviewDocument, CaptureDraftRequestError } from '../../providers/workbench-capture-drafts';

@@ -59,7 +59,7 @@ mode below).
 ## Recordings live on R2, not in this repo
 
 The 179-recording corpus (~4.5 MB) is hosted on Cloudflare R2 at
-`open-design-mocks` and fetched **on demand** — `pnpm install` does NOT
+`mish-mocks` and fetched **on demand** — `pnpm install` does NOT
 pull them, and the repo stays small. Recordings only land in
 `mocks/recordings/` when:
 
@@ -115,7 +115,7 @@ re-harvest.
 
 `mocks/golden/<trace>.events.json` holds the exact event sequence the
 OD daemon emits when fed each (mock CLI → handler) pipeline. Diffed
-on every `pnpm --filter @open-design/daemon test` run by
+on every `pnpm --filter @mish/daemon test` run by
 `apps/daemon/tests/mocks-golden.test.ts`.
 
 A parser refactor that semantically changes events (drops a field,
@@ -123,7 +123,7 @@ renames `sessionId`, stops emitting `turn_end`) fails the diff loudly.
 After an intentional parser change, regenerate:
 
 ```bash
-MOCKS_GOLDEN_UPDATE=1 pnpm --filter @open-design/daemon test mocks-golden
+MOCKS_GOLDEN_UPDATE=1 pnpm --filter @mish/daemon test mocks-golden
 git diff mocks/golden/    # eyeball the new shapes
 git add mocks/golden/ && git commit -m "mocks: refresh goldens for <parser change>"
 ```
@@ -264,7 +264,7 @@ The recordings live as one JSONL file per Langfuse trace under
   "tool_call_count": 17,
   "error_count": 0,
   "total_tokens": 12345,
-  "tags": ["agent:claude", "skill:agent-browser", "open-design", ...],
+  "tags": ["agent:claude", "skill:agent-browser", "mish", ...],
   "user_input": "...",
   "session_id": "..."
 }
@@ -375,10 +375,10 @@ etc. The .jsonl itself stays in R2.
 ```bash
 # 1. delete from R2
 export CLOUDFLARE_ACCOUNT_ID=64ad4569ffd912432d6b86d5656484c4
-wrangler r2 object delete open-design-mocks/recordings/v1/<trace-id>.jsonl --remote
+wrangler r2 object delete mish-mocks/recordings/v1/<trace-id>.jsonl --remote
 # 2. drop the entry from manifest.json (edit by hand, or use `jq`)
 # 3. re-upload manifest
-wrangler r2 object put open-design-mocks/recordings/v1/manifest.json \
+wrangler r2 object put mish-mocks/recordings/v1/manifest.json \
   --file mocks/manifest.json --remote
 # 4. git add mocks/manifest.json && git commit && git push
 ```
@@ -489,7 +489,7 @@ under any Node ≥18.
 ## Provenance / safety
 
 All recordings come from the upstream project's own Langfuse project (the
-`open-design` project under the `powerformer` org). Users opted into
+`mish` project under the `powerformer` org). Users opted into
 telemetry when they installed the desktop client. The anonymizer
 removed user-identifying paths and project UUIDs before checking in.
 

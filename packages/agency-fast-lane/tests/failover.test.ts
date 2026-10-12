@@ -10,7 +10,7 @@ import test from 'node:test';
 import { createModelCaller, failedAfterStreamBytes, ProviderHttpError, type ProviderName } from '../src/deepseek.ts';
 import { createFailoverCaller, createRecordingCaller, failoverReason, ProviderFailoverError, ProviderKeyError, ProviderKeyUnreadableError, type FailoverReason } from '../src/failover.ts';
 import { runFastLane, type RunEvent } from '../src/run.ts';
-import { fakeModel, loadMaben } from './fixtures.ts';
+import { fakeModel, loadTestSite } from './fixtures.ts';
 
 const encoder = new TextEncoder();
 
@@ -482,7 +482,7 @@ test('committing the switch itself (not yet sticky) still reports ProviderFailov
 // the whole build with a `ProviderFailoverError` and 0 `transport-retry` events; after it, the
 // build succeeds with exactly one `transport-retry` event on the secondary.
 test('Opus repro: a transient 503 on the sticky secondary no longer fails the whole build', async () => {
-  const pkg = await loadMaben();
+  const pkg = await loadTestSite();
   const BRIEF = 'Riverbend Dental, a family dental practice in Boise. Same-day crowns, sedation options, open Saturdays.';
   const good = fakeModel();
   const primaryFetch = (async () => new Response('down', { status: 503 })) as typeof fetch;
@@ -503,7 +503,7 @@ test('Opus repro: a transient 503 on the sticky secondary no longer fails the wh
     onFailover: (event) => failovers.push(event),
   });
   const events: RunEvent[] = [];
-  const report = await runFastLane({ pkg, brief: BRIEF, mode: 'sections', entry: 'maben-r1.html', revision: 1, model, modelName: 'fake', onEvent: (event) => events.push(event) });
+  const report = await runFastLane({ pkg, brief: BRIEF, mode: 'sections', entry: 'ownedsite-r1.html', revision: 1, model, modelName: 'fake', onEvent: (event) => events.push(event) });
   assert.equal(failovers.length, 1, 'the switch to the secondary happens exactly once');
   const retryEvents = events.filter((event) => event.type === 'transport-retry');
   assert.equal(retryEvents.length, 1, 'the secondary\'s own transient 503 is retried, not fatal');

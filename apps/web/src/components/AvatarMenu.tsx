@@ -23,7 +23,7 @@ import { fetchProviderModels } from '../providers/provider-models';
 import {
   canReachWorkspaceBillingEntrance,
   workspaceBillingAuthorityContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { AgentInfo, AppConfig, ExecMode, ProviderModelOption } from '../types';
 import {
   canUpgradeVelaPlan,
@@ -254,7 +254,7 @@ export function AvatarMenu({
     [agents],
   );
   const amrAvailable = amrAgent !== null;
-  const amrProfile = config.agentCliEnv?.amr?.OPEN_DESIGN_AMR_PROFILE;
+  const amrProfile = config.agentCliEnv?.amr?.MISH_AMR_PROFILE;
 
   // Fetch the live login status when the popover opens so plan-gated model
   // rows route to the signed-in profile's workspace-scoped plans page (see

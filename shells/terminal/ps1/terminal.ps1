@@ -72,7 +72,7 @@ $manifestDigest = ([IO.File]::ReadAllText($manifestDigestPath).Trim() -split '\s
 if ($manifestDigest -notmatch '^[a-f0-9]{64}$') { Fail "invalid manifest digest" }
 if ((Get-FileHash -LiteralPath $manifestPath -Algorithm SHA256).Hash.ToLowerInvariant() -ne $manifestDigest) { Fail "installed manifest digest mismatch" }
 
-$exchangeRoot = Join-Path ([IO.Path]::GetTempPath()) ("nexu-terminal-" + [Guid]::NewGuid().ToString("N"))
+$exchangeRoot = Join-Path ([IO.Path]::GetTempPath()) ("mish-terminal-" + [Guid]::NewGuid().ToString("N"))
 [IO.Directory]::CreateDirectory($exchangeRoot) | Out-Null
 $fossilExitCode = 0
 try {

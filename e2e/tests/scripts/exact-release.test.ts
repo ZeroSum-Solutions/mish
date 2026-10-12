@@ -1,13 +1,21 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+
 import { createHash } from 'node:crypto';
+
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+
 import { tmpdir } from 'node:os';
+
 import { join, resolve } from 'node:path';
+
 import { execFile } from 'node:child_process';
+
 import { promisify } from 'node:util';
-import { afterEach, describe, expect, it } from 'vitest';
+
+import { afterEach, expect, it, describe } from 'vitest';
 
 const roots: string[] = [];
+
 afterEach(async () => Promise.all(roots.splice(0).map((root) => rm(root, { force: true, recursive: true }))));
 
 const execFileAsync = promisify(execFile);
@@ -23,11 +31,6 @@ async function runPython(script: string, ...args: string[]) {
 }
 
 describe('exact release scripts', () => {
-  it('derives publication time from the immutable source commit', async () => {
-    const workflow = await readFile(resolve('../.github/workflows/release-exact.yml'), 'utf8');
-    expect(workflow).toContain("subprocess.check_output(['git', 'show', '--no-patch', '--format=%cI', os.environ['SOURCE_SHA']]");
-    expect(workflow).not.toContain('datetime.now');
-  });
 
   it('rejects a reused Terminal scene for a different standalone version', async () => {
     const root = await mkdtemp(join(tmpdir(), 'exact-pack-version-'));

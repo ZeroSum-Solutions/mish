@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import Database from 'better-sqlite3';
-import { parseRightsAssessment, parseSourceAdmission, type RightsAssessment, type SourceAdmission } from '@open-design/contracts';
+import { parseRightsAssessment, parseSourceAdmission, type RightsAssessment, type SourceAdmission } from '@mish/contracts';
 import { SourceRecordStore, migrateSourceRecords } from '../../src/storage/workbench-source-store.js';
 import type { EvidenceRecord } from '../../src/workbench/source-records.js';
 import type { TrustedSourceSnapshotDependencies, SourceSnapshotRequest } from '../../src/workbench/source-snapshot.js';

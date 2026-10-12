@@ -28,7 +28,7 @@ import {
   successfulRunEventBody,
 } from '@/playwright/mock-factory';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 test.describe.configure({ timeout: process.env.CI ? 90_000 : 60_000 });
 
 function artifactPreview(page: Page) {
@@ -2334,7 +2334,7 @@ test('[P1] project composer working directory replace and clear update linked di
 });
 
 test('[P1] project composer working directory rejects stale folder without promoting it to recents', async ({ page }) => {
-  const staleDir = '/Users/mac/open-design/open-design/missing-linked-dir';
+  const staleDir = '/Users/mac/mish/mish/missing-linked-dir';
   const patchBodies: Array<Record<string, unknown>> = [];
   const recentDirPutBodies: Array<Record<string, unknown>> = [];
 
@@ -2516,7 +2516,7 @@ async function seedAssistantMessage(
   await expectWorkspaceReady(page);
 }
 
-async function openDesignFile(page: Page, fileName: string) {
+async function mishFile(page: Page, fileName: string) {
   const tab = tabBySuffix(page, fileName);
   if (await tab.isVisible().catch(() => false)) {
     await tab.click();
@@ -2655,7 +2655,7 @@ async function ensureFileTabOpen(page: Page, name: string): Promise<Locator> {
   if (await tab.isVisible().catch(() => false)) return tab;
 
   await page.getByTestId('design-files-tab').click();
-  await openDesignFile(page, name);
+  await mishFile(page, name);
   await expect(tab).toBeVisible();
   return tab;
 }
@@ -2844,7 +2844,7 @@ async function runDeckPaginationNextPrevCorrectnessFlow(page: Page) {
   const { projectId } = await getCurrentProjectContext(page);
   await seedDeckArtifact(page, projectId, 'pagination.html', 'Pagination Deck', ['Slide One', 'Slide Two', 'Slide Three']);
   await page.reload();
-  await openDesignFile(page, 'pagination.html');
+  await mishFile(page, 'pagination.html');
 
   const frame = artifactPreviewFrame(page);
   await expect(frame.getByText('Slide One')).toBeVisible();
@@ -2862,14 +2862,14 @@ async function runDeckPaginationPerFileIsolatedFlow(page: Page) {
   await seedDeckArtifact(page, projectId, 'deck-beta.html', 'Deck Beta', ['Beta One', 'Beta Two']);
   await page.reload();
 
-  await openDesignFile(page, 'deck-alpha.html');
+  await mishFile(page, 'deck-alpha.html');
   const frame = artifactPreviewFrame(page);
   await expect(frame.getByText('Alpha One')).toBeVisible();
   await clickDeckNextSlide(page);
   await expect(frame.getByText('Alpha Two')).toBeVisible();
 
   await openAllProjectFiles(page);
-  await openDesignFile(page, 'deck-beta.html');
+  await mishFile(page, 'deck-beta.html');
   await expect(frame.getByText('Beta One')).toBeVisible();
   await clickDeckNextSlide(page);
   await expect(frame.getByText('Beta Two')).toBeVisible();
@@ -2891,7 +2891,7 @@ async function runUploadedImageRendersInPreviewFlow(page: Page) {
     '<!doctype html><html><body><main><h1>Image Preview</h1><img alt="Brand logo" src="brand.png"></main></body></html>',
   );
   await page.reload();
-  await openDesignFile(page, 'image-preview.html');
+  await mishFile(page, 'image-preview.html');
 
   const image = artifactPreviewFrame(page).getByRole('img', { name: 'Brand logo' });
   await expect(image).toBeVisible();
@@ -2904,7 +2904,7 @@ async function runPythonSourcePreviewFlow(page: Page) {
   const { projectId } = await getCurrentProjectContext(page);
   await seedProjectFile(page, projectId, 'app.py', 'def greet():\n    return "hello from python"\n');
   await page.reload();
-  await openDesignFile(page, 'app.py');
+  await mishFile(page, 'app.py');
 
   await expect(page.locator('.code-viewer')).toContainText('def greet');
   await expect(page.locator('.code-viewer')).toContainText('hello from python');

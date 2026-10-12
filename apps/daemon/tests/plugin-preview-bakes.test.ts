@@ -11,7 +11,7 @@ import {
   PLUGIN_PREVIEWS_ROUTE,
 } from '../src/plugins/plugin-preview-bakes.js';
 
-const PUBLIC_BASE = 'https://repo-assets.open-design.ai/plugin-previews';
+const PUBLIC_BASE = 'https://repo-assets.mish.invalid/plugin-previews';
 
 interface ManifestEntry {
   video: string;

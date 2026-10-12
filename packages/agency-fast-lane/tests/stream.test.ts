@@ -55,7 +55,7 @@ test('parseJsonObject tolerates fences and prose around the object', () => {
   assert.throws(() => parseJsonObject('no object here'), /not a JSON object/);
 });
 
-// G8 dry run (halcyon x DeepSeek, `now-showing`): the model closed the object early after each
+// G8 dry run (ownedinstitution x DeepSeek, `now-showing`): the model closed the object early after each
 // card group's last key, on every retry. The parser recovers exactly that, and nothing else.
 const CARD_TEMPLATE = { id: 'now-showing', content: { label: 'x', card1Title: 'x', card1Alt: 'x', card2Title: 'x', card2Alt: 'x' } };
 

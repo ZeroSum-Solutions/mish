@@ -5,8 +5,8 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { detectInitialLocale, LOCALES, resolveSystemLocale } from '../../src/i18n';
 
-const LS_KEY = 'open-design:locale';
-const LS_SOURCE_KEY = 'open-design:locale-source';
+const LS_KEY = 'mish:locale';
+const LS_SOURCE_KEY = 'mish:locale-source';
 
 const REMOVED_LOCALES = [
   'es', 'es-ES', 'ar', 'de', 'fa', 'fr', 'hu', 'id', 'it', 'ja', 'ko', 'pl',

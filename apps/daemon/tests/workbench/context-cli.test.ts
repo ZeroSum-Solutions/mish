@@ -70,7 +70,7 @@ it('runs actual source CLI subprocesses against HTTP using stdin, files, history
   await writeFile(join(dir, 'package.json'), JSON.stringify({ type: 'module' }));
   const shim = join(dir, 'contracts.ts');
   await writeFile(shim, `export * from ${JSON.stringify(join(repo, 'packages/contracts/src/index.ts'))};\nexport * from ${JSON.stringify(join(repo, 'packages/contracts/src/api/workbench-context.ts'))};\n`);
-  const config = join(dir, 'tsconfig.json'); await writeFile(config, JSON.stringify({ compilerOptions: { baseUrl: repo, paths: { '@open-design/contracts': [shim] } } }));
+  const config = join(dir, 'tsconfig.json'); await writeFile(config, JSON.stringify({ compilerOptions: { baseUrl: repo, paths: { '@mish/contracts': [shim] } } }));
   const runner = `import {runContextCli} from ${JSON.stringify(join(repo, 'apps/daemon/src/workbench/context-cli.ts'))}; process.exitCode = await runContextCli(process.argv.slice(1), {env:process.env});`;
   const invoke = (args: string[], input?: unknown) => new Promise<{ code: number | null; value: unknown; stderr: string }>((resolve, reject) => {
     const child = spawn(process.execPath, ['--import', 'tsx', '--input-type=module', '--eval', runner, ...args, '--daemon-url', base], { cwd: join(repo, 'apps/daemon'), env: { ...process.env, TSX_TSCONFIG_PATH: config } });

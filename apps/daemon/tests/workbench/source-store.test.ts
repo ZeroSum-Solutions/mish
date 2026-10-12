@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseSourceAdmission } from '@open-design/contracts';
+import { parseSourceAdmission } from '@mish/contracts';
 import type { TermsRecord, EvidenceRecord } from '../../src/workbench/source-records.js';
 import { SourceRecordStore, migrateSourceRecords } from '../../src/storage/workbench-source-store.js';
 

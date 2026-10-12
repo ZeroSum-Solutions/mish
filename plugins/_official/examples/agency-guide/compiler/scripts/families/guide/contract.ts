@@ -212,7 +212,7 @@ function sectionSchema(spec: SectionSpec): Schema {
 export function recipeSchema(): Schema {
   return {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
-    $id: `https://open-design.ai/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
+    $id: `https://github.com/ZeroSum-Solutions/mish/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
     title: `${FAMILY_ID} recipe`,
     description: 'A one-destination guide page kind (atlas CS.01): header/nav, masthead, an opening chapter, a chapter list, optional practical facts, optional places to see, an optional typographic gallery of place cards, an optional plan-a-visit link, and a footer. Derived from compiler/scripts/families/guide/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.',
     $comment: 'contract.ts additionally enforces markup-free plain text and a well-formed URL on the plan-a-visit destination, and that a null appears only on an x-atom string leaf, an x-atom item (a whole practical-facts row), or in an x-optional section slot.',

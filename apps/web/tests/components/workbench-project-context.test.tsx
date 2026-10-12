@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { parseProjectDesignContextDraft, parseProjectRubricDraft, type ProjectDesignContextSnapshot, type ProjectRubricDraft, type ProjectRubricSnapshot } from '@open-design/contracts';
+import { parseProjectDesignContextDraft, parseProjectRubricDraft, type ProjectDesignContextSnapshot, type ProjectRubricDraft, type ProjectRubricSnapshot } from '@mish/contracts';
 import { advanceWorkspaceAccountGeneration, resetWorkspaceAccountGeneration } from '../../src/collab/workspace-identity';
 import { I18nProvider } from '../../src/i18n';
 import { WorkbenchProjectContext } from '../../src/components/workbench/WorkbenchProjectContext';

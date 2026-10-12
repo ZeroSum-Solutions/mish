@@ -1,4 +1,4 @@
-import { parseRightsAssessment, parseSourceAdmission, SOURCE_OPERATIONS, type SourceAdmission, type RightsAssessment, type OperationRight } from '@open-design/contracts';
+import { parseRightsAssessment, parseSourceAdmission, SOURCE_OPERATIONS, type SourceAdmission, type RightsAssessment, type OperationRight } from '@mish/contracts';
 
 interface Binding { id: string; revision: number; admissionId: string; admissionRevision: number }
 type TermsMetadata = { version: string; sha256: string } | null;

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { attachIntakeBatch, clearIntakeBatch, createIntakeBatch, getIntakeBatch, intakeFileDownloadUrl, listIntakeBatches, putIntakeFile } from '../../src/providers/intake';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 
 const batchId = '00000000-0000-4000-8000-000000000001';
 const fileId = '00000000-0000-4000-8000-000000000002';

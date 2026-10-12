@@ -16,7 +16,7 @@ launches it.
 The desired user experience is:
 
 1. The user installs the official `@deepseek-ai/dsh` package.
-2. Mishh Mashh installs or detects an OD-specific profile named `open-design`.
+2. Mishh Mashh installs or detects an OD-specific profile named `mish`.
 3. The user selects **DeepSeek Harness** from the normal coding-agent picker.
 4. Harness creates files in the selected OD project; OD detects, previews, and
    delivers those files through its existing artifact path.
@@ -28,7 +28,7 @@ The stable Mishh Mashh runtime identity is:
 - runtime id: `deepseek-harness`
 - display name: `DeepSeek Harness`
 - executable: user-installed `dsh`, overridable through `DSH_BIN`
-- profile: `open-design`
+- profile: `mish`
 - stream format: `dsh-profile-jsonl`
 - protocol generation: `1`
 
@@ -47,7 +47,7 @@ This adapter remains distinct from the existing `deepseek` TUI adapter.
 ### Mishh Mashh owns
 
 - daemon discovery and launch of the user's `dsh`;
-- the `open-design` profile bundle and its versioned stdio contract;
+- the `mish` profile bundle and its versioned stdio contract;
 - mapping OD conversations to stable Harness session ids;
 - mapping Harness events into OD chat/tool/artifact events;
 - run cancellation and platform process-tree cleanup;
@@ -77,9 +77,9 @@ Conceptually:
 
 ```text
 user-installed official dsh
-  └── profile: open-design
+  └── profile: mish
        ├── official Harness base, agent loop, tools, provider, persistence
-       └── @open-design/dsh-runtime
+       └── @mish/dsh-runtime
             ├── versioned stdio entry point
             ├── cold-resume bridge
             ├── structured event projection
@@ -103,12 +103,12 @@ control contract OD needs.
 The profile bundle is installed into the user's official Harness installation:
 
 ```text
-dsh plugin --profile open-design add <pinned OD bundle package>
+dsh plugin --profile mish add <pinned OD bundle package>
 ```
 
 The source lives in the Mishh Mashh repository so the host types, fake runtime,
 profile implementation, and protocol fixtures change atomically. Its package
-identity is `@open-design/dsh-runtime`, but end-user setup does not require a
+identity is `@mish/dsh-runtime`, but end-user setup does not require a
 public registry release: each packaged OD build carries an exact packed
 tarball plus a SHA-256 manifest. This couples the host and profile protocol
 versions and avoids an unbounded `latest` install.
@@ -121,7 +121,7 @@ setup-required label. Selecting it opens a confirmation dialog. Only after the
 user confirms does OD invoke:
 
 ```text
-dsh plugin --profile open-design add <embedded pinned tarball>
+dsh plugin --profile mish add <embedded pinned tarball>
 ```
 
 OD verifies the tarball hash before invocation, rescans the profile, selects
@@ -142,7 +142,7 @@ A bare `dsh` binary is not enough. OD advertises DeepSeek Harness as runnable
 only when both checks succeed:
 
 1. `dsh --version` produces a usable identity.
-2. `dsh --profile open-design --probe` emits a compatible probe frame and exits
+2. `dsh --profile mish --probe` emits a compatible probe frame and exits
    successfully.
 
 The probe frame is one JSON line:
@@ -151,7 +151,7 @@ The probe frame is one JSON line:
 {
   "v": 1,
   "type": "probe",
-  "runtime": "open-design",
+  "runtime": "mish",
   "protocol_version": 1,
   "plugin_version": "<version>",
   "capabilities": {
@@ -182,7 +182,7 @@ server and does not pretend that the stock server supports resume.
 OD launches:
 
 ```text
-dsh --profile open-design --stdio
+dsh --profile mish --stdio
 ```
 
 Every non-empty stdout line is exactly one protocol frame. Diagnostics go to
@@ -254,7 +254,7 @@ run starts one short-lived `dsh` process.
 
 ```text
 first run
-  spawn dsh --profile open-design --stdio
+  spawn dsh --profile mish --stdio
   validate ready
   execute with bootstrap context + current user turn
   receive new session id
@@ -310,7 +310,7 @@ and delivery paths remain authoritative.
 
 OD must not replace `DSH_HOME` to isolate a run. That home is the user's
 official Harness installation boundary and contains the installed
-`open-design` profile, Harness-managed credentials, and native session history.
+`mish` profile, Harness-managed credentials, and native session history.
 OD treats that history as external-tool state and never parses or edits it. OD
 persists only the opaque session id plus compatibility metadata in its own
 database under the daemon's resolved `RUNTIME_DATA_DIR`; clients cannot choose

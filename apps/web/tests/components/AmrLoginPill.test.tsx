@@ -26,6 +26,8 @@ import {
   AMR_LOGIN_TIMEOUT_MS,
 } from '../../src/components/amrLoginPolling';
 import { I18nProvider } from '../../src/i18n';
+import { setRuntimeAmrConsoleOrigin } from '../../src/runtime/amr-guidance';
+import { TEST_AMR_CONSOLE_ORIGIN } from '../helpers/amr-console';
 import type { VelaLoginStatus } from '../../src/providers/daemon';
 import {
   TEAM_PROJECTS_CHANGED_EVENT,
@@ -68,6 +70,7 @@ const originalFetch = globalThis.fetch;
 
 afterEach(() => {
   cleanup();
+  setRuntimeAmrConsoleOrigin(null);
   vi.unstubAllGlobals();
   globalThis.fetch = originalFetch;
   vi.useRealTimers();
@@ -267,57 +270,57 @@ describe('AmrLoginPill', () => {
     expect(screen.queryByText('LOCAL')).toBeNull();
   });
 
-  it('uses the test-profile AMR management URL for signed-in users', () => {
-    renderAccountControl({
-      status: 'signed-in',
-      email: 'leaf@example.com',
-      profile: 'test',
-      showProfileBadge: true,
-      showConsoleAction: true,
-    });
-
-    expect(screen.getByText('leaf@example.com')).toBeTruthy();
-    expect(screen.getByText('TEST')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'https://open-design.powerformer.net/cloud/dashboard?source=open_design',
-    );
+  // AMR is an upstream paid service the fork does not operate: with no console
+  // origin configured the Manage action is unavailable and not rendered.
+  it('hides the AMR management action when no console origin is configured', () => {
+    for (const profile of ['test', 'local', 'prod']) {
+      const { unmount } = renderAccountControl({
+        status: 'signed-in',
+        email: 'leaf@example.com',
+        profile,
+        showProfileBadge: true,
+        showConsoleAction: true,
+      });
+      expect(screen.getByText('leaf@example.com')).toBeTruthy();
+      expect(screen.queryByRole('link', { name: 'Manage' })).toBeNull();
+      unmount();
+    }
   });
 
-  it('uses the local-profile AMR management URL for signed-in users', () => {
-    renderAccountControl({
-      status: 'signed-in',
-      email: 'leaf@example.com',
-      profile: 'local',
-      showProfileBadge: true,
-      showConsoleAction: true,
-    });
-
-    expect(screen.getByText('LOCAL')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'http://localhost:5173/dashboard?source=open_design',
-    );
-  });
-
-  it('uses the production AMR management URL by default', () => {
+  it('hides the management action when the caller passes an explicit null console URL', () => {
+    setRuntimeAmrConsoleOrigin(TEST_AMR_CONSOLE_ORIGIN);
     renderAccountControl({
       status: 'signed-in',
       email: 'leaf@example.com',
       profile: 'prod',
-      showProfileBadge: true,
       showConsoleAction: true,
+      consoleUrl: null,
     });
+    expect(screen.queryByRole('link', { name: 'Manage' })).toBeNull();
+  });
 
-    expect(screen.queryByText('PROD')).toBeNull();
-    expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'https://open-design.ai/amr/dashboard?source=open_design',
-    );
+  it('uses the configured console origin for management on every profile, prod included', () => {
+    setRuntimeAmrConsoleOrigin(TEST_AMR_CONSOLE_ORIGIN);
+    for (const profile of ['test', 'prod']) {
+      const { unmount } = renderAccountControl({
+        status: 'signed-in',
+        email: 'leaf@example.com',
+        profile,
+        showProfileBadge: true,
+        showConsoleAction: true,
+      });
+      expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
+        `${TEST_AMR_CONSOLE_ORIGIN}/dashboard?source=mish`,
+      );
+      unmount();
+    }
   });
 
   it('bridges the attributed management URL even though its click stops propagation', async () => {
     const fetchMock = vi.fn(async (input: string | URL | Request) => {
       const url = typeof input === 'string' ? input : input.toString();
       if (url === '/api/attribution/bridge-url') {
-        return jsonResponse({ body: { url: 'https://open-design.ai/amr/dashboard?od_bridge=odbr_12345678' } });
+        return jsonResponse({ body: { url: 'https://mish.invalid/amr/dashboard?od_bridge=odbr_12345678' } });
       }
       if (url === '/api/system/open-external') return jsonResponse({ body: { ok: true } });
       return new Response('{}', { status: 202 });
@@ -330,7 +333,10 @@ describe('AmrLoginPill', () => {
           initialStatus={{
             loggedIn: true,
             loginInFlight: false,
-            profile: 'prod',
+            // The prod console URL is not a first-party host after the rebrand,
+            // so exercise the bridge through a first-party feature-test origin.
+            profile: 'feature-test',
+            consoleOrigin: 'https://staging.mish.invalid',
             configPath: '/x',
             user: { id: 'u', email: 'leaf@example.com', plan: 'free' },
           }}
@@ -346,8 +352,8 @@ describe('AmrLoginPill', () => {
     fireEvent.click(link);
 
     const url = new URL(link.href);
-    expect(url.searchParams.get('source')).toBe('open_design');
-    expect(url.searchParams.get('od_origin')).toBe('open_design');
+    expect(url.searchParams.get('source')).toBe('mish');
+    expect(url.searchParams.get('od_origin')).toBe('mish');
     expect(url.searchParams.get('od_entry_source')).toBe('settings_amr_console');
     expect(url.searchParams.get('od_device_id')).toBe('od-install-abc');
     expect(url.searchParams.get('od_entry_id')).toMatch(/^od-amr-/u);
@@ -366,7 +372,7 @@ describe('AmrLoginPill', () => {
       '/api/system/open-external',
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ url: 'https://open-design.ai/amr/dashboard?od_bridge=odbr_12345678' }),
+        body: JSON.stringify({ url: 'https://mish.invalid/amr/dashboard?od_bridge=odbr_12345678' }),
       }),
     );
   });
@@ -393,7 +399,7 @@ describe('AmrLoginPill', () => {
     });
 
     const link = screen.getByRole('link', { name: 'Manage' }) as HTMLAnchorElement;
-    expect(link.href).toBe('https://feature.example/dashboard?source=open_design');
+    expect(link.href).toBe('https://feature.example/dashboard?source=mish');
     fireEvent.click(link);
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(

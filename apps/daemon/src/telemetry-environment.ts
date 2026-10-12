@@ -5,7 +5,7 @@ export function readTelemetryEnvironment(
 ): string {
   const explicit =
     env.OD_TELEMETRY_ENV?.trim() ||
-    env.OPEN_DESIGN_ENV?.trim() ||
+    env.MISH_ENV?.trim() ||
     env.POSTHOG_ENV?.trim() ||
     env.LANGFUSE_ENVIRONMENT?.trim();
   if (explicit) return explicit;

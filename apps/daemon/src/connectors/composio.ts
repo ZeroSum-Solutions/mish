@@ -11,7 +11,7 @@ import { ConnectorServiceError, type ConnectorCredentialMaterial } from './servi
 
 const DEFAULT_COMPOSIO_BASE_URL = 'https://backend.composio.dev';
 const DEFAULT_COMPOSIO_TIMEOUT_MS = 30_000;
-const DEFAULT_COMPOSIO_USER_ID = 'open-design-local-user';
+const DEFAULT_COMPOSIO_USER_ID = 'mish-local-user';
 const OAUTH_STATE_TTL_MS = 10 * 60 * 1000;
 const DISCOVERY_CACHE_TTL_MS = 60_000;
 const PERSISTED_CATALOG_REFRESH_MS = 24 * 60 * 60 * 1000;
@@ -1168,7 +1168,7 @@ export class ComposioConnectorProvider {
       headers: {
         accept: 'application/json',
         'content-type': 'application/json',
-        'user-agent': 'OpenDesign/0.1 ComposioConnectorProvider',
+        'user-agent': 'Mish/0.1 ComposioConnectorProvider',
         'x-api-key': apiKey,
       },
       ...(input.body ? { body: input.body } : {}),

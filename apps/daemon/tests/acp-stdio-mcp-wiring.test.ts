@@ -49,7 +49,7 @@ async function withFakeKimi<T>(
   };
   try {
     const bin = join(dir, options.binName ?? 'kimi');
-    await fsp.writeFile(bin, `#!/usr/bin/env node\nimport(${JSON.stringify(FIXTURE)});\n`);
+    await fsp.writeFile(bin, `#!/usr/bin/env node\nObject.assign(process.env, ${JSON.stringify({ FAKE_KIMI_VERSION: options.version, FAKE_KIMI_ACP_VERSION: options.acpVersion, FAKE_KIMI_SESSION_NEW_LOG: sessionNewLog })});\nimport(${JSON.stringify(FIXTURE)});\n`);
     await fsp.chmod(bin, 0o755);
     process.env.PATH = `${dir}${delimiter}${saved.PATH ?? ''}`;
     process.env.FAKE_KIMI_VERSION = options.version;
@@ -193,7 +193,7 @@ describe('ACP stdio MCP servers are withheld from runtimes that reject them', ()
   it('still sends the live-artifacts stdio MCP server to Kimi 0.36.1', async () => {
     const { params } = await runTurnAndReadSessionNew({ version: '0.36.1' });
     const names = (params.mcpServers ?? []).map((s) => s.name);
-    expect(names).toContain('open-design-live-artifacts');
+    expect(names).toContain('mish-live-artifacts');
   }, 60_000);
 
   it('trusts the version the agent reports in the ACP handshake, not the `--version` probe', async () => {
@@ -231,7 +231,7 @@ describe('ACP stdio MCP servers are withheld from runtimes that reject them', ()
     const { params } = await runTurnAndReadSessionNew({ version: '0.38.0' });
     const names = (params.mcpServers ?? []).map((s) => s.name);
     expect(names).not.toContain('user-stdio-server');
-    expect(names).not.toContain('open-design-live-artifacts');
+    expect(names).not.toContain('mish-live-artifacts');
   }, 60_000);
 
   it('leaves another mature-acp runtime (hermes) receiving its stdio MCP server', async () => {
@@ -244,6 +244,6 @@ describe('ACP stdio MCP servers are withheld from runtimes that reject them', ()
       binName: 'hermes',
     });
     const names = (params.mcpServers ?? []).map((s) => s.name);
-    expect(names).toContain('open-design-live-artifacts');
+    expect(names).toContain('mish-live-artifacts');
   }, 60_000);
 });

@@ -3,7 +3,7 @@ import { parse } from '@babel/parser';
 import { parse as parseJsonc, type ParseError } from 'jsonc-parser';
 import { isBuiltin } from 'node:module';
 import path from 'node:path';
-import type { Twenty1stLocalImportClosure } from '@open-design/contracts';
+import type { Twenty1stLocalImportClosure } from '@mish/contracts';
 
 type SourceFile = { path: string; content: string };
 type Node = { type?: string; source?: Node; value?: unknown; name?: string; callee?: Node; arguments?: Node[]; object?: Node; property?: Node; expression?: Node; expressions?: Node[]; quasis?: Node[]; left?: Node; right?: Node; key?: Node; id?: Node; properties?: Node[]; operator?: string; computed?: boolean; shorthand?: boolean; [key: string]: unknown };

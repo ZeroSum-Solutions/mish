@@ -3,7 +3,7 @@
 //
 // This drives the real `createDaemonProxyHandler` bound to a LAN interface and requests the
 // preview info and frame routes from that address, and from loopback for the served case. The
-// daemon stand-in decides with `cultLocalOnlyRefusal` from @open-design/contracts, the rule
+// daemon stand-in decides with `cultLocalOnlyRefusal` from @mish/contracts, the rule
 // apps/daemon/src/routes/cult-live-preview.ts applies (its own tests drive that route with a real
 // LAN peer and with the header shape this proxy sends).
 
@@ -12,7 +12,7 @@ import type { AddressInfo } from 'node:net';
 import { networkInterfaces } from 'node:os';
 
 import { afterEach, describe, expect, it } from 'vitest';
-import { CULT_CLIENT_HOST_HEADER, cultLocalOnlyRefusal, cultPreviewFrameUrl, cultPreviewInfoUrl } from '@open-design/contracts';
+import { CULT_CLIENT_HOST_HEADER, cultLocalOnlyRefusal, cultPreviewFrameUrl, cultPreviewInfoUrl } from '@mish/contracts';
 
 import { createDaemonProxyHandler } from '../sidecar/server';
 

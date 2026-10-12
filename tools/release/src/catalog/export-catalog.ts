@@ -53,7 +53,7 @@ function exporterVersion(): string {
   for (const path of candidates) {
     try {
       const pkg = JSON.parse(readFileSync(path, "utf8")) as { name?: string; version?: string };
-      if (pkg.name === "@open-design/tools-release" || pkg.version) {
+      if (pkg.name === "@mish/tools-release" || pkg.version) {
         return `tools-release@${pkg.version ?? "0.0.0"}`;
       }
     } catch {

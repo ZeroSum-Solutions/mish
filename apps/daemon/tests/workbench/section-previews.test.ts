@@ -6,8 +6,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
 import { createLocalResourceSources } from '../../src/workbench/resources.js';
 import { registerSectionsRoutes } from '../../src/routes/sections.js';
 
@@ -54,7 +54,7 @@ describe('compiled HTML section previews in the resource listing', () => {
     }
     const cult = items.filter(item => item.ref.itemId.startsWith('cult:'));
     const compiled = cult.filter(item => item.previewCapability.available);
-    expect(compiled.length).toBeGreaterThan(100);
+    expect(cult).toEqual([]);
     for (const item of compiled) expect(item.previewCapability).toMatchObject({ kind: 'html', adapter: 'compiled-html-section', url: `/api/sections/${encodeURIComponent(item.ref.itemId)}/preview` });
     // Truthful remainder: a Cult row with no converted layout and every family section.
     for (const item of cult.filter(item => !item.previewCapability.available)) expect(item.previewCapability).toEqual({ available: false, kind: 'none', reason: 'compiled-section-missing' });
@@ -64,7 +64,7 @@ describe('compiled HTML section previews in the resource listing', () => {
   it('says why when the licensed kit or the compiled stylesheet is absent, and refuses a stale stylesheet', async () => {
     const withoutRoots = await sectionsListing({ hyperuiRoot: null, cultKitDir: null });
     expect(withoutRoots.find(item => item.ref.itemId === hyperuiBlock.id)!.previewCapability).toEqual({ available: false, kind: 'none', reason: 'compiled-section-missing' });
-    expect(withoutRoots.find(item => item.ref.itemId.startsWith('cult:'))!.previewCapability).toEqual({ available: false, kind: 'none', reason: 'licensed-kit-not-configured' });
+    expect(withoutRoots.filter(item => item.ref.itemId.startsWith('cult:'))).toEqual([]);
     const stale = mkdtempSync(path.join(tmpdir(), 'hyperui-stale-'));
     cpSync(hyperuiRoot, stale, { recursive: true });
     const css = path.join(stale, 'css', 'preview.css');
@@ -120,14 +120,9 @@ describe('GET /api/sections/:id/preview', () => {
     expect(html).not.toMatch(/<script\b[^>]*\bsrc=/i);
   });
 
-  it('serves a converted Cult section to this machine only', async () => {
-    const cult = (await sectionsListing({ hyperuiRoot, cultKitDir })).find(item => item.ref.itemId.startsWith('cult:') && item.previewCapability.available)!;
-    const response = await fetch(`${live.base}${cult.previewCapability.url}`);
-    expect(response.status).toBe(200);
-    expect(response.headers.get('content-security-policy')).toMatch(/sandbox allow-scripts/);
-    expect(await response.text()).toContain('data-od-section="od-live-preview"');
-    const remote = await fetch(`${live.base}${cult.previewCapability.url}`, { headers: { Origin: 'https://evil.example' } });
-    expect(remote.status).toBe(403);
+  it('refuses removed Cult sections through the preview route', async () => {
+    const response = await fetch(`${live.base}/api/sections/cult%3Apricing-series-v/preview`);
+    expect(response.status).toBe(404);
   });
 
   it('answers 404 for a section with no compiled bytes and refuses altered block bytes', async () => {

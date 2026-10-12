@@ -1,4 +1,4 @@
-import { findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 export type SpeakerNotesPresenterLabels = {
   title: string;

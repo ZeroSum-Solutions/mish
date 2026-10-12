@@ -6,11 +6,11 @@ import { BrowserWindow } from "electron";
 import type {
   DesktopRenderFramesInput,
   DesktopRenderFramesResult,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   findRealTagEnd,
   HTML_TAG_PATTERNS,
-} from "@open-design/contracts/runtime/html-injection-points";
+} from "@mish/contracts/runtime/html-injection-points";
 
 import { loadArtifactDocument } from "./deck-capture.js";
 import { waitForPrintableContent } from "./pdf-export.js";

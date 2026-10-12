@@ -70,14 +70,14 @@ export function renderPluginBriefTemplate(
 }
 
 export async function readProjectPluginManifest(folder: string): Promise<ProjectPluginManifest> {
-  const raw = await fs.promises.readFile(path.join(folder, 'open-design.json'), 'utf8');
+  const raw = await fs.promises.readFile(path.join(folder, 'mish.json'), 'utf8');
   const manifest = parseJsonObject(raw);
   const name = typeof manifest.name === 'string' && manifest.name.trim()
     ? manifest.name.trim()
     : path.basename(folder);
   if (/[/\\]/.test(name) || /^\.+$/.test(name)) {
     throw new Error(
-      `open-design.json in ${folder}: name "${name}" must not contain path separators or consist only of dots`,
+      `mish.json in ${folder}: name "${name}" must not contain path separators or consist only of dots`,
     );
   }
   return {
@@ -170,7 +170,7 @@ export function isPluginAuthoringRun(
 export async function hasGeneratedPluginArtifacts(projectRoot: string | null | undefined): Promise<boolean> {
   if (!projectRoot || typeof projectRoot !== 'string') return false;
   const required = [
-    path.join(projectRoot, 'generated-plugin', 'open-design.json'),
+    path.join(projectRoot, 'generated-plugin', 'mish.json'),
     path.join(projectRoot, 'generated-plugin', 'SKILL.md'),
   ];
   try {

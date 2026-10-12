@@ -7,7 +7,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { createRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { MCP_SECRET_MASK } from '@open-design/contracts';
+import { MCP_SECRET_MASK } from '@mish/contracts';
 import { McpClientSection, type McpClientSectionHandle } from '../../src/components/McpClientSection';
 
 const MASKED = {

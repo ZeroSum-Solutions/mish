@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import {
   parseConnectorInventory, parseIntegrationRoster,
   type ConnectorInventory, type IntegrationRoster, type IntegrationRosterEntry, type LicenceRecordSnapshot,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { ALL_INTEGRATION_ROWS, ROSTER_EXCLUSIONS, ROSTER_KNOWN_GAPS, USER_NAMED_SITE_IDS, type RosterRow } from './integration-roster-data.js';
 
 export { USER_NAMED_SITE_IDS };

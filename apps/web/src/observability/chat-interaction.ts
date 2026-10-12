@@ -31,7 +31,7 @@
 // make "chat input latency" untrue, and the file viewer has its own
 // observability surface.
 
-import type { ChatInteractionLatencyProps } from '@open-design/contracts/analytics';
+import type { ChatInteractionLatencyProps } from '@mish/contracts/analytics';
 
 import { reportSafetyEvent } from '../analytics/error-tracking';
 import { chatCorrelation } from './chat-context';

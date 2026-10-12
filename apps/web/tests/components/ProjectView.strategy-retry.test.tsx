@@ -9,7 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ProjectView } from '../../src/components/ProjectView';
 import type { ProjectWorkspaceScopeState } from '../../src/collab/useProjectWorkspaceScope';
-import type { ChatRunStatusResponse, WorkspaceCollabContext } from '@open-design/contracts';
+import type { ChatRunStatusResponse, WorkspaceCollabContext } from '@mish/contracts';
 import type {
   AgentInfo,
   AppConfig,

@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { Readable, Writable } from 'node:stream';
-import { WORKBENCH_OBSERVED_BEHAVIORS, WORKBENCH_REVIEW_EGRESS_LIMITS, type ReviewEgressPolicy } from '@open-design/contracts';
+import { WORKBENCH_OBSERVED_BEHAVIORS, WORKBENCH_REVIEW_EGRESS_LIMITS, type ReviewEgressPolicy } from '@mish/contracts';
 import { load } from 'cheerio';
 import { findBrowserExecutable } from '../../browser-sessions.js';
 import { CdpPipe } from './cdp-pipe.js';

@@ -127,6 +127,53 @@ describe('workspace-scoped Team resource materialization', () => {
     },
   );
 
+  it('serializes commits when two calls spell the same directory differently', async () => {
+    const root = await tempRoot();
+    const relativeRoot = path.relative(process.cwd(), root);
+    expect(relativeRoot).not.toBe(root);
+    const events: string[] = [];
+    let releaseFirst!: () => void;
+    const firstGate = new Promise<void>((resolve) => { releaseFirst = resolve; });
+    let firstStarted!: () => void;
+    const firstRunning = new Promise<void>((resolve) => { firstStarted = resolve; });
+    const materialize = (kindRoot: string, label: string, gate?: Promise<void>) =>
+      materializeWorkspaceScopedTeamResource({
+        kindRoot,
+        identity: {
+          kind: 'skill',
+          workspaceId: 'workspace-a',
+          resourceId: 'same-dir',
+          hubResourceId: 'skill-workspace-a-same-dir',
+        },
+        pullInto: async (dir) => {
+          events.push(`${label}:start`);
+          if (gate) {
+            firstStarted();
+            await gate;
+          }
+          await writeFile(path.join(dir, 'content.txt'), label);
+          events.push(`${label}:end`);
+        },
+        verifyWorkspaceScope: async () => true,
+        verifyStillShared: async () => true,
+      });
+
+    const first = materialize(root, 'absolute', firstGate);
+    await firstRunning;
+    const second = materialize(relativeRoot, 'relative');
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    expect(events).toEqual(['absolute:start']);
+    releaseFirst();
+    await expect(Promise.all([first, second])).resolves.toEqual([
+      expect.objectContaining({ status: 'committed' }),
+      expect.objectContaining({ status: 'committed' }),
+    ]);
+    expect(events).toEqual(['absolute:start', 'absolute:end', 'relative:start', 'relative:end']);
+    await expect(
+      readWorkspaceScopedTeamResourceFile(root, 'workspace-a', 'same-dir', 'content.txt'),
+    ).resolves.toEqual(Buffer.from('relative'));
+  });
+
   it('preserves the previously committed copy when a replacement loses authority', async () => {
     const root = await tempRoot();
     const identity = {

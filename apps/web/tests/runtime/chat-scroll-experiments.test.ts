@@ -39,9 +39,9 @@ afterEach(() => {
 describe('开关键名(操作契约,改名 = 破坏真机操作说明)', () => {
   it('两个键名和文档里写给操作者的字符串一致', () => {
     expect(CHAT_LOG_SELF_RESIZE_OBSERVE_DISABLED_KEY).toBe(
-      'open-design:disable-chat-log-self-resize-observe',
+      'mish:disable-chat-log-self-resize-observe',
     );
-    expect(MSG_ENTER_ANIMATION_DISABLED_KEY).toBe('open-design:disable-msg-enter-animation');
+    expect(MSG_ENTER_ANIMATION_DISABLED_KEY).toBe('mish:disable-msg-enter-animation');
   });
 });
 

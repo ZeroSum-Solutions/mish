@@ -1,7 +1,7 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { parseResourceSearchResponse, type ComponentFit } from '@open-design/contracts';
+import { parseResourceSearchResponse, type ComponentFit } from '@mish/contracts';
 import { approvedDesignSystemFixtures } from './approved-design-systems';
 
 /** Real V05 approval and V06 target/admission assessment; never forge Apply permission. */

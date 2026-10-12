@@ -1,5 +1,5 @@
 import path from 'node:path';
-import type { JevKeyResolver } from '@open-design/agency-fast-lane/jev';
+import type { JevKeyResolver } from '@mish/agency-fast-lane/jev';
 import { createClaudeVisualReviewer } from './reviewers/claude-visual.js';
 import { createDeepSeekReviewer } from './reviewers/deepseek.js';
 import { createGeminiReviewer } from './reviewers/gemini.js';

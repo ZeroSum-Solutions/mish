@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PLATFORMS="${PLATFORMS:-linux/amd64,linux/arm64}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 REGISTRY="${REGISTRY:-ghcr.io}"
-IMAGE_NAMESPACE="${IMAGE_NAMESPACE:-nexu-io}"
+IMAGE_NAMESPACE="${IMAGE_NAMESPACE:-ZeroSum-Solutions}"
 IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-od}"
 NODE_BASE_IMAGE="${NODE_BASE_IMAGE:-docker.io/library/node:24-alpine}"
 RUNTIME_BASE_IMAGE="${RUNTIME_BASE_IMAGE:-docker.io/library/node:24-alpine}"
@@ -104,7 +104,7 @@ Options:
   --arch <amd64|arm64>            publish a single platform as <tag>-<arch>
   --image_tag <tag>               default: latest
   --registry <registry>           default: ghcr.io
-  --image_namespace <namespace>   default: nexu-io
+  --image_namespace <namespace>   default: ZeroSum-Solutions
   --image_repository <name>       default: od
   --image <image-ref>             override full image ref
   --node_base_image <image-ref>   default: docker.io/library/node:24-alpine
@@ -272,14 +272,14 @@ node_local_base_image() {
   local platform="$1"
   local arch
   arch="$(platform_to_arch "$platform")" || die "unsupported platform '$platform'"
-  printf 'open-design-base-node:24-alpine-%s' "$arch"
+  printf 'mish-base-node:24-alpine-%s' "$arch"
 }
 
 runtime_local_base_image() {
   local platform="$1"
   local arch
   arch="$(platform_to_arch "$platform")" || die "unsupported platform '$platform'"
-  printf 'open-design-runtime-base:24-alpine-%s' "$arch"
+  printf 'mish-runtime-base:24-alpine-%s' "$arch"
 }
 
 node_image_for_platform() {

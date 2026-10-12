@@ -20,7 +20,7 @@ import {
   PACK_FORMAT,
   parsePackManifest,
   type PackListResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { requestJson } from '@/vitest/http';
 import { createSmokeSuite } from '@/vitest/suite';

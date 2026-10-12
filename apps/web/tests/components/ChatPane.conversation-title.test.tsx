@@ -6,8 +6,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ChatPane } from '../../src/components/ChatPane';
 import { trackRunFailedToastSurfaceView } from '../../src/analytics/events';
-import type { RunFailureDetail } from '@open-design/contracts';
+import type { RunFailureDetail } from '@mish/contracts';
 import type { AppConfig, ChatMessage, Conversation } from '../../src/types';
+import { TEST_AMR_CONSOLE_ORIGIN, useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const translate = (key: string, vars?: Record<string, string | number>) => {
   const localized: Record<string, string> = {
@@ -247,7 +251,7 @@ describe('ChatPane session switcher', () => {
         activeConversationId="conv-1"
         onSelectConversation={vi.fn()}
         onDeleteConversation={vi.fn()}
-        config={{ agentCliEnv: { amr: { OPEN_DESIGN_AMR_PROFILE: 'test' } } } as unknown as AppConfig}
+        config={{ agentCliEnv: { amr: { MISH_AMR_PROFILE: 'test' } } } as unknown as AppConfig}
       />,
     );
 
@@ -266,7 +270,7 @@ describe('ChatPane session switcher', () => {
     const parsedConsoleUrl = new URL(String(consoleUrl));
     // Top-up reports on the console dashboard now, not a wallet page.
     expect(`${parsedConsoleUrl.origin}${parsedConsoleUrl.pathname}`).toBe(
-      'https://open-design.powerformer.net/cloud/dashboard',
+      `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
     );
     // The plain top-up entry must NOT carry the upgrade intent — it opens the
     // console to add credit, not the plan catalog.
@@ -298,7 +302,7 @@ describe('ChatPane session switcher', () => {
         activeConversationId="conv-1"
         onSelectConversation={vi.fn()}
         onDeleteConversation={vi.fn()}
-        config={{ agentCliEnv: { amr: { OPEN_DESIGN_AMR_PROFILE: 'test' } } } as unknown as AppConfig}
+        config={{ agentCliEnv: { amr: { MISH_AMR_PROFILE: 'test' } } } as unknown as AppConfig}
       />,
     );
 
@@ -312,7 +316,7 @@ describe('ChatPane session switcher', () => {
     // non-prod build sent people to production checkout.
     const parsedPlansUrl = new URL(String(plansUrl));
     expect(`${parsedPlansUrl.origin}${parsedPlansUrl.pathname}`).toBe(
-      'https://open-design.powerformer.net/cloud/dashboard',
+      `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
     );
     expect(parsedPlansUrl.searchParams.get('billing')).toBe('plan');
     expect(parsedPlansUrl.searchParams.get('od_entry_source')).toBe('chat_error_upgrade');

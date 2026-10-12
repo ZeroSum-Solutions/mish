@@ -33,6 +33,10 @@ import { QuestionFormView } from '../../../src/components/QuestionForm';
 import type { QuestionForm } from '../../../src/artifacts/question-form';
 import type { VisualStyleContext } from '../../../src/runtime/visual-style-catalog';
 import { visualStyleCardsForContext } from '../../../src/runtime/visual-style-catalog';
+import { useConfiguredStyleCatalog } from '../../helpers/style-catalog';
+
+// No hosted style previews ship with the fork; these tests configure an origin.
+useConfiguredStyleCatalog();
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const CSS = readFileSync(

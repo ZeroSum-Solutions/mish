@@ -18,9 +18,9 @@ import {
   type LauncherPaths,
   type LauncherRuntimeDescriptor,
   type LauncherVersionPointer,
-} from "@open-design/launcher-proto";
-import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@open-design/release";
-import { spawnSidecar } from "@open-design/sidecar";
+} from "@mish/launcher-proto";
+import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@mish/release";
+import { spawnSidecar } from "@mish/sidecar";
 import {
   APP_KEYS,
   SIDECAR_ENV,
@@ -28,7 +28,7 @@ import {
   SIDECAR_SOURCES,
   type DesktopStatusSnapshot,
   type SidecarSource,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 
 import { holdParentMonitorExit } from "./parent-monitor-gate.js";
 

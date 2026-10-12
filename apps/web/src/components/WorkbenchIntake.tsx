@@ -1,13 +1,13 @@
 import { formatBytes } from './LibraryAssetMeta';
 import { beginGuestDropMode, hasGuestSurfaces } from '../runtime/intake/guest-drop-mode';
 import { createContext, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode } from 'react';
-import type { AttachIntakeResponse, IntakeFileOutcome } from '@open-design/contracts';
-import { IconButton } from '@open-design/components';
+import type { AttachIntakeResponse, IntakeFileOutcome } from '@mish/contracts';
+import { IconButton } from '@mish/components';
 import { Icon } from './Icon';
 import { createDropCoordinator, type ExternalFilesDrop } from '../runtime/intake/drop-coordinator';
 import { collectNativeDrop } from '../runtime/intake/native-drop-intake';
 import { createOptionDropMode } from '../runtime/intake/option-drop-mode';
-import { getOpenDesignHost } from '@open-design/host';
+import { getMishHost } from '@mish/host';
 import { workbenchIntakeStore, type IntakeTarget, type IntakeStore } from '../runtime/intake/intake-store';
 import { applyLibraryAsset, fetchProjectFiles, invalidateProjectFilesCache } from '../providers/registry';
 import { intakeFileDownloadUrl } from '../providers/intake';
@@ -153,7 +153,7 @@ export function WorkbenchIntake({ target, children, store = workbenchIntakeStore
  acceptDropRef.current = async (drop, frozen, options) => {
   try {
   if (!drop.directories.length) return addRef.current(drop.files, frozen, options);
-  const { files, reports } = await collectNativeDrop(drop, getOpenDesignHost()?.intake ?? null, {
+  const { files, reports } = await collectNativeDrop(drop, getMishHost()?.intake ?? null, {
    unsupported: t('intake.directory'),
    refused: (folder, items) => t('intake.directoryRefused').replace('{folder}', folder).replace('{items}', items),
    truncated: folder => t('intake.directoryTruncated').replace('{folder}', folder),

@@ -36,7 +36,7 @@
 | **S08 供应商额度用完**<br>23,333/月 · 9,220 设备 · ↑55% | 对话里卡片;「{供应商}额度用完了,重试不会恢复」;〔更换模型 \| 去设置〕+ 非 Cloud 多一张〔切到 Mishh Mashh 智能体〕 | **部分实现** | 映射 `apps/web/src/runtime/amr-guidance.ts:411-414`(`hard_quota` → `switchToAlternative`,`primaryAction:'none'` 刻意不给重试);中文文案 `apps/web/src/i18n/locales/zh-CN.ts:148,155`;切换卡 `apps/web/src/components/AmrGuidance.tsx:70-112`,CTA 文案 `zh-CN.ts:71`「切换到 AMR 并重试」;AMR 自己不会误出切换卡(`amr-guidance.ts:554-593` 先于 `DETAIL_FAILURE_UI:627` 返回) | 〔更换模型〕〔去设置〕两颗 CTA 全无(见横切 C);正文折叠(横切 A) |
 | **S25 预览白屏**<br>每周 1,000–3,400 人 · 唯一在涨 | 预览区内(不进对话);先自动重载一次;15 秒仍不行才显示「预览加载失败」〔重新加载 \| 在浏览器打开〕 | **未实现** | 白屏探针只上报埋点:`apps/web/src/components/FileViewer.tsx:10534-10540` → `apps/web/src/observability/iframe-error.ts:191-204`,handler 里没有任何 setState/渲染;静默一次性重挂 `FileViewer.tsx:11068-11127`(`setSrcDocTransportResetKey` @ `:11122`),触发阈值是 1.5s 传输握手超时(`FileViewer.tsx:640`)而不是 15s 白屏;预览区唯一的可见错误页是「重定向死循环」占位,硬编码英文且无按钮 `apps/web/src/runtime/srcdoc.ts:154-179` | 全部三件都缺:无可见 UI、无 i18n 文案、无 CTA |
 | **S19 进程崩了 / 异常退出**<br>20,868/月 · 3,869 设备 | 对话里;「{智能体} 意外退出了 —— 它没说为什么」;〔重试 \| 导出日志〕 | **部分实现** | `AGENT_EXECUTION_FAILED` / `process_exit` 系列在 web 侧**没有任何映射**(`amr-guidance.ts:335-384` 与 `:408-478` 两张表都没有),落到兜底 `amr-guidance.ts:679-685`:标题「任务执行失败」+ 原始 stderr + 重试;卡上有「复制诊断信息」按钮 `ChatPane.tsx:2849-2861` | 缺专属文案;〔导出日志〕不在卡上 —— **但这个动作是存在的**:`apps/web/src/components/ExportDiagnosticsButton.tsx:83`,daemon 端点 `apps/daemon/src/server.ts:668-669`,今天挂在 Settings→About(`SettingsDialog.tsx:6189`),而且 renderer 崩溃页已经用上了(`apps/desktop/src/main/runtime.ts:1341-1345`)。是**接线活,不是从零做** |
-| **S15 Cloud 余额用完**<br>8,680/月 · 3,855 设备 | 个人保持「去充值+重试」;团队成员「团队额度用完了,需要管理员充值」〔通知管理员 \| 先不了〕 | **部分实现** | 个人路径成立:`amr-guidance.ts:568-575`(`AMR_INSUFFICIENT_BALANCE` → recharge + secondaryRetry),按钮 `ChatPane.tsx:2944-2989`。**但充值链接是账号级的**:`ChatPane.tsx:2969` → `amrRechargeUrlForProfile` → `amr-guidance.ts:21-24` = `/amr/dashboard?source=open_design`,不带 workspaceId、不带 billing 参数;带 workspace 的 `amrConsoleUrlForWorkspace`(`amr-guidance.ts:100-105`)**全仓无调用方**;`canManageBilling` 在 ChatPane 零使用;`billing=plan` 只出现在 `GoPlanSunsetDialog.tsx:15`,与报错卡无关 | 团队分支整个没有:无角色判断、无团队文案、无〔通知管理员〕(相关 i18n 键 `entry.creditsMemberNotice*` 是死键,只在 `i18n/types.ts:1213-1215` 和各 locale 里,无代码读取)。**设计要修的那个问题(团队成员被带到个人充值页)在 main 上没修** |
+| **S15 Cloud 余额用完**<br>8,680/月 · 3,855 设备 | 个人保持「去充值+重试」;团队成员「团队额度用完了,需要管理员充值」〔通知管理员 \| 先不了〕 | **部分实现** | 个人路径成立:`amr-guidance.ts:568-575`(`AMR_INSUFFICIENT_BALANCE` → recharge + secondaryRetry),按钮 `ChatPane.tsx:2944-2989`。**但充值链接是账号级的**:`ChatPane.tsx:2969` → `amrRechargeUrlForProfile` → `amr-guidance.ts:21-24` = `/amr/dashboard?source=mish`,不带 workspaceId、不带 billing 参数;带 workspace 的 `amrConsoleUrlForWorkspace`(`amr-guidance.ts:100-105`)**全仓无调用方**;`canManageBilling` 在 ChatPane 零使用;`billing=plan` 只出现在 `GoPlanSunsetDialog.tsx:15`,与报错卡无关 | 团队分支整个没有:无角色判断、无团队文案、无〔通知管理员〕(相关 i18n 键 `entry.creditsMemberNotice*` 是死键,只在 `i18n/types.ts:1213-1215` 和各 locale 里,无代码读取)。**设计要修的那个问题(团队成员被带到个人充值页)在 main 上没修** |
 
 ### P1
 
@@ -100,7 +100,7 @@
 一颗按钮解六条,ROI 最高。
 
 **第三:S15 团队成员的钱路 —— 量不是最大,但是唯一会让人去投诉的一类。**
-今天用户拿到的:团队成员点〔充值〕,落到 `/amr/dashboard?source=open_design`(`amr-guidance.ts:21-24`),
+今天用户拿到的:团队成员点〔充值〕,落到 `/amr/dashboard?source=mish`(`amr-guidance.ts:21-24`),
 充的是自己的钱,不是团队的钱。设计方案里点名的那个问题,在 main 上一行都没改。
 8,680 次/月、3,855 台设备,但真正的代价在飞书那 26 条支付争议里 —— 这类不产生重试,产生的是退款和投诉。
 配套的 S06 死胡同弹窗(见 §4)是同一条链上的,应该一起修。
@@ -149,7 +149,7 @@
 
 | 事项 | 卡在哪 | 要看什么才能判 |
 |---|---|---|
-| **S17 的「被移出团队」「客户端太旧」** | OD 仓内确实没有 403/426 分支,但设计方案自己写了前提(Q-19):要 vela CLI 先把 link 的 `code` 透进 ACP `error.data`。今天目录阶段被抹成「AMR model catalog is unavailable」 | 需要看 `/Users/elian/Documents/nexu/vela` 里 CLI 到父进程的错误契约,确认是「后端还没给」还是「给了但 OD 没接」。在 OD 仓内只能判到「OD 侧没接」 |
+| **S17 的「被移出团队」「客户端太旧」** | OD 仓内确实没有 403/426 分支,但设计方案自己写了前提(Q-19):要 vela CLI 先把 link 的 `code` 透进 ACP `error.data`。今天目录阶段被抹成「AMR model catalog is unavailable」 | 需要看 `/Users/elian/Documents/mish/vela` 里 CLI 到父进程的错误契约,确认是「后端还没给」还是「给了但 OD 没接」。在 OD 仓内只能判到「OD 侧没接」 |
 | **S25 白屏的 15 秒阈值** | 代码里的 1.5s(`FileViewer.tsx:640`)是「srcdoc 传输握手未确认」,探针侧另有 5s + 1.5s 确认(`packages/contracts/src/runtime/preview-observability.ts:16,24`)。三个数都不是 15s | 需要产品确认设计里的「15 秒」指的是哪一段(首屏可见?资源加载完?),否则实现出来会和设计对不上 |
 | **S06「套餐开通中」的判定信号** | 代码里完全没有这个概念;`AmrBalanceDialog` 的 wallet 轮询(`:116-140`)是「已经拦住之后」的等待,不是「不拦」 | 需要后端确认「刚购买未到账」有没有可读的状态字段。没有的话这条做不了 |
 | **S24(ii)「文件已生成但报过错」的提示** | 后端已经把它判成 succeeded 并跳过整个 error 发送块(`server.ts:15145`),所以前端**拿不到任何信号**知道「过程中报过错」 | 需要 daemon 在 end 帧上加一个标记(设计方案 Q-06 就是这条,还没拍板)。前端单独做不了 |

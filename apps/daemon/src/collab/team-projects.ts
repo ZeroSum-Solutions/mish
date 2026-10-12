@@ -2,7 +2,7 @@
 // transport: it reuses the login session and keeps backend credentials out of
 // the Mishh Mashh daemon.
 
-import type { TeamProject } from '@open-design/contracts';
+import type { TeamProject } from '@mish/contracts';
 import {
   createVelaCliTeamProjectCatalog,
   shouldUseVelaCliTeamProjectCatalog,

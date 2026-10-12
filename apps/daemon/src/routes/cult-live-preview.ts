@@ -27,11 +27,11 @@
  */
 
 import type { Express, Request, Response } from 'express';
-import type { CultPreviewInfoResponse, CultPreviewTheme } from '@open-design/contracts';
-import { CULT_PREVIEW_MESSAGE_SOURCE, cultDisplayText, cultLocalOnlyRefusal, cultRegistryName } from '@open-design/contracts';
-import { findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
-import { COMPOSED_PAGE_CSP } from '@open-design/agency-fast-lane/block-compose';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
+import type { CultPreviewInfoResponse, CultPreviewTheme } from '@mish/contracts';
+import { CULT_PREVIEW_MESSAGE_SOURCE, cultDisplayText, cultLocalOnlyRefusal, cultRegistryName } from '@mish/contracts';
+import { findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
+import { COMPOSED_PAGE_CSP } from '@mish/agency-fast-lane/block-compose';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
 
 import { BundledCultPreviews } from '../services/bundled-cult-previews.js';
 import { resolveCultKitDir } from '../cult-registry.js';

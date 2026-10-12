@@ -8,9 +8,9 @@ The native carrier has one deliberately small job: verify and install the pinned
 official Node carrier, verify the installed Terminal manifest and executable,
 then invoke `runtime/fossil.mjs` with that absolute executable. The archive
 carries its Sidecar bootstrap/host and the minimal verified
-`@open-design/sidecar`/`@open-design/platform` runtime modules. The fossil adapter
+`@mish/sidecar`/`@mish/platform` runtime modules. The fossil adapter
 uses only Sidecar's public convergence and control APIs, while lifecycle policy
-stays in the installed `@open-design/standalone` artifact.
+stays in the installed `@mish/standalone` artifact.
 
 The authoritative release artifact is a complete offline archive. Its digest is
 the immutable download identity. Once installed, the exact bytes of
@@ -55,7 +55,7 @@ After Node is available, `runtime/fossil.mjs` verifies the complete installed
 surface again and imports only the installed Standalone public entrypoint. Store,
 signature, update, activation and rollback policy remain in Standalone. The fossil
 adapts Terminal files to the public Sidecar operations; IPC, endpoint derivation,
-process discovery and generation fencing stay private to `@open-design/sidecar`.
+process discovery and generation fencing stay private to `@mish/sidecar`.
 `probe`, cold `start`, reference/heartbeat/release/stop, content update preparation
 and apply are all executable without Web or daemon.
 
@@ -163,7 +163,7 @@ main CI:
 
 ```sh
 OD_TERMINAL_NODE_ARCHIVE=/path/to/node-v24.18.0-darwin-arm64.tar.gz \
-  pnpm --filter @open-design/terminal test
+  pnpm --filter @mish/terminal test
 ```
 
 Without the environment variable the suite uses the matching archive from

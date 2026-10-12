@@ -238,7 +238,7 @@ describe('project file version routes', () => {
       promptSource: 'message',
       origin: {
         entrySurface: 'external_mcp',
-        externalPluginId: 'open-design',
+        externalPluginId: 'mish',
         pluginWorkflowId: 'workflow-origin',
         runId: 'run-origin',
       },
@@ -270,7 +270,7 @@ describe('project file version routes', () => {
         parentVersionId: parent!.id,
         origin: {
           entrySurface: 'external_mcp',
-          externalPluginId: 'open-design',
+          externalPluginId: 'mish',
           pluginWorkflowId: 'workflow-origin',
           runId: 'run-origin',
         },
@@ -293,7 +293,7 @@ describe('project file version routes', () => {
       promptSource: 'message',
       origin: {
         entrySurface: 'external_mcp',
-        externalPluginId: 'open-design',
+        externalPluginId: 'mish',
         pluginWorkflowId: 'workflow-drift',
         runId: 'run-drift',
       },

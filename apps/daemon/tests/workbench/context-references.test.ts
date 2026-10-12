@@ -5,7 +5,7 @@ import type { Request } from 'express';
 import express from 'express';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { InstalledPluginRecordSchema } from '@open-design/contracts';
+import { InstalledPluginRecordSchema } from '@mish/contracts';
 import { readProjectFile, resolveProjectDir } from '../../src/projects.js';
 import { listInstalledPlugins, upsertInstalledPlugin } from '../../src/plugins/registry.js';
 import { createLocalResourceSources, searchResources } from '../../src/workbench/resources.js';

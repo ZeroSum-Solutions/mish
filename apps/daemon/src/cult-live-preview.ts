@@ -25,7 +25,7 @@ import { randomBytes } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 
-import type { CultPreviewTheme } from '@open-design/contracts';
+import type { CultPreviewTheme } from '@mish/contracts';
 import { cultPreviewArtwork } from './cult-preview-artwork.js';
 import { cultPreviewPresentationCss } from './cult-preview-presentation.js';
 import { cultRefinedSlot } from './cult-copy-refinements.js';

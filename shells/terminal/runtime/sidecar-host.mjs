@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-import { bootstrapSidecarProcess, handoffCurrentSidecarGeneration, SidecarFactory } from "@open-design/sidecar";
+import { bootstrapSidecarProcess, handoffCurrentSidecarGeneration, SidecarFactory } from "@mish/sidecar";
 
 import { FileFixtureLifecyclePort } from "./fixture-lifecycle.mjs";
 import { FixtureShellUpdaterPort } from "./fixture-shell-updater.mjs";

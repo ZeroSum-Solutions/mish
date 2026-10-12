@@ -16,7 +16,7 @@ describe.skip('AMR relogin-required run failures', () => {
     const suite = await createSmokeSuite('amr-relogin-required');
     const homeDir = join(suite.scratchDir, 'home-missing-login');
 
-    await suite.with.env({ HOME: homeDir, OPEN_DESIGN_AMR_PROFILE: 'local' }, async () => {
+    await suite.with.env({ HOME: homeDir, MISH_AMR_PROFILE: 'local' }, async () => {
       await suite.with.toolsDev(async ({ webUrl }) => {
         const velaBin = await writeFakeVelaBin(join(suite.scratchDir, 'fake-vela-missing-login'), {
           endpoints: suite.amr,
@@ -28,7 +28,7 @@ describe.skip('AMR relogin-required run failures', () => {
           agentCliEnv: {
             amr: {
               VELA_BIN: velaBin,
-              OPEN_DESIGN_AMR_PROFILE: 'local',
+              MISH_AMR_PROFILE: 'local',
             },
           },
         });
@@ -67,7 +67,7 @@ describe.skip('AMR relogin-required run failures', () => {
     const suite = await createSmokeSuite('amr-configured-profile-preflight');
     const homeDir = join(suite.scratchDir, 'home-configured-profile');
 
-    await suite.with.env({ HOME: homeDir, OPEN_DESIGN_AMR_PROFILE: 'prod' }, async () => {
+    await suite.with.env({ HOME: homeDir, MISH_AMR_PROFILE: 'prod' }, async () => {
       await seedVelaLoginConfig(homeDir, { endpoints: suite.amr, profile: 'local' });
       await suite.with.toolsDev(async ({ webUrl }) => {
         const velaBin = await writeFakeVelaBin(join(suite.scratchDir, 'fake-vela-configured-profile'), {
@@ -80,7 +80,7 @@ describe.skip('AMR relogin-required run failures', () => {
           agentCliEnv: {
             amr: {
               VELA_BIN: velaBin,
-              OPEN_DESIGN_AMR_PROFILE: 'local',
+              MISH_AMR_PROFILE: 'local',
             },
           },
         });
@@ -114,7 +114,7 @@ describe.skip('AMR relogin-required run failures', () => {
     await suite.with.env(
       {
         HOME: homeDir,
-        OPEN_DESIGN_AMR_PROFILE: 'local',
+        MISH_AMR_PROFILE: 'local',
         ...suite.amr.runtimeEnv({ VELA_RUNTIME_KEY: 'fake-runtime-key-from-daemon-env' }),
       },
       async () => {
@@ -130,7 +130,7 @@ describe.skip('AMR relogin-required run failures', () => {
             agentCliEnv: {
               amr: {
                 VELA_BIN: velaBin,
-                OPEN_DESIGN_AMR_PROFILE: 'local',
+                MISH_AMR_PROFILE: 'local',
               },
             },
           });

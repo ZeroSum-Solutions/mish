@@ -8,7 +8,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import test from 'node:test';
-import { loadAtlasData, validateFamilyRegistry, type FamilyRegistry, type FamilyRegistryEntry } from '../src/atlas.ts';
+import { validateFamilyRegistry, type FamilyRegistry, type FamilyRegistryEntry } from '../src/atlas.ts';
+import { loadAtlasData } from './routing-fixture.ts';
 import { applyExclusionAnswer, buildExclusionQuestion, buildRouteQuestions, createJevRouter, DEFAULT_CONSENSUS_K, DEFAULT_MIN_TRANSFER, resolveRoute, type ChoiceAnswer } from '../src/route.ts';
 import type { JsonObject } from '../src/spine.ts';
 
@@ -98,9 +99,9 @@ test('buildRouteQuestions: criteria quote the atlas\'s own text', () => {
   assert.ok(questions.spine!.criteria.TL!.includes(tl.name));
   assert.ok(questions.spine!.criteria.TL!.includes(tl.intent));
   assert.ok(questions.spine!.criteria.TL!.includes(tl.steps.join(' → ')));
-  const watson = registry.families.find((f) => f.family === 'watson')!;
-  assert.ok(questions.family!.criteria.watson!.includes(watson.summary));
-  assert.ok(questions.family!.criteria.watson!.includes(watson.archetype));
+  const ownededitorial = registry.families.find((f) => f.family === 'ownededitorial')!;
+  assert.ok(questions.family!.criteria.ownededitorial!.includes(ownededitorial.summary));
+  assert.ok(questions.family!.criteria.ownededitorial!.includes(ownededitorial.archetype));
   for (const skin of atlas.skins) assert.ok(skin in questions.skin!.criteria, `skin criteria has ${skin}`);
 });
 
@@ -113,7 +114,7 @@ test('buildRouteQuestions: criteria quote the atlas\'s own text', () => {
 // probability mass has no reason to track spine legality, and a family whose spine the brief did
 // NOT pick (so `resolveRoute` will never admit it as a candidate) can still absorb most of the
 // probability mass, starving the legal candidates below `threshold`. See bl.json in the routing
-// eval corpus: spine CS, family fervor (TL) at p=0.93 — fervor is not even a reachable candidate
+// eval corpus: spine CS, family ownedcinematic (TL) at p=0.93 — ownedcinematic is not even a reachable candidate
 // for CS, so that mass was never spendable.
 // ---------------------------------------------------------------------------
 
@@ -147,12 +148,12 @@ test('buildRouteQuestions: every family criterion names every spine resolveRoute
 });
 
 test('buildRouteQuestions: a custom minTransfer changes which spines a family criterion names — the family question and the eventual resolveRoute(..., { minTransfer }) call must agree on the same legality bar', () => {
-  const permissive = buildRouteQuestions('brief', atlas, registry, 1).questions.family!.criteria.fervor!;
-  const strict = buildRouteQuestions('brief', atlas, registry, 3).questions.family!.criteria.fervor!;
-  const defaulted = buildRouteQuestions('brief', atlas, registry).questions.family!.criteria.fervor!;
-  const atDefault = buildRouteQuestions('brief', atlas, registry, DEFAULT_MIN_TRANSFER).questions.family!.criteria.fervor!;
+  const permissive = buildRouteQuestions('brief', atlas, registry, 1).questions.family!.criteria.ownedcinematic!;
+  const strict = buildRouteQuestions('brief', atlas, registry, 3).questions.family!.criteria.ownedcinematic!;
+  const defaulted = buildRouteQuestions('brief', atlas, registry).questions.family!.criteria.ownedcinematic!;
+  const atDefault = buildRouteQuestions('brief', atlas, registry, DEFAULT_MIN_TRANSFER).questions.family!.criteria.ownedcinematic!;
   assert.equal(defaulted, atDefault, 'omitting minTransfer must build the same criteria as passing DEFAULT_MIN_TRANSFER explicitly');
-  // minTransfer 1 admits every spine with ANY transfer to fervor's own spine (TL); minTransfer 3
+  // minTransfer 1 admits every spine with ANY transfer to ownedcinematic's own spine (TL); minTransfer 3
   // admits only spines whose transfer to TL is exactly 3 (the diagonal max) — a strictly narrower
   // set. If buildRouteQuestions ignored the argument (the bug this test guards against — the
   // family question always describing the DEFAULT legality bar regardless of what the caller will
@@ -195,7 +196,7 @@ test('R1: a new registry row is routable with no router code change — a temp f
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.01', { 'TL.01': 1, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 0 }),
-    family: choice('route-negatives-fixture', { 'route-negatives-fixture': 0.9, watson: 0.1, none: 0 }),
+    family: choice('route-negatives-fixture', { 'route-negatives-fixture': 0.9, ownededitorial: 0.1, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, extendedRegistry);
@@ -210,7 +211,7 @@ test('R1: an unknown family id from the model (not in the registry) fails closed
     archetype_TL: choice('TL.05', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 1, 'TL.06': 0, none: 0 }),
     // Jev hallucinates a family id that was never offered as a criterion (not a registered
     // family, not "none") — e.g. an answer naming a family still being built on another branch.
-    family: { type: 'choice' as const, choice: 'not-yet-a-family', confidence: 0.95, probabilities: { 'not-yet-a-family': 0.95, watson: 0.05 } },
+    family: { type: 'choice' as const, choice: 'not-yet-a-family', confidence: 0.95, probabilities: { 'not-yet-a-family': 0.95, ownededitorial: 0.05 } },
     skin: choice('unspecified', { unspecified: 1 }),
   };
   assert.doesNotThrow(() => resolveRoute(answers, atlas, registry));
@@ -225,16 +226,16 @@ test('createJevRouter: the request body carries the family question built from t
   const captured: Captured[] = [];
   const router = createJevRouter({ consensusK: 1, apiKey: 'test-key', fetchImpl: fakeFetch(captured, allNone) });
   await router.route({ brief: 'A dentist office.', atlas, registry, minTransfer: 1 });
-  const sentFervorCriterion = (captured[0]!.body.questions as JsonObject).family as { criteria: Record<string, string> };
-  const expected = buildRouteQuestions('A dentist office.', atlas, registry, 1).questions.family!.criteria.fervor!;
-  assert.equal(sentFervorCriterion.criteria.fervor, expected, 'createJevRouter must thread its own minTransfer into buildRouteQuestions, not silently use the default');
+  const sentTestCinematicCriterion = (captured[0]!.body.questions as JsonObject).family as { criteria: Record<string, string> };
+  const expected = buildRouteQuestions('A dentist office.', atlas, registry, 1).questions.family!.criteria.ownedcinematic!;
+  assert.equal(sentTestCinematicCriterion.criteria.ownedcinematic, expected, 'createJevRouter must thread its own minTransfer into buildRouteQuestions, not silently use the default');
 });
 
-test('buildRouteQuestions: fervor is scoped to agencies selling their own creative services, not any motion-heavy or cinematic brief', () => {
+test('buildRouteQuestions: ownedcinematic is scoped to agencies selling their own creative services, not any motion-heavy or cinematic brief', () => {
   const { questions } = buildRouteQuestions('brief', atlas, registry);
-  const fervor = questions.family!.criteria.fervor!;
-  assert.ok(/not\b.*(saas|e-?commerce|course|museum|contractor)/i.test(fervor), 'fervor criterion names businesses it excludes');
-  assert.ok(/motion|cinematic/i.test(fervor) && /alone|merely/i.test(fervor), 'fervor criterion says motion/cinematic styling alone is not enough');
+  const ownedcinematic = questions.family!.criteria.ownedcinematic!;
+  assert.ok(/not\b.*(saas|e-?commerce|course|museum|contractor)/i.test(ownedcinematic), 'ownedcinematic criterion names businesses it excludes');
+  assert.ok(/motion|cinematic/i.test(ownedcinematic) && /alone|merely/i.test(ownedcinematic), 'ownedcinematic criterion says motion/cinematic styling alone is not enough');
 });
 
 test('buildRouteQuestions: commerceOwnership criteria distinguish a full-stack PLATFORM name (always linksOut, regardless of which of its own features the brief also lists) from a bare payment PROCESSOR name (linksOut by default, but flips to inline when a concrete on-page mechanic is also described) — run-3 §8, replacing a reverted blanket-inversion attempt', () => {
@@ -395,7 +396,7 @@ test('createJevRouter: saturated raw confidence cannot bypass the family thresho
   const answers = {
     spine: choice('BA', { BA: 1 }),
     archetype_BA: choice('BA.03', { 'BA.03': 1, none: 0 }),
-    family: choice('halcyon', { halcyon: 0.3, none: 0.7 }, 1),
+    family: choice('ownedinstitution', { ownedinstitution: 0.3, none: 0.7 }, 1),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const router = createJevRouter({ consensusK: 1, apiKey: 'test-key', fetchImpl: fakeFetch(captured, () => ({ model: 'jev-stub', answers })) });
@@ -405,7 +406,7 @@ test('createJevRouter: saturated raw confidence cannot bypass the family thresho
   assert.match(rejected.reason!, /below 0\.5/);
   const admitted = await router.route({ ...input, threshold: 0.3 });
   assert.equal(admitted.decision, 'routed');
-  assert.equal(admitted.family?.id, 'halcyon');
+  assert.equal(admitted.family?.id, 'ownedinstitution');
   assert.equal(admitted.family?.probability, 0.3);
   assert.equal(captured.length, 2);
 });
@@ -414,12 +415,12 @@ test('resolveRoute: exact archetype match wins outright', () => {
   const answers = {
     spine: choice('BA', { BA: 1 }),
     archetype_BA: choice('BA.03', { 'BA.01': 0, 'BA.02': 0, 'BA.03': 1, none: 0 }),
-    family: choice('halcyon', { halcyon: 0.8, watson: 0.1, fervor: 0.02, wrenfield: 0.02, maben: 0.02, maren: 0.02, emmpo: 0.02, none: 0 }),
+    family: choice('ownedinstitution', { ownedinstitution: 0.8, ownededitorial: 0.1, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedmaker: 0.02, ownedlearning: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.deepEqual(decision.family, { id: 'halcyon', probability: 0.8, basis: 'exact', transfer: 3, viaSpine: 'BA' });
+  assert.deepEqual(decision.family, { id: 'ownedinstitution', probability: 0.8, basis: 'exact', transfer: 3, viaSpine: 'BA' });
   assert.equal(decision.archetype?.id, 'BA.03');
 });
 
@@ -434,7 +435,7 @@ test('resolveRoute: a BA.02 restaurant-shaped answer set (menu, reservation, din
   const answers = {
     spine: choice('BA', { BA: 1 }),
     archetype_BA: choice('BA.02', { 'BA.01': 0, 'BA.02': 1, 'BA.03': 0, none: 0 }),
-    family: choice('restaurant', { restaurant: 0.82, halcyon: 0.08, watson: 0.02, fervor: 0.02, wrenfield: 0.02, maben: 0.02, maren: 0.01, emmpo: 0.01, none: 0 }),
+    family: choice('restaurant', { restaurant: 0.82, ownedinstitution: 0.08, ownededitorial: 0.02, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedmaker: 0.01, ownedlearning: 0.01, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -443,16 +444,16 @@ test('resolveRoute: a BA.02 restaurant-shaped answer set (menu, reservation, din
   assert.equal(decision.archetype?.id, 'BA.02');
 });
 
-test('resolveRoute: a BA.03 museum/venue-shaped answer set still routes to halcyon, not restaurant — restaurant does not steal BA.03', () => {
+test('resolveRoute: a BA.03 museum/venue-shaped answer set still routes to ownedinstitution, not restaurant — restaurant does not steal BA.03', () => {
   const answers = {
     spine: choice('BA', { BA: 1 }),
     archetype_BA: choice('BA.03', { 'BA.01': 0, 'BA.02': 0, 'BA.03': 1, none: 0 }),
-    family: choice('halcyon', { halcyon: 0.7, restaurant: 0.15, watson: 0.05, fervor: 0.02, wrenfield: 0.02, maben: 0.02, maren: 0.02, emmpo: 0.02, none: 0 }),
+    family: choice('ownedinstitution', { ownedinstitution: 0.7, restaurant: 0.15, ownededitorial: 0.05, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedmaker: 0.02, ownedlearning: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'halcyon');
+  assert.equal(decision.family?.id, 'ownedinstitution');
   assert.notEqual(decision.family?.id, 'restaurant');
   assert.equal(decision.archetype?.id, 'BA.03');
 });
@@ -461,11 +462,11 @@ test('resolveRoute: a BA.03 museum/venue-shaped answer set still routes to halcy
 // community (LM.03): offline routing proof for the two route-corpus-labels.json v4 additions.
 // ---------------------------------------------------------------------------
 
-test('resolveRoute: an LM.03 community-membership answer routes to community, not emmpo (M11)', () => {
+test('resolveRoute: an LM.03 community-membership answer routes to community, not ownedlearning (M11)', () => {
   const answers = {
     spine: choice('LM', { LM: 1 }),
     archetype_LM: choice('LM.03', { 'LM.01': 0, 'LM.02': 0, 'LM.03': 1, none: 0 }),
-    family: choice('community', { community: 0.8, emmpo: 0.15, watson: 0.02, fervor: 0.01, wrenfield: 0.01, maben: 0.01, none: 0 }),
+    family: choice('community', { community: 0.8, ownedlearning: 0.15, ownededitorial: 0.02, ownedcinematic: 0.01, ownedcontractor: 0.01, ownedsite: 0.01, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -474,16 +475,16 @@ test('resolveRoute: an LM.03 community-membership answer routes to community, no
   assert.equal(decision.archetype?.id, 'LM.03');
 });
 
-test('resolveRoute: an LM.01 course/cohort answer still routes to emmpo, not community (M11 regression guard)', () => {
+test('resolveRoute: an LM.01 course/cohort answer still routes to ownedlearning, not community (M11 regression guard)', () => {
   const answers = {
     spine: choice('LM', { LM: 1 }),
     archetype_LM: choice('LM.01', { 'LM.01': 1, 'LM.02': 0, 'LM.03': 0, none: 0 }),
-    family: choice('emmpo', { emmpo: 0.8, community: 0.15, watson: 0.02, fervor: 0.01, wrenfield: 0.01, maben: 0.01, none: 0 }),
+    family: choice('ownedlearning', { ownedlearning: 0.8, community: 0.15, ownededitorial: 0.02, ownedcinematic: 0.01, ownedcontractor: 0.01, ownedsite: 0.01, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.deepEqual(decision.family, { id: 'emmpo', probability: 0.8, basis: 'exact', transfer: 3, viaSpine: 'LM' });
+  assert.deepEqual(decision.family, { id: 'ownedlearning', probability: 0.8, basis: 'exact', transfer: 3, viaSpine: 'LM' });
   assert.equal(decision.archetype?.id, 'LM.01');
 });
 
@@ -491,30 +492,30 @@ test('resolveRoute: same-spine candidates are ranked by family probability', () 
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.01', { 'TL.01': 1, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 0 }),
-    family: choice('watson', { watson: 0.5, fervor: 0.3, wrenfield: 0.1, maben: 0.05, halcyon: 0.02, maren: 0.02, emmpo: 0.01, none: 0 }),
+    family: choice('ownededitorial', { ownededitorial: 0.5, ownedcinematic: 0.3, ownedcontractor: 0.1, ownedsite: 0.05, ownedinstitution: 0.02, ownedmaker: 0.02, ownedlearning: 0.01, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.deepEqual(decision.family, { id: 'watson', probability: 0.5, basis: 'same-spine', transfer: 3, viaSpine: 'TL' });
+  assert.deepEqual(decision.family, { id: 'ownededitorial', probability: 0.5, basis: 'same-spine', transfer: 3, viaSpine: 'TL' });
 });
 
 test('resolveRoute: a family reached only through spine compatibility (transfer 2) is picked when Jev favours it — the design doc\'s SM -> storefront (CO, transfer 2) example', () => {
-  // Was SM -> maren before maren moved to spine TL (G7 task f8 root cause (b)); storefront kept
+  // Was SM -> ownedmaker before ownedmaker moved to spine TL (G7 task f8 root cause (b)); storefront kept
   // its own spine (CO) and archetype (CO.01), so it now carries this compatible-spine-transfer
   // mechanism test instead — the mechanism under test (transfer >= minTransfer admits a family
   // from a non-home spine) is unchanged.
   const answers = {
     spine: choice('SM', { SM: 1 }),
     archetype_SM: choice('none', { 'SM.01': 0, 'SM.02': 0, 'SM.03': 0, 'SM.04': 0, 'SM.05': 0, none: 1 }),
-    family: choice('storefront', { storefront: 0.6, halcyon: 0.3, watson: 0.02, fervor: 0.02, wrenfield: 0.02, maben: 0.02, emmpo: 0.02, none: 0 }),
+    family: choice('storefront', { storefront: 0.6, ownedinstitution: 0.3, ownededitorial: 0.02, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedlearning: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry, { minTransfer: 2 });
   assert.equal(decision.decision, 'routed');
   assert.deepEqual(decision.family, { id: 'storefront', probability: 0.6, basis: 'compatible', transfer: 2, viaSpine: 'SM' });
-  // emmpo sits on LM, and the atlas scores SM -> LM at 1 — below minTransfer, so it never becomes a candidate.
-  assert.ok(!decision.candidates.some((c) => c.family === 'emmpo'), 'transfer 1 (SM -> LM) is excluded, not just outranked');
+  // ownedlearning sits on LM, and the atlas scores SM -> LM at 1 — below minTransfer, so it never becomes a candidate.
+  assert.ok(!decision.candidates.some((c) => c.family === 'ownedlearning'), 'transfer 1 (SM -> LM) is excluded, not just outranked');
   assert.ok(decision.candidates.some((c) => c.family === 'storefront' && c.transfer === 2));
 });
 
@@ -534,19 +535,19 @@ test('resolveRoute: a top-ranked family below the threshold is unrouted, but the
   const answers = {
     spine: choice('BA', { BA: 1 }),
     archetype_BA: choice('BA.03', { 'BA.01': 0, 'BA.02': 0, 'BA.03': 1, none: 0 }),
-    family: choice('halcyon', { halcyon: 0.3, watson: 0.1, fervor: 0.1, wrenfield: 0.1, maben: 0.1, maren: 0.1, emmpo: 0.1, none: 0.2 }),
+    family: choice('ownedinstitution', { ownedinstitution: 0.3, ownededitorial: 0.1, ownedcinematic: 0.1, ownedcontractor: 0.1, ownedsite: 0.1, ownedmaker: 0.1, ownedlearning: 0.1, none: 0.2 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry, { threshold: 0.5 });
   assert.equal(decision.decision, 'unrouted');
-  assert.match(decision.reason!, /^family halcyon at p=0\.3.* below 0\.5$/);
+  assert.match(decision.reason!, /^family ownedinstitution at p=0\.3.* below 0\.5$/);
   assert.ok(decision.candidates.length > 0, 'the ranking is still present');
 });
 
 test('resolveRoute: unrouted when no family is within transfer >= minTransfer (MI family removed from a test registry)', () => {
   // MI has no registry family on its own spine, and every MI -> family-spine score is below 2
   // except MI -> MI itself (no registry family there either): TL 2, PA 1, CO 1, SM 0, CS 2, LM 2, BA 1, TU 2.
-  // maren sits on CO (score 1, excluded) and emmpo on LM (score 2, kept) — pick an archetype/spine
+  // ownedmaker sits on CO (score 1, excluded) and ownedlearning on LM (score 2, kept) — pick an archetype/spine
   // combination with truly nothing in range instead: use minTransfer 3, which only same-spine/exact clear.
   // PA itself now carries a family (marketing-site, page-kind Task 4) and cannot be used here.
   // Every spine now carries a family (nonprofit sits on MI), so the MI family is left out of the
@@ -554,7 +555,7 @@ test('resolveRoute: unrouted when no family is within transfer >= minTransfer (M
   const answers = {
     spine: choice('MI', { MI: 1 }),
     archetype_MI: choice('none', { 'MI.01': 0, 'MI.02': 0, none: 1 }),
-    family: choice('none', { watson: 0.1, fervor: 0.1, wrenfield: 0.1, maben: 0.1, halcyon: 0.1, maren: 0.1, emmpo: 0.1, none: 0.3 }),
+    family: choice('none', { ownededitorial: 0.1, ownedcinematic: 0.1, ownedcontractor: 0.1, ownedsite: 0.1, ownedinstitution: 0.1, ownedmaker: 0.1, ownedlearning: 0.1, none: 0.3 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   // The SHIPPED registry does have an MI family (nonprofit, MI.01); only this test copy drops it.
@@ -570,15 +571,15 @@ test('resolveRoute: a tie within 0.02 is broken by basis (exact beats same-spine
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.05', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 1, 'TL.06': 0, none: 0 }),
-    // watson (TL.05, exact) at 0.52 vs wrenfield (TL.04, same-spine) at 0.53: 0.01 apart, a tie —
-    // exact must still win even though wrenfield's raw probability is (barely) higher. Both clear
-    // the default 0.5 threshold; halcyon (BA, compatible via TL -> BA transfer 3) sits well below
+    // ownededitorial (TL.05, exact) at 0.52 vs ownedcontractor (TL.04, same-spine) at 0.53: 0.01 apart, a tie —
+    // exact must still win even though ownedcontractor's raw probability is (barely) higher. Both clear
+    // the default 0.5 threshold; ownedinstitution (BA, compatible via TL -> BA transfer 3) sits well below
     // either, so it never becomes a tie candidate.
-    family: choice('wrenfield', { watson: 0.52, fervor: 0.05, wrenfield: 0.53, maben: 0.02, halcyon: 0.1, maren: 0.02, emmpo: 0.02, none: 0 }),
+    family: choice('ownedcontractor', { ownededitorial: 0.52, ownedcinematic: 0.05, ownedcontractor: 0.53, ownedsite: 0.02, ownedinstitution: 0.1, ownedmaker: 0.02, ownedlearning: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
-  assert.equal(decision.family?.id, 'watson');
+  assert.equal(decision.family?.id, 'ownededitorial');
   assert.equal(decision.family?.basis, 'exact');
 });
 
@@ -587,23 +588,23 @@ test('resolveRoute: a tie within 0.02 at the same basis is broken by skin match'
     // TL.01 has no exact registry match, so every registry TL family is a same-spine candidate.
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.01', { 'TL.01': 1, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 0 }),
-    // maben (skin Minimal and quiet) at 0.51, watson (skin Editorial) at 0.52: a tie, same basis —
-    // the requested skin (Minimal and quiet, maben's own) must break it over the raw ranking.
-    family: choice('watson', { watson: 0.52, maben: 0.51, fervor: 0.05, wrenfield: 0.02, halcyon: 0.05, maren: 0.02, emmpo: 0.02, none: 0 }),
+    // ownedsite (skin Minimal and quiet) at 0.51, ownededitorial (skin Editorial) at 0.52: a tie, same basis —
+    // the requested skin (Minimal and quiet, ownedsite's own) must break it over the raw ranking.
+    family: choice('ownededitorial', { ownededitorial: 0.52, ownedsite: 0.51, ownedcinematic: 0.05, ownedcontractor: 0.02, ownedinstitution: 0.05, ownedmaker: 0.02, ownedlearning: 0.02, none: 0 }),
     skin: choice('Minimal and quiet', { 'Minimal and quiet': 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
-  assert.equal(decision.family?.id, 'maben');
+  assert.equal(decision.family?.id, 'ownedsite');
 });
 
 test('resolveRoute: a family on the runner-up spine is a candidate when the spine call is spread (the storefront case: TL 0.48 / CO 0.36)', () => {
-  // Was the maren case before maren moved to spine TL (G7 task f8 root cause (b)); storefront
+  // Was the ownedmaker case before ownedmaker moved to spine TL (G7 task f8 root cause (b)); storefront
   // kept spine CO/archetype CO.01, so it now exercises this runner-up-spine mechanism instead.
   const answers = {
     spine: choice('TL', { TL: 0.48, CO: 0.36, BA: 0.14, PA: 0.01, SM: 0.01 }),
     // No archetype_TL answer: nothing on TL should reach 'exact' here. CO.01 is storefront's own archetype.
     archetype_CO: choice('CO.01', { 'CO.01': 1, 'CO.02': 0, 'CO.03': 0, none: 0 }),
-    family: choice('storefront', { storefront: 0.8, watson: 0.02, fervor: 0.02, wrenfield: 0.02, maben: 0.02, halcyon: 0.02, emmpo: 0.02, none: 0.08 }),
+    family: choice('storefront', { storefront: 0.8, ownededitorial: 0.02, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedinstitution: 0.02, ownedlearning: 0.02, none: 0.08 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -626,7 +627,7 @@ test('resolveRoute: a runner-up spine below spineShare stays excluded from candi
     spine: choice('TL', { TL: 0.7, CO: 0.2, BA: 0.05, PA: 0.03, SM: 0.02 }),
     archetype_TL: choice('none', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 1 }),
     // storefront (spine CO) would win outright if CO qualified; it must not even become a candidate.
-    family: choice('storefront', { storefront: 0.9, watson: 0.02, fervor: 0.02, wrenfield: 0.02, maben: 0.02, halcyon: 0.02, emmpo: 0, none: 0 }),
+    family: choice('storefront', { storefront: 0.9, ownededitorial: 0.02, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedinstitution: 0.02, ownedlearning: 0, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -639,7 +640,7 @@ test('resolveRoute: a probability exactly at the threshold still routes (the gat
   const answers = {
     spine: choice('BA', { BA: 1 }),
     archetype_BA: choice('BA.03', { 'BA.01': 0, 'BA.02': 0, 'BA.03': 1, none: 0 }),
-    family: choice('halcyon', { halcyon: 0.5, watson: 0.1, fervor: 0.1, wrenfield: 0.1, maben: 0.1, maren: 0.1, emmpo: 0.1, none: 0 }),
+    family: choice('ownedinstitution', { ownedinstitution: 0.5, ownededitorial: 0.1, ownedcinematic: 0.1, ownedcontractor: 0.1, ownedsite: 0.1, ownedmaker: 0.1, ownedlearning: 0.1, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry, { threshold: 0.5 });
@@ -653,12 +654,12 @@ test('resolveRoute: the routed spine is always a candidate-gathering spine even 
   const answers = {
     spine: choice('TL', { TL: 0.22, PA: 0.1, CO: 0.1, SM: 0.1, CS: 0.1, LM: 0.1, BA: 0.1, TU: 0.09, MI: 0.09 }),
     archetype_TL: choice('TL.04', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0.5, 'TL.05': 0.3, 'TL.06': 0.2, none: 0 }),
-    family: choice('wrenfield', { wrenfield: 0.7, watson: 0.1, fervor: 0.05, maben: 0.05, halcyon: 0.05, maren: 0.03, emmpo: 0.02, none: 0 }),
+    family: choice('ownedcontractor', { ownedcontractor: 0.7, ownededitorial: 0.1, ownedcinematic: 0.05, ownedsite: 0.05, ownedinstitution: 0.05, ownedmaker: 0.03, ownedlearning: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.deepEqual(decision.family, { id: 'wrenfield', probability: 0.7, basis: 'exact', transfer: 3, viaSpine: 'TL' });
+  assert.deepEqual(decision.family, { id: 'ownedcontractor', probability: 0.7, basis: 'exact', transfer: 3, viaSpine: 'TL' });
   assert.ok(decision.spines.some((s) => s.code === 'TL'), 'the routed spine TL is in the candidate-gathering set despite p=0.22');
 });
 
@@ -679,12 +680,12 @@ test('resolveRoute: a missing archetype_<spine> answer is treated as none — th
   const answers = {
     spine: choice('TL', { TL: 1 }),
     // archetype_TL omitted entirely — must degrade to "no archetype", not throw or crash.
-    family: choice('watson', { watson: 0.6, fervor: 0.1, wrenfield: 0.1, maben: 0.1, halcyon: 0.05, maren: 0.03, emmpo: 0.02, none: 0 }),
+    family: choice('ownededitorial', { ownededitorial: 0.6, ownedcinematic: 0.1, ownedcontractor: 0.1, ownedsite: 0.1, ownedinstitution: 0.05, ownedmaker: 0.03, ownedlearning: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.deepEqual(decision.family, { id: 'watson', probability: 0.6, basis: 'same-spine', transfer: 3, viaSpine: 'TL' });
+  assert.deepEqual(decision.family, { id: 'ownededitorial', probability: 0.6, basis: 'same-spine', transfer: 3, viaSpine: 'TL' });
   assert.equal(decision.archetype, undefined);
   assert.ok(decision.warnings.some((w) => w.startsWith('archetype_TL:')), `expected an archetype_TL warning, got ${JSON.stringify(decision.warnings)}`);
 });
@@ -693,7 +694,7 @@ test('resolveRoute: warnings is empty when nothing was ignored', () => {
   const answers = {
     spine: choice('BA', { BA: 1 }),
     archetype_BA: choice('BA.03', { 'BA.01': 0, 'BA.02': 0, 'BA.03': 1, none: 0 }),
-    family: choice('halcyon', { halcyon: 0.9, watson: 0.02, fervor: 0.02, wrenfield: 0.02, maben: 0.02, maren: 0.02, emmpo: 0, none: 0 }),
+    family: choice('ownedinstitution', { ownedinstitution: 0.9, ownededitorial: 0.02, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedmaker: 0.02, ownedlearning: 0, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -730,7 +731,7 @@ test('resolveRoute: a malformed archetype_<spine> answer (an option outside this
     spine: choice('TL', { TL: 1 }),
     // BA.01 is not a TL archetype: invalid for the archetype_TL question specifically.
     archetype_TL: choice('BA.01', { 'BA.01': 1 }),
-    family: choice('watson', { watson: 0.6, fervor: 0.1, wrenfield: 0.1, maben: 0.1, halcyon: 0.05, maren: 0.03, emmpo: 0.02, none: 0 }),
+    family: choice('ownededitorial', { ownededitorial: 0.6, ownedcinematic: 0.1, ownedcontractor: 0.1, ownedsite: 0.1, ownedinstitution: 0.05, ownedmaker: 0.03, ownedlearning: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -758,14 +759,14 @@ test('resolveRoute: skin is always reported, regardless of routed/unrouted', () 
 // see the four cases in resolveRoute's own docblock.
 // ---------------------------------------------------------------------------
 
-/** A routed-to-fervor answer set (TL.05 exact match, family fervor at 0.9), with an optional
+/** A routed-to-ownedcinematic answer set (TL.05 exact match, family ownedcinematic at 0.9), with an optional
  * pageKind answer appended. `undefined` omits the key entirely — an older caller, or the
  * 25-profile corpus, that has never heard of the question. */
-function fervorAnswers(pageKind: 'site' | 'app' | 'dashboard' | 'none' | undefined): Record<string, ChoiceAnswer> {
+function ownedcinematicAnswers(pageKind: 'site' | 'app' | 'dashboard' | 'none' | undefined): Record<string, ChoiceAnswer> {
   const answers: Record<string, ChoiceAnswer> = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.05', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 1, 'TL.06': 0, none: 0 }),
-    family: choice('fervor', { fervor: 0.9, watson: 0.02, wrenfield: 0.02, maben: 0.02, halcyon: 0.02, maren: 0.01, emmpo: 0.01, none: 0 }),
+    family: choice('ownedcinematic', { ownedcinematic: 0.9, ownededitorial: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedinstitution: 0.02, ownedmaker: 0.01, ownedlearning: 0.01, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   if (pageKind !== undefined) {
@@ -777,15 +778,15 @@ function fervorAnswers(pageKind: 'site' | 'app' | 'dashboard' | 'none' | undefin
 }
 
 test('resolveRoute: no pageKind answer at all (the 25-profile corpus, older callers) leaves the decision unchanged and pageKind absent', () => {
-  const decision = resolveRoute(fervorAnswers(undefined), atlas, registry);
+  const decision = resolveRoute(ownedcinematicAnswers(undefined), atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'fervor');
+  assert.equal(decision.family?.id, 'ownedcinematic');
   assert.equal(decision.pageKind, undefined);
 });
 
 test('createJevRouter + resolveRoute: a pageKind answer of none is recorded but leaves the routed decision byte-identical otherwise', async () => {
   const captured: Captured[] = [];
-  // fervor DOES have `excludes`, so `createJevRouter` sends a second (exclusion-gate) request too
+  // ownedcinematic DOES have `excludes`, so `createJevRouter` sends a second (exclusion-gate) request too
   // — answer it `none` so this test's own invariant (nothing else about the decision changes)
   // still holds; the exclusion gate's own behavior is covered separately above.
   const respond = (body: JsonObject): JsonObject => {
@@ -795,47 +796,47 @@ test('createJevRouter + resolveRoute: a pageKind answer of none is recorded but 
     }
     return {
       model: 'jev-1.13.0',
-      answers: fervorAnswers('none') as unknown as JsonObject,
+      answers: ownedcinematicAnswers('none') as unknown as JsonObject,
       usage: { input_tokens: 50, output_tokens: 5 },
     };
   };
   const router = createJevRouter({ consensusK: 1, apiKey: 'k', fetchImpl: fakeFetch(captured, respond) });
   const withPageKind = await router.route({ brief: 'An ad agency that makes its own campaigns.', atlas, registry });
-  const withoutPageKind = resolveRoute(fervorAnswers(undefined), atlas, registry);
+  const withoutPageKind = resolveRoute(ownedcinematicAnswers(undefined), atlas, registry);
 
   assert.equal(withPageKind.decision, 'routed');
-  assert.equal(withPageKind.family?.id, 'fervor');
+  assert.equal(withPageKind.family?.id, 'ownedcinematic');
   assert.equal(withPageKind.pageKind?.choice, 'none');
   const { pageKind: _pageKind, ms: _ms, calls: _calls, model: _model, usage: _usage, votes: _votes, consensusK: _consensusK, ...withPageKindPolicy } = withPageKind;
   assert.deepEqual(withPageKindPolicy, withoutPageKind, 'a none pageKind answer must not change anything else about the decision');
 });
 
 test('resolveRoute: a confident pageKind answer that agrees with the winning family changes nothing', () => {
-  // fervor's own pageKind (family-registry.json) is "site".
-  const decision = resolveRoute(fervorAnswers('site'), atlas, registry);
+  // ownedcinematic's own pageKind (family-registry.json) is "site".
+  const decision = resolveRoute(ownedcinematicAnswers('site'), atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'fervor');
+  assert.equal(decision.family?.id, 'ownedcinematic');
   assert.equal(decision.pageKind?.choice, 'site');
   assert.deepEqual(decision.warnings, []);
 });
 
 test('resolveRoute: a pageKind answer below DEFAULT_THRESHOLD changes nothing, but is still recorded', () => {
-  const answers = fervorAnswers(undefined);
+  const answers = ownedcinematicAnswers(undefined);
   answers.pageKind = choice('dashboard', { site: 0.1, app: 0.1, dashboard: 0.3, none: 0.5 }, 0.3);
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'fervor');
+  assert.equal(decision.family?.id, 'ownedcinematic');
   assert.deepEqual(decision.pageKind, { choice: 'dashboard', confidence: 0.3 });
   assert.deepEqual(decision.warnings, []);
 });
 
-test('resolveRoute: a confident pageKind answer that disagrees, with no bundled family at or above threshold to reroute to, becomes unrouted (maben 0.7 site vs pageKind dashboard 0.9)', () => {
+test('resolveRoute: a confident pageKind answer that disagrees, with no bundled family at or above threshold to reroute to, becomes unrouted (ownedsite 0.7 site vs pageKind dashboard 0.9)', () => {
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('none', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 1 }),
     // crm-dashboard sits on TU; TL -> TU transfer is below minTransfer, so it never becomes a
     // candidate here at all — the reroute search below must come up empty.
-    family: choice('maben', { maben: 0.7, watson: 0.02, fervor: 0.02, wrenfield: 0.02, halcyon: 0.02, maren: 0.02, emmpo: 0.02, none: 0 }),
+    family: choice('ownedsite', { ownedsite: 0.7, ownededitorial: 0.02, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedinstitution: 0.02, ownedmaker: 0.02, ownedlearning: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
     pageKind: choice('dashboard', { site: 0.05, app: 0.05, dashboard: 0.9, none: 0 }, 0.9),
   };
@@ -844,25 +845,25 @@ test('resolveRoute: a confident pageKind answer that disagrees, with no bundled 
   assert.equal(decision.family, undefined);
   assert.match(decision.reason!, /^page kind dashboard at p=0\.90 has no bundled family at or above 0\.5$/);
   assert.equal(decision.warnings.length, 1);
-  assert.equal(decision.warnings[0], 'page kind dashboard disagrees with family maben (site)');
+  assert.equal(decision.warnings[0], 'page kind dashboard disagrees with family ownedsite (site)');
 });
 
-test('resolveRoute: a confident pageKind answer that disagrees re-routes to the highest-probability matching candidate when one clears threshold (maben 0.7 site vs crm-dashboard 0.55 dashboard)', () => {
+test('resolveRoute: a confident pageKind answer that disagrees re-routes to the highest-probability matching candidate when one clears threshold (ownedsite 0.7 site vs crm-dashboard 0.55 dashboard)', () => {
   const answers = {
-    // TL (maben's own spine) and TU (crm-dashboard's own spine) both qualify for
+    // TL (ownedsite's own spine) and TU (crm-dashboard's own spine) both qualify for
     // candidate-gathering: TU's 0.3 share clears the default 0.25 spineShare.
     spine: choice('TL', { TL: 0.6, TU: 0.3, BA: 0.1 }),
     archetype_TL: choice('none', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 1 }),
     archetype_TU: choice('none', { 'TU.01': 0, 'TU.02': 0, 'TU.03': 0, none: 1 }),
-    family: choice('maben', {
-      maben: 0.7,
+    family: choice('ownedsite', {
+      ownedsite: 0.7,
       'crm-dashboard': 0.55,
-      watson: 0.02,
-      fervor: 0.02,
-      wrenfield: 0.02,
-      halcyon: 0.02,
-      maren: 0.02,
-      emmpo: 0.02,
+      ownededitorial: 0.02,
+      ownedcinematic: 0.02,
+      ownedcontractor: 0.02,
+      ownedinstitution: 0.02,
+      ownedmaker: 0.02,
+      ownedlearning: 0.02,
       none: 0,
     }),
     skin: choice('unspecified', { unspecified: 1 }),
@@ -871,21 +872,21 @@ test('resolveRoute: a confident pageKind answer that disagrees re-routes to the 
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
   assert.deepEqual(decision.family, { id: 'crm-dashboard', probability: 0.55, basis: 'same-spine', transfer: 3, viaSpine: 'TU' });
-  // The reroute changes which candidate WINS, not the ranking itself: maben, the original
+  // The reroute changes which candidate WINS, not the ranking itself: ownedsite, the original
   // (higher-probability) winner, stays listed at the top of `candidates`.
-  assert.equal(decision.candidates[0]?.family, 'maben');
+  assert.equal(decision.candidates[0]?.family, 'ownedsite');
   assert.equal(decision.warnings.length, 1);
-  assert.equal(decision.warnings[0], 'page kind dashboard disagrees with family maben (site)');
+  assert.equal(decision.warnings[0], 'page kind dashboard disagrees with family ownedsite (site)');
 });
 
 test('resolveRoute: a malformed pageKind answer degrades to no answer — a warning is recorded, the decision is untouched, and policy.pageKind stays absent', () => {
-  const answers = fervorAnswers(undefined);
+  const answers = ownedcinematicAnswers(undefined);
   // `choice` is not one of the offered options ('site' | 'app' | 'dashboard' | 'none') —
   // `validateChoiceAnswer` rejects it the same way it would for the spine/skin/family answers.
   answers.pageKind = { type: 'choice', choice: 'sites', confidence: 0.9, probabilities: { site: 0.9 } };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'fervor');
+  assert.equal(decision.family?.id, 'ownedcinematic');
   assert.equal(decision.pageKind, undefined);
   assert.equal(decision.warnings.length, 1);
   assert.equal(decision.warnings[0], 'malformed answer pageKind: choice is not one of the offered options; treated as no answer');
@@ -900,7 +901,7 @@ test('resolveRoute: a one-destination, chapters-and-practical-facts answer set r
   const answers = {
     spine: choice('CS', { CS: 1 }),
     archetype_CS: choice('CS.01', { 'CS.01': 1, 'CS.02': 0, 'CS.03': 0, none: 0 }),
-    family: choice('guide', { guide: 0.82, publication: 0.1, watson: 0.03, fervor: 0.02, wrenfield: 0.02, maben: 0.01, none: 0 }),
+    family: choice('guide', { guide: 0.82, publication: 0.1, ownededitorial: 0.03, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.01, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -913,7 +914,7 @@ test('resolveRoute: a recurring-title, subscribe-and-archive answer set still ro
   const answers = {
     spine: choice('CS', { CS: 1 }),
     archetype_CS: choice('CS.01', { 'CS.01': 1, 'CS.02': 0, 'CS.03': 0, none: 0 }),
-    family: choice('publication', { publication: 0.78, guide: 0.12, watson: 0.03, fervor: 0.02, wrenfield: 0.02, none: 0.01 }),
+    family: choice('publication', { publication: 0.78, guide: 0.12, ownededitorial: 0.03, ownedcinematic: 0.02, ownedcontractor: 0.02, none: 0.01 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -938,7 +939,7 @@ test('resolveRoute: a practice-shaped (TL.01, clinical/booking) answer set never
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.01', { 'TL.01': 1, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, none: 0 }),
-    family: choice('practice', { practice: 0.55, guide: 0.3, watson: 0.1, wrenfield: 0.05 }),
+    family: choice('practice', { practice: 0.55, guide: 0.3, ownededitorial: 0.1, ownedcontractor: 0.05 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -958,19 +959,19 @@ test('resolveRoute: a storefront-shaped (CO.01, buy/preorder catalog) answer set
   assert.equal(decision.family?.id, 'storefront');
 });
 
-test('resolveRoute: a maren-shaped (TL.06, made-to-order atelier) answer set never yields guide', () => {
-  // maren moved from CO/CO.01 to TL/TL.06 (G7 task f8 root cause (b) — see atlas.ts and
+test('resolveRoute: a ownedmaker-shaped (TL.06, made-to-order atelier) answer set never yields guide', () => {
+  // ownedmaker moved from CO/CO.01 to TL/TL.06 (G7 task f8 root cause (b) — see atlas.ts and
   // eval-v7/G7-DIAGNOSIS.md): a made-to-order maker/atelier brief (no cart, orders by call or
   // email) is a TL "personal expert or portfolio" story, not a CO "move to purchase" one.
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.06', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 1, none: 0 }),
-    family: choice('maren', { maren: 0.82, guide: 0.15, none: 0.03 }),
+    family: choice('ownedmaker', { ownedmaker: 0.82, guide: 0.15, none: 0.03 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.notEqual(decision.family?.id, 'guide');
-  assert.equal(decision.family?.id, 'maren');
+  assert.equal(decision.family?.id, 'ownedmaker');
 });
 
 test('resolveRoute: a marketing-site-shaped (PA.01, software trial/pricing) answer set never yields guide, even though PA is the one spine with atlas transfer to CS at the floor', () => {
@@ -1007,7 +1008,7 @@ test('resolveRoute: the committed near-miss fixture (Tide & Table, a recurring t
   const answers = {
     spine: choice('CS', { CS: 1 }),
     archetype_CS: choice('CS.01', { 'CS.01': 1, 'CS.02': 0, 'CS.03': 0, none: 0 }),
-    family: choice('publication', { publication: 0.75, guide: 0.15, watson: 0.05, fervor: 0.03, wrenfield: 0.02, none: 0 }),
+    family: choice('publication', { publication: 0.75, guide: 0.15, ownededitorial: 0.05, ownedcinematic: 0.03, ownedcontractor: 0.02, none: 0 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
@@ -1024,7 +1025,7 @@ test('resolveRoute: commerceOwnership gate — a confident inline answer unroute
   const answers = {
     spine: choice('CO', { CO: 1 }),
     archetype_CO: choice('CO.01', { 'CO.01': 1, none: 0 }),
-    family: choice('storefront', { storefront: 0.85, maren: 0.05, 'marketing-site': 0.02, listings: 0.02, none: 0.06 }),
+    family: choice('storefront', { storefront: 0.85, ownedmaker: 0.05, 'marketing-site': 0.02, listings: 0.02, none: 0.06 }),
     commerceOwnership: choice('inline', { inline: 0.97, linksOut: 0.02, none: 0.01 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
@@ -1038,7 +1039,7 @@ test('resolveRoute: commerceOwnership gate — a confident linksOut answer chang
   const answers = {
     spine: choice('CO', { CO: 1 }),
     archetype_CO: choice('CO.01', { 'CO.01': 1, none: 0 }),
-    family: choice('storefront', { storefront: 0.9, maren: 0.05, none: 0.05 }),
+    family: choice('storefront', { storefront: 0.9, ownedmaker: 0.05, none: 0.05 }),
     commerceOwnership: choice('linksOut', { linksOut: 0.95, inline: 0.03, none: 0.02 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
@@ -1047,17 +1048,17 @@ test('resolveRoute: commerceOwnership gate — a confident linksOut answer chang
   assert.equal(decision.family?.id, 'storefront');
 });
 
-test('resolveRoute: commerceOwnership gate — an inline answer never touches a winner without requiresExternalBuyStep (e.g. maren, which is already cart-free by design)', () => {
+test('resolveRoute: commerceOwnership gate — an inline answer never touches a winner without requiresExternalBuyStep (e.g. ownedmaker, which is already cart-free by design)', () => {
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.06', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 1, none: 0 }),
-    family: choice('maren', { maren: 0.85, watson: 0.1, none: 0.05 }),
+    family: choice('ownedmaker', { ownedmaker: 0.85, ownededitorial: 0.1, none: 0.05 }),
     commerceOwnership: choice('inline', { inline: 0.9, linksOut: 0.05, none: 0.05 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'maren');
+  assert.equal(decision.family?.id, 'ownedmaker');
 });
 
 test('resolveRoute: commerceOwnership gate — an absent answer (older caller / 25-profile corpus) leaves the decision byte-identical', () => {
@@ -1159,16 +1160,16 @@ test('buildExclusionQuestion: one choice question over ONLY the winner\'s own ex
   assert.ok(request);
   assert.deepEqual(request.state, { brief: 'A brief.' });
   const criteria = request.questions.exclusion!.criteria;
-  assert.equal(Object.keys(criteria).length, storefrontEntry.excludes!.length + 1, 'exactly storefront\'s own clauses plus none — not maren\'s, watson\'s, or any other family\'s');
+  assert.equal(Object.keys(criteria).length, storefrontEntry.excludes!.length + 1, 'exactly storefront\'s own clauses plus none — not ownedmaker\'s, ownededitorial\'s, or any other family\'s');
   for (let i = 0; i < storefrontEntry.excludes!.length; i += 1) {
     assert.equal(criteria[`storefront:${i}`], storefrontEntry.excludes![i]);
   }
   assert.ok('none' in criteria);
-  assert.ok(!('maren:0' in criteria), 'a different family\'s clause never appears in this family-scoped question');
+  assert.ok(!('ownedmaker:0' in criteria), 'a different family\'s clause never appears in this family-scoped question');
 });
 
 test('buildExclusionQuestion: undefined for a family with no excludes — createJevRouter must skip the second request entirely', () => {
-  const noExcludesEntry: FamilyRegistryEntry = { ...storefrontEntry, family: 'wrenfield', excludes: undefined };
+  const noExcludesEntry: FamilyRegistryEntry = { ...storefrontEntry, family: 'ownedcontractor', excludes: undefined };
   assert.equal(buildExclusionQuestion('A brief.', noExcludesEntry), undefined);
   const emptyExcludesEntry: FamilyRegistryEntry = { ...storefrontEntry, excludes: [] };
   assert.equal(buildExclusionQuestion('A brief.', emptyExcludesEntry), undefined);
@@ -1355,27 +1356,27 @@ function fanOutSequenceFetch(perCall: Array<string | undefined>, delayMs = 0): t
 }
 
 test('createJevRouter consensus: unanimity (all 3 attempts pick the same family) routes, with 3 votes recorded', async () => {
-  const router = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['watson', 'watson', 'watson']) });
+  const router = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['ownededitorial', 'ownededitorial', 'ownededitorial']) });
   const decision = await router.route({ brief: 'A studio brief.', atlas, registry });
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'watson');
+  assert.equal(decision.family?.id, 'ownededitorial');
   assert.equal(decision.votes?.length, 3);
-  assert.ok(decision.votes!.every((vote) => vote.decision === 'routed' && vote.family === 'watson'));
-  assert.equal(decision.calls, 3, 'watson has no excludes, so each attempt is exactly one call');
+  assert.ok(decision.votes!.every((vote) => vote.decision === 'routed' && vote.family === 'ownededitorial'));
+  assert.equal(decision.calls, 3, 'ownededitorial has no excludes, so each attempt is exactly one call');
 });
 
 test('createJevRouter consensus: a split vote (attempts disagree on the family) unroutes, with reason consensus: … naming each vote', async () => {
-  const router = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['watson', 'fervor', 'watson']) });
+  const router = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['ownededitorial', 'ownedcinematic', 'ownededitorial']) });
   const decision = await router.route({ brief: 'An ambiguous studio-or-agency brief.', atlas, registry });
   assert.equal(decision.decision, 'unrouted');
   assert.match(decision.reason!, /^consensus:/);
   assert.equal(decision.family, undefined);
   assert.equal(decision.votes?.length, 3);
-  assert.deepEqual(decision.votes!.map((vote) => vote.family), ['watson', 'fervor', 'watson']);
+  assert.deepEqual(decision.votes!.map((vote) => vote.family), ['ownededitorial', 'ownedcinematic', 'ownededitorial']);
 });
 
 test('createJevRouter consensus: an unroute in any one of the k attempts unroutes the whole decision, even when the OTHER attempts agree', async () => {
-  const router = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['watson', 'watson', undefined]) });
+  const router = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['ownededitorial', 'ownededitorial', undefined]) });
   const decision = await router.route({ brief: 'A borderline studio brief.', atlas, registry });
   assert.equal(decision.decision, 'unrouted');
   assert.match(decision.reason!, /^consensus:/);
@@ -1389,7 +1390,7 @@ test('createJevRouter consensus: an unroute in any one of the k attempts unroute
 test('createJevRouter consensus: the k attempts are sent CONCURRENTLY, not sequentially', async () => {
   const delayMs = 40;
   const k = 3;
-  const router = createJevRouter({ consensusK: k, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(Array(k).fill('watson'), delayMs) });
+  const router = createJevRouter({ consensusK: k, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(Array(k).fill('ownededitorial'), delayMs) });
   const startedAt = performance.now();
   await router.route({ brief: 'A studio brief.', atlas, registry });
   const elapsedMs = performance.now() - startedAt;
@@ -1403,7 +1404,7 @@ test('createJevRouter consensus: default consensusK is DEFAULT_CONSENSUS_K (3) w
   let calls = 0;
   const fetchImpl: typeof fetch = (async (...args) => {
     calls += 1;
-    return fanOutSequenceFetch(['watson', 'watson', 'watson'])(...args);
+    return fanOutSequenceFetch(['ownededitorial', 'ownededitorial', 'ownededitorial'])(...args);
   }) as typeof fetch;
   const router = createJevRouter({ apiKey: 'test-key', fetchImpl });
   await router.route({ brief: 'A studio brief.', atlas, registry });
@@ -1431,88 +1432,88 @@ test('createJevRouter consensus: a vote that exceeds voteTimeoutMs counts as a f
 });
 
 test('createJevRouter: RouteDecision logs consensusK on both an unanimous and a disagreeing decision', async () => {
-  const unanimousRouter = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['watson', 'watson', 'watson']) });
+  const unanimousRouter = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['ownededitorial', 'ownededitorial', 'ownededitorial']) });
   const unanimousDecision = await unanimousRouter.route({ brief: 'A studio brief.', atlas, registry });
   assert.equal(unanimousDecision.consensusK, 3);
 
-  const splitRouter = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['watson', 'fervor', 'watson']) });
+  const splitRouter = createJevRouter({ consensusK: 3, apiKey: 'test-key', fetchImpl: fanOutSequenceFetch(['ownededitorial', 'ownedcinematic', 'ownededitorial']) });
   const splitDecision = await splitRouter.route({ brief: 'An ambiguous brief.', atlas, registry });
   assert.equal(splitDecision.consensusK, 3);
 });
 
-test('resolveRoute: maren now lives on spine TL / archetype TL.06 (root cause (b): a made-to-order maker/atelier brief with no cart is a TL "personal expert or portfolio" story, not a CO one)', () => {
-  const marenEntry = registry.families.find((entry) => entry.family === 'maren');
-  assert.equal(marenEntry?.spine, 'TL');
-  assert.equal(marenEntry?.archetype, 'TL.06');
+test('resolveRoute: ownedmaker now lives on spine TL / archetype TL.06 (root cause (b): a made-to-order maker/atelier brief with no cart is a TL "personal expert or portfolio" story, not a CO one)', () => {
+  const ownedmakerEntry = registry.families.find((entry) => entry.family === 'ownedmaker');
+  assert.equal(ownedmakerEntry?.spine, 'TL');
+  assert.equal(ownedmakerEntry?.archetype, 'TL.06');
   // CO -> TL transfer is 1 (below minTransfer 2 by default), so a CO-spine brief never reaches
-  // maren any more — the exact mismatch that made maren unroutable when 5/5 dev maren briefs
+  // ownedmaker any more — the exact mismatch that made ownedmaker unroutable when 5/5 dev ownedmaker briefs
   // spine-classified as TL, never CO.
   const answers = {
     spine: choice('CO', { CO: 1 }),
     archetype_CO: choice('CO.01', { 'CO.01': 1, none: 0 }),
-    family: choice('maren', { maren: 0.9, storefront: 0.05, none: 0.05 }),
+    family: choice('ownedmaker', { ownedmaker: 0.9, storefront: 0.05, none: 0.05 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
-  assert.ok(!decision.candidates.some((c) => c.family === 'maren'), 'maren is unreachable from spine CO now that its home spine is TL');
+  assert.ok(!decision.candidates.some((c) => c.family === 'ownedmaker'), 'ownedmaker is unreachable from spine CO now that its home spine is TL');
 });
 
-test('resolveRoute: maren\'s TL.06 archetype match is sameSpineOnly — it never claims exact, so a higher-probability watson pick on a confident TL.06 photographer brief is NOT beaten by basis inside the 0.02 tie window (routefix-r1 Grok audit, FIX finding: TL.06 is the atlas\'s shared general-portfolio archetype, not maren\'s alone)', () => {
-  const marenEntry = registry.families.find((entry) => entry.family === 'maren');
-  assert.equal(marenEntry?.sameSpineOnly, true);
+test('resolveRoute: ownedmaker\'s TL.06 archetype match is sameSpineOnly — it never claims exact, so a higher-probability ownededitorial pick on a confident TL.06 photographer brief is NOT beaten by basis inside the 0.02 tie window (routefix-r1 Grok audit, FIX finding: TL.06 is the atlas\'s shared general-portfolio archetype, not ownedmaker\'s alone)', () => {
+  const ownedmakerEntry = registry.families.find((entry) => entry.family === 'ownedmaker');
+  assert.equal(ownedmakerEntry?.sameSpineOnly, true);
   // A photographer/freelancer brief that confidently reads TL.06 ("Personal expert or
-  // portfolio") but whose family vote actually favours watson (a text-forward studio statement),
-  // not maren (a made-to-order atelier) — watson at 0.55 vs. maren at 0.54, within TIE_EPSILON
-  // (0.02). Before this fix, maren's `exact` TL.06 ownership would have beaten watson's
+  // portfolio") but whose family vote actually favours ownededitorial (a text-forward studio statement),
+  // not ownedmaker (a made-to-order atelier) — ownededitorial at 0.55 vs. ownedmaker at 0.54, within TIE_EPSILON
+  // (0.02). Before this fix, ownedmaker's `exact` TL.06 ownership would have beaten ownededitorial's
   // `same-spine` basis purely on basis rank, publishing an atelier page over the family
   // question's own (near-)preference. Both are now same-spine, so probability alone decides.
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.06', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0.02, 'TL.06': 0.98, none: 0 }),
-    family: choice('watson', { watson: 0.55, maren: 0.54, fervor: 0.05, wrenfield: 0, maben: 0, none: 0 }),
+    family: choice('ownededitorial', { ownededitorial: 0.55, ownedmaker: 0.54, ownedcinematic: 0.05, ownedcontractor: 0, ownedsite: 0, none: 0 }),
     skin: choice('Editorial', { Editorial: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
-  const watsonCandidate = decision.candidates.find((c) => c.family === 'watson');
-  const marenCandidate = decision.candidates.find((c) => c.family === 'maren');
-  assert.equal(watsonCandidate?.basis, 'same-spine');
-  assert.equal(marenCandidate?.basis, 'same-spine', 'maren no longer claims exact on TL.06');
+  const ownededitorialCandidate = decision.candidates.find((c) => c.family === 'ownededitorial');
+  const ownedmakerCandidate = decision.candidates.find((c) => c.family === 'ownedmaker');
+  assert.equal(ownededitorialCandidate?.basis, 'same-spine');
+  assert.equal(ownedmakerCandidate?.basis, 'same-spine', 'ownedmaker no longer claims exact on TL.06');
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'watson', 'with both same-spine, the higher family probability (watson 0.55) wins the tie, not maren\'s old exact-basis privilege');
+  assert.equal(decision.family?.id, 'ownededitorial', 'with both same-spine, the higher family probability (ownededitorial 0.55) wins the tie, not ownedmaker\'s old exact-basis privilege');
 });
 
-test('resolveRoute: requiresExactArchetype (fervor) never falls back to a same-spine or compatible-spine basis (root cause (c): a content-free stub with archetype_TL: none still won fervor on tag-word matching alone)', () => {
+test('resolveRoute: requiresExactArchetype (ownedcinematic) never falls back to a same-spine or compatible-spine basis (root cause (c): a content-free stub with archetype_TL: none still won ownedcinematic on tag-word matching alone)', () => {
   const answers = {
     // No content beyond visual/motion tags and a generic vertical — the archetype question itself
     // finds nothing to match (archetype_TL: none), the same shape reproduced on scroll-landing.
     spine: choice('TL', { TL: 0.8, BA: 0.1, none: 0.05 }),
     archetype_TL: choice('none', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 1 }),
-    family: choice('fervor', { fervor: 0.65, watson: 0.02, wrenfield: 0, none: 0.05 }),
+    family: choice('ownedcinematic', { ownedcinematic: 0.65, ownededitorial: 0.02, ownedcontractor: 0, none: 0.05 }),
     skin: choice('Cinematic and immersive', { 'Cinematic and immersive': 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
-  assert.ok(!decision.candidates.some((c) => c.family === 'fervor'), 'fervor is excluded outright, not merely outranked, when it has no exact archetype match');
+  assert.ok(!decision.candidates.some((c) => c.family === 'ownedcinematic'), 'ownedcinematic is excluded outright, not merely outranked, when it has no exact archetype match');
   assert.equal(decision.decision, 'unrouted');
 });
 
-test('resolveRoute: requiresExactArchetype (fervor) excludes a technically-matching but low-confidence archetype answer too (model variance reproduced on scroll-landing: the same content-free stub answered archetype_TL: TL.05 at confidence 0.38-0.41 on some runs, none on others)', () => {
+test('resolveRoute: requiresExactArchetype (ownedcinematic) excludes a technically-matching but low-confidence archetype answer too (model variance reproduced on scroll-landing: the same content-free stub answered archetype_TL: TL.05 at confidence 0.38-0.41 on some runs, none on others)', () => {
   const answers = {
     spine: choice('TL', { TL: 0.8, BA: 0.1, none: 0.05 }),
     archetype_TL: choice('TL.05', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0.4, 'TL.06': 0, none: 0.02 }, 0.4),
-    family: choice('fervor', { fervor: 0.66, watson: 0.02, none: 0.05 }),
+    family: choice('ownedcinematic', { ownedcinematic: 0.66, ownededitorial: 0.02, none: 0.05 }),
     skin: choice('Cinematic and immersive', { 'Cinematic and immersive': 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
-  assert.ok(!decision.candidates.some((c) => c.family === 'fervor'), 'a matching but low-confidence (< threshold) archetype answer does not count as a confident signal');
+  assert.ok(!decision.candidates.some((c) => c.family === 'ownedcinematic'), 'a matching but low-confidence (< threshold) archetype answer does not count as a confident signal');
   assert.equal(decision.decision, 'unrouted');
 });
 
-test('resolveRoute: requiresExactArchetype (fervor) never reaches a compatible-spine basis either (routefix-r1 Grok audit, FIX finding: the original guard only fired when entry.spine === spineCode, so a qualifying runner-up spine — BA, whose transfer into TL is 3, or PA, whose transfer into TL is 2 — still fell through to the compatible branch regardless of archetype_TL)', () => {
+test('resolveRoute: requiresExactArchetype (ownedcinematic) never reaches a compatible-spine basis either (routefix-r1 Grok audit, FIX finding: the original guard only fired when entry.spine === spineCode, so a qualifying runner-up spine — BA, whose transfer into TL is 3, or PA, whose transfer into TL is 2 — still fell through to the compatible branch regardless of archetype_TL)', () => {
   const answersBA = {
     // BA clears the default 0.25 spineShare alongside TL, so it becomes a qualifying spine too.
     spine: choice('TL', { TL: 0.7, BA: 0.25, PA: 0.05 }),
     archetype_TL: choice('none', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 1 }),
-    family: choice('fervor', { fervor: 0.65, watson: 0.02, halcyon: 0.02, none: 0.05 }),
+    family: choice('ownedcinematic', { ownedcinematic: 0.65, ownededitorial: 0.02, ownedinstitution: 0.02, none: 0.05 }),
     skin: choice('Cinematic and immersive', { 'Cinematic and immersive': 1 }),
   };
   const decisionBA = resolveRoute(answersBA, atlas, registry);
@@ -1521,13 +1522,13 @@ test('resolveRoute: requiresExactArchetype (fervor) never reaches a compatible-s
     ['BA', 'TL'],
     'BA clears spineShare and becomes a qualifying (candidate-gathering) spine',
   );
-  assert.ok(!decisionBA.candidates.some((c) => c.family === 'fervor'), 'fervor must not be admitted via BA -> TL compatible transfer (3) when archetype_TL found nothing');
+  assert.ok(!decisionBA.candidates.some((c) => c.family === 'ownedcinematic'), 'ownedcinematic must not be admitted via BA -> TL compatible transfer (3) when archetype_TL found nothing');
   assert.equal(decisionBA.decision, 'unrouted');
 
   const answersPA = {
     spine: choice('TL', { TL: 0.7, PA: 0.25, BA: 0.05 }),
     archetype_TL: choice('none', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 0, none: 1 }),
-    family: choice('fervor', { fervor: 0.65, watson: 0.02, 'marketing-site': 0.02, none: 0.05 }),
+    family: choice('ownedcinematic', { ownedcinematic: 0.65, ownededitorial: 0.02, 'marketing-site': 0.02, none: 0.05 }),
     skin: choice('Cinematic and immersive', { 'Cinematic and immersive': 1 }),
   };
   const decisionPA = resolveRoute(answersPA, atlas, registry);
@@ -1536,32 +1537,32 @@ test('resolveRoute: requiresExactArchetype (fervor) never reaches a compatible-s
     ['PA', 'TL'],
     'PA clears spineShare and becomes a qualifying (candidate-gathering) spine',
   );
-  assert.ok(!decisionPA.candidates.some((c) => c.family === 'fervor'), 'fervor must not be admitted via PA -> TL compatible transfer (2, exactly minTransfer) when archetype_TL found nothing');
+  assert.ok(!decisionPA.candidates.some((c) => c.family === 'ownedcinematic'), 'ownedcinematic must not be admitted via PA -> TL compatible transfer (2, exactly minTransfer) when archetype_TL found nothing');
   assert.equal(decisionPA.decision, 'unrouted');
 });
 
-test('resolveRoute: requiresExactArchetype (fervor) still reaches same-spine (not exact) on a confident but non-matching archetype answer (route-corpus-25.json\'s 3d-jack-portfolio-hero: archetype_TL answered TL.06 at 0.96 while family still correctly picked fervor)', () => {
+test('resolveRoute: requiresExactArchetype (ownedcinematic) still reaches same-spine (not exact) on a confident but non-matching archetype answer (route-corpus-25.json\'s 3d-jack-portfolio-hero: archetype_TL answered TL.06 at 0.96 while family still correctly picked ownedcinematic)', () => {
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.06', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0.04, 'TL.06': 0.96, none: 0 }),
-    family: choice('fervor', { fervor: 0.81, watson: 0.17, none: 0.01 }),
+    family: choice('ownedcinematic', { ownedcinematic: 0.81, ownededitorial: 0.17, none: 0.01 }),
     skin: choice('Cinematic and immersive', { 'Cinematic and immersive': 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'fervor');
+  assert.equal(decision.family?.id, 'ownedcinematic');
   assert.equal(decision.family?.basis, 'same-spine');
 });
 
-test('resolveRoute: requiresExactArchetype (fervor) still wins normally on an exact TL.05 archetype match', () => {
+test('resolveRoute: requiresExactArchetype (ownedcinematic) still wins normally on an exact TL.05 archetype match', () => {
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.05', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 1, 'TL.06': 0, none: 0 }),
-    family: choice('fervor', { fervor: 0.9, watson: 0.05, none: 0.05 }),
+    family: choice('ownedcinematic', { ownedcinematic: 0.9, ownededitorial: 0.05, none: 0.05 }),
     skin: choice('Cinematic and immersive', { 'Cinematic and immersive': 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'fervor');
+  assert.equal(decision.family?.id, 'ownedcinematic');
   assert.equal(decision.family?.basis, 'exact');
 });

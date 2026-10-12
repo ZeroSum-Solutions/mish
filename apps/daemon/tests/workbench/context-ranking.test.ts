@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import type { ResourceCandidate } from '@open-design/contracts';
+import type { ResourceCandidate } from '@mish/contracts';
 import { rankContextualResources } from '../../src/workbench/context-ranking.js';
 import { candidate, savedContext, booking } from './context-ranking-fixture.js';
 const ids = (items: readonly ResourceCandidate[]) => items.map(item => item.ref.itemId);

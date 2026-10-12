@@ -21,14 +21,14 @@
 // their own daemon (which would dirty the registry table).
 
 import path from 'node:path';
-import type { RegistryView } from '@open-design/plugin-runtime';
+import type { RegistryView } from '@mish/plugin-runtime';
 import { doctorPlugin, type DoctorReport, type Diagnostic } from './doctor.js';
 import { resolvePluginFolder } from './registry.js';
 import type { ConnectorProbe } from './connector-gate.js';
 
 export interface ValidatePluginFolderInput {
   // Path to the plugin folder. Must contain at least one of
-  // `open-design.json` / `SKILL.md` / `.claude-plugin/plugin.json`
+  // `mish.json` / `SKILL.md` / `.claude-plugin/plugin.json`
   // for resolvePluginFolder() to succeed.
   folder: string;
   // Optional pre-fetched registry. Tests pass a stub; CLI fetches

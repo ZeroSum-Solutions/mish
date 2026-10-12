@@ -1,4 +1,4 @@
-import type { ApiErrorResponse } from '@open-design/contracts';
+import type { ApiErrorResponse } from '@mish/contracts';
 import type { Response } from 'express';
 import {
   workspaceResourceContextFromRequest,

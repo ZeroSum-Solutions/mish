@@ -1,5 +1,5 @@
 import type { APIRequestContext } from '@playwright/test';
-import type { DesignSystemSummary } from '@open-design/contracts';
+import type { DesignSystemSummary } from '@mish/contracts';
 
 export async function approveDesignSystem(request: APIRequestContext, id: string, headers: Record<string, string> = {}): Promise<DesignSystemSummary> {
   // Finish package migration/derived files before approving the exact bytes

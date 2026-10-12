@@ -130,7 +130,7 @@ async function runWatcher(outputFile: string, baseUrl: string): Promise<number> 
         GH_TOKEN: "gh_stub",
         GITHUB_API_URL: baseUrl,
         GITHUB_OUTPUT: outputFile,
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         ORIGIN_RUN_ID: "4242",
         RELEASE_PUBLIC_ORIGIN: "",
         VERSION: "0.21.1-prerelease.3",

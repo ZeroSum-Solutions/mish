@@ -17,7 +17,7 @@ import {
   type DesktopStatusSnapshot,
   type DesktopUpdateResult,
   type WebStatusSnapshot,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   findSidecarProcesses,
   invokeSidecar,
@@ -27,12 +27,12 @@ import {
   type SidecarRestartOptions,
   type SidecarRestartResult,
   type SidecarStamp as ConvergedSidecarStamp,
-} from "@open-design/sidecar";
+} from "@mish/sidecar";
 import {
   createPackageManagerInvocation,
   isProcessAlive,
   readLogTail,
-} from "@open-design/platform";
+} from "@mish/platform";
 
 import { placementOwnerEnv, withoutAmbientPlacementOwner, type PlacementOwnerOptions } from "./placement-owner.js";
 import { adoptionExecutorEnv, type PlacementAdoptionOptions } from "./placement-adoption-helper.js";
@@ -485,8 +485,8 @@ async function spawnWebRuntime(config: ToolDevConfig, options: CliOptions): Prom
 }
 
 async function buildDesktop(config: ToolDevConfig, logHandle: FileHandle): Promise<void> {
-  await logHandle.write(`\n[tools-dev] building @open-design/desktop at ${new Date().toISOString()}\n`);
-  const invocation = createPackageManagerInvocation(["--filter", "@open-design/desktop", "build"], process.env);
+  await logHandle.write(`\n[tools-dev] building @mish/desktop at ${new Date().toISOString()}\n`);
+  const invocation = createPackageManagerInvocation(["--filter", "@mish/desktop", "build"], process.env);
   await runLoggedCommand({
     args: invocation.args,
     command: invocation.command,
@@ -525,8 +525,8 @@ async function ensureDaemonCliBuild(config: ToolDevConfig, logHandle: FileHandle
   if (distMtime > 0 && distMtime >= sourceMtime) return;
 
   const reason = distMtime > 0 ? "source is newer than apps/daemon/dist/cli.js" : "apps/daemon/dist/cli.js is missing";
-  await logHandle.write(`\n[tools-dev] building @open-design/daemon because ${reason} at ${new Date().toISOString()}\n`);
-  const invocation = createPackageManagerInvocation(["--filter", "@open-design/daemon", "build"], process.env);
+  await logHandle.write(`\n[tools-dev] building @mish/daemon because ${reason} at ${new Date().toISOString()}\n`);
+  const invocation = createPackageManagerInvocation(["--filter", "@mish/daemon", "build"], process.env);
   await runLoggedCommand({
     args: invocation.args,
     command: invocation.command,
@@ -552,8 +552,8 @@ async function ensureContractsBuild(config: ToolDevConfig, logHandle: FileHandle
   const reason = distMtime > 0
     ? "source is newer than packages/contracts/dist/index.d.ts"
     : "packages/contracts/dist/index.d.ts is missing";
-  await logHandle.write(`\n[tools-dev] building @open-design/contracts because ${reason} at ${new Date().toISOString()}\n`);
-  const invocation = createPackageManagerInvocation(["--filter", "@open-design/contracts", "build"], process.env);
+  await logHandle.write(`\n[tools-dev] building @mish/contracts because ${reason} at ${new Date().toISOString()}\n`);
+  const invocation = createPackageManagerInvocation(["--filter", "@mish/contracts", "build"], process.env);
   await runLoggedCommand({
     args: invocation.args,
     command: invocation.command,
@@ -1144,7 +1144,7 @@ function addPortOptions(command: ReturnType<typeof cli.command>) {
     .option("--daemon-port <port>", "force daemon port; conflict quick-fails")
     .option("--web-port <port>", "force web port; conflict quick-fails")
     .option("--desktop-user-data-dir <path>", "opt-in private Electron profile directory (absolute path)")
-    .option("--prod", "use production build (requires pnpm --filter @open-design/web build first)")
+    .option("--prod", "use production build (requires pnpm --filter @mish/web build first)")
     .option("--placement-owner-binding <path>", "explicit native placement owner binary (.node); requires sha256 and provenance")
     .option("--placement-owner-sha256 <hex>", "expected SHA-256 of --placement-owner-binding")
     .option("--placement-owner-provenance <path>", "provenance record produced by the explicit owner build")

@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/21st-catalog",
+  "name": "@mish/21st-catalog",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -23,7 +23,7 @@
     "21st-thumbnails": "node --experimental-strip-types scripts/twenty-first-thumbnails.ts --fetch"
   },
   "devDependencies": {
-    "@open-design/contracts": "workspace:*",
+    "@mish/contracts": "workspace:*",
     "@types/node": "24.12.2",
     "sharp": "0.35.3",
     "typescript": "5.9.3"

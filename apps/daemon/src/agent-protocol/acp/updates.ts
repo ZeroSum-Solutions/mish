@@ -4,7 +4,7 @@
  * event-shape diagnostics. Depends on acp/types, acp/json, and the vela-errors
  * integration; consumed exclusively by acp/session.ts.
  */
-import { isTodoWriteToolName } from '@open-design/contracts';
+import { isTodoWriteToolName } from '@mish/contracts';
 import { createHash } from 'node:crypto';
 import type { JsonObject } from './types.js';
 import { asObject, acpValueKind, objectKeys, extractAcpUpdateText } from './json.js';
@@ -150,7 +150,7 @@ export function promotedAmrRetryStatusPayload(update: JsonObject) {
       retryable: false,
       details: {
         ...amrAccountFailureDetails(failure),
-        promoted_by: 'open_design_acp_retry_status',
+        promoted_by: 'mish_acp_retry_status',
       },
     },
   };
@@ -177,7 +177,7 @@ export function promotedAmrStderrPayload(chunk: string) {
       retryable: false,
       details: {
         ...amrAccountFailureDetails(failure),
-        promoted_by: 'open_design_acp_stderr_retry_status',
+        promoted_by: 'mish_acp_stderr_retry_status',
       },
     },
   };

@@ -42,8 +42,8 @@ afterEach(() => {
 function pluginFolderFiles(folderPath: string): ProjectFile[] {
   return [
     {
-      name: `${folderPath}/open-design.json`,
-      path: `${folderPath}/open-design.json`,
+      name: `${folderPath}/mish.json`,
+      path: `${folderPath}/mish.json`,
       size: 100,
       mtime: 1700000005,
       kind: 'code',

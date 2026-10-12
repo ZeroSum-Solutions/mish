@@ -3,7 +3,7 @@ import { lstat, mkdtemp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 
 import {
   promoteAuthorizedTeamProjectStage,

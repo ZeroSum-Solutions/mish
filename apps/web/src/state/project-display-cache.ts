@@ -1,7 +1,7 @@
 import {
   workspacePrincipalKey,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { workspaceIdentityCacheKey } from '../collab/workspace-identity';
 import type { Project } from '../types';

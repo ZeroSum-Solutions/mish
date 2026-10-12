@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Badge, Button, DisclosureRow, IconButton } from '@open-design/components';
-import type { BadgeTone } from '@open-design/components';
+import { Badge, Button, DisclosureRow, IconButton } from '@mish/components';
+import type { BadgeTone } from '@mish/components';
 import { useI18n } from '../i18n';
 import { Icon } from './Icon';
 

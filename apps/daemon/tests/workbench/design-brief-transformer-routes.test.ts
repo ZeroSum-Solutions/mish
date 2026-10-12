@@ -2,7 +2,7 @@ import type { AddressInfo } from 'node:net';
 import type { Server } from 'node:http';
 import express from 'express';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { BriefTransformerLane } from '@open-design/contracts';
+import type { BriefTransformerLane } from '@mish/contracts';
 import { registerWorkbenchBriefRoutes } from '../../src/routes/workbench-brief.js';
 import { runBriefCli } from '../../src/workbench/brief/cli.js';
 import { createDesignBriefService } from '../../src/workbench/brief/service.js';

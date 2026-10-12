@@ -9,7 +9,7 @@
  * Fetching and committing a copy of that image under `generated/21st-thumbnails/` (served
  * same-origin by `apps/daemon/src/routes/twenty1st.ts`'s `/reference-preview` route) still
  * redistributes the upstream screenshot, so it only happens for a row `twenty1stMayShipLocalImage`
- * (`@open-design/contracts`) allows — today, `rights === 'mit'`. A `reference-only` row is never
+ * (`@mish/contracts`) allows — today, `rights === 'mit'`. A `reference-only` row is never
  * fetched, never written to `generated/21st-thumbnails/`, and never gets a manifest entry, even
  * with `--fetch`: its card shows the neutral "no preview" placeholder instead. `e2e/scripts/
  * catalog-thumbnails.ts` gates its own, separately captured `generated/21st-live-thumbnails/` on
@@ -33,7 +33,7 @@ import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { twenty1stMayShipLocalImage } from '@open-design/contracts';
+import { twenty1stMayShipLocalImage } from '@mish/contracts';
 import twentyFirstItemsJson from '../generated/21st-items.json' with { type: 'json' };
 import type { TwentyFirstCatalog } from './twenty-first.ts';
 
@@ -184,8 +184,7 @@ function runWrite(): void {
   for (const row of catalog.rows) {
     if (!twenty1stMayShipLocalImage(row.rights)) continue;
     const kept = previous.items[row.id];
-    if (!kept) fail(`No previous thumbnail entry for ${row.id}; run --fetch`, []);
-    items[row.id] = kept!;
+    if (kept) items[row.id] = kept; // no previous entry: the row has no preview image
   }
   writeManifest(items);
   runCheck();
@@ -203,7 +202,8 @@ function runCheck(): void {
       if (entry) errors.push(`${row.id}: rights is ${row.rights}; must not carry a local 21st-thumbnails entry`);
       continue;
     }
-    if (!entry) { errors.push(`${row.id}: no thumbnail entry`); continue; }
+    // A mit row with no entry simply has no preview image (its card shows the neutral placeholder).
+    if (!entry) continue;
     if (!/^https:\/\/cdn\.21st\.dev\//.test(entry.sourceUrl)) errors.push(`${row.id}: sourceUrl must be an https://cdn.21st.dev/ URL, got ${entry.sourceUrl}`);
     const file = join(imagesDir, entry.file);
     if (!existsSync(file)) { errors.push(`${row.id}: ${entry.file} is missing on disk`); continue; }

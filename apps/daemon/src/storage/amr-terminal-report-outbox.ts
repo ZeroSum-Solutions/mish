@@ -425,7 +425,7 @@ export function createAmrTerminalReportDeliveryService(input: {
         let commandFailure: ReturnType<typeof failureFrom> | null = null;
         try {
           const receipt = await run(args, {
-            configuredEnv: { VELA_INVOCATION_SOURCE: 'open-design' },
+            configuredEnv: { VELA_INVOCATION_SOURCE: 'mish' },
             timeoutMs,
             maxBuffer: 64 * 1024,
             signal: controller.signal,

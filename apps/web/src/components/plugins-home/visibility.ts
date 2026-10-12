@@ -1,4 +1,4 @@
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 const INTERNAL_BUNDLED_SCENARIOS = new Set([
   'od-media-generation',

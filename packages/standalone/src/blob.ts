@@ -3,7 +3,7 @@ import { createReadStream } from "node:fs";
 import { copyFile, mkdir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 
-import { managedDownload } from "@open-design/download";
+import { managedDownload } from "@mish/download";
 import JSZip from "jszip";
 
 import { canonicalJson, type StandaloneBlob, type StandaloneMaterialization } from "./protocol.js";

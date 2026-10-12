@@ -8,11 +8,11 @@ import { readProjectFile, validateProjectPath } from './projects.js';
 import { assertInsertedUnitPublicationRights, PublicationRightsError } from './workbench/units/publication-rights.js';
 import { load as loadHtml } from 'cheerio';
 import { cssPublicationReferences, fallbackCssPublicationReferences, fallbackScriptPublicationReferences, rewriteCssPublicationReferences, rewriteScriptPublicationReferences, rewriteSrcsetPublicationReferences, scriptPublicationReferences, srcsetPublicationReferences } from './deploy/reference-parser.js';
-import { findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 import { agencyPublicationScope } from './artifacts/deploy-scope.js';
 import { confirmAnonymousPageGet, pageMarkerFromFiles, parsePageMarker, type PageMarker } from './deploy/public-page-probe.js';
 import { bindVercelSite, bindVercelStableAlias, verifyVercelStoredAlias, type VercelBinding } from './deploy/vercel-site.js';
-import type { DeploymentAccess, DeploymentLinkStatus, DeployPublicAccessOutcome, DeployPreflightWarning } from '@open-design/contracts';
+import type { DeploymentAccess, DeploymentLinkStatus, DeployPublicAccessOutcome, DeployPreflightWarning } from '@mish/contracts';
 
 export const VERCEL_PROVIDER_ID = 'vercel-self';
 export const CLOUDFLARE_PAGES_PROVIDER_ID = 'cloudflare-pages';
@@ -199,7 +199,7 @@ export function configureDeployDataDir(dataDir: string): void {
 }
 
 export function deployConfigPath(providerId: DeployProviderId = VERCEL_PROVIDER_ID) {
-  const base = process.env.OD_USER_STATE_DIR || daemonDeployDataDir || path.join(os.homedir(), '.open-design');
+  const base = process.env.OD_USER_STATE_DIR || daemonDeployDataDir || path.join(os.homedir(), '.mish');
   return path.join(base, providerId === CLOUDFLARE_PAGES_PROVIDER_ID ? 'cloudflare-pages.json' : 'vercel.json');
 }
 
@@ -614,7 +614,7 @@ export async function deployToVercel({ config, files, projectId, projectName, pr
   const created = await readVercelJson(createResp);
   if (!createResp.ok) {
     if (createResp.status === 409 || created.error?.code === 'project_name_taken') {
-      const { vercelSiteNameSuggestion } = await import('@open-design/contracts');
+      const { vercelSiteNameSuggestion } = await import('@mish/contracts');
       throw new DeployError('The Vercel site name is taken.', 409, { suggestion: vercelSiteNameSuggestion(binding.vercelProjectName, '2') }, 'VERCEL_NAME_TAKEN');
     }
     throw vercelError(created, createResp.status);
@@ -2388,7 +2388,7 @@ export function injectDeployHookScript(html: string, scriptUrl: unknown) {
 
   const tag =
     `<script src="${escapeHtmlAttribute(normalized)}" defer ` +
-    'data-open-design-deploy-hook="true" data-closeable="true"></script>';
+    'data-mish-deploy-hook="true" data-closeable="true"></script>';
   // The document's own `</body>`, not one an author wrote into a script string:
   // splicing there would end their script with this tag's `</script>` and leak
   // the rest of it onto the deployed page (upstream #7410).

@@ -1,22 +1,5 @@
 {
   "_comment": "Hand-reviewed exceptions to the generic HYPERUI_GROUP_SECTION_KIND / FAMILY_SECTION_TYPE_KIND tables in scripts/build-catalog.ts, keyed by the final entry id. Each key must match a generated entry or build-catalog.ts throws — this file cannot silently go stale. Keep it short: an entry belongs here only when the table's generic reading of its group/type is clearly wrong for this specific section, not as a place to re-derive the whole catalog by hand.",
-
-  "family-section:emmpo:emmpo-career": {
-    "sectionKind": "cta-band",
-    "_why": "The 'career quiz' callout is a promotional call to action, not a feature list — the generic emmpo type table has no entry for 'career', so this overrides the 'unclassified' fallback."
-  },
-  "family-section:emmpo:emmpo-social": {
-    "sectionKind": "proof-gallery",
-    "_why": "The social gallery shows finished/past work images, closer to a proof gallery than a generic list."
-  },
-  "family-section:halcyon:now-showing": {
-    "sectionKind": "proof-gallery",
-    "_why": "The current-exhibit showcase is a gallery of what's on display, not a generic feature list."
-  },
-  "family-section:maren:care": {
-    "sectionKind": "specifications",
-    "_why": "Care instructions read as exact-figure/technical spec content (materials, cleaning, handling), closer to specifications than a generic section."
-  },
   "family-section:nonprofit:nonprofit-stories": {
     "sectionKind": "testimonials",
     "_why": "First-person impact stories are attributed personal accounts, structurally closest to testimonials even though the taxonomy definition names customers rather than beneficiaries."

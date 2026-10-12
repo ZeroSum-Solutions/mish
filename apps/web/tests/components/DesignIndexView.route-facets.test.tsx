@@ -7,7 +7,7 @@
 
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { familyRegistry, shapeAtlas } from '@open-design/agency-fast-lane/data';
+import { familyRegistry, shapeAtlas } from '@mish/agency-fast-lane/data';
 
 import { DesignIndexView } from '../../src/components/DesignIndexView';
 import { DESIGN_INDEX_CHANGED_EVENT } from '../../src/state/design-index';
@@ -109,7 +109,7 @@ describe('DesignIndexView route facets', () => {
     await settle();
 
     fireEvent.change(screen.getByTestId('design-index-facet-spine'), { target: { value: 'TL' } });
-    fireEvent.change(screen.getByTestId('design-index-facet-family'), { target: { value: 'watson' } });
+    fireEvent.change(screen.getByTestId('design-index-facet-family'), { target: { value: 'practice' } });
     await act(async () => {
       fireEvent.click(screen.getByTestId('design-index-search'));
       await Promise.resolve();
@@ -118,7 +118,7 @@ describe('DesignIndexView route facets', () => {
 
     const query = calls.at(-1) ?? '';
     expect(query).toContain('spine=TL');
-    expect(query).toContain('family=watson');
+    expect(query).toContain('family=practice');
   });
 
   it('tells Home when a stored profile is removed', async () => {

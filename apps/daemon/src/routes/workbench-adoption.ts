@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import { parseApplyAdoptionRequest, parseCatalogueAdoptionRequest, parseCatalogueSavedUnitDeleteResponse, parseCatalogueSaveRequest, parsePrepareAdoptionRequest, type WorkbenchAdoptionStatusResponse } from '@open-design/contracts';
+import { parseApplyAdoptionRequest, parseCatalogueAdoptionRequest, parseCatalogueSavedUnitDeleteResponse, parseCatalogueSaveRequest, parsePrepareAdoptionRequest, type WorkbenchAdoptionStatusResponse } from '@mish/contracts';
 import type { AuthorizeProjectRequest } from '../collab/project-request-authority.js';
 import { resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';
 import { validateLocalDaemonRequest } from '../http/local-daemon-request.js';
@@ -8,7 +8,7 @@ import type { CatalogueMaterialSource } from '../workbench/adoption/catalogue-ma
 import { referenceAdoptionRefusal } from '../workbench/reference-sources.js';
 import path from 'node:path';
 import type { ComponentGateTarget } from '../workbench/component-target.js';
-import type { ResourceRef } from '@open-design/contracts';
+import type { ResourceRef } from '@mish/contracts';
 import { createShadcnCatalogueMaterials } from '../workbench/adoption/shadcn-material.js';
 import { CatalogueSavedUnitStore, SavedUnitError } from '../workbench/adoption/saved-units.js';
 import { createGsapRecipeMaterials } from '../workbench/recipes/gsap/index.js';

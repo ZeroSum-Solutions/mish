@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 2,
+  "family": "ownedcontractor",
+  "revision": 1,
+  "brand": {
+    "name": "Fixture"
+  },
+  "sections": [
+    {
+      "id": "ownedcontractor-0",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "hero",
+      "type": "hero",
+      "content": {
+        "heading": "Fixture hours",
+        "railKey4": "Contact",
+        "railValue4": "Fixture"
+      }
+    },
+    {
+      "id": "ownedcontractor-2",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedcontractor-3",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedcontractor-4",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedcontractor-5",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedcontractor-6",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedcontractor-7",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedcontractor-8",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "footer",
+      "type": "footer",
+      "content": {
+        "hours1": "Monday-Friday 7am-5pm",
+        "hours2": "Saturday by appointment"
+      }
+    }
+  ]
+}

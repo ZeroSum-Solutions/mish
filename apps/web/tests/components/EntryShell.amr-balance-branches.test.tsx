@@ -31,7 +31,7 @@ import {
   buildWorkspaceSeatSummary,
   type AmrWalletSnapshot,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EntryShell } from '../../src/components/EntryShell';
@@ -45,6 +45,10 @@ import { checkAmrBalanceGate } from '../../src/runtime/amr-balance-gate';
 import type { AgentInfo, AppConfig } from '../../src/types';
 import { setHomeHeroPrompt } from '../helpers/home-hero-lexical';
 import { workspaceDirectoryFixture } from '../helpers/workspace-context';
+import { useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 vi.mock('../../src/components/workbench/WorkbenchImprovePrompt', () => ({
   WorkbenchImprovePrompt: ({ onUsePreview }: { onUsePreview: (preview: unknown) => void }) => (

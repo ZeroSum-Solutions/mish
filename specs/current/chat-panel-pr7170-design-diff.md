@@ -175,7 +175,7 @@ Risks and gates:
 
 1. Focused unit/component suites for each owner.
 2. 24/88 ledger coverage report plus all 89 design-row screenshots.
-3. `pnpm --filter @open-design/web typecheck`, focused web tests, `pnpm guard`, repository typecheck.
+3. `pnpm --filter @mish/web typecheck`, focused web tests, `pnpm guard`, repository typecheck.
 4. Browser E2E at constrained width with local service only; full matrix/CI may run remotely.
 5. Prompt parity and all 19 locale compile checks when any host copy or prompt changes.
 6. Previous-release DB replay and current-main replay before beta packaging.

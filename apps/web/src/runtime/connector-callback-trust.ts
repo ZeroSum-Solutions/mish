@@ -1,6 +1,6 @@
-import { CONNECTOR_CALLBACK_NONCE_PATTERN } from '@open-design/contracts';
+import { CONNECTOR_CALLBACK_NONCE_PATTERN } from '@mish/contracts';
 
-export const CONNECTOR_CALLBACK_MESSAGE_TYPE = 'open-design:connector-connected';
+export const CONNECTOR_CALLBACK_MESSAGE_TYPE = 'mish:connector-connected';
 
 // A connector OAuth flow can take a while (provider login, MFA), so a nonce
 // stays valid well past a typical consent screen.

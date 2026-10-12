@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { buildSrcdoc } from '../runtime/srcdoc';
 import { useBrandFonts } from './DesignKitView';
 import { useT } from '../i18n';

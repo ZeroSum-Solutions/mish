@@ -21,7 +21,7 @@
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 
 afterEach(cleanup);
 

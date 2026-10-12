@@ -15,11 +15,15 @@
 // than fixed to show a real value.
 
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
-import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@mish/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EntryNavRail, resetWorkspaceDirectoryCache } from '../../src/components/EntryNavRail';
 import { I18nProvider } from '../../src/i18n';
+import { TEST_AMR_CONSOLE_ORIGIN, useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const originalFetch = globalThis.fetch;
 
@@ -183,7 +187,7 @@ describe('account menu billing card — workspace-aware upgrade routing', () => 
       expect(openSpy).toHaveBeenCalledTimes(1);
       const target = new URL(String(openSpy.mock.calls[0]![0]));
       expect(`${target.origin}${target.pathname}`).toBe(
-        'https://open-design.ai/amr/dashboard',
+        `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
       );
       expect(target.searchParams.get('billing')).toBe('plan');
     },

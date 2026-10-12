@@ -28,7 +28,7 @@ async function exportSyntheticStderr(chunk: string, redaction: { username?: stri
     { event: "error", data: { code: "SAFE_ERROR_MARKER" } },
   ].map((record) => JSON.stringify(record)).join(separator) + separator, "utf8");
   const result = await buildDiagnosticsZip({
-    context: { app: { name: "open-design" }, source: "synthetic-test" },
+    context: { app: { name: "mish" }, source: "synthetic-test" },
     sources: await buildRunEventLogSources(runsDir),
     redaction,
   });
@@ -102,7 +102,7 @@ describe("buildDiagnosticsZip", () => {
     await writeFile(join(tempDir, 'first.log'), 'first-public-marker');
     await writeFile(join(tempDir, 'second.log'), 'second-public-marker');
     const result = await buildDiagnosticsZip({
-      context: { app: { name: 'open-design' }, source: 'synthetic-test' },
+      context: { app: { name: 'mish' }, source: 'synthetic-test' },
       sources: [
         { name: `logs/${first}.log`, absolutePath: join(tempDir, 'first.log'), kind: 'text' },
         { name: `logs/${second}.log`, absolutePath: join(tempDir, 'second.log'), kind: 'text' },
@@ -122,7 +122,7 @@ describe("buildDiagnosticsZip", () => {
     expect(contents.join('\n')).toContain('public-summary-marker');
     expect(await zip.file('logs/missing.log')!.async('string')).toContain('file unavailable');
     const again = await buildDiagnosticsZip({
-      context: { app: { name: 'open-design' }, source: 'synthetic-test' },
+      context: { app: { name: 'mish' }, source: 'synthetic-test' },
       sources: [
         { name: `logs/${first}.log`, absolutePath: join(tempDir, 'first.log'), kind: 'text' },
         { name: `logs/${second}.log`, absolutePath: join(tempDir, 'second.log'), kind: 'text' },
@@ -164,7 +164,7 @@ describe("buildDiagnosticsZip", () => {
     const original = 'logs/person@example.invalid';
     await writeFile(join(tempDir, 'email.log'), 'public-marker');
     const result = await buildDiagnosticsZip({
-      context: { app: { name: 'open-design' }, source: 'synthetic-test' },
+      context: { app: { name: 'mish' }, source: 'synthetic-test' },
       sources: [{ name: original, absolutePath: join(tempDir, 'email.log'), kind: 'text' }],
     });
     const zip = await JSZip.loadAsync(result.zip);
@@ -178,7 +178,7 @@ describe("buildDiagnosticsZip", () => {
     await writeFile(join(tempDir, 'email.log'), 'email-file-public-marker');
     await writeFile(join(tempDir, 'public.log'), 'existing-file-public-marker');
     const result = await buildDiagnosticsZip({
-      context: { app: { name: 'open-design' }, source: 'synthetic-test' },
+      context: { app: { name: 'mish' }, source: 'synthetic-test' },
       sources: [
         { name: original, absolutePath: join(tempDir, 'email.log'), kind: 'text' },
         { name: publicName, absolutePath: join(tempDir, 'public.log'), kind: 'text' },
@@ -540,7 +540,7 @@ describe("buildDiagnosticsZip", () => {
     const sources = await buildRunEventLogSources(runsDir);
     expect(sources).toHaveLength(1);
     const result = await buildDiagnosticsZip({
-      context: { app: { name: "open-design" }, source: "synthetic-test" },
+      context: { app: { name: "mish" }, source: "synthetic-test" },
       sources,
     });
     const zip = await JSZip.loadAsync(result.zip);
@@ -573,7 +573,7 @@ describe("buildDiagnosticsZip", () => {
     const logPath = join(tempDir, "nested-events.jsonl");
     await writeFile(logPath, JSON.stringify({ event: "stderr", data: { chunk }, marker: "safe-marker" }) + "\r\n", "utf8");
     const result = await buildDiagnosticsZip({
-      context: { app: { name: "open-design" }, source: "synthetic-test" },
+      context: { app: { name: "mish" }, source: "synthetic-test" },
       sources: [{ name: "runs/nested/events.jsonl", absolutePath: logPath, kind: "text" }],
     });
     const zip = await JSZip.loadAsync(result.zip);
@@ -597,7 +597,7 @@ describe("buildDiagnosticsZip", () => {
 
     const result = await buildDiagnosticsZip({
       context: {
-        app: { name: "open-design", version: "1.2.3", packaged: false },
+        app: { name: "mish", version: "1.2.3", packaged: false },
         source: "test",
         namespace: "default",
       },
@@ -610,7 +610,7 @@ describe("buildDiagnosticsZip", () => {
     expect(log).toContain("token=[REDACTED]");
 
     const manifest = JSON.parse(await zip.file("summary/manifest.json")!.async("string"));
-    expect(manifest.app.name).toBe("open-design");
+    expect(manifest.app.name).toBe("mish");
     expect(manifest.namespace).toBe("default");
     expect(manifest.files[0].name).toBe("logs/daemon/latest.log");
     expect(manifest.warnings).toEqual([]);
@@ -623,7 +623,7 @@ describe("buildDiagnosticsZip", () => {
 
   it("includes redacted in-memory summaries for failures that happened before a run existed", async () => {
     const result = await buildDiagnosticsZip({
-      context: { app: { name: "open-design" }, source: "test" },
+      context: { app: { name: "mish" }, source: "test" },
       sources: [],
       redaction: { username: "alice" },
       summaries: {
@@ -644,7 +644,7 @@ describe("buildDiagnosticsZip", () => {
   it("records a warning placeholder when a file cannot be read", async () => {
     const result = await buildDiagnosticsZip({
       context: {
-        app: { name: "open-design" },
+        app: { name: "mish" },
         source: "test",
       },
       sources: [{ name: "logs/missing.log", absolutePath: join(tempDir, "no-such.log"), kind: "text" }],

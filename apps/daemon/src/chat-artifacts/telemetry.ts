@@ -8,7 +8,7 @@
 // sizes, prompts, or snapshot URLs — a snapshot is a copy of the user's own
 // design work, and the failure code is the whole diagnostic.
 
-import type { ChatArtifactCaptureResultProps } from '@open-design/contracts';
+import type { ChatArtifactCaptureResultProps } from '@mish/contracts';
 
 import type { CaptureRunChatArtifactsReport } from './run-capture.js';
 

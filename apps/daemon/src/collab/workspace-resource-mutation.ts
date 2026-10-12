@@ -13,7 +13,7 @@
 // canSendTo) that only make sense for a project; this module owns the part
 // that generalizes cleanly: reading the caller's workspace identity off
 // headers, and deciding whether a caller may mutate a bound resource row.
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import type { Response } from 'express';
 
 export type WorkspaceResourceContext = {
@@ -66,7 +66,7 @@ type RequestAuthorityCacheEntry = {
   promise: Promise<WorkspaceRequestAuthorityResult>;
 };
 
-const REQUEST_AUTHORITY_CACHE = Symbol('open-design.workspace-request-authority');
+const REQUEST_AUTHORITY_CACHE = Symbol('mish.workspace-request-authority');
 
 /**
  * One mutation request can pass through more than one independent resource

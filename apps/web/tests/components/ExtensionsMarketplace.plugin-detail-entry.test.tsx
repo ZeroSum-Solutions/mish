@@ -7,7 +7,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
-import { InstalledPluginRecordSchema } from '@open-design/contracts';
+import { InstalledPluginRecordSchema } from '@mish/contracts';
 
 import { ExtensionsMarketplace } from '../../src/components/PluginsView';
 import { MarketplaceView } from '../../src/components/MarketplaceView';
@@ -39,7 +39,7 @@ const INSTALLED_OFFICIAL = InstalledPluginRecordSchema.parse({
   sourceKind: 'bundled',
   source: '/plugins/_official/build-test',
   sourceMarketplaceId: 'official',
-  sourceMarketplaceEntryName: 'open-design/build-test',
+  sourceMarketplaceEntryName: 'mish/build-test',
   trust: 'bundled',
   capabilitiesGranted: [],
   manifest: {
@@ -63,7 +63,7 @@ function bundledInternal(
     ...INSTALLED_OFFICIAL,
     id,
     title,
-    sourceMarketplaceEntryName: `open-design/${id}`,
+    sourceMarketplaceEntryName: `mish/${id}`,
     manifest: {
       name: id,
       title,
@@ -83,23 +83,23 @@ const INTERNAL_OFFICIALS = [
 const MARKETPLACES = [
   {
     id: 'official',
-    url: 'https://open-design.ai/marketplace/open-design-marketplace.json',
+    url: 'https://github.com/ZeroSum-Solutions/mish/marketplace/mish-marketplace.json',
     trust: 'official',
     manifest: {
       name: 'Mishh Mashh Official',
       version: '1.0.0',
       plugins: [
         {
-          name: 'open-design/build-test',
+          name: 'mish/build-test',
           title: 'Build test',
-          source: 'github:nexu-io/open-design@main/plugins/_official/build-test',
+          source: 'github:ZeroSum-Solutions/mish@main/plugins/_official/build-test',
           version: '0.1.0',
           description: 'A real installed Official plugin.',
         },
         ...INTERNAL_OFFICIALS.map((record) => ({
-          name: `open-design/${record.id}`,
+          name: `mish/${record.id}`,
           title: record.title,
-          source: `github:nexu-io/open-design@main/plugins/_official/${record.id}`,
+          source: `github:ZeroSum-Solutions/mish@main/plugins/_official/${record.id}`,
           version: record.version,
           description: record.manifest.description,
         })),
@@ -108,7 +108,7 @@ const MARKETPLACES = [
   },
   {
     id: 'community',
-    url: 'https://open-design.ai/marketplace/community.json',
+    url: 'https://github.com/ZeroSum-Solutions/mish/marketplace/community.json',
     trust: 'restricted',
     manifest: {
       name: 'Community',
@@ -191,7 +191,7 @@ describe('ExtensionsMarketplace installed plugin detail entry', () => {
 
     fireEvent.click(
       await screen.findByTestId(
-        'plugins-card-official:open-design/build-test:0.1.0',
+        'plugins-card-official:mish/build-test:0.1.0',
       ),
     );
 
@@ -207,7 +207,7 @@ describe('ExtensionsMarketplace installed plugin detail entry', () => {
     await waitFor(() => {
       expect(window.location.pathname).toBe('/plugins');
       expect(screen.getByTestId(
-        'plugins-card-official:open-design/build-test:0.1.0',
+        'plugins-card-official:mish/build-test:0.1.0',
       )).toBeTruthy();
     });
     expect(screen.queryByTestId('plugin-detail')).toBeNull();

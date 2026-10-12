@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { parseRightsAssessment, SOURCE_OPERATIONS, type ConnectorSearchRequest } from '@open-design/contracts';
+import { parseRightsAssessment, SOURCE_OPERATIONS, type ConnectorSearchRequest } from '@mish/contracts';
 
 export const REFERO_EVIDENCE = 'docs/plans/2026-10-02-design-workbench/evidence/refero-b069.md';
 export const REFERO_SERVER_ID = 'refero';

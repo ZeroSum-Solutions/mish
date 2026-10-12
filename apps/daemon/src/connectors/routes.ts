@@ -5,7 +5,7 @@ import type { Express, Request, RequestHandler, Response } from 'express';
 
 import { checkConnectorAccess, type ToolTokenGrant } from '../tool-tokens.js';
 import { serializeJsonForInlineScript } from '../http/oauth-result-page.js';
-import { CONNECTOR_CALLBACK_NONCE_PATTERN } from '@open-design/contracts';
+import { CONNECTOR_CALLBACK_NONCE_PATTERN } from '@mish/contracts';
 import { validateBoundedJsonObject } from '../live-artifacts/schema.js';
 import { executeConnectorTool, listConnectorTools } from '../tools/connectors.js';
 import { readComposioConfig, readPublicComposioConfig, writeComposioConfig } from './composio-config.js';
@@ -515,7 +515,7 @@ function renderConnectorConnectedHtml(connectorId: string, callbackNonce?: strin
         const connectorId = ${connectorIdJson};
         const connectorLabel = ${connectorLabelJson};
         const callbackNonce = ${callbackNonceJson};
-        const message = { type: 'open-design:connector-connected', connectorId, connectorLabel };
+        const message = { type: 'mish:connector-connected', connectorId, connectorLabel };
         if (callbackNonce) message.callbackNonce = callbackNonce;
         const closeButton = document.getElementById('close-window');
         const hint = document.getElementById('auto-close-hint');

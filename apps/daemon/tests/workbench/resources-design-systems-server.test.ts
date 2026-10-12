@@ -1,6 +1,6 @@
 import type { Server } from 'node:http';
 import { describe, expect, it } from 'vitest';
-import { parseResourceSearchResponse } from '@open-design/contracts';
+import { parseResourceSearchResponse } from '@mish/contracts';
 import { startServer } from '../../src/server.js';
 
 describe('design-systems inventory on a real daemon', () => {

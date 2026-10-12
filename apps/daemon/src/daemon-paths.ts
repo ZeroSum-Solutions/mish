@@ -20,7 +20,7 @@ export function resolveDaemonCliPath(env: NodeJS.ProcessEnv = process.env): stri
   const configured = cleanOptionalPath(env[DAEMON_CLI_PATH_ENV]) ?? cleanOptionalPath(env.OD_BIN);
   if (configured) return configured;
 
-  const packageJsonPath = require.resolve('@open-design/daemon/package.json');
+  const packageJsonPath = require.resolve('@mish/daemon/package.json');
   return path.join(path.dirname(packageJsonPath), 'dist', 'cli.js');
 }
 
@@ -51,7 +51,7 @@ export function resolveProcessResourcesPath(): string | null {
 
   const normalizedExecPath = process.execPath.toLowerCase();
   const windowsResourceBinMarker =
-    `${path.sep}resources${path.sep}open-design${path.sep}bin${path.sep}`.toLowerCase();
+    `${path.sep}resources${path.sep}mish${path.sep}bin${path.sep}`.toLowerCase();
   const windowsMarkerIndex = normalizedExecPath.indexOf(windowsResourceBinMarker);
   if (windowsMarkerIndex !== -1) {
     return process.execPath.slice(

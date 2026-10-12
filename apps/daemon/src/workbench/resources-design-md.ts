@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { readdir, realpath } from 'node:fs/promises';
 import path from 'node:path';
-import type { ResourceCandidate, ResourceSourceSnapshot } from '@open-design/contracts';
+import type { ResourceCandidate, ResourceSourceSnapshot } from '@mish/contracts';
 import { readPackageFile } from './resources-design-systems.js';
 import type { OwnedKitListing } from './resources-user-design-systems.js';
 import type { ResourceSourceAdapter } from './resources.js';

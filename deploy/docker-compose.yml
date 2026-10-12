@@ -1,9 +1,9 @@
-name: open-design
+name: mish
 
 services:
-  open-design:
-    container_name: open-design
-    image: ${OPEN_DESIGN_IMAGE:-ghcr.io/nexu-io/od:latest}
+  mish:
+    container_name: mish
+    image: ${MISH_IMAGE:-ghcr.io/zerosum-solutions/mish:latest}
     build:
       context: ..
       dockerfile: deploy/Dockerfile
@@ -12,22 +12,22 @@ services:
       NODE_ENV: production
       NODE_OPTIONS: ${NODE_OPTIONS:---max-old-space-size=192}
       OD_BIND_HOST: 0.0.0.0
-      OD_ALLOWED_ORIGINS: ${OPEN_DESIGN_ALLOWED_ORIGINS:-}
+      OD_ALLOWED_ORIGINS: ${MISH_ALLOWED_ORIGINS:-}
       OD_PORT: 7456
-      OD_WEB_PORT: ${OPEN_DESIGN_PORT:-7456}
+      OD_WEB_PORT: ${MISH_PORT:-7456}
       OD_API_TOKEN: ${OD_API_TOKEN:-}
-      OD_DISABLE_API_AUTH: ${OPEN_DESIGN_DISABLE_API_AUTH:-}
+      OD_DISABLE_API_AUTH: ${MISH_DISABLE_API_AUTH:-}
       OD_CODEX_SANDBOX: ${OD_CODEX_SANDBOX:-}
     ports:
-      - "127.0.0.1:${OPEN_DESIGN_PORT:-7456}:7456"
+      - "127.0.0.1:${MISH_PORT:-7456}:7456"
     volumes:
-      - open_design_data:/app/.od
+      - mish_data:/app/.od
     read_only: true
     tmpfs:
       - /tmp
     security_opt:
       - no-new-privileges:true
-    mem_limit: ${OPEN_DESIGN_MEM_LIMIT:-384m}
+    mem_limit: ${MISH_MEM_LIMIT:-384m}
     pids_limit: 256
     healthcheck:
       test:
@@ -43,4 +43,4 @@ services:
       start_period: 20s
 
 volumes:
-  open_design_data:
+  mish_data:

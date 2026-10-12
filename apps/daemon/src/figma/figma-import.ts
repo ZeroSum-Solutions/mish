@@ -12,7 +12,7 @@ import { promises as fsp } from 'node:fs';
 import type {
   FigmaImportResult,
   FigmaInventory,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   walkNode,
   liftTokens,

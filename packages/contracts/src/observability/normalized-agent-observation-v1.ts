@@ -8,7 +8,7 @@ import {
 import { StrategyInputStageV2Schema } from '../plugins/strategy-v2.js';
 
 export const NORMALIZED_AGENT_OBSERVATION_V1_SCHEMA =
-  'open-design.normalized-agent-observation/v1' as const;
+  'mish.normalized-agent-observation/v1' as const;
 
 const nonEmptyStringSchema = z.string().trim().min(1);
 const nonNegativeNumberSchema = z.number().finite().nonnegative();
@@ -543,7 +543,7 @@ export type ObservationTurnAccountingV1 = z.infer<
   typeof ObservationTurnAccountingV1Schema
 >;
 
-export const SAFE_RUN_QUALITY_V1_SCHEMA = 'open-design.safe-run-quality/v1' as const;
+export const SAFE_RUN_QUALITY_V1_SCHEMA = 'mish.safe-run-quality/v1' as const;
 
 export const SafeObservationTextV1Schema = z.object({
   text: z.string(),
@@ -593,7 +593,7 @@ export const SafeObservationManifestEntryV1Schema = z.object({
   extension: nonEmptyStringSchema.optional(),
   redacted: z.boolean(),
   truncated: z.boolean(),
-  stored_in_open_design: z.boolean().optional(),
+  stored_in_mish: z.boolean().optional(),
   retention_policy: nonEmptyStringSchema.optional(),
   access_scope: nonEmptyStringSchema.optional(),
   sensitivity: nonEmptyStringSchema.optional(),
@@ -608,7 +608,7 @@ export const SafeObservationManifestEntryV1Schema = z.object({
   build_status: nonEmptyStringSchema.optional(),
   preview_status: nonEmptyStringSchema.optional(),
   export_status: nonEmptyStringSchema.optional(),
-  open_in_open_design_url: z.string().nullable().optional(),
+  open_in_mish_url: z.string().nullable().optional(),
   access_policy: nonEmptyStringSchema.optional(),
 }).strict();
 export type SafeObservationManifestEntryV1 = z.infer<

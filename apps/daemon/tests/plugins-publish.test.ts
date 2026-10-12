@@ -14,11 +14,11 @@ import {
 } from '../src/plugins/publish.js';
 
 const META = {
-  pluginId:          'open-design/sample-plugin',
+  pluginId:          'mish/sample-plugin',
   pluginVersion:     '1.0.0',
   pluginTitle:       'Sample Plugin',
   pluginDescription: 'A fixture for the publish flow.',
-  repoUrl:           'https://github.com/open-design/sample-plugin',
+  repoUrl:           'https://github.com/mish/sample-plugin',
 };
 
 describe('buildPublishLink', () => {
@@ -27,7 +27,7 @@ describe('buildPublishLink', () => {
       'anthropics-skills',
       'awesome-agent-skills',
       'clawhub',
-      'open-design',
+      'mish',
       'skills-sh',
     ].sort());
   });
@@ -40,7 +40,7 @@ describe('buildPublishLink', () => {
     const params = new URLSearchParams(link.url.split('?')[1]);
     expect(params.get('title')).toBe('Add Sample Plugin');
     expect(params.get('body')).toContain('A fixture for the publish flow.');
-    expect(link.prBody).toContain('https://github.com/open-design/sample-plugin');
+    expect(link.prBody).toContain('https://github.com/mish/sample-plugin');
   });
 
   it('builds a github-issue URL for awesome-agent-skills', () => {
@@ -56,17 +56,17 @@ describe('buildPublishLink', () => {
   it('points at skills.sh + the npx skills add command (no PR form there)', () => {
     const link = buildPublishLink({ catalog: 'skills-sh', meta: META });
     expect(link.url).toBe('https://skills.sh/');
-    expect(link.prBody).toContain('npx skills add open-design/sample-plugin');
+    expect(link.prBody).toContain('npx skills add mish/sample-plugin');
   });
 
   it('builds a Mishh Mashh registry submission URL', () => {
     // Submissions land in the private Mishh Mashh repository
     // (plugins/community/<plugin-name>/), not in the upstream project.
-    const link = buildPublishLink({ catalog: 'open-design', meta: META });
+    const link = buildPublishLink({ catalog: 'mish', meta: META });
     expect(link.catalogLabel).toBe('ZeroSum-Solutions/Mishh-Mashh-2');
     expect(link.url).toMatch(/^https:\/\/github\.com\/ZeroSum-Solutions\/Mishh-Mashh-2\/issues\/new\?/);
-    expect(link.prBody).toContain('plugins/community/<plugin-name>/open-design.json');
-    expect(link.prBody).toContain('plugins/registry/community/open-design-marketplace.json');
+    expect(link.prBody).toContain('plugins/community/<plugin-name>/mish.json');
+    expect(link.prBody).toContain('plugins/registry/community/mish-marketplace.json');
   });
 
   it('falls back to owner/repo placeholder when repoUrl is missing for skills-sh', () => {
@@ -97,12 +97,12 @@ describe('upsertMarketplaceJsonEntry', () => {
 
     expect(outcome.inserted).toBe(true);
     expect(outcome.entry).toMatchObject({
-      name: 'open-design/sample-plugin',
-      source: 'github:open-design/sample-plugin',
+      name: 'mish/sample-plugin',
+      source: 'github:mish/sample-plugin',
       version: '1.0.0',
       title: 'Sample Plugin',
       publisher: {
-        github: 'open-design',
+        github: 'mish',
       },
     });
     expect(outcome.manifest.plugins).toHaveLength(1);
@@ -119,8 +119,8 @@ describe('upsertMarketplaceJsonEntry', () => {
         extra: true,
         plugins: [
           {
-            name: 'open-design/sample-plugin',
-            source: 'github:open-design/sample-plugin@old',
+            name: 'mish/sample-plugin',
+            source: 'github:mish/sample-plugin@old',
             version: '0.9.0',
             tags: ['kept'],
           },
@@ -129,15 +129,15 @@ describe('upsertMarketplaceJsonEntry', () => {
       meta: {
         ...META,
         pluginVersion: '1.1.0',
-        repoUrl: 'https://github.com/open-design/sample-plugin/tree/main/plugins/sample',
+        repoUrl: 'https://github.com/mish/sample-plugin/tree/main/plugins/sample',
       },
     });
 
     expect(outcome.inserted).toBe(false);
     expect(outcome.manifest.extra).toBe(true);
     expect(outcome.manifest.plugins[0]).toMatchObject({
-      name: 'open-design/sample-plugin',
-      source: 'github:open-design/sample-plugin@main/plugins/sample',
+      name: 'mish/sample-plugin',
+      source: 'github:mish/sample-plugin@main/plugins/sample',
       version: '1.1.0',
       tags: ['kept'],
     });
@@ -149,7 +149,7 @@ describe('upsertMarketplaceJsonEntry', () => {
       meta: {
         pluginId: 'sample-plugin',
         pluginVersion: '1.0.0',
-        repoUrl: 'https://github.com/open-design/sample-plugin',
+        repoUrl: 'https://github.com/mish/sample-plugin',
       },
     })).toThrow(PublishError);
   });

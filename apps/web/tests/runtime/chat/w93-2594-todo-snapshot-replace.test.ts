@@ -14,7 +14,7 @@
  *   ② 顺序  —— 药丸说「第 6 步」,壳里当前那条排在第 9 位
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { planPillState } from '../../../src/runtime/chat/plan-pill';
 import type { ExecutionShell, TodoSegment, TurnBlock } from '../../../src/runtime/chat/contract';
@@ -33,7 +33,7 @@ const todoWrite = (
 } as PersistedAgentEvent);
 
 const INIT = 'Init clone scaffold (NOTES.md, RECON/)';
-const SEARCH = 'Search GitHub for real source of open-design.ai';
+const SEARCH = 'Search GitHub for real source of mish.invalid';
 const RECON = 'Recon the original site (CDP probe + screenshots)';
 const HARVEST = 'Harvest fonts/images/assets to local';
 const ASSESS = 'Assess complexity (L1-L6) and pick fidelity path';

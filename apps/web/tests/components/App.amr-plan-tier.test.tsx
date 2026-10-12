@@ -363,7 +363,7 @@ describe('App AMR plan-tier gate', () => {
         ]));
       }
       if (url.includes('/api/workspace/billing?')) {
-        const workspaceId = new URL(url, 'http://open-design.test')
+        const workspaceId = new URL(url, 'http://mish.test')
           .searchParams.get('workspaceId');
         const context = workspaceId === projectTeamContext.workspaceId
           ? projectTeamContext

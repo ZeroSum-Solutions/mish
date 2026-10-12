@@ -2,7 +2,7 @@ import { copyFileSync, mkdirSync, mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { ResourceRequestContext } from '@open-design/contracts';
+import type { ResourceRequestContext } from '@mish/contracts';
 import { bundledFontCatalogue, type FontCatalogue } from '../../src/fonts/catalogue.js';
 
 /** The repository's bundled official plugins: the resource root the admitted font bytes live under. */

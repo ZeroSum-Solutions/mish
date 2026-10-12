@@ -12,10 +12,10 @@ const attemptPath = process.env.OD_TEST_LAUNCH_ATTEMPT;
 if (attemptPath == null) throw new Error("OD_TEST_LAUNCH_ATTEMPT is required");
 const stamp = readCurrentSidecarStamp();
 const resources = {
-  dataRoot: "/tmp/open-design-converging-launcher-data",
+  dataRoot: "/tmp/mish-converging-launcher-data",
   ownerPid: null,
   port: 0,
-  runtimeRoot: "/tmp/open-design-converging-launcher-runtime",
+  runtimeRoot: "/tmp/mish-converging-launcher-runtime",
 };
 
 if (isCurrentSidecarLauncher()) {

@@ -34,12 +34,12 @@ from lib.github import (
 from lib.r2 import R2Client, R2Credentials, R2Error, R2PreconditionFailed, self_check as r2_self_check
 
 
-PROTOCOL = "nexu-workload-result-v1"
+PROTOCOL = "mish-workload-result-v1"
 CONTROL_SUITE = "convergence-control"
 DIGEST_RE = re.compile(r"^[0-9a-f]{64}$")
 IDENTITY_RE = re.compile(r"^[a-z0-9][a-z0-9_-]{0,79}$")
 PRODUCT_TYPES = {"job", "url"}
-PUBLIC_READ_USER_AGENT = "open-design-workload-convergence/1"
+PUBLIC_READ_USER_AGENT = "mish-workload-convergence/1"
 STORAGE_ENV = {
     "endpoint": "CLOUDFLARE_R2_WORKLOAD_RESULTS_URL",
     "bucket": "CLOUDFLARE_R2_WORKLOAD_RESULTS_BUCKET",

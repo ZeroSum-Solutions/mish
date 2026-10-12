@@ -43,13 +43,13 @@ test('sandbox runtime registry ignores host-local agent profiles at module load'
   const root = mkdtempSync(path.join(tmpdir(), 'od-sandbox-registry-'));
   const dataDir = path.join(root, 'data');
   const hostHome = path.join(root, 'host-home');
-  const hostConfigDir = path.join(hostHome, '.open-design');
+  const hostConfigDir = path.join(hostHome, '.mish');
   const hostConfig = path.join(hostConfigDir, 'agents.local.json');
   const sandboxConfigDir = path.join(
     dataDir,
     'sandbox',
     'agent-home',
-    '.open-design',
+    '.mish',
   );
   const sandboxConfig = path.join(sandboxConfigDir, 'agents.local.json');
 
@@ -104,7 +104,7 @@ test('sandbox runtime registry ignores host-local agent profiles at module load'
 test('sandbox runtime registry ignores implicit profiles without OD_DATA_DIR', async () => {
   const root = mkdtempSync(path.join(tmpdir(), 'od-sandbox-registry-missing-data-'));
   const hostHome = path.join(root, 'host-home');
-  const hostConfigDir = path.join(hostHome, '.open-design');
+  const hostConfigDir = path.join(hostHome, '.mish');
   const hostConfig = path.join(hostConfigDir, 'agents.local.json');
 
   try {

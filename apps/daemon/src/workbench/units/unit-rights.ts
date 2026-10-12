@@ -1,4 +1,4 @@
-import type { OperationRight, RightsDeclaration, UnitSavePlan, WorkbenchDeclarationSurface, WorkbenchRightsStatus } from '@open-design/contracts';
+import type { OperationRight, RightsDeclaration, UnitSavePlan, WorkbenchDeclarationSurface, WorkbenchRightsStatus } from '@mish/contracts';
 
 type Basis = RightsDeclaration['basis'];
 const RANK: Record<WorkbenchRightsStatus, number> = { redistributable: 4, 'incorporation-only': 3, 'private-use-only': 2, 'reference-only': 1, unknown: 0 };

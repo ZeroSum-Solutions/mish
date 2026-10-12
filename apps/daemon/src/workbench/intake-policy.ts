@@ -1,4 +1,4 @@
-import { FILE_UPLOAD_MAX_BYTES, type IntakeFileOutcome } from '@open-design/contracts';
+import { FILE_UPLOAD_MAX_BYTES, type IntakeFileOutcome } from '@mish/contracts';
 
 /**
  * AC-R01.3 intake policy, one source for the daemon and `od workbench intake`.

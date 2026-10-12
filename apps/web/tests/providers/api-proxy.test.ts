@@ -2,7 +2,7 @@ import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { historyWithApiAttachmentContext } from '../../src/api-attachment-context';

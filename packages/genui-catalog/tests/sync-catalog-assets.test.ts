@@ -46,10 +46,6 @@ describe('sync-catalog-assets --check', () => {
     }
     const byName = (name: string) => syncTargets().find((target) => target.label.endsWith(name))!;
     expect(copiedComponents(byName('agency-marketing-site').scriptsDir)).toEqual(['glare-hover', 'glass-surface', 'masked-heading', 'scroll-reveal', 'shiny-text', 'split-text']);
-    // agency-watson also carries the emmpo module, whose effect placements allow two surface components.
-    expect(copiedComponents(byName('agency-watson').scriptsDir)).toEqual(['glare-hover', 'scroll-reveal', 'spotlight-card']);
-    // The template carries the watson and emmpo modules (the daemon imports them directly), so it needs their copies too.
-    expect(copiedComponents(byName('design-templates/agency-site').scriptsDir)).toEqual(['glare-hover', 'scroll-reveal', 'spotlight-card']);
     expect(copiedComponents(byName('agency-app-shell').scriptsDir)).toEqual(['glass-surface']);
     expect(copiedComponents(byName('agency-crm-dashboard').scriptsDir)).toEqual(['glass-surface']);
   });

@@ -6,7 +6,7 @@ import {
   type ChildEvidenceCoverageV1,
   type NormalizedAgentObservationV1,
   type StrategyInputStageV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   buildSafeChildPromptTelemetry,
   type SafeChildPromptInput,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { composeSystemPrompt } from '../../src/prompts/system.js';
-import { DESIGN_SYSTEM_BINDING_INSTRUCTION } from '@open-design/contracts';
+import { DESIGN_SYSTEM_BINDING_INSTRUCTION } from '@mish/contracts';
 
 describe('daemon design-system consumer fidelity', () => {
   it.each(['slim', 'classic'] as const)('uses prose-only guides without requesting absent CSS with %s core', (promptCoreVariant) => {

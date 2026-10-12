@@ -5,7 +5,7 @@
 // visual style instead of showing a score.
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import { WORKBENCH_REVIEW_ABSTAIN_REASONS, WORKBENCH_REVIEWER_REASON_CODES, type ReviewRunView } from '@open-design/contracts';
+import { WORKBENCH_REVIEW_ABSTAIN_REASONS, WORKBENCH_REVIEWER_REASON_CODES, type ReviewRunView } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { en } from '../../../src/i18n/locales/en';
 

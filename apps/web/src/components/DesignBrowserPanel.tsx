@@ -12,9 +12,9 @@ import {
 import { createPortal, flushSync } from 'react-dom';
 import {
   clearHostBrowserData,
-  isOpenDesignHostAvailable,
-} from '@open-design/host';
-import type { TrackingReferenceBoardCategory } from '@open-design/contracts/analytics';
+  isMishHostAvailable,
+} from '@mish/host';
+import type { TrackingReferenceBoardCategory } from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackReferenceBoardClick,
@@ -278,7 +278,7 @@ interface DesignBrowserPanelProps {
   projectId: string;
   resolvedDir?: string | null;
   onOpenFile: (name: string) => void;
-  onOpenDesignFiles?: () => void;
+  onMishFiles?: () => void;
   onRefreshFiles: () => Promise<void> | void;
   onPageInfoChange?: (info: BrowserPageInfo) => void;
   previewComments?: PreviewComment[];
@@ -302,7 +302,7 @@ export interface BrowserPageInfo {
 }
 
 const EMPTY_URL = 'about:blank';
-const DESIGN_BROWSER_PARTITION = 'persist:open-design-design-browser';
+const DESIGN_BROWSER_PARTITION = 'persist:mish-design-browser';
 const HISTORY_LIMIT = DESIGN_BROWSER_HISTORY_LIMIT;
 const HISTORY_SUGGESTION_LIMIT = 20;
 const EMPTY_PREVIEW_COMMENTS: PreviewComment[] = [];
@@ -753,10 +753,10 @@ export function browserUsePrompt(action: BrowserUseAction, context: BrowserUsePr
   ].join('\n');
 }
 
-const ADD_IMAGE_TO_CHAT_MESSAGE = '__open_design_add_image_to_chat__:';
+const ADD_IMAGE_TO_CHAT_MESSAGE = '__mish_add_image_to_chat__:';
 const browserImageHoverScript = (addToChatLabel: string) => String.raw`(() => {
-  const rootId = '__open_design_image_hover_layer__';
-  window.__openDesignImageHoverCleanup?.();
+  const rootId = '__mish_image_hover_layer__';
+  window.__mishImageHoverCleanup?.();
   document.getElementById(rootId)?.remove();
   const controller = new AbortController();
 
@@ -865,10 +865,10 @@ const browserImageHoverScript = (addToChatLabel: string) => String.raw`(() => {
       console.info('${ADD_IMAGE_TO_CHAT_MESSAGE}' + JSON.stringify(payload));
     }));
   }, { signal: controller.signal });
-  window.__openDesignImageHoverCleanup = () => {
+  window.__mishImageHoverCleanup = () => {
     controller.abort();
     layer.remove();
-    delete window.__openDesignImageHoverCleanup;
+    delete window.__mishImageHoverCleanup;
   };
   return true;
 })()`;
@@ -921,7 +921,7 @@ export function DesignBrowserPanel({
   projectId,
   resolvedDir,
   onOpenFile,
-  onOpenDesignFiles,
+  onMishFiles,
   onPageInfoChange,
   onRefreshFiles,
   previewComments = EMPTY_PREVIEW_COMMENTS,
@@ -936,7 +936,7 @@ export function DesignBrowserPanel({
 }: DesignBrowserPanelProps) {
   const t = useT();
   const { workspaceContext } = useProjectCollabContext();
-  const desktopHostAvailable = isOpenDesignHostAvailable();
+  const desktopHostAvailable = isMishHostAvailable();
   const initialState = initialBrowserState(initialUrl, initialTitle);
   // `loadUrl` is the navigation target bound to the <webview>/<iframe> `src`.
   // It changes ONLY on user-initiated navigation. `currentUrl` is the committed
@@ -1981,13 +1981,13 @@ export function DesignBrowserPanel({
       if (options.openAfterSave !== false) onOpenFile(manifestFile);
       const message = t('designBrowser.status.pageSnapshotSaved');
       const elapsedSeconds = pageSnapshotRunElapsedSeconds(run);
-      const canOpenDesignFiles = Boolean(onOpenDesignFiles);
+      const canMishFiles = Boolean(onMishFiles);
       setStatusMessage({
         actionFileName: manifestFile,
-        actionLabel: canOpenDesignFiles
+        actionLabel: canMishFiles
           ? t('designBrowser.status.viewDesignFiles')
           : t('workspace.designFiles'),
-        actionTarget: canOpenDesignFiles ? 'design-files' : 'file',
+        actionTarget: canMishFiles ? 'design-files' : 'file',
         message,
         source: 'page-snapshot',
       });
@@ -2698,8 +2698,8 @@ export function DesignBrowserPanel({
               type="button"
               className="db-status-action"
               onClick={() => {
-                if (statusAction.actionTarget === 'design-files' && onOpenDesignFiles) {
-                  onOpenDesignFiles();
+                if (statusAction.actionTarget === 'design-files' && onMishFiles) {
+                  onMishFiles();
                 } else {
                   onOpenFile(statusAction.actionFileName ?? '');
                 }

@@ -4,8 +4,8 @@ import type { AddressInfo } from 'node:net';
 import os from 'node:os';
 import path from 'node:path';
 
-import type { AppliedPluginSnapshot, ChatMessage, OpenDesignPlanContractV2 } from '@open-design/contracts';
-import { strategyPackageHashFromDigests } from '@open-design/plugin-runtime';
+import type { AppliedPluginSnapshot, ChatMessage, MishPlanContractV2 } from '@mish/contracts';
+import { strategyPackageHashFromDigests } from '@mish/plugin-runtime';
 import express, { type Response } from 'express';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
@@ -67,7 +67,7 @@ function seedTaskAndMessage(
     pluginVersion: '2.0.0',
     manifestSourceDigest: 'history-fixture-manifest',
     strategy: {
-      schema: 'open-design.applied-strategy/v2',
+      schema: 'mish.applied-strategy/v2',
       id: 'od-next-strategy',
       version: '2.0.0',
       packageHash: strategyPackageHashFromDigests(assetDigests),
@@ -135,10 +135,10 @@ function seedTaskAndMessage(
   return { snapshot, task };
 }
 
-function planContract(snapshot: AppliedPluginSnapshot): OpenDesignPlanContractV2 {
+function planContract(snapshot: AppliedPluginSnapshot): MishPlanContractV2 {
   const strategy = snapshot.strategy!;
   return {
-    schema: 'open-design.plan-contract/v2',
+    schema: 'mish.plan-contract/v2',
     strategy: {
       id: 'od-next-strategy',
       version: strategy.version,

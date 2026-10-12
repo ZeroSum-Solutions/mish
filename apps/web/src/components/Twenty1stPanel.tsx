@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import type { Twenty1stItem, Twenty1stListFilters, Twenty1stSourceResponse } from '@open-design/contracts';
-import { TWENTY1ST_RIGHTS, twenty1stBrowseTags, twenty1stCardPreviewUrl, twenty1stListQuery, twenty1stPreviewUrl, filterTwenty1stItems, parseTwenty1stListResponse, parseTwenty1stSourceResponse, selectTwenty1stPrimarySourceFile } from '@open-design/contracts';
-import { Button, EmptyState } from '@open-design/components';
+import type { Twenty1stItem, Twenty1stListFilters, Twenty1stSourceResponse } from '@mish/contracts';
+import { TWENTY1ST_RIGHTS, twenty1stBrowseTags, twenty1stCardPreviewUrl, twenty1stListQuery, twenty1stPreviewUrl, filterTwenty1stItems, parseTwenty1stListResponse, parseTwenty1stSourceResponse, selectTwenty1stPrimarySourceFile } from '@mish/contracts';
+import { Button, EmptyState } from '@mish/components';
 
 import { useT } from '../i18n';
 import { copyToClipboard } from '../lib/copy-to-clipboard';

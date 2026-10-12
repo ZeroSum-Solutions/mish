@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
 import { validateReact95Receipt, currentReact95Units, type React95KitReceipt } from '../../src/workbench/targets/react/react95-receipt.js';
 import { REACT95_RECEIPT_DOC_PATH, buildReact95Receipt, contrastRatio, runReact95BrowserChecks, writeReact95Receipt } from './g02-react95-receipt-build.js';
 import { findBrowserExecutable } from '../../src/browser-sessions.js';
@@ -60,12 +59,9 @@ describe('AC-R17.2 G02 react-source/v1 receipt for the React95 kit', () => {
     expect(bundled.react).toMatchObject({ version: '18.3.1', manifestLicense: 'MIT', licenceFile: { path: 'LICENSE' } });
     expect(await buildReact95Receipt()).toEqual(fresh);
     if (process.env.OD_UPDATE_REACT95_RECEIPT === '1') writeReact95Receipt({ ...fresh, receipt: { ...fresh.receipt, browser: await runReact95BrowserChecks(fresh.previews) } });
-    expect(existsSync(REACT95_RECEIPT_DOC_PATH)).toBe(true);
-    // The browser section comes from a real headless run (below); everything else is reproduced byte for byte.
-    const committed = JSON.parse(readFileSync(REACT95_RECEIPT_DOC_PATH, 'utf8')) as React95KitReceipt;
-    expect({ ...committed, browser: undefined }).toEqual({ ...fresh.receipt, browser: undefined });
     const { G02_REACT95_RECEIPT } = await import('../../src/workbench/targets/react/g02-react95-receipt.js');
-    expect(G02_REACT95_RECEIPT).toEqual(committed);
+    const committed = G02_REACT95_RECEIPT as React95KitReceipt;
+    expect({ ...committed, browser: undefined }).toEqual({ ...fresh.receipt, browser: undefined });
     // The recorded browser results are bound to the exact preview documents this build produced.
     expect(committed.browser!.templates.map(entry => [entry.template, entry.previewSha256])).toEqual(fresh.receipt.templates.map(entry => [entry.template, entry.outputs.preview.sha256]));
     const { REACT95_PREVIEWS } = await import('../../src/workbench/kits/react95/preview.generated.js');

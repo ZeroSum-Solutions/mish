@@ -44,12 +44,12 @@ Running the installer without flags launches an interactive wizard:
   ▸ Runtime: docker Docker version 26.1.3, build b72abbb
   ▸ Compose: Docker Compose version v2.27.1
 
-Docker image [ghcr.io/nexu-io/od:latest]:
+Docker image [ghcr.io/zerosum-solutions/mish:latest]:
 Port [7456]:
 Allowed origins (CORS, comma-separated, or empty) []:
 Memory limit [384m]:
 
-  ▸ Pulling image: ghcr.io/nexu-io/od:latest
+  ▸ Pulling image: ghcr.io/zerosum-solutions/mish:latest
   ▸ Starting Mishh Mashh...
   ▸ Waiting for health check (up to 60s)...
   ✓ Daemon is healthy (200 OK)
@@ -59,7 +59,7 @@ Memory limit [384m]:
 
 | Prompt | Default | Notes |
 |--------|---------|-------|
-| **Docker image** | `ghcr.io/nexu-io/od:latest` | Use `:latest` for the newest stable image, `:<version>` for a pinned release, or `@sha256:<digest>` for reproducibility |
+| **Docker image** | `ghcr.io/zerosum-solutions/mish:latest` | Use `:latest` for the newest stable image, `:<version>` for a pinned release, or `@sha256:<digest>` for reproducibility |
 | **Port** | `7456` | The port the daemon listens on. Must not be in use. |
 | **Allowed origins** | _(empty)_ | CORS origins for reverse-proxy setups. See [`deploy/README.md`](../deploy/README.md). Leave empty for localhost-only use. |
 | **Memory limit** | `384m` | Container memory cap. Raise for large concurrent agent runs. |
@@ -102,28 +102,28 @@ The installer creates a `systemd --user` unit that wraps Docker Compose. No `sud
 
 ```bash
 # Check status
-systemctl --user status open-design
+systemctl --user status mish
 
 # Start / stop / restart
-systemctl --user start open-design
-systemctl --user stop open-design
-systemctl --user restart open-design
+systemctl --user start mish
+systemctl --user stop mish
+systemctl --user restart mish
 
 # View logs
-journalctl --user -u open-design -f
+journalctl --user -u mish -f
 
 # Disable auto-start
-systemctl --user disable open-design
+systemctl --user disable mish
 
 # Re-enable auto-start
-systemctl --user enable open-design
+systemctl --user enable mish
 ```
 
 To skip systemd unit creation, pass `--no-systemd` to the installer.
 
 ### macOS (Docker Desktop)
 
-Docker Desktop manages the container lifecycle. Use Docker Desktop's dashboard to start, stop, or restart the `open-design` container, or use the CLI:
+Docker Desktop manages the container lifecycle. Use Docker Desktop's dashboard to start, stop, or restart the `mish` container, or use the CLI:
 
 ```bash
 # Using docker compose directly
@@ -143,7 +143,7 @@ bash deploy/scripts/update.sh
 To update to a specific image:
 
 ```bash
-bash deploy/scripts/update.sh --image=ghcr.io/nexu-io/od@sha256:<digest>
+bash deploy/scripts/update.sh --image=ghcr.io/zerosum-solutions/mish@sha256:<digest>
 ```
 
 The update script:
@@ -175,10 +175,10 @@ All settings live in `deploy/.env`. Edit it directly or re-run the installer to 
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `OPEN_DESIGN_IMAGE` | `ghcr.io/nexu-io/od:latest` | Full image reference |
-| `OPEN_DESIGN_PORT` | `7456` | Host-side port (bound to `127.0.0.1`) |
-| `OPEN_DESIGN_ALLOWED_ORIGINS` | _(empty)_ | CORS origins for reverse-proxy setups |
-| `OPEN_DESIGN_MEM_LIMIT` | `384m` | Container memory cap |
+| `MISH_IMAGE` | `ghcr.io/zerosum-solutions/mish:latest` | Full image reference |
+| `MISH_PORT` | `7456` | Host-side port (bound to `127.0.0.1`) |
+| `MISH_ALLOWED_ORIGINS` | _(empty)_ | CORS origins for reverse-proxy setups |
+| `MISH_MEM_LIMIT` | `384m` | Container memory cap |
 | `NODE_OPTIONS` | `--max-old-space-size=192` | Node.js heap cap inside the container |
 
 The container always binds `127.0.0.1:<port>:7456` — the daemon is never directly exposed to the network. To allow remote access, put an authenticated reverse proxy in front. See [`deploy/README.md`](../deploy/README.md) for the authentication and allowed-origin contract.
@@ -195,7 +195,7 @@ The container always binds `127.0.0.1:<port>:7456` — the daemon is never direc
 | systemd unit not created | `systemd` not found | Omit `--no-systemd` if systemd is available, or manage via Docker CLI |
 | `.env` has wrong port after re-install | Old backup not restored | Edit `deploy/.env` directly or delete it and re-run |
 | Container exits immediately | Image incompatibility | Check `docker compose -f deploy/docker-compose.yml logs` for errors |
-| Browser sign-in repeats | Username or token does not match | Use username `open-design` and the exact `OD_API_TOKEN` value from `deploy/.env`; recreate the container after changing it |
+| Browser sign-in repeats | Username or token does not match | Use username `mish` and the exact `OD_API_TOKEN` value from `deploy/.env`; recreate the container after changing it |
 
 ## References
 

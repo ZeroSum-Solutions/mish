@@ -17,7 +17,7 @@
 // the workspace-resolved tier. Both must read the SAME resolved tier.
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { SettingsDialog } from '../../src/components/SettingsDialog';

@@ -3,7 +3,7 @@
 // The daemon HTTP acceptance gate for `POST /api/build-on-brand`. Until C2 adds the route this
 // file fails on its first request: Express answers the unknown POST with 404, so every
 // `expect(response.status)` below reads 404. Until C2 adds the contract module, the
-// `@open-design/contracts` import of `buildOnBrandResultSchema` is undefined and the first
+// `@mish/contracts` import of `buildOnBrandResultSchema` is undefined and the first
 // schema assertion throws `Cannot read properties of undefined`.
 //
 // What it pins:
@@ -31,7 +31,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
-import * as contracts from '@open-design/contracts';
+import * as contracts from '@mish/contracts';
 
 // Record every run that enters the run-start choke point, whichever entry (`start` or
 // `startAdmitted`) the route uses. The wrapper keeps the real service behaviour.
@@ -113,7 +113,7 @@ let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { input += chunk; });
 process.stdin.on('end', () => {
-  fs.writeFileSync(process.env.OD_CAPTURE_PROMPT_PATH, input, 'utf8');
+  fs.writeFileSync(${JSON.stringify(capturePath)}, input, 'utf8');
   console.log(JSON.stringify({ type: 'text', part: { text: 'Done.' } }));
 });
 `,

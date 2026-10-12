@@ -62,7 +62,7 @@ beforeEach(() => {
   tmpHome = mkdtempSync(path.join(tmpdir(), 'od-vela-test-'));
   process.env.HOME = tmpHome;
   delete process.env.AMR_HOME;
-  delete process.env.OPEN_DESIGN_AMR_PROFILE;
+  delete process.env.MISH_AMR_PROFILE;
   delete process.env.VELA_PROFILE;
 });
 
@@ -75,33 +75,33 @@ afterEach(() => {
 });
 
 describe('resolveAmrProfile', () => {
-  it('defaults to "prod" when OPEN_DESIGN_AMR_PROFILE is unset or empty', () => {
+  it('defaults to "prod" when MISH_AMR_PROFILE is unset or empty', () => {
     expect(resolveAmrProfile({})).toBe('prod');
-    expect(resolveAmrProfile({ OPEN_DESIGN_AMR_PROFILE: '   ' })).toBe('prod');
+    expect(resolveAmrProfile({ MISH_AMR_PROFILE: '   ' })).toBe('prod');
   });
 
-  it('honors OPEN_DESIGN_AMR_PROFILE when set to a known profile', () => {
-    expect(resolveAmrProfile({ OPEN_DESIGN_AMR_PROFILE: 'prod' })).toBe('prod');
-    expect(resolveAmrProfile({ OPEN_DESIGN_AMR_PROFILE: 'local' })).toBe('local');
-    expect(resolveAmrProfile({ OPEN_DESIGN_AMR_PROFILE: 'test' })).toBe('test');
-    expect(resolveAmrProfile({ OPEN_DESIGN_AMR_PROFILE: 'feature-test' })).toBe('feature-test');
+  it('honors MISH_AMR_PROFILE when set to a known profile', () => {
+    expect(resolveAmrProfile({ MISH_AMR_PROFILE: 'prod' })).toBe('prod');
+    expect(resolveAmrProfile({ MISH_AMR_PROFILE: 'local' })).toBe('local');
+    expect(resolveAmrProfile({ MISH_AMR_PROFILE: 'test' })).toBe('test');
+    expect(resolveAmrProfile({ MISH_AMR_PROFILE: 'feature-test' })).toBe('feature-test');
   });
 
-  it('uses VELA_PROFILE when OPEN_DESIGN_AMR_PROFILE is unset', () => {
+  it('uses VELA_PROFILE when MISH_AMR_PROFILE is unset', () => {
     expect(resolveAmrProfile({ VELA_PROFILE: 'local' })).toBe('local');
     expect(
       resolveAmrProfile({
-        OPEN_DESIGN_AMR_PROFILE: 'test',
+        MISH_AMR_PROFILE: 'test',
         VELA_PROFILE: 'local',
       }),
     ).toBe('test');
   });
 
-  it('warns for unknown OPEN_DESIGN_AMR_PROFILE values and falls back to prod', () => {
+  it('warns for unknown MISH_AMR_PROFILE values and falls back to prod', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    expect(resolveAmrProfile({ OPEN_DESIGN_AMR_PROFILE: 'evil' })).toBe('prod');
+    expect(resolveAmrProfile({ MISH_AMR_PROFILE: 'evil' })).toBe('prod');
     expect(warn).toHaveBeenCalledWith(
-      expect.stringContaining('OPEN_DESIGN_AMR_PROFILE'),
+      expect.stringContaining('MISH_AMR_PROFILE'),
     );
     warn.mockRestore();
   });
@@ -112,7 +112,7 @@ describe('readVelaLoginStatus', () => {
 
   it('marks only the rejected credential revision as requiring sign-in again', () => {
     const firstEnv = {
-      OPEN_DESIGN_AMR_PROFILE: 'local',
+      MISH_AMR_PROFILE: 'local',
       VELA_RUNTIME_KEY: 'expired-runtime-key',
       VELA_LINK_URL: 'https://link.example/v1',
     };
@@ -144,7 +144,7 @@ describe('readVelaLoginStatus', () => {
     });
     const fixedTime = new Date('2026-08-12T03:57:36Z');
     utimesSync(file, fixedTime, fixedTime);
-    const env = { OPEN_DESIGN_AMR_PROFILE: 'local' };
+    const env = { MISH_AMR_PROFILE: 'local' };
 
     markVelaAuthorizationExpired(env);
     expect(readVelaLoginStatus(env).sessionState).toBe('reauth_required');
@@ -164,7 +164,7 @@ describe('readVelaLoginStatus', () => {
     expect(readVelaLoginStatus(env).sessionState).toBe('authenticated');
   });
   it('returns loggedIn=false when ~/.amr/config.json is absent', () => {
-    const status = readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    const status = readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' });
     expect(status.loggedIn).toBe(false);
     expect(status.user).toBeNull();
     expect(status.profile).toBe('local');
@@ -180,7 +180,7 @@ describe('readVelaLoginStatus', () => {
         },
       },
     });
-    const status = readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    const status = readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' });
     expect(status.loggedIn).toBe(false);
     expect(status.user).toBeNull();
     expect(status.configPath).toBe(amrConfigPath());
@@ -188,7 +188,7 @@ describe('readVelaLoginStatus', () => {
 
   it('treats configured AMR env credentials as logged in without an AMR config file', () => {
     const status = readVelaLoginStatus(
-      { OPEN_DESIGN_AMR_PROFILE: 'local' },
+      { MISH_AMR_PROFILE: 'local' },
       {
         VELA_RUNTIME_KEY: 'rt-env-secret',
         VELA_LINK_URL: 'https://openrouter.example/v1',
@@ -210,7 +210,7 @@ describe('readVelaLoginStatus', () => {
       },
     });
     const status = readVelaLoginStatus(
-      { OPEN_DESIGN_AMR_PROFILE: 'local' },
+      { MISH_AMR_PROFILE: 'local' },
       {
         VELA_RUNTIME_KEY: 'rt-env-secret',
         VELA_LINK_URL: 'https://openrouter.example/v1',
@@ -231,8 +231,8 @@ describe('readVelaLoginStatus', () => {
       },
     });
     const status = readVelaLoginStatus(
-      { OPEN_DESIGN_AMR_PROFILE: 'prod' },
-      { OPEN_DESIGN_AMR_PROFILE: 'local' },
+      { MISH_AMR_PROFILE: 'prod' },
+      { MISH_AMR_PROFILE: 'local' },
     );
     expect(status.loggedIn).toBe(true);
     expect(status.profile).toBe('local');
@@ -241,7 +241,7 @@ describe('readVelaLoginStatus', () => {
 
   it('treats daemon process AMR env credentials as logged in without an AMR config file', () => {
     const status = readVelaLoginStatus({
-      OPEN_DESIGN_AMR_PROFILE: 'local',
+      MISH_AMR_PROFILE: 'local',
       VELA_RUNTIME_KEY: 'rt-process-secret',
       VELA_LINK_URL: 'https://openrouter.example/v1',
     });
@@ -254,13 +254,13 @@ describe('readVelaLoginStatus', () => {
   it('requires both env runtime key and link URL before reporting env-only login', () => {
     expect(
       readVelaLoginStatus(
-        { OPEN_DESIGN_AMR_PROFILE: 'local' },
+        { MISH_AMR_PROFILE: 'local' },
         { VELA_RUNTIME_KEY: 'rt-env-secret' },
       ).loggedIn,
     ).toBe(false);
     expect(
       readVelaLoginStatus(
-        { OPEN_DESIGN_AMR_PROFILE: 'local' },
+        { MISH_AMR_PROFILE: 'local' },
         { VELA_LINK_URL: 'https://openrouter.example/v1' },
       ).loggedIn,
     ).toBe(false);
@@ -284,7 +284,7 @@ describe('readVelaLoginStatus', () => {
         },
       },
     });
-    const status = readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    const status = readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' });
     expect(status.loggedIn).toBe(true);
     expect(status.profile).toBe('local');
     expect(status.user?.email).toBe('leaf@example.com');
@@ -315,11 +315,11 @@ describe('readVelaLoginStatus', () => {
     );
     process.env.AMR_HOME = amrHome;
 
-    const status = readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    const status = readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' });
     expect(status.loggedIn).toBe(true);
     expect(status.configPath).toBe(path.join(amrHome, 'config.json'));
     expect(status.user?.email).toBe('custom@example.com');
-    expect(readVelaControlApiContext({ OPEN_DESIGN_AMR_PROFILE: 'local' })).toMatchObject({
+    expect(readVelaControlApiContext({ MISH_AMR_PROFILE: 'local' })).toMatchObject({
       profile: 'local',
       apiUrl: 'http://127.0.0.1:18082',
       controlKey: 'vela_ctrl_custom',
@@ -332,7 +332,7 @@ describe('readVelaLoginStatus', () => {
         local: { apiUrl: 'http://localhost:18080', user: { id: 'u', email: 'e' } },
       },
     });
-    const status = readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    const status = readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' });
     expect(status.loggedIn).toBe(false);
   });
 
@@ -342,8 +342,8 @@ describe('readVelaLoginStatus', () => {
         local: { runtimeKey: 'rt-local', user: { id: 'u', email: 'leaf@example.com' } },
       },
     });
-    expect(readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' }).loggedIn).toBe(true);
-    expect(readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'prod' }).loggedIn).toBe(false);
+    expect(readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' }).loggedIn).toBe(true);
+    expect(readVelaLoginStatus({ MISH_AMR_PROFILE: 'prod' }).loggedIn).toBe(false);
   });
 
   it('does not let VELA_PROFILE select the active status profile', () => {
@@ -354,7 +354,7 @@ describe('readVelaLoginStatus', () => {
     });
     expect(
       readVelaLoginStatus({
-        OPEN_DESIGN_AMR_PROFILE: 'prod',
+        MISH_AMR_PROFILE: 'prod',
         VELA_PROFILE: 'local',
       }).loggedIn,
     ).toBe(false);
@@ -364,7 +364,7 @@ describe('readVelaLoginStatus', () => {
     const file = path.join(tmpHome, '.amr', 'config.json');
     mkdirSync(path.dirname(file), { recursive: true });
     writeFileSync(file, '{not json', 'utf8');
-    expect(readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' }).loggedIn).toBe(false);
+    expect(readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' }).loggedIn).toBe(false);
   });
 
   it('treats the local runtimeKey as the source of truth even when user fields are missing', () => {
@@ -376,7 +376,7 @@ describe('readVelaLoginStatus', () => {
         },
       },
     });
-    const status = readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    const status = readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' });
     expect(status.loggedIn).toBe(true);
     expect(status.user?.id).toBe('');
     expect(status.user?.email).toBe('');
@@ -394,7 +394,7 @@ describe('readVelaCredentialRevision', () => {
         },
       },
     });
-    const before = readVelaCredentialRevision({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    const before = readVelaCredentialRevision({ MISH_AMR_PROFILE: 'local' });
     expect(before).toMatchObject({
       authSource: 'file',
       loggedIn: true,
@@ -403,9 +403,9 @@ describe('readVelaCredentialRevision', () => {
     });
 
     await new Promise((resolve) => setTimeout(resolve, 5));
-    forgetVelaLogin({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    forgetVelaLogin({ MISH_AMR_PROFILE: 'local' });
 
-    const after = readVelaCredentialRevision({ OPEN_DESIGN_AMR_PROFILE: 'local' });
+    const after = readVelaCredentialRevision({ MISH_AMR_PROFILE: 'local' });
     expect(after).toMatchObject({
       authSource: 'none',
       loggedIn: false,
@@ -459,7 +459,7 @@ describe('readVelaControlApiContext', () => {
     });
 
     const vela = await import('../../src/integrations/vela.js');
-    const context = vela.readVelaControlApiContext({ HOME: tmpHome, OPEN_DESIGN_AMR_PROFILE: 'test' });
+    const context = vela.readVelaControlApiContext({ HOME: tmpHome, MISH_AMR_PROFILE: 'test' });
     expect(context).toEqual({
       profile: 'test',
       apiUrl: 'https://old.example',
@@ -490,10 +490,10 @@ describe('forgetVelaLogin', () => {
       },
       otherTopLevel: true,
     });
-    expect(readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' }).loggedIn).toBe(true);
-    forgetVelaLogin({ OPEN_DESIGN_AMR_PROFILE: 'local' });
-    expect(readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'local' }).loggedIn).toBe(false);
-    expect(readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'prod' }).loggedIn).toBe(true);
+    expect(readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' }).loggedIn).toBe(true);
+    forgetVelaLogin({ MISH_AMR_PROFILE: 'local' });
+    expect(readVelaLoginStatus({ MISH_AMR_PROFILE: 'local' }).loggedIn).toBe(false);
+    expect(readVelaLoginStatus({ MISH_AMR_PROFILE: 'prod' }).loggedIn).toBe(true);
 
     const next = JSON.parse(readFileSync(file, 'utf8'));
     expect(next.otherTopLevel).toBe(true);
@@ -511,7 +511,7 @@ describe('forgetVelaLogin', () => {
         prod: { runtimeKey: 'rt-prod', user: { id: 'p', email: 'prod@example.com' } },
       },
     });
-    expect(() => forgetVelaLogin({ OPEN_DESIGN_AMR_PROFILE: 'local' })).not.toThrow();
+    expect(() => forgetVelaLogin({ MISH_AMR_PROFILE: 'local' })).not.toThrow();
     const next = JSON.parse(readFileSync(file, 'utf8'));
     expect(next.profiles.prod.runtimeKey).toBe('rt-prod');
   });
@@ -547,12 +547,12 @@ describe('spawnVelaLogin', () => {
       baseEnv: {
         ...process.env,
         HOME: tmpHome,
-        OPEN_DESIGN_AMR_PROFILE: 'feature-test',
+        MISH_AMR_PROFILE: 'feature-test',
         VELA_PROFILE: 'prod',
-        FAKE_VELA_LOGIN_USER_EMAIL: 'spawn-login@example.com',
       },
       configuredEnv: {
         VELA_BIN: FAKE_VELA,
+        FAKE_VELA_LOGIN_USER_EMAIL: 'spawn-login@example.com',
       },
     });
 
@@ -570,7 +570,7 @@ describe('spawnVelaLogin', () => {
     expect(next.profiles['feature-test'].user.email).toBe('spawn-login@example.com');
     expect(next.profiles.prod).toBeUndefined();
     expect(next.profiles.test).toBeUndefined();
-    expect(readVelaLoginStatus({ OPEN_DESIGN_AMR_PROFILE: 'feature-test' })).toMatchObject({
+    expect(readVelaLoginStatus({ MISH_AMR_PROFILE: 'feature-test' })).toMatchObject({
       loggedIn: true,
       profile: 'feature-test',
       user: { email: 'spawn-login@example.com' },
@@ -582,13 +582,13 @@ describe('spawnVelaLogin', () => {
       baseEnv: {
         ...process.env,
         HOME: tmpHome,
-        OPEN_DESIGN_AMR_PROFILE: 'prod',
+        MISH_AMR_PROFILE: 'prod',
         VELA_PROFILE: 'prod',
-        FAKE_VELA_LOGIN_USER_EMAIL: 'settings-profile@example.com',
       },
       configuredEnv: {
         VELA_BIN: FAKE_VELA,
-        OPEN_DESIGN_AMR_PROFILE: 'local',
+        MISH_AMR_PROFILE: 'local',
+        FAKE_VELA_LOGIN_USER_EMAIL: 'settings-profile@example.com',
       },
     });
 

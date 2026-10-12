@@ -14,7 +14,7 @@ import {
   isReleaseChannel,
 } from "../src/index.js";
 
-describe("@open-design/release", () => {
+describe("@mish/release", () => {
   it("formats and parses counted release versions", () => {
     expect(formatReleaseVersion("prerelease", "1.2.3", 4)).toBe("1.2.3-prerelease.4");
     expect(parseReleaseVersion("1.2.3-prerelease.4", "prerelease")).toEqual({
@@ -47,19 +47,19 @@ describe("@open-design/release", () => {
   });
 
   it("centralizes release identity and namespace derivation", () => {
-    expect(releaseChannelDescriptor("prerelease").productName).toBe("Open Design Prerelease");
+    expect(releaseChannelDescriptor("prerelease").productName).toBe("Mish Prerelease");
     expect(releaseInstallIdentity("prerelease")).toEqual({
-      appId: "io.open-design.desktop.prerelease",
-      executableName: "Open Design Prerelease",
-      productName: "Open Design Prerelease",
+      appId: "io.mish.desktop.prerelease",
+      executableName: "Mish Prerelease",
+      productName: "Mish Prerelease",
     });
     expect(releaseNamespace("prerelease")).toBe("release-prerelease");
     expect(releaseNamespace("prerelease", "win")).toBe("release-prerelease-win");
     expect(releaseNamespace("prerelease", "macIntel")).toBe("release-prerelease-intel");
     expect(releaseChannelDescriptor("qa2")).toMatchObject({
-      appId: "io.open-design.desktop.qa2",
+      appId: "io.mish.desktop.qa2",
       channel: "qa2",
-      productName: "Open Design Qa2",
+      productName: "Mish Qa2",
       storagePrefix: "qa2",
     });
   });
@@ -78,7 +78,7 @@ describe("@open-design/release", () => {
     expect(releaseChannelFromVersion("1.2.3-beta-internal.1")).toBe("beta");
     expect(releaseChannelFromVersion("1.2.3-prerelease.1")).toBe("prerelease");
     expect(releaseChannelFromNamespace("release-preview-linux")).toBe("preview");
-    expect(releaseChannelFromNamespace("open-design")).toBe("stable");
+    expect(releaseChannelFromNamespace("mish")).toBe("stable");
     expect(releaseChannelFromNamespace("beta-local-flow")).toBeNull();
     expect(releaseChannelFromNamespace("release-local")).toBeNull();
   });

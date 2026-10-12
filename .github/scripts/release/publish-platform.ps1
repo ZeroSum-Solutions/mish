@@ -49,8 +49,8 @@ $assetSuffix = if ($signed) { ".signed" } else { ".unsigned" }
 $publicOrigin = Get-PublicOrigin
 $versionPrefix = "$channel/versions/$releaseVersion$assetSuffix"
 $latestPrefix = "$channel/latest"
-$installerName = "open-design-$releaseVersion$assetSuffix-win-x64-setup.exe"
-$portableZipName = "open-design-$releaseVersion$assetSuffix-win-x64-portable.zip"
+$installerName = "mish-$releaseVersion$assetSuffix-win-x64-setup.exe"
+$portableZipName = "mish-$releaseVersion$assetSuffix-win-x64-portable.zip"
 $installer = Copy-Artifact ([string]$index.artifacts.installerPath) $installerName $releaseDir
 $portableZip = $null
 if (-not [string]::IsNullOrWhiteSpace([string]$index.artifacts.portableZipPath)) {

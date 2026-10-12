@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { constants, type Dirent } from 'node:fs';
 import { open, readdir, realpath, stat } from 'node:fs/promises';
 import path from 'node:path';
-import type { ProjectDesignContext, ResourceCandidate, ResourceRef, ResourceRequestContext, ResourceSourceSnapshot, ResourceSourceStatus } from '@open-design/contracts';
+import type { ProjectDesignContext, ResourceCandidate, ResourceRef, ResourceRequestContext, ResourceSourceSnapshot, ResourceSourceStatus } from '@mish/contracts';
 import { CONTRAST_EVIDENCE_STYLE_TAG, resourceRefKey } from './context-ranking.js';
 import {
   COHORT_LABELS, TEXT_CONTRAST_MINIMUM, UI_CONTRAST_MINIMUM, classifyToken, contrastEvidenceLines, contrastRatio, describeContrastPair, extractCustomProperties,

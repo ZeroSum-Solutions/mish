@@ -1,4 +1,4 @@
-import { createModelCaller, type CallerOptions, type ModelCall, type ProviderName } from '@open-design/agency-fast-lane/deepseek';
+import { createModelCaller, type CallerOptions, type ModelCall, type ProviderName } from '@mish/agency-fast-lane/deepseek';
 import { reportedModelId, type BriefGenerator } from './generator.js';
 import { DESIGN_BRIEF_MODEL_JSON_SCHEMA } from './prompt.js';
 

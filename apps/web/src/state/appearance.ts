@@ -1,4 +1,4 @@
-import { getOpenDesignHost } from '@open-design/host';
+import { getMishHost } from '@mish/host';
 import type { AppTheme } from '../types';
 
 const ACCENT_VARS = [
@@ -108,7 +108,7 @@ export function applyAppearanceToDocument({
   // follows the OS appearance, so the light app over a dark OS sat on dark
   // glass and read as a muddy gray (#94). Feature-detected — browsers and
   // older host builds have no appearance capability.
-  getOpenDesignHost()?.appearance?.setTheme(resolvedTheme);
+  getMishHost()?.appearance?.setTheme(resolvedTheme);
 
   const normalized = resolveAccentColor(accentColor);
   // The neutral default is theme-owned: tokens.css intentionally flips it

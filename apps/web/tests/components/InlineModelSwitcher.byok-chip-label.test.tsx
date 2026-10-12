@@ -6,7 +6,7 @@
  * chip 的可见文字是 `google/gemini-2.5-flash`(对的),但
  * `aria-label` / `data-tooltip` 是「**Claude Code** · google/gemini-2.5-flash」。
  * 而这一轮真正跑的是 `byok-opencode`(落盘 run 里
- * `agent=byok-opencode model=open-design-byok/google/gemini-2.5-flash`)——
+ * `agent=byok-opencode model=mish-byok/google/gemini-2.5-flash`)——
  * 读屏用户会被告知一个根本没参与的执行者。
  *
  * 根因:非紧凑那支的 `chipPrimary` 按 `config.mode` 分了岔(API 模式用

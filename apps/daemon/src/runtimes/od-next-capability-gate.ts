@@ -13,7 +13,7 @@ import {
   type RuntimeCapabilityRegistryEntryV1,
   type RuntimeCapabilitySnapshotSourceV1,
   type RuntimeObservationEvidenceLevelV1,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import type { RuntimeCapabilityMap } from './types.js';
 
@@ -82,7 +82,7 @@ export const CODEX_0_147_0_BEST_EFFORT_MANIFEST =
       recordingDigest:
         'sha256:729d0e58e80e7b8b81eb90ad286471a26c3df80411f0b0f7092c19d157b50cc6',
       anonymizationVersion: 'od-runtime-evidence/v1',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
     },
     containsSensitiveContent: false,
     cases: ALL_REQUIRED_CASES,
@@ -106,7 +106,7 @@ export const OPENCODE_1_18_18_BEST_EFFORT_MANIFEST =
       recordingDigest:
         'sha256:b1224716a340401879cfb2f366d1252e9f837ce24050d9b0dfa4430f89492fc5',
       anonymizationVersion: 'od-runtime-evidence/v1',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
     },
     containsSensitiveContent: false,
     cases: ALL_REQUIRED_CASES,
@@ -130,7 +130,7 @@ export const CLAUDE_2_1_233_BEST_EFFORT_MANIFEST =
       recordingDigest:
         'sha256:5681a9a211562e119efc470b6846a4be8b3ee822f4e15f8967c19871e69c9b8b',
       anonymizationVersion: 'od-runtime-evidence/v1',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
     },
     containsSensitiveContent: false,
     cases: ALL_REQUIRED_CASES,
@@ -173,7 +173,7 @@ export const VELA_OPENCODE_LOCAL_BEST_EFFORT_MANIFEST =
       recordingDigest:
         'sha256:6fe49f1e0946b2220052b2239494786879c03c972b5be12dee30a7973872f6aa',
       anonymizationVersion: 'od-runtime-evidence/v1',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
     },
     containsSensitiveContent: false,
     cases: ALL_REQUIRED_CASES,

@@ -24,7 +24,7 @@
 // measured. Neither cost is acceptable for every user all the time.
 //
 // So: nothing is patched until somebody asks. The switch is a `localStorage`
-// key — the same `open-design:` prefix the rest of the app uses for persisted
+// key — the same `mish:` prefix the rest of the app uses for persisted
 // UI state — because the freeze is intermittent and a switch that dies with
 // the window would have to be re-thrown after every restart, which is exactly
 // the problem that made a hand-injected renderer probe useless.
@@ -42,7 +42,7 @@
  * The switch. `'1'` arms the trace at the next observer install; anything
  * else, including absence, leaves the prototype alone.
  */
-export const SCROLL_WRITE_TRACE_STORAGE_KEY = 'open-design:chat-scroll-write-trace';
+export const SCROLL_WRITE_TRACE_STORAGE_KEY = 'mish:chat-scroll-write-trace';
 
 /** Which API did the writing. */
 export type ScrollWriteApi = 'scrollTop' | 'scrollTo' | 'scrollBy' | 'scrollIntoView';

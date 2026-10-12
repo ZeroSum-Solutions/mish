@@ -5,7 +5,7 @@ import type {
   ProjectDesignTokenSuggestionProp,
   ProjectDesignTokenSuggestionQuery,
   ProjectDesignTokenSuggestionsResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { DesignSystemGenerationRefusal, readGenerationDesignSystem } from './design-systems/generation-reader.js';
 
 type ProjectFileLike = {

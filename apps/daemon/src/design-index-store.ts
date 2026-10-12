@@ -5,9 +5,9 @@ import {
   saveDesignIndex,
   type DesignIndex,
   type FindQuery,
-} from '@open-design/agency-fast-lane/design-index';
-import type { DesignProfile } from '@open-design/agency-fast-lane/profile';
-import type { DesignTaxonomy } from '@open-design/agency-fast-lane/taxonomy';
+} from '@mish/agency-fast-lane/design-index';
+import type { DesignProfile } from '@mish/agency-fast-lane/profile';
+import type { DesignTaxonomy } from '@mish/agency-fast-lane/taxonomy';
 import { parseDesignProfile } from './design-profile-parse.js';
 
 export interface DesignIndexQueryResult {

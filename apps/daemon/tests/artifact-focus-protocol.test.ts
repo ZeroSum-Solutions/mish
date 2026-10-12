@@ -27,7 +27,7 @@ import {
   renderArtifactFocusMarkerExample,
   parseArtifactFocusMarker,
   stripArtifactFocusMarkers,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /** 真实录制里的 done_key 形状(16 位十六进制) */
 const KEY = 'a7f3c91ed2b40561';

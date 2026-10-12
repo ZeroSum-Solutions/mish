@@ -24,7 +24,7 @@ test('outputScopeOf reads the bundled registry: app-shell and crm-dashboard are 
   assert.equal(outputScopeOf(registry, 'app-shell'), 'static-prototype');
   assert.equal(outputScopeOf(registry, 'crm-dashboard'), 'static-prototype');
   assert.equal(outputScopeOf(registry, 'marketing-site'), 'site');
-  assert.equal(outputScopeOf(registry, 'watson'), 'site');
+  assert.equal(outputScopeOf(registry, 'watson'), undefined);
   assert.equal(outputScopeOf(registry, 'no-such-family'), undefined);
   const prototypes = registry.families.filter((entry) => outputScopeOf(registry, entry.family) === 'static-prototype').map((entry) => entry.family);
   assert.deepEqual(prototypes.sort(), ['app-shell', 'crm-dashboard'], 'every app or dashboard family, and nothing else');

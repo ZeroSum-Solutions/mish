@@ -15,7 +15,7 @@ import type {
   McpServerConfig,
   SkillSummary,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useI18n, useT } from '../i18n';
 import { LIBRARY_UI_VISIBLE } from '../features/libraryUi';
 import { ComposerPluginPreview, ComposerPluginOption } from './ComposerPluginPreview';
@@ -256,7 +256,7 @@ export interface ComposerPlusMenuProps {
    * Opens the existing palette picker. The responsive menu renders this only
    * while the composer's container query collapses the toolbar palette.
    */
-  onOpenDesignSystems?: () => void;
+  onMishSystems?: () => void;
 
   /**
    * Optional "Design toolbox" row, rendered LAST. Only the project composer
@@ -403,7 +403,7 @@ export function ComposerPlusMenu({
   disabled = false,
   strokeGlyph = false,
   responsiveToolbar = false,
-  onOpenDesignSystems,
+  onMishSystems,
   triggerLabel,
   onOpen,
   onSubmenuOpen,
@@ -798,7 +798,7 @@ export function ComposerPlusMenu({
             />
             <span>{t('chat.attachAria')}</span>
           </button>
-          {responsiveToolbar && paletteCollapsed && onOpenDesignSystems ? <button ref={designSystemItemRef} type="button" role="menuitem" className="plus-menu__item" data-testid="composer-plus-design-system" onClick={() => { close(); onOpenDesignSystems(); }}>
+          {responsiveToolbar && paletteCollapsed && onMishSystems ? <button ref={designSystemItemRef} type="button" role="menuitem" className="plus-menu__item" data-testid="composer-plus-design-system" onClick={() => { close(); onMishSystems(); }}>
             <Icon name="palette" size={15} className="plus-menu__item-icon" />
             <span>{t('newproj.designSystem')}</span>
           </button> : null}

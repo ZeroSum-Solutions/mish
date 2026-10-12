@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readdir, readFile, rename, writeFile, readlink, rm } from 'node:fs/promises';
 import path from 'node:path';
-import { designSystemRevisionMetadata, updateDesignSystemRevisionFile, type DesignSystemApproval } from '@open-design/contracts';
+import { designSystemRevisionMetadata, updateDesignSystemRevisionFile, type DesignSystemApproval } from '@mish/contracts';
 import { contentStats } from './listing-cache.js';
 
 type Inspection = { revision: string; linkedFiles: string[]; invalidMetadata: boolean };

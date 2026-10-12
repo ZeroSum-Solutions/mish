@@ -1,4 +1,4 @@
-import { byokChoiceCompletenessIssues, FILE_UPLOAD_MAX_BYTES, parseModelPreflightRequest, type ModelPreflightMismatch, type ModelPreflightResult } from '@open-design/contracts';
+import { byokChoiceCompletenessIssues, FILE_UPLOAD_MAX_BYTES, parseModelPreflightRequest, type ModelPreflightMismatch, type ModelPreflightResult } from '@mish/contracts';
 import { isKnownModel, sanitizeCustomModel } from '../runtimes/models.js';
 import type { RuntimeAgentDef } from '../runtimes/types.js';
 

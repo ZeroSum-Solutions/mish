@@ -103,7 +103,7 @@ the status of a daemon it runs beside, then `tools-dev status`, and falls back t
 `http://127.0.0.1:7456`.
 
 ```bash
-mise exec -- pnpm --filter @open-design/daemon build
+mise exec -- pnpm --filter @mish/daemon build
 alias od="node $PWD/apps/daemon/bin/od.mjs"
 od agency config status
 ```
@@ -263,16 +263,16 @@ Edit `deploy/.env` to set your own token and adjust other values as needed:
 
 ```env
 # Port exposed on the host
-OPEN_DESIGN_PORT=7456
+MISH_PORT=7456
 
 # Container memory limit
-OPEN_DESIGN_MEM_LIMIT=384m
+MISH_MEM_LIMIT=384m
 
 # Allowed CORS origins
-OPEN_DESIGN_ALLOWED_ORIGINS=https://yourdomain.com
+MISH_ALLOWED_ORIGINS=https://yourdomain.com
 
 # Docker image tag (this fork's private image; run `docker login ghcr.io` first)
-OPEN_DESIGN_IMAGE=ghcr.io/zerosum-solutions/od:latest
+MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest
 
 # Required API token for daemon security
 # Generate one with: openssl rand -hex 32
@@ -330,8 +330,8 @@ pnpm tools-dev status          # inspect managed runtimes
 pnpm tools-dev logs            # show daemon/web/desktop logs
 pnpm tools-dev check           # status + recent logs + common diagnostics
 pnpm tools-dev stop            # stop managed runtimes
-pnpm --filter @open-design/daemon build  # build apps/daemon/dist/cli.js for `od`
-pnpm --filter @open-design/web build     # build the web package when needed
+pnpm --filter @mish/daemon build  # build apps/daemon/dist/cli.js for `od`
+pnpm --filter @mish/web build     # build the web package when needed
 pnpm typecheck                 # workspace typecheck
 ```
 
@@ -353,7 +353,7 @@ Image, video, audio, and HyperFrames skills call the local `od` CLI through envi
 If media generation fails with `OD_BIN: parameter not set`, `apps/daemon/dist/cli.js` missing, or `failed to reach daemon at http://127.0.0.1:0`, rebuild the daemon CLI and restart the managed runtime:
 
 ```bash
-pnpm --filter @open-design/daemon build
+pnpm --filter @mish/daemon build
 pnpm tools-dev restart --daemon-port 7457 --web-port 5175
 ls -la apps/daemon/dist/cli.js
 curl -s http://127.0.0.1:7457/api/health
@@ -467,7 +467,7 @@ Mishh-Mashh/
 
 ## Troubleshooting
 
-- **`better-sqlite3` fails to load / ABI mismatch after a Node.js version change** — `pnpm install` re-runs `postinstall` automatically and rebuilds the native addon for the current Node.js. To rebuild manually or verify the fix: `pnpm --filter @open-design/daemon rebuild better-sqlite3` then `pnpm --filter @open-design/daemon exec node -e "require('better-sqlite3')"`. Requires build tools: `python3`, `make`, `g++` (or `clang++`). If you use `ignore-scripts=true` in your `.npmrc` (common for AUR packages), run `pnpm bootstrap` after `pnpm install`.
+- **`better-sqlite3` fails to load / ABI mismatch after a Node.js version change** — `pnpm install` re-runs `postinstall` automatically and rebuilds the native addon for the current Node.js. To rebuild manually or verify the fix: `pnpm --filter @mish/daemon rebuild better-sqlite3` then `pnpm --filter @mish/daemon exec node -e "require('better-sqlite3')"`. Requires build tools: `python3`, `make`, `g++` (or `clang++`). If you use `ignore-scripts=true` in your `.npmrc` (common for AUR packages), run `pnpm bootstrap` after `pnpm install`.
 - **"no agents found on PATH"** — install one of the local runtimes registered in [`apps/daemon/src/runtimes/registry.ts`](apps/daemon/src/runtimes/registry.ts), make sure its executable is visible to the daemon, then use **Rescan** in **Models & providers → Local CLI**. Or configure a BYOK runtime in Settings.
 - **Claude Code exits with code 1** — Mishh Mashh was able to start `claude`, but the spawned non-interactive run failed before producing a response. From the same shell or app environment that starts Mishh Mashh, check:
   ```bash
@@ -480,7 +480,7 @@ Mishh-Mashh/
 - **media generation says `OD_BIN` is missing or daemon URL is `:0`** — run the media dispatcher checks above. Do not resume the old CLI session; reopen the project from the Mishh Mashh app so the daemon can inject fresh `OD_*` variables.
 - **Codex loads too much plugin context** — start Mishh Mashh with `OD_CODEX_DISABLE_PLUGINS=1 pnpm tools-dev` to make daemon-spawned Codex processes run with `--disable plugins`.
 - **artifact never renders** — first identify the run's handoff profile. For a filesystem-capable local runtime, confirm the agent created a previewable project file and that file-write events reached the daemon; it should not emit source in `<artifact>`. For a plain/text-only or BYOK run, confirm the response contains one complete `<artifact>` block. Check daemon logs for the first failed boundary instead of asking a filesystem runtime to fall back to inline source.
-- **Browser authentication prompt on macOS** — keep Docker Desktop's default bridge networking. Sign in with username `open-design` and the `OD_API_TOKEN` value from `deploy/.env` as the password. Host networking is not required. See [`deploy/README.md` — Docker Desktop on macOS](deploy/README.md#docker-desktop-on-macos).
+- **Browser authentication prompt on macOS** — keep Docker Desktop's default bridge networking. Sign in with username `mish` and the `OD_API_TOKEN` value from `deploy/.env` as the password. Host networking is not required. See [`deploy/README.md` — Docker Desktop on macOS](deploy/README.md#docker-desktop-on-macos).
 
 ## Mapping back to the vision
 

@@ -13,8 +13,8 @@ import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { AgencyBuildForkResponse, AgencyBuildResponse, AgencyBuildSnapshot, ApiErrorResponse } from '@open-design/contracts';
-import type { BuildDeps, BuildInput, BuildResult } from '@open-design/agency-fast-lane/build';
+import type { AgencyBuildForkResponse, AgencyBuildResponse, AgencyBuildSnapshot, ApiErrorResponse } from '@mish/contracts';
+import type { BuildDeps, BuildInput, BuildResult } from '@mish/agency-fast-lane/build';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';
@@ -23,9 +23,9 @@ import { brandHit } from './helpers/cult-brands.js';
 import { registerAgencyBuildRoutes, toCompositionDto, publicSnapshotIds } from '../src/routes/agency-build.js';
 
 const BRIEF = 'Ledgerline, accounting software for small agencies. Start a free trial.';
-const PLAN = { spine: 'PA', directionId: 'tech-utility', blocks: ['hyperui:marketing/sections/1', 'cult:marketing-bento-shadcn', 'cult:marketing-cta-cosmic', 'cult:marketing-footer-apple'] };
-/** `PLAN.blocks` as a build reports them: Cult blocks by public id. */
-const PUBLIC_BLOCKS = ['hyperui:marketing/sections/1', 'cult:bento-gradient', 'cult:cta-cosmic', 'cult:footer-series-a'];
+const PLAN = { spine: 'PA', directionId: 'tech-utility', blocks: ['hyperui:marketing/sections/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/ctas/1', 'hyperui:marketing/sections/1'] };
+/** The supported public block ids the build reports. */
+const PUBLIC_BLOCKS = ['hyperui:marketing/sections/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/ctas/1', 'hyperui:marketing/sections/1'];
 
 type Report = Extract<BuildResult, { outcome: 'built' }>['report'];
 
@@ -161,7 +161,7 @@ describe('POST /api/agency/build composition', () => {
       expect(typeof app.calls[0]!.loadBlockCatalog).toBe('function');
       expect(done.family).toBe('composed');
       expect(done.outputScope).toBe('site');
-      // Cult blocks are reported by public id (`cult:<slug>`), on the snapshot and in its event.
+      // Public block ids are retained on the snapshot and its event.
       expect(done.composition).toEqual({ requested: 'blocks', used: 'blocks', spine: 'PA', directionId: 'tech-utility', blocks: PUBLIC_BLOCKS, source: 'jev', planner: { calls: 2, ms: 1000 }, effects: { mode: 'off', reason: 'no-placements' } });
       const event = done.events.find((entry) => entry.type === 'composition');
       expect(event?.composition?.blocks).toEqual(PUBLIC_BLOCKS);
@@ -287,10 +287,10 @@ describe('toCompositionDto', () => {
   it('retains support receipts with public ids and strips nested extra fields', () => {
     const dto = toCompositionDto({ requested: 'blocks', used: 'blocks', supportGate: {
       threshold: 0.8, extra: 'private brief',
-      added: [{ kind: 'team', id: 'cult:marketing-team-minimal', probability: 0.95, reason: 'jev-brief-support', prose: 'private provider answer' }],
+      added: [{ kind: 'team', id: 'hyperui:marketing/sections/1', probability: 0.95, reason: 'jev-brief-support', prose: 'private provider answer' }],
       removed: [], decisions: [{ kind: 'team', probability: 0.95, reason: 'supported', extra: 'private' }], skipped: 'arbitrary provider message',
     } } as never);
-    expect(dto.supportGate?.added[0]?.id).not.toBe('cult:marketing-team-minimal');
+    expect(dto.supportGate?.added[0]?.id).toBe('hyperui:marketing/sections/1');
     expect(dto.supportGate).toEqual({ threshold: 0.8,
       added: [{ kind: 'team', id: dto.supportGate?.added[0]?.id, probability: 0.95, reason: 'jev-brief-support' }],
       removed: [], decisions: [{ kind: 'team', probability: 0.95, reason: 'supported' }],

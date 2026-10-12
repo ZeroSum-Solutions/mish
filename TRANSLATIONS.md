@@ -25,7 +25,7 @@ while the registry contains one locale.
 pnpm guard
 pnpm typecheck
 pnpm i18n:check
-pnpm --filter @open-design/web test -- tests/i18n
+pnpm --filter @mish/web test -- tests/i18n
 ```
 
 `pnpm i18n:coverage` reports dictionary coverage. The locale registry, English

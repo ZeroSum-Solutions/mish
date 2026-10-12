@@ -23,7 +23,7 @@
  * cached stable prefix on every turn of every conversation and guarantee a
  * prompt-cache miss.
  */
-import type { ExecutionProfile } from '@open-design/contracts';
+import type { ExecutionProfile } from '@mish/contracts';
 
 // Existing injection-resistance wording for the classic stack and slim Ask /
 // media runs that do not compose the design charter. SP v2.0 carries its own

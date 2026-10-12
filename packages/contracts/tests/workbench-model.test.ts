@@ -36,7 +36,7 @@ describe('public session model boundary', () => {
     { ...native, byokBinding: binding },
     { agentId: 'byok-opencode', modelId: 'model' },
     { ...byok, modelId: ' DEFAULT ' },
-    { ...byok, modelId: 'open-design-byok/model' },
+    { ...byok, modelId: 'mish-byok/model' },
     { ...byok, byokBinding: { ...binding, apiKey: 'sentinel-secret' } },
     { ...native, nativeSessionId: 'private-handle' },
     { ...native, apiKeyHash: 'not-public-identity' },

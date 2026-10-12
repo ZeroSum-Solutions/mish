@@ -10,7 +10,7 @@ import path from 'node:path';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { parseCultCopyResponse, parseCultRegistryItem } from '@open-design/contracts';
+import { parseCultCopyResponse, parseCultRegistryItem } from '@mish/contracts';
 import { runCultAddCli } from '../src/cult-add-cli.js';
 import { CultRegistry, scrubPageMetadata } from '../src/cult-registry.js';
 import { registerCultRegistryRoutes } from '../src/routes/cult-registry.js';

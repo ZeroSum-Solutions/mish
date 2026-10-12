@@ -629,7 +629,7 @@ export interface ProjectWorkspaceScopeResponse {
 }
 
 // Local D-lane placeholder until the B-owned CurrentWorkspaceContext is
-// imported into open-design. The route adapter keeps this replaceable.
+// imported into mish. The route adapter keeps this replaceable.
 export type WorkspaceProjectRole = 'owner' | 'admin' | 'member';
 
 // C owns project sync orchestration. D exposes this on its read model and emits

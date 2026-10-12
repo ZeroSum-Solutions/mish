@@ -24,7 +24,7 @@
 
 import type { Express } from 'express';
 import type { RouteDeps } from '../server-context.js';
-import type { MotionSitesCatalogResponse } from '@open-design/contracts/api/motionsites';
+import type { MotionSitesCatalogResponse } from '@mish/contracts/api/motionsites';
 import { getMotionSitesConnectionStatus } from '../motionsites/connection.js';
 import { fetchMotionSitesCatalogEntries } from '../motionsites/catalog.js';
 import { MOTIONSITES_STARTING_POINTS } from '../motionsites/starting-points-data.js';

@@ -25,7 +25,7 @@ const NSIS_LANGUAGES = [
 const WIN_NSIS_OVERLAY_RELATIVE_PATHS = [
   `${PRODUCT_NAME}.exe`,
   "resources/app/package.json",
-  "resources/open-design-config.json",
+  "resources/mish-config.json",
 ] as const;
 
 export const WIN_PAYLOAD_SEVEN_Z_CREATE_ARGS = ["-t7z", "-m0=LZMA2", "-mx=1", "-mf=off"] as const;
@@ -417,7 +417,7 @@ async function writeInstallerScript(config: ToolPackConfig, paths: WinPaths, pac
   const shortcutName = escapeNsisString(identity.shortcutName);
   const registryKey = escapeNsisString(identity.registryKey);
   const appPathsKey = escapeNsisString(identity.appPathsKey);
-  const inviteProtocolKey = "Software\\Classes\\opendesign";
+  const inviteProtocolKey = "Software\\Classes\\mish";
   const inviteProtocolCommand = createNsisQuotedCommandLiteral([`$INSTDIR\\${exeName}`, "%1"]);
   const inviteProtocolExecutablePrefix = createNsisQuotedCommandLiteral([`$INSTDIR\\${exeName}`]);
   const namespace = escapeNsisString(config.namespace);
@@ -990,7 +990,7 @@ skip_silent_desktop_shortcut:
   WriteRegStr HKCU "${registryKey}" "QuietUninstallString" '"$INSTDIR\\${uninstallerName}" /currentuser /S'
   WriteRegStr HKCU "${registryKey}" "DisplayIcon" "$INSTDIR\\${exeName},0"
   WriteRegStr HKCU "${appPathsKey}" "" "$INSTDIR\\${exeName}"
-  WriteRegStr HKCU "${inviteProtocolKey}" "" "URL:Open Design Invite Protocol"
+  WriteRegStr HKCU "${inviteProtocolKey}" "" "URL:Mish Invite Protocol"
   WriteRegStr HKCU "${inviteProtocolKey}" "URL Protocol" ""
   WriteRegStr HKCU "${inviteProtocolKey}\\DefaultIcon" "" "$INSTDIR\\${exeName},0"
   WriteRegStr HKCU "${inviteProtocolKey}\\shell\\open\\command" "" ${inviteProtocolCommand}

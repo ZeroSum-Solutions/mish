@@ -9,7 +9,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 import {
   buildPluginShareUrl,
@@ -126,15 +126,15 @@ describe('PluginShareMenu', () => {
       make({
         id: 'mp-plugin',
         sourceKind: 'github',
-        source: 'github:open-design/plugins/mp-plugin',
+        source: 'github:mish/plugins/mp-plugin',
         marketplaceId: 'official',
-        marketplaceEntryName: 'open-design/mp-plugin',
+        marketplaceEntryName: 'mish/mp-plugin',
       }),
     );
     openPopover();
     clickItem('Copy install command');
     await Promise.resolve();
-    expect(writes).toContain('od plugin install open-design/mp-plugin');
+    expect(writes).toContain('od plugin install mish/mp-plugin');
   });
 
   it('copies the github source string for github-installed plugins', async () => {
@@ -173,7 +173,7 @@ describe('PluginShareMenu', () => {
       id: 'badge-plugin',
       title: 'Badge Plugin',
       marketplaceId: 'official',
-      marketplaceEntryName: 'open-design/badge-plugin',
+      marketplaceEntryName: 'mish/badge-plugin',
     }));
     openPopover();
     clickItem('Copy README badge');
@@ -225,7 +225,7 @@ describe('PluginShareMenu', () => {
         sourceKind: 'github',
         source: 'github:owner/repo',
         marketplaceId: 'official',
-        marketplaceEntryName: 'open-design/zh-plugin',
+        marketplaceEntryName: 'mish/zh-plugin',
         homepage: 'https://example.test/plugin-home',
       }),
       "en",
@@ -369,7 +369,7 @@ describe('PluginShareMenu', () => {
     openPopover();
     const repoLinks = Array.from(
       container.querySelectorAll<HTMLAnchorElement>(
-        'a.plugin-share-item[href="https://github.com/nexu-io/open-design"]',
+        'a.plugin-share-item[href="https://github.com/ZeroSum-Solutions/mish"]',
       ),
     );
     expect(repoLinks).toHaveLength(0);

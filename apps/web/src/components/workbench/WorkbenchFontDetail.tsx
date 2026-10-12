@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Button } from '@open-design/components';
-import { describeFontSource, type FontCheckResponse, type FontProfile, type FontSourceRecord, type ResourceResult, type WorkspaceCollabContext } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import { describeFontSource, type FontCheckResponse, type FontProfile, type FontSourceRecord, type ResourceResult, type WorkspaceCollabContext } from '@mish/contracts';
 import { postWorkbenchFontCheck } from '../../providers/workbench';
 import { useT } from '../../i18n';
 import { WorkbenchFontSpecimen, type FontSpecimenValue } from './WorkbenchFontSpecimen';

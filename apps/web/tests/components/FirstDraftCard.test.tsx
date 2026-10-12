@@ -9,7 +9,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { beforeAll, afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 import { approvedDesignSystemFixtures } from '../helpers/approved-design-systems';
-import type { DesignSystemSummary, RouteDecision } from '@open-design/contracts';
+import type { DesignSystemSummary, RouteDecision } from '@mish/contracts';
 
 import { FirstDraftCard } from '../../src/components/design-index/FirstDraftCard';
 import { I18nProvider } from '../../src/i18n';

@@ -59,11 +59,19 @@ test('[P0] Team design systems catch up missed shares, updates, and retractions'
     cluster = await createCollabCluster(browser, testInfo, [
       {
         id: 'owner-design-system',
-        env: { ...commonEnv, VELA_CONTROL_KEY: OWNER.controlKey },
+        env: {
+          ...commonEnv,
+          VELA_CONTROL_KEY: OWNER.controlKey,
+          VELA_BIN: await hub.writeVelaBin(`${velaBin}-owner`, OWNER.controlKey),
+        },
       },
       {
         id: 'member-design-system',
-        env: { ...commonEnv, VELA_CONTROL_KEY: MEMBER.controlKey },
+        env: {
+          ...commonEnv,
+          VELA_CONTROL_KEY: MEMBER.controlKey,
+          VELA_BIN: await hub.writeVelaBin(`${velaBin}-member`, MEMBER.controlKey),
+        },
       },
     ]);
     const ownerPage = cluster.clients['owner-design-system']!.page;
@@ -230,7 +238,7 @@ test('[P0] Team design systems catch up missed shares, updates, and retractions'
     // The badge is optimistic; a full navigation must follow the persisted
     // choice, whose passive effect can run after that first visible render.
     await expect.poll(() => memberPage.evaluate(() => localStorage.getItem(
-      'open-design:home-composer:design-system',
+      'mish:home-composer:design-system',
     ))).toBe(designSystemId);
 
     await gotoDesignSystems(memberPage);

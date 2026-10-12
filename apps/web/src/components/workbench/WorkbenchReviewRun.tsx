@@ -1,5 +1,5 @@
-import { reviewFindingDecisionProblem, renderReviewEvidenceText, type ReviewFindingDecisionAction, WORKBENCH_MIN_INDEPENDENT_REVIEWERS, type ReviewAbstainReason, type ReviewCheckVerdict, type ReviewEgressHostProblem, type ReviewerReasonCode, type ReviewerRole, type ReviewRunView, type VerificationBundle } from '@open-design/contracts';
-import { Button } from '@open-design/components';
+import { reviewFindingDecisionProblem, renderReviewEvidenceText, type ReviewFindingDecisionAction, WORKBENCH_MIN_INDEPENDENT_REVIEWERS, type ReviewAbstainReason, type ReviewCheckVerdict, type ReviewEgressHostProblem, type ReviewerReasonCode, type ReviewerRole, type ReviewRunView, type VerificationBundle } from '@mish/contracts';
+import { Button } from '@mish/components';
 import { useI18n, useT } from '../../i18n';
 import styles from './workbench.module.css';
 

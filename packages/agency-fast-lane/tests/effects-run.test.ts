@@ -2,7 +2,7 @@
  * Effects through `runFastLane` and `buildSite` (`src/run.ts`, `src/build.ts`): the plan reaches
  * every render, the published page carries it, the selected section composes first, and the
  * report says what applied. The family compiler's own decoration is agent-independent here: a
- * wrapped watson package records each plan it is handed and returns a synthetic
+ * wrapped ownededitorial package records each plan it is handed and returns a synthetic
  * `EffectRenderReport`, the shape the shared compiler's `renderFamily` returns.
  */
 
@@ -13,19 +13,19 @@ import { createJevEffectJudge, type EffectCatalog, type EffectPlan, type FamilyE
 import { loadFamilyPackage, type FamilyPackage, type RenderResult } from '../src/family.ts';
 import type { ProjectPublisher } from '../src/publish.ts';
 import { runFastLane } from '../src/run.ts';
-import { fakeJevChecker, fakeModel, WATSON_DIR, type Filler } from './fixtures.ts';
+import { fakeJevChecker, fakeModel, TEST_EDITORIAL_DIR, type Filler } from './fixtures.ts';
 
-const ENTRY = 'watson-r1.html';
-const BRIEF = 'Watson, a design and technology studio in Los Angeles. Brand, product and motion work for ambitious teams.';
+const ENTRY = 'ownededitorial-r1.html';
+const BRIEF = 'TestEditorial, a design and technology studio in Los Angeles. Brand, product and motion work for ambitious teams.';
 const NULLABLE_ATOMS = ['awardCaption', 'businessEmail', 'jobsEmail', 'addressFirst', 'addressSecond', 'phone'];
-const watsonFill: Filler = (key, _value, _at, limit) => (NULLABLE_ATOMS.includes(key) ? null : `New ${key} for Watson`.slice(0, limit ?? Infinity));
+const ownededitorialFill: Filler = (key, _value, _at, limit) => (NULLABLE_ATOMS.includes(key) ? null : `New ${key} for TestEditorial`.slice(0, limit ?? Infinity));
 
 const DECLARATION: FamilyEffectDeclaration = {
   scriptPolicy: 'inline',
   maxEffects: 2,
   placements: {
-    'hero-title': { host: { id: 'watson-hero' }, allow: ['shiny-text'] },
-    'card-surface': { host: { id: 'watson-ui-home' }, allow: ['glass-surface'] },
+    'hero-title': { host: { id: 'ownededitorial-hero' }, allow: ['shiny-text'] },
+    'card-surface': { host: { id: 'ownededitorial-ui-home' }, allow: ['glass-surface'] },
   },
 };
 
@@ -36,9 +36,9 @@ const CATALOG: EffectCatalog = {
   ],
 };
 
-/** Watson with a declaration, whose render records every plan and marks the page for each item. */
-async function effectsWatson(): Promise<{ pkg: FamilyPackage; plans: Array<EffectPlan | undefined> }> {
-  const base = await loadFamilyPackage(WATSON_DIR, 'watson');
+/** TestEditorial with a declaration, whose render records every plan and marks the page for each item. */
+async function effectsTestEditorial(): Promise<{ pkg: FamilyPackage; plans: Array<EffectPlan | undefined> }> {
+  const base = await loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
   const plans: Array<EffectPlan | undefined> = [];
   const render = (input: Parameters<FamilyPackage['render']>[0], entry: string, options?: { effects?: EffectPlan }): RenderResult => {
     plans.push(options?.effects);
@@ -71,7 +71,7 @@ function recordingPublisher(): ProjectPublisher & { pages: string[] } {
 const HINT_PLAN: EffectPlan = { effects: [{ placement: 'hero-title', componentId: 'shiny-text', source: 'hint' }] };
 
 test('runFastLane: the plan reaches every render and the strict publish carries it', async () => {
-  const { pkg, plans } = await effectsWatson();
+  const { pkg, plans } = await effectsTestEditorial();
   const publisher = recordingPublisher();
   const report = await runFastLane({
     pkg,
@@ -79,7 +79,7 @@ test('runFastLane: the plan reaches every render and the strict publish carries 
     mode: 'single',
     entry: ENTRY,
     revision: 1,
-    model: fakeModel({ fill: watsonFill }),
+    model: fakeModel({ fill: ownededitorialFill }),
     modelName: 'fake',
     lockPaths: ['brand.name'],
     verify: fakeJevChecker(),
@@ -102,30 +102,30 @@ test('runFastLane: the plan reaches every render and the strict publish carries 
 });
 
 test('runFastLane: progressive paints carry the plan too', async () => {
-  const { pkg: watson } = await effectsWatson();
+  const { pkg: ownededitorial } = await effectsTestEditorial();
   // The save queue waits for the asset upload before its first paint and coalesces renders that
   // arrive meanwhile, so a disk read slower than the fake model's whole fill (seen on CI) left one
   // page. Assets from memory settle in microtasks, before the first fill lands: every paint the
   // run makes is then a separate save, whatever the disk speed.
-  const pkg: FamilyPackage = { ...watson, readAsset: async () => Buffer.alloc(0) };
+  const pkg: FamilyPackage = { ...ownededitorial, readAsset: async () => Buffer.alloc(0) };
   const publisher = recordingPublisher();
-  await runFastLane({ pkg, brief: BRIEF, mode: 'sections', entry: ENTRY, revision: 1, model: fakeModel({ fill: watsonFill }), modelName: 'fake', lockPaths: ['brand.name'], publisher, effects: HINT_PLAN });
+  await runFastLane({ pkg, brief: BRIEF, mode: 'sections', entry: ENTRY, revision: 1, model: fakeModel({ fill: ownededitorialFill }), modelName: 'fake', lockPaths: ['brand.name'], publisher, effects: HINT_PLAN });
   assert.ok(publisher.pages.length > 1);
   assert.ok(publisher.pages.every((html) => html.includes('data-genui="shiny-text"')));
 });
 
 test('runFastLane: with a selected section, the section composes and the final render still carries the plan', async () => {
-  const { pkg, plans } = await effectsWatson();
+  const { pkg, plans } = await effectsTestEditorial();
   const report = await runFastLane({
     pkg,
     brief: BRIEF,
     mode: 'single',
     entry: ENTRY,
     revision: 1,
-    model: fakeModel({ fill: watsonFill }),
+    model: fakeModel({ fill: ownededitorialFill }),
     modelName: 'fake',
     lockPaths: ['brand.name'],
-    sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' }, directionId: 'modern-minimal' },
+    sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' }, directionId: 'modern-minimal' },
     effects: HINT_PLAN,
   });
   assert.ok(report.html.includes('data-od-selected-section="hyperui:marketing/ctas/1"'));
@@ -135,8 +135,8 @@ test('runFastLane: with a selected section, the section composes and the final r
 });
 
 test('runFastLane: no plan, no effects on the page and no report field', async () => {
-  const { pkg, plans } = await effectsWatson();
-  const report = await runFastLane({ pkg, brief: BRIEF, mode: 'single', entry: ENTRY, revision: 1, model: fakeModel({ fill: watsonFill }), modelName: 'fake', lockPaths: ['brand.name'] });
+  const { pkg, plans } = await effectsTestEditorial();
+  const report = await runFastLane({ pkg, brief: BRIEF, mode: 'single', entry: ENTRY, revision: 1, model: fakeModel({ fill: ownededitorialFill }), modelName: 'fake', lockPaths: ['brand.name'] });
   assert.ok(plans.every((plan) => plan === undefined));
   assert.equal(report.html.includes('data-genui="shiny-text"'), false);
   assert.equal(report.effects, undefined);
@@ -149,7 +149,7 @@ test('runFastLane: no plan, no effects on the page and no report field', async (
 function input(pkg: FamilyPackage, overrides: Partial<BuildInput> = {}): BuildInput {
   return {
     brief: BRIEF,
-    family: 'watson',
+    family: 'ownededitorial',
     mode: 'single',
     revision: 1,
     verify: 'off',
@@ -163,7 +163,7 @@ function input(pkg: FamilyPackage, overrides: Partial<BuildInput> = {}): BuildIn
 
 function deps(overrides: Partial<BuildDeps> = {}): BuildDeps {
   return {
-    createModelCaller: () => fakeModel({ fill: watsonFill }),
+    createModelCaller: () => fakeModel({ fill: ownededitorialFill }),
     createJevChecker: () => fakeJevChecker(),
     createJevRouter: () => { throw new Error('not routed in these tests'); },
     resolveJevCredential: async () => 'fake-jev-key',
@@ -177,7 +177,7 @@ function deps(overrides: Partial<BuildDeps> = {}): BuildDeps {
 const effectsEvents = (events: BuildEvent[]) => events.filter((event): event is Extract<BuildEvent, { type: 'effects' }> => event.type === 'effects');
 
 test('buildSite: auto asks Jev once, applies its pick, and reports it', async () => {
-  const { pkg } = await effectsWatson();
+  const { pkg } = await effectsTestEditorial();
   const events: BuildEvent[] = [];
   let sent: Record<string, unknown> | undefined;
   const fetchImpl = (async (_url: string, init: RequestInit) => {
@@ -201,11 +201,11 @@ test('buildSite: auto asks Jev once, applies its pick, and reports it', async ()
   assert.equal(event!.skipped, 1);
   // Ids, counts and codes only: no criteria prose, no brief, no answer body.
   const surfaced = JSON.stringify([result.report.effects, effectsEvents(events)]);
-  for (const text of ['Shiny Text', 'light sweep', 'Watson, a design', 'probabilities', 'confidence']) assert.equal(surfaced.includes(text), false, text);
+  for (const text of ['Shiny Text', 'light sweep', 'TestEditorial, a design', 'probabilities', 'confidence']) assert.equal(surfaced.includes(text), false, text);
 });
 
 test('buildSite: Jev down yields zero effects, the fixed code, and a built page', async () => {
-  const { pkg, plans } = await effectsWatson();
+  const { pkg, plans } = await effectsTestEditorial();
   const fetchImpl = (async () => { throw new TypeError('fetch failed: getaddrinfo ENOTFOUND secret-host'); }) as typeof fetch;
   const events: BuildEvent[] = [];
   const result = await buildSite(input(pkg, { onEvent: (event) => events.push(event) }), deps({ createEffectJudge: (options) => createJevEffectJudge({ ...options, fetchImpl }) }));
@@ -219,7 +219,7 @@ test('buildSite: Jev down yields zero effects, the fixed code, and a built page'
 });
 
 test('buildSite: a missing Jev key under verify off is jev-key-missing, not a failed build', async () => {
-  const { pkg } = await effectsWatson();
+  const { pkg } = await effectsTestEditorial();
   const result = await buildSite(input(pkg), deps({ resolveJevCredential: async () => { throw new Error('no credential'); }, createEffectJudge: createJevEffectJudge }));
   assert.equal(result.outcome, 'built');
   if (result.outcome !== 'built') return;
@@ -228,7 +228,7 @@ test('buildSite: a missing Jev key under verify off is jev-key-missing, not a fa
 });
 
 test('buildSite: off yields mode off, never asks, and hands no plan to the compiler', async () => {
-  const { pkg, plans } = await effectsWatson();
+  const { pkg, plans } = await effectsTestEditorial();
   let asked = 0;
   const result = await buildSite(input(pkg, { effects: 'off' }), deps({ createEffectJudge: () => ({ judge: async () => { asked += 1; return { picks: [], skipped: [], ms: 0, calls: 1 }; } }) }));
   assert.equal(result.outcome, 'built');
@@ -239,7 +239,7 @@ test('buildSite: off yields mode off, never asks, and hands no plan to the compi
 });
 
 test('buildSite: a family with no placements defaults to off and emits no effects event', async () => {
-  const { pkg } = await effectsWatson();
+  const { pkg } = await effectsTestEditorial();
   const events: BuildEvent[] = [];
   const result = await buildSite(input({ ...pkg, effects: null }, { onEvent: (event) => events.push(event) }), deps());
   assert.equal(result.outcome, 'built');
@@ -249,7 +249,7 @@ test('buildSite: a family with no placements defaults to off and emits no effect
 });
 
 test('buildSite: explicit ids apply without Jev and unlisted placements stay auto', async () => {
-  const { pkg } = await effectsWatson();
+  const { pkg } = await effectsTestEditorial();
   const asked: string[][] = [];
   const result = await buildSite(
     input(pkg, { effects: { 'card-surface': 'glass-surface' } }),
@@ -267,7 +267,7 @@ test('buildSite: explicit ids apply without Jev and unlisted placements stay aut
 test('buildSite: under verify strict, a failed effect judge leaves the faithfulness check running and passing', async () => {
   const unreachable = (async () => { throw new TypeError('fetch failed'); }) as typeof fetch;
   const run = async (effects: BuildInput['effects']) => {
-    const { pkg } = await effectsWatson();
+    const { pkg } = await effectsTestEditorial();
     const checker = fakeJevChecker();
     const result = await buildSite(
       input(pkg, { verify: 'strict', ...(effects ? { effects } : {}) }),
@@ -292,7 +292,7 @@ test('buildSite: under verify strict, a failed effect judge leaves the faithfuln
 });
 
 test('buildSite: when every placement is hinted, the effect judge is never called', async () => {
-  const { pkg } = await effectsWatson();
+  const { pkg } = await effectsTestEditorial();
   let created = 0;
   let judged = 0;
   const result = await buildSite(
@@ -308,7 +308,7 @@ test('buildSite: when every placement is hinted, the effect judge is never calle
 });
 
 test('buildSite: effectsReplay reports the replayed ids with source repair', async () => {
-  const { pkg } = await effectsWatson();
+  const { pkg } = await effectsTestEditorial();
   const result = await buildSite(input(pkg, { effects: { 'hero-title': 'shiny-text', 'card-surface': 'none' }, effectsReplay: true }), deps());
   assert.equal(result.outcome, 'built');
   if (result.outcome !== 'built') return;

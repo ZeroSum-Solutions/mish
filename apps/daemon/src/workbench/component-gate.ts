@@ -1,5 +1,5 @@
 import type { Request } from 'express';
-import type { ResourceRef } from '@open-design/contracts';
+import type { ResourceRef } from '@mish/contracts';
 import { resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';
 import { CatalogueAdoptionError } from './adoption/catalogue-adoption.js';
 import { resourceRefKey } from './context-ranking.js';

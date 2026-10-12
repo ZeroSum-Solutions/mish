@@ -21,7 +21,7 @@ import {
   isPathLikeChatHref,
   resolveChatFileLink,
 } from "../runtime/in-project-link";
-import { Button } from "@open-design/components";
+import { Button } from "@mish/components";
 import { navigate } from "../router";
 import { deleteProjectFile, projectFileUrl, uploadProjectFiles } from "../providers/registry";
 import { useProjectCollabContext } from "../collab/collab-context";
@@ -47,8 +47,8 @@ import {
   type TrackingFeedbackReasonCode,
   type TrackingFeedbackRatingWithNone,
   type TrackingProjectKind,
-} from "@open-design/contracts/analytics";
-import { questionsFormTrackingId } from "@open-design/contracts/analytics";
+} from "@mish/contracts/analytics";
+import { questionsFormTrackingId } from "@mish/contracts/analytics";
 import {
   hasUnterminatedQuestionForm,
   splitOnQuestionForms,
@@ -72,7 +72,7 @@ import {
   type OdCardBrandBrowserAssist,
   type RunContextSelection,
   type WorkspaceContextItem,
-} from "@open-design/contracts";
+} from "@mish/contracts";
 import { OdCardView, type BrandBrowserAssistConfirm } from "./OdCard";
 import {
   AnsweredValue,
@@ -120,7 +120,7 @@ import type {
   ProjectMetadata,
   SkillSummary,
 } from "../types";
-import type { ProjectMediaTask } from '@open-design/contracts';
+import type { ProjectMediaTask } from '@mish/contracts';
 
 type TranslateFn = (
   key: keyof Dict,
@@ -139,9 +139,9 @@ export type QuestionFormSubmitHandler = (
 ) => boolean | void | Promise<boolean | void>;
 
 const viewedInlineQuestionForms = new Set<string>();
-const QUESTION_FORM_DRAFT_STORAGE_PREFIX = "open-design:question-form-draft:";
+const QUESTION_FORM_DRAFT_STORAGE_PREFIX = "mish:question-form-draft:";
 const QUESTION_FORM_SUBMITTED_STORAGE_PREFIX =
-  "open-design:question-form-submitted:";
+  "mish:question-form-submitted:";
 
 interface ActionNotice {
   message: string;
@@ -283,14 +283,14 @@ function SkillPluginCandidateCard({
           setNotice({ message: install?.message ?? t('chat.pluginAction.failed') });
         } else {
           if (typeof window !== "undefined") {
-            window.dispatchEvent(new CustomEvent("open-design:plugins-changed"));
+            window.dispatchEvent(new CustomEvent("mish:plugins-changed"));
           }
           setNotice({ message: install?.message ?? t('chat.pluginAction.saved') });
         }
       } else {
         setNotice({ message: t('chat.pluginAction.saved') });
       }
-      if (draftPath && onRequestOpenFile) onRequestOpenFile(`${draftPath}/open-design.json`);
+      if (draftPath && onRequestOpenFile) onRequestOpenFile(`${draftPath}/mish.json`);
     } catch (err) {
       setNotice({ message: err instanceof Error ? err.message : String(err) });
     } finally {
@@ -298,7 +298,7 @@ function SkillPluginCandidateCard({
     }
   }
 
-  async function share(action: "contribute-open-design") {
+  async function share(action: "contribute-mish") {
     if (!projectId) return;
     setBusy("contribute");
     setNotice(null);
@@ -331,7 +331,7 @@ function SkillPluginCandidateCard({
             type="button"
             className="plugin-action-button"
             disabled={disabled}
-            onClick={() => void share("contribute-open-design")}
+            onClick={() => void share("contribute-mish")}
           >
             <Icon name={busy === "contribute" ? "spinner" : "share"} size={13} />
             <span>{busy === "contribute" ? t("pluginCard.starting") : t("skillPluginCandidate.contributeToMain")}</span>
@@ -398,8 +398,8 @@ interface Props {
   // Click handler for the post-completion "Share to Mishh Mashh" submission
   // action. ProjectView wires this to handleSend with the bundled
   // `od-share-to-community` trigger prompt.
-  onShareToOpenDesign?: () => void;
-  shareToOpenDesignBusy?: boolean;
+  onShareToMish?: () => void;
+  shareToMishBusy?: boolean;
   // Consecutive messages from the same assistant share one identity header.
   // ChatPane sets this false after the first item in a contiguous run.
   showRole?: boolean;
@@ -514,7 +514,7 @@ const ASSISTANT_MESSAGE_COMPARED_PROPS: Array<keyof Props> = [
   'nextUserContent',
   'questionFormSubmitDisabled',
   'forking',
-  'shareToOpenDesignBusy',
+  'shareToMishBusy',
   'suppressDirectionForms',
   'hasDesignSystemContext',
   'nextStepAiOptimizeBusy',
@@ -617,8 +617,8 @@ function AssistantMessageImpl({
   onRequestPluginFolderAgentAction,
   activePluginActionPaths = new Set(),
   hiddenPluginActionPaths = new Set(),
-  onShareToOpenDesign,
-  shareToOpenDesignBusy = false,
+  onShareToMish,
+  shareToMishBusy = false,
   showRole = true,
   isLast,
   isLastTurn,
@@ -1252,9 +1252,9 @@ function AssistantMessageImpl({
     hasEmptyResponse ||
     !!copyMarkdown ||
     canFork);
-  const canShowOpenDesignSubmission = !!onShareToOpenDesign && showFeedback && runSucceeded;
-  const showOpenDesignSubmission =
-    canShowOpenDesignSubmission && (!!isLast || shareToOpenDesignBusy);
+  const canShowMishSubmission = !!onShareToMish && showFeedback && runSucceeded;
+  const showMishSubmission =
+    canShowMishSubmission && (!!isLast || shareToMishBusy);
   const effectiveNextStepVariant: NextStepActionsVariant =
     nextStepVariant === 'brand-extraction' && (!runSucceeded || !nextStepArtifactName)
       ? 'brand-programmatic-incomplete'
@@ -1454,7 +1454,7 @@ function AssistantMessageImpl({
     !hasPendingQuestionForm &&
     ((ownsTrailingNextStep && hasNextStepPrimary &&
       ((runSucceeded && nextStepDeliveryEvidence) || isBrandExtractionRecovery)) ||
-      showOpenDesignSubmission);
+      showMishSubmission);
   // Pre-output vs working: before any real content (text / thinking / tools /
   // files) the footer shimmers "Preparing…"; the moment content lands it
   // flips to "Working". The elapsed clock stays anchored to the persisted run
@@ -1786,8 +1786,8 @@ function AssistantMessageImpl({
               ownsTrailingNextStep && nextStepFileName ? onArtifactDownload : undefined
             }
             skills={ownsTrailingNextStep ? nextStepSkills : undefined}
-            onShareToOpenDesign={showOpenDesignSubmission ? onShareToOpenDesign : undefined}
-            shareToOpenDesignBusy={shareToOpenDesignBusy}
+            onShareToMish={showMishSubmission ? onShareToMish : undefined}
+            shareToMishBusy={shareToMishBusy}
             variant={effectiveNextStepVariant}
           />
         ) : null}
@@ -3337,7 +3337,7 @@ function ProseBlock({
      * 三者互不重叠,合在一条链上,谁都不能少:
      *
      * 1. `stripInternalControlMarkers`(origin/main):daemon 的内部控制标记
-     *    (`<od-title>` / `open-design-plan-contract` / `open-design-runtime-state`)。
+     *    (`<od-title>` / `mish-plan-contract` / `mish-runtime-state`)。
      *    这些本该被 daemon 侧的流式剥离器吃掉,但已经落库的旧消息修不回来。
      * 2. `stripCritiqueGrammar`(本分支):评审剧场语法。daemon 那道
      *    (`panel-grammar-strip.ts`)只管**新流**;用户手上已经有一堆落了库的旧对话,
@@ -3346,7 +3346,7 @@ function ProseBlock({
      *
      * 位置都在最前面:后面 `stripArtifact` 之类都按标记找边界,先把不是标记的
      * 噪音清掉,它们的扫描才不会被岔开。
-     * 语法出处在 `@open-design/contracts`,两边共用一份,不会分叉。
+     * 语法出处在 `@mish/contracts`,两边共用一份,不会分叉。
      */
     const withoutMarkers = stripArtifactFocusMarkers(
       stripCritiqueGrammar(stripInternalControlMarkers(text, { streaming })),

@@ -147,7 +147,7 @@ fsTest('resolveAgentLaunch uses packaged built-in Vela for AMR and prepends its 
   const root = mkdtempSync(join(tmpdir(), 'od-launch-amr-built-in-'));
   try {
     return withEnvSnapshot(['PATH', 'OD_AGENT_HOME', 'OD_RESOURCE_ROOT', 'VELA_OPENCODE_BIN'], () => {
-      const resourceRoot = join(root, 'resources', 'open-design');
+      const resourceRoot = join(root, 'resources', 'mish');
       const builtInDir = join(resourceRoot, 'bin');
       const builtInVela = join(builtInDir, 'vela');
       const companionTree = join(builtInDir, 'libexec', 'opencode');

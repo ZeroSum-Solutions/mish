@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { Dispatch, SetStateAction } from 'react';
-import type { ProjectLocation } from '@open-design/contracts';
+import type { ProjectLocation } from '@mish/contracts';
 import type { AppConfig } from '../types';
 import {
   fetchProjectLocations,
@@ -9,7 +9,7 @@ import {
   updateProjectLocations,
 } from '../state/project-locations';
 import { useI18n } from '../i18n';
-import { Badge, Button, IconButton } from '@open-design/components';
+import { Badge, Button, IconButton } from '@mish/components';
 import { Icon } from './Icon';
 import styles from './ProjectLocationsSection.module.css';
 

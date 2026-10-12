@@ -1,4 +1,4 @@
-import { designBriefModelOutputSchema, type BriefTransformerLane } from '@open-design/contracts';
+import { designBriefModelOutputSchema, type BriefTransformerLane } from '@mish/contracts';
 import type { BriefGenerator, BriefGeneratorAvailability } from './generator.js';
 
 export interface SelectableBriefGeneratorOptions {

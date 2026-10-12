@@ -1,4 +1,4 @@
-import { WORKBENCH_ADOPTION_EXECUTOR_ENV, WORKBENCH_ADOPTION_HELPER_LAYOUT, WORKBENCH_ADOPTION_HELPER_RECORD_SCHEMA } from '@open-design/contracts';
+import { WORKBENCH_ADOPTION_EXECUTOR_ENV, WORKBENCH_ADOPTION_HELPER_LAYOUT, WORKBENCH_ADOPTION_HELPER_RECORD_SCHEMA } from '@mish/contracts';
 import { createHash } from 'node:crypto';
 import { closeSync, constants, fstatSync, lstatSync, mkdirSync, openSync, readSync, realpathSync } from 'node:fs';
 import { release } from 'node:os';

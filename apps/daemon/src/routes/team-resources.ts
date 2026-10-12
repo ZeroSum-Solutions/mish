@@ -5,7 +5,7 @@ import {
   createApiErrorResponse,
   TeamResourceCopyForbiddenError,
   type TeamResourceState,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   TeamResourceKind,
   TeamResourceKey,

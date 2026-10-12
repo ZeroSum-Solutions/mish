@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isTodoWriteToolName } from '@open-design/contracts';
+import { isTodoWriteToolName } from '@mish/contracts';
 import { acpToolName } from '../src/agent-protocol/acp/updates.js';
 
 /**

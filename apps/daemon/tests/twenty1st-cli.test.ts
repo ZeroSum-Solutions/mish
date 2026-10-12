@@ -6,7 +6,7 @@ import { execFile } from 'node:child_process';
 import http from 'node:http';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import originals from '@open-design/21st-catalog/generated/21st-originals.json' with { type: 'json' };
+import originals from '@mish/21st-catalog/generated/21st-originals.json' with { type: 'json' };
 import type { AddressInfo } from 'node:net';
 import { dirname, resolve as pathResolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -14,7 +14,7 @@ import { promisify } from 'node:util';
 import { createHash } from 'node:crypto';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { Twenty1stItem, Twenty1stListResponse } from '@open-design/contracts';
+import type { Twenty1stItem, Twenty1stListResponse } from '@mish/contracts';
 
 const execFileP = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));

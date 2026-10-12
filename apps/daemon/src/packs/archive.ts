@@ -64,7 +64,7 @@ import {
   PACK_RELATIVE_PATH_PATTERN,
   packPathCollisionKey,
   type PackFileEntry,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { O_NOFOLLOW, PackError } from './manifest.js';
 

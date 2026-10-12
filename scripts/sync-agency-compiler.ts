@@ -56,7 +56,7 @@
 // What it never touches:
 //   - a family module's OWN package, `scripts/families/<family>/**` inside `agency-<family>` —
 //     that copy is package-owned (`registry.ts` sits beside it, not inside it)
-//   - `families/`, `preview/`, `assets/`, `README.md`, `SKILL.md`, `open-design.json`
+//   - `families/`, `preview/`, `assets/`, `README.md`, `SKILL.md`, `mish.json`
 //   - `compiler/FAMILY-PATCH.json` — it records hashes of family sources only, never a shared or
 //     mirrored file, so it has nothing to say about this sync
 //   - every `COMMIT.json` entry for a file this script does not write. That file records a
@@ -119,8 +119,6 @@ const REGISTRY = 'families/registry.ts';
 
 /** A family module the template shares with an example package, and the package that owns it. */
 const TEMPLATE_MIRRORS: ReadonlyArray<{ family: string; owner: string }> = [
-  { family: 'emmpo', owner: 'agency-emmpo' },
-  { family: 'watson', owner: 'agency-watson' },
 ];
 
 /**
@@ -137,12 +135,7 @@ const PACKAGE_MIRRORS: Readonly<Record<string, readonly string[]>> = {
   'agency-community': [],
   'agency-crm-dashboard': [],
   'agency-docs-hub': [],
-  'agency-emmpo': ['watson'],
-  'agency-fervor': ['emmpo', 'watson', 'wrenfield'],
-  'agency-halcyon': ['emmpo', 'watson', 'wrenfield'],
   'agency-listings': [],
-  'agency-maben': [],
-  'agency-maren': ['emmpo', 'watson', 'wrenfield'],
   'agency-marketing-site': [],
   'agency-nonprofit': [],
   'agency-practice': [],
@@ -150,8 +143,6 @@ const PACKAGE_MIRRORS: Readonly<Record<string, readonly string[]>> = {
   'agency-publication': [],
   'agency-restaurant': [],
   'agency-storefront': [],
-  'agency-watson': ['emmpo'],
-  'agency-wrenfield': ['emmpo', 'watson'],
 };
 
 type Target = {
@@ -303,7 +294,8 @@ function renderRegistry(target: Target, report: SyncReport): Buffer | undefined 
     report.errors.push(`${label}: declared families with no module: ${absent.join(', ')}`);
     return undefined;
   }
-  if (roster.length === 0) {
+  // The template carries no family module in the public repository (the study families ship in a private pack).
+  if (roster.length === 0 && scriptsDir !== templateScripts) {
     report.errors.push(`${label}: no family module under scripts/families`);
     return undefined;
   }

@@ -17,8 +17,8 @@ import {
   type BuildOnBrandPlanSection,
   type BuildOnBrandReferenceDigest,
   type BuildOnBrandSectionRole,
-} from '@open-design/contracts';
-import type { SectionCatalogEntry, SectionCatalogSectionKind } from '@open-design/contracts/api/section-catalog';
+} from '@mish/contracts';
+import type { SectionCatalogEntry, SectionCatalogSectionKind } from '@mish/contracts/api/section-catalog';
 
 export interface PlanKit {
   id: string;

@@ -26,7 +26,7 @@ import {
   type TrackingDesignSystemKind,
   type TrackingDesignSystemSource,
   type TrackingRunRecoveryActionType,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { spawnEnvForAgent } from '../agents.js';
 import { newInsertId, normalizeAnalyticsCaptureResult } from '../analytics.js';
 import type { AnalyticsCaptureResult, AnalyticsContext } from '../analytics.js';
@@ -79,7 +79,7 @@ import {
   runPreviewModuleCountForRun,
 } from '../runtimes/run-lifecycle-analytics.js';
 import { odNextRolloutAnalyticsProperties } from '../strategies/od-next/rollout-analytics.js';
-import type { AppliedPluginSnapshot } from '@open-design/contracts';
+import type { AppliedPluginSnapshot } from '@mish/contracts';
 import type { OdNextRolloutDecision } from '../strategies/od-next/rollout.js';
 import {
   runTouchedArtifactPaths,

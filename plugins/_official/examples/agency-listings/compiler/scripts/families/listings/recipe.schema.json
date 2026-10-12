@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://open-design.ai/schemas/agency-site/listings/recipe.v2.json",
+  "$id": "https://github.com/ZeroSum-Solutions/mish/schemas/agency-site/listings/recipe.v2.json",
   "title": "listings recipe",
   "description": "A static directory or listings page kind (atlas SM.02): header, search, categories, filters, results, comparison, featured listing, optional reviews, inquiry and footer. Derived from compiler/scripts/families/listings/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.",
   "$comment": "contract.ts additionally enforces markup-free plain text, email and phone formats on the nullable inquiry atoms, and that a null appears only on an x-atom string leaf or in the x-optional reviews slot. x-mock item groups are illustrative sample data: render.ts shows the fixed template caption (SAMPLE_DATA_CAPTION in slots.ts, not a recipe field) before every one of them.",

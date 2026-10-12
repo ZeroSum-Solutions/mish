@@ -5,7 +5,7 @@ import { mkdtemp, readdir, readFile, rm, stat, writeFile } from 'node:fs/promise
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { encodeCaptureMetadataHeader, parseCaptureList, parseCaptureView, WORKBENCH_CAPTURE_MAX_BYTES, type RightsDeclaration } from '@open-design/contracts';
+import { encodeCaptureMetadataHeader, parseCaptureList, parseCaptureView, WORKBENCH_CAPTURE_MAX_BYTES, type RightsDeclaration } from '@mish/contracts';
 import { registerWorkbenchCaptureRoutes } from '../../src/routes/workbench-capture.js';
 import { createCaptureService } from '../../src/workbench/capture/capture-service.js';
 import { createUnitService } from '../../src/workbench/units/unit-service.js';

@@ -11,9 +11,9 @@ import {
   type CSSProperties,
   type ReactNode,
 } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { createPortal } from 'react-dom';
-import type { DesignSystemEditClickProps, TrackingArtifactKind, TrackingProjectKind } from '@open-design/contracts/analytics';
+import type { DesignSystemEditClickProps, TrackingArtifactKind, TrackingProjectKind } from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackFileManagerClick,
@@ -114,7 +114,7 @@ import {
   type LocalizedText,
   type WorkspaceCollabContext,
   type WorkspaceContextItem,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   notifyTeamProjectsChanged,
   TEAM_PROJECTS_CHANGED_EVENT,
@@ -1303,10 +1303,10 @@ export function FileWorkspace({
       });
     };
     load();
-    window.addEventListener('open-design:plugins-changed', load);
+    window.addEventListener('mish:plugins-changed', load);
     return () => {
       cancelled = true;
-      window.removeEventListener('open-design:plugins-changed', load);
+      window.removeEventListener('mish:plugins-changed', load);
     };
   }, [workspaceContext]);
 
@@ -3018,7 +3018,7 @@ export function FileWorkspace({
   // A persisted file tab can outlive its file. The tab strip hides that stale
   // entry, so keeping it as the visual active target would leave the fixed
   // Design Files tab as the only visible tab while the body tells the user to
-  // open Design Files. Treat the root as the display fallback without erasing
+  // open the Design Files. Treat the root as the display fallback without erasing
   // persisted state: an in-flight file refresh may still restore the target.
   const designFilesTabActive =
     activeTab === DESIGN_FILES_TAB || !activeTabHasRenderableSurface;
@@ -3957,7 +3957,7 @@ export function FileWorkspace({
               onRequestBrowserUsePrompt={onRequestBrowserUsePrompt}
               onPageSnapshotToast={handleBrowserPageSnapshotToast}
               onRefreshFiles={refreshFilesWithoutResult}
-              onOpenDesignFiles={() => setPersistedActive(DESIGN_FILES_TAB)}
+              onMishFiles={() => setPersistedActive(DESIGN_FILES_TAB)}
               onOpenFile={openFile}
               onPageInfoChange={(info) => updateBrowserTabInfo(browserTab.id, info)}
               onAddImageToChat={(attachment) => {

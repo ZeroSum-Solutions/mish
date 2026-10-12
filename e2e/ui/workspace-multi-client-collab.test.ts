@@ -44,10 +44,10 @@ const MEMBER = {
 };
 
 const ADAPTIVE_AUTHORITY_HEALTHY_SERIES =
-  'open_design_workspace_authority_decisions_total' +
+  'mish_workspace_authority_decisions_total' +
   '{mode="adaptive",source="sse",reason="healthy",outcome="allow"}';
 const ADAPTIVE_AUTHORITY_UNHEALTHY_SERIES =
-  'open_design_workspace_authority_decisions_total' +
+  'mish_workspace_authority_decisions_total' +
   '{mode="adaptive",source="sse",reason="unhealthy",outcome="fallback"}';
 
 test.describe.configure({ timeout: T.xlong * 5 });
@@ -81,11 +81,19 @@ test('[P0] strict SSE health suppresses authority reads and bounds event storms 
       await createCollabCluster(browser, testInfo, [
         {
           id: 'authority-owner',
-          env: { ...commonEnv, VELA_CONTROL_KEY: OWNER.controlKey },
+          env: {
+            ...commonEnv,
+            VELA_CONTROL_KEY: OWNER.controlKey,
+            VELA_BIN: await hub.writeVelaBin(`${velaBin}-owner`, OWNER.controlKey),
+          },
         },
         {
           id: 'authority-member',
-          env: { ...commonEnv, VELA_CONTROL_KEY: MEMBER.controlKey },
+          env: {
+            ...commonEnv,
+            VELA_CONTROL_KEY: MEMBER.controlKey,
+            VELA_BIN: await hub.writeVelaBin(`${velaBin}-member`, MEMBER.controlKey),
+          },
         },
       ]));
     const owner = cluster.clients['authority-owner']!;
@@ -355,11 +363,19 @@ test('[P0] two isolated clients converge live content, presence, and owner unsha
       await createCollabCluster(browser, testInfo, [
         {
           id: 'owner',
-          env: { ...commonEnv, VELA_CONTROL_KEY: OWNER.controlKey },
+          env: {
+            ...commonEnv,
+            VELA_CONTROL_KEY: OWNER.controlKey,
+            VELA_BIN: await hub.writeVelaBin(`${velaBin}-owner`, OWNER.controlKey),
+          },
         },
         {
           id: 'member',
-          env: { ...commonEnv, VELA_CONTROL_KEY: MEMBER.controlKey },
+          env: {
+            ...commonEnv,
+            VELA_CONTROL_KEY: MEMBER.controlKey,
+            VELA_BIN: await hub.writeVelaBin(`${velaBin}-member`, MEMBER.controlKey),
+          },
         },
       ]));
     const ownerPage = cluster.clients.owner!.page;
@@ -719,11 +735,19 @@ test.fixme('[P0] two active clients converge when a member gains then loses admi
       await createCollabCluster(browser, testInfo, [
         {
           id: 'owner',
-          env: { ...commonEnv, VELA_CONTROL_KEY: OWNER.controlKey },
+          env: {
+            ...commonEnv,
+            VELA_CONTROL_KEY: OWNER.controlKey,
+            VELA_BIN: await hub.writeVelaBin(`${velaBin}-owner`, OWNER.controlKey),
+          },
         },
         {
           id: 'member',
-          env: { ...commonEnv, VELA_CONTROL_KEY: MEMBER.controlKey },
+          env: {
+            ...commonEnv,
+            VELA_CONTROL_KEY: MEMBER.controlKey,
+            VELA_BIN: await hub.writeVelaBin(`${velaBin}-member`, MEMBER.controlKey),
+          },
         },
       ]));
     const ownerPage = cluster.clients.owner!.page;
@@ -822,11 +846,19 @@ test('[P0] two isolated clients converge shared plugins and skills without scope
     cluster = await createCollabCluster(browser, testInfo, [
       {
         id: 'extension-owner',
-        env: { ...commonEnv, VELA_CONTROL_KEY: OWNER.controlKey },
+        env: {
+          ...commonEnv,
+          VELA_CONTROL_KEY: OWNER.controlKey,
+          VELA_BIN: await hub.writeVelaBin(`${velaBin}-owner`, OWNER.controlKey),
+        },
       },
       {
         id: 'extension-member',
-        env: { ...commonEnv, VELA_CONTROL_KEY: MEMBER.controlKey },
+        env: {
+          ...commonEnv,
+          VELA_CONTROL_KEY: MEMBER.controlKey,
+          VELA_BIN: await hub.writeVelaBin(`${velaBin}-member`, MEMBER.controlKey),
+        },
       },
     ]);
     const ownerPage = cluster.clients['extension-owner']!.page;
@@ -851,9 +883,9 @@ test('[P0] two isolated clients converge shared plugins and skills without scope
     await writeProjectTextFile(
       ownerPage,
       projectId,
-      'plugin-source/open-design.json',
+      'plugin-source/mish.json',
       JSON.stringify({
-        $schema: 'https://open-design.ai/schemas/plugin.v1.json',
+        $schema: 'https://github.com/ZeroSum-Solutions/mish/schemas/plugin.v1.json',
         name: pluginId,
         title: 'Realtime Shared Plugin',
         version: '0.1.0',

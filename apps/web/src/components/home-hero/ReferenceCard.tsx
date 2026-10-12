@@ -10,8 +10,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   PreviewCard, PreviewCardMedia, PreviewCardCaption, PreviewCardTitle, PreviewCardDescription,
-} from '@open-design/components';
-import type { DesignProfile } from '@open-design/contracts';
+} from '@mish/components';
+import type { DesignProfile } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { MediaSurface } from '../plugins-home/cards/MediaSurface';
 import { useInView } from '../plugins-home/useInView';

@@ -4,7 +4,7 @@
 // import under that member and member-scoped search and apply can find it.
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchOwnedImport } from '../../../src/components/workbench/WorkbenchOwnedImport';
 

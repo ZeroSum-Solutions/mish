@@ -12,7 +12,7 @@ import type {
   LibraryAssetKind,
   LibraryElementMeta,
   LibrarySourceKind,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 export const SOURCE_LABELS: Record<LibrarySourceKind, string> = {
   clipper: 'Clipper',
@@ -100,7 +100,7 @@ export function originProjectId(asset: LibraryAsset): string | null {
 
 /**
  * The design system an asset belongs to (the `user:`-prefixed id), from its
- * provenance — drives the card's "Open design system" jump-link. Present on
+ * provenance — drives the card's "Open the design system" jump-link. Present on
  * assets the reconcile sync registered for a design system.
  */
 export function originDesignSystemId(asset: LibraryAsset): string | null {

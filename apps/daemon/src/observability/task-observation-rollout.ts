@@ -5,7 +5,7 @@ import {
   NormalizedAgentObservationV1Schema,
   type ChildEvidenceCoverageV1,
   type OdNextRolloutDecision,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type Database from 'better-sqlite3';
 
 import type { TelemetryPrefs } from '../app-config.js';
@@ -1160,7 +1160,7 @@ export function createTaskObservationRolloutService(
                 reason: 'task_rollout_context_missing',
               }
             : TASK_OBSERVATION_SCHEMA_CAPABILITY_V1.schema
-                !== 'open-design.task-observation-schema-capability/v1'
+                !== 'mish.task-observation-schema-capability/v1'
               ? {
                   status: 'compatibility' as const,
                   reason: 'schema_capability_missing',

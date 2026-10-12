@@ -89,17 +89,17 @@ test('canonicalization: an UNBOUND "percent" (no adjacent number) still must tra
 });
 
 test('canonicalization: "GC" traces against a brief that spells out "general contractor"', () => {
-  const brief = 'Wrenfield Remodeling is a general contractor in Raleigh, licensed NC #78412.';
+  const brief = 'TestContractor Remodeling is a general contractor in Raleigh, licensed NC #78412.';
   assert.equal(traceableFlagsFor(brief, 'Licensed GC, NC #78412.'), 0);
 });
 
 test('canonicalization: "GC" against a brief that never mentions being a contractor at all still fails to trace', () => {
-  const brief = 'Wrenfield Remodeling is a home renovation studio in Raleigh, licensed NC #78412.';
+  const brief = 'TestContractor Remodeling is a home renovation studio in Raleigh, licensed NC #78412.';
   assert.equal(traceableFlagsFor(brief, 'Licensed GC, NC #78412.'), 1);
 });
 
 test('canonicalization: "GC" traces for deterministicProperNounFlags too, the same abbreviation table as the word-trace path', () => {
-  const brief = 'Wrenfield Remodeling is a general contractor in Raleigh.';
+  const brief = 'TestContractor Remodeling is a general contractor in Raleigh.';
   const slot: FaithfulnessSlot = { path: 'a', text: 'Every job is run by a licensed GC.' };
   assert.deepEqual(deterministicProperNounFlags(brief, [slot], new Set(['a'])), []);
 });
@@ -108,51 +108,51 @@ test('canonicalization: "GC" traces for deterministicProperNounFlags too, the sa
 // 2. Multi-family true-positive sweep: an invented person, place, brand, and claim sentence
 // ---------------------------------------------------------------------------
 
-const WRENFIELD_BRIEF = 'Wrenfield Remodeling is a general contractor in Raleigh, North Carolina, in business '
+const TEST_CONTRACTOR_BRIEF = 'TestContractor Remodeling is a general contractor in Raleigh, North Carolina, in business '
   + 'since 2009. We are licensed (NC #78412), rated 4.9 stars with 212 five-star reviews, and we serve '
   + 'Raleigh, Cary and Wake Forest. Services: kitchens, bathrooms, decks and porches, siding, windows and '
-  + 'doors, roofing. Contact: (919) 555-0142, hello@wrenfieldremodeling.com.';
+  + 'doors, roofing. Contact: (919) 555-0142, hello@ownedcontractorremodeling.com.';
 
-const HALCYON_BRIEF = 'Halcyon Hall is a contemporary art and design museum on the east bank of the river in '
+const TEST_INSTITUTION_BRIEF = 'TestInstitution Hall is a contemporary art and design museum on the east bank of the river in '
   + 'Providence, Rhode Island, open since 1961. Five collection rooms, three exhibitions a season. '
   + 'Admission: general $16, students $9, under 18 free, members free.';
 
-const MAREN_BRIEF = 'Maren Atelier is a two-person studio in Providence, Rhode Island, making pearl and gold '
-  + 'jewelry in runs of twelve, working since 2016. Maren cuts and solders, Ilse strings and finishes.';
+const TEST_MAKER_BRIEF = 'TestMaker Atelier is a two-person studio in Providence, Rhode Island, making pearl and gold '
+  + 'jewelry in runs of twelve, working since 2016. TestMaker cuts and solders, Ilse strings and finishes.';
 
-test('true positive: an invented person name flags (wrenfield)', () => {
+test('true positive: an invented person name flags (ownedcontractor)', () => {
   const slot: FaithfulnessSlot = { path: 'sections[9].content.owner', text: 'Founded and led by Marguerite Ashcombe.' };
-  const flagged = deterministicProperNounFlags(WRENFIELD_BRIEF, [slot], new Set([slot.path]));
+  const flagged = deterministicProperNounFlags(TEST_CONTRACTOR_BRIEF, [slot], new Set([slot.path]));
   assert.equal(flagged.length, 1, 'an invented owner name with no brief support must flag');
 });
 
-test('true positive: an invented place name flags (halcyon)', () => {
+test('true positive: an invented place name flags (ownedinstitution)', () => {
   const slot: FaithfulnessSlot = { path: 'sections[6].content.lede', text: 'Just a short walk from Larkmoor Heights station.' };
-  const flagged = deterministicProperNounFlags(HALCYON_BRIEF, [slot], new Set([slot.path]));
+  const flagged = deterministicProperNounFlags(TEST_INSTITUTION_BRIEF, [slot], new Set([slot.path]));
   assert.equal(flagged.length, 1, 'an invented station/place name with no brief support must flag');
 });
 
-test('true positive: an invented brand/business name flags (maren)', () => {
+test('true positive: an invented brand/business name flags (ownedmaker)', () => {
   const slot: FaithfulnessSlot = { path: 'sections[1].content.credit', text: 'Findings sourced from Hallowgate Metals.' };
-  const flagged = deterministicProperNounFlags(MAREN_BRIEF, [slot], new Set([slot.path]));
+  const flagged = deterministicProperNounFlags(TEST_MAKER_BRIEF, [slot], new Set([slot.path]));
   assert.equal(flagged.length, 1, 'an invented supplier/brand name with no brief support must flag');
 });
 
-test('true positive: an invented claim-bearing sentence flags (wrenfield — an unsupported specific number)', () => {
+test('true positive: an invented claim-bearing sentence flags (ownedcontractor — an unsupported specific number)', () => {
   const slot: FaithfulnessSlot = { path: 'sections[1].content.annotationRoofLabel', text: 'Standing-seam roof, replaced in 2025.' };
-  const flagged = deterministicSentenceClaimFlags(WRENFIELD_BRIEF, [slot], new Set([slot.path]));
+  const flagged = deterministicSentenceClaimFlags(TEST_CONTRACTOR_BRIEF, [slot], new Set([slot.path]));
   assert.equal(flagged.length, 1, 'an invented specific year with no brief support must flag as a claim-bearing sentence');
 });
 
-test('true positive: an invented claim-bearing sentence flags (halcyon — an unsupported discount)', () => {
+test('true positive: an invented claim-bearing sentence flags (ownedinstitution — an unsupported discount)', () => {
   const slot: FaithfulnessSlot = { path: 'sections[7].content.tier1Benefit2', text: 'Twenty percent off in the shop.' };
-  const flagged = deterministicSentenceClaimFlags(HALCYON_BRIEF, [slot], new Set([slot.path]));
+  const flagged = deterministicSentenceClaimFlags(TEST_INSTITUTION_BRIEF, [slot], new Set([slot.path]));
   assert.equal(flagged.length, 1, 'an invented discount figure the brief never states must flag');
 });
 
-test('true positive: an invented claim-bearing sentence flags (maren — an unsupported price)', () => {
+test('true positive: an invented claim-bearing sentence flags (ownedmaker — an unsupported price)', () => {
   const slot: FaithfulnessSlot = { path: 'sections[2].content.priceNote', text: 'Every piece starts at $95.' };
-  const flagged = deterministicSentenceClaimFlags(MAREN_BRIEF, [slot], new Set([slot.path]));
+  const flagged = deterministicSentenceClaimFlags(TEST_MAKER_BRIEF, [slot], new Set([slot.path]));
   assert.equal(flagged.length, 1, 'an invented price with no brief support must flag');
 });
 
@@ -188,29 +188,29 @@ test('g6-r3-opus55 B2: a "two hours" brief against an "about an hour" page must 
 
 // ---------------------------------------------------------------------------
 // 5. g6-r3-opus55 audit (FIX F2): award/credential/superlative signals in isClaimBearingSentence.
-//    Opus's own four wrenfield strings — none carried a digit, currency, percent, star mark or
+//    Opus's own four ownedcontractor strings — none carried a digit, currency, percent, star mark or
 //    commercial-stem word, so isClaimBearingSentence returned false for all four before this fix,
 //    on every family now that the sentence gate is unconditional.
 // ---------------------------------------------------------------------------
 
 test('g6-r3-opus55 F2: "Award-winning remodels across Raleigh." now flags (no brief support for the award)', () => {
   const slot: FaithfulnessSlot = { path: 'a', text: 'Award-winning remodels across Raleigh.' };
-  assert.equal(deterministicSentenceClaimFlags(WRENFIELD_BRIEF, [slot], new Set(['a'])).length, 1);
+  assert.equal(deterministicSentenceClaimFlags(TEST_CONTRACTOR_BRIEF, [slot], new Set(['a'])).length, 1);
 });
 
 test('g6-r3-opus55 F2: "Voted best remodeler in Raleigh." now flags (no brief support for the accolade)', () => {
   const slot: FaithfulnessSlot = { path: 'a', text: 'Voted best remodeler in Raleigh.' };
-  assert.equal(deterministicSentenceClaimFlags(WRENFIELD_BRIEF, [slot], new Set(['a'])).length, 1);
+  assert.equal(deterministicSentenceClaimFlags(TEST_CONTRACTOR_BRIEF, [slot], new Set(['a'])).length, 1);
 });
 
 test('g6-r3-opus55 F2: "Nationally recognized for kitchen design." now flags (no brief support for the recognition)', () => {
   const slot: FaithfulnessSlot = { path: 'a', text: 'Nationally recognized for kitchen design.' };
-  assert.equal(deterministicSentenceClaimFlags(WRENFIELD_BRIEF, [slot], new Set(['a'])).length, 1);
+  assert.equal(deterministicSentenceClaimFlags(TEST_CONTRACTOR_BRIEF, [slot], new Set(['a'])).length, 1);
 });
 
 test('g6-r3-opus55 F2: "The most trusted remodeler in Raleigh." now flags (no brief support for the superlative)', () => {
   const slot: FaithfulnessSlot = { path: 'a', text: 'The most trusted remodeler in Raleigh.' };
-  assert.equal(deterministicSentenceClaimFlags(WRENFIELD_BRIEF, [slot], new Set(['a'])).length, 1);
+  assert.equal(deterministicSentenceClaimFlags(TEST_CONTRACTOR_BRIEF, [slot], new Set(['a'])).length, 1);
 });
 
 test('g6-r3-opus55 F2 negative: a superlative/certification word that IS brief-supported still traces (no over-flagging)', () => {

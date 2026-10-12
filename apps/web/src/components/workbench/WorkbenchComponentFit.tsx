@@ -1,4 +1,4 @@
-import { COMPONENT_APPLY_BLOCKERS, type ComponentFit } from '@open-design/contracts';
+import { COMPONENT_APPLY_BLOCKERS, type ComponentFit } from '@mish/contracts';
 import type { Dict } from '../../i18n/types';
 import { useT } from '../../i18n';
 import styles from './workbench.module.css';

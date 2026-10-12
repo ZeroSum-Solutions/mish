@@ -7,7 +7,7 @@ import {
   buildWorkspaceSeatSummary,
   type CollabCloudComment,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   closeDatabase,
   deleteConversationAndRepairTeamCommentAnchor,

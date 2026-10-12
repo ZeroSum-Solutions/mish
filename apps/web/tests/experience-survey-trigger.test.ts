@@ -122,7 +122,7 @@ describe('experience survey delivery trigger', () => {
 
   it('restarts the count from zero when the stored value is corrupted', () => {
     const storage = createStorageStub();
-    storage.setItem('open-design:experience-survey:v1:deliveries', 'not-a-number');
+    storage.setItem('mish:experience-survey:v1:deliveries', 'not-a-number');
     useStorage(storage);
     const listener = listen();
 

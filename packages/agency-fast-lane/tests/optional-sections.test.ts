@@ -1,5 +1,5 @@
 /**
- * Optional sections across all sixteen bundled families.
+ * Optional sections across the retained public families.
  *
  * For every family: the schema's `x-optional` sections are exactly the family's
  * `OPTIONAL_SECTIONS`; the reference recipe renders with that section dropped (`null` in its slot)
@@ -9,6 +9,7 @@
  * reports it dropped. Offline: the model, the judge and the checker are fakes.
  */
 
+import {TEST_EDITORIAL_DIR} from './fixtures.ts';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import test from 'node:test';
@@ -37,35 +38,6 @@ type Case = {
 };
 
 const CASES: Case[] = [
-  { family: 'watson', id: 'watson-about', type: 'about' },
-  { family: 'fervor', id: 'work', type: 'work', navSlots: ['sections[0].content.workLabel', 'sections[4].content.ctaLabel', 'sections[5].content.ctaLabel', 'sections[6].content.ctaLabel'] },
-  { family: 'fervor', id: 'testimonial', type: 'testimonial' },
-  { family: 'wrenfield', id: 'trust', type: 'trust' },
-  {
-    family: 'wrenfield',
-    id: 'reviews',
-    type: 'reviews',
-    navSlots: ['sections[0].content.reviewsLabel'],
-    check: (dropped, full) => {
-      assert.ok(full.includes('href="#reviews"'), 'wrenfield: the full nav links to the reviews');
-      assert.ok(!dropped.includes('href="#reviews"'), 'wrenfield: the nav reviews link is gone');
-    },
-  },
-  { family: 'maben', id: 'maben-latest-projects', type: 'portfolio-carousel' },
-  { family: 'halcyon', id: 'events', type: 'events', navSlots: ['sections[0].content.linkEvents'] },
-  { family: 'halcyon', id: 'membership', type: 'membership', navSlots: ['sections[0].content.linkJoin', 'sections[9].content.col3Link4'] },
-  { family: 'halcyon', id: 'support', type: 'support' },
-  {
-    family: 'maren',
-    id: 'reviews',
-    type: 'reviews',
-    navSlots: ['sections[0].content.link4Label'],
-    check: (dropped, full) => {
-      assert.ok(full.includes('href="#reviews"'), 'maren: the full nav links to the reviews');
-      assert.ok(!dropped.includes('href="#reviews"'), 'maren: the nav reviews link is gone');
-    },
-  },
-  { family: 'emmpo', id: 'emmpo-community', type: 'community' },
   { family: 'marketing-site', id: 'marketing-site-proof', type: 'testimonials', requiresQuote: true },
   { family: 'app-shell', id: 'app-shell-empty', type: 'empty-state' },
   { family: 'crm-dashboard', id: 'crm-dashboard-activity', type: 'activity-feed' },
@@ -209,7 +181,7 @@ for (const testCase of CASES) {
     assert.ok(!report.units.some((unit) => unit.label === testCase.id), 'no unit for the dropped section');
     for (const prompt of model.prompts) assert.ok(!prompt.includes(`"${testCase.id}"`), 'no prompt carries the dropped section');
     for (const slot of testCase.navSlots ?? []) {
-      // Only the prompt for the slot's own section: another section may reuse the bare key (fervor's `ctaLabel`).
+      // Only the prompt for the slot's own section: another section may reuse the bare key (ownedcinematic's `ctaLabel`).
       const owner = (pkg.fixture.sections as JsonObject[])[Number(/^sections\[(\d+)\]/.exec(slot)![1])]!.id as string;
       const ownPrompts = model.prompts.filter((prompt) => prompt.includes(`Fill the "${owner}" part`));
       assert.ok(ownPrompts.length > 0, `the section holding ${slot} was filled`);
@@ -253,14 +225,14 @@ test('marketing-site: a brief that quotes no one drops the testimonials without 
 });
 
 test('verify off, and a repair, never ask the judge; hints still apply', async () => {
-  const pkg = await load('wrenfield');
+  const pkg = await load('practice');
   const asked: string[][] = [];
   const base = {
     brief: BRIEF,
-    family: 'wrenfield',
+    family: 'practice',
     mode: 'sections' as const,
     revision: 1,
-    prepare: async () => ({ pkg, entry: 'wrenfield-r1.html' }),
+    prepare: async () => ({ pkg, entry: 'practice-r1.html' }),
   };
   const deps: BuildDeps = {
     createModelCaller: () => echo(),
@@ -280,19 +252,19 @@ test('verify off, and a repair, never ask the judge; hints still apply', async (
   assert.equal((repair as Extract<typeof repair, { outcome: 'built' }>).report.droppedSections, undefined);
   assert.deepEqual(asked, [], 'the judge was never asked');
 
-  const hinted = await buildSite({ ...base, verify: 'off', sections: { reviews: 'drop' } }, deps);
-  assert.deepEqual((hinted as Extract<typeof hinted, { outcome: 'built' }>).report.droppedSections, ['reviews'], 'a drop hint applies without Jev');
+  const hinted = await buildSite({ ...base, verify: 'off', sections: { 'practice-reviews': 'drop' } }, deps);
+  assert.deepEqual((hinted as Extract<typeof hinted, { outcome: 'built' }>).report.droppedSections, ['practice-reviews'], 'a drop hint applies without Jev');
   assert.deepEqual(asked, []);
 
   // A repair re-fills a published recipe that already dropped the section: it stays dropped.
   const published = (hinted as Extract<typeof hinted, { outcome: 'built' }>).report.recipe as JsonObject;
-  const again = await buildSite({ ...base, verify: 'advisory', judgeSections: false, prepare: async () => ({ pkg, entry: 'wrenfield-r1.html', spine: structuredClone(published) }) }, deps);
-  assert.deepEqual((again as Extract<typeof again, { outcome: 'built' }>).report.droppedSections, ['reviews'], 'the null survives a repair without re-judging');
+  const again = await buildSite({ ...base, verify: 'advisory', judgeSections: false, prepare: async () => ({ pkg, entry: 'practice-r1.html', spine: structuredClone(published) }) }, deps);
+  assert.deepEqual((again as Extract<typeof again, { outcome: 'built' }>).report.droppedSections, ['practice-reviews'], 'the null survives a repair without re-judging');
   assert.deepEqual(asked, []);
 });
 
 test('verify off needs no Jev: a missing credential keeps every section; any other mode aborts first', async () => {
-  const pkg = await load('wrenfield');
+  const pkg = await load('practice');
   const asked: string[][] = [];
   const events: BuildEvent[] = [];
   let credentialReads = 0;
@@ -308,10 +280,10 @@ test('verify off needs no Jev: a missing credential keeps every section; any oth
   };
   const base = {
     brief: BRIEF,
-    family: 'wrenfield',
+    family: 'practice',
     mode: 'sections' as const,
     revision: 1,
-    prepare: async () => ({ pkg, entry: 'wrenfield-r1.html' }),
+    prepare: async () => ({ pkg, entry: 'practice-r1.html' }),
     onEvent: (event: BuildEvent) => events.push(event),
   };
 
@@ -319,7 +291,7 @@ test('verify off needs no Jev: a missing credential keeps every section; any oth
   assert.equal(off.outcome, 'built');
   assert.equal((off as Extract<typeof off, { outcome: 'built' }>).report.droppedSections, undefined, 'every section kept');
   const decided = events.find((event) => event.type === 'sections');
-  assert.deepEqual(decided && { kept: decided.kept, dropped: decided.dropped }, { kept: ['trust', 'reviews'], dropped: [] });
+  assert.deepEqual(decided && { kept: decided.kept, dropped: decided.dropped }, { kept: ['practice-providers', 'practice-expect', 'practice-reviews', 'practice-insurance', 'practice-faq', 'practice-hours-location'], dropped: [] });
   assert.deepEqual(asked, [], 'the judge was never asked');
   assert.equal(credentialReads, 0, 'the credential was never read');
 
@@ -328,37 +300,41 @@ test('verify off needs no Jev: a missing credential keeps every section; any oth
 });
 
 test('single mode: the whole-page prompt shows only the sections the page renders', async () => {
-  const pkg = await load('watson');
+  const pkg = await loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
   const model = echo();
   const report = await runFastLane({
     pkg,
     brief: BRIEF,
     mode: 'single',
-    entry: 'watson-r1.html',
+    entry: 'ownededitorial-r1.html',
     revision: 1,
     model,
     modelName: 'fake',
     lockPaths: ['brand.name'],
-    dropSections: ['watson-about'],
+    dropSections: ['ownededitorial-about'],
   });
   assert.equal(model.prompts.length, 1);
   const template = promptBlock(model.prompts[0]!, 'TEMPLATE') as JsonObject;
   const ids = (template.sections as JsonObject[]).map((section) => section.id);
-  assert.deepEqual(ids, ['watson-navigation', 'watson-hero', 'watson-statement', 'watson-footer']);
+  assert.deepEqual(ids, ['ownededitorial-nav', 'ownededitorial-hero', 'ownededitorial-statement', 'ownededitorial-footer']);
   assert.match(model.prompts[0]!, /It has 4 sections/);
   assert.deepEqual(report.missing, [], 'nothing reported missing for the dropped slot');
-  assert.deepEqual(report.droppedSections, ['watson-about']);
+  assert.deepEqual(report.droppedSections, ['ownededitorial-about']);
 });
 
-test('emmpo: a reordered recipe keeps the dropped section\'s identity through the build, a repair and a keep hint', async () => {
-  const pkg = await load('emmpo');
-  // Emmpo lets its middle sections reorder: move the optional community section from 7 to 2.
+test('ownededitorial: a reordered recipe keeps the dropped section\'s identity through the build, a repair and a keep hint', async () => {
+  const pkg = await loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
+  const shape = (pkg.schema as any).properties.sections;
+  const alternatives = shape.prefixItems.slice(1, 4);
+  alternatives.forEach((node: any, i: number) => { node.properties.type.const = (pkg.fixture.sections as JsonObject[])[i + 1]!.type; });
+  shape.prefixItems = [shape.prefixItems[0], ...[1, 2, 3].map(() => ({ oneOf: alternatives })), shape.prefixItems[4]];
+  // The owned schema admits the middle section types in any order; move about to position 2.
   const reordered = structuredClone(pkg.fixture);
   const sections = reordered.sections as Json[];
-  const [community] = sections.splice(sectionIndex(reordered, 'emmpo-community'), 1);
+  const [community] = sections.splice(sectionIndex(reordered, 'ownededitorial-about'), 1);
   sections.splice(2, 0, community!);
-  assert.equal(sectionIndex(reordered, 'emmpo-community'), 2);
-  assert.doesNotThrow(() => pkg.render(reordered, 'emmpo-r1.html'), 'the reordered recipe is valid');
+  assert.equal(sectionIndex(reordered, 'ownededitorial-about'), 2);
+  assert.doesNotThrow(() => pkg.render(reordered, 'ownededitorial-r1.html'), 'the reordered recipe is valid');
 
   const asked: string[][] = [];
   const events: BuildEvent[] = [];
@@ -372,29 +348,29 @@ test('emmpo: a reordered recipe keeps the dropped section\'s identity through th
     daemonFetch: (async () => { throw new Error('dry run'); }) as typeof fetch,
     acquireRunLock: async () => () => {},
   };
-  const base = { brief: BRIEF, family: 'emmpo', mode: 'sections' as const, revision: 1, onEvent: (event: BuildEvent) => events.push(event) };
-  const built = await buildSite({ ...base, verify: 'advisory', prepare: async () => ({ pkg, entry: 'emmpo-r1.html', lockPaths: ['brand.name'], spine: structuredClone(reordered) }) }, deps);
+  const base = { brief: BRIEF, family: 'ownededitorial', mode: 'sections' as const, revision: 1, onEvent: (event: BuildEvent) => events.push(event) };
+  const built = await buildSite({ ...base, verify: 'advisory', prepare: async () => ({ pkg, entry: 'ownededitorial-r1.html', lockPaths: ['brand.name'], spine: structuredClone(reordered) }) }, deps);
   assert.equal(built.outcome, 'built');
   const report = (built as Extract<typeof built, { outcome: 'built' }>).report;
-  assert.deepEqual(asked, [['emmpo-community']]);
-  assert.deepEqual(report.droppedSections, ['emmpo-community']);
+  assert.deepEqual(asked, [['ownededitorial-about']]);
+  assert.deepEqual(report.droppedSections, ['ownededitorial-about']);
   const published = report.recipe as JsonObject;
   assert.equal((published.sections as Json[])[2], null, 'the null sits where the recipe had the section');
-  assert.equal(((published.sections as JsonObject[])[7]!).id, 'emmpo-talents', 'the other sections are untouched');
+  assert.equal(((published.sections as JsonObject[])[3]!).id, 'ownededitorial-statement', 'the other sections are untouched');
 
   // The null is identified by the type the page no longer has, not by the fixture's position 2.
   const optional = optionalSectionsOf(pkg.schema, published, pkg.fixture);
-  assert.deepEqual(optional.map(({ index, id, type, dropped }) => ({ index, id, type, dropped })), [{ index: 2, id: 'emmpo-community', type: 'community', dropped: true }]);
+  assert.deepEqual(optional.map(({ index, id, type, dropped }) => ({ index, id, type, dropped })), [{ index: 2, id: 'ownededitorial-about', type: 'about', dropped: true }]);
 
   // A repair re-fills without re-judging and reports the same id.
-  const repaired = await buildSite({ ...base, verify: 'advisory', judgeSections: false, prepare: async () => ({ pkg, entry: 'emmpo-r1.html', lockPaths: ['brand.name'], spine: structuredClone(published) }) }, deps);
-  assert.deepEqual((repaired as Extract<typeof repaired, { outcome: 'built' }>).report.droppedSections, ['emmpo-community']);
+  const repaired = await buildSite({ ...base, verify: 'advisory', judgeSections: false, prepare: async () => ({ pkg, entry: 'ownededitorial-r1.html', lockPaths: ['brand.name'], spine: structuredClone(published) }) }, deps);
+  assert.deepEqual((repaired as Extract<typeof repaired, { outcome: 'built' }>).report.droppedSections, ['ownededitorial-about']);
   assert.equal((((repaired as Extract<typeof repaired, { outcome: 'built' }>).report.recipe as JsonObject).sections as Json[])[2], null);
   assert.equal(asked.length, 1, 'the repair never asked the judge');
 
-  // A keep hint restores the community section at the null's own position.
-  const restored = await buildSite({ ...base, verify: 'off', sections: { 'emmpo-community': 'keep' }, prepare: async () => ({ pkg, entry: 'emmpo-r1.html', lockPaths: ['brand.name'], spine: structuredClone(published) }) }, deps);
+  // A keep hint restores the about section at the null's own position.
+  const restored = await buildSite({ ...base, verify: 'off', sections: { 'ownededitorial-about': 'keep' }, prepare: async () => ({ pkg, entry: 'ownededitorial-r1.html', lockPaths: ['brand.name'], spine: structuredClone(published) }) }, deps);
   const restoredRecipe = (restored as Extract<typeof restored, { outcome: 'built' }>).report.recipe as JsonObject;
-  assert.equal(((restoredRecipe.sections as JsonObject[])[2]!).type, 'community');
+  assert.equal(((restoredRecipe.sections as JsonObject[])[2]!).type, 'about');
   assert.equal((restored as Extract<typeof restored, { outcome: 'built' }>).report.droppedSections, undefined);
 });

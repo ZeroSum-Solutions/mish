@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://nexu.io/contracts/terminal/scene-request-v1.schema.json",
+  "$id": "https://github.com/ZeroSum-Solutions/contracts/terminal/scene-request-v1.schema.json",
   "title": "Terminal target scene request v1",
   "type": "object",
   "additionalProperties": false,

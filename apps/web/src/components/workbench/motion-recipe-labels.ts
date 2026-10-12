@@ -1,4 +1,4 @@
-import type { ResourceResult } from '@open-design/contracts';
+import type { ResourceResult } from '@mish/contracts';
 import type { Dict } from '../../i18n/types';
 
 type Translate = (key: keyof Dict, vars?: Record<string, string | number>) => string;

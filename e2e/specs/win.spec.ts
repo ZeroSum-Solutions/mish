@@ -62,7 +62,7 @@ const updateFixtureMode = resolveUpdateFixtureMode(process.env.OD_PACKAGED_E2E_W
 const releaseChannel = process.env.OD_PACKAGED_E2E_RELEASE_CHANNEL;
 const releaseVersion = process.env.OD_PACKAGED_E2E_RELEASE_VERSION;
 const packagedInviteDeeplink =
-  'opendesign://workspace/invite/continue?workspace_id=packaged-smoke-workspace&member_id=packaged-smoke-member&invite_id=packaged-smoke-invite&nonce=packaged-smoke-nonce';
+  'mish://workspace/invite/continue?workspace_id=packaged-smoke-workspace&member_id=packaged-smoke-member&invite_id=packaged-smoke-invite&nonce=packaged-smoke-nonce';
 const updateScenario = resolvePackagedUpdateScenario({ releaseChannel, releaseVersion });
 const installIdentity = resolvePackagedWinInstallIdentity({ namespace, releaseVersion });
 
@@ -615,7 +615,7 @@ winDescribe('packaged windows runtime smoke', () => {
       expect(basename(install.startMenuShortcutPath)).toBe(`${installIdentity.displayName}.lnk`);
       expect(install.registryEntries.length).toBeGreaterThan(0);
       expect(JSON.stringify(install.registryEntries)).toContain(installIdentity.displayName);
-      expect(JSON.stringify(install.registryEntries)).toContain(`Open Design-${installIdentity.namespaceToken}`);
+      expect(JSON.stringify(install.registryEntries)).toContain(`Mish-${installIdentity.namespaceToken}`);
       await assertWindowsInviteProtocolRegistration(install.installDir);
       expect(install.installPayload.fileCount).toBeGreaterThan(0);
       expect(install.installPayload.totalBytes).toBeGreaterThan(0);
@@ -846,7 +846,7 @@ winDescribe('packaged windows runtime smoke', () => {
         );
         expect(preUpdateScreenshot.screenshot?.path).toBe(preUpdateScreenshotPath);
         expect(await fileSizeBytes(preUpdateScreenshotPath)).toBeGreaterThan(0);
-        await report.report.save('screenshots/open-design-win-before-update.png', await readFile(preUpdateScreenshotPath));
+        await report.report.save('screenshots/mish-win-before-update.png', await readFile(preUpdateScreenshotPath));
       } else if (verifyUpgradePersistence) {
         throw new Error('upgrade persistence validation requires desktop IPC eval support');
       }
@@ -865,7 +865,7 @@ winDescribe('packaged windows runtime smoke', () => {
                 expectedVersion: expectedPayloadUpdateVersion,
                 ...(intermediateUpdateFixture == null
                   ? {}
-                  : { legacyInstalledExecutablePath: join(install.installDir, 'Open Design.exe') }),
+                  : { legacyInstalledExecutablePath: join(install.installDir, 'Mish.exe') }),
                 persistedProjectId,
                 verifyPptx: intermediateUpdateFixture == null,
               }),
@@ -1046,7 +1046,7 @@ winDescribe('packaged windows runtime smoke', () => {
           ? { afterUpdate: null, beforeUpdate: null }
           : {
               afterUpdate: report.screenshotRelpath,
-              beforeUpdate: 'screenshots/open-design-win-before-update.png',
+              beforeUpdate: 'screenshots/mish-win-before-update.png',
             },
         start: {
           executablePath: start.executablePath,
@@ -1206,7 +1206,7 @@ winDescribe('packaged windows runtime smoke', () => {
       cleanupInstalled = true;
       await seedPackagedOnboardingComplete();
 
-      const sevenZipExe = join(install.installDir, 'resources', 'open-design', 'bin', '7z.exe');
+      const sevenZipExe = join(install.installDir, 'resources', 'mish', 'bin', '7z.exe');
       expect((await stat(sevenZipExe)).isFile()).toBe(true);
       const corruptPayloadPath = await buildCorruptedWinPayloadFixture(
         localUpdate.payloadPath,
@@ -1386,12 +1386,12 @@ winOnboardingDescribe('packaged windows onboarding AMR smoke', () => {
       const screenshot = await runToolsPackJson<WinInspectResult>('inspect', ['--path', onboardingScreenshotPath]);
       expect(screenshot.screenshot?.path).toBe(onboardingScreenshotPath);
       expect(await fileSizeBytes(onboardingScreenshotPath)).toBeGreaterThan(0);
-      await report.report.save('screenshots/open-design-win-onboarding-smoke.png', await readFile(onboardingScreenshotPath));
+      await report.report.save('screenshots/mish-win-onboarding-smoke.png', await readFile(onboardingScreenshotPath));
       await report.report.json('onboarding-summary.json', {
         health,
         initial,
         namespace,
-        screenshot: 'screenshots/open-design-win-onboarding-smoke.png',
+        screenshot: 'screenshots/mish-win-onboarding-smoke.png',
         start: {
           executablePath: start.executablePath,
           logPath: start.logPath,
@@ -1570,7 +1570,7 @@ async function runSameVersionUpdaterRecoveryAcceptance(options: {
     persistedProjectId: options.persistedProjectId,
   });
   const installedConfig = JSON.parse(
-    await readFile(join(options.installDir, 'resources', 'open-design-config.json'), 'utf8'),
+    await readFile(join(options.installDir, 'resources', 'mish-config.json'), 'utf8'),
   ) as { appVersion?: unknown };
   expect(installedConfig.appVersion).toBe(options.targetVersion);
 
@@ -1745,7 +1745,7 @@ async function runInstallerFallbackAcceptance(options: {
 
   const start = await runToolsPackJsonForVersion<WinStartResult>('start', targetVersion);
   expect(start.source).toBe('installed');
-  expect(start.executablePath).toBe(join(options.installDir, 'Open Design.exe'));
+  expect(start.executablePath).toBe(join(options.installDir, 'Mish.exe'));
   // The updater-owned installer may preserve the already-confirmed payload
   // desktop while replacing the physical outer. Verify continuity here; the
   // explicit full stop + installed-outer cold start below owns the stronger
@@ -2127,7 +2127,7 @@ async function fetchPackagedHealth(daemonUrl: string): Promise<HealthEvalValue> 
       health: await response.json() as HealthEvalValue['health'],
       href: daemonUrl,
       status: response.status,
-      title: 'Open Design Beta',
+      title: 'Mish Beta',
     };
   } finally {
     clearTimeout(timeout);
@@ -2316,8 +2316,8 @@ async function buildVersionBumpedWinPayloadFixture(
     if (executableRelPath == null || executableRelPath.length === 0) {
       throw new Error(`payload manifest has no entry.executable: ${payloadSevenZPath}`);
     }
-    // <payload dir>/<binary>.exe → <payload dir>/resources/open-design-config.json
-    const configPath = join(extractRoot, dirname(executableRelPath), 'resources', 'open-design-config.json');
+    // <payload dir>/<binary>.exe → <payload dir>/resources/mish-config.json
+    const configPath = join(extractRoot, dirname(executableRelPath), 'resources', 'mish-config.json');
     const config = JSON.parse(await readFile(configPath, 'utf8')) as { appVersion?: string };
     config.appVersion = bumpedVersion;
     await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
@@ -2506,7 +2506,7 @@ async function assertPayloadDesktopIdentity(
     normalizePathForComparison(resolve(legacyInstalledExecutablePath)),
   );
   const resourceRoot = await readDesktopStartupResourceRoot(identity.pid);
-  expectPathInside(resourceRoot, join(payloadRoot, 'resources', 'open-design'));
+  expectPathInside(resourceRoot, join(payloadRoot, 'resources', 'mish'));
 }
 
 async function readDesktopStartupResourceRoot(pid: number): Promise<string> {
@@ -2644,7 +2644,7 @@ function expectWindowsDaemonUrl(value: string | null | undefined): void {
 async function assertWindowsInviteProtocolRegistration(installDir: string): Promise<void> {
   const { stdout } = await execFileAsync('reg.exe', [
     'query',
-    'HKCU\\Software\\Classes\\opendesign\\shell\\open\\command',
+    'HKCU\\Software\\Classes\\mish\\shell\\open\\command',
     '/ve',
   ]);
   const normalized = stdout.toLowerCase();
@@ -2704,7 +2704,7 @@ async function readInviteContinuationResults(): Promise<InviteContinuationResult
     }
     if (!isRecord(entry) || entry.message !== 'console.info' || !isRecord(entry.meta)) continue;
     const args = entry.meta.args;
-    if (!Array.isArray(args) || args[0] !== '[open-design desktop] invite deeplink continuation completed') continue;
+    if (!Array.isArray(args) || args[0] !== '[mish desktop] invite deeplink continuation completed') continue;
     const outcome = args[1];
     if (!isRecord(outcome) || typeof outcome.ok !== 'boolean') continue;
     results.push({
@@ -2720,7 +2720,7 @@ async function assertWindowsInviteProtocolRemoved(): Promise<void> {
   await expect(
     execFileAsync('reg.exe', [
       'query',
-      'HKCU\\Software\\Classes\\opendesign',
+      'HKCU\\Software\\Classes\\mish',
     ]),
   ).rejects.toMatchObject({ code: 1 });
 }

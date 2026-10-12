@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import type { AmrWalletSnapshot } from '@open-design/contracts';
+import type { AmrWalletSnapshot } from '@mish/contracts';
 
 import {
   markVelaAuthorizationExpired,
@@ -11,7 +11,7 @@ import {
 
 const DEFAULT_AMR_WALLET_CACHE_TTL_MS = 8_000;
 const DEFAULT_AMR_WALLET_FETCH_TIMEOUT_MS = 8_000;
-const DEFAULT_AMR_API_URL = 'https://amr-api.open-design.ai';
+const DEFAULT_AMR_API_URL = 'https://amr-api.mish.invalid';
 
 type FetchLike = typeof fetch;
 

@@ -101,7 +101,7 @@ describe('ToolCard secondary result disclosures', () => {
       { name: 'Read', category: 'read', input: { file_path: 'source.ts' } },
       { name: 'Bash', category: 'run', input: { command: 'pnpm guard' } },
       { name: 'Grep', category: 'search', input: { pattern: 'TODO', path: 'src' } },
-      { name: 'WebFetch', category: 'fetch', input: { url: 'https://open-design.ai' } },
+      { name: 'WebFetch', category: 'fetch', input: { url: 'https://github.com/ZeroSum-Solutions/mish' } },
       { name: 'Skill', category: 'skill', input: { name: 'visual-explain' } },
       { name: 'AskUserQuestion', category: 'ask', input: { questions: [{ question: 'Continue?', options: ['Yes'] }] } },
       { name: 'CustomTool', category: 'other', input: { name: 'custom action' } },

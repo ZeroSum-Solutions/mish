@@ -26,14 +26,14 @@ import {
   type ComponentLedgerCohort,
   type ComponentLedgerRow,
   type ComponentState,
-} from '@open-design/contracts';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
-import { genuiCatalog } from '@open-design/genui-catalog/data';
-import type { CatalogEntry } from '@open-design/genui-catalog';
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
-import cultCatalogJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
-import twenty1stJson from '@open-design/21st-catalog/generated/21st-items.json' with { type: 'json' };
-import originalsJson from '@open-design/21st-catalog/generated/21st-originals.json' with { type: 'json' };
+} from '@mish/contracts';
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
+import { genuiCatalog } from '@mish/genui-catalog/data';
+import type { CatalogEntry } from '@mish/genui-catalog';
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
+import cultCatalogJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
+import twenty1stJson from '@mish/21st-catalog/generated/21st-items.json' with { type: 'json' };
+import originalsJson from '@mish/21st-catalog/generated/21st-originals.json' with { type: 'json' };
 import type { React95Kit } from './kits/react95/kit-types.js';
 import { react95UnitFiles } from './kits/react95/unit.js';
 import { REACT95_KIT } from './kits/react95/kit.generated.js';
@@ -101,7 +101,7 @@ function genuiRow(root: string, entry: CatalogEntry): ComponentLedgerRow {
       viewports: [...REVIEW_VIEWPORTS], reducedMotion: motion ? 'required' : 'not-applicable',
     },
     dependencies: [
-      ...(ported ? [{ name: '@open-design/genui-catalog runtime', kind: 'runtime' as const, version: null }] : []),
+      ...(ported ? [{ name: '@mish/genui-catalog runtime', kind: 'runtime' as const, version: null }] : []),
       ...(webgl ? [{ name: 'webgl', kind: 'capability' as const, version: null }] : []),
       ...[...new Set(upstream)].map(name => ({ name, kind: 'upstream-declared' as const, version: null })),
     ],
@@ -293,13 +293,31 @@ function cohort(id: string, sourceId: ComponentLedgerCohort['sourceId'], scope: 
 }
 const rowListing = (rows: ComponentLedgerRow[]) => rows.map(row => [row.id, row.sourceVersion.digest ?? row.sourceVersion.revision]);
 
+const FAMILY_NAME = /^[a-z0-9-]+$/;
+
+/**
+ * A family-section entry counts only when its family ships an agency example.
+ * The family name is interpolated into a filesystem path, so anything other
+ * than a plain `[a-z0-9-]` slug is treated as absent rather than probed.
+ */
+export function isShippedFamilySection(root: string, entry: { sourceKind?: unknown; content?: unknown }): boolean {
+  if (entry.sourceKind !== 'family-section') return false;
+  const content = entry.content as { kind?: unknown; family?: unknown } | null | undefined;
+  if (content?.kind !== 'family-section') return false;
+  const family = content.family;
+  if (typeof family !== 'string' || !FAMILY_NAME.test(family)) return false;
+  return existsSync(path.join(root, 'plugins/_official/examples', `agency-${family}`, 'README.md'));
+}
+
 export function collectComponentInventory(root: string = defaultRepositoryRoot()): ComponentInventory {
   const sections = (sectionCatalogJson as { entries: SectionCatalogEntry[] }).entries;
   const manifest = JSON.parse(readFileSync(path.join(root, 'plugins/_official/shared/ui-kits/hyperui/manifest.json'), 'utf8')) as HyperuiManifest;
   const originals = (originalsJson as { items: Original[] }).items;
   const genui = genuiCatalog.manifest.components.map(entry => genuiRow(root, entry as CatalogEntry)).sort(byId);
   const hyperui = sections.filter(entry => entry.sourceKind === 'hyperui').map(entry => hyperuiRow(root, manifest, entry)).sort(byId);
-  const families = sections.filter(entry => entry.sourceKind === 'family-section').map(familySectionRow).sort(byId);
+  // Reference metadata can outlive a removed private study; only shipped families enter the ledger.
+  const families = sections.filter(entry => isShippedFamilySection(root, entry))
+    .map(familySectionRow).sort(byId);
   const twentyFirst = (twenty1stJson as { rows: Array<{ id: string; name: string; itemUrl: string; rights: string }> }).rows
     .map(row => twentyFirstRow(row, originals.find(original => original.id === row.id))).sort(byId);
   const shadcn = shadcnRows().sort(byId);

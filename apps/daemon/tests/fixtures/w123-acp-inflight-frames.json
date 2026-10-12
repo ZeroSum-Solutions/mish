@@ -5,8 +5,8 @@
   "sessions": 12,
   "exporter": "apps/daemon/tests/fixtures/w123-export-acp-inflight-frames.ts",
   "mapping": [
-   "nexu/vela apps/cli/internal/agent/opencode_client.go:971 mapOpenCodeToolPart",
-   "nexu/vela apps/cli/internal/agent/acp_runtime.go:965 buildACPToolUpdate"
+   "mish/vela apps/cli/internal/agent/opencode_client.go:971 mapOpenCodeToolPart",
+   "mish/vela apps/cli/internal/agent/acp_runtime.go:965 buildACPToolUpdate"
   ],
   "note": "offsetMs is real wall clock from the opencode event row (`time`), not synthesized.",
   "trimmed": "Every string leaf longer than 180 chars is truncated with a \"…[trimmed N chars]\" suffix. Frame count, ordering, wall-clock offsets, sessionUpdate/status/kind/title and the rawInput/content key sets are byte-for-byte as vela emitted them; only long payload bodies are shortened (size + privacy). Nothing under test depends on the elided bytes.",
@@ -36,11 +36,11 @@
       "sessionUpdate": "tool_call",
       "toolCallId": "call_00_1OhEyAoUybUu7lXcbMMi0224",
       "status": "in_progress",
-      "title": "Survey OpenDesign chat panel",
+      "title": "Survey Mish chat panel",
       "kind": "task",
       "rawInput": {
-       "description": "Survey OpenDesign chat panel",
-       "prompt": "Explore the repository at /Users/elian/Documents/od-wt-chat-panel (an OpenDesign codebase on branch feat/chat-panel-next-impl). I am writing an editorial product document about its…[trimmed 1452 chars]",
+       "description": "Survey Mish chat panel",
+       "prompt": "Explore the repository at /Users/elian/Documents/od-wt-chat-panel (an Mish codebase on branch feat/chat-panel-next-impl). I am writing an editorial product document about its…[trimmed 1452 chars]",
        "subagent_type": "explore"
       }
      }
@@ -51,11 +51,11 @@
       "sessionUpdate": "tool_call",
       "toolCallId": "call_00_1OhEyAoUybUu7lXcbMMi0224",
       "status": "in_progress",
-      "title": "Survey OpenDesign chat panel",
+      "title": "Survey Mish chat panel",
       "kind": "task",
       "rawInput": {
-       "description": "Survey OpenDesign chat panel",
-       "prompt": "Explore the repository at /Users/elian/Documents/od-wt-chat-panel (an OpenDesign codebase on branch feat/chat-panel-next-impl). I am writing an editorial product document about its…[trimmed 1452 chars]",
+       "description": "Survey Mish chat panel",
+       "prompt": "Explore the repository at /Users/elian/Documents/od-wt-chat-panel (an Mish codebase on branch feat/chat-panel-next-impl). I am writing an editorial product document about its…[trimmed 1452 chars]",
        "subagent_type": "explore"
       }
      }
@@ -66,11 +66,11 @@
       "sessionUpdate": "tool_call_update",
       "toolCallId": "call_00_1OhEyAoUybUu7lXcbMMi0224",
       "status": "completed",
-      "title": "Survey OpenDesign chat panel",
+      "title": "Survey Mish chat panel",
       "kind": "task",
       "rawInput": {
-       "description": "Survey OpenDesign chat panel",
-       "prompt": "Explore the repository at /Users/elian/Documents/od-wt-chat-panel (an OpenDesign codebase on branch feat/chat-panel-next-impl). I am writing an editorial product document about its…[trimmed 1452 chars]",
+       "description": "Survey Mish chat panel",
+       "prompt": "Explore the repository at /Users/elian/Documents/od-wt-chat-panel (an Mish codebase on branch feat/chat-panel-next-impl). I am writing an editorial product document about its…[trimmed 1452 chars]",
        "subagent_type": "explore"
       },
       "rawOutput": "<task id=\"ses_fbcca84e4ffeloLMhCf7mlR3z7\" state=\"completed\">\n<task_result>\nI have gathered everything needed. Here is the research summary.\n\n---\n\n# Chat Panel (\"ChatPanel\" / ChatPa…[trimmed 15517 chars]",
@@ -8908,7 +8908,7 @@
       "title": "read",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json"
       }
      }
     },
@@ -8918,18 +8918,18 @@
       "sessionUpdate": "tool_call_update",
       "toolCallId": "call_00_B47hHsmu8UB4jWUvU4B08547",
       "status": "completed",
-      "title": ".od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json",
+      "title": ".od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json"
       },
-      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]",
+      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]",
       "content": [
        {
         "type": "content",
         "content": {
          "type": "text",
-         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]"
+         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/cb6ad1b6-d267-47c5-843d-93b8ca94df24/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]"
         }
        }
       ]
@@ -9841,7 +9841,7 @@
       "title": "read",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json"
       }
      }
     },
@@ -9851,18 +9851,18 @@
       "sessionUpdate": "tool_call_update",
       "toolCallId": "call_01_hXfeMTysBny8KCg35Yb73031",
       "status": "completed",
-      "title": ".od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json",
+      "title": ".od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json"
       },
-      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]",
+      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]",
       "content": [
        {
         "type": "content",
         "content": {
          "type": "text",
-         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]"
+         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]"
         }
        }
       ]
@@ -11573,7 +11573,7 @@
       "title": "read",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json"
       }
      }
     },
@@ -11583,18 +11583,18 @@
       "sessionUpdate": "tool_call_update",
       "toolCallId": "call_02_SPIldza7OZEFytjGg0rI0867",
       "status": "completed",
-      "title": ".od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json",
+      "title": ".od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json"
       },
-      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]",
+      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]",
       "content": [
        {
         "type": "content",
         "content": {
          "type": "text",
-         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/open-design.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]"
+         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/c8eccea0-9635-4d3d-835f-53aea54bd7e2/.od-skills/doc-kami-parchment-0e66a0ee10/mish.json</path>\n<type>file</type>\n<…[trimmed 5995 chars]"
         }
        }
       ]
@@ -11628,7 +11628,7 @@
       "title": "read",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json"
       }
      }
     },
@@ -11638,18 +11638,18 @@
       "sessionUpdate": "tool_call_update",
       "toolCallId": "call_01_ET_PjnehrHfu8SeW2LukmkF5811",
       "status": "completed",
-      "title": ".od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json",
+      "title": ".od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json"
       },
-      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json</path>\n<type>file</type>\n<co…[trimmed 5790 chars]",
+      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json</path>\n<type>file</type>\n<co…[trimmed 5790 chars]",
       "content": [
        {
         "type": "content",
         "content": {
          "type": "text",
-         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json</path>\n<type>file</type>\n<co…[trimmed 5790 chars]"
+         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json</path>\n<type>file</type>\n<co…[trimmed 5790 chars]"
         }
        }
       ]
@@ -11970,7 +11970,7 @@
       "title": "read",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json"
       }
      }
     },
@@ -11980,18 +11980,18 @@
       "sessionUpdate": "tool_call_update",
       "toolCallId": "call_02_9coGWokRD6wPLc4GLq6y3850",
       "status": "completed",
-      "title": ".od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json",
+      "title": ".od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json",
       "kind": "read",
       "rawInput": {
-       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json"
+       "filePath": "/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json"
       },
-      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json</path>\n<type>file</type>\n<co…[trimmed 5790 chars]",
+      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json</path>\n<type>file</type>\n<co…[trimmed 5790 chars]",
       "content": [
        {
         "type": "content",
         "content": {
          "type": "text",
-         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/open-design.json</path>\n<type>file</type>\n<co…[trimmed 5790 chars]"
+         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/.od/projects/f22f27e4-5856-4a1e-80d2-742657cda760/.od-skills/article-magazine-a14420d2ed/mish.json</path>\n<type>file</type>\n<co…[trimmed 5790 chars]"
         }
        }
       ]
@@ -14769,13 +14769,13 @@
       "rawInput": {
        "filePath": "/Users/elian/Documents/od-wt-chat-panel/apps/web/src/runtime/chat/tool-kind.ts"
       },
-      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/apps/web/src/runtime/chat/tool-kind.ts</path>\n<type>file</type>\n<content>\n1: import { isTodoWriteToolName } from '@open-design/contrac…[trimmed 10969 chars]",
+      "rawOutput": "<path>/Users/elian/Documents/od-wt-chat-panel/apps/web/src/runtime/chat/tool-kind.ts</path>\n<type>file</type>\n<content>\n1: import { isTodoWriteToolName } from '@mish/contrac…[trimmed 10969 chars]",
       "content": [
        {
         "type": "content",
         "content": {
          "type": "text",
-         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/apps/web/src/runtime/chat/tool-kind.ts</path>\n<type>file</type>\n<content>\n1: import { isTodoWriteToolName } from '@open-design/contrac…[trimmed 10969 chars]"
+         "text": "<path>/Users/elian/Documents/od-wt-chat-panel/apps/web/src/runtime/chat/tool-kind.ts</path>\n<type>file</type>\n<content>\n1: import { isTodoWriteToolName } from '@mish/contrac…[trimmed 10969 chars]"
         }
        }
       ]

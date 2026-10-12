@@ -3,7 +3,7 @@ import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseProjectRubric, parseStartReviewRunRequest, parseVerificationBundle, parseVerificationBundleList, WORKBENCH_REVIEW_CONSOLE_SCHEMA, WORKBENCH_REVIEW_EVIDENCE_VERSION, WORKBENCH_REVIEW_EVIDENCE_VERSION_V1, type VerificationBundle } from '@open-design/contracts';
+import { parseProjectRubric, parseStartReviewRunRequest, parseVerificationBundle, parseVerificationBundleList, WORKBENCH_REVIEW_CONSOLE_SCHEMA, WORKBENCH_REVIEW_EVIDENCE_VERSION, WORKBENCH_REVIEW_EVIDENCE_VERSION_V1, type VerificationBundle } from '@mish/contracts';
 import { createReviewEvidenceStore, isLegacyBundle, LegacyEvidenceError } from '../../src/workbench/review/evidence-store.js';
 import { buildReviewerInput } from '../../src/workbench/review/reviewer-plan.js';
 import { createReviewRunService } from '../../src/workbench/review/run-service.js';

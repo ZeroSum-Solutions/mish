@@ -1,6 +1,6 @@
 import { appendFileSync } from "node:fs";
 
-import type { ReleaseChannel } from "@open-design/release";
+import type { ReleaseChannel } from "@mish/release";
 
 import type { ReleaseNotePlan } from "./source.ts";
 

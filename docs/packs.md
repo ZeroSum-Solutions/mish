@@ -164,9 +164,9 @@ A pack can carry plugins. Put each plugin in its own folder under one
 ```text
 team-kit/
   pack.json
-  plugins/brief-writer/open-design.json
+  plugins/brief-writer/mish.json
   plugins/brief-writer/SKILL.md
-  plugins/deck-helper/open-design.json
+  plugins/deck-helper/mish.json
 ```
 
 ```json
@@ -176,7 +176,7 @@ team-kit/
 ```
 
 List every plugin file in `files[]` like any other file. The `name` in each
-plugin's `open-design.json` must equal the folder id.
+plugin's `mish.json` must equal the folder id.
 
 - **Install:** the daemon checks each plugin file against its sha256, then
   registers the plugin through the normal plugin installer. The plugin then

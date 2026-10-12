@@ -23,7 +23,7 @@ import { traeCliAgentDef } from '../src/runtimes/defs/trae-cli.js';
 const KIMI_REMOVED_IN = '0.37.0';
 
 const liveArtifacts = {
-  name: 'open-design-live-artifacts',
+  name: 'mish-live-artifacts',
   type: 'stdio',
   command: 'od',
   args: ['mcp', 'live-artifacts'],
@@ -101,7 +101,7 @@ describe('withholdStdioMcpServersForBuild', () => {
       removedInVersion: KIMI_REMOVED_IN,
     });
     expect(result.servers).toEqual([httpServer]);
-    expect(result.withheldNames).toEqual(['open-design-live-artifacts']);
+    expect(result.withheldNames).toEqual(['mish-live-artifacts']);
   });
 
   it('returns the input array by reference for an accepting build', () => {

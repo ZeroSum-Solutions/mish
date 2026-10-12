@@ -28,7 +28,7 @@ import {
   type TeamProject,
   type WorkspaceCollabContext,
   type WorkspaceTeamProjectsResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { coalescedGet, forceCoalescedGet } from '../lib/coalesced-get';
 import {

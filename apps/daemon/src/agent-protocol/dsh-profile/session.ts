@@ -1,5 +1,5 @@
 /** @module agent-protocol/dsh-profile/session
- * One-run controller for `dsh --profile open-design --stdio`.
+ * One-run controller for `dsh --profile mish --stdio`.
  */
 import type { ChildProcess } from 'node:child_process';
 import { createDshProfileJsonlStream } from './stream.js';

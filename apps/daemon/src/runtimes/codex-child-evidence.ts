@@ -19,7 +19,7 @@ import {
   type NormalizedTimingEvidenceV1,
   type NormalizedUsageEvidenceV1,
   type StrategyInputStageV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   buildSafeChildPromptTelemetry,
   type SafeChildPromptInput,

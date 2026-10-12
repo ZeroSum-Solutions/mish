@@ -1,4 +1,4 @@
-import type { BrandFontSpec } from '@open-design/contracts';
+import type { BrandFontSpec } from '@mish/contracts';
 import googleFonts from '../fonts/google-fonts-snapshot.json' with { type: 'json' };
 import googleFontsPart2 from '../fonts/google-fonts-snapshot-2.json' with { type: 'json' };
 import { safeFontStylesheetUrl } from './font-url.js';

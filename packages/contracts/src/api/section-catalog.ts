@@ -2,9 +2,9 @@
 // Pro section/page projection (insertable only through a checked adapter), and federated MotionSites prompt
 // metadata, behind one rights-labeled entry shape.
 //
-// These types mirror @open-design/section-catalog's `SectionCatalogEntry` (packages/section-catalog/src/types.ts)
+// These types mirror @mish/section-catalog's `SectionCatalogEntry` (packages/section-catalog/src/types.ts)
 // structurally, so contracts stays free of a workspace dependency on that package — the same
-// pattern genui-catalog.ts uses for @open-design/genui-catalog. A daemon route that serves the
+// pattern genui-catalog.ts uses for @mish/genui-catalog. A daemon route that serves the
 // catalog (phase D) checks the two agree with a typed assignment, which fails to compile if
 // section-catalog's literal drifts from this file's shape.
 //
@@ -379,7 +379,7 @@ export function parseSectionCatalogResponse(value: unknown): SectionCatalogRespo
   return value as unknown as SectionCatalogResponse;
 }
 
-/** One of the five built-in design directions (`@open-design/agency-fast-lane/section-overlay`'s
+/** One of the five built-in design directions (`@mish/agency-fast-lane/section-overlay`'s
  * `listDesignDirections`), narrowed to what a section picker offers as a choice — never the full
  * palette/font/mood spec, which stays that package's own runtime detail. */
 export interface SectionCatalogDirectionOption {

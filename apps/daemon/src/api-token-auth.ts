@@ -1,6 +1,6 @@
 import { timingSafeEqual } from 'node:crypto';
 
-export const API_TOKEN_BASIC_USERNAME = 'open-design';
+export const API_TOKEN_BASIC_USERNAME = 'mish';
 export const API_TOKEN_BASIC_CHALLENGE = 'Basic realm="Mishh Mashh", charset="UTF-8"';
 
 export function isTruthyEnvFlag(value: unknown): boolean {

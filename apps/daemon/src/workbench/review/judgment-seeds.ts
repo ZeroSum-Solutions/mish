@@ -1,4 +1,4 @@
-import type { ObservedBehavior, ProjectDesignContext } from '@open-design/contracts';
+import type { ObservedBehavior, ProjectDesignContext } from '@mish/contracts';
 
 /**
  * AC-R06.3 default judgment criteria. Each seed is an optional judgment check

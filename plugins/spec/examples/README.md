@@ -18,4 +18,4 @@ Coverage:
 - `extend-plugin-author` - extend lane.
 
 Use the examples as copyable patterns, then trim aggressively for your actual plugin.
-The sample `open-design-marketplace.json` is versioned at the catalog level and each entry pins the listed plugin version so registry snapshots can be audited.
+The sample `mish-marketplace.json` is versioned at the catalog level and each entry pins the listed plugin version so registry snapshots can be audited.

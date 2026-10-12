@@ -30,7 +30,7 @@ import {
   TODO_RECALL_HEADING,
   renderUnfinishedTodoRecall,
   recalledTodosFromTodoWriteInput,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 const TODO_WRITE = (todos: Array<{ content: string; status: string }>, id = 'tw-1') => ({
   kind: 'tool_use' as const,

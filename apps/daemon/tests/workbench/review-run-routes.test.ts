@@ -1,9 +1,9 @@
 import { readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseReviewRunView } from '@open-design/contracts';
+import { parseReviewRunView } from '@mish/contracts';
 import { ReviewRunError } from '../../src/workbench/review/run-service.js';
-import { parseReviewRunList } from '@open-design/contracts';
+import { parseReviewRunList } from '@mish/contracts';
 import { ReviewerCallError } from '../../src/workbench/review/reviewers/types.js';
 import { knownGoodCapture, page, unavailablePort } from './review-capture-fixture.js';
 import { bootReviewRuns, concurrency, fakeReviewer, PNG_BASE64, sha256 } from './review-run-fixture.js';

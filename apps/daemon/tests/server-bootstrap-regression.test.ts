@@ -125,7 +125,7 @@ describe('server route inventory', () => {
       'POST /api/projects/:id/plugin-candidates/:candidateId/dismiss',
       'POST /api/projects/:id/plugin-candidates/:candidateId/draft',
       'POST /api/projects/:id/plugin-candidates/:candidateId/share-tasks',
-      'POST /api/projects/:id/plugins/contribute-open-design',
+      'POST /api/projects/:id/plugins/contribute-mish',
       'POST /api/projects/:id/plugins/share-tasks',
       'POST /api/plugins/share-tasks/:id/wait',
     ];
@@ -592,9 +592,9 @@ describe('static SPA fallback classification', () => {
 
 describe('daemon data dir resolver', () => {
   it('requires explicit OD_DATA_DIR in sandbox mode and resolves project-relative dirs', () => {
-    expect(() => resolveDataDir('', '/tmp/open-design-test', { requireExplicit: true })).toThrow(
+    expect(() => resolveDataDir('', '/tmp/mish-test', { requireExplicit: true })).toThrow(
       /OD_DATA_DIR is required/,
     );
-    expect(resolveDataDir('relative-data', '/tmp/open-design-test')).toBe('/tmp/open-design-test/relative-data');
+    expect(resolveDataDir('relative-data', '/tmp/mish-test')).toBe('/tmp/mish-test/relative-data');
   });
 });

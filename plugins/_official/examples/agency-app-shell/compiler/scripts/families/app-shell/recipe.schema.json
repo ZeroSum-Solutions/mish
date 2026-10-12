@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://open-design.ai/schemas/agency-site/app-shell/recipe.v2.json",
+  "$id": "https://github.com/ZeroSum-Solutions/mish/schemas/agency-site/app-shell/recipe.v2.json",
   "title": "app-shell recipe",
   "description": "A static web-app shell page kind: top nav, grouped side nav, an empty state, one five-row list view, one detail view and a settings page. Mirrors compiler/scripts/families/app-shell/{slots.ts,contract.ts} field for field; run render.test.ts's schema cross-check before trusting either copy alone.",
   "type": "object",

@@ -3,7 +3,7 @@ import type {
   DeliverableSyntaxToolCliFailure,
   DeliverableSyntaxToolCliSuccess,
   DeliverableSyntaxToolResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 type JsonObject = Record<string, unknown>;
 

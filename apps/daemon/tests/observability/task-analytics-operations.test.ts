@@ -2,7 +2,7 @@ import {
   normalizeAgentObservationV1,
   type StrategyInputStageV2,
   type StrategyTaskTypeV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -182,7 +182,7 @@ function record(input: {
     })] : []),
   ];
   const aggregate: StrategyTaskObservationAggregateV1 = {
-    schema: 'open-design.strategy-task-observation/v1',
+    schema: 'mish.strategy-task-observation/v1',
     root: {
       observationId: rootId,
       taskExecutionId: input.id,

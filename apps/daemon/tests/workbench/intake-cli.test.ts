@@ -14,7 +14,7 @@ import { runWorkbenchCli } from '../../src/workbench-cli.js';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { migrateLibrary, deleteLibraryAsset } from '../../src/library-store.js';
 import { registerWorkbenchIntakeRoutes, type RegisterWorkbenchIntakeRoutesDeps } from '../../src/routes/workbench-intake.js';
-import type { IntakeBatchSnapshot, AttachIntakeResponse } from '@open-design/contracts';
+import type { IntakeBatchSnapshot, AttachIntakeResponse } from '@mish/contracts';
 import { cleanupIntakeRoots, coordinatedIntake, ordinaryIntakeAuthority } from './intake-placement-fixture.js';
 let server: Server | undefined, root: string;
 afterEach(async()=>{if(server)await new Promise<void>(r=>server!.close(()=>r()));if(root)await rm(root,{recursive:true,force:true});cleanupIntakeRoots();});

@@ -1,20 +1,22 @@
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { teamConsoleUrl, workspaceUpgradeUrl } from '../../src/components/EntryNavRail';
 import { setRuntimeAmrConsoleOrigin } from '../../src/runtime/amr-guidance';
-import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@mish/contracts';
 
 // Stand-in for an internal deployment's console origin — the real hostnames are
 // injected at build time and reported by the daemon, never literals in source.
 const RUNTIME_CONSOLE_ORIGIN = 'https://vela.example.invalid';
 
 /**
- * Where 升级 lands on the prod profile since spec T54 (product 2026-09-06):
- * the console's own plan surface, not public Pricing. These expectations used
- * to read the public Pricing URL — that was #7122's Go-launch routing, and
- * the ruling put the upgrade entries back on the console.
+ * Where 升级 lands once an AMR console is configured (spec T54): the console's
+ * own plan surface. The fork ships no console host, so without a configured
+ * origin the upgrade entry is unavailable (`null`).
  */
-const PROD_CONSOLE_PLAN_URL =
-  'https://open-design.ai/amr/dashboard?source=open_design&billing=plan';
+const CONFIGURED_CONSOLE_PLAN_URL = `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish&billing=plan`;
+
+beforeEach(() => {
+  setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
+});
 
 afterEach(() => {
   setRuntimeAmrConsoleOrigin(null);
@@ -109,7 +111,7 @@ describe('workspaceUpgradeUrl', () => {
       ...baseContext,
       workspaceType: 'personal',
     };
-    expect(workspaceUpgradeUrl(context, null)).toBe(PROD_CONSOLE_PLAN_URL);
+    expect(workspaceUpgradeUrl(context, null)).toBe(CONFIGURED_CONSOLE_PLAN_URL);
   });
 
   // 红测(§6.Y 死胡同的第二扇门)。三处注释逐字断言「Personal workspaces always
@@ -129,27 +131,27 @@ describe('workspaceUpgradeUrl', () => {
       role: 'member',
       permissions: { ...baseContext.permissions, canManageBilling: false },
     };
-    expect(workspaceUpgradeUrl(context, null)).toBe(PROD_CONSOLE_PLAN_URL);
+    expect(workspaceUpgradeUrl(context, null)).toBe(CONFIGURED_CONSOLE_PLAN_URL);
     expect(
       workspaceUpgradeUrl(context, billingSummary('team_pro'), {
         fallbackProfile: 'prod',
       }),
-    ).toBe(PROD_CONSOLE_PLAN_URL);
+    ).toBe(CONFIGURED_CONSOLE_PLAN_URL);
   });
 
   it('sends a never-subscribed team to the console plan surface', () => {
-    expect(workspaceUpgradeUrl(baseContext, null)).toBe(PROD_CONSOLE_PLAN_URL);
+    expect(workspaceUpgradeUrl(baseContext, null)).toBe(CONFIGURED_CONSOLE_PLAN_URL);
     expect(workspaceUpgradeUrl(baseContext, billingSummary(''))).toBe(
-      PROD_CONSOLE_PLAN_URL,
+      CONFIGURED_CONSOLE_PLAN_URL,
     );
   });
 
   it('sends an already-subscribed team to the console plan surface', () => {
     expect(
       workspaceUpgradeUrl({ ...baseContext, planId: 'team_pro', billingState: 'active' }, null),
-    ).toBe(PROD_CONSOLE_PLAN_URL);
+    ).toBe(CONFIGURED_CONSOLE_PLAN_URL);
     expect(workspaceUpgradeUrl(baseContext, billingSummary('team_pro'))).toBe(
-      PROD_CONSOLE_PLAN_URL,
+      CONFIGURED_CONSOLE_PLAN_URL,
     );
   });
 
@@ -181,7 +183,7 @@ describe('workspaceUpgradeUrl', () => {
   it('does not require a console URL when workspace ownership is known', () => {
     const context: WorkspaceCollabContext = { ...baseContext };
     delete context.workspaceSettingsUrl;
-    expect(workspaceUpgradeUrl(context, null)).toBe(PROD_CONSOLE_PLAN_URL);
+    expect(workspaceUpgradeUrl(context, null)).toBe(CONFIGURED_CONSOLE_PLAN_URL);
     expect(workspaceUpgradeUrl(null, null)).toBeNull();
   });
 
@@ -192,10 +194,15 @@ describe('workspaceUpgradeUrl', () => {
   it('follows the caller profile for CTA callers that must always link somewhere', () => {
     setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
     expect(workspaceUpgradeUrl(null, null, { fallbackProfile: 'feature-test' })).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design&billing=plan`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish&billing=plan`,
     );
     expect(workspaceUpgradeUrl(null, null, { fallbackProfile: 'prod' })).toBe(
-      PROD_CONSOLE_PLAN_URL,
+      CONFIGURED_CONSOLE_PLAN_URL,
     );
+  });
+  it('is unavailable when no AMR console origin is configured', () => {
+    setRuntimeAmrConsoleOrigin(null);
+    expect(workspaceUpgradeUrl(baseContext, null)).toBeNull();
+    expect(workspaceUpgradeUrl(null, null, { fallbackProfile: 'prod' })).toBeNull();
   });
 });

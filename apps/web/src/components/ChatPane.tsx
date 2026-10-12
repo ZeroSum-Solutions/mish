@@ -50,7 +50,7 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { hasOdCard, OD_NEXT_STRATEGY_ID, type ProjectMediaTask } from '@open-design/contracts';
+import { hasOdCard, OD_NEXT_STRATEGY_ID, type ProjectMediaTask } from '@mish/contracts';
 import { useAnalytics } from '../analytics/provider';
 import { getResolvedDeviceId } from '../analytics/client';
 import {
@@ -107,11 +107,11 @@ import type {
   ChatSessionMode,
   RunContextSelection,
   WorkspaceContextItem,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   TrackingProjectKind,
   TrackingRunRecoveryActionType,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { isDesignSystemWorkspacePrompt } from '../design-system-auto-prompt';
 import {
   isTodoWriteToolName,
@@ -731,8 +731,8 @@ interface Props {
   // "Share to Mishh Mashh" button on each completed assistant message —
   // wired by ProjectView to handleSend with the bundled
   // `od-share-to-community` scenario's trigger prompt.
-  onShareToOpenDesign?: (assistantMessageId: string) => void;
-  shareToOpenDesignBusyMessageId?: string | null;
+  onShareToMish?: (assistantMessageId: string) => void;
+  shareToMishBusyMessageId?: string | null;
   forceStreamingMessageIds?: Set<string>;
   initialDraft?: string;
   // Product path of the Home recommendation that started this project. When
@@ -984,7 +984,7 @@ interface Props {
   config?: AppConfig;
 }
 
-const AMR_PROFILE_ENV_KEY = 'OPEN_DESIGN_AMR_PROFILE';
+const AMR_PROFILE_ENV_KEY = 'MISH_AMR_PROFILE';
 
 type Tab = 'chat' | 'comments';
 
@@ -1372,8 +1372,8 @@ export function ChatPane({
   onRequestPluginFolderAgentAction,
   activePluginActionPaths,
   hiddenPluginActionPaths,
-  onShareToOpenDesign,
-  shareToOpenDesignBusyMessageId,
+  onShareToMish,
+  shareToMishBusyMessageId,
   forceStreamingMessageIds,
   initialDraft,
   onboardingStarterPath = null,
@@ -1756,7 +1756,7 @@ export function ChatPane({
     onBrandBrowserAssistConfirm,
     onArtifactShare,
     onForkFromMessage,
-    onShareToOpenDesign,
+    onShareToMish,
     onNextStepAiOptimize: onContinueBrandEnrichment,
     onNextStepContinueExtraction: onContinueBrandExtraction,
     onNextStepContinueAiExtraction: onContinueBrandAgentExtraction,
@@ -1770,7 +1770,7 @@ export function ChatPane({
     onBrandBrowserAssistConfirm,
     onArtifactShare,
     onForkFromMessage,
-    onShareToOpenDesign,
+    onShareToMish,
     onNextStepAiOptimize: onContinueBrandEnrichment,
     onNextStepContinueExtraction: onContinueBrandExtraction,
     onNextStepContinueAiExtraction: onContinueBrandAgentExtraction,
@@ -2571,7 +2571,13 @@ export function ChatPane({
    * 同样的 device id 传递规则(仅在同意指标上报时带)。入口来源分开记,
    * 这样漏斗能读出「卡」和「弹窗」各自带来多少升级。
    */
+  // `null` when no AMR console origin is configured: the recharge / upgrade
+  // actions are then unavailable (hidden on the error card, disabled on the
+  // balance card).
+  const amrPlansUrl = amrPlansUrlForProfile(amrProfile);
+  const amrRechargeUrl = amrRechargeUrlForProfile(amrProfile);
   const openAmrPlans = useCallback((entrySource: 'chat_error_upgrade' | 'chat_upgrade_card') => {
+    if (!amrPlansUrl) return;
     const attribution = recordAmrEntry(analytics.track, entrySource, new Date(), {
       metricsConsent: config?.telemetry?.metrics === true,
     });
@@ -2581,11 +2587,14 @@ export function ChatPane({
       installationId: config?.installationId,
     });
     window.open(
-      attributedAmrUrl(amrPlansUrlForProfile(amrProfile), attribution, deviceId),
+      attributedAmrUrl(amrPlansUrl, attribution, deviceId),
       '_blank',
       'noopener,noreferrer',
     );
-  }, [amrProfile, analytics.track, config?.installationId, config?.telemetry?.metrics]);
+  }, [amrPlansUrl, analytics.track, config?.installationId, config?.telemetry?.metrics]);
+  const fallbackAmrBalanceUpgrade = amrPlansUrl
+    ? () => openAmrPlans('chat_upgrade_card')
+    : undefined;
   const visibleRecoveryActionTypes = useMemo(() => {
     const actions: TrackingRunRecoveryActionType[] = [];
     if (!retryAssistant || !onRetry || !runFailureUi) return actions;
@@ -4575,7 +4584,7 @@ export function ChatPane({
                   streaming={streaming}
                   lowBalanceTurnCards={lowBalanceTurnCards}
                   onLowBalanceTurnCardUpgrade={
-                    onAmrBalanceUpgrade ?? (() => openAmrPlans('chat_upgrade_card'))
+                    onAmrBalanceUpgrade ?? fallbackAmrBalanceUpgrade
                   }
                   onResendUserMessage={onResendUserMessage}
                   onRetryImage={handleRetryImage}
@@ -4594,8 +4603,8 @@ export function ChatPane({
                   onRequestPluginFolderAgentAction={onRequestPluginFolderAgentAction}
                   activePluginActionPaths={activePluginActionPaths}
                   hiddenPluginActionPaths={hiddenPluginActionPaths}
-                  onShareToOpenDesign={onShareToOpenDesign}
-                  shareToOpenDesignBusyMessageId={shareToOpenDesignBusyMessageId}
+                  onShareToMish={onShareToMish}
+                  shareToMishBusyMessageId={shareToMishBusyMessageId}
                   forceStreamingMessageIds={forceStreamingMessageIds}
                   lastAssistantId={lastAssistantId}
                   lastTurnAssistantId={lastTurnAssistantId}
@@ -4817,7 +4826,7 @@ export function ChatPane({
                               >
                                 {t('chat.runError.openSettingsCta')}
                               </RunErrorCardAction>
-                            ) : runFailureUi.primaryAction === 'recharge' ? (
+                            ) : runFailureUi.primaryAction === 'recharge' && amrRechargeUrl ? (
                               <RunErrorCardAction
                                 type="button"
                                 variant={errorActionVariant}
@@ -4846,7 +4855,7 @@ export function ChatPane({
                                   });
                                   window.open(
                                     attributedAmrUrl(
-                                      amrRechargeUrlForProfile(amrProfile),
+                                      amrRechargeUrl,
                                       attribution,
                                       deviceId,
                                     ),
@@ -4857,7 +4866,7 @@ export function ChatPane({
                               >
                                 {t('chat.amrError.rechargeCta')}
                               </RunErrorCardAction>
-                            ) : runFailureUi.primaryAction === 'upgrade' ? (
+                            ) : runFailureUi.primaryAction === 'upgrade' && amrPlansUrl ? (
                               <RunErrorCardAction
                                 type="button"
                                 variant={errorActionVariant}
@@ -4879,7 +4888,7 @@ export function ChatPane({
                                   });
                                   window.open(
                                     attributedAmrUrl(
-                                      amrPlansUrlForProfile(amrProfile),
+                                      amrPlansUrl,
                                       attribution,
                                       deviceId,
                                     ),
@@ -5035,7 +5044,7 @@ export function ChatPane({
                   <UpgradeCard
                     balanceUsd={tailAmrBalanceCardUsd}
                     onUpgrade={
-                      onAmrBalanceUpgrade ?? (() => openAmrPlans('chat_upgrade_card'))
+                      onAmrBalanceUpgrade ?? fallbackAmrBalanceUpgrade
                     }
                   />
                 ) : null}
@@ -5236,7 +5245,7 @@ interface AssistantCallbacks {
   onBrandBrowserAssistConfirm: BrandBrowserAssistConfirm | undefined;
   onArtifactShare: ((fileName: string, anchorId?: string) => void) | undefined;
   onForkFromMessage: ((message: ChatMessage) => void) | undefined;
-  onShareToOpenDesign: ((assistantMessageId: string) => void) | undefined;
+  onShareToMish: ((assistantMessageId: string) => void) | undefined;
   onNextStepAiOptimize: (() => void) | undefined;
   onNextStepContinueExtraction: (() => void) | undefined;
   onNextStepContinueAiExtraction: (() => void) | undefined;
@@ -5689,8 +5698,8 @@ function ChatRows({
   onRequestPluginFolderAgentAction,
   activePluginActionPaths,
   hiddenPluginActionPaths,
-  onShareToOpenDesign,
-  shareToOpenDesignBusyMessageId,
+  onShareToMish,
+  shareToMishBusyMessageId,
   forceStreamingMessageIds,
   lastAssistantId,
   lastTurnAssistantId,
@@ -5772,8 +5781,8 @@ function ChatRows({
   onRequestPluginFolderAgentAction?: (relativePath: string, action: PluginFolderAgentAction) => void;
   activePluginActionPaths?: Set<string>;
   hiddenPluginActionPaths?: Set<string>;
-  onShareToOpenDesign?: (assistantMessageId: string) => void;
-  shareToOpenDesignBusyMessageId?: string | null;
+  onShareToMish?: (assistantMessageId: string) => void;
+  shareToMishBusyMessageId?: string | null;
   forceStreamingMessageIds?: Set<string>;
   lastAssistantId: string | undefined;
   lastTurnAssistantId: string | undefined;
@@ -5905,12 +5914,12 @@ function ChatRows({
         onRequestPluginFolderAgentAction={onRequestPluginFolderAgentAction}
         activePluginActionPaths={activePluginActionPaths}
         hiddenPluginActionPaths={hiddenPluginActionPaths}
-        onShareToOpenDesign={
-          onShareToOpenDesign
-            ? () => assistantCallbacksRef.current.onShareToOpenDesign?.(m.id)
+        onShareToMish={
+          onShareToMish
+            ? () => assistantCallbacksRef.current.onShareToMish?.(m.id)
             : undefined
         }
-        shareToOpenDesignBusy={shareToOpenDesignBusyMessageId === m.id}
+        shareToMishBusy={shareToMishBusyMessageId === m.id}
         showRole={assistantRoleByMessageId.get(m.id) ?? true}
         isLast={m.id === lastAssistantId}
         isLastTurn={m.id === lastTurnAssistantId}
@@ -6682,7 +6691,7 @@ function queuedTipPlacement(
   );
 }
 
-  const QUEUED_SEND_DRAG_MIME = 'application/x-open-design-queued-send';
+  const QUEUED_SEND_DRAG_MIME = 'application/x-mish-queued-send';
 
 type QueuedSendDropEdge = 'before' | 'after';
 

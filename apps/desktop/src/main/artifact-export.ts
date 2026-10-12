@@ -9,11 +9,11 @@ import {
   type DesktopArtifactCaptureMode,
   type DesktopExportArtifactInput,
   type DesktopExportArtifactResult,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 
 import { DECK_PAGE_SIZE, DECK_PRINT_CSS, inferPageSize, waitForPrintableContent } from "./pdf-export.js";
 import { bgraBitmapHasPaint, freezePageForStaticCapture, type StaticCaptureFreeze } from "./static-capture.js";
-import { findRealElementRange, findRealTagEnd, findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealElementRange, findRealTagEnd, findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 // Headless programmatic exporter for the `od export` CLI (PDF / image).
 // The on-screen web Download menu rasterizes client-side; this is the daemon →

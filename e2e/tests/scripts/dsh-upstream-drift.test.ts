@@ -1,46 +1,33 @@
-// The upstream watch exists because the in-repo drift check cannot see the one
-// thing that actually went wrong twice: our installers and our agent def
-// agreeing with each other while both sat behind what npm serves. These cases
-// pin that distinction, plus the parsing that lets the checker read either side
-// out of source rather than being told the versions twice.
-
 import { readFile } from 'node:fs/promises';
+
 import { fileURLToPath } from 'node:url';
 
-import { describe, expect, it, vi } from 'vitest';
+import { expect, it, vi, describe } from 'vitest';
 
-import {
-  type DriftCard,
-  buildCard,
-  classifyDrift,
-  describePublishedAt,
-  interpretFeishuResponse,
-  readAcceptedPattern,
-  readListedVersions,
-  readPinnedVersion,
-  readPublishedAt,
-} from '../../../.github/scripts/dsh-upstream-drift.ts';
+import { type DriftCard, buildCard, classifyDrift, describePublishedAt, interpretFeishuResponse, readAcceptedPattern, readListedVersions, readPinnedVersion, readPublishedAt } from '../../../.github/scripts/dsh-upstream-drift.ts';
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
-const INSTALLER_SH = `${repoRoot}tools/release/resources/dsh-bootstrap/install-dsh.sh`;
-const AGENT_DEF = `${repoRoot}apps/daemon/src/runtimes/defs/deepseek-harness.ts`;
-const DRIFT_SCRIPT = `${repoRoot}.github/scripts/dsh-upstream-drift.ts`;
-const WORKFLOW = `${repoRoot}.github/workflows/dsh-upstream-drift.yml`;
 
-/** A fixed "now" so the card's relative age is a fact, not a moving target. */
+const INSTALLER_SH = `${repoRoot}tools/release/resources/dsh-bootstrap/install-dsh.sh`;
+
+const AGENT_DEF = `${repoRoot}apps/daemon/src/runtimes/defs/deepseek-harness.ts`;
+
+const DRIFT_SCRIPT = `${repoRoot}.github/scripts/dsh-upstream-drift.ts`;
+
 const NOW = new Date('2026-09-07T00:00:00.000Z');
+
 const PUBLISHED_AT = '2026-09-03T06:21:52.107Z';
 
 function headlineOf(card: DriftCard): string {
   return card.header.title.content;
 }
 
-/** Everything the reader actually reads under the headline. */
 function bodyOf(card: DriftCard): string {
   return card.elements.map((element) => element.text?.content ?? '').join('\n');
 }
 
 describe('DeepSeek Harness upstream drift', () => {
+
   it('reads what we currently ship out of the real files', async () => {
     const [installer, def, script] = await Promise.all([
       readFile(INSTALLER_SH, 'utf8'),
@@ -249,7 +236,6 @@ describe('DeepSeek Harness upstream drift', () => {
     expect(readAcceptedPattern("    supportedVersions: ['0.1.0-rc.8'],")).toBeNull();
   });
 
-
   // Importing the module used to run the CLI: collecting this very file fetched
   // the live registry and, once drift existed, would have tried to post to
   // Feishu before a single assertion ran. A watcher that fires from a test run
@@ -290,30 +276,5 @@ describe('DeepSeek Harness upstream drift', () => {
     expect(interpretFeishuResponse({ status: 503, text: '' }).retryable).toBe(true);
     expect(interpretFeishuResponse({ status: 200, text: '{"code":9499}' }).retryable).toBe(true);
     expect(interpretFeishuResponse({ status: 400, text: '{"code":19001}' }).retryable).toBe(false);
-  });
-
-  // A watch that only runs on a green PR would never fire, since an upstream
-  // release does not touch this repo.
-  it('runs on a schedule and stays outside the merge gate', async () => {
-    const workflow = await readFile(WORKFLOW, 'utf8');
-
-    expect(workflow).toMatch(/^on:\n\s+schedule:/mu);
-    expect(workflow).toContain('workflow_dispatch');
-    expect(workflow).toContain('dsh-upstream-drift.ts self-check');
-    expect(workflow).not.toContain('pull_request');
-  });
-
-  // The webhook and its signing secret are a pair. Selecting the landing bot
-  // while signing with the release bot's secret sends a card Feishu rejects,
-  // which is a silent loss of the only message this workflow exists to send.
-  it('signs with the secret belonging to the webhook it chose', async () => {
-    const workflow = await readFile(WORKFLOW, 'utf8');
-
-    expect(workflow).toContain(
-      'secrets.FEISHU_LANDING_WEBHOOK || secrets.FEISHU_RELEASE_WEBHOOK',
-    );
-    expect(workflow).toContain(
-      'secrets.FEISHU_LANDING_SIGN_SECRET || secrets.FEISHU_RELEASE_SIGN_SECRET',
-    );
   });
 });

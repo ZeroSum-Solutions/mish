@@ -193,7 +193,7 @@ describe('/api/chat', () => {
       'sample-plugin',
     );
     await fsp.cp(baseFixtureDir, fixtureDir, { recursive: true });
-    const manifestPath = resolve(fixtureDir, 'open-design.json');
+    const manifestPath = resolve(fixtureDir, 'mish.json');
     const manifest = JSON.parse(await fsp.readFile(manifestPath, 'utf8')) as {
       name: string;
       title: string;
@@ -695,7 +695,7 @@ const fs = require('node:fs');
 process.stdin.resume();
 process.stdin.on('end', () => {
   fs.writeFileSync(${JSON.stringify(envFile)}, process.env.OPENCODE_CONFIG_CONTENT || '');
-  fs.writeFileSync(${JSON.stringify(keyFile)}, process.env.OPEN_DESIGN_BYOK_API_KEY || '');
+  fs.writeFileSync(${JSON.stringify(keyFile)}, process.env.MISH_BYOK_API_KEY || '');
   fs.writeFileSync(${JSON.stringify(argsFile)}, JSON.stringify(process.argv.slice(2)));
   console.log(JSON.stringify({ type: 'step_start' }));
   console.log(JSON.stringify({ type: 'text', part: { text: 'byok-opencode-ok' } }));
@@ -733,7 +733,7 @@ process.stdin.on('end', () => {
           '--dir',
           expect.stringContaining(projectId),
           '-m',
-          'open-design-byok/deepseek-v4-flash',
+          'mish-byok/deepseek-v4-flash',
         ]);
         const parsed = JSON.parse(await fsp.readFile(envFile, 'utf8')) as {
           provider?: Record<string, {
@@ -742,12 +742,12 @@ process.stdin.on('end', () => {
             models?: Record<string, unknown>;
           }>;
         };
-        const provider = parsed.provider?.['open-design-byok'];
+        const provider = parsed.provider?.['mish-byok'];
         expect(provider).toMatchObject({
           npm: '@ai-sdk/openai-compatible',
           options: {
             baseURL: 'https://api.senseaudio.cn',
-            apiKey: '{env:OPEN_DESIGN_BYOK_API_KEY}',
+            apiKey: '{env:MISH_BYOK_API_KEY}',
           },
         });
         expect(provider?.models?.['deepseek-v4-flash']).toEqual({
@@ -788,7 +788,7 @@ const fs = require('node:fs');
 process.stdin.resume();
 process.stdin.on('end', () => {
   fs.writeFileSync(${JSON.stringify(envFile)}, process.env.OPENCODE_CONFIG_CONTENT || '');
-  fs.writeFileSync(${JSON.stringify(keyFile)}, process.env.OPEN_DESIGN_BYOK_API_KEY || '');
+  fs.writeFileSync(${JSON.stringify(keyFile)}, process.env.MISH_BYOK_API_KEY || '');
   fs.writeFileSync(${JSON.stringify(argsFile)}, JSON.stringify(process.argv.slice(2)));
   console.log(JSON.stringify({ type: 'step_start' }));
   console.log(JSON.stringify({ type: 'text', part: { text: 'byok-opencode-keyless-ok' } }));
@@ -827,7 +827,7 @@ process.stdin.on('end', () => {
           '--dir',
           expect.stringContaining(projectId),
           '-m',
-          'open-design-byok/model',
+          'mish-byok/model',
         ]);
         const rawConfig = await fsp.readFile(envFile, 'utf8');
         const parsed = JSON.parse(rawConfig) as {
@@ -837,7 +837,7 @@ process.stdin.on('end', () => {
             models?: Record<string, unknown>;
           }>;
         };
-        const provider = parsed.provider?.['open-design-byok'];
+        const provider = parsed.provider?.['mish-byok'];
         expect(provider).toMatchObject({
           npm: '@ai-sdk/openai-compatible',
           options: {
@@ -845,7 +845,7 @@ process.stdin.on('end', () => {
           },
         });
         expect(provider?.options).not.toHaveProperty('apiKey');
-        expect(rawConfig).not.toContain('OPEN_DESIGN_BYOK_API_KEY');
+        expect(rawConfig).not.toContain('MISH_BYOK_API_KEY');
       },
     );
   });
@@ -875,7 +875,7 @@ const fs = require('node:fs');
 process.stdin.resume();
 process.stdin.on('end', () => {
   fs.writeFileSync(${JSON.stringify(envFile)}, process.env.OPENCODE_CONFIG_CONTENT || '');
-  fs.writeFileSync(${JSON.stringify(keyFile)}, process.env.OPEN_DESIGN_BYOK_API_KEY || '');
+  fs.writeFileSync(${JSON.stringify(keyFile)}, process.env.MISH_BYOK_API_KEY || '');
   console.log(JSON.stringify({ type: 'step_start' }));
   console.log(JSON.stringify({ type: 'text', part: { text: 'opencode-ok' } }));
   console.log(JSON.stringify({ type: 'step_finish', part: { tokens: { input: 1, output: 1 } } }));
@@ -904,7 +904,7 @@ process.stdin.on('end', () => {
         expect(body).toContain('opencode-ok');
         expect(await fsp.readFile(keyFile, 'utf8')).toBe('');
         const rawConfig = await fsp.readFile(envFile, 'utf8');
-        expect(rawConfig).not.toContain('open-design-byok');
+        expect(rawConfig).not.toContain('mish-byok');
         expect(rawConfig).not.toContain('sk-test-byok');
       },
     );
@@ -1138,7 +1138,7 @@ process.exit(1);
     try {
       // Unique key so the shared model cache key is unique per test run.
       process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-      process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+      process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
       const workspaceFixture =
         await createPersonalWorkspaceBoundProjectFixture('Transient AMR catalog fixture');
 
@@ -1157,13 +1157,13 @@ if (args[0] === 'model' && args[1] === 'list') {
   state.attempts += 1;
   writeFileSync(stateFile, JSON.stringify(state), 'utf8');
   if (state.attempts < 3) {
-    process.stderr.write('Get "https://amr-link.open-design.ai/v1/models": context deadline exceeded\\n');
+    process.stderr.write('Get "https://amr-link.mish.invalid/v1/models": context deadline exceeded\\n');
     process.exit(1);
   }
 }
 const child = spawn(process.execPath, [fixture, ...args], {
   stdio: 'inherit',
-  env: process.env,
+  env: { ...process.env, ...${JSON.stringify({ FAKE_VELA_MODEL_PRESET_JSON: process.env.FAKE_VELA_MODEL_PRESET_JSON, FAKE_VELA_MODEL_LIST_JSON: process.env.FAKE_VELA_MODEL_LIST_JSON })} },
 });
 child.on('exit', (code, signal) => {
   if (signal) process.kill(process.pid, signal);
@@ -1228,7 +1228,7 @@ child.on('exit', (code, signal) => {
       // shared model cache key unique so this case never reuses another test's
       // cached remote catalog.
       process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-      process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+      process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
       const workspaceFixture =
         await createPersonalWorkspaceBoundProjectFixture('Cached AMR catalog fixture');
 
@@ -1243,12 +1243,12 @@ const args = process.argv.slice(2);
 // \`login\`, and \`agent run\` still delegate to the fixture, mirroring the real
 // CLI where the offline preset and the ACP run do not need the gateway.
 if (args[0] === 'model' && args[1] === 'list') {
-  process.stderr.write('Get "https://amr-link.open-design.ai/v1/models": context deadline exceeded\\n');
+  process.stderr.write('Get "https://amr-link.mish.invalid/v1/models": context deadline exceeded\\n');
   process.exit(1);
 }
 const child = spawn(process.execPath, [fixture, ...args], {
   stdio: 'inherit',
-  env: process.env,
+  env: { ...process.env, ...${JSON.stringify({ FAKE_VELA_MODEL_PRESET_JSON: process.env.FAKE_VELA_MODEL_PRESET_JSON, FAKE_VELA_MODEL_LIST_JSON: process.env.FAKE_VELA_MODEL_LIST_JSON })} },
 });
 child.on('exit', (code, signal) => {
   if (signal) process.kill(process.pid, signal);
@@ -1315,7 +1315,7 @@ child.on('exit', (code, signal) => {
     const model = 'claude-observability-5';
     try {
       process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-      process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+      process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
       process.env.FAKE_VELA_MODEL_PRESET_JSON = JSON.stringify({
         source: 'preset',
         data: [{
@@ -1352,7 +1352,7 @@ const { spawn } = require('node:child_process');
 const fixture = ${JSON.stringify(FAKE_VELA_FIXTURE)};
 const child = spawn(process.execPath, [fixture, ...process.argv.slice(2)], {
   stdio: 'inherit',
-  env: process.env,
+  env: { ...process.env, ...${JSON.stringify({ FAKE_VELA_MODEL_PRESET_JSON: process.env.FAKE_VELA_MODEL_PRESET_JSON, FAKE_VELA_MODEL_LIST_JSON: process.env.FAKE_VELA_MODEL_LIST_JSON })} },
 });
 child.on('exit', (code, signal) => {
   if (signal) process.kill(process.pid, signal);
@@ -1552,7 +1552,7 @@ process.stdin.resume();
 process.stdin.on('end', () => {
   const pluginDir = path.join(process.cwd(), 'generated-plugin');
   fs.mkdirSync(pluginDir, { recursive: true });
-  fs.writeFileSync(path.join(pluginDir, 'open-design.json'), JSON.stringify({ name: 'generated-plugin' }, null, 2));
+  fs.writeFileSync(path.join(pluginDir, 'mish.json'), JSON.stringify({ name: 'generated-plugin' }, null, 2));
   fs.writeFileSync(path.join(pluginDir, 'SKILL.md'), '# Generated plugin\\n');
   console.log(JSON.stringify({ type: 'step_start' }));
   console.log(JSON.stringify({ type: 'text', part: { text: '我来帮你创建一个通用的 Mishh Mashh 插件脚手架。先读取文档规范，再生成插件文件。' } }));
@@ -1585,7 +1585,7 @@ process.stdin.on('end', () => {
         const filesResponse = await fetch(`${baseUrl}/api/projects/${projectId}/files`);
         expect(filesResponse.status).toBe(200);
         const filesBody = await filesResponse.json() as { files: Array<{ name: string }> };
-        expect(filesBody.files.some((file) => file.name === 'generated-plugin/open-design.json')).toBe(true);
+        expect(filesBody.files.some((file) => file.name === 'generated-plugin/mish.json')).toBe(true);
         expect(filesBody.files.some((file) => file.name === 'generated-plugin/SKILL.md')).toBe(true);
       },
     );
@@ -3449,7 +3449,7 @@ let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { input += chunk; });
 process.stdin.on('end', () => {
-  fs.writeFileSync(process.env.OD_CAPTURE_PROMPT_PATH, input, 'utf8');
+  fs.writeFileSync(${JSON.stringify(process.env.OD_CAPTURE_PROMPT_PATH)}, input, 'utf8');
   console.log(JSON.stringify({ type: 'text', part: { text: 'building now' } }));
 });
 `,
@@ -3557,7 +3557,7 @@ let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { input += chunk; });
 process.stdin.on('end', () => {
-  fs.writeFileSync(process.env.OD_CAPTURE_PROMPT_PATH, input, 'utf8');
+  fs.writeFileSync(fs.readFileSync(${JSON.stringify(join(captureDir, 'destination.txt'))}, 'utf8'), input, 'utf8');
   console.log(JSON.stringify({ type: 'text', part: { text: 'ok' } }));
   console.log(JSON.stringify({ type: 'step_finish', part: { tokens: { input: 1, output: 1 } } }));
 });
@@ -3567,6 +3567,7 @@ process.stdin.on('end', () => {
             turn: { message: string; currentPrompt: string },
             capturePath: string,
           ): Promise<string> => {
+            writeFileSync(join(captureDir, 'destination.txt'), capturePath, 'utf8');
             process.env.OD_CAPTURE_PROMPT_PATH = capturePath;
             const response = await fetch(`${baseUrl}/api/runs`, {
               method: 'POST',

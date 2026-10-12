@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
-import type { DesktopStatusSnapshot } from "@open-design/sidecar-proto";
+import type { DesktopStatusSnapshot } from "@mish/sidecar-proto";
 
 import { resolveToolDevConfig } from "../src/config.js";
 import { desktopLaunchArgs } from "../src/desktop-profile.js";

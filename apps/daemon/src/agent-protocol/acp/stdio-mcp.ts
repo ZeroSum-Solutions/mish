@@ -7,7 +7,7 @@
  * that built stdio servers out of those entries and replaced it with a throw:
  *
  *   {"code":-32603,"message":"Internal error","data":{"details":
- *    "ACP stdio MCP server open-design-live-artifacts does not declare a runtime identity"}}
+ *    "ACP stdio MCP server mish-live-artifacts does not declare a runtime identity"}}
  *
  * The message names a "runtime identity" the entry should declare, but no
  * accepted value exists. Kimi validates `session/new` against a zod union whose
@@ -18,7 +18,7 @@
  * 0.38.0 reject both spellings identically. Only `http` and `sse` survive.
  *
  * OD attaches at least one stdio MCP server to every `mature-acp` runtime
- * (`open-design-live-artifacts`, from `buildLiveArtifactsMcpServersForAgent`),
+ * (`mish-live-artifacts`, from `buildLiveArtifactsMcpServersForAgent`),
  * plus any user-configured external MCP servers merged in via `acp-merge`. On a
  * rejecting build that makes `session/new` fail deterministically, which is why
  * the observed failure rate for those versions is ~85–92% rather than

@@ -37,9 +37,9 @@ interface MessageCenterPage {
 
 const ACCOUNT_PROXY = '/api/integrations/vela/message-center';
 const ANONYMOUS_PROXY = '/api/integrations/vela/message-center-public';
-const LEGACY_WINDOW_KEY = 'open-design.message-center.anonymous-started-at.v1';
-const MESSAGES_KEY = 'open-design.message-center.anonymous-messages.v1';
-const READ_KEY = 'open-design.message-center.anonymous-read-ids.v1';
+const LEGACY_WINDOW_KEY = 'mish.message-center.anonymous-started-at.v1';
+const MESSAGES_KEY = 'mish.message-center.anonymous-messages.v1';
+const READ_KEY = 'mish.message-center.anonymous-read-ids.v1';
 const MAX_MESSAGE_CENTER_PAGES = 20;
 
 export function readAnonymousMessages(storage: Storage): MessageCenterMessage[] {

@@ -6,7 +6,7 @@
  * 现场(2026-09-02 实测,namespace `chatpanel`,真 Chrome):一个会话里同一份
  * `slow-thinking-one-pager.html` 出了 **4 张卡**(4 轮回答各出一张),4 张全部
  * 掉进降级支 —— desktop renderer 的 IPC socket 在纯 web 的开发运行时里根本不
- * 存在(`connect ENOENT /tmp/open-design/ipc/chatpanel/desktop.sock`),所以这
+ * 存在(`connect ENOENT /tmp/mish/ipc/chatpanel/desktop.sock`),所以这
  * 一轮没有静态封面。
  *
  * 降级本身是产品定的,这里**不动**:没有当轮快照就用 live iframe 显示最新 html,

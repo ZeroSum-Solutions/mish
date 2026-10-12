@@ -1,7 +1,7 @@
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { verificationBundleSchema } from '@open-design/contracts';
+import { verificationBundleSchema } from '@mish/contracts';
 import { findBrowserExecutable } from '../../src/browser-sessions.js';
 import { createCdpReviewPort } from '../../src/workbench/review/cdp-worker.js';
 import { runMechanicalReview } from '../../src/workbench/review/runner.js';

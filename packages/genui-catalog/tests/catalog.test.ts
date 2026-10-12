@@ -48,16 +48,9 @@ describe('catalog.json', () => {
     expect(raw.components.map((entry) => entry.id)).toEqual(readSeed().map((row) => row.id));
   });
 
-  it('records Cult UI Pro rows as licensed ports and the harvest as clean-room', () => {
-    const cult = raw.components.filter((entry) => entry.source.name === 'cult-ui-pro');
-    expect(cult.length).toBeGreaterThan(0);
-    for (const entry of cult) {
-      expect(entry.source.name, entry.id).toBe('cult-ui-pro');
-      expect(entry.licenceDecision, entry.id).toBe('licensed');
-      expect(entry.source.license, entry.id).toContain('docs/legal/cult-ui-pro-rights.md');
-      expect(entry.sourceUrl, entry.id).toMatch(/^https:\/\/pro\.cult-ui\.com\/api\/registry\/[a-z0-9-]+$/);
-    }
-    expect(raw.components.filter((e) => e.licenceDecision === 'licensed').length).toBe(cult.length);
+  it('carries no licensed Cult UI Pro rows in the public set and records the harvest as clean-room', () => {
+    expect(raw.components.filter((entry) => entry.source.name === 'cult-ui-pro')).toEqual([]);
+    expect(raw.components.filter((entry) => entry.licenceDecision === 'licensed')).toEqual([]);
     const harvest = JSON.parse(readFileSync(path.join(packageRoot, 'data/harvest-seed.json'), 'utf8')) as { components: Array<{ id: string }> };
     for (const { id } of harvest.components) {
       const entry = raw.components.find((candidate) => candidate.id === id)!;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog } from '@open-design/components';
+import { Button, Dialog } from '@mish/components';
 
 import { attributedAmrUrl, recordAmrEntry } from '../analytics/amr-attribution';
 import {
@@ -9,10 +9,8 @@ import {
 } from '../analytics/events';
 import { useAnalytics } from '../analytics/provider';
 import { useI18n } from '../i18n';
+import { amrPlansUrlForProfile } from '../runtime/amr-guidance';
 import styles from './GoPlanSunsetDialog.module.css';
-
-const GO_PLAN_PRICING_URL =
-  'https://open-design.ai/amr/dashboard?source=open_design&billing=plan';
 
 type DismissElement = 'acknowledge' | 'close';
 
@@ -140,8 +138,11 @@ export function GoPlanSunsetDialog({
     }
   }, [dismissing, onDismiss, trackClick]);
 
+  // `null` when no AMR console origin is configured: "view other plans" is
+  // then unavailable and not rendered.
+  const plansUrl = amrPlansUrlForProfile(null);
   const viewSubscriptions = () => {
-    if (dismissing) return;
+    if (dismissing || !plansUrl) return;
     trackClick('view_other_subscriptions');
     const attribution = recordAmrEntry(
       analytics.track,
@@ -154,7 +155,7 @@ export function GoPlanSunsetDialog({
       },
     );
     window.open(
-      attributedAmrUrl(GO_PLAN_PRICING_URL, attribution),
+      attributedAmrUrl(plansUrl, attribution),
       '_blank',
       'noopener,noreferrer',
     );
@@ -218,13 +219,15 @@ export function GoPlanSunsetDialog({
         ) : null}
 
         <footer className={styles.actions}>
-          <Button
-            className={`${styles.action} ${styles.secondaryAction}`}
-            disabled={dismissing}
-            onClick={viewSubscriptions}
-          >
-            {t('goPlanSunset.viewSubscriptions')}
-          </Button>
+          {plansUrl ? (
+            <Button
+              className={`${styles.action} ${styles.secondaryAction}`}
+              disabled={dismissing}
+              onClick={viewSubscriptions}
+            >
+              {t('goPlanSunset.viewSubscriptions')}
+            </Button>
+          ) : null}
           <Button
             className={`${styles.action} ${styles.primaryAction}`}
             disabled={dismissing}

@@ -7,7 +7,7 @@ import {
   type DeliverableSyntaxSafeFixRefusal,
   type DeliverableSyntaxFinalization,
   type DeliverableSyntaxSafeFixRule,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { performance } from 'node:perf_hooks';
 import type { PlacementFinalIO } from '../workbench/placement/project-writes.js';
 import { PlacementCoordinationError } from '../workbench/placement/write-coordinator.js';

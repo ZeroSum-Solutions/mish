@@ -21,7 +21,7 @@ import type {
   LibraryAssetKind,
   LibraryStorage,
   LibrarySourceKind,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   addLibraryAssetSource,
   findLibraryAssetByHash,

@@ -2381,7 +2381,7 @@ exit 128
       ok: true,
       errors: [],
       warnings: expect.arrayContaining([
-        expect.objectContaining({ code: 'missing_open_design_rules', path: 'DESIGN.md' }),
+        expect.objectContaining({ code: 'missing_mish_rules', path: 'DESIGN.md' }),
       ]),
     });
 

@@ -4,7 +4,7 @@ import { lstat, open, realpath } from 'node:fs/promises';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { load, type CheerioAPI } from 'cheerio';
-import type { AgencyRecipeAsset, AgencyRecipeChange, AgencyRecipeConflict, AgencyRecipeData, ReconcileAgencyRecipeRequest, ReconcileAgencyRecipeResponse } from '@open-design/contracts';
+import type { AgencyRecipeAsset, AgencyRecipeChange, AgencyRecipeConflict, AgencyRecipeData, ReconcileAgencyRecipeRequest, ReconcileAgencyRecipeResponse } from '@mish/contracts';
 import { agencyPublicationScope } from './deploy-scope.js';
 
 type DocumentNode = ReturnType<CheerioAPI['root']>[number];

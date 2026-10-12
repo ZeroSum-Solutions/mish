@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import postcss from 'postcss';
-import type { ComponentTokenEvidence, ResourceRef } from '@open-design/contracts';
+import type { ComponentTokenEvidence, ResourceRef } from '@mish/contracts';
 import type { CatalogueMaterialFile } from './adoption/catalogue-material.js';
 
 /** Only literal CSS declarations in the exact admitted source bytes are observations.

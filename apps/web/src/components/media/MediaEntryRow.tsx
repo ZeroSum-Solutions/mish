@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { Badge, Button, Input, Select, Spinner } from '@open-design/components';
-import { MEDIA_TASK_CANCELLED_CODE, type MediaGalleryEntry, type MediaGalleryEntryDetail, type WorkspaceCollabContext } from '@open-design/contracts';
+import { Badge, Button, Input, Select, Spinner } from '@mish/components';
+import { MEDIA_TASK_CANCELLED_CODE, type MediaGalleryEntry, type MediaGalleryEntryDetail, type WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import type { Dict } from '../../i18n/types';
 import { projectRawUrl } from '../../providers/registry';

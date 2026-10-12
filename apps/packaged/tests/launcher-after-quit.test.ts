@@ -2,9 +2,9 @@ import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-import type { SidecarStamp, SidecarStopResult } from "@open-design/sidecar";
-import { APP_KEYS, SIDECAR_SOURCES } from "@open-design/sidecar-proto";
-import type { StopProcessesResult, stopProcesses, waitForProcessExit } from "@open-design/platform";
+import type { SidecarStamp, SidecarStopResult } from "@mish/sidecar";
+import { APP_KEYS, SIDECAR_SOURCES } from "@mish/sidecar-proto";
+import type { StopProcessesResult, stopProcesses, waitForProcessExit } from "@mish/platform";
 import { describe, expect, it, vi } from "vitest";
 
 import { exitPackagedLauncherForExistingDesktop, inspectExistingDesktopForLauncher, waitForLauncherAfterQuit } from "../src/launcher-after-quit.js";
@@ -20,7 +20,7 @@ function fakePaths(root: string): PackagedNamespacePaths {
     desktopLogsRoot: join(root, "logs", "desktop"), electronSessionDataRoot: join(root, "user-data", "session"),
     electronUserDataRoot: join(root, "user-data"), installationRoot: root,
     installerObservationRoot: join(root, "data", "observations", "installer"), logsRoot: join(root, "logs"), namespaceRoot: root,
-    resourceRoot: join(root, "resources", "open-design"), runtimeRoot: join(root, "runtime"), updateRoot: join(root, "updates"),
+    resourceRoot: join(root, "resources", "mish"), runtimeRoot: join(root, "runtime"), updateRoot: join(root, "updates"),
   };
 }
 
@@ -81,13 +81,13 @@ describe("inspectExistingDesktopForLauncher", () => {
     const invoke = vi.fn(async () => ({ accepted: true }));
     try {
       await expect(inspectExistingDesktopForLauncher(stamp(), {
-        deeplinkUrl: "opendesign://invite",
+        deeplinkUrl: "mish://invite",
         getStatus: vi.fn(async (target: SidecarStamp) => target.app === APP_KEYS.DESKTOP
           ? { pid: 1234, state: "running", updatedAt: new Date().toISOString(), windowVisible: true }
           : { state: "running", url: "http://127.0.0.1:1234" }) as never,
         invoke: invoke as never, paths: fakePaths(root),
       })).resolves.toEqual({ action: "exit", reason: "existing-focused" });
-      expect(invoke).toHaveBeenCalledWith(stamp(), "show", { deeplinkUrl: "opendesign://invite" }, { timeoutMs: 800 });
+      expect(invoke).toHaveBeenCalledWith(stamp(), "show", { deeplinkUrl: "mish://invite" }, { timeoutMs: 800 });
     } finally {
       await rm(root, { force: true, recursive: true });
     }

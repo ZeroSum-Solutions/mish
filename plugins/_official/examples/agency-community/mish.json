@@ -1,0 +1,41 @@
+{
+  "$schema": "https://github.com/ZeroSum-Solutions/mish/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "example-agency-community",
+  "title": "community page kind",
+  "version": "0.1.0",
+  "publishedAt": "2026-09-24T00:00:00Z",
+  "description": "A members' studio, club, coworking space or professional-community page kind: hero with a join call, member benefits, membership tiers, how joining works, upcoming events, optional member voices, an FAQ and a join step. Fits a shared studio, maker space, coworking space, club or professional community that gives members standing access to a space and each other. An authored poster layout with responsive typography and an inline stylesheet. Membership actions use native contact links; an email supplied by the brief enables a CSP-hashed details-to-review-to-email-draft journey without claiming that an application was sent.",
+  "tags": [
+    "example",
+    "first-party",
+    "page-kind",
+    "community",
+    "membership",
+    "coworking"
+  ],
+  "od": {
+    "kind": "scenario",
+    "mode": "prototype",
+    "taskKind": "new-generation",
+    "useCase": {
+      "query": {
+        "en": "Use the community family for a members' studio, club, coworking space or professional-community mock (a shared studio, maker space, coworking space, club or professional community): hero, member benefits, membership tiers, how joining works, upcoming events, optional member voices, FAQ and a join step. Ask for the business, who it is for and what members get, generate a schemaVersion 2 community typed recipe through the bundled trusted compiler, and render it. This is a page kind, not a decoded client site: every business fact in the reference fixture is a placeholder."
+      }
+    },
+    "context": {
+      "skills": [
+        { "path": "./SKILL.md" }
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        { "id": "generate", "atoms": ["file-write", "live-artifact"] }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ]
+  }
+}

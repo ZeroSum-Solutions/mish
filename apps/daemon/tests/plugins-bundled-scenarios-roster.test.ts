@@ -55,11 +55,11 @@ describe('plugins/_official/scenarios roster', () => {
     expect(dirs).toEqual(EXPECTED_SCENARIOS);
   });
 
-  it('every scenario folder ships SKILL.md + open-design.json', async () => {
+  it('every scenario folder ships SKILL.md + mish.json', async () => {
     for (const id of EXPECTED_SCENARIOS) {
       const folder = path.join(scenariosRoot, id);
       const skill = await stat(path.join(folder, 'SKILL.md'));
-      const manifest = await stat(path.join(folder, 'open-design.json'));
+      const manifest = await stat(path.join(folder, 'mish.json'));
       expect(skill.isFile()).toBe(true);
       expect(manifest.isFile()).toBe(true);
     }

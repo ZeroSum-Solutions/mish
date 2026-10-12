@@ -6,7 +6,7 @@ import { openHomeTemplateMenu } from '@/playwright/home-hero';
 import type {
   WorkspaceCollabContext,
   WorkspaceDirectoryItem,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { Page, Request } from '@playwright/test';
 import {
   applyStandardMocks,
@@ -1042,10 +1042,10 @@ test('[P1] Use everywhere guide uses daemon MCP install info and copies an agent
   await page.route('**/api/mcp/install-info', async (route) => {
     await route.fulfill({
       json: {
-        command: '/Applications/Open Design.app/Contents/MacOS/od',
+        command: '/Applications/Mish.app/Contents/MacOS/od',
         args: ['mcp', '--daemon-url', 'http://127.0.0.1:7456'],
         env: {
-          OD_DATA_DIR: '/Users/test/.open-design',
+          OD_DATA_DIR: '/Users/test/.mish',
         },
       },
     });
@@ -1067,14 +1067,14 @@ test('[P1] Use everywhere guide uses daemon MCP install info and copies an agent
 
   await page.getByTestId('use-everywhere-tab-mcp').click();
   const mcpSection = page.getByTestId('use-everywhere-section-mcp');
-  await expect(mcpSection).toContainText('/Applications/Open Design.app/Contents/MacOS/od');
+  await expect(mcpSection).toContainText('/Applications/Mish.app/Contents/MacOS/od');
   await expect(mcpSection).toContainText('OD_DATA_DIR');
 
   await page.getByTestId('use-everywhere-copy-guide').click();
   await expect(page.getByTestId('use-everywhere-copy-guide')).toContainText(/Copied|已复制|已複製/i);
   await expect
     .poll(() => page.evaluate(() => (window as unknown as { __copiedTexts?: string[] }).__copiedTexts?.at(-1) ?? ''))
-    .toContain('/Applications/Open Design.app/Contents/MacOS/od');
+    .toContain('/Applications/Mish.app/Contents/MacOS/od');
   await expect
     .poll(() => page.evaluate(() => (window as unknown as { __copiedTexts?: string[] }).__copiedTexts?.at(-1) ?? ''))
     .toMatch(/http:\/\/127\.0\.0\.1:\d+\/api\/mcp\/install-info/);

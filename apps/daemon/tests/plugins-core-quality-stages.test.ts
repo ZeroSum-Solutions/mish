@@ -20,7 +20,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { applyPlugin } from '../src/plugins/apply.js';
-import type { InstalledPluginRecord, PluginManifest, PluginPipeline } from '@open-design/contracts';
+import type { InstalledPluginRecord, PluginManifest, PluginPipeline } from '@mish/contracts';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 
@@ -119,7 +119,7 @@ describe('core quality-stage floor', () => {
   it('repairs the real bundled web-prototype template (generate-only on disk)', () => {
     const manifest = JSON.parse(
       readFileSync(
-        path.join(REPO_ROOT, 'plugins/_official/examples/web-prototype/open-design.json'),
+        path.join(REPO_ROOT, 'plugins/_official/examples/web-prototype/mish.json'),
         'utf8',
       ),
     ) as PluginManifest;

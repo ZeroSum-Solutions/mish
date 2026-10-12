@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { mediaTaskInterruptReason, type MediaTaskInterruptReason } from '@open-design/contracts';
+import { mediaTaskInterruptReason, type MediaTaskInterruptReason } from '@mish/contracts';
 import { syncMediaTaskLineage } from './lineage.js';
 import type { MediaTaskInsert, MediaTaskPatch, MediaTaskRow, MediaTaskStatus } from './tasks.js';
 import {

@@ -46,7 +46,7 @@ function observation(input: {
   attributes?: Record<string, unknown>;
 }): NormalizedAgentObservationV1 {
   return {
-    schema: 'open-design.normalized-agent-observation/v1',
+    schema: 'mish.normalized-agent-observation/v1',
     identity: {
       observationId: input.id,
       taskExecutionId: input.taskExecutionId ?? 'task-1',
@@ -115,7 +115,7 @@ describe('OD Next runtime capability contracts', () => {
         kind: 'sanitized_real',
         recordingDigest: `sha256:${'a'.repeat(64)}`,
         anonymizationVersion: 'redaction/v1',
-        evidenceReview: 'open_design_best_effort',
+        evidenceReview: 'mish_best_effort',
       },
     })).toThrow(/exact recorded Agent CLI version/i);
   });
@@ -201,7 +201,7 @@ describe('OD Next runtime capability contracts', () => {
 
   it('keeps recorded fixture versions as provenance while current versions stay optional diagnostics', () => {
     expect(() => OdNextRuntimeCapabilitySnapshotV1Schema.parse({
-      schema: 'open-design.od-next-runtime-capability-snapshot/v1',
+      schema: 'mish.od-next-runtime-capability-snapshot/v1',
       runtimePath: 'codex',
       agentId: 'codex',
       agentCliVersion: 'synthetic-cli/1',
@@ -224,7 +224,7 @@ describe('OD Next runtime capability contracts', () => {
     })).toThrow(/sanitized real fixture replay/i);
 
     const versionlessSnapshot = OdNextRuntimeCapabilitySnapshotV1Schema.parse({
-      schema: 'open-design.od-next-runtime-capability-snapshot/v1',
+      schema: 'mish.od-next-runtime-capability-snapshot/v1',
       runtimePath: 'codex',
       agentId: 'codex',
       recordedAgentCliVersion: 'recorded-cli/1',
@@ -250,7 +250,7 @@ describe('OD Next runtime capability contracts', () => {
     expect(versionlessSnapshot).not.toHaveProperty('agentCliVersion');
 
     expect(() => OdNextRuntimeCapabilitySnapshotV1Schema.parse({
-      schema: 'open-design.od-next-runtime-capability-snapshot/v1',
+      schema: 'mish.od-next-runtime-capability-snapshot/v1',
       runtimePath: 'codex',
       agentId: 'codex',
       runtimeAdapterVersion: 'adapter/v1',
@@ -273,7 +273,7 @@ describe('OD Next runtime capability contracts', () => {
 
   it('does not let runtime advertising downgrade unknown support to unsupported', () => {
     expect(() => OdNextRuntimeCapabilitySnapshotV1Schema.parse({
-      schema: 'open-design.od-next-runtime-capability-snapshot/v1',
+      schema: 'mish.od-next-runtime-capability-snapshot/v1',
       runtimePath: 'codex',
       agentId: 'codex',
       recordedAgentCliVersion: 'recorded-cli/1',
@@ -295,7 +295,7 @@ describe('OD Next runtime capability contracts', () => {
     })).toThrow(/verified or unsupported.*sanitized real fixture replay/i);
 
     expect(() => OdNextRuntimeCapabilitySnapshotV1Schema.parse({
-      schema: 'open-design.od-next-runtime-capability-snapshot/v1',
+      schema: 'mish.od-next-runtime-capability-snapshot/v1',
       runtimePath: 'codex',
       agentId: 'codex',
       recordedAgentCliVersion: 'recorded-cli/1',

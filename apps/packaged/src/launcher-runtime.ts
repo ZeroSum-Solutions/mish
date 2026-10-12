@@ -21,8 +21,8 @@ import {
   validateLauncherRuntimeDescriptor,
   type LauncherAttemptDescriptor,
   type LauncherTargetSelection,
-} from "@open-design/launcher-proto";
-import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@open-design/release";
+} from "@mish/launcher-proto";
+import { releaseChannelFromNamespace, releaseChannelFromVersion } from "@mish/release";
 
 import type { PackagedConfig, PackagedWebOutputMode, RawPackagedConfig } from "./config.js";
 import type { PackagedNamespacePaths } from "./paths.js";
@@ -301,18 +301,18 @@ async function resolvePayloadConfig(
   const resourcesPath = manifest.platform === "darwin"
     ? join(versionPaths.versionRoot, manifest.entry.cwd, "Contents", "Resources")
     : join(versionPaths.versionRoot, manifest.payloadRoot, "resources");
-  const packagedConfigPath = join(resourcesPath, "open-design-config.json");
+  const packagedConfigPath = join(resourcesPath, "mish-config.json");
   if (!(await pathExists(packagedConfigPath))) return null;
   const raw = await readJsonFile<RawPackagedConfig>(packagedConfigPath);
   const webOutputMode = raw.webOutputMode === "standalone" || raw.webOutputMode === "server"
     ? raw.webOutputMode
     : config.webOutputMode;
   const resourceRoot = raw.resourceRoot == null || raw.resourceRoot.length === 0
-    ? join(resourcesPath, "open-design")
+    ? join(resourcesPath, "mish")
     : raw.resourceRoot;
   const relativeNodeCommand =
     raw.nodeCommandRelative == null || raw.nodeCommandRelative.length === 0
-      ? join("open-design", "bin", process.platform === "win32" ? "node.exe" : "node")
+      ? join("mish", "bin", process.platform === "win32" ? "node.exe" : "node")
       : raw.nodeCommandRelative;
   const nodeCommand = await resolveOptionalPayloadEntry(resourcesPath, relativeNodeCommand);
   const electronNodeCommand = manifest.platform === "win32"
@@ -322,7 +322,7 @@ async function resolvePayloadConfig(
     )
     : null;
   const rawWebStandaloneRoot = raw.webStandaloneRoot == null || raw.webStandaloneRoot.length === 0
-    ? webOutputMode === "standalone" ? join(resourcesPath, "open-design-web-standalone") : null
+    ? webOutputMode === "standalone" ? join(resourcesPath, "mish-web-standalone") : null
     : raw.webStandaloneRoot;
   const webStandaloneRoot = await resolveWindowsWebStandaloneRoot(
     versionPaths,

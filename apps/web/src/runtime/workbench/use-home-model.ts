@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { parseSessionModelChoice, type SessionModelChoice, type WorkspaceCollabContext } from '@open-design/contracts';
+import { parseSessionModelChoice, type SessionModelChoice, type WorkspaceCollabContext } from '@mish/contracts';
 import { workspaceAccountScopedCacheKey } from '../../collab/workspace-identity';
 import type { AppConfig, ApiProtocol, AgentModelChoice } from '../../types';
 import { configForSessionChoice, requireSessionChoiceFromConfig, sessionChoiceFromConfig } from './session-model-config';

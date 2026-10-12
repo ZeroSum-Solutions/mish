@@ -1,4 +1,4 @@
-import { WORKBENCH_ADOPTION_HELPER_LAYOUT, type WorkbenchAdoptionPredecessorGate } from '@open-design/contracts';
+import { WORKBENCH_ADOPTION_HELPER_LAYOUT, type WorkbenchAdoptionPredecessorGate } from '@mish/contracts';
 import DatabaseConstructor from 'better-sqlite3';
 import type Database from 'better-sqlite3';
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto';

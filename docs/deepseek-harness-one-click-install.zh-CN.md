@@ -1,10 +1,10 @@
 # DeepSeek Harness × Mishh Mashh 一键安装指引
 
-> 运营发布状态：文案已可评审，安装脚本尚未发布到正式下载地址。正式对外发送前，请确认下方三个 `open-design.ai/install-dsh.*` 地址均可访问，并分别完成一次 macOS、Windows PowerShell 和 Windows CMD 验证。
+> 运营发布状态：文案已可评审，安装脚本尚未发布到正式下载地址。正式对外发送前，请确认下方三个 `mish.invalid/install-dsh.*` 地址均可访问，并分别完成一次 macOS、Windows PowerShell 和 Windows CMD 验证。
 
-正式发布不采用开发机手动上传。脚本合并到 `main` 后，由 `dsh-bootstrap-publish` workflow 将脚本和 `SHA256SUMS` 以不可覆盖的版本保存到 `https://releases.open-design.ai/bootstrap/dsh/<version>/`。`open-design.ai/install-dsh.*` 短链接由独立的 marketing site 仓库提供。
+正式发布不采用开发机手动上传。脚本合并到 `main` 后，由 `dsh-bootstrap-publish` workflow 将脚本和 `SHA256SUMS` 以不可覆盖的版本保存到 `https://releases.mish.invalid/bootstrap/dsh/<version>/`。`mish.invalid/install-dsh.*` 短链接由独立的 marketing site 仓库提供。
 
-版本号由脚本内容决定，不需要人工维护：脚本没变就复用已发布的那一版，脚本改了就自动开下一版（`v1` → `v2` → …）。每个已发布版本都保持逐字节不可覆盖，历史版本永久留存，`https://releases.open-design.ai/bootstrap/dsh/latest.json` 指向当前版本并附带各文件的 sha256 与发布来源。
+版本号由脚本内容决定，不需要人工维护：脚本没变就复用已发布的那一版，脚本改了就自动开下一版（`v1` → `v2` → …）。每个已发布版本都保持逐字节不可覆盖，历史版本永久留存，`https://releases.mish.invalid/bootstrap/dsh/latest.json` 指向当前版本并附带各文件的 sha256 与发布来源。
 
 ## 对外宣发文案
 
@@ -23,7 +23,7 @@
 打开“终端”，粘贴下面一行并按回车：
 
 ```sh
-curl -fsSL 'https://open-design.ai/install-dsh.sh?version=1' | sh
+curl -fsSL 'https://github.com/ZeroSum-Solutions/mish/install-dsh.sh?version=1' | sh
 ```
 
 支持 Apple Silicon、Intel Mac，以及主流 x64/arm64 Linux 发行版。Alpine Linux 暂不支持自动安装。
@@ -33,7 +33,7 @@ curl -fsSL 'https://open-design.ai/install-dsh.sh?version=1' | sh
 打开 PowerShell，粘贴下面一行并按回车：
 
 ```powershell
-& ([scriptblock]::Create((irm 'https://open-design.ai/install-dsh.ps1?version=1')))
+& ([scriptblock]::Create((irm 'https://github.com/ZeroSum-Solutions/mish/install-dsh.ps1?version=1')))
 ```
 
 ### Windows CMD
@@ -41,7 +41,7 @@ curl -fsSL 'https://open-design.ai/install-dsh.sh?version=1' | sh
 打开“命令提示符”，粘贴下面一行并按回车：
 
 ```bat
-curl -fsSL "https://open-design.ai/install-dsh.cmd?version=1" -o "%TEMP%\install-dsh.cmd" && call "%TEMP%\install-dsh.cmd"
+curl -fsSL "https://github.com/ZeroSum-Solutions/mish/install-dsh.cmd?version=1" -o "%TEMP%\install-dsh.cmd" && call "%TEMP%\install-dsh.cmd"
 ```
 
 ## 配置 DeepSeek API Key
@@ -142,16 +142,16 @@ DeepSeek API Key 在 DeepSeek Harness 自己的页面中配置和保存。Mishh 
 
 DeepSeek Harness 已接入 Mishh Mashh。没有 Node.js、pnpm 或 dsh 也没关系：复制一行命令即可自动补齐兼容环境。安装完成后，在 Harness Web UI 的“设置 → 模型 → DeepSeek”中保存 API Key，再回到 Mishh Mashh 重新扫描并选择 DeepSeek Harness，就可以开始生成设计。
 
-- macOS / Linux：`curl -fsSL 'https://open-design.ai/install-dsh.sh?version=1' | sh`
-- Windows PowerShell：`& ([scriptblock]::Create((irm 'https://open-design.ai/install-dsh.ps1?version=1')))`
-- Windows CMD：`curl -fsSL "https://open-design.ai/install-dsh.cmd?version=1" -o "%TEMP%\install-dsh.cmd" && call "%TEMP%\install-dsh.cmd"`
+- macOS / Linux：`curl -fsSL 'https://github.com/ZeroSum-Solutions/mish/install-dsh.sh?version=1' | sh`
+- Windows PowerShell：`& ([scriptblock]::Create((irm 'https://github.com/ZeroSum-Solutions/mish/install-dsh.ps1?version=1')))`
+- Windows CMD：`curl -fsSL "https://github.com/ZeroSum-Solutions/mish/install-dsh.cmd?version=1" -o "%TEMP%\install-dsh.cmd" && call "%TEMP%\install-dsh.cmd"`
 
 API Key 由 DeepSeek Harness 自己保存，Mishh Mashh 不保存你的 Key。
 
 ## 运营发布前检查
 
 - 三个下载地址均返回对应脚本，而不是 HTML 页面或 404。
-- R2 上的版本化对象、SHA-256 清单和 `open-design.ai` 稳定入口已经发布。
+- R2 上的版本化对象、SHA-256 清单和 `mish.invalid` 稳定入口已经发布。
 - 用全新 macOS 用户环境完成安装、配置、Mishh Mashh 重新扫描和一次真实生成。
 - 用 Windows PowerShell 完成同样的全链路验证。
 - 用 Windows CMD 至少验证下载、PowerShell 转发和安装完成。

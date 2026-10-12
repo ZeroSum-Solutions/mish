@@ -12,7 +12,7 @@
 //
 // `SectionCatalogEntry` (./section-catalog.ts) is reused as-is for the catalog merge: a
 // normalized MotionSites prompt IS a `SectionCatalogEntry` with `sourceKind: 'motionsites-prompt'`
-// (see @open-design/section-catalog's `normalizeMotionSitesPrompts`), so `MotionSitesCatalogResponse`
+// (see @mish/section-catalog's `normalizeMotionSitesPrompts`), so `MotionSitesCatalogResponse`
 // carries `SectionCatalogResponse`'s `catalog` shape as-is rather than a parallel entry shape —
 // but it is its own DTO, not a bare type alias: it adds the two fields a catalog fetch needs that
 // a generic section catalog does not, `connection` and `upstream` (see each field's own doc). A

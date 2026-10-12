@@ -18,7 +18,7 @@ import {
 } from '../src/plugins/installer.js';
 import { listInstalledPlugins } from '../src/plugins/registry.js';
 import { addMarketplace, resolvePluginInMarketplaces } from '../src/plugins/marketplaces.js';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 let tmpRoot: string;
 let pluginsRoot: string;
@@ -31,7 +31,7 @@ beforeEach(async () => {
   sourceFolder = path.join(tmpRoot, 'source-plugin');
   await mkdir(sourceFolder, { recursive: true });
   await writeFile(
-    path.join(sourceFolder, 'open-design.json'),
+    path.join(sourceFolder, 'mish.json'),
     JSON.stringify({
       name: 'sample-plugin',
       version: '1.0.0',
@@ -91,10 +91,10 @@ describe('installFromLocalFolder', () => {
     })) {
       if (event.kind === 'error') throw new Error(event.message);
     }
-    const installedManifest = path.join(pluginsRoot, 'sample-plugin', 'open-design.json');
+    const installedManifest = path.join(pluginsRoot, 'sample-plugin', 'mish.json');
     const before = await readFile(installedManifest, 'utf8');
     await writeFile(
-      path.join(sourceFolder, 'open-design.json'),
+      path.join(sourceFolder, 'mish.json'),
       JSON.stringify({ name: 'sample-plugin', version: '9.9.9', title: 'Attacker overwrite' }),
     );
 
@@ -164,7 +164,7 @@ describe('installFromLocalFolder', () => {
       ],
     });
     const added = await addMarketplace(db, {
-      url: 'https://example.com/open-design-marketplace.json',
+      url: 'https://example.com/mish-marketplace.json',
       trust: 'official',
       fetcher: async () => ({
         ok: true,
@@ -347,7 +347,7 @@ describe('plugin install diagnostics', () => {
   });
 
   it('classifies a real README-only folder as an invalid manifest', async () => {
-    await rm(path.join(sourceFolder, 'open-design.json'));
+    await rm(path.join(sourceFolder, 'mish.json'));
     await writeFile(path.join(sourceFolder, 'README.md'), '# Not a plugin\n');
 
     const events = [];
@@ -376,8 +376,8 @@ describe('plugin install diagnostics', () => {
         },
       },
     })],
-  ])('classifies open-design.json with %s as an invalid manifest', async (_label, manifest) => {
-    await writeFile(path.join(sourceFolder, 'open-design.json'), manifest);
+  ])('classifies mish.json with %s as an invalid manifest', async (_label, manifest) => {
+    await writeFile(path.join(sourceFolder, 'mish.json'), manifest);
 
     const events = [];
     for await (const event of installPlugin(db, {

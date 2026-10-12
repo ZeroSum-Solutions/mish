@@ -2,7 +2,7 @@ import {
   buildWorkspacePermissions,
   type CollabMemberRole,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {

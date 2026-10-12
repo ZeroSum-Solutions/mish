@@ -9,7 +9,7 @@
  *   N/M  —— N 是**当前正在做第几步**(不是「已完成几步」),M 是总条数
  *   记号  —— 每一步落到 `StatusMark` 的哪一档
  */
-import { todoStatusIsUnfinished } from '@open-design/contracts';
+import { todoStatusIsUnfinished } from '@mish/contracts';
 import type { TodoStatus } from './contract';
 
 /** 药丸只认清单里的这两样;`runtime/todos.ts` 的 `TodoItem` 天然满足 */

@@ -2,8 +2,8 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { installMockOpenDesignHost } from '@open-design/host/testing';
-import { parseCaptureImportMetadata } from '@open-design/contracts';
+import { installMockMishHost } from '@mish/host/testing';
+import { parseCaptureImportMetadata } from '@mish/contracts';
 
 import { DesignBrowserPanel } from '../../src/components/DesignBrowserPanel';
 import { I18nProvider } from '../../src/i18n';
@@ -27,7 +27,7 @@ let restoreHost: (() => void) | null = null;
 const calls: { url: string; init: RequestInit }[] = [];
 beforeEach(() => {
   calls.length = 0;
-  restoreHost = installMockOpenDesignHost({ host: { capture: { page: vi.fn(async () => ({ ok: true as const, dataUrl: 'data:image/png;base64,iVBORw0KGgo=', w: 80, h: 60 })) } } });
+  restoreHost = installMockMishHost({ host: { capture: { page: vi.fn(async () => ({ ok: true as const, dataUrl: 'data:image/png;base64,iVBORw0KGgo=', w: 80, h: 60 })) } } });
   vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL, init: RequestInit = {}) => {
     calls.push({ url: String(input), init });
     if (String(input).startsWith('/api/workbench/captures') && init.method === 'POST') {
