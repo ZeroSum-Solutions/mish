@@ -4,7 +4,7 @@ import {
   type AdoptionOperationView, type CatalogueAdoptionRequest, type CatalogueAdoptionResponse, type CatalogueDependencyReport,
   type CatalogueReplacementReview, type CatalogueSaveRequest, type CatalogueSavedUnit, type CatalogueTargetRefusal, type PreparedAdoptionPlan, type WorkspaceCollabContext,
   parseWorkbenchAdoptionStatusResponse, type WorkbenchAdoptionStatusResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { workspaceProjectHeaders } from '../collab/workspace-identity';
 import { WorkbenchRequestError } from './workbench';
 

@@ -20,9 +20,9 @@ const help = `Usage (from repository root):
   grade (below) scores one build path against the agency bar; compare judges designs pairwise:
 ${COMPARE_HELP}
 
-  pnpm --filter @open-design/e2e exec tsx benchmarks/quality/cli.ts run --daemon http://127.0.0.1:PORT --out NEW_DIR --agent ID --model ID [--kit ID] [--case dental] [--baseline DIR]
-  pnpm --filter @open-design/e2e exec tsx benchmarks/quality/cli.ts run --stub --out NEW_DIR
-  pnpm --filter @open-design/e2e exec tsx benchmarks/quality/cli.ts capture|judge|score --out DIR
+  pnpm --filter @mish/e2e exec tsx benchmarks/quality/cli.ts run --daemon http://127.0.0.1:PORT --out NEW_DIR --agent ID --model ID [--kit ID] [--case dental] [--baseline DIR]
+  pnpm --filter @mish/e2e exec tsx benchmarks/quality/cli.ts run --stub --out NEW_DIR
+  pnpm --filter @mish/e2e exec tsx benchmarks/quality/cli.ts capture|judge|score --out DIR
 Options: --builder build-on-brand|agency-build (default build-on-brand), --judge-model ID, --codex-judge-model gpt-6.1-sol, --measurement-baseline, --capture-only, --human-ratings FILE (repeatable), --rubric FILE, --timeout-ms N, --threshold 0..4 (advisory deltas only), --gate
 Run creates builds, captures every page and judges/reports them. Services belong to the caller.
 Stub creates synthetic files and uses a stub judge, but still renders with Chromium. No provider calls.

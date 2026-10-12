@@ -88,7 +88,7 @@ if (args[0] === 'resource' && args[1] === 'pull') {
     '<!doctype html><html><body data-e2e="first-materialized">shared</body></html>',
   );
   writeFileSync(
-    targetDir + '/open-design.json',
+    targetDir + '/mish.json',
     JSON.stringify({ name: 'First-open materialized project', createdAt: 1, updatedAt: 2 }),
   );
   process.stdout.write(JSON.stringify({ version: 7, versionId: 'v7' }) + '\\n');
@@ -103,7 +103,7 @@ if (args[1] === 'upsert' || args[1] === 'remove') {
   if (process.env.FAKE_TEAM_PROJECT_MUTATION_LOG) {
     appendFileSync(
       process.env.FAKE_TEAM_PROJECT_MUTATION_LOG,
-      JSON.stringify({ args, workspaceId: process.env.OPEN_DESIGN_WORKSPACE_ID ?? null }) + '\\n',
+      JSON.stringify({ args, workspaceId: process.env.MISH_WORKSPACE_ID ?? null }) + '\\n',
     );
   }
   process.stdout.write('{}\\n');

@@ -1,4 +1,4 @@
-import { parsePreparedAdoptionPlan, type PrepareAdoptionRequest, type PreparedAdoptionPlan, type ResourceRef } from '@open-design/contracts';
+import { parsePreparedAdoptionPlan, type PrepareAdoptionRequest, type PreparedAdoptionPlan, type ResourceRef } from '@mish/contracts';
 import { sha256, type StoredBlob } from './adoption-files.js';
 
 /** Deterministic JSON (sorted keys) for every digest the trusted manager recomputes. */

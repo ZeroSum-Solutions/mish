@@ -55,7 +55,7 @@ READ_BACK_TIMEOUT = 20.0
 # verification fails on every run and the publisher can never confirm anything.
 READ_HEADERS = {
     "accept": "application/json",
-    "user-agent": "open-design-whats-new-publisher/1 (+https://github.com/nexu-io/open-design)",
+    "user-agent": "mish-whats-new-publisher/1 (+https://github.com/ZeroSum-Solutions/mish)",
 }
 
 REQUIRED_STORAGE_VARS = (
@@ -161,7 +161,7 @@ def read_back(url: str, expected: bytes) -> None:
 def main() -> int:
     document_path = Path(_env("WHATS_NEW_DOCUMENT", "docs/whats-new.json"))
     object_key = _env("WHATS_NEW_OBJECT_KEY", "whats-new.json")
-    public_url = _env("WHATS_NEW_PUBLIC_URL", "https://whatsnew.open-design.ai/whats-new.json")
+    public_url = _env("WHATS_NEW_PUBLIC_URL", "https://whatsnew.mish.invalid/whats-new.json")
     dry_run = os.environ.get("WHATS_NEW_DRY_RUN", "").strip().lower() == "true"
 
     body, payload = read_document(document_path)

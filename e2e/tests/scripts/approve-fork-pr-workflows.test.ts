@@ -19,12 +19,12 @@ test("isPendingApprovalRun matches approval-gated fork PR runs from GitHub's cap
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -50,12 +50,12 @@ test("isPendingApprovalRun also accepts action_required runs reported only in st
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -81,12 +81,12 @@ test("isPendingApprovalRun rejects runs outside the allowlist or without action_
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -133,12 +133,12 @@ test("runTargetsPullRequest accepts empty run.pull_requests only when the head S
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -164,12 +164,12 @@ test("runTargetsPullRequest accepts fork PR runs with no GitHub PR association w
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -178,7 +178,7 @@ test("runTargetsPullRequest accepts fork PR runs with no GitHub PR association w
     name: "CI",
     event: "pull_request",
     head_branch: "fix/workflow-linkage",
-    head_repository: { full_name: "someone/open-design" },
+    head_repository: { full_name: "someone/mish" },
     status: "completed",
     conclusion: "action_required",
     head_sha: pull.head.sha,
@@ -197,12 +197,12 @@ test("runTargetsPullRequest rejects ambiguous empty run.pull_requests associatio
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -212,7 +212,7 @@ test("runTargetsPullRequest rejects ambiguous empty run.pull_requests associatio
     base: {
       ref: "release",
       sha: "8db117d728f967d108f6fdd64cb8d921d057f7f6",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -238,12 +238,12 @@ test("runTargetsPullRequest rejects fork PR runs when multiple open PRs share th
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -253,7 +253,7 @@ test("runTargetsPullRequest rejects fork PR runs when multiple open PRs share th
     base: {
       ref: "release",
       sha: "8db117d728f967d108f6fdd64cb8d921d057f7f6",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -281,12 +281,12 @@ test("runTargetsPullRequest rejects empty associations when fork head identity d
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -295,7 +295,7 @@ test("runTargetsPullRequest rejects empty associations when fork head identity d
     name: "CI",
     event: "pull_request",
     head_branch: "different-branch",
-    head_repository: { full_name: "someone/open-design" },
+    head_repository: { full_name: "someone/mish" },
     status: "completed",
     conclusion: "action_required",
     head_sha: pull.head.sha,
@@ -314,12 +314,12 @@ test("runTargetsPullRequest rejects runs that GitHub already associates to a dif
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -338,7 +338,7 @@ test("runTargetsPullRequest rejects runs that GitHub already associates to a dif
         base: {
           ref: "release",
           sha: "8db117d728f967d108f6fdd64cb8d921d057f7f6",
-          repo: { full_name: "nexu-io/open-design" },
+          repo: { full_name: "ZeroSum-Solutions/mish" },
         },
       },
     ],
@@ -355,12 +355,12 @@ test("runTargetsPullRequest approves only the run that GitHub associates to the 
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -370,7 +370,7 @@ test("runTargetsPullRequest approves only the run that GitHub associates to the 
     base: {
       ref: "release",
       sha: "8db117d728f967d108f6fdd64cb8d921d057f7f6",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -403,12 +403,12 @@ test("runTargetsPullRequest ignores base tip churn for the same PR association",
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
@@ -443,17 +443,17 @@ test("listPendingApprovalRuns paginates all pull_request runs for the head SHA a
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 
   const requestedPaths: string[] = [];
-  const pendingRuns = await listPendingApprovalRuns("nexu-io/open-design", pull, {
+  const pendingRuns = await listPendingApprovalRuns("ZeroSum-Solutions/mish", pull, {
     loadWorkflowRunsResponsePage: async (path) => {
       requestedPaths.push(path);
       if (path.endsWith("page=1")) {
@@ -507,8 +507,8 @@ test("listPendingApprovalRuns paginates all pull_request runs for the head SHA a
   });
 
   assert.deepEqual(requestedPaths, [
-    "/repos/nexu-io/open-design/actions/runs?event=pull_request&head_sha=734076155c44e569304856590019cea54506fdab&per_page=100&page=1",
-    "/repos/nexu-io/open-design/actions/runs?event=pull_request&head_sha=734076155c44e569304856590019cea54506fdab&per_page=100&page=2",
+    "/repos/ZeroSum-Solutions/mish/actions/runs?event=pull_request&head_sha=734076155c44e569304856590019cea54506fdab&per_page=100&page=1",
+    "/repos/ZeroSum-Solutions/mish/actions/runs?event=pull_request&head_sha=734076155c44e569304856590019cea54506fdab&per_page=100&page=2",
   ]);
   assert.equal(requestedPaths.some((path) => path.includes("status=action_required")), false);
   assert.deepEqual(
@@ -525,12 +525,12 @@ test("listPendingApprovalRuns only approves the unified CI workflow", async () =
     head: {
       ref: "fix/readme-copy",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
   const workflowRuns = [
@@ -553,12 +553,12 @@ test("listPendingApprovalRuns only approves the unified CI workflow", async () =
   };
 
   assert.deepEqual(
-    (await listPendingApprovalRuns("nexu-io/open-design", pull, [{ filename: "README.md", status: "modified" }], deps)).map((run) => run.id),
+    (await listPendingApprovalRuns("ZeroSum-Solutions/mish", pull, [{ filename: "README.md", status: "modified" }], deps)).map((run) => run.id),
     [26273463769],
   );
   assert.deepEqual(
     (await listPendingApprovalRuns(
-      "nexu-io/open-design",
+      "ZeroSum-Solutions/mish",
       pull,
       [{ filename: "apps/web/src/components/Button.tsx", status: "modified" }],
       deps,
@@ -575,12 +575,12 @@ test("hasPullApprovalStateDrift ignores base tip churn but still rejects base re
     head: {
       ref: "fix/workflow-linkage",
       sha: "734076155c44e569304856590019cea54506fdab",
-      repo: { full_name: "someone/open-design" },
+      repo: { full_name: "someone/mish" },
     },
     base: {
       ref: "main",
       sha: "4cd93a5c7a7b0db1961c854e55f8e0e6b1b45542",
-      repo: { full_name: "nexu-io/open-design" },
+      repo: { full_name: "ZeroSum-Solutions/mish" },
     },
   };
 

@@ -1,9 +1,9 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
-import type { ResourceCandidate } from '@open-design/contracts';
-import { cultRegistryName } from '@open-design/contracts';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
+import type { ResourceCandidate } from '@mish/contracts';
+import { cultRegistryName } from '@mish/contracts';
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
 import { convertedDir, convertedPreviewHtml, escapeHtml } from '../cult-live-preview.js';
 import { cultInternalId } from '../cult-public-ids.js';
 

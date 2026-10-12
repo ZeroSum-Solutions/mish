@@ -4,9 +4,9 @@
   "cliVersion": "2.1.233 (Claude Code)",
   "adapterVersion": "od-claude-stream-json/v1",
   "anonymizationVersion": "od-runtime-evidence/v1",
-  "evidenceReview": "open_design_best_effort",
+  "evidenceReview": "mish_best_effort",
   "recordingDigest": "sha256:5681a9a211562e119efc470b6846a4be8b3ee822f4e15f8967c19871e69c9b8b",
-  "note": "Open Design local replay of the exact Claude 2.1.233 Agent stream shape. Prompt bodies, outputs, paths, credentials, and provider identifiers are omitted.",
+  "note": "Mish local replay of the exact Claude 2.1.233 Agent stream shape. Prompt bodies, outputs, paths, credentials, and provider identifiers are omitted.",
   "cases": [
     {
       "caseId": "main_run",

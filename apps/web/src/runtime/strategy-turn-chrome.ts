@@ -1,4 +1,4 @@
-import type { AppliedPluginSnapshot, ChatSessionMode } from '@open-design/contracts';
+import type { AppliedPluginSnapshot, ChatSessionMode } from '@mish/contracts';
 
 /**
  * An applied snapshot carries `strategy` only when the daemon bound an internal

@@ -50,7 +50,7 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { hasOdCard, OD_NEXT_STRATEGY_ID, type ProjectMediaTask } from '@open-design/contracts';
+import { hasOdCard, OD_NEXT_STRATEGY_ID, type ProjectMediaTask } from '@mish/contracts';
 import { useAnalytics } from '../analytics/provider';
 import { getResolvedDeviceId } from '../analytics/client';
 import {
@@ -107,11 +107,11 @@ import type {
   ChatSessionMode,
   RunContextSelection,
   WorkspaceContextItem,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   TrackingProjectKind,
   TrackingRunRecoveryActionType,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { isDesignSystemWorkspacePrompt } from '../design-system-auto-prompt';
 import {
   isTodoWriteToolName,
@@ -731,8 +731,8 @@ interface Props {
   // "Share to Mishh Mashh" button on each completed assistant message —
   // wired by ProjectView to handleSend with the bundled
   // `od-share-to-community` scenario's trigger prompt.
-  onShareToOpenDesign?: (assistantMessageId: string) => void;
-  shareToOpenDesignBusyMessageId?: string | null;
+  onShareToMish?: (assistantMessageId: string) => void;
+  shareToMishBusyMessageId?: string | null;
   forceStreamingMessageIds?: Set<string>;
   initialDraft?: string;
   // Product path of the Home recommendation that started this project. When
@@ -984,7 +984,7 @@ interface Props {
   config?: AppConfig;
 }
 
-const AMR_PROFILE_ENV_KEY = 'OPEN_DESIGN_AMR_PROFILE';
+const AMR_PROFILE_ENV_KEY = 'MISH_AMR_PROFILE';
 
 type Tab = 'chat' | 'comments';
 
@@ -1372,8 +1372,8 @@ export function ChatPane({
   onRequestPluginFolderAgentAction,
   activePluginActionPaths,
   hiddenPluginActionPaths,
-  onShareToOpenDesign,
-  shareToOpenDesignBusyMessageId,
+  onShareToMish,
+  shareToMishBusyMessageId,
   forceStreamingMessageIds,
   initialDraft,
   onboardingStarterPath = null,
@@ -1756,7 +1756,7 @@ export function ChatPane({
     onBrandBrowserAssistConfirm,
     onArtifactShare,
     onForkFromMessage,
-    onShareToOpenDesign,
+    onShareToMish,
     onNextStepAiOptimize: onContinueBrandEnrichment,
     onNextStepContinueExtraction: onContinueBrandExtraction,
     onNextStepContinueAiExtraction: onContinueBrandAgentExtraction,
@@ -1770,7 +1770,7 @@ export function ChatPane({
     onBrandBrowserAssistConfirm,
     onArtifactShare,
     onForkFromMessage,
-    onShareToOpenDesign,
+    onShareToMish,
     onNextStepAiOptimize: onContinueBrandEnrichment,
     onNextStepContinueExtraction: onContinueBrandExtraction,
     onNextStepContinueAiExtraction: onContinueBrandAgentExtraction,
@@ -4594,8 +4594,8 @@ export function ChatPane({
                   onRequestPluginFolderAgentAction={onRequestPluginFolderAgentAction}
                   activePluginActionPaths={activePluginActionPaths}
                   hiddenPluginActionPaths={hiddenPluginActionPaths}
-                  onShareToOpenDesign={onShareToOpenDesign}
-                  shareToOpenDesignBusyMessageId={shareToOpenDesignBusyMessageId}
+                  onShareToMish={onShareToMish}
+                  shareToMishBusyMessageId={shareToMishBusyMessageId}
                   forceStreamingMessageIds={forceStreamingMessageIds}
                   lastAssistantId={lastAssistantId}
                   lastTurnAssistantId={lastTurnAssistantId}
@@ -5236,7 +5236,7 @@ interface AssistantCallbacks {
   onBrandBrowserAssistConfirm: BrandBrowserAssistConfirm | undefined;
   onArtifactShare: ((fileName: string, anchorId?: string) => void) | undefined;
   onForkFromMessage: ((message: ChatMessage) => void) | undefined;
-  onShareToOpenDesign: ((assistantMessageId: string) => void) | undefined;
+  onShareToMish: ((assistantMessageId: string) => void) | undefined;
   onNextStepAiOptimize: (() => void) | undefined;
   onNextStepContinueExtraction: (() => void) | undefined;
   onNextStepContinueAiExtraction: (() => void) | undefined;
@@ -5689,8 +5689,8 @@ function ChatRows({
   onRequestPluginFolderAgentAction,
   activePluginActionPaths,
   hiddenPluginActionPaths,
-  onShareToOpenDesign,
-  shareToOpenDesignBusyMessageId,
+  onShareToMish,
+  shareToMishBusyMessageId,
   forceStreamingMessageIds,
   lastAssistantId,
   lastTurnAssistantId,
@@ -5772,8 +5772,8 @@ function ChatRows({
   onRequestPluginFolderAgentAction?: (relativePath: string, action: PluginFolderAgentAction) => void;
   activePluginActionPaths?: Set<string>;
   hiddenPluginActionPaths?: Set<string>;
-  onShareToOpenDesign?: (assistantMessageId: string) => void;
-  shareToOpenDesignBusyMessageId?: string | null;
+  onShareToMish?: (assistantMessageId: string) => void;
+  shareToMishBusyMessageId?: string | null;
   forceStreamingMessageIds?: Set<string>;
   lastAssistantId: string | undefined;
   lastTurnAssistantId: string | undefined;
@@ -5905,12 +5905,12 @@ function ChatRows({
         onRequestPluginFolderAgentAction={onRequestPluginFolderAgentAction}
         activePluginActionPaths={activePluginActionPaths}
         hiddenPluginActionPaths={hiddenPluginActionPaths}
-        onShareToOpenDesign={
-          onShareToOpenDesign
-            ? () => assistantCallbacksRef.current.onShareToOpenDesign?.(m.id)
+        onShareToMish={
+          onShareToMish
+            ? () => assistantCallbacksRef.current.onShareToMish?.(m.id)
             : undefined
         }
-        shareToOpenDesignBusy={shareToOpenDesignBusyMessageId === m.id}
+        shareToMishBusy={shareToMishBusyMessageId === m.id}
         showRole={assistantRoleByMessageId.get(m.id) ?? true}
         isLast={m.id === lastAssistantId}
         isLastTurn={m.id === lastTurnAssistantId}
@@ -6682,7 +6682,7 @@ function queuedTipPlacement(
   );
 }
 
-  const QUEUED_SEND_DRAG_MIME = 'application/x-open-design-queued-send';
+  const QUEUED_SEND_DRAG_MIME = 'application/x-mish-queued-send';
 
 type QueuedSendDropEdge = 'before' | 'after';
 

@@ -14,7 +14,7 @@ if [ -z "$release_public_origin" ]; then
   exit 1
 fi
 
-notes_file="$RUNNER_TEMP/open-design-stable-notes.md"
+notes_file="$RUNNER_TEMP/mish-stable-notes.md"
 public_origin="${release_public_origin%/}"
 cat > "$notes_file" <<EOF
 ## Summary

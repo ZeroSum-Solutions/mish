@@ -24,9 +24,9 @@ const AMR_AGENT = {
 
 async function seedBalanceFailure(page: Page, locale: 'en') {
   await page.addInitScript((nextLocale) => {
-    window.localStorage.setItem('open-design:locale', nextLocale);
-    window.localStorage.setItem('open-design:locale-source', 'manual');
-    window.localStorage.setItem('open-design.project.chatPanelWidth', '320');
+    window.localStorage.setItem('mish:locale', nextLocale);
+    window.localStorage.setItem('mish:locale-source', 'manual');
+    window.localStorage.setItem('mish.project.chatPanelWidth', '320');
   }, locale);
   await routeAgents(page, [AMR_AGENT]);
   await page.route('**/api/skills', (route) => route.fulfill({ json: { skills: [] } }));

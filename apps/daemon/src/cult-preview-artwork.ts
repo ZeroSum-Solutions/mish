@@ -2,9 +2,9 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import artwork from '@open-design/21st-catalog/generated/preview-artwork/manifest.json' with { type: 'json' };
+import artwork from '@mish/21st-catalog/generated/preview-artwork/manifest.json' with { type: 'json' };
 
-const directory = path.dirname(fileURLToPath(import.meta.resolve('@open-design/21st-catalog/generated/preview-artwork/manifest.json')));
+const directory = path.dirname(fileURLToPath(import.meta.resolve('@mish/21st-catalog/generated/preview-artwork/manifest.json')));
 const images = new Map<string, string>();
 function image(id: string): string | null {
   const entry = artwork.items.find((item) => item.id === id);

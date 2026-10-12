@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { licenceOperationStatuses, parseConnectorInventory, parseIntegrationRoster, type IntegrationRoster, type LicenceRecordSnapshot } from '@open-design/contracts';
+import { licenceOperationStatuses, parseConnectorInventory, parseIntegrationRoster, type IntegrationRoster, type LicenceRecordSnapshot } from '@mish/contracts';
 import { buildConnectorInventory, buildIntegrationRoster } from '../../src/workbench/integration-roster.js';
 
 const repoRoot = resolve(import.meta.dirname, '../../../..');

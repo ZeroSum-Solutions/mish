@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { ChatRunStatusResponse, StrategyTaskProjectionV2 } from '@open-design/contracts';
+import type { ChatRunStatusResponse, StrategyTaskProjectionV2 } from '@mish/contracts';
 import {
   resolveQuestionFormStrategyTaskExecutionId,
   strategyBlockedMessageFields,

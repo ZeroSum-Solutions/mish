@@ -17,10 +17,10 @@ const child = await spawnSidecar({
   // opt out. On POSIX this remains a normal attached child.
   detached: false,
   resources: {
-    dataRoot: "/tmp/open-design-nested-child",
+    dataRoot: "/tmp/mish-nested-child",
     ownerPid: null,
     port: 0,
-    runtimeRoot: "/tmp/open-design-nested-child-runtime",
+    runtimeRoot: "/tmp/mish-nested-child-runtime",
   },
   stamp: childStamp,
 });

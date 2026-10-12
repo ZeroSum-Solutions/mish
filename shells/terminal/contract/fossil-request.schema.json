@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://nexu.io/contracts/terminal/fossil-request-v3.schema.json",
+  "$id": "https://mish.invalid/contracts/terminal/fossil-request-v3.schema.json",
   "title": "Terminal fossil request with updater protocol v3",
   "type": "object",
   "additionalProperties": false,

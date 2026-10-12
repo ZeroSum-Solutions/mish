@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parseIntegrationRoster } from '@open-design/contracts';
+import { parseIntegrationRoster } from '@mish/contracts';
 import { buildIntegrationRoster } from '../../src/workbench/integration-roster.js';
 
 vi.mock('../../src/runtimes/registry.js', async original => {

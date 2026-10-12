@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { OpenDesignGithubLatestReleaseResponse } from '@open-design/contracts';
+import type { MishGithubLatestReleaseResponse } from '@mish/contracts';
 
 import { fetchLatestGithubReleaseInfo } from '../../src/providers/registry';
 
@@ -15,20 +15,20 @@ describe('fetchLatestGithubReleaseInfo', () => {
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({
-        repo: 'nexu-io/open-design',
+        repo: 'ZeroSum-Solutions/mish',
         tag_name: 'v0.8.0-prerelease.3',
-        html_url: 'https://github.com/nexu-io/open-design/releases/tag/v0.8.0-prerelease.3',
+        html_url: 'https://github.com/ZeroSum-Solutions/mish/releases/tag/v0.8.0-prerelease.3',
         fetchedAt: Date.parse('2026-05-22T00:00:00.000Z'),
         stale: false,
-      } satisfies OpenDesignGithubLatestReleaseResponse),
+      } satisfies MishGithubLatestReleaseResponse),
     } satisfies Partial<Response>) as typeof fetch;
 
     const result = await fetchLatestGithubReleaseInfo();
 
-    expect(globalThis.fetch).toHaveBeenCalledWith('/api/github/open-design/releases/latest');
+    expect(globalThis.fetch).toHaveBeenCalledWith('/api/github/mish/releases/latest');
     expect(result).toEqual({
       tagName: 'v0.8.0-prerelease.3',
-      htmlUrl: 'https://github.com/nexu-io/open-design/releases/tag/v0.8.0-prerelease.3',
+      htmlUrl: 'https://github.com/ZeroSum-Solutions/mish/releases/tag/v0.8.0-prerelease.3',
       stale: false,
     });
   });

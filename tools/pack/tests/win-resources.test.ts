@@ -38,7 +38,7 @@ async function createWorkspaceFixture(workspaceRoot: string): Promise<void> {
     recursive: true,
   });
   await writeFile(
-    join(workspaceRoot, "plugins", "_official", "sample", "open-design.json"),
+    join(workspaceRoot, "plugins", "_official", "sample", "mish.json"),
     "{\"id\":\"sample\"}\n",
     "utf8",
   );
@@ -46,7 +46,7 @@ async function createWorkspaceFixture(workspaceRoot: string): Promise<void> {
     recursive: true,
   });
   await writeFile(
-    join(workspaceRoot, "plugins", "registry", "community", "open-design-marketplace.json"),
+    join(workspaceRoot, "plugins", "registry", "community", "mish-marketplace.json"),
     "{\"plugins\":[]}\n",
     "utf8",
   );
@@ -76,7 +76,7 @@ async function createDshRuntimeFixture(workspaceRoot: string): Promise<void> {
   await writeFile(
     join(packageRoot, "package.json"),
     `${JSON.stringify({
-      name: "@open-design/dsh-runtime",
+      name: "@mish/dsh-runtime",
       version: "0.1.0",
       files: ["dist"],
     }, null, 2)}\n`,
@@ -92,9 +92,9 @@ async function createDshRuntimeFixture(workspaceRoot: string): Promise<void> {
 
 describe("prepareResourceTree", () => {
   it("bundles the DeepSeek Harness runtime into the Windows resource tree", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-dsh-runtime-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-dsh-runtime-"));
     const workspaceRoot = join(root, "workspace");
-    const resourceRoot = join(root, "materialized", "open-design");
+    const resourceRoot = join(root, "materialized", "mish");
     const cache = new ToolPackCache(join(root, "cache"));
     const config = { workspaceRoot } as ToolPackConfig;
     const paths = { resourceRoot } as WinPaths;
@@ -125,7 +125,7 @@ describe("prepareResourceTree", () => {
 
       expect(manifest).toMatchObject({
         file: tarballs[0],
-        packageName: "@open-design/dsh-runtime",
+        packageName: "@mish/dsh-runtime",
         schemaVersion: 1,
         version: "0.1.0",
       });
@@ -137,9 +137,9 @@ describe("prepareResourceTree", () => {
   }, RESOURCE_TREE_CACHE_TEST_TIMEOUT_MS);
 
   it("invalidates the Windows resource tree cache when design templates change", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-resources-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-resources-"));
     const workspaceRoot = join(root, "workspace");
-    const resourceRoot = join(root, "materialized", "open-design");
+    const resourceRoot = join(root, "materialized", "mish");
     const cache = new ToolPackCache(join(root, "cache"));
     const config = { workspaceRoot } as ToolPackConfig;
     const paths = { resourceRoot } as WinPaths;
@@ -183,9 +183,9 @@ describe("prepareResourceTree", () => {
   }, RESOURCE_TREE_CACHE_TEST_TIMEOUT_MS);
 
   it("invalidates the Windows resource tree cache when the plugin-preview manifest changes", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-previews-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-previews-"));
     const workspaceRoot = join(root, "workspace");
-    const resourceRoot = join(root, "materialized", "open-design");
+    const resourceRoot = join(root, "materialized", "mish");
     const cache = new ToolPackCache(join(root, "cache"));
     const config = { workspaceRoot } as ToolPackConfig;
     const paths = { resourceRoot } as WinPaths;
@@ -229,21 +229,21 @@ describe("prepareResourceTree", () => {
   }, RESOURCE_TREE_CACHE_TEST_TIMEOUT_MS);
 
   it("copies a configured Vela CLI binary into the Windows resource tree", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-vela-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-vela-"));
     const workspaceRoot = join(root, "workspace");
-    const resourceRoot = join(root, "materialized", "open-design");
+    const resourceRoot = join(root, "materialized", "mish");
     const source = join(root, "source", "vela.exe");
     const cache = new ToolPackCache(join(root, "cache"));
     const config = { workspaceRoot } as ToolPackConfig;
     const paths = { resourceRoot } as WinPaths;
-    const originalVelaBin = process.env.OPEN_DESIGN_VELA_CLI_BIN;
+    const originalVelaBin = process.env.MISH_VELA_CLI_BIN;
 
     try {
       await createWorkspaceFixture(workspaceRoot);
       await mkdir(join(root, "source"), { recursive: true });
       await writeFile(source, "fake vela exe\n", "utf8");
       await writeFakeOpenCodeCompanion(source, "fake opencode\n");
-      process.env.OPEN_DESIGN_VELA_CLI_BIN = source;
+      process.env.MISH_VELA_CLI_BIN = source;
 
       await prepareResourceTree(config, paths, cache, { materialize: true });
 
@@ -254,46 +254,46 @@ describe("prepareResourceTree", () => {
         readFile(join(resourceRoot, "bin", "libexec", "opencode", "opencode"), "utf8"),
       ).resolves.toBe("fake opencode\n");
     } finally {
-      if (originalVelaBin == null) delete process.env.OPEN_DESIGN_VELA_CLI_BIN;
-      else process.env.OPEN_DESIGN_VELA_CLI_BIN = originalVelaBin;
+      if (originalVelaBin == null) delete process.env.MISH_VELA_CLI_BIN;
+      else process.env.MISH_VELA_CLI_BIN = originalVelaBin;
       await rm(root, { force: true, recursive: true });
     }
   });
 
   it("fails strict Windows resource preparation when configured Vela CLI is missing", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-vela-strict-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-vela-strict-"));
     const workspaceRoot = join(root, "workspace");
-    const resourceRoot = join(root, "materialized", "open-design");
+    const resourceRoot = join(root, "materialized", "mish");
     const cache = new ToolPackCache(join(root, "cache"));
     const config = {
       workspaceRoot,
       requireVelaCli: true,
     } as ToolPackConfig;
     const paths = { resourceRoot } as WinPaths;
-    const originalVelaBin = process.env.OPEN_DESIGN_VELA_CLI_BIN;
+    const originalVelaBin = process.env.MISH_VELA_CLI_BIN;
 
     try {
       await createWorkspaceFixture(workspaceRoot);
-      process.env.OPEN_DESIGN_VELA_CLI_BIN = join(root, "missing", "vela.exe");
+      process.env.MISH_VELA_CLI_BIN = join(root, "missing", "vela.exe");
       await expect(
         prepareResourceTree(config, paths, cache, { materialize: true }),
       ).rejects.toThrow();
     } finally {
-      if (originalVelaBin == null) delete process.env.OPEN_DESIGN_VELA_CLI_BIN;
-      else process.env.OPEN_DESIGN_VELA_CLI_BIN = originalVelaBin;
+      if (originalVelaBin == null) delete process.env.MISH_VELA_CLI_BIN;
+      else process.env.MISH_VELA_CLI_BIN = originalVelaBin;
       await rm(root, { force: true, recursive: true });
     }
   });
 
   it("invalidates the Windows resource tree cache when the Vela companion changes", async () => {
-    const root = await mkdtemp(join(tmpdir(), "open-design-win-vela-companion-"));
+    const root = await mkdtemp(join(tmpdir(), "mish-win-vela-companion-"));
     const workspaceRoot = join(root, "workspace");
-    const resourceRoot = join(root, "materialized", "open-design");
+    const resourceRoot = join(root, "materialized", "mish");
     const source = join(root, "source", "vela.exe");
     const cache = new ToolPackCache(join(root, "cache"));
     const config = { workspaceRoot } as ToolPackConfig;
     const paths = { resourceRoot } as WinPaths;
-    const originalVelaBin = process.env.OPEN_DESIGN_VELA_CLI_BIN;
+    const originalVelaBin = process.env.MISH_VELA_CLI_BIN;
     const materializedCompanion = join(
       resourceRoot,
       "bin",
@@ -307,7 +307,7 @@ describe("prepareResourceTree", () => {
       await mkdir(join(root, "source"), { recursive: true });
       await writeFile(source, "fake vela exe\n", "utf8");
       const sourceCompanion = await writeFakeOpenCodeCompanion(source, "companion one\n");
-      process.env.OPEN_DESIGN_VELA_CLI_BIN = source;
+      process.env.MISH_VELA_CLI_BIN = source;
 
       await prepareResourceTree(config, paths, cache, { materialize: true });
       await expect(readFile(materializedCompanion, "utf8")).resolves.toBe(
@@ -326,8 +326,8 @@ describe("prepareResourceTree", () => {
         "miss",
       ]);
     } finally {
-      if (originalVelaBin == null) delete process.env.OPEN_DESIGN_VELA_CLI_BIN;
-      else process.env.OPEN_DESIGN_VELA_CLI_BIN = originalVelaBin;
+      if (originalVelaBin == null) delete process.env.MISH_VELA_CLI_BIN;
+      else process.env.MISH_VELA_CLI_BIN = originalVelaBin;
       await rm(root, { force: true, recursive: true });
     }
   }, RESOURCE_TREE_CACHE_TEST_TIMEOUT_MS);

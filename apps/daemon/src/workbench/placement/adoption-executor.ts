@@ -3,7 +3,7 @@ import { mkdirSync, realpathSync } from 'node:fs';
 import path from 'node:path';
 import {
   isAdoptionPlanUnexpired, isRestrictedAdoptionPath, type AdoptionOperationView, type ApplyAdoptionRequest, type PrepareAdoptionRequest, type PreparedAdoptionPlan,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { AdoptionBlobStore, readNamedRegularFile, sameNamedFile, writeExclusiveFile, type StoredBlob } from './adoption-files.js';
 import { resolveInstalledPackage, type InstalledPackage } from '../adoption/installed-packages.js';
 import type { AdoptionMover } from './adoption-mover.js';

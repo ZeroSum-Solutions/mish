@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseComponentLedger } from '@open-design/contracts';
+import { parseComponentLedger } from '@mish/contracts';
 import { readComponentLedger, collectComponentInventory, collectReact95ComponentRows } from '../../src/workbench/component-ledger.js';
 import { buildComponentLedgerReport } from '../../src/workbench/component-ledger-report.js';
 import { createPackRegistry, packsDirForDataDir } from '../../src/packs/registry.js';

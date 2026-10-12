@@ -10,7 +10,7 @@ import type {
   AnalyticsPublisherClass,
   TrackingRuntimeType,
 } from '../public-params.js';
-import type { ReleaseChannel } from '@open-design/release';
+import type { ReleaseChannel } from '@mish/release';
 import type { ArtifactOriginEntrySurface, ArtifactOriginStatus } from '../../api/files.js';
 import type { AgentDiagnosticReason, AgentDiagnosticSeverity } from '../../api/registry.js';
 import type { TrackingDesignSystemEditSurface, TrackingDesignSystemKind, TrackingDesignSystemLengthBucket, TrackingDesignSystemOrigin, TrackingDesignSystemRunEntryFrom } from './design-systems.js';
@@ -949,7 +949,7 @@ export type FileUploadResultProps = TrackingFileUploadSurface & {
 export interface ArtifactExportResultProps {
   page_name: 'artifact';
   area: 'share_option_popover';
-  entry_surface: 'open_design_ui';
+  entry_surface: 'mish_ui';
   artifact_id: string;
   artifact_kind: TrackingArtifactKind;
   export_format: TrackingExportFormat;

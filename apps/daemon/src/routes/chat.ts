@@ -32,7 +32,7 @@ import {
   classifyAIHubMixModel,
 } from '../integrations/aihubmix.js';
 import { isSafeId as isSafeProjectId } from '../projects.js';
-import { projectKindToTracking } from '@open-design/contracts/analytics';
+import { projectKindToTracking } from '@mish/contracts/analytics';
 import { proxyDispatcherRequestInit, validateUserProviderBaseUrl } from '../connectionTest.js';
 import { isKnownReasoningEffort, resolveModelForServiceTier } from '../runtimes/models.js';
 import { googleStreamGenerateContentUrl } from '../integrations/google-models.js';
@@ -1104,7 +1104,7 @@ export function registerChatRoutes(app: Express, ctx: RegisterChatRoutesDeps) {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${apiKey}`,
           ...(validated.parsed!.hostname === 'openrouter.ai' ? {
-            'HTTP-Referer': 'https://opendesign.dev',
+            'HTTP-Referer': 'https://mish.dev',
             'X-Title': 'Mishh Mashh',
           } : {}),
         },

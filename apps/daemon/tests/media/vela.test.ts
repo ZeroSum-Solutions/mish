@@ -204,7 +204,7 @@ describe('Vela media provider', () => {
     expect(result.providerNote).toContain('1:1 2K');
     expect(options.timeoutMs).toBe(330_000);
     expect(options.configuredEnv).toEqual({
-      VELA_INVOCATION_SOURCE: 'open-design',
+      VELA_INVOCATION_SOURCE: 'mish',
       VELA_WORKSPACE_ID: 'workspace-team',
     });
     await expect(stat(tempOutputDirs[0]!)).rejects.toThrow();
@@ -247,7 +247,7 @@ describe('Vela media provider', () => {
     expect(inputPaths.every((inputPath) => !inputPath.startsWith(projectDir))).toBe(true);
     expect(new Set(inputPaths.map((inputPath) => path.dirname(inputPath)))).toHaveLength(1);
     expect(options.configuredEnv).toEqual({
-      VELA_INVOCATION_SOURCE: 'open-design',
+      VELA_INVOCATION_SOURCE: 'mish',
     });
   });
 

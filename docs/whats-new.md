@@ -18,7 +18,7 @@ docs/whats-new.json
 daemon reads:
 
 ```
-https://whatsnew.open-design.ai/whats-new.json
+https://whatsnew.mish.invalid/whats-new.json
 ```
 
 Changing the card is therefore an ordinary pull request — no local Cloudflare
@@ -62,7 +62,7 @@ down is an explicit act rather than something a typo can do for you.
   "id": "1.0.0",
   "title": "Design system sync",
   "body": "Import, edit and sync design systems with cleaner release highlights on Home.",
-  "imageUrl": "https://whatsnew.open-design.ai/1.0.0.png",
+  "imageUrl": "https://whatsnew.mish.invalid/1.0.0.png",
   "linkUrl": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/releases/tag/v1.0.0",
   "ctaLabel": "View release notes",
   "locales": {
@@ -104,7 +104,7 @@ parser rather than trusting review:
    error, it just makes the card disappear.
 3. On merge to `main`, `whats-new-publish.yml` uploads the file
    (`application/json`, `cache-control: public, max-age=300`) and then reads it
-   back from `https://whatsnew.open-design.ai/whats-new.json` with the edge
+   back from `https://whatsnew.mish.invalid/whats-new.json` with the edge
    cache bypassed. The job fails unless the bytes served match the bytes
    uploaded — an exit code from the upload alone is not treated as proof.
 

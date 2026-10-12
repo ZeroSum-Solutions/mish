@@ -183,13 +183,13 @@ describe('openrouter video generation', () => {
 
     // Submit headers
     const submitHeaders = fetchMock.mock.calls[0]![1].headers;
-    expect(submitHeaders['HTTP-Referer']).toBe('https://opendesign.dev');
+    expect(submitHeaders['HTTP-Referer']).toBe('https://mish.dev');
     expect(submitHeaders['X-Title']).toBe('Mishh Mashh');
     expect(submitHeaders.authorization).toBe('Bearer sk-or-test-key-1234');
 
     // Poll headers
     const pollHeaders = fetchMock.mock.calls[1]![1].headers;
-    expect(pollHeaders['HTTP-Referer']).toBe('https://opendesign.dev');
+    expect(pollHeaders['HTTP-Referer']).toBe('https://mish.dev');
     expect(pollHeaders['X-Title']).toBe('Mishh Mashh');
   });
 
@@ -637,7 +637,7 @@ describe('openrouter image generation', () => {
     await generateMedia(imageArgs());
 
     const headers = fetchMock.mock.calls[0]![1].headers;
-    expect(headers['HTTP-Referer']).toBe('https://opendesign.dev');
+    expect(headers['HTTP-Referer']).toBe('https://mish.dev');
     expect(headers['X-Title']).toBe('Mishh Mashh');
     expect(headers.authorization).toBe('Bearer sk-or-img-test-key');
   });

@@ -42,7 +42,7 @@ describe('download attribution service', () => {
       const result = await service.claim({
         source: 'mac_where_froms',
         token: 'odtoken_123456',
-        rawUrl: 'https://download.open-design.ai/mac/arm64/odtoken_123456/Open.dmg',
+        rawUrl: 'https://download.mish.invalid/mac/arm64/odtoken_123456/Open.dmg',
         platform: 'macos',
       });
 
@@ -189,7 +189,7 @@ describe('download attribution service', () => {
   it('mints a first-party browser bridge only with metrics consent and a ledger secret', async () => {
     await withTempData(async (dataDir) => {
       const fetchImpl = vi.fn(async () => new Response(JSON.stringify({
-        url: 'https://open-design.ai/clipper?od_bridge=odbr_12345678',
+        url: 'https://mish.invalid/clipper?od_bridge=odbr_12345678',
       }), { status: 200 }));
       const service = createAttributionService({
         analytics: analyticsStub(),
@@ -199,8 +199,8 @@ describe('download attribution service', () => {
         paths: { RUNTIME_DATA_DIR: dataDir },
       });
 
-      await expect(service.bridgeUrl('https://open-design.ai/clipper')).resolves.toBe(
-        'https://open-design.ai/clipper?od_bridge=odbr_12345678',
+      await expect(service.bridgeUrl('https://mish.invalid/clipper')).resolves.toBe(
+        'https://mish.invalid/clipper?od_bridge=odbr_12345678',
       );
       expect(fetchImpl).toHaveBeenCalledWith(
         'https://ledger.test/api/attribution/bridge/mint',

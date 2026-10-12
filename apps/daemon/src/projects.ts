@@ -674,7 +674,7 @@ function buildDesignManifest(entries, projectLabel, outputScopes: Map<string, Ar
   const entryScope = scopeOf(entryFile);
   const scopedFiles = files.filter((file) => scopeOf(file)).map((file) => ({ file, outputScope: scopeOf(file) }));
   return JSON.stringify({
-    schema: 'open-design.design-manifest.v1',
+    schema: 'mish.design-manifest.v1',
     title: projectLabel || 'Mishh Mashh project',
     entryFile,
     ...(entryScope ? { outputScope: entryScope } : {}),

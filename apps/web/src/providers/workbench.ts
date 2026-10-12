@@ -1,16 +1,16 @@
-import { parseResourceSearchRequest, parseResourceSearchResponse, parseResourceDetailResponse, type ResourceSearchRequest, type ResourceSearchResponse, type ResourceDetailResponse, type WorkspaceCollabContext } from '@open-design/contracts';
-import { parseFontCheckRequest, parseFontCheckResponse, type FontCheckRequest, type FontCheckResponse } from '@open-design/contracts';
-import { parsePutSessionModel, parseSessionModelSnapshot, type PutSessionModel, type SessionModelSnapshot } from '@open-design/contracts';
-import { parseModelPreflightRequest, parseModelPreflightResult, type ModelPreflightRequest, type ModelPreflightResult } from '@open-design/contracts';
+import { parseResourceSearchRequest, parseResourceSearchResponse, parseResourceDetailResponse, type ResourceSearchRequest, type ResourceSearchResponse, type ResourceDetailResponse, type WorkspaceCollabContext } from '@mish/contracts';
+import { parseFontCheckRequest, parseFontCheckResponse, type FontCheckRequest, type FontCheckResponse } from '@mish/contracts';
+import { parsePutSessionModel, parseSessionModelSnapshot, type PutSessionModel, type SessionModelSnapshot } from '@mish/contracts';
+import { parseModelPreflightRequest, parseModelPreflightResult, type ModelPreflightRequest, type ModelPreflightResult } from '@mish/contracts';
 import {
   parseProjectDesignContextSnapshot, parseProjectRubricSnapshot, parseWorkbenchPreferencesSnapshot,
   parsePutProjectDesignContext, parsePutProjectRubric, parsePutWorkbenchPreferences,
   type PutProjectDesignContext, type PutProjectRubric, type PutWorkbenchPreferences,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   parseDesignBriefPreview, parsePreviewDesignBriefRequest, parseAttachDesignBriefRequest, parseCreateDesignBriefRequest, parseDesignBriefRecordView, parsePatchDesignBriefRequest,
   type DesignBriefPreview, type PreviewDesignBriefRequest, type AttachDesignBriefRequest, type CreateDesignBriefRequest, type DesignBriefRecordView, type PatchDesignBriefRequest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { workspaceProjectHeaders } from '../collab/workspace-identity';
 
 export class WorkbenchRequestError extends Error {

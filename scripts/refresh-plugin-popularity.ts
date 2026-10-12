@@ -8,7 +8,7 @@
  *
  *   1. Query PostHog `run_finished` for the trailing-window per-plugin_id counts
  *      (total runs + distinct users).
- *   2. Join against the live bundled catalog (the open-design.json manifests
+ *   2. Join against the live bundled catalog (the mish.json manifests
  *      under plugins/_official → the daemon's plugin ids); drop retired ids.
  *   3. Blend distinct-users + runs into one [0,1] score and rewrite the
  *      generated file.
@@ -89,7 +89,7 @@ async function fetchCounts(): Promise<Counts> {
 
 // 2. live catalog from the bundled first-party manifests. Their bare `name`
 // matches the telemetry plugin_id; the marketplace registry is not used (its
-// names are `open-design/<id>`-prefixed and do not match plugin_id).
+// names are `mish/<id>`-prefixed and do not match plugin_id).
 interface CatalogEntry {
   dir: string;
   od: Record<string, unknown>;
@@ -108,7 +108,7 @@ function liveCatalog(): Map<string, CatalogEntry> {
     }
     for (const dir of entries) {
       const dirPath = join(officialRoot, bucket, dir);
-      const mf = join(dirPath, 'open-design.json');
+      const mf = join(dirPath, 'mish.json');
       if (!existsSync(mf)) continue;
       try {
         const j = JSON.parse(readFileSync(mf, 'utf8')) as { name?: string; od?: Record<string, unknown> };
@@ -255,7 +255,7 @@ async function main(): Promise<void> {
     return;
   }
   if (!existsSync(join(OD_REPO, 'plugins/_official'))) {
-    throw new Error(`--od-repo does not look like an open-design checkout: ${OD_REPO}`);
+    throw new Error(`--od-repo does not look like an mish checkout: ${OD_REPO}`);
   }
 
   const counts = await fetchCounts();

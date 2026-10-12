@@ -164,8 +164,8 @@ test('the adapter gate and public-name generator bootstrap with public names abs
   await cp(path.join(workspace, 'packages/agency-fast-lane/src'), path.join(fastLane, 'src'), { recursive: true });
   await cp(path.join(workspace, 'packages/agency-fast-lane/package.json'), path.join(fastLane, 'package.json'));
   await symlink(path.join(workspace, 'packages/cult-ui-catalog/node_modules'), path.join(catalog, 'node_modules'), 'dir');
-  await mkdir(path.join(fastLane, 'node_modules/@open-design'), { recursive: true });
-  await symlink(catalog, path.join(fastLane, 'node_modules/@open-design/cult-ui-catalog'), 'dir');
+  await mkdir(path.join(fastLane, 'node_modules/@mish'), { recursive: true });
+  await symlink(catalog, path.join(fastLane, 'node_modules/@mish/cult-ui-catalog'), 'dir');
   await rm(path.join(catalog, 'generated/public-names.json'));
   // The first adapters-script step must load and validate the real generated registry before
   // public-names.ts recreates the missing output. No private source kit is required for this gate.

@@ -16,7 +16,7 @@
 
 import type { Server } from 'node:http';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { ProjectMetadata, ProjectScenarioTaskProfile } from '@open-design/contracts';
+import type { ProjectMetadata, ProjectScenarioTaskProfile } from '@mish/contracts';
 import { closeDatabase } from '../../src/db.js';
 import { startServer, type StartServerOptions } from '../../src/server.js';
 

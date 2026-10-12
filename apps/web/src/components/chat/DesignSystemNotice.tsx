@@ -1,7 +1,7 @@
 // A refused selected kit stops generation. Approval binds the revision in the notice.
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { useState } from 'react';
-import type { DesignSystemRunNotice } from '@open-design/contracts';
+import type { DesignSystemRunNotice } from '@mish/contracts';
 import { useWorkspaceContext } from '../../collab/useWorkspaceContext';
 import { useT } from '../../i18n';
 import { setDesignSystemApproval, updateDesignSystemDraft } from '../../providers/registry';

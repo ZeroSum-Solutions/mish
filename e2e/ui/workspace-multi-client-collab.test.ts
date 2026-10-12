@@ -44,10 +44,10 @@ const MEMBER = {
 };
 
 const ADAPTIVE_AUTHORITY_HEALTHY_SERIES =
-  'open_design_workspace_authority_decisions_total' +
+  'mish_workspace_authority_decisions_total' +
   '{mode="adaptive",source="sse",reason="healthy",outcome="allow"}';
 const ADAPTIVE_AUTHORITY_UNHEALTHY_SERIES =
-  'open_design_workspace_authority_decisions_total' +
+  'mish_workspace_authority_decisions_total' +
   '{mode="adaptive",source="sse",reason="unhealthy",outcome="fallback"}';
 
 test.describe.configure({ timeout: T.xlong * 5 });
@@ -851,9 +851,9 @@ test('[P0] two isolated clients converge shared plugins and skills without scope
     await writeProjectTextFile(
       ownerPage,
       projectId,
-      'plugin-source/open-design.json',
+      'plugin-source/mish.json',
       JSON.stringify({
-        $schema: 'https://open-design.ai/schemas/plugin.v1.json',
+        $schema: 'https://mish.invalid/schemas/plugin.v1.json',
         name: pluginId,
         title: 'Realtime Shared Plugin',
         version: '0.1.0',

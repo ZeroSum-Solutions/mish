@@ -5,7 +5,7 @@ import type { AddressInfo } from 'node:net';
 import { afterEach, describe, expect, it } from 'vitest';
 import { egressEligible } from '../../src/workbench/review/cdp-worker.js';
 import { PageText } from '../../src/workbench/review/evidence.js';
-import { isReviewEvidenceMessage, renderReviewEvidenceMessage, WORKBENCH_REVIEW_EGRESS_LIMITS } from '@open-design/contracts';
+import { isReviewEvidenceMessage, renderReviewEvidenceMessage, WORKBENCH_REVIEW_EGRESS_LIMITS } from '@mish/contracts';
 import { text } from './review-capture-fixture.js';
 
 /** The value with every structured message rendered as its English text, for readable assertions. */

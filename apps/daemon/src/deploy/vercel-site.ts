@@ -1,4 +1,4 @@
-import { validateVercelProjectName, vercelSiteNameSuggestion, type VercelDeploymentInfo, type VercelNameCheckResponse } from '@open-design/contracts';
+import { validateVercelProjectName, vercelSiteNameSuggestion, type VercelDeploymentInfo, type VercelNameCheckResponse } from '@mish/contracts';
 import { DeployError, vercelProjectNameForProject } from '../deploy.js';
 
 type Config = { token: string; teamId?: string | undefined; teamSlug?: string | undefined };

@@ -3,7 +3,7 @@ import {
   WORKBENCH_CAPTURE_METADATA_HEADER,
   type CaptureImportMetadata, type CaptureList, type CaptureView, type ReusableUnitManifest, type UnitSavePlan, type UnitSaveRequest,
   type UnitInsertReceipt, type UnitInsertRequest, type UnitUndoInsertRequest, type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { workspaceProjectHeaders, workspaceResourceUrl } from '../collab/workspace-identity';
 
 /** A daemon refusal with its typed reason, kept for the UI to show and recover from. */

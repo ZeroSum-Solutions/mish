@@ -6,7 +6,7 @@ import {
   LAUNCHER_SCHEMA_VERSION,
   resolveLauncherVersionPaths,
   type LauncherDesktopHandoffDescriptor,
-} from "@open-design/launcher-proto";
+} from "@mish/launcher-proto";
 import { describe, expect, it } from "vitest";
 
 import type { PackagedConfig } from "../src/config.js";
@@ -29,7 +29,7 @@ function fakeConfig(root: string, appVersion = "1.2.3-beta.4"): PackagedConfig {
     nodeCommand: null,
     posthogHost: null,
     posthogKey: null,
-    resourceRoot: join(root, "installed", "resources", "open-design"),
+    resourceRoot: join(root, "installed", "resources", "mish"),
     telemetryRelayUrl: null,
     updateMetadataUrl: null,
     velaWebUrl: null,
@@ -51,13 +51,13 @@ async function writeActiveMacPayloadFixture(
     root,
     version,
   });
-  const appRoot = join(versionPaths.payloadRoot, "Open Design Beta.app");
+  const appRoot = join(versionPaths.payloadRoot, "Mish Beta.app");
   const resourcesPath = join(appRoot, "Contents", "Resources");
   await mkdir(join(appRoot, "Contents", "MacOS"), { recursive: true });
   await mkdir(resourcesPath, { recursive: true });
-  await writeFile(join(appRoot, "Contents", "MacOS", "Open Design Beta"), "");
+  await writeFile(join(appRoot, "Contents", "MacOS", "Mish Beta"), "");
   await writeFile(
-    join(resourcesPath, "open-design-config.json"),
+    join(resourcesPath, "mish-config.json"),
     `${JSON.stringify({
       appVersion: version,
       ...(telemetryRelayUrl == null ? {} : { telemetryRelayUrl }),
@@ -69,8 +69,8 @@ async function writeActiveMacPayloadFixture(
     `${JSON.stringify({
       channel: "beta",
       entry: {
-        cwd: "payload/Open Design Beta.app",
-        executable: "payload/Open Design Beta.app/Contents/MacOS/Open Design Beta",
+        cwd: "payload/Mish Beta.app",
+        executable: "payload/Mish Beta.app/Contents/MacOS/Mish Beta",
       },
       namespace: config.namespace,
       payloadRoot: "payload",
@@ -106,13 +106,13 @@ describe("resolvePackagedLauncherRuntime", () => {
     try {
       const physicalRoot = join(root, "physical");
       const aliasRoot = join(root, "alias");
-      const executable = join(physicalRoot, "Open Design.app", "Contents", "MacOS", "Open Design");
+      const executable = join(physicalRoot, "Mish.app", "Contents", "MacOS", "Mish");
       await mkdir(dirname(executable), { recursive: true });
       await writeFile(executable, "");
       await symlink(physicalRoot, aliasRoot, "dir");
 
       await expect(sameExecutablePath(
-        join(aliasRoot, "Open Design.app", "Contents", "MacOS", "Open Design"),
+        join(aliasRoot, "Mish.app", "Contents", "MacOS", "Mish"),
         executable,
       )).resolves.toBe(true);
     } finally {
@@ -205,28 +205,28 @@ describe("resolvePackagedLauncherRuntime", () => {
         root,
         version: "1.2.3-beta.5",
       });
-      const resourcesPath = join(versionPaths.payloadRoot, "Open Design Beta.app", "Contents", "Resources");
+      const resourcesPath = join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "Resources");
       const payloadExecutablePath = join(
         versionPaths.payloadRoot,
-        "Open Design Beta.app",
+        "Mish Beta.app",
         "Contents",
         "MacOS",
-        "Open Design Beta",
+        "Mish Beta",
       );
-      await mkdir(join(resourcesPath, "open-design", "bin"), { recursive: true });
-      await mkdir(join(versionPaths.payloadRoot, "Open Design Beta.app", "Contents", "MacOS"), { recursive: true });
+      await mkdir(join(resourcesPath, "mish", "bin"), { recursive: true });
+      await mkdir(join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "MacOS"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "daemon"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "web"), { recursive: true });
-      await writeFile(join(resourcesPath, "open-design", "bin", "node"), "");
+      await writeFile(join(resourcesPath, "mish", "bin", "node"), "");
       await writeFile(payloadExecutablePath, "");
       await writeFile(join(resourcesPath, "prebundled", "daemon", "daemon-sidecar.mjs"), "");
       await writeFile(join(resourcesPath, "prebundled", "web", "web-sidecar.mjs"), "");
       await writeFile(
-        join(resourcesPath, "open-design-config.json"),
+        join(resourcesPath, "mish-config.json"),
         `${JSON.stringify({
           appVersion: "1.2.3-beta.5",
           daemonSidecarEntryRelative: "prebundled/daemon/daemon-sidecar.mjs",
-          nodeCommandRelative: "open-design/bin/node",
+          nodeCommandRelative: "mish/bin/node",
           webOutputMode: "standalone",
           webSidecarEntryRelative: "prebundled/web/web-sidecar.mjs",
         })}\n`,
@@ -236,8 +236,8 @@ describe("resolvePackagedLauncherRuntime", () => {
         `${JSON.stringify({
           channel: "beta",
           entry: {
-            cwd: "payload/Open Design Beta.app",
-            executable: "payload/Open Design Beta.app/Contents/MacOS/Open Design Beta",
+            cwd: "payload/Mish Beta.app",
+            executable: "payload/Mish Beta.app/Contents/MacOS/Mish Beta",
           },
           namespace: config.namespace,
           payloadRoot: "payload",
@@ -261,7 +261,7 @@ describe("resolvePackagedLauncherRuntime", () => {
         join(paths.installationRoot, "launcher", "channels", "beta", "namespaces", config.namespace, "install.json"),
         `${JSON.stringify({
           channel: "beta",
-          launchPath: "/Applications/Open Design Beta.app",
+          launchPath: "/Applications/Mish Beta.app",
           namespace: config.namespace,
           schemaVersion: LAUNCHER_SCHEMA_VERSION,
         })}\n`,
@@ -271,20 +271,20 @@ describe("resolvePackagedLauncherRuntime", () => {
         // The launcher process runs from the stable installed app bundle, so
         // its stable launch path matches the persisted install descriptor and
         // the payload branch keeps the persisted entry untouched.
-        currentExecutablePath: "/Applications/Open Design Beta.app",
+        currentExecutablePath: "/Applications/Mish Beta.app",
       });
 
       expect(runtime.source).toBe("payload");
       expect(runtime.desktopExecutablePath).toBe(payloadExecutablePath);
       expect(runtime.electronNodeCommand).toBeNull();
-      expect(runtime.installedLaunchPath).toBe("/Applications/Open Design Beta.app");
+      expect(runtime.installedLaunchPath).toBe("/Applications/Mish Beta.app");
       expect(runtime.targetVersion).toBe("1.2.3-beta.5");
       expect(runtime.config.appVersion).toBe("1.2.3-beta.5");
-      expect(runtime.config.resourceRoot).toBe(join(resourcesPath, "open-design"));
+      expect(runtime.config.resourceRoot).toBe(join(resourcesPath, "mish"));
       expect(runtime.config.daemonSidecarEntry).toBe(join(resourcesPath, "prebundled", "daemon", "daemon-sidecar.mjs"));
       expect(runtime.config.webSidecarEntry).toBe(join(resourcesPath, "prebundled", "web", "web-sidecar.mjs"));
-      expect(runtime.config.webStandaloneRoot).toBe(join(resourcesPath, "open-design-web-standalone"));
-      expect(runtime.paths.resourceRoot).toBe(join(resourcesPath, "open-design"));
+      expect(runtime.config.webStandaloneRoot).toBe(join(resourcesPath, "mish-web-standalone"));
+      expect(runtime.paths.resourceRoot).toBe(join(resourcesPath, "mish"));
       await expect(readFile(runtime.launcherPaths.attemptsPath, "utf8")).rejects.toThrow();
 
       const payloadRuntime = await resolvePackagedLauncherRuntime(config, paths, {
@@ -357,28 +357,28 @@ describe("resolvePackagedLauncherRuntime", () => {
         root,
         version: "1.2.3-beta.5",
       });
-      const resourcesPath = join(versionPaths.payloadRoot, "Open Design Beta.app", "Contents", "Resources");
+      const resourcesPath = join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "Resources");
       const payloadExecutablePath = join(
         versionPaths.payloadRoot,
-        "Open Design Beta.app",
+        "Mish Beta.app",
         "Contents",
         "MacOS",
-        "Open Design Beta",
+        "Mish Beta",
       );
-      await mkdir(join(resourcesPath, "open-design", "bin"), { recursive: true });
-      await mkdir(join(versionPaths.payloadRoot, "Open Design Beta.app", "Contents", "MacOS"), { recursive: true });
+      await mkdir(join(resourcesPath, "mish", "bin"), { recursive: true });
+      await mkdir(join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "MacOS"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "daemon"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "web"), { recursive: true });
-      await writeFile(join(resourcesPath, "open-design", "bin", "node"), "");
+      await writeFile(join(resourcesPath, "mish", "bin", "node"), "");
       await writeFile(payloadExecutablePath, "");
       await writeFile(join(resourcesPath, "prebundled", "daemon", "daemon-sidecar.mjs"), "");
       await writeFile(join(resourcesPath, "prebundled", "web", "web-sidecar.mjs"), "");
       await writeFile(
-        join(resourcesPath, "open-design-config.json"),
+        join(resourcesPath, "mish-config.json"),
         `${JSON.stringify({
           appVersion: "1.2.3-beta.5",
           daemonSidecarEntryRelative: "prebundled/daemon/daemon-sidecar.mjs",
-          nodeCommandRelative: "open-design/bin/node",
+          nodeCommandRelative: "mish/bin/node",
           webOutputMode: "standalone",
           webSidecarEntryRelative: "prebundled/web/web-sidecar.mjs",
         })}\n`,
@@ -388,8 +388,8 @@ describe("resolvePackagedLauncherRuntime", () => {
         `${JSON.stringify({
           channel: "beta",
           entry: {
-            cwd: "payload/Open Design Beta.app",
-            executable: "payload/Open Design Beta.app/Contents/MacOS/Open Design Beta",
+            cwd: "payload/Mish Beta.app",
+            executable: "payload/Mish Beta.app/Contents/MacOS/Mish Beta",
           },
           namespace: config.namespace,
           payloadRoot: "payload",
@@ -417,22 +417,22 @@ describe("resolvePackagedLauncherRuntime", () => {
         installPath,
         `${JSON.stringify({
           channel: "beta",
-          launchPath: "/Applications/Open Design Legacy.app",
+          launchPath: "/Applications/Mish Legacy.app",
           namespace: config.namespace,
           schemaVersion: LAUNCHER_SCHEMA_VERSION,
         })}\n`,
       );
 
       const runtime = await resolvePackagedLauncherRuntime(config, paths, {
-        currentExecutablePath: "/Applications/Open Design Beta.app",
+        currentExecutablePath: "/Applications/Mish Beta.app",
       });
 
       expect(runtime.source).toBe("payload");
       expect(runtime.payloadDesktopProcess).toBe(false);
-      expect(runtime.installedLaunchPath).toBe("/Applications/Open Design Beta.app");
+      expect(runtime.installedLaunchPath).toBe("/Applications/Mish Beta.app");
       expect(JSON.parse(await readFile(installPath, "utf8"))).toMatchObject({
         channel: "beta",
-        launchPath: "/Applications/Open Design Beta.app",
+        launchPath: "/Applications/Mish Beta.app",
         namespace: config.namespace,
         schemaVersion: LAUNCHER_SCHEMA_VERSION,
       });
@@ -459,10 +459,10 @@ describe("resolvePackagedLauncherRuntime", () => {
         "versions",
         secondPayload.version,
         "payload",
-        "Open Design Beta.app",
+        "Mish Beta.app",
         "Contents",
         "MacOS",
-        "Open Design Beta",
+        "Mish Beta",
       );
       await mkdir(currentPackageRuntime.launcherPaths.stateRoot, { recursive: true });
       await writeFile(
@@ -546,8 +546,8 @@ describe("resolvePackagedLauncherRuntime", () => {
         version: "1.2.3-beta.5",
       });
       const resourcesPath = join(versionPaths.versionRoot, "payload", "resources");
-      const payloadExePath = join(versionPaths.versionRoot, "payload", "Open Design.exe");
-      const webStandaloneRoot = join(resourcesPath, "open-design-web-standalone");
+      const payloadExePath = join(versionPaths.versionRoot, "payload", "Mish.exe");
+      const webStandaloneRoot = join(resourcesPath, "mish-web-standalone");
       await mkdir(join(resourcesPath, "prebundled", "daemon"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "web"), { recursive: true });
       await mkdir(webStandaloneRoot, { recursive: true });
@@ -556,7 +556,7 @@ describe("resolvePackagedLauncherRuntime", () => {
       await writeFile(join(resourcesPath, "prebundled", "daemon", "daemon-sidecar.mjs"), "");
       await writeFile(join(resourcesPath, "prebundled", "web", "web-sidecar.mjs"), "");
       await writeFile(
-        join(resourcesPath, "open-design-config.json"),
+        join(resourcesPath, "mish-config.json"),
         `${JSON.stringify({
           appVersion: "1.2.3-beta.5",
           daemonSidecarEntryRelative: "prebundled/daemon/daemon-sidecar.mjs",
@@ -570,7 +570,7 @@ describe("resolvePackagedLauncherRuntime", () => {
           channel: "beta",
           entry: {
             cwd: "payload",
-            executable: "payload/Open Design.exe",
+            executable: "payload/Mish.exe",
           },
           namespace: config.namespace,
           payloadRoot: "payload",

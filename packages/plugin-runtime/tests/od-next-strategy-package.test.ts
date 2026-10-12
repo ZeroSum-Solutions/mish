@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { BundledStrategyDeclarationV2Schema } from '@open-design/contracts';
+import { BundledStrategyDeclarationV2Schema } from '@mish/contracts';
 import { parseManifest } from '../src/index.js';
 
 const pluginRoot = fileURLToPath(
   new URL('../../../plugins/_official/scenarios/od-next-strategy/', import.meta.url),
 );
-const manifestSource = readFileSync(`${pluginRoot}/open-design.json`, 'utf8');
+const manifestSource = readFileSync(`${pluginRoot}/mish.json`, 'utf8');
 const parsed = parseManifest(manifestSource);
 
 if (!parsed.ok) throw new Error(parsed.errors.join('\n'));
@@ -43,7 +43,7 @@ describe('bundled OD Next Strategy V2 package', () => {
         kind: 'scenario',
         hidden: true,
         strategy: {
-          schema: 'open-design.bundled-strategy/v2',
+          schema: 'mish.bundled-strategy/v2',
           id: 'od-next-strategy',
           promptRecipe: 'od-next-plan-build-v2',
         },

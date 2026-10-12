@@ -51,7 +51,7 @@ import type { ChatMessage } from '../../src/types';
  * 以下,虚拟滚动那条路(`items.length > 80`)不会开。
  */
 
-const SELF_OBSERVE_DISABLED_KEY = 'open-design:disable-chat-log-self-resize-observe';
+const SELF_OBSERVE_DISABLED_KEY = 'mish:disable-chat-log-self-resize-observe';
 
 type Geom = { contentHeight: number; clientHeight: number; scrollTop: number };
 
@@ -295,7 +295,7 @@ async function mountChat() {
   await flushFrames();
 }
 
-describe('H2 开关:滚动盒自观察(open-design:disable-chat-log-self-resize-observe)', () => {
+describe('H2 开关:滚动盒自观察(mish:disable-chat-log-self-resize-observe)', () => {
   it('默认(不设开关):滚动盒把自己也挂进了跟随 ResizeObserver 的观察名单', async () => {
     await mountChat();
     expect(followObserver(chatLog()).targets.has(chatLog())).toBe(true);

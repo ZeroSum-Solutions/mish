@@ -11,7 +11,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { publicAdapterText } from '@open-design/agency-fast-lane/cult-public-ids';
+import { publicAdapterText } from '@mish/agency-fast-lane/cult-public-ids';
 import { brandHit } from './helpers/cult-brand-names.js';
 
 type Slot = { name: string; max: number; atom?: string };
@@ -62,7 +62,7 @@ function unresolved(html: string): string[] {
 
 // The generated registry is TypeScript source with `.ts` import paths, which this app's tsc does
 // not accept; a non-literal specifier keeps tsc from following it, and vitest loads it as usual.
-const REGISTRY = '@open-design/cult-ui-catalog/generated';
+const REGISTRY = '@mish/cult-ui-catalog/generated';
 const { CULT_ADAPTERS } = await import(REGISTRY) as { CULT_ADAPTERS: Record<string, () => Promise<Adapter>> };
 const ADAPTERS = await Promise.all(Object.values(CULT_ADAPTERS).map((load) => load()));
 

@@ -1,6 +1,6 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { DesignBrief, DesignBriefRecordView } from '@open-design/contracts';
+import type { DesignBrief, DesignBriefRecordView } from '@mish/contracts';
 
 /** Persisted record. Revisions are immutable files beside it. */
 export interface StoredBriefRecord {

@@ -1067,7 +1067,7 @@ const response = await fetch(new URL('/__e2e/command', process.env.VELA_API_URL)
   headers: {
     authorization: 'Bearer ' + process.env.VELA_CONTROL_KEY,
     'content-type': 'application/json',
-    'x-vela-workspace-id': process.env.VELA_WORKSPACE_ID || process.env.OPEN_DESIGN_WORKSPACE_ID || '',
+    'x-vela-workspace-id': process.env.VELA_WORKSPACE_ID || process.env.MISH_WORKSPACE_ID || '',
   },
   body: JSON.stringify({ args, stdin }),
 });

@@ -1,6 +1,6 @@
 import { readHomeModelHandoff } from './home-model-handoff';
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
-import { parseSessionModelChoice, type ModelPreflightResult, type SessionModelChoice, type SessionModelSnapshot, type WorkspaceCollabContext } from '@open-design/contracts';
+import { parseSessionModelChoice, type ModelPreflightResult, type SessionModelChoice, type SessionModelSnapshot, type WorkspaceCollabContext } from '@mish/contracts';
 import type { AppConfig, ApiProtocol, AgentModelChoice } from '../../types';
 import { workspaceAccountScopedCacheKey } from '../../collab/workspace-identity';
 import { getSessionModel, postModelPreflight, putSessionModel } from '../../providers/workbench';

@@ -34,20 +34,20 @@ export const WIN_PREBUNDLE_RUNTIME_DEPENDENCIES = {
 } as const;
 
 export const WIN_STANDALONE_PREBUNDLE_EXCLUDED_INTERNAL_PACKAGES = [
-  "@open-design/daemon",
-  "@open-design/desktop",
-  "@open-design/launcher-proto",
-  "@open-design/packaged",
-  "@open-design/sidecar-proto",
-  "@open-design/web",
+  "@mish/daemon",
+  "@mish/desktop",
+  "@mish/launcher-proto",
+  "@mish/packaged",
+  "@mish/sidecar-proto",
+  "@mish/web",
 ] as const;
 
 export const WIN_PREBUNDLE_POLICIES = {
   packagedMain: {
-    externals: ["@open-design/sidecar", "electron"],
+    externals: ["@mish/sidecar", "electron"],
     forbiddenInputs: [
       "/apps/web/",
-      "/node_modules/@open-design/web/",
+      "/node_modules/@mish/web/",
       "/node_modules/next/",
       "/node_modules/openai/",
       "/node_modules/react/",
@@ -56,9 +56,9 @@ export const WIN_PREBUNDLE_POLICIES = {
     label: "packaged main",
   },
   daemonCli: {
-    externals: ["@ffmpeg-installer/ffmpeg", "@open-design/sidecar", "better-sqlite3", "blake3-wasm", "gsap", "hyperframes", "node-pty"],
+    externals: ["@ffmpeg-installer/ffmpeg", "@mish/sidecar", "better-sqlite3", "blake3-wasm", "gsap", "hyperframes", "node-pty"],
     forbiddenInputs: [
-      "/node_modules/@open-design/daemon/",
+      "/node_modules/@mish/daemon/",
       "/node_modules/@ffmpeg-installer/ffmpeg/",
       "/node_modules/better-sqlite3/",
       "/node_modules/blake3-wasm/",
@@ -74,9 +74,9 @@ export const WIN_PREBUNDLE_POLICIES = {
     label: "daemon cli",
   },
   daemonSidecar: {
-    externals: ["@ffmpeg-installer/ffmpeg", "@open-design/sidecar", "better-sqlite3", "blake3-wasm", "gsap", "hyperframes", "node-pty"],
+    externals: ["@ffmpeg-installer/ffmpeg", "@mish/sidecar", "better-sqlite3", "blake3-wasm", "gsap", "hyperframes", "node-pty"],
     forbiddenInputs: [
-      "/node_modules/@open-design/daemon/",
+      "/node_modules/@mish/daemon/",
       "/node_modules/@ffmpeg-installer/ffmpeg/",
       "/node_modules/better-sqlite3/",
       "/node_modules/blake3-wasm/",
@@ -92,7 +92,7 @@ export const WIN_PREBUNDLE_POLICIES = {
     label: "daemon sidecar",
   },
   webSidecar: {
-    externals: ["@open-design/sidecar"],
+    externals: ["@mish/sidecar"],
     forbiddenInputs: [
       "/node_modules/next/",
       "/node_modules/openai/",
@@ -150,5 +150,5 @@ export async function assertWinPrebundleMetafile(options: {
 export function renderWinPackagedMainEntry(usePrebundle: boolean): string {
   return usePrebundle
     ? 'import("./prebundled/packaged-main.mjs").catch((error) => {\n  console.error("packaged entry failed", error);\n  process.exit(1);\n});\n'
-    : 'import("@open-design/packaged").catch((error) => {\n  console.error("packaged entry failed", error);\n  process.exit(1);\n});\n';
+    : 'import("@mish/packaged").catch((error) => {\n  console.error("packaged entry failed", error);\n  process.exit(1);\n});\n';
 }

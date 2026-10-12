@@ -170,7 +170,7 @@ The **same MV3 package** publishes to Edge unchanged.
 
 Firefox needs the gecko settings already added to `manifest.json`:
 ```json
-"browser_specific_settings": { "gecko": { "id": "web-clipper@open-design.ai", "strict_min_version": "121.0" } }
+"browser_specific_settings": { "gecko": { "id": "web-clipper@mish.invalid", "strict_min_version": "121.0" } }
 ```
 And the dual background key (already in `manifest.json`) — Firefox uses
 `background.scripts`, Chrome/Edge use `background.service_worker`:

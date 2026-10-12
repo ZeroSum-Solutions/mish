@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { Dirent } from 'node:fs';
-import { parseReviewRun, WORKBENCH_REVIEW_RUN_ID_PATTERN, type ReviewRun } from '@open-design/contracts';
+import { parseReviewRun, WORKBENCH_REVIEW_RUN_ID_PATTERN, type ReviewRun } from '@mish/contracts';
 
 const MAX_LISTED = 200;
 export type ReviewInventoryRecord = { projectKey: string; id: string | null };

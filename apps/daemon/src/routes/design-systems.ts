@@ -9,7 +9,7 @@ import {
   findRealTagEnd,
   HTML_TAG_PATTERNS,
   prependAfterDoctype,
-} from '@open-design/contracts/runtime/html-injection-points';
+} from '@mish/contracts/runtime/html-injection-points';
 import { isApprovedDesignSystemFontHash } from '../design-systems/approved-font-hashes.js';
 import type { RouteDeps } from '../server-context.js';
 import type {
@@ -41,7 +41,7 @@ import {
   type VerifyWorkspaceRequestAuthority,
   type WorkspaceResourceAccessInput,
 } from '../collab/workspace-resource-mutation.js';
-import type { Project, ProjectFile } from '@open-design/contracts';
+import type { Project, ProjectFile } from '@mish/contracts';
 import { KitMaterializeError } from '../design-systems/kit-materialize.js';
 
 type DbHandle = ReturnType<typeof openDatabase>;
@@ -803,7 +803,7 @@ export function registerDesignSystemRoutes(
       // path too. `DesignSystemsTab` already re-derives an equivalent verdict
       // from the separate `/team` share listing for its own list+detail pane,
       // but a design system reached any other way — e.g. the direct
-      // `/design-systems/:id` route the Library's "Open design system" link
+      // `/design-systems/:id` route the Library's "Open the design system" link
       // and `LibrarySection` navigate to, which renders `DesignSystemFlow`
       // directly — had no ownership signal at all and fell back to treating
       // any non-built-in system as fully editable. Computing it once here,

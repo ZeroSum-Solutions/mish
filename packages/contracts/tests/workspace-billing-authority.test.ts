@@ -39,7 +39,7 @@ import {
 
 const WORKSPACE = 'ac43mfba3blvfvfmeie1euti';
 const MEMBER = 'dn87ohicuyq4o839pgi37op4';
-const SETTINGS_URL = `https://open-design.ai/amr/settings?workspaceId=${WORKSPACE}`;
+const SETTINGS_URL = `https://mish.invalid/amr/settings?workspaceId=${WORKSPACE}`;
 
 function context(overrides: {
   workspaceId?: string;

@@ -10,7 +10,7 @@ import { useWorkbenchIntake } from './WorkbenchIntake';
 // textarea can live centered in the hero.
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Dialog, DialogFooter, DialogTitle } from '@open-design/components';
+import { Dialog, DialogFooter, DialogTitle } from '@mish/components';
 import type {
   AgencyRouteResponse,
   ApplyResult,
@@ -29,13 +29,13 @@ import type {
   WorkspaceProjectSummary,
   AudioVoiceOption,
   WorkspaceContextItem,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   automaticStrategyTaskProfileForRouteId,
   DEFAULT_UNSELECTED_SCENARIO_PLUGIN_ID,
   extractWebCloneTargetUrl,
-} from '@open-design/contracts';
-import { projectKindFromMetadataToTracking } from '@open-design/contracts/analytics';
+} from '@mish/contracts';
+import { projectKindFromMetadataToTracking } from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackCommunityGalleryClick,
@@ -90,7 +90,7 @@ import {
   pushRecentLinkedDir,
   updateDesignSystemDraft,
 } from '../providers/registry';
-import { isOpenDesignHostAvailable, pickHostWorkingDir } from '@open-design/host';
+import { isMishHostAvailable, pickHostWorkingDir } from '@mish/host';
 import type {
   DesignSystemSummary,
   Project,
@@ -160,7 +160,7 @@ import {
 import { SkillDetailsModal } from './SkillDetailsModal';
 import type { PluginLoopSubmit } from './PluginLoopHome';
 import { WorkbenchImprovePrompt } from './workbench/WorkbenchImprovePrompt';
-import type { DesignBriefPreview } from '@open-design/contracts';
+import type { DesignBriefPreview } from '@mish/contracts';
 import { localizePluginTitle } from './plugins-home/localization';
 import type { PluginUseAction } from './plugins-home/useActions';
 import { examplePresetSeedPrompt } from './plugins-home/presetSeedPrompt';
@@ -366,9 +366,9 @@ const EMPTY_PROMPT_TEMPLATES: PromptTemplateSummary[] = [];
 // intentionally NOT persisted here — they reference live catalogue records /
 // File handles / a desktop auth token that cannot round-trip through JSON
 // safely.
-const HOME_COMPOSER_PROMPT_KEY = 'open-design:home-composer:prompt';
-const HOME_COMPOSER_DESIGN_SYSTEM_KEY = 'open-design:home-composer:design-system';
-const HOME_COMPOSER_DESIGN_SYSTEM_SCOPE_KEY = 'open-design:home-composer:design-system-scope';
+const HOME_COMPOSER_PROMPT_KEY = 'mish:home-composer:prompt';
+const HOME_COMPOSER_DESIGN_SYSTEM_KEY = 'mish:home-composer:design-system';
+const HOME_COMPOSER_DESIGN_SYSTEM_SCOPE_KEY = 'mish:home-composer:design-system-scope';
 // The active type-chip + bound plugin (the "创作类型" + "示例提示词" pick) is a
 // third piece of composer state that used to fall through this same crack:
 // `active` (below) held only a live `InstalledPluginRecord` + resolved apply
@@ -379,12 +379,12 @@ const HOME_COMPOSER_DESIGN_SYSTEM_SCOPE_KEY = 'open-design:home-composer:design-
 // project kind) and re-resolve the full `ActivePlugin` from the live plugin catalog
 // on remount (see `pendingChipRestore` below), the same way a cross-surface
 // "use this plugin" hand-off resolves `pendingPluginUseHandoff`.
-const HOME_COMPOSER_CHIP_KEY = 'open-design:home-composer:chip';
+const HOME_COMPOSER_CHIP_KEY = 'mish:home-composer:chip';
 // The Prototype strip's "Jev chooses" mode. A fourth piece of composer state
 // with the same lifetime as the three above: the user set it deliberately, so
 // a Settings round trip must not silently hand the family choice back to them.
 // One flag, no object — what Jev chose is decided at Send, never restored.
-const HOME_COMPOSER_JEV_CHOOSES_KEY = 'open-design:home-composer:jev-chooses';
+const HOME_COMPOSER_JEV_CHOOSES_KEY = 'mish:home-composer:jev-chooses';
 
 interface HomeComposerChipDraft {
   chipId: string | null;
@@ -408,7 +408,7 @@ interface HomeComposerChipDraft {
 // remount into — it writes the draft key but nobody re-reads it. Dispatch a
 // live event too so an already-mounted HomeView can pick up the seed
 // directly; the draft key stays as the true-cold-mount fallback.
-const HOME_COMPOSER_SEED_EVENT = 'open-design:home-composer:seed';
+const HOME_COMPOSER_SEED_EVENT = 'mish:home-composer:seed';
 
 function readHomeComposerDraft(key: string): string | null {
   if (typeof window === 'undefined') return null;
@@ -1135,7 +1135,7 @@ export function HomeView({
       if (homeActiveRef.current) load(true, true);
       else pluginCatalogStaleRef.current = true;
     };
-    window.addEventListener('open-design:plugins-changed', onChanged);
+    window.addEventListener('mish:plugins-changed', onChanged);
     return () => {
       cancelled = true;
       // A Workspace-directory refresh can briefly mask the catalog identity
@@ -1151,7 +1151,7 @@ export function HomeView({
       if (pluginCatalogReloadRef.current === load) {
         pluginCatalogReloadRef.current = async () => {};
       }
-      window.removeEventListener('open-design:plugins-changed', onChanged);
+      window.removeEventListener('mish:plugins-changed', onChanged);
     };
   }, [desiredPluginCatalogKey, pluginCatalogWorkspaceContext?.workspaceType]);
 
@@ -2531,7 +2531,7 @@ export function HomeView({
   async function handlePickWorkingDir() {
     // On desktop the working-dir POST is gated behind a host-minted token, so
     // pick through the host bridge to capture { baseDir, token } together.
-    if (isOpenDesignHostAvailable()) {
+    if (isMishHostAvailable()) {
       const result = await pickHostWorkingDir();
       if (result.ok) {
         setWorkingDir(result.baseDir);
@@ -2567,7 +2567,7 @@ export function HomeView({
   }
 
   async function handlePickLocalCodeDir() {
-    if (isOpenDesignHostAvailable()) {
+    if (isMishHostAvailable()) {
       const result = await pickHostWorkingDir();
       if (result.ok) {
         void rememberRecentDir(result.baseDir);

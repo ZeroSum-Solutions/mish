@@ -272,7 +272,7 @@ async function checkOne(row: CultCatalogRow, generatedDir: string, rules: Produc
   } else {
     try {
       if (readFileSync(file, 'utf8') !== productAdapterSource(readFileSync(kitAdapter, 'utf8'), row.name)) {
-        err('generated adapter differs from the kit\'s converted output; run `pnpm --filter @open-design/cult-ui-catalog adapters`');
+        err('generated adapter differs from the kit\'s converted output; run `pnpm --filter @mish/cult-ui-catalog adapters`');
       }
     } catch (error) {
       err(`kit adapter cannot be copied: ${(error as Error).message}`);

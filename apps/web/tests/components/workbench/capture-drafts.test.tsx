@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { buildWorkspacePermissions, type CaptureDraftRevision, type CaptureView, type WorkspaceCollabContext } from '@open-design/contracts';
+import { buildWorkspacePermissions, type CaptureDraftRevision, type CaptureView, type WorkspaceCollabContext } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchCaptureHub } from '../../../src/components/workbench/WorkbenchCaptureHub';
 import { WorkbenchCaptureDraftPanel } from '../../../src/components/workbench/WorkbenchCaptureDraftPanel';

@@ -35,7 +35,7 @@ type StartedServer = { url: string; server: Server; shutdown?: () => Promise<voi
 
 const TELEMETRY_ENV = [
   'POSTHOG_KEY', 'POSTHOG_HOST', 'LANGFUSE_PUBLIC_KEY', 'LANGFUSE_SECRET_KEY',
-  'LANGFUSE_BASE_URL', 'OPEN_DESIGN_TELEMETRY_RELAY_URL',
+  'LANGFUSE_BASE_URL', 'MISH_TELEMETRY_RELAY_URL',
 ] as const;
 
 /** Fails once before first token with a retryable 503, then succeeds. */

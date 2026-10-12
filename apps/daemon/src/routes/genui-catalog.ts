@@ -1,12 +1,12 @@
 import type { Express } from 'express';
-import type { GenuiCatalogManifest, GenuiCatalogResponse } from '@open-design/contracts';
-import { DEMO_CSP, demoDocument, genuiCatalog } from '@open-design/genui-catalog/data';
+import type { GenuiCatalogManifest, GenuiCatalogResponse } from '@mish/contracts';
+import { DEMO_CSP, demoDocument, genuiCatalog } from '@mish/genui-catalog/data';
 import { effectPreviewDocument } from './effect-preview-document.js';
 
 /**
  * GET /api/genui/catalog — the owned GenUI component catalog manifest (catalog-design.md §E).
  *
- * The manifest comes from `@open-design/genui-catalog/data`, generated JS literals that survive
+ * The manifest comes from `@mish/genui-catalog/data`, generated JS literals that survive
  * the daemon's esbuild prebundle. It is read-only, public-safe metadata (no source, no key), so
  * it follows the design-index taxonomy route (`GET /api/design-index/taxonomy`): no per-route
  * auth beyond the daemon's global middleware. That middleware is the `app.use('/api', ...)`

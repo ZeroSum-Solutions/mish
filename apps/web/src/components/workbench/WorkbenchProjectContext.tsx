@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import {
   parseProjectDesignContextDraft, parseProjectRubricDraft, WORKBENCH_MOTION_DEFAULT_VIEWPORTS,
   type WorkspaceCollabContext, type ProjectDesignContextSnapshot, type ProjectRubricSnapshot,
   type ProjectDesignContextDraft, type ProjectRubricDraft,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { getProjectDesignContext, getProjectRubric, putProjectDesignContext, putProjectRubric, WorkbenchRequestError } from '../../providers/workbench';
 import { workspaceAccountScopedCacheKey, currentWorkspaceAccountGeneration } from '../../collab/workspace-identity';
 import { useT } from '../../i18n';

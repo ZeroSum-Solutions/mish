@@ -12,7 +12,7 @@ describe('plugin skill description client boundary', () => {
       'utf8',
     );
 
-    expect(packageJson.dependencies).not.toHaveProperty('@open-design/plugin-runtime');
-    expect(runtimeSource).not.toContain("from '@open-design/plugin-runtime'");
+    expect(packageJson.dependencies).not.toHaveProperty('@mish/plugin-runtime');
+    expect(runtimeSource).not.toContain("from '@mish/plugin-runtime'");
   });
 });

@@ -76,7 +76,7 @@ Commands, from repository root with the pinned runtime:
 mise exec -- node --experimental-strip-types scripts/build-ui-kit-css.ts community
 mise exec -- node --experimental-strip-types scripts/sync-agency-compiler.ts
 mise exec -- node --experimental-strip-types --test plugins/_official/examples/agency-community/compiler/scripts/families/community/render.test.ts plugins/_official/shared/agency-compiler/tests/effects.test.ts
-mise exec -- corepack pnpm --filter @open-design/plugin-runtime typecheck
+mise exec -- corepack pnpm --filter @mish/plugin-runtime typecheck
 mise exec -- corepack pnpm guard
 ```
 

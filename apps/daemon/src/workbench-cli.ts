@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { parseResourceDetailResponse, parseResourceSearchRequest, parseResourceSearchResponse } from '@open-design/contracts';
+import { parseResourceDetailResponse, parseResourceSearchRequest, parseResourceSearchResponse } from '@mish/contracts';
 import { runIntakeCli } from './workbench/intake-cli.js';
 import { runModelCli } from './workbench/model-cli.js';
 import { runContextCli } from './workbench/context-cli.js';

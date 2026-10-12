@@ -34,7 +34,7 @@ import {
   type WorkspaceBillingResponse,
   type WorkspaceBillingSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EntryShell } from '../../src/components/EntryShell';
@@ -249,7 +249,7 @@ async function mountHomeShell(initial: WorkspaceCollabContext): Promise<Harness>
     }
     if (url.includes('/api/workspace/billing?')) {
       const workspaceId =
-        new URL(url, 'http://open-design.test').searchParams.get('workspaceId') ?? '';
+        new URL(url, 'http://mish.test').searchParams.get('workspaceId') ?? '';
       billingReads.push(workspaceId);
       if (workspaceId === PAID_TEAM.workspaceId) {
         return jsonResponse(

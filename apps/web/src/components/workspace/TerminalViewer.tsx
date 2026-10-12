@@ -5,7 +5,7 @@ import type {
   TerminalDataEvent,
   TerminalExitEvent,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useT } from '../../i18n';
 import { Icon } from '../Icon';
 import {

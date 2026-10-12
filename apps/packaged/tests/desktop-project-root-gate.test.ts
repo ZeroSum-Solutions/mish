@@ -24,7 +24,7 @@ import {
   fetchResolvedProjectDir,
   isOpenPathAllowedForProject,
   signDesktopImportToken,
-} from "@open-design/desktop/main";
+} from "@mish/desktop/main";
 
 let tempRoot = "";
 

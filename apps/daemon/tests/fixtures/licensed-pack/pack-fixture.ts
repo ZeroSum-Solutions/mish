@@ -14,7 +14,7 @@ import { gzipSync } from 'node:zlib';
 
 import { c as tarCreate, Header } from 'tar';
 
-import type { PackManifest } from '@open-design/contracts';
+import type { PackManifest } from '@mish/contracts';
 
 import { writeFixtureKit } from '../../helpers/cult-kit-fixture.js';
 

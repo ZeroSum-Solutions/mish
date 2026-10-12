@@ -3,7 +3,7 @@ import { mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { Twenty1stItem } from '@open-design/contracts';
+import type { Twenty1stItem } from '@mish/contracts';
 import { twenty1stLiveThumbnailBytes, twenty1stLiveThumbnailIndex } from '../src/services/twenty1st-thumbnails.js';
 
 const directories: string[] = [];

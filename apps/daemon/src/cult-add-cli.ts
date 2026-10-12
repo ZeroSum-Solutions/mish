@@ -29,8 +29,8 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, renameSync, rmdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import path from 'node:path';
-import type { CultRegistryFile, CultRegistryItem } from '@open-design/contracts';
-import { cultRegistryName, parseCultCopyResponse, parseCultRegistryItem } from '@open-design/contracts';
+import type { CultRegistryFile, CultRegistryItem } from '@mish/contracts';
+import { cultRegistryName, parseCultCopyResponse, parseCultRegistryItem } from '@mish/contracts';
 
 import { DEFAULT_ALIASES, rewriteImports, type ProjectAliases } from './cult-registry.js';
 

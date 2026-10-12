@@ -166,8 +166,8 @@ dogfood artifacts.
 > **合并带进 `packages/` 下任何包的源码改动,就必须重建那个包的 dist。**
 
 ```bash
-pnpm --filter @open-design/contracts build       # 栽了 3 次
-pnpm --filter @open-design/plugin-runtime build  # 栽了 1 次
+pnpm --filter @mish/contracts build       # 栽了 3 次
+pnpm --filter @mish/plugin-runtime build  # 栽了 1 次
 ```
 
 症状伪装得很像别的问题:「类型不存在」、「不是函数」、看起来像合并没解干净。
@@ -177,7 +177,7 @@ pnpm --filter @open-design/plugin-runtime build  # 栽了 1 次
 daemon 的 build 用更严的 tsconfig(带 `noUncheckedIndexedAccess`)。动了 daemon 要单独跑,**并且显式确认 exit code** —— 它有时什么都不打印:
 
 ```bash
-pnpm --filter @open-design/daemon build; echo "EXIT=$?"
+pnpm --filter @mish/daemon build; echo "EXIT=$?"
 ```
 
 (我写过一句无条件的 `echo "typecheck 空=通过"`,把一个 exit=2 的真失败盖过去了。)
@@ -225,7 +225,7 @@ pnpm --filter @open-design/daemon build; echo "EXIT=$?"
 - **红测先行 → 撤掉实现验红 → 逐机制消融**(单独撤一个,恰好只红对应那条)
 - **反向对照**:每条否定断言都要配正向控制,否则「什么都不渲染」也能绿
 - **交付时老实列没验证的部分**
-- 涉及 vela/AMR 的,把仓库路径给它:`/Users/elian/Documents/nexu/vela`
+- 涉及 vela/AMR 的,把仓库路径给它:`/Users/elian/Documents/mish/vela`
 
 **效果最好的两条:**
 
@@ -242,9 +242,9 @@ pnpm --filter @open-design/daemon build; echo "EXIT=$?"
 |---|---|
 | 用户 runtime | web `127.0.0.1:17573` / daemon `127.0.0.1:17456`,namespace `default` |
 | 工作树 | `/Users/elian/Documents/od-wt-chat-panel` |
-| AMR 档位 | `OPEN_DESIGN_AMR_PROFILE=test` → `vela.powerformer.net`(**不是生产**) |
-| 启动命令 | `OPEN_DESIGN_AMR_PROFILE=test pnpm tools-dev run web --daemon-port 17456 --web-port 17573` |
-| vela 仓库 | `/Users/elian/Documents/nexu/vela` |
+| AMR 档位 | `MISH_AMR_PROFILE=test` → `vela.powerformer.net`(**不是生产**) |
+| 启动命令 | `MISH_AMR_PROFILE=test pnpm tools-dev run web --daemon-port 17456 --web-port 17573` |
+| vela 仓库 | `/Users/elian/Documents/mish/vela` |
 | 回放 mock | `export PATH="$PWD/mocks/bin:$PATH" OD_MOCKS_TRACE=98d2b062 OD_MOCKS_NO_DELAY=1` |
 | E2E 浏览器 | 用 open-browser-use 接管用户自己的 Chrome。**本机绝不装 playwright 浏览器**(534MB,曾把磁盘写穿到 0 字节) |
 

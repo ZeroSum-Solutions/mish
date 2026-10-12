@@ -218,7 +218,7 @@ describe('AMR terminal report delivery', () => {
       'run', 'terminal', '--run-id', 'run-1', '--outcome', 'canceled',
       '--terminal-at', new Date(now).toISOString(), '--json',
     ], expect.objectContaining({
-      configuredEnv: { VELA_INVOCATION_SOURCE: 'open-design' },
+      configuredEnv: { VELA_INVOCATION_SOURCE: 'mish' },
     }));
     expect(store.diagnostics(now)).toMatchObject({ pending: 0, delivered: 1 });
     expect(db.prepare('SELECT receipt FROM amr_terminal_report_outbox WHERE run_id = ?').get('run-1'))
@@ -250,7 +250,7 @@ describe('AMR terminal report delivery', () => {
       '--terminal-at', new Date(terminalAt).toISOString(), '--json',
     ]);
     expect(run.mock.calls[0]?.[1]).toMatchObject({
-      configuredEnv: { VELA_INVOCATION_SOURCE: 'open-design' },
+      configuredEnv: { VELA_INVOCATION_SOURCE: 'mish' },
       maxBuffer: 64 * 1024,
     });
     expect(recovered.diagnostics()).toMatchObject({ pending: 0, delivered: 1 });

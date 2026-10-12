@@ -132,7 +132,7 @@ describe('run failure telemetry smoke', () => {
       // must be masked before it leaves the daemon — including the wider path
       // shapes (/opt, /tmp, /private/var, UNC, file://) that only the
       // Prompt-stack masker covers.
-      'Loaded config from /Users/od-smoke-user/.config/open-design/creds.json',
+      'Loaded config from /Users/od-smoke-user/.config/mish/creds.json',
       'via /opt/od-smoke-user/state.json.',
     ].join(' '));
     await writeFakeClaude(binDir, 'claude-hang', null);
@@ -142,7 +142,7 @@ describe('run failure telemetry smoke', () => {
     process.env.LANGFUSE_PUBLIC_KEY = 'pk-test';
     process.env.LANGFUSE_SECRET_KEY = 'sk-test';
     process.env.LANGFUSE_BASE_URL = ingestion.url;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     delete process.env.POSTHOG_KEY;
     process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS = '400';
 
@@ -282,7 +282,7 @@ describe('run failure telemetry smoke', () => {
         // span per Run inside it.
         expect(observed.trace.body.id, item.id)
           .toBe(`strategy-task:${observed.taskExecutionId}`);
-        expect(observed.trace.body.name, item.id).toBe('open-design-strategy-task');
+        expect(observed.trace.body.name, item.id).toBe('mish-strategy-task');
         expect(observed.span.body.traceId, item.id).toBe(observed.trace.body.id);
         expect(observed.span.body.id, item.id)
           .toBe(`task-run:${observed.taskExecutionId}:${run.id}`);
@@ -324,7 +324,7 @@ describe('run failure telemetry smoke', () => {
       // narrow `item` itself away inside the conditional.
       const expectStderr: boolean = item.expectStderr;
       const trace = await ingestion.waitForSingleRunTrace(run.id);
-      expect(trace.body.name, caseId).toBe('open-design-turn');
+      expect(trace.body.name, caseId).toBe('mish-turn');
       expect('expectedCodes' in item ? item.expectedCodes : [item.expectedCode])
         .toContain(trace.body.metadata.error_code);
       expect(trace.body.metadata.failure_category, caseId).toBe(item.expectedCategory);
@@ -449,7 +449,7 @@ describe('run failure telemetry smoke', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
 
     started = await startIsolatedServer();
     await putConfig(started.url, {
@@ -490,7 +490,7 @@ describe('run failure telemetry smoke', () => {
     process.env.LANGFUSE_PUBLIC_KEY = 'pk-test';
     process.env.LANGFUSE_SECRET_KEY = 'sk-test';
     process.env.LANGFUSE_BASE_URL = ingestion.url;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     delete process.env.POSTHOG_KEY;
 
     started = await startIsolatedServer();
@@ -512,7 +512,7 @@ describe('run failure telemetry smoke', () => {
 
     const observed = await ingestion.waitForTaskRunObservation(run.id);
     expect(observed.trace.body.id).toBe(`strategy-task:${observed.taskExecutionId}`);
-    expect(observed.trace.body.name).toBe('open-design-strategy-task');
+    expect(observed.trace.body.name).toBe('mish-strategy-task');
     expect(observed.span.body.id).toBe(`task-run:${observed.taskExecutionId}:${run.id}`);
     expect(observed.span.body.metadata.errorCode).toBe(deriveRunErrorCode(run));
   }, 60_000);
@@ -525,7 +525,7 @@ describe('run failure telemetry smoke', () => {
     process.env.LANGFUSE_PUBLIC_KEY = 'pk-test';
     process.env.LANGFUSE_SECRET_KEY = 'sk-test';
     process.env.LANGFUSE_BASE_URL = ingestion.url;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     delete process.env.POSTHOG_KEY;
 
     started = await startIsolatedServer();
@@ -586,7 +586,7 @@ function snapshotEnv(): Record<string, string | undefined> {
     LANGFUSE_PUBLIC_KEY: process.env.LANGFUSE_PUBLIC_KEY,
     LANGFUSE_SECRET_KEY: process.env.LANGFUSE_SECRET_KEY,
     LANGFUSE_BASE_URL: process.env.LANGFUSE_BASE_URL,
-    OPEN_DESIGN_TELEMETRY_RELAY_URL: process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL,
+    MISH_TELEMETRY_RELAY_URL: process.env.MISH_TELEMETRY_RELAY_URL,
     POSTHOG_KEY: process.env.POSTHOG_KEY,
     OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS: process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS,
     OD_DATA_DIR: process.env.OD_DATA_DIR,

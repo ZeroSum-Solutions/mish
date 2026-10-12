@@ -12,7 +12,7 @@
  * 仓库里已经有 `computeSkipRanges`(跳过围栏代码块与行内代码),产物剥离器一直在用。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import type { ExecutionShell } from '../../../src/runtime/chat/contract';
 

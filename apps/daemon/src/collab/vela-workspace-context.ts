@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   CollabMemberRole,
   WorkspaceBillingState,
@@ -15,7 +15,7 @@ import type {
   WorkspaceProviderMode,
   WorkspaceSeatSummary,
   WorkspaceType,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   markVelaAuthorizationExpired,
   readVelaControlApiContext,

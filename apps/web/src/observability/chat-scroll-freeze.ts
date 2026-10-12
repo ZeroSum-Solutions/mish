@@ -117,7 +117,7 @@
 // text, no selector, no user-authored string is read. Class names and test
 // ids ARE read — to derive a role enum, which is the only thing reported.
 
-import type { ChatScrollFreezeProps } from '@open-design/contracts/analytics';
+import type { ChatScrollFreezeProps } from '@mish/contracts/analytics';
 
 import { reportSafetyEvent } from '../analytics/error-tracking';
 import { chatCorrelation } from './chat-context';

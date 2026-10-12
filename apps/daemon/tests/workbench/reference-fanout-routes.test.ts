@@ -2,7 +2,7 @@ import { request as httpRequest, type ClientRequest, type Server } from 'node:ht
 import { type AddressInfo } from 'node:net';
 import express from 'express';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseReferenceFanoutResponse } from '@open-design/contracts';
+import { parseReferenceFanoutResponse } from '@mish/contracts';
 import { ToolTokenRegistry } from '../../src/tool-tokens.js';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchReferenceRoutes } from '../../src/routes/workbench-references.js';

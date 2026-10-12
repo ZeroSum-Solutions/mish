@@ -3,7 +3,7 @@ import { mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'n
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
-import { WORKBENCH_MANDATORY_CRITERION_IDS } from '@open-design/contracts';
+import { WORKBENCH_MANDATORY_CRITERION_IDS } from '@mish/contracts';
 import { createCdpReviewPort } from '../../src/workbench/review/cdp-worker.js';
 import { runMechanicalReview } from '../../src/workbench/review/runner.js';
 import { classifyStartupFailure } from '../../src/workbench/review/startup.js';

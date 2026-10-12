@@ -6,7 +6,7 @@
   "sourceCommit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
   "recordingDigest": "sha256:729d0e58e80e7b8b81eb90ad286471a26c3df80411f0b0f7092c19d157b50cc6",
   "anonymizationVersion": "od-runtime-evidence/v1",
-  "evidenceReview": "open_design_best_effort",
+  "evidenceReview": "mish_best_effort",
   "note": "Exact Codex CLI lifecycle facts recorded in isolated repositories. Child failure was produced by an isolated local Responses API that closed the Child stream after response.created; no online trace or user project was touched.",
   "caseCoverage": [
     {
@@ -83,7 +83,7 @@
       "caseId": "timeout",
       "outcome": "passed",
       "minimumEvidence": "L0",
-      "source": "open_design_host_timeout",
+      "source": "mish_host_timeout",
       "nativeChildTerminal": "unavailable",
       "evidence": {
         "hostRunStatus": "failed",

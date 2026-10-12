@@ -3,7 +3,7 @@
 import { act } from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { SkillSummary } from '@open-design/contracts';
+import type { SkillSummary } from '@mish/contracts';
 
 vi.mock('../../src/components/home-hero/PlaceholderCarousel', () => ({
   PlaceholderCarousel: () => null,
@@ -263,7 +263,7 @@ describe('HomeView — @-mentioning a Skill on top of a picked task type', () =>
       await Promise.resolve();
     });
     await waitFor(() => {
-      expect(JSON.parse(window.localStorage.getItem('open-design:home-composer:chip') ?? '{}'))
+      expect(JSON.parse(window.localStorage.getItem('mish:home-composer:chip') ?? '{}'))
         .toMatchObject({ chipId: 'prototype', prototypeSubtypeId: 'mobile' });
     });
 

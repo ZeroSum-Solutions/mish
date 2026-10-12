@@ -6,7 +6,7 @@
  *   node --experimental-strip-types scripts/slugs.ts          write generated/slugs.json
  *   node --experimental-strip-types scripts/slugs.ts --check  write nothing; exit 1 when stale
  *
- * `assignCultSlugs` (@open-design/contracts, api/cult-brand.ts) owns the rule: the slugified
+ * `assignCultSlugs` (@mish/contracts, api/cult-brand.ts) owns the rule: the slugified
  * brand-free title ("Marketing Pricing Vercel" → `pricing-series-v`), unique, never another row's
  * internal name, and sticky: a row keeps the slug the committed file gives it while that slug is
  * still valid for its title, so a regeneration never renames an item a person already installed.
@@ -14,14 +14,14 @@
  *
  * The file is its own generated output (not a catalog.json field), so branches that regenerate
  * catalog.json's conversion fields merge with it without a conflict; a new row only needs a
- * re-run of this script (`pnpm --filter @open-design/cult-ui-catalog import` runs it last).
+ * re-run of this script (`pnpm --filter @mish/cult-ui-catalog import` runs it last).
  */
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { assignCultSlugs } from '@open-design/contracts';
+import { assignCultSlugs } from '@mish/contracts';
 
 import type { CultCatalog } from '../src/types.ts';
 

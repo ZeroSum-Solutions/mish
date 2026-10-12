@@ -20,7 +20,7 @@ import {
   createArtifactFocusMarkerStripper,
   resolveArtifactFocusProjectPath,
 } from '../src/artifact-focus-marker.js';
-import type { ArtifactFocusSelection } from '@open-design/contracts';
+import type { ArtifactFocusSelection } from '@mish/contracts';
 
 /** 真实录制里的 done_key 就是 16 位十六进制,`<od-focus>` 复用同一枚 */
 const KEY = 'c07a83a9bc73cbd6';

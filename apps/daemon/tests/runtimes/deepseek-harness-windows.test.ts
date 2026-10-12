@@ -23,7 +23,7 @@ import {
   createCommandInvocation,
   listProcessSnapshots,
   stopProcesses,
-} from '@open-design/platform';
+} from '@mish/platform';
 
 const require = createRequire(import.meta.url);
 
@@ -49,7 +49,7 @@ function writeFakeDshCarrier(dir: string): string {
 
 function createProfileHome(dir: string): string {
   const home = path.join(dir, 'dsh-home');
-  const profile = path.join(home, 'profiles', 'open-design');
+  const profile = path.join(home, 'profiles', 'mish');
   mkdirSync(profile, { recursive: true });
   writeFileSync(path.join(profile, 'package.json'), '{}\n');
   return home;
@@ -70,7 +70,7 @@ describe('DeepSeek Harness Windows carrier', () => {
       expect(detected.available).toBe(true);
       expect(detected.version).toBe('0.1.0-rc.6');
       expect(getDetectedRuntimeVersions('deepseek-harness')).toMatchObject({
-        runtimeCompanionName: '@open-design/dsh-runtime',
+        runtimeCompanionName: '@mish/dsh-runtime',
         runtimeCompanionVersion: 'fixture-1',
       });
     } finally {
@@ -195,7 +195,7 @@ describe('DeepSeek Harness Windows carrier', () => {
         const env = { ...process.env, OD_DSH_FAKE_SESSION_ROOT: dir };
         const invocation = createCommandInvocation({
           command: carrier,
-          args: ['--profile', 'open-design', '--stdio'],
+          args: ['--profile', 'mish', '--stdio'],
           env,
         });
         child = spawn(invocation.command, invocation.args, {

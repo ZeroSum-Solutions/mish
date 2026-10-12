@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseResourceSearchResponse, type ResourceResult } from '@open-design/contracts';
+import { parseResourceSearchResponse, type ResourceResult } from '@mish/contracts';
 import { localInventorySources, searchEveryPage } from './resources-inventory-fixture.js';
 
 describe('AC-R04.1 preview capability and adoption permission', () => {

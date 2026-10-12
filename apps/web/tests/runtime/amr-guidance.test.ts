@@ -29,14 +29,14 @@ describe('amrRechargeUrlForProfile', () => {
   // entry this module builds therefore targets `/dashboard`, not `/wallet`.
   it('targets the console dashboard on every AMR profile', () => {
     expect(DEFAULT_AMR_RECHARGE_URL).toBe(
-      'https://open-design.ai/amr/dashboard?source=open_design',
+      'https://mish.invalid/amr/dashboard?source=mish',
     );
     expect(amrRechargeUrlForProfile('prod')).toBe(DEFAULT_AMR_RECHARGE_URL);
     expect(amrRechargeUrlForProfile('test')).toBe(
-      'https://open-design.powerformer.net/cloud/dashboard?source=open_design',
+      'https://mish.powerformer.net/cloud/dashboard?source=mish',
     );
     expect(amrRechargeUrlForProfile('local')).toBe(
-      'http://localhost:5173/dashboard?source=open_design',
+      'http://localhost:5173/dashboard?source=mish',
     );
     expect(amrRechargeUrlForProfile(' unknown ')).toBe(DEFAULT_AMR_RECHARGE_URL);
     expect(amrRechargeUrlForProfile(null)).toBe(DEFAULT_AMR_RECHARGE_URL);
@@ -56,14 +56,14 @@ describe('amrRechargeUrlForProfile', () => {
   it('uses the runtime console origin the daemon reported for a non-prod profile', () => {
     setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
     expect(amrRechargeUrlForProfile('feature-test')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish`,
     );
   });
 
   it('tolerates a trailing slash and blank runtime origins', () => {
     setRuntimeAmrConsoleOrigin(`${RUNTIME_CONSOLE_ORIGIN}/`);
     expect(amrRechargeUrlForProfile('feature-test')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish`,
     );
     setRuntimeAmrConsoleOrigin('   ');
     expect(amrRechargeUrlForProfile('feature-test')).toBe(DEFAULT_AMR_RECHARGE_URL);
@@ -105,10 +105,10 @@ describe('workspace-scoped AMR URLs', () => {
   it('pins both console links to the workspace', () => {
     setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
     expect(amrConsoleUrlForWorkspace('feature-test', ' workspace-a ')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design&workspaceId=workspace-a`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish&workspaceId=workspace-a`,
     );
     expect(amrPlansUrlForWorkspace('feature-test', ' workspace-a ')).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design&workspaceId=workspace-a&billing=plan`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish&workspaceId=workspace-a&billing=plan`,
     );
   });
 

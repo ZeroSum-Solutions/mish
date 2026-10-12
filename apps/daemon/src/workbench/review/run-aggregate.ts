@@ -1,4 +1,4 @@
-import { isIndependentReviewerCompletion, WORKBENCH_MIN_INDEPENDENT_REVIEWERS, type MechanicalCheckResult, type ReviewCheckVerdict, type ReviewerRecord, type ReviewOutcome, type ReviewRunReason } from '@open-design/contracts';
+import { isIndependentReviewerCompletion, WORKBENCH_MIN_INDEPENDENT_REVIEWERS, type MechanicalCheckResult, type ReviewCheckVerdict, type ReviewerRecord, type ReviewOutcome, type ReviewRunReason } from '@mish/contracts';
 import { verdictBlockers } from './check-verdicts.js';
 
 /** Said plainly on every run (HTTP, UI and od) that has an open required judgment or manual check. */

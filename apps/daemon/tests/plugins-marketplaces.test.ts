@@ -33,7 +33,7 @@ const VALID_MANIFEST = JSON.stringify({
   version: '1.0.0',
   metadata: { description: 'fixture', version: '1.0.0' },
   plugins: [
-    { name: 'sample-plugin', source: 'github:open-design/sample-plugin', version: '0.1.0' },
+    { name: 'sample-plugin', source: 'github:mish/sample-plugin', version: '0.1.0' },
   ],
 });
 
@@ -141,7 +141,7 @@ describe('marketplaces', () => {
   it('normalizes public marketplace urls to the canonical raw registry', async () => {
     const seenUrls: string[] = [];
     const result = await addMarketplace(db, {
-      url: 'https://open-design.ai/marketplace/community/open-design-marketplace.json',
+      url: 'https://mish.invalid/marketplace/community/mish-marketplace.json',
       fetcher: async (url) => {
         seenUrls.push(url);
         return {
@@ -160,13 +160,13 @@ describe('marketplaces', () => {
 
   it('normalizes legacy branch raw urls to the canonical raw registry', () => {
     expect(resolveMarketplaceFetchUrl(
-      'https://raw.githubusercontent.com/ZeroSum-Solutions/Mishh-Mashh-2/garnet-hemisphere/plugins/registry/community/open-design-marketplace.json',
+      'https://raw.githubusercontent.com/ZeroSum-Solutions/Mishh-Mashh-2/garnet-hemisphere/plugins/registry/community/mish-marketplace.json',
     )).toBe(marketplaceManifestUrlForRegistry('community'));
   });
 
-  it('requires a raw open-design-marketplace.json document, not a GitHub tree page', async () => {
+  it('requires a raw mish-marketplace.json document, not a GitHub tree page', async () => {
     const result = await addMarketplace(db, {
-      url: 'https://github.com/nexu-io/open-design/tree/garnet-hemisphere/plugins/registry/community',
+      url: 'https://github.com/ZeroSum-Solutions/mish/tree/garnet-hemisphere/plugins/registry/community',
       fetcher: fixtureFetcher('<!doctype html><html><body>GitHub tree page</body></html>'),
     });
 
@@ -186,7 +186,7 @@ describe('marketplaces', () => {
     const updatedManifest = JSON.parse(VALID_MANIFEST);
     updatedManifest.plugins.push({
       name: 'new-plugin',
-      source: 'github:open-design/new-plugin',
+      source: 'github:mish/new-plugin',
       version: '0.2.0',
     });
     updatedManifest.version = '1.0.1';
@@ -204,7 +204,7 @@ describe('marketplaces', () => {
   it('refresh normalizes legacy public urls before fetching', async () => {
     const seeded = ensureMarketplaceManifest(db, {
       id: 'community',
-      url: 'https://open-design.ai/marketplace/community/open-design-marketplace.json',
+      url: 'https://mish.invalid/marketplace/community/mish-marketplace.json',
       trust: 'restricted',
       manifestText: VALID_MANIFEST,
     });
@@ -248,7 +248,7 @@ describe('marketplaces', () => {
   it('upserts a fixed built-in marketplace manifest', () => {
     const result = ensureMarketplaceManifest(db, {
       id: 'official',
-      url: 'https://open-design.ai/marketplace/open-design-marketplace.json',
+      url: 'https://mish.invalid/marketplace/mish-marketplace.json',
       trust: 'official',
       manifestText: VALID_MANIFEST,
       now: 123,
@@ -265,7 +265,7 @@ describe('marketplaces', () => {
     });
     const updated = ensureMarketplaceManifest(db, {
       id: 'official',
-      url: 'https://open-design.ai/marketplace/open-design-marketplace.json',
+      url: 'https://mish.invalid/marketplace/mish-marketplace.json',
       trust: 'official',
       manifestText: updatedManifest,
       now: 456,
@@ -279,13 +279,13 @@ describe('marketplaces', () => {
 
   it('seeds the empty checked-in community registry as restricted', async () => {
     const communityManifest = await readFile(
-      new URL('../../../plugins/registry/community/open-design-marketplace.json', import.meta.url),
+      new URL('../../../plugins/registry/community/mish-marketplace.json', import.meta.url),
       'utf8',
     );
 
     const seeded = ensureMarketplaceManifest(db, {
       id: 'community',
-      url: 'https://open-design.ai/marketplace/community/open-design-marketplace.json',
+      url: 'https://mish.invalid/marketplace/community/mish-marketplace.json',
       trust: 'restricted',
       manifestText: communityManifest,
       now: 123,
@@ -298,7 +298,7 @@ describe('marketplaces', () => {
 
   it('keeps the checked-in official registry populated from bundled plugins', async () => {
     const officialManifestText = await readFile(
-      new URL('../../../plugins/registry/official/open-design-marketplace.json', import.meta.url),
+      new URL('../../../plugins/registry/official/mish-marketplace.json', import.meta.url),
       'utf8',
     );
     const officialManifest = JSON.parse(officialManifestText) as {
@@ -312,45 +312,45 @@ describe('marketplaces', () => {
     expect(officialManifest.metadata?.bundledPreinstallCount).toBe(
       officialManifest.plugins?.length,
     );
-    expect(officialManifest.plugins?.some((plugin) => plugin.name === 'open-design/code-import')).toBe(true);
+    expect(officialManifest.plugins?.some((plugin) => plugin.name === 'mish/code-import')).toBe(true);
     expect(officialManifest.plugins?.every((plugin) =>
       /^github:ZeroSum-Solutions\/Mishh-Mashh-2(?:@[^/]+)?\/plugins\/_official\//.test(plugin.source ?? ''),
     )).toBe(true);
 
     const seeded = ensureMarketplaceManifest(db, {
       id: 'official',
-      url: 'https://open-design.ai/marketplace/open-design-marketplace.json',
+      url: 'https://mish.invalid/marketplace/mish-marketplace.json',
       trust: 'official',
       manifestText: officialManifestText,
       now: 123,
     });
     if (!seeded.ok) throw new Error('official seed failed');
 
-    const resolved = resolvePluginInMarketplaces(db, 'open-design/code-import');
+    const resolved = resolvePluginInMarketplaces(db, 'mish/code-import');
     expect(resolved?.marketplaceId).toBe('official');
     expect(resolved?.marketplaceTrust).toBe('official');
   });
 
   it('keeps example-meeting-notes catalog version aligned with the bundled manifest', async () => {
     const officialManifest = JSON.parse(await readFile(
-      new URL('../../../plugins/registry/official/open-design-marketplace.json', import.meta.url),
+      new URL('../../../plugins/registry/official/mish-marketplace.json', import.meta.url),
       'utf8',
     )) as {
       plugins?: Array<{ name?: string; version?: string }>;
     };
     const sourceManifest = JSON.parse(await readFile(
-      new URL('../../../plugins/_official/examples/meeting-notes/open-design.json', import.meta.url),
+      new URL('../../../plugins/_official/examples/meeting-notes/mish.json', import.meta.url),
       'utf8',
     )) as { version?: string };
     const catalogEntry = officialManifest.plugins?.find(
-      (plugin) => plugin.name === 'open-design/example-meeting-notes',
+      (plugin) => plugin.name === 'mish/example-meeting-notes',
     );
     expect(catalogEntry?.version).toBe(sourceManifest.version);
   });
 
   it('ships no community examples by default', async () => {
     const communityManifest = JSON.parse(await readFile(
-      new URL('../../../plugins/registry/community/open-design-marketplace.json', import.meta.url),
+      new URL('../../../plugins/registry/community/mish-marketplace.json', import.meta.url),
       'utf8',
     )) as {
       plugins?: Array<{ name?: string; source?: string }>;
@@ -367,7 +367,7 @@ describe('resolvePluginInMarketplaces', () => {
     });
     const resolved = resolvePluginInMarketplaces(db, 'sample-plugin');
     expect(resolved).not.toBeNull();
-    expect(resolved!.source).toBe('github:open-design/sample-plugin');
+    expect(resolved!.source).toBe('github:mish/sample-plugin');
     expect(resolved!.pluginVersion).toBe('0.1.0');
     expect(resolved!.marketplaceVersion).toBe('1.0.0');
     expect(resolved!.marketplaceTrust).toBe('restricted');

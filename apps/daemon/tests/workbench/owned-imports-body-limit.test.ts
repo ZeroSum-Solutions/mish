@@ -8,7 +8,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { OWNED_IMPORT_LIMITS } from '@open-design/contracts';
+import { OWNED_IMPORT_LIMITS } from '@mish/contracts';
 
 let daemon: http.Server | undefined;
 let daemonShutdown: (() => Promise<void> | void) | undefined;

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import type { BriefTransformerLane } from '@open-design/contracts';
+import type { BriefTransformerLane } from '@mish/contracts';
 import { createSelectableBriefGenerator } from '../../src/workbench/brief/generator-select.js';
 import { BRIEF_TERRA_MODEL, createOpenRouterBriefGenerator } from '../../src/workbench/brief/generator-provider.js';
 import type { BriefGenerator } from '../../src/workbench/brief/generator.js';

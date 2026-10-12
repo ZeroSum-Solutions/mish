@@ -20,14 +20,14 @@ import {
   type KeyboardEvent as ReactKeyboardEvent,
   type SetStateAction,
 } from 'react';
-import type { AmrWalletSnapshot } from '@open-design/contracts';
-import { Chip, VisuallyHidden } from '@open-design/components';
+import type { AmrWalletSnapshot } from '@mish/contracts';
+import { Chip, VisuallyHidden } from '@mish/components';
 import { useT } from '../i18n';
 import {
   agentIdToTracking,
   byokProtocolToTracking,
   modelIdForTracking,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import {
   amrHandoffDeviceId,
@@ -81,7 +81,7 @@ import {
   isAmrSessionAuthenticated,
   notifyAmrLoginStatusChanged,
 } from './amrLoginPolling';
-import { orderAgentsWithOpenDesignFirst } from './agentOrdering';
+import { orderAgentsWithMishFirst } from './agentOrdering';
 import { anchorSelectionInView } from './pickerSelectionAnchor';
 import {
   agentModelIsSelectable,
@@ -180,7 +180,7 @@ const API_PROTOCOL_TABS: Array<{ id: ApiProtocol; title: string }> = [
   { id: 'aihubmix', title: 'AIHubMix' },
 ];
 
-const AMR_REMINDER_SEEN_KEY = 'open-design:inline-amr-cli-reminder-seen:v2';
+const AMR_REMINDER_SEEN_KEY = 'mish:inline-amr-cli-reminder-seen:v2';
 let amrReminderSeenFallback = false;
 
 function readAmrReminderSeen(): boolean {
@@ -770,7 +770,7 @@ export function InlineModelSwitcher({
 
   const installedAgents = useMemo(
     () =>
-      orderAgentsWithOpenDesignFirst(
+      orderAgentsWithMishFirst(
         agents.filter((a) => a.available && isVisibleLocalCliAgent(a)),
       ),
     [agents],
@@ -997,7 +997,7 @@ export function InlineModelSwitcher({
     window.open(
       attributedAmrUrl(
         amrPlansUrlForProfile(
-          amrStatus?.profile ?? config.agentCliEnv?.amr?.OPEN_DESIGN_AMR_PROFILE,
+          amrStatus?.profile ?? config.agentCliEnv?.amr?.MISH_AMR_PROFILE,
         ),
         attribution,
         deviceId,
@@ -1009,7 +1009,7 @@ export function InlineModelSwitcher({
     amrStatus?.profile,
     analytics.track,
     campaignNeedsUpgrade,
-    config.agentCliEnv?.amr?.OPEN_DESIGN_AMR_PROFILE,
+    config.agentCliEnv?.amr?.MISH_AMR_PROFILE,
     config.installationId,
     config.telemetry?.metrics,
   ]);
@@ -1484,7 +1484,7 @@ export function InlineModelSwitcher({
                 attributedAmrUrl(
                   amrPlansUrlForProfile(
                     amrStatus?.profile ??
-                      config.agentCliEnv?.amr?.OPEN_DESIGN_AMR_PROFILE,
+                      config.agentCliEnv?.amr?.MISH_AMR_PROFILE,
                   ),
                   attribution,
                   deviceId,

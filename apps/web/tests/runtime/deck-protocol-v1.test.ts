@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   DECK_PROTOCOL_V1_INLINE_RUNTIME,
   DECK_PROTOCOL_VERSION,
-} from '@open-design/contracts/runtime/deck-protocol';
+} from '@mish/contracts/runtime/deck-protocol';
 
 function setupCanonicalProtocolDeck() {
   const dom = new JSDOM(`<!doctype html><html data-od-deck-protocol="1"><body>

@@ -36,7 +36,7 @@
 ```bash
 # ① 我们这一侧(每一格都重新走一遍真实事件流)
 OD_WRITE_MIRROR="$PWD/docs/design/chat-mirror/mirror-exec.html" \
-  pnpm --filter @open-design/web exec vitest run \
+  pnpm --filter @mish/web exec vitest run \
   -c vitest.config.ts tests/components/chat/mirror-gallery.test.tsx
 
 # ①.5 上字体 —— **别跳这一步**

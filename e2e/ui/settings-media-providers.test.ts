@@ -4,7 +4,7 @@ import { routeAgents } from '@/playwright/mock-factory';
 import type { Page, Route } from '@playwright/test';
 import { openSettingsDialog } from '../lib/playwright/amr.js';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 
 // Mirrors apps/daemon/src/media/config.ts writeConfig's accepted provider IDs.
 const MEDIA_PROVIDER_IDS = [

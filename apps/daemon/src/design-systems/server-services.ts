@@ -1,5 +1,5 @@
 import { DesignSystemGenerationRefusal } from './generation-reader.js';
-import { designSystemRunNotice } from '@open-design/contracts';
+import { designSystemRunNotice } from '@mish/contracts';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,13 +33,13 @@ type DesignSystemSummary = {
   projectId?: string;
   teamSynced?: boolean;
   workspaceId?: string;
-  approval?: import('@open-design/contracts').DesignSystemApproval;
+  approval?: import('@mish/contracts').DesignSystemApproval;
 } & JsonRecord;
 
 function selectabilityInput(summary: DesignSystemSummary) {
   return {
     id: summary.id,
-    ...(summary.approval ? { approval: summary.approval as import('@open-design/contracts').DesignSystemApproval } : {}),
+    ...(summary.approval ? { approval: summary.approval as import('@mish/contracts').DesignSystemApproval } : {}),
     title: typeof summary.title === 'string' ? summary.title : summary.id,
     ...(summary.status === 'draft' || summary.status === 'published'
       ? { status: summary.status as 'draft' | 'published' }

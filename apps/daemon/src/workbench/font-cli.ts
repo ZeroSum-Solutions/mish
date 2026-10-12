@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { parseFontCheckRequest, parseFontCheckResponse, FONT_STYLES } from '@open-design/contracts';
+import { parseFontCheckRequest, parseFontCheckResponse, FONT_STYLES } from '@mish/contracts';
 import { fetchWithScopedToolToken, resolveDaemonUrl } from '../daemon-url.js';
 
 export interface FontCliOptions {

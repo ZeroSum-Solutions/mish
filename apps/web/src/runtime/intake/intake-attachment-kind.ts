@@ -1,4 +1,4 @@
-import type { IntakeFileOutcome } from '@open-design/contracts';
+import type { IntakeFileOutcome } from '@mish/contracts';
 
 /** Staged transport follows the detected byte receipt, never a filename suffix. */
 export function intakeAttachmentKind(clientFileId: string, outcomes: readonly IntakeFileOutcome[]): 'image' | 'file' {

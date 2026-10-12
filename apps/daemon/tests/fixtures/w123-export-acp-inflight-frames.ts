@@ -179,8 +179,8 @@ function main(): void {
       sessions,
       exporter: 'apps/daemon/tests/fixtures/w123-export-acp-inflight-frames.ts',
       mapping: [
-        'nexu/vela apps/cli/internal/agent/opencode_client.go:971 mapOpenCodeToolPart',
-        'nexu/vela apps/cli/internal/agent/acp_runtime.go:965 buildACPToolUpdate',
+        'mish/vela apps/cli/internal/agent/opencode_client.go:971 mapOpenCodeToolPart',
+        'mish/vela apps/cli/internal/agent/acp_runtime.go:965 buildACPToolUpdate',
       ],
       note: 'offsetMs is real wall clock from the opencode event row (`time`), not synthesized.',
       trimmed:

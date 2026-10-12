@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { ProjectMetadata } from '@open-design/contracts';
+import type { ProjectMetadata } from '@mish/contracts';
 
 import { resolveFrozenSkillBundleBodies } from '../../../src/strategies/od-next/frozen-skill-package.js';
 import { captureOdNextSessionSkillPackage } from '../../../src/strategies/od-next/session-skill-package.js';

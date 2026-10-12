@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { shapeAtlas } from '@open-design/agency-fast-lane/data';
+import { shapeAtlas } from '@mish/agency-fast-lane/data';
 import { prototypeSpineChips } from '../src/components/home-hero/spine-chips';
 import { subChipsForChip } from '../src/components/home-hero/sub-chips';
 import { en } from '../src/i18n/locales/en';

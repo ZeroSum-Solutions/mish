@@ -2,7 +2,7 @@ import {
   releaseChannelFromNamespace,
   releaseChannelFromVersion,
   releaseInstallIdentity,
-} from "@open-design/release";
+} from "@mish/release";
 
 export { releaseAppVersionArgs } from "./packaged-release-version.js";
 
@@ -22,6 +22,6 @@ export function resolvePackagedWinInstallIdentity(options: {
   const namespaceToken = sanitizeNamespace(options.namespace);
   const channel = releaseChannelFromVersion(options.releaseVersion)
     ?? releaseChannelFromNamespace(options.namespace, "default");
-  const displayName = channel == null ? `Open Design ${namespaceToken}` : releaseInstallIdentity(channel).productName;
+  const displayName = channel == null ? `Mish ${namespaceToken}` : releaseInstallIdentity(channel).productName;
   return { displayName, namespaceToken };
 }

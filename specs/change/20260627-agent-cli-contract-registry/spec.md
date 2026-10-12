@@ -45,8 +45,8 @@ safe public publishing, and offline consumption by the Mishh Mashh repository.
 
 ## Goals
 
-- Create a public contract registry, likely `open-design-agent-contracts`.
-- Publish a pnpm-consumable package, likely `@open-design/agent-cli-contracts`.
+- Create a public contract registry, likely `mish-agent-contracts`.
+- Publish a pnpm-consumable package, likely `@mish/agent-cli-contracts`.
 - Track real CLI observations by agent, CLI version, platform, protocol family,
   probe, and observed shape signature.
 - Support multiple active shapes for the same CLI version, including
@@ -72,7 +72,7 @@ safe public publishing, and offline consumption by the Mishh Mashh repository.
 ## Repository Shape
 
 ```text
-open-design-agent-contracts/
+mish-agent-contracts/
   registry/
     agents.json
     support-matrix.json
@@ -109,7 +109,7 @@ open-design-agent-contracts/
       sha256-<shape>.transcript.jsonl
 
   goldens/
-    open-design-parser/
+    mish-parser/
       json-event-stream/
         sha256-<shape>.events.json
 
@@ -200,7 +200,7 @@ do not have child-process transcripts or redaction artifacts.
 | `redaction.status` | yes | none | `passed`, `failed`, or `manual_review_required` |
 | `shape.signature` | yes | none | shape hash |
 | `shape.path` | yes | none | relative path under `shapes/` |
-| `parser_replay.open_design_commit` | no | `null` | commit used for parser replay |
+| `parser_replay.mish_commit` | no | `null` | commit used for parser replay |
 | `parser_replay.status` | no | `not_run` | `compatible`, `incompatible`, or `not_run` |
 
 Invalid examples that must fail validation:
@@ -297,7 +297,7 @@ Invalid examples that must fail validation:
 |---|---:|---|---|
 | `schema_version` | yes | none | integer, currently `1` |
 | `generated_at` | yes | none | UTC timestamp |
-| `open_design_min_commit` | no | `null` | lowest Mishh Mashh commit that consumed this matrix |
+| `mish_min_commit` | no | `null` | lowest Mishh Mashh commit that consumed this matrix |
 | `agents[]` | yes | none | one entry per agent with any public claim |
 
 Each `agents[]` entry requires:
@@ -430,9 +430,9 @@ Example observation:
     "path": "shapes/json-event-stream/sha256-....shape.json"
   },
   "parser_replay": {
-    "open_design_commit": "...",
+    "mish_commit": "...",
     "status": "compatible",
-    "golden": "goldens/open-design-parser/json-event-stream/sha256-....events.json"
+    "golden": "goldens/mish-parser/json-event-stream/sha256-....events.json"
   }
 }
 ```
@@ -583,7 +583,7 @@ async function captureContract(input: CaptureInput) {
   const shape = normalizeToShape(sanitized, input.protocol_family);
   const shapeId = shape.signature;
 
-  const daemonEvents = replayThroughOpenDesignParser({
+  const daemonEvents = replayThroughMishParser({
     agent: input.agent,
     protocolFamily: input.protocol_family,
     sanitized,
@@ -845,7 +845,7 @@ Mishh Mashh should consume the contract package in three ways.
 Add a daemon parser test that replays all supported parser-level shapes:
 
 ```ts
-import contracts from "@open-design/agent-cli-contracts";
+import contracts from "@mish/agent-cli-contracts";
 
 test("supported agent CLI contracts replay through Mishh Mashh parsers", () => {
   for (const contract of contracts.supportedShapes()) {
@@ -881,7 +881,7 @@ contract transcript and pass it through the same run lifecycle that production
 uses:
 
 ```ts
-import contracts from "@open-design/agent-cli-contracts";
+import contracts from "@mish/agent-cli-contracts";
 
 test("supported agent CLI contracts replay through daemon run semantics", async () => {
   for (const contract of contracts.daemonRunShapes()) {
@@ -1065,7 +1065,7 @@ observed shapes:
 {
   "schema_version": 1,
   "generated_at": "2026-06-27T10:00:00Z",
-  "open_design_min_commit": "b784c8650",
+  "mish_min_commit": "b784c8650",
   "agents": [
     {
       "agent": "codex",

@@ -17,7 +17,7 @@
  *    http(s) URLs become clickable) to keep `javascript:` /
  *    `data:` payloads in a manifest from rendering as live links.
  */
-import { parsePackPluginSource, type InstalledPluginRecord } from '@open-design/contracts';
+import { parsePackPluginSource, type InstalledPluginRecord } from '@mish/contracts';
 
 export interface PluginSourceLinks {
   /** Browseable URL for the install source, or null when the source

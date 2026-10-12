@@ -263,7 +263,7 @@ describe('ACP handshake rejection — server wiring', () => {
 
     // The daemon opened exactly one session for this run. (Model detection
     // probes the same CLI over ACP, so count only sessions opened by
-    // `attachAcpSession`, which identifies itself as `open-design`.)
+    // `attachAcpSession`, which identifies itself as `mish`.)
     const runSessions = await readRunSessionRequests(logPath);
     expect(runSessions).toEqual(['session/new']);
 
@@ -508,8 +508,8 @@ function isolateAgentDetection(dir: string, homeDir: string): void {
 }
 
 /**
- * Handshake requests issued by `attachAcpSession` (client id `open-design`),
- * excluding the `open-design-detect` probes `detectAcpModels` makes against the
+ * Handshake requests issued by `attachAcpSession` (client id `mish`),
+ * excluding the `mish-detect` probes `detectAcpModels` makes against the
  * same CLI.
  */
 async function readRunSessionRequests(logPath: string): Promise<string[]> {
@@ -524,7 +524,7 @@ async function readRunSessionRequests(logPath: string): Promise<string[]> {
     .split('\n')
     .filter(Boolean)
     .map((line) => JSON.parse(line) as { method: string; client?: string })
-    .filter((entry) => entry.client === 'open-design')
+    .filter((entry) => entry.client === 'mish')
     .map((entry) => entry.method);
 }
 
@@ -626,7 +626,7 @@ function snapshotEnv(): Record<string, string | undefined> {
     LANGFUSE_PUBLIC_KEY: process.env.LANGFUSE_PUBLIC_KEY,
     LANGFUSE_SECRET_KEY: process.env.LANGFUSE_SECRET_KEY,
     LANGFUSE_BASE_URL: process.env.LANGFUSE_BASE_URL,
-    OPEN_DESIGN_TELEMETRY_RELAY_URL: process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL,
+    MISH_TELEMETRY_RELAY_URL: process.env.MISH_TELEMETRY_RELAY_URL,
     POSTHOG_KEY: process.env.POSTHOG_KEY,
     POSTHOG_HOST: process.env.POSTHOG_HOST,
   };
@@ -645,7 +645,7 @@ function clearTelemetryEnv(): void {
   delete process.env.LANGFUSE_PUBLIC_KEY;
   delete process.env.LANGFUSE_SECRET_KEY;
   delete process.env.LANGFUSE_BASE_URL;
-  delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+  delete process.env.MISH_TELEMETRY_RELAY_URL;
 }
 
 async function putConfig(url: string, patch: Record<string, unknown>): Promise<void> {

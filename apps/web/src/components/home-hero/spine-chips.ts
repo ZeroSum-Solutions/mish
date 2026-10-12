@@ -4,7 +4,7 @@
 // The atlas says the functional spine is the category a website belongs to
 // (format and visual skin are separate axes), so the Prototype row is the nine
 // spines rather than the plugin catalog's keyword facets. The spines come from
-// `@open-design/agency-fast-lane/data`, the same generated module the router
+// `@mish/agency-fast-lane/data`, the same generated module the router
 // and the family registry read, so a tab can never name a spine the router
 // does not know.
 //
@@ -12,7 +12,7 @@
 // drafts, queued `mobile` / `wireframe` intents and the placeholder carousel
 // still resolve through them. They are simply not rendered under Prototype.
 
-import { shapeAtlas } from '@open-design/agency-fast-lane/data';
+import { shapeAtlas } from '@mish/agency-fast-lane/data';
 import type { IconName } from '../Icon';
 import type { HomeHeroSubChip, SubChipLabelKey } from './sub-chips';
 

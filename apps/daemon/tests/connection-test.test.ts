@@ -9,14 +9,14 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { Socks5ProxyAgent } from 'undici';
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
-import * as platform from '@open-design/platform';
+import * as platform from '@mish/platform';
 
 const { resolveSystemProxyEnvMock } = vi.hoisted(() => ({
   resolveSystemProxyEnvMock: vi.fn(() => ({})),
 }));
 
-vi.mock('@open-design/platform', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@open-design/platform')>()),
+vi.mock('@mish/platform', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@mish/platform')>()),
   resolveSystemProxyEnv: resolveSystemProxyEnvMock,
 }));
 
@@ -2509,7 +2509,7 @@ describe('POST /api/test/connection agent mode', () => {
           agentId: 'amr',
           agentCliEnv: {
             amr: {
-              OPEN_DESIGN_AMR_PROFILE: 'local',
+              MISH_AMR_PROFILE: 'local',
             },
           },
         });
@@ -2720,8 +2720,8 @@ describe('POST /api/test/connection agent mode', () => {
 
   it('resolves the AMR connection-test scope from the merged launch env', async () => {
     rememberLiveModels('amr', [{ id: 'local-env-model', label: 'local-env-model' }], 'local');
-    const previousProfile = process.env.OPEN_DESIGN_AMR_PROFILE;
-    process.env.OPEN_DESIGN_AMR_PROFILE = 'local';
+    const previousProfile = process.env.MISH_AMR_PROFILE;
+    process.env.MISH_AMR_PROFILE = 'local';
 
     try {
       await withFakeAgent(
@@ -2746,8 +2746,8 @@ describe('POST /api/test/connection agent mode', () => {
         },
       );
     } finally {
-      if (previousProfile === undefined) delete process.env.OPEN_DESIGN_AMR_PROFILE;
-      else process.env.OPEN_DESIGN_AMR_PROFILE = previousProfile;
+      if (previousProfile === undefined) delete process.env.MISH_AMR_PROFILE;
+      else process.env.MISH_AMR_PROFILE = previousProfile;
     }
   });
 

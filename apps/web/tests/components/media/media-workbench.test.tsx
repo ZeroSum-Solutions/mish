@@ -6,7 +6,7 @@
 // and video generation runs until 2026-10-29.
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { MediaGalleryEntry, MediaGalleryEntryDetail, MediaGalleryResponse, ProjectFile } from '@open-design/contracts';
+import type { MediaGalleryEntry, MediaGalleryEntryDetail, MediaGalleryResponse, ProjectFile } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { MediaWorkbench, MediaWorkbenchPanel } from '../../../src/components/media/MediaWorkbench';
 import { MediaEntryRow } from '../../../src/components/media/MediaEntryRow';

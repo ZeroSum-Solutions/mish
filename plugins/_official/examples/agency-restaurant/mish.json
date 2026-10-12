@@ -1,0 +1,41 @@
+{
+  "$schema": "https://mish.invalid/schemas/plugin.v1.json",
+  "specVersion": "1.0.0",
+  "name": "example-agency-restaurant",
+  "title": "restaurant page kind",
+  "version": "0.1.0",
+  "publishedAt": "2026-09-24T00:00:00Z",
+  "description": "A static restaurant or food-business page kind: hero with a reservation call to action, menu highlights with nullable prices, hours and location with a nullable address and phone, a reservations step, chef or story, a photography gallery placeholder, optional diner reviews and a footer. Fits a restaurant, cafe, bar or bakery. Composed from eleven vendored HyperUI blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "tags": [
+    "example",
+    "first-party",
+    "page-kind",
+    "restaurant",
+    "food",
+    "booking"
+  ],
+  "od": {
+    "kind": "scenario",
+    "mode": "prototype",
+    "taskKind": "new-generation",
+    "useCase": {
+      "query": {
+        "en": "Use the restaurant family for a static restaurant, cafe, bar or bakery mock: a hero with a reservation call to action, menu highlights, hours and location, a reservations step, chef or story, a photography gallery placeholder and optional diner reviews. Ask for the business, its cuisine and where it is, generate a schemaVersion 2 restaurant typed recipe through the bundled trusted compiler, and render it. This is a page kind, not a decoded client site: every business fact in the reference fixture is a placeholder."
+      }
+    },
+    "context": {
+      "skills": [
+        { "path": "./SKILL.md" }
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        { "id": "generate", "atoms": ["file-write", "live-artifact"] }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ]
+  }
+}

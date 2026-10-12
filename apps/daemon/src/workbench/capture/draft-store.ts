@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { link, mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import { parseCaptureDraftRevision, WORKBENCH_CAPTURE_DRAFT_ID_PATTERN, type CaptureDraftRevision } from '@open-design/contracts';
+import { parseCaptureDraftRevision, WORKBENCH_CAPTURE_DRAFT_ID_PATTERN, type CaptureDraftRevision } from '@mish/contracts';
 
 const actorKey = (principal: string) => createHash('sha256').update(principal).digest('hex');
 

@@ -13,7 +13,7 @@ const azureDir = join(repoRoot, 'deploy/azure');
 const appServicePath = join(azureDir, 'app-service.bicep');
 const aciPath = join(azureDir, 'aci.bicep');
 
-// Must match deploy/docker-compose.yml and charts/open-design.
+// Must match deploy/docker-compose.yml and charts/mish.
 const CONTAINER_PORT = '7456';
 const DATA_DIR = '/app/.od';
 const HEALTH_PATH = '/api/health';

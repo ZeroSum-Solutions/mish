@@ -14,7 +14,7 @@
  * 屏幕阅读器通过 `role="status"` 的隐藏文本拿到同一句话。
  */
 import type { ReactElement } from 'react';
-import { VisuallyHidden } from '@open-design/components';
+import { VisuallyHidden } from '@mish/components';
 import { Icon } from '../Icon';
 import { useDiagnosticsExport } from '../ExportDiagnosticsButton';
 import { useT } from '../../i18n';

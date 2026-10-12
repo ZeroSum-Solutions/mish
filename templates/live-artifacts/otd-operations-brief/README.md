@@ -70,4 +70,4 @@ The `live-artifact` skill (see `design-templates/live-artifact/SKILL.md`) is the
 
 ## Source attribution
 
-Original visual reference: a 1200 × 960 OTD operations dashboard image extracted into `DESIGN.md` via the open-design 9-section spec. Sample account names, month, currency, and percentages are fictional and intentionally illustrative; do not treat them as ground truth.
+Original visual reference: a 1200 × 960 OTD operations dashboard image extracted into `DESIGN.md` via the mish 9-section spec. Sample account names, month, currency, and percentages are fictional and intentionally illustrative; do not treat them as ground truth.

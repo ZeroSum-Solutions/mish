@@ -7,7 +7,7 @@ import {
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { WORKBENCH_ADOPTION_HELPER_LAYOUT, WORKBENCH_ADOPTION_PREDECESSOR_GATES } from '@open-design/contracts';
+import { WORKBENCH_ADOPTION_HELPER_LAYOUT, WORKBENCH_ADOPTION_PREDECESSOR_GATES } from '@mish/contracts';
 import { canonicalJson } from '../../../src/workbench/placement/adoption-plan.js';
 import { migratePlacementJournal, PlacementJournal } from '../../../src/workbench/placement/journal.js';
 import {

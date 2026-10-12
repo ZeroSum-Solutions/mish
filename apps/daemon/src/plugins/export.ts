@@ -7,20 +7,20 @@
 // can re-publish to anthropics/skills, awesome-agent-skills, clawhub,
 // or skills.sh. Three targets:
 //
-//   - `od`            → SKILL.md + open-design.json (canonical OD shape).
+//   - `od`            → SKILL.md + mish.json (canonical OD shape).
 //   - `claude-plugin` → SKILL.md + .claude-plugin/plugin.json (Claude
 //                       Code listing format).
 //   - `agent-skill`   → SKILL.md only (every catalog accepts this).
 //
 // The export is best-effort: it pulls SKILL.md straight off the
-// installed plugin's fs_path, and reconstructs open-design.json from
+// installed plugin's fs_path, and reconstructs mish.json from
 // the cached `manifest_json` so a publishable snapshot is reproducible
 // even after an `od plugin update` rotates the live source.
 
 import path from 'node:path';
 import { promises as fsp } from 'node:fs';
 import type Database from 'better-sqlite3';
-import type { AppliedPluginSnapshot } from '@open-design/contracts';
+import type { AppliedPluginSnapshot } from '@mish/contracts';
 import { getInstalledPlugin } from './registry.js';
 import { getSnapshot } from './snapshots.js';
 
@@ -87,7 +87,7 @@ export async function exportPlugin(input: ExportInput): Promise<ExportResult> {
 
   if (input.target === 'od') {
     const manifest = buildPortableManifest(snapshot);
-    const manifestPath = path.join(folder, 'open-design.json');
+    const manifestPath = path.join(folder, 'mish.json');
     await fsp.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n', 'utf8');
     written.push(manifestPath);
   }
@@ -176,7 +176,7 @@ async function readSkillBody(
 
 function buildPortableManifest(snapshot: AppliedPluginSnapshot): Record<string, unknown> {
   return {
-    $schema:     'https://open-design.ai/schemas/plugin.v1.json',
+    $schema:     'https://mish.invalid/schemas/plugin.v1.json',
     specVersion: snapshot.pluginSpecVersion ?? '1.0.0',
     name:        snapshot.pluginId,
     title:       snapshot.pluginTitle ?? snapshot.pluginId,

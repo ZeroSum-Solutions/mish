@@ -25,7 +25,7 @@
 
 import { act, cleanup, render, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { ChatMessage } from '@open-design/contracts';
+import type { ChatMessage } from '@mish/contracts';
 import { ProjectView } from '../../src/components/ProjectView';
 import { foldStrategyTaskTurns } from '../../src/components/ChatPane';
 

@@ -454,10 +454,10 @@ describe('media-config OpenAI auth-file fallback', () => {
 
     // Round 3 review feedback on PR #530.
     // resolveOverrideDir shares expandHomePrefix with resolveDataDir, so
-    // OD_DATA_DIR=$HOME/.open-design (and ${HOME}/.open-design) routes
+    // OD_DATA_DIR=$HOME/.mish (and ${HOME}/.mish) routes
     // both daemon runtime data AND media credentials to the same expanded
     // path. Without this, media-config.json was written under
-    // <projectRoot>/$HOME/.open-design and stored provider keys appeared
+    // <projectRoot>/$HOME/.mish and stored provider keys appeared
     // missing on the next read.
     it('expands $HOME/... in OD_DATA_DIR fallback so media-config co-locates with daemon data', async () => {
       const subdir = '.od-test-home';

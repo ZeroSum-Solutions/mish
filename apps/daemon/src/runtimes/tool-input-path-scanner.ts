@@ -8,7 +8,7 @@
  * on `"content"`:
  *
  *   '{"file_path": "/private/tmp/claude-501'
- *   '/-Users-elian-Documents-open-design/bff58f5e-18'
+ *   '/-Users-elian-Documents-mish/bff58f5e-18'
  *   'bb-4b58-96e7-8180846e980a/'
  *   'scratchpad/w107/cwd/alpha.html'
  *   '", "content": "<!doctype html><html><body'

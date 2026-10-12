@@ -46,7 +46,7 @@ function makeConfig(root: string, namespace: string): ToolPackConfig {
 describe("resolveMacInstallIdentity", () => {
   it("keeps stable builds on the canonical mac identity", () => {
     expect(resolveMacInstallIdentity(makeConfig("/work", "release-stable"))).toMatchObject({
-      appId: "io.open-design.desktop",
+      appId: "io.mish.desktop",
       installerTitle: "Mishh Mashh",
       productName: "Mishh Mashh",
       publicAppBundleName: "Mishh Mashh.app",
@@ -58,7 +58,7 @@ describe("resolveMacInstallIdentity", () => {
     const config = makeConfig("/work", "release-beta");
 
     expect(resolveMacInstallIdentity(config)).toEqual({
-      appId: "io.open-design.desktop.beta",
+      appId: "io.mish.desktop.beta",
       executableName: "Mishh Mashh Beta",
       installerTitle: "Mishh Mashh Beta",
       productName: "Mishh Mashh Beta",
@@ -72,7 +72,7 @@ describe("resolveMacInstallIdentity", () => {
     const config = makeConfig("/work", "release-preview");
 
     expect(resolveMacInstallIdentity(config)).toEqual({
-      appId: "io.open-design.desktop.preview",
+      appId: "io.mish.desktop.preview",
       executableName: "Mishh Mashh Preview",
       installerTitle: "Mishh Mashh Preview",
       productName: "Mishh Mashh Preview",
@@ -90,7 +90,7 @@ describe("resolveMacInstallIdentity", () => {
     const prereleaseNamespaceConfig = makeConfig("/work", "release-prerelease");
 
     expect(resolveMacInstallIdentity(prereleaseVersionConfig)).toEqual({
-      appId: "io.open-design.desktop.prerelease",
+      appId: "io.mish.desktop.prerelease",
       executableName: "Mishh Mashh Prerelease",
       installerTitle: "Mishh Mashh Prerelease",
       productName: "Mishh Mashh Prerelease",

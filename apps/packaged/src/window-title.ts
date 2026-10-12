@@ -2,7 +2,7 @@ import {
   releaseChannelFromNamespace,
   releaseChannelFromVersion,
   releaseInstallIdentity,
-} from "@open-design/release";
+} from "@mish/release";
 
 const DEFAULT_WINDOW_TITLE = "Mishh Mashh";
 
@@ -12,5 +12,5 @@ export function resolvePackagedWindowTitle(config: { appVersion: string | null; 
     releaseChannelFromNamespace(config.namespace);
   return channel == null
     ? DEFAULT_WINDOW_TITLE
-    : releaseInstallIdentity(channel).productName.replace(/^Open Design/, DEFAULT_WINDOW_TITLE);
+    : releaseInstallIdentity(channel).productName.replace(/^Mish/, DEFAULT_WINDOW_TITLE);
 }

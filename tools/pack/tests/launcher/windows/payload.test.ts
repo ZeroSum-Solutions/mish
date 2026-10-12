@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
-import { LAUNCHER_SCHEMA_VERSION } from "@open-design/launcher-proto";
+import { LAUNCHER_SCHEMA_VERSION } from "@mish/launcher-proto";
 import { describe, expect, it } from "vitest";
 
 import type { ToolPackConfig } from "@/config/index.js";
@@ -70,7 +70,7 @@ function createWinPaths(root: string, namespace: string): WinPaths {
     assembledMainEntryPath: join(namespaceRoot, "assembled", "app", "main.cjs"),
     assembledPackageJsonPath: join(namespaceRoot, "assembled", "app", "package.json"),
     assembledPrebundledRoot: join(namespaceRoot, "assembled", "app", "prebundled"),
-    blockmapPath: join(namespaceRoot, "builder", "Open Design-release-beta-win-setup.exe.blockmap"),
+    blockmapPath: join(namespaceRoot, "builder", "Mish-release-beta-win-setup.exe.blockmap"),
     builtManifestPath: join(namespaceRoot, "built-app.json"),
     daemonCliPrebundleEntrypointPath: join(namespaceRoot, "prebundle-entrypoints", "daemon-cli.js"),
     daemonCliPrebundlePath: join(namespaceRoot, "assembled", "app", "prebundled", "daemon", "daemon-cli.mjs"),
@@ -78,37 +78,37 @@ function createWinPaths(root: string, namespace: string): WinPaths {
     daemonPrebundleRoot: join(namespaceRoot, "assembled", "app", "prebundled", "daemon"),
     daemonSidecarPrebundleEntrypointPath: join(namespaceRoot, "prebundle-entrypoints", "daemon-sidecar.js"),
     daemonSidecarPrebundlePath: join(namespaceRoot, "assembled", "app", "prebundled", "daemon", "daemon-sidecar.mjs"),
-    exePath: join(namespaceRoot, "builder", "Open Design-release-beta-win.exe"),
-    installDir: join(namespaceRoot, "runtime", "install", "Open Design Beta"),
-    installedExePath: join(namespaceRoot, "runtime", "install", "Open Design Beta", "Open Design.exe"),
+    exePath: join(namespaceRoot, "builder", "Mish-release-beta-win.exe"),
+    installDir: join(namespaceRoot, "runtime", "install", "Mish Beta"),
+    installedExePath: join(namespaceRoot, "runtime", "install", "Mish Beta", "Mish.exe"),
     installerBasePayloadPath: join(namespaceRoot, "installer", "payload-base.7z"),
     installerOverlayPayloadPath: join(namespaceRoot, "installer", "payload-overlay.7z"),
     installerScriptPath: join(namespaceRoot, "installer", "installer.nsi"),
-    launcherPayloadPath: join(namespaceRoot, "payload", "Open Design-release-beta-win-payload.7z"),
+    launcherPayloadPath: join(namespaceRoot, "payload", "Mish-release-beta-win-payload.7z"),
     publicDesktopShortcutPath: join(namespaceRoot, "desktop", "public.lnk"),
     latestYmlPath: join(namespaceRoot, "builder", "latest.yml"),
     installMarkerPath: join(namespaceRoot, "logs", "install.marker.json"),
     installTimingPath: join(namespaceRoot, "logs", "install.timing.json"),
     nsisLogPath: join(namespaceRoot, "logs", "nsis.log"),
     nsisIncludePath: join(namespaceRoot, "nsis", "installer.nsh"),
-    packagedConfigPath: join(namespaceRoot, "open-design-config.json"),
+    packagedConfigPath: join(namespaceRoot, "mish-config.json"),
     packagedMainPrebundleMetaPath: join(namespaceRoot, "prebundle-meta", "packaged-main.meta.json"),
     packagedMainPrebundlePath: join(namespaceRoot, "assembled", "app", "prebundled", "packaged-main.mjs"),
-    resourceRoot: join(namespaceRoot, "resources", "open-design"),
-    setupPath: join(namespaceRoot, "builder", "Open Design-release-beta-win-setup.exe"),
-    setupZipPath: join(namespaceRoot, "builder", "Open Design-release-beta-win-portable.zip"),
+    resourceRoot: join(namespaceRoot, "resources", "mish"),
+    setupPath: join(namespaceRoot, "builder", "Mish-release-beta-win-setup.exe"),
+    setupZipPath: join(namespaceRoot, "builder", "Mish-release-beta-win-portable.zip"),
     startMenuShortcutPath: join(namespaceRoot, "start-menu.lnk"),
     tarballsRoot: join(namespaceRoot, "tarballs"),
     userDesktopShortcutPath: join(namespaceRoot, "desktop", "user.lnk"),
     uninstallMarkerPath: join(namespaceRoot, "logs", "uninstall.marker.json"),
     uninstallTimingPath: join(namespaceRoot, "logs", "uninstall.timing.json"),
-    uninstallerPath: join(namespaceRoot, "runtime", "install", "Open Design Beta", "Uninstall.exe"),
+    uninstallerPath: join(namespaceRoot, "runtime", "install", "Mish Beta", "Uninstall.exe"),
     webStandaloneHookAuditPath: join(namespaceRoot, "web-standalone-after-pack-audit.json"),
     webStandaloneHookConfigPath: join(namespaceRoot, "web-standalone-after-pack-config.json"),
     webSidecarPrebundleMetaPath: join(namespaceRoot, "prebundle-meta", "web-sidecar.meta.json"),
     webSidecarPrebundlePath: join(namespaceRoot, "assembled", "app", "prebundled", "web-sidecar.mjs"),
     winIconPath: join(namespaceRoot, "resources", "win", "icon.ico"),
-    unpackedExePath: join(namespaceRoot, "builder", "win-unpacked", "Open Design.exe"),
+    unpackedExePath: join(namespaceRoot, "builder", "win-unpacked", "Mish.exe"),
     unpackedRoot: join(namespaceRoot, "builder", "win-unpacked"),
   };
 }
@@ -119,23 +119,23 @@ async function writeFakeWinUnpackedApp(root: string, namespace: string, version:
 }> {
   const paths = createWinPaths(root, namespace);
   await mkdir(join(paths.unpackedRoot, "resources"), { recursive: true });
-  await writeFile(join(paths.unpackedRoot, "Open Design.exe"), "fake executable\n", "utf8");
+  await writeFile(join(paths.unpackedRoot, "Mish.exe"), "fake executable\n", "utf8");
   await writeFile(
-    join(paths.unpackedRoot, "resources", "open-design-config.json"),
+    join(paths.unpackedRoot, "resources", "mish-config.json"),
     `${JSON.stringify({
       appVersion: version,
-      daemonSidecarEntryRelative: "open-design/prebundled/daemon/daemon-sidecar.mjs",
+      daemonSidecarEntryRelative: "mish/prebundled/daemon/daemon-sidecar.mjs",
       namespace,
-      nodeCommandRelative: "open-design/bin/node",
+      nodeCommandRelative: "mish/bin/node",
       webOutputMode: "standalone",
-      webSidecarEntryRelative: "open-design/prebundled/web/web-sidecar.mjs",
+      webSidecarEntryRelative: "mish/prebundled/web/web-sidecar.mjs",
     }, null, 2)}\n`,
     "utf8",
   );
   await mkdir(join(paths.unpackedRoot, "resources", "app"), { recursive: true });
   await writeFile(
     join(paths.unpackedRoot, "resources", "app", "package.json"),
-    `${JSON.stringify({ name: "open-design-packaged-app", version })}\n`,
+    `${JSON.stringify({ name: "mish-packaged-app", version })}\n`,
     "utf8",
   );
   await mkdir(join(paths.packagedConfigPath, ".."), { recursive: true });
@@ -143,11 +143,11 @@ async function writeFakeWinUnpackedApp(root: string, namespace: string, version:
     paths.packagedConfigPath,
     `${JSON.stringify({
       appVersion: version,
-      daemonSidecarEntryRelative: "open-design/prebundled/daemon/daemon-sidecar.mjs",
+      daemonSidecarEntryRelative: "mish/prebundled/daemon/daemon-sidecar.mjs",
       namespace,
-      nodeCommandRelative: "open-design/bin/node",
+      nodeCommandRelative: "mish/bin/node",
       webOutputMode: "standalone",
-      webSidecarEntryRelative: "open-design/prebundled/web/web-sidecar.mjs",
+      webSidecarEntryRelative: "mish/prebundled/web/web-sidecar.mjs",
     }, null, 2)}\n`,
     "utf8",
   );
@@ -156,7 +156,7 @@ async function writeFakeWinUnpackedApp(root: string, namespace: string, version:
       appBuilderOutputRoot: paths.appBuilderOutputRoot,
       cacheEntryPath: null,
       configPath: paths.packagedConfigPath,
-      executablePath: join(paths.unpackedRoot, "Open Design.exe"),
+      executablePath: join(paths.unpackedRoot, "Mish.exe"),
       source: "namespace",
       unpackedRoot: paths.unpackedRoot,
       version: 1,
@@ -176,7 +176,7 @@ describe("tools-pack Windows launcher payload archives", () => {
       channel: "beta",
       entry: {
         cwd: "payload",
-        executable: "payload/Open Design.exe",
+        executable: "payload/Mish.exe",
       },
       namespace: "release-beta-win",
       payloadRoot: "payload",
@@ -207,10 +207,10 @@ describe("tools-pack Windows launcher payload archives", () => {
       };
       expect(manifest.namespace).toBe(namespace);
       expect(manifest.platform).toBe("win32");
-      expect(manifest.entry.executable).toBe("payload/Open Design.exe");
+      expect(manifest.entry.executable).toBe("payload/Mish.exe");
       expect(manifest.version).toBe(version);
-      await expectPathExists(join(extractRoot, "payload", "Open Design.exe"));
-      await expectPathExists(join(extractRoot, "payload", "resources", "open-design-config.json"));
+      await expectPathExists(join(extractRoot, "payload", "Mish.exe"));
+      await expectPathExists(join(extractRoot, "payload", "resources", "mish-config.json"));
     } finally {
       await rm(root, { force: true, recursive: true });
     }
@@ -262,11 +262,11 @@ describe("tools-pack Windows launcher payload archives", () => {
           paths.packagedConfigPath,
           `${JSON.stringify({
             appVersion: version,
-            daemonSidecarEntryRelative: "open-design/prebundled/daemon/daemon-sidecar.mjs",
+            daemonSidecarEntryRelative: "mish/prebundled/daemon/daemon-sidecar.mjs",
             namespace,
-            nodeCommandRelative: "open-design/bin/node",
+            nodeCommandRelative: "mish/bin/node",
             webOutputMode: "standalone",
-            webSidecarEntryRelative: "open-design/prebundled/web/web-sidecar.mjs",
+            webSidecarEntryRelative: "mish/prebundled/web/web-sidecar.mjs",
           }, null, 2)}\n`,
           "utf8",
         );
@@ -287,7 +287,7 @@ describe("tools-pack Windows launcher payload archives", () => {
 
       const manifest = JSON.parse(await readFile(join(extractRoot, "manifest.json"), "utf8")) as { version: string };
       const config = JSON.parse(
-        await readFile(join(extractRoot, "payload", "resources", "open-design-config.json"), "utf8"),
+        await readFile(join(extractRoot, "payload", "resources", "mish-config.json"), "utf8"),
       ) as { appVersion: string };
       const packageJson = JSON.parse(
         await readFile(join(extractRoot, "payload", "resources", "app", "package.json"), "utf8"),
@@ -328,11 +328,11 @@ describe("tools-pack Windows launcher payload archives", () => {
 
       const manifest = JSON.parse(await readFile(join(extractRoot, "manifest.json"), "utf8")) as { version: string };
       const configJson = JSON.parse(
-        await readFile(join(extractRoot, "payload", "resources", "open-design-config.json"), "utf8"),
+        await readFile(join(extractRoot, "payload", "resources", "mish-config.json"), "utf8"),
       ) as { appVersion: string };
       expect(manifest.version).toBe(version);
       expect(configJson.appVersion).toBe(version);
-      await expectPathExists(join(extractRoot, "payload", "Open Design.exe"));
+      await expectPathExists(join(extractRoot, "payload", "Mish.exe"));
       await expectPathExists(join(extractRoot, "payload", "resources"));
     } finally {
       await rm(root, { force: true, recursive: true });

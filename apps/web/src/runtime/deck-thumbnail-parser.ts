@@ -23,7 +23,7 @@ import {
   DECK_EXPLICIT_SLIDE_SELECTOR,
   DECK_SLIDE_SELECTOR,
   DECK_STRUCTURED_SLIDE_SELECTOR,
-} from '@open-design/contracts/runtime/deck-stage-fallback';
+} from '@mish/contracts/runtime/deck-stage-fallback';
 import { collectLegacyDeckScreenSlides } from './deck-slide-structure';
 
 export type DeckThumbnailFallbackReason =

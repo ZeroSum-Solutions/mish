@@ -178,7 +178,7 @@ async function main(): Promise<void> {
   const current = existsSync(catalogPath) ? readFileSync(catalogPath, 'utf8') : '';
   if (check) {
     if (current !== text) {
-      console.error('build-catalog: catalog.json is stale. Run `pnpm --filter @open-design/genui-catalog catalog` and commit the result.');
+      console.error('build-catalog: catalog.json is stale. Run `pnpm --filter @mish/genui-catalog catalog` and commit the result.');
       process.exitCode = 1;
       return;
     }

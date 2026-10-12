@@ -17,11 +17,11 @@ import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { AgencyBuildResponse, AgencyBuildSnapshot, ApiErrorResponse } from '@open-design/contracts';
-import type { BuildDeps, BuildInput, BuildResult, PreparedBuild } from '@open-design/agency-fast-lane/build';
-import { ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError } from '@open-design/agency-fast-lane/deepseek';
-import { ProviderFailoverError } from '@open-design/agency-fast-lane/failover';
-import { withBuildProvenance } from '@open-design/agency-fast-lane/build';
+import type { AgencyBuildResponse, AgencyBuildSnapshot, ApiErrorResponse } from '@mish/contracts';
+import type { BuildDeps, BuildInput, BuildResult, PreparedBuild } from '@mish/agency-fast-lane/build';
+import { ProviderHttpError, ProviderKeyError, ProviderKeyUnreadableError } from '@mish/agency-fast-lane/deepseek';
+import { ProviderFailoverError } from '@mish/agency-fast-lane/failover';
+import { withBuildProvenance } from '@mish/agency-fast-lane/build';
 
 import { AgencyJevConfigUnreadableError, AgencyModelKeyUnavailableError, createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

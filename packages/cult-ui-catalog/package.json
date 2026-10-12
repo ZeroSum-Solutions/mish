@@ -1,9 +1,9 @@
 {
-  "name": "@open-design/cult-ui-catalog",
+  "name": "@mish/cult-ui-catalog",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Canonical Cult UI inventory metadata. Upstream source remains in private source kits. The 21st.dev references and their independently authored alternatives live in @open-design/21st-catalog.",
+  "description": "Canonical Cult UI inventory metadata. Upstream source remains in private source kits. The 21st.dev references and their independently authored alternatives live in @mish/21st-catalog.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
@@ -42,7 +42,7 @@
     "public-names": "node --experimental-strip-types scripts/public-names.ts"
   },
   "devDependencies": {
-    "@open-design/contracts": "workspace:*",
+    "@mish/contracts": "workspace:*",
     "@types/node": "24.12.2",
     "cobe": "2.0.1",
     "sharp": "0.35.3",

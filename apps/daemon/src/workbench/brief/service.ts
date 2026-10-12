@@ -5,7 +5,7 @@ import {
   designBriefPreviewSchema, canonicalDesignBriefJson, designBriefModelOutputSchema, parseDesignBrief, parseDesignBriefRecordView, renderDesignBriefPrompt,
   type AttachDesignBriefRequest, type PreviewDesignBriefRequest, type DesignBriefPreview, type CreateDesignBriefRequest, type DesignBrief, type DesignBriefEditablePath, type DesignBriefField, type DesignBriefModelOutput,
   type DesignBriefRecordView, type DesignBriefTextPath, type PatchDesignBriefRequest, type ResourceRef, type RunDesignBriefBinding,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { BriefGenerator } from './generator.js';
 import { detectStyleDirections, detectTargetRuntime, modernDrift } from './intent.js';
 import { groundBriefOutput, type BriefGroundingChecker } from './grounding.js';

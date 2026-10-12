@@ -3,11 +3,11 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest';
 import { parseRoute } from '../../src/router';
 import { applyLibraryAsset, fetchProjectFiles, invalidateProjectFilesCache } from '../../src/providers/registry';
-import type { CreateIntakeBatchRequest, IntakeBatchSnapshot, IntakeFilePutResponse } from '@open-design/contracts';
+import type { CreateIntakeBatchRequest, IntakeBatchSnapshot, IntakeFilePutResponse } from '@mish/contracts';
 import { IntakeStore, type IntakeTarget } from '../../src/runtime/intake/intake-store';
 import { INTAKE_ATTACHED_EVENT, INTAKE_PROJECT_FILE_ADDED_EVENT, WorkbenchDropModeButton, WorkbenchIntake, useIntakeDropTarget, useWorkbenchIntake } from '../../src/components/WorkbenchIntake';
 import { IframeKeepAliveProvider, PooledIframe } from '../../src/components/IframeKeepAlivePool';
-import { installMockOpenDesignHost } from '@open-design/host/testing';
+import { installMockMishHost } from '@mish/host/testing';
 import { HomeHero } from '../../src/components/HomeHero';
 import { ChatComposer } from '../../src/components/ChatComposer';
 import { ChatPane } from '../../src/components/ChatPane';
@@ -374,7 +374,7 @@ function dropFolder(element: Element, folder: File, entry: unknown) {
 it('uploads a natively listed folder into the editor target it was dropped on and reports what it refused', async () => {
  const f = fixture(); const folder = new File([], 'Brand Kit');
  const listDroppedDirectory = vi.fn(async () => ({ rootName: 'Brand Kit', files: [{ relativePath: 'a.txt', size: 1 }, { relativePath: 'b.txt', size: 1 }], refused: [{ relativePath: 'escape.txt', reason: 'symlink-outside-tree' as const }], truncated: false }));
- const restore = installMockOpenDesignHost({ host: { intake: { listDroppedDirectory } } });
+ const restore = installMockMishHost({ host: { intake: { listDroppedDirectory } } });
  try {
   const shell: IntakeTarget = { destination: { kind: 'project', projectId: 'p' }, context: null };
   const editor: IntakeTarget = { destination: { kind: 'project', projectId: 'p', dir: 'assets' }, context: null };
@@ -429,7 +429,7 @@ it('ignores an Option-drag when the only frames are app-owned previews, not gues
 it('still uploads the loose files of a drop when one of its folders cannot be listed', async () => {
  const f = fixture(); const folder = new File([], 'Gone'); const loose = new File(['l'], 'loose.txt');
  const listDroppedDirectory = vi.fn(async () => { throw new Error('The dropped folder is unavailable'); });
- const restore = installMockOpenDesignHost({ host: { intake: { listDroppedDirectory } } });
+ const restore = installMockMishHost({ host: { intake: { listDroppedDirectory } } });
  try {
   const target: IntakeTarget = { destination: { kind: 'project', projectId: 'p' }, context: null };
   render(<WorkbenchIntake store={f.store} target={target}><div data-testid="shell" /></WorkbenchIntake>);

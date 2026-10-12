@@ -9,7 +9,7 @@ test('[P1] composer toolbar adapts to its container in both themes', async ({ pa
   test.setTimeout(T.xlong);
   await applyStandardMocks(page);
   await routeAgents(page, [{ id: 'mock', name: 'Claude', bin: 'mock-agent', available: true, version: 'test', models: [{ id: 'sonnet', label: 'Claude Sonnet 5.5 with extended thinking' }] }]);
-  await page.addInitScript(() => { const config = JSON.parse(localStorage.getItem('open-design:config')!); config.agentModels = { mock: { model: 'sonnet', reasoning: 'default' } }; localStorage.setItem('open-design:config', JSON.stringify(config)); });
+  await page.addInitScript(() => { const config = JSON.parse(localStorage.getItem('mish:config')!); config.agentModels = { mock: { model: 'sonnet', reasoning: 'default' } }; localStorage.setItem('mish:config', JSON.stringify(config)); });
   await page.setViewportSize({ width: 1440, height: 1000 });
   const created = await page.request.post('/api/projects', { data: { id: randomUUID(), name: 'Responsive composer', skillId: null, designSystemId: null, metadata: { kind: 'prototype', nameSource: 'user' } } });
   expect(created.ok()).toBeTruthy();

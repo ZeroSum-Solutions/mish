@@ -1,6 +1,6 @@
-export const OPEN_DESIGN_GITHUB_REPO_URL = 'https://github.com/ZeroSum-Solutions/Mishh-Mashh-2';
+export const MISH_GITHUB_REPO_URL = 'https://github.com/ZeroSum-Solutions/Mishh-Mashh-2';
 
-export type SocialShareTargetKind = 'open-design-repo' | 'project-html';
+export type SocialShareTargetKind = 'mish-repo' | 'project-html';
 
 export type SocialSharePlatform =
   | 'x'
@@ -156,9 +156,9 @@ function buildPlatformUrl(
 }
 
 export function buildSocialSharePayload(input: SocialShareRequest): SocialShareResponse {
-  const kind = input.kind === 'project-html' ? 'project-html' : 'open-design-repo';
+  const kind = input.kind === 'project-html' ? 'project-html' : 'mish-repo';
   const url = normalizeSocialShareUrl(input.url)
-    ?? (kind === 'open-design-repo' ? OPEN_DESIGN_GITHUB_REPO_URL : '');
+    ?? (kind === 'mish-repo' ? MISH_GITHUB_REPO_URL : '');
   const fallbackTitle = kind === 'project-html' ? 'Mishh Mashh project' : 'Mishh Mashh';
   const title = cleanText(input.title, fallbackTitle);
   const fallbackText = kind === 'project-html'
@@ -189,7 +189,7 @@ export function buildSocialSharePayload(input: SocialShareRequest): SocialShareR
     title,
     text,
     copyText,
-    githubRepoUrl: OPEN_DESIGN_GITHUB_REPO_URL,
+    githubRepoUrl: MISH_GITHUB_REPO_URL,
     platforms,
   };
 }

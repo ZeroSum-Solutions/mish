@@ -7,7 +7,7 @@ import { randomUUID } from 'node:crypto';
 import { existsSync, lstatSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative } from 'node:path';
-import type { ResourceRef } from '@open-design/contracts';
+import type { ResourceRef } from '@mish/contracts';
 import { createComponentGateForRequest } from '../../src/workbench/component-gate.js';
 import { readComponentTargetForEntry } from '../../src/workbench/component-target.js';
 import { sendApiError } from '../../src/http/api-errors.js';

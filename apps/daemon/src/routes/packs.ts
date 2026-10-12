@@ -61,7 +61,7 @@ import {
   type PackInstallEvent,
   type PackListResponse,
   type PackRemoveResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import type { PackGithubAccess } from '../integrations/github-auth.js';
 import { isPackError } from '../packs/manifest.js';

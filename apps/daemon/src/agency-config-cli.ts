@@ -13,8 +13,8 @@
 // here would quietly undo the reason the subcommand exists. Nothing this module returns contains
 // the key — the daemon does not send it back, and the key that was read is never echoed.
 
-import type { AgencyConfigRepairResponse, AgencyJevConfigResponse, AgencyModelProvider } from '@open-design/contracts';
-import { AGENCY_MODEL_PROVIDERS } from '@open-design/contracts';
+import type { AgencyConfigRepairResponse, AgencyJevConfigResponse, AgencyModelProvider } from '@mish/contracts';
+import { AGENCY_MODEL_PROVIDERS } from '@mish/contracts';
 
 export type AgencyConfigCliResult =
   /** Print `stdout` verbatim and exit 0. */

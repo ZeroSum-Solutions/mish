@@ -3,7 +3,7 @@ import {
   ATTRIBUTION_CLAIM_PATH,
   type AttributionClaimResponse,
   type AttributionClaimSource,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { AnalyticsService } from '../analytics.js';
 import type { AppConfigPrefs } from '../app-config.js';
 import {
@@ -337,7 +337,7 @@ function trustedFirstPartyUrl(value: string): URL | null {
   try {
     const url = new URL(value);
     if (url.protocol !== 'https:') return null;
-    return ['open-design.ai', 'www.open-design.ai', 'staging.open-design.ai'].includes(url.hostname)
+    return ['mish.invalid', 'www.mish.invalid', 'staging.mish.invalid'].includes(url.hostname)
       ? url
       : null;
   } catch {

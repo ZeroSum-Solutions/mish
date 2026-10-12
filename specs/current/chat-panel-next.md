@@ -932,7 +932,7 @@ color: inherit; font-size: var(--font-size-13) }`。我们的全局 `button`(`st
   不是工具调用」,保证两种模式对这套语法的口径一致。
 - **旧会话**:历史消息没有这个事件 → 这一块**整块不出**。不退回目录、不出空壳。
 - **降级**:模型不发 / 发歪(key 不对、格式不对、一条都解析不出)→ 同样整块不出。
-- **⚠️ 待产品定**:「投稿社区」(`onShareToOpenDesign`)原来只挂在这三行的
+- **⚠️ 待产品定**:「投稿社区」(`onShareToMish`)原来只挂在这三行的
   更多 → 分享 → 贡献 三级路径上,`default` 档换掉之后它**没有落点了**。
   设计百宝箱 / 分享 / 下载 / 建设计系统在别处都还有入口(输入框「+」菜单、
   文件查看器工具条、文件面板「…」菜单),只有这一个是孤儿。
@@ -1176,7 +1176,7 @@ color: inherit; font-size: var(--font-size-13) }`。我们的全局 `button`(`st
 | B20 | 清单里没有 in_progress 时,第一条未完成的 todo 视为进行中并收内容;后续更新仍写 pending 不退回;标 completed 即关闭,下一条未完成的接上 | D36 | codex 真实录制 `rec-codex-todo`:4 条 todo 中 1、3 收到各自区间的工具,2、4 无内容划线 |
 | B1–B7 | **已实现** `apps/web/src/runtime/chat/build-turn-blocks.ts`(纯函数,无 JSX / DOM;原型是 `docs/design/chat-sim/sim.js`) | `apps/web/tests/runtime/chat/build-turn-blocks.test.ts`(39 项)+ `build-turn-blocks.real-traces.test.ts`(11 项,回放 codex / claude / opencode 真实录制,夹具在 `apps/web/tests/fixtures/chat/`) | **97 项全绿**;并做过变异验证:把 D36 的隐式点亮删掉 → 3 项红,把 D43 的正文分流关掉 → 8 项红,还原后回到全绿 |
 | B8、B9 | **已实现** `apps/web/src/runtime/chat/tool-kind.ts`(命令嗅探 + 剥壳 + 搜索模式 + 标题回落)与 `format.ts`(耗时 / 改动量 / 产物类型) | `apps/web/tests/runtime/chat/tool-kind.test.ts`(44 项,含规格 §2.2 的 9 条真命令) | 全绿。`< 100ms` 一律当未知(不出「0.0s」);codex 的 `/bin/zsh -lc` 剥壳有专门用例 |
-| W2 / W4 / W10 | L0 契约按决策重写:`ShellStatus` 去掉 `stopped` 改旗标、搜索行加 `hits`、工具行加 `elapsedMs`;`packages/contracts` 给 `tool_result` 加**可选** `completedAt`(与已有的 `tool_use.startedAt` 配对) | 同上;`pnpm --filter @open-design/web typecheck` + 根 `pnpm typecheck` 通过 | 纯 additive,老数据缺字段就不显示耗时 |
+| W2 / W4 / W10 | L0 契约按决策重写:`ShellStatus` 去掉 `stopped` 改旗标、搜索行加 `hits`、工具行加 `elapsedMs`;`packages/contracts` 给 `tool_result` 加**可选** `completedAt`(与已有的 `tool_use.startedAt` 配对) | 同上;`pnpm --filter @mish/web typecheck` + 根 `pnpm typecheck` 通过 | 纯 additive,老数据缺字段就不显示耗时 |
 | B8、B9 | Plane 2189 / 2196 | `tool-kind.test.ts`(44 例,已写) | **已完成**(见上面同名行) |
 | B16 / L1 原子 | **已实现** `apps/web/src/components/chat/primitives/`:`Foldable`(flat / boxed 两形态、不可展开不出箭头、手点开不被重渲染复位)、`StatusMark`(勾走 `--chat-tick-img` 整图、球留给 orb 引擎挂载)、`ToolRow`(五种写法:文件动词 / 搜索命中 / 执行单行 / 失败两写法 / 元工具兜底)、`SayText`、`FileButton`、`icons.tsx`(路径逐字取自设计稿);样式共用 `record.module.css`(cascade 咬合,不拆) | `apps/web/tests/components/chat/primitives.test.tsx`(19 项,jsdom) | 全绿。i18n `chat.record.*` 12 个 key 已补满 19 语言 + `types.ts` |
 | B10–B13、B15 | Plane 2193–2200 | 组件测试 + 镜像陈列页 | 执行记录组件(壳 + 分段 + 组件 11 / 12)与陈列页**已完成**;**未开工**:其余组件家族、接入 `AssistantMessage` / `ChatPane`(2201) |

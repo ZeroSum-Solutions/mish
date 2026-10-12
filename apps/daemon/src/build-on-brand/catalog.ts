@@ -7,10 +7,10 @@
  * rows never are. Rendering uses the committed generated adapters through the fast lane's
  * `resolveSectionAdapter`, so it needs no kit directory, no network and no executor.
  */
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
-import { resolveSectionAdapter } from '@open-design/agency-fast-lane/section-overlay';
-import { publicAdapterText } from '@open-design/agency-fast-lane/cult-public-ids';
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
+import { resolveSectionAdapter } from '@mish/agency-fast-lane/section-overlay';
+import { publicAdapterText } from '@mish/agency-fast-lane/cult-public-ids';
 import { publicCultEntry } from '../routes/sections.js';
 import { insertFileStem, type StagedInsert } from './stage.js';
 

@@ -2,7 +2,7 @@
 // that snapshot-plus-deltas and a resume's fold agree on, and no brief anywhere.
 
 import { describe, expect, it } from 'vitest';
-import type { AgencyBuildEvent, AgencyBuildSnapshot } from '@open-design/contracts';
+import type { AgencyBuildEvent, AgencyBuildSnapshot } from '@mish/contracts';
 import {
   applyJsonPatch,
   encodeAgencyBuildEvent,

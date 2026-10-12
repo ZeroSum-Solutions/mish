@@ -9,7 +9,7 @@
 // visible even when the installed plugin catalog has no matching example.
 // Deck continues to use the dynamic Community facet taxonomy.
 
-import type { InstalledPluginRecord, ProjectMetadata } from '@open-design/contracts';
+import type { InstalledPluginRecord, ProjectMetadata } from '@mish/contracts';
 import type { IconName } from '../Icon';
 import type { Dict } from '../../i18n/types';
 import type { HomeHeroChip } from './chips';

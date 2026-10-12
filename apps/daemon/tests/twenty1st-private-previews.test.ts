@@ -6,7 +6,7 @@ import express from 'express';
 import type {AddressInfo} from 'node:net';
 import {afterEach,describe,expect,it,vi} from 'vitest';
 import JSZip from 'jszip';
-import {parseTwenty1stItemResponse,parseTwenty1stListResponse,parseTwenty1stSourceResponse} from '@open-design/contracts';
+import {parseTwenty1stItemResponse,parseTwenty1stListResponse,parseTwenty1stSourceResponse} from '@mish/contracts';
 import {Twenty1stPrivatePreviews} from '../src/services/twenty1st-private-previews.js';
 import {twenty1stCatalog,registerTwenty1stRoutes} from '../src/routes/twenty1st.js';
 

@@ -43,7 +43,7 @@ import { cleanup, render } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 
 import { I18nProvider } from '../../../src/i18n';
 import { Orb } from '../../../src/components/chat/primitives/Orb';

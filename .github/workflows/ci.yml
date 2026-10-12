@@ -308,19 +308,19 @@ jobs:
       # Setup workspace runs root postinstall, including the daemon build.
       # Fresh CI typecheck/test still need the app outputs not built there:
       #   - `apps/desktop/dist/main/index.d.ts` for `apps/packaged` imports of
-      #     `@open-design/desktop/main`
+      #     `@mish/desktop/main`
       #   - `apps/web/dist/sidecar/index.d.ts` for `apps/packaged` imports of
-      #     `@open-design/web/sidecar`
+      #     `@mish/web/sidecar`
       - name: Prebuild workspace type declarations
         if: ${{ fromJSON(needs.plan.outputs.scopes).run_preflight_typecheck }}
         run: |
-          pnpm --filter @open-design/desktop build
-          pnpm --filter @open-design/web build:sidecar
+          pnpm --filter @mish/desktop build
+          pnpm --filter @mish/web build:sidecar
 
       - name: Typecheck workspaces
         if: ${{ fromJSON(needs.plan.outputs.scopes).run_preflight_typecheck }}
         run: |
-          pnpm -r --filter '!open-design' --workspace-concurrency="${OPEN_DESIGN_WORKSPACE_CONCURRENCY:-1}" --if-present run typecheck
+          pnpm -r --filter '!mish' --workspace-concurrency="${MISH_WORKSPACE_CONCURRENCY:-1}" --if-present run typecheck
           pnpm exec tsc -p scripts/tsconfig.json --noEmit
 
       - name: Check repository layout policies
@@ -338,18 +338,18 @@ jobs:
       # dist/components comes from the postinstall build of packages/genui-catalog.
       - name: Check GenUI catalog and its family copies
         run: |
-          pnpm --filter @open-design/genui-catalog check
-          pnpm --filter @open-design/genui-catalog sync-assets:check
+          pnpm --filter @mish/genui-catalog check
+          pnpm --filter @mish/genui-catalog sync-assets:check
 
       # No private source kit in CI: `check` validates the committed inventory, overrides and
       # rights-doc pin, and skips the kit comparison (CULT_REQUIRE_KIT=1 would make that an error).
       - name: Check Cult UI Pro inventory
-        run: pnpm --filter @open-design/cult-ui-catalog check
+        run: pnpm --filter @mish/cult-ui-catalog check
 
       # The committed 21st.dev metadata, independently authored alternatives and MIT preview images;
       # without a local copy of the saved collection, `check` validates the committed files only.
       - name: Check 21st.dev catalog
-        run: pnpm --filter @open-design/21st-catalog check
+        run: pnpm --filter @mish/21st-catalog check
 
       # Runs after the Cult check: section-catalog's catalog.json projects the Cult inventory.
       - name: Check section catalog
@@ -376,27 +376,27 @@ jobs:
 
       - name: Workspace unit tests
         run: |
-          pnpm --filter @open-design/contracts test
-          pnpm --filter @open-design/host test
-          pnpm --filter @open-design/platform test
-          pnpm --filter @open-design/sidecar test
-          pnpm --filter @open-design/sidecar-proto test
-          pnpm --filter @open-design/agui-adapter test
-          pnpm --filter @open-design/agency-fast-lane test
-          pnpm --filter @open-design/genui-catalog test
-          pnpm --filter @open-design/section-catalog test
-          pnpm --filter @open-design/cult-ui-catalog test
-          pnpm --filter @open-design/21st-catalog test
+          pnpm --filter @mish/contracts test
+          pnpm --filter @mish/host test
+          pnpm --filter @mish/platform test
+          pnpm --filter @mish/sidecar test
+          pnpm --filter @mish/sidecar-proto test
+          pnpm --filter @mish/agui-adapter test
+          pnpm --filter @mish/agency-fast-lane test
+          pnpm --filter @mish/genui-catalog test
+          pnpm --filter @mish/section-catalog test
+          pnpm --filter @mish/cult-ui-catalog test
+          pnpm --filter @mish/21st-catalog test
           if [ "${{ fromJSON(needs.plan.outputs.scopes).tools_dev_tests_required }}" = "true" ]; then
-            pnpm --filter @open-design/tools-dev test
+            pnpm --filter @mish/tools-dev test
           fi
           if [ "${{ fromJSON(needs.plan.outputs.scopes).tools_pack_tests_required }}" = "true" ]; then
-            pnpm --filter @open-design/desktop build
-            pnpm --filter @open-design/desktop test
-            pnpm --filter @open-design/packaged test
-            pnpm --filter @open-design/tools-pack test
+            pnpm --filter @mish/desktop build
+            pnpm --filter @mish/desktop test
+            pnpm --filter @mish/packaged test
+            pnpm --filter @mish/tools-pack test
             if [ "${{ fromJSON(needs.plan.outputs.run).e2e_vitest }}" != "true" ]; then
-              pnpm --filter @open-design/e2e test tests/packaged-launcher-update-loop.test.ts
+              pnpm --filter @mish/e2e test tests/packaged-launcher-update-loop.test.ts
             fi
           fi
 
@@ -429,7 +429,7 @@ jobs:
       - name: Run daemon test shard
         env:
           OD_WATCHER_TEST_DEBUG: "1"
-        run: pnpm --filter @open-design/daemon test --shard=${{ matrix.shard }}/4
+        run: pnpm --filter @mish/daemon test --shard=${{ matrix.shard }}/4
 
   render_tests:
     name: Design-templates render tests
@@ -478,7 +478,7 @@ jobs:
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).workspace_unit) }}
 
       - name: Run agency fast-lane tests
-        run: pnpm --filter @open-design/agency-fast-lane test
+        run: pnpm --filter @mish/agency-fast-lane test
 
       - name: Run family package render tests
         run: node --experimental-strip-types --test plugins/_official/examples/agency-*/compiler/scripts/families/*/render.test.ts
@@ -496,7 +496,7 @@ jobs:
       # Every insertable Cult block, worst-case filled and spliced into real family pages, loaded
       # in Chromium under the family CSP (no kit needed). Proves itself on a planted self-test.
       - name: Run Cult render check
-        run: pnpm --filter @open-design/cult-ui-catalog render-check
+        run: pnpm --filter @mish/cult-ui-catalog render-check
 
   windows_tools_pack_payload_tests:
     name: Windows tools-pack payload tests
@@ -515,7 +515,7 @@ jobs:
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).windows_tools) }}
 
       - name: Windows launcher payload archive tests
-        run: pnpm --filter @open-design/tools-pack exec vitest run tests/launcher/windows/payload.test.ts
+        run: pnpm --filter @mish/tools-pack exec vitest run tests/launcher/windows/payload.test.ts
 
   web_workspace_tests:
     name: Web workspace tests (${{ matrix.shard }}/2)
@@ -541,10 +541,10 @@ jobs:
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).js_hot) }}
 
       - name: Prebuild web sidecar declarations
-        run: pnpm --filter @open-design/web build:sidecar
+        run: pnpm --filter @mish/web build:sidecar
 
       - name: Web workspace tests
-        run: pnpm --filter @open-design/web exec vitest run -c vitest.config.ts --maxWorkers=2 --shard=${{ matrix.shard }}/2
+        run: pnpm --filter @mish/web exec vitest run -c vitest.config.ts --maxWorkers=2 --shard=${{ matrix.shard }}/2
 
   e2e_vitest:
     name: E2E Vitest
@@ -574,11 +574,11 @@ jobs:
 
       - name: Prebuild workspace type declarations
         run: |
-          pnpm --filter @open-design/desktop build
-          pnpm --filter @open-design/web build:sidecar
+          pnpm --filter @mish/desktop build
+          pnpm --filter @mish/web build:sidecar
 
       - name: E2E Vitest
-        run: pnpm --filter @open-design/e2e test
+        run: pnpm --filter @mish/e2e test
 
   playwright_critical:
     name: Playwright critical (${{ matrix.group }})
@@ -616,8 +616,8 @@ jobs:
 
       - name: Prebuild workspace type declarations
         run: |
-          pnpm --filter @open-design/desktop build
-          pnpm --filter @open-design/web build:sidecar
+          pnpm --filter @mish/desktop build
+          pnpm --filter @mish/web build:sidecar
 
       - name: Clean Playwright state
         run: pnpm -C e2e exec tsx scripts/playwright.ts clean
@@ -659,8 +659,8 @@ jobs:
 
       - name: Prebuild workspace type declarations
         run: |
-          pnpm --filter @open-design/desktop build
-          pnpm --filter @open-design/web build:sidecar
+          pnpm --filter @mish/desktop build
+          pnpm --filter @mish/web build:sidecar
 
       - name: Clean Playwright state
         run: pnpm -C e2e exec tsx scripts/playwright.ts clean
@@ -732,8 +732,8 @@ jobs:
 
       - name: Prebuild workspace type declarations
         run: |
-          pnpm --filter @open-design/desktop build
-          pnpm --filter @open-design/web build:sidecar
+          pnpm --filter @mish/desktop build
+          pnpm --filter @mish/web build:sidecar
 
       - name: Run strict visual Playwright suite
         id: visual

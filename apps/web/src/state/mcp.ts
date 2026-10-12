@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 // Web client for the daemon's external-MCP endpoints.
 //
 // `GET /api/mcp/servers` returns both the user's saved entries AND the
@@ -12,7 +12,7 @@ import type {
   McpServersResponse,
   McpTemplate,
   StartMcpOAuthResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 export type {
   McpOAuthStatusResponse,

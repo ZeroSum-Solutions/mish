@@ -18,11 +18,11 @@ import express from 'express';
 import JSZip from 'jszip';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
-import cultSlugsJson from '@open-design/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
-import twentyFirstJson from '@open-design/21st-catalog/generated/21st-items.json' with { type: 'json' };
-import originalSourcesJson from '@open-design/21st-catalog/generated/21st-originals.json' with { type: 'json' };
-import { twenty1stBrowseTags, parseTwenty1stListResponse, parseTwenty1stSourceResponse } from '@open-design/contracts';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
+import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
+import twentyFirstJson from '@mish/21st-catalog/generated/21st-items.json' with { type: 'json' };
+import originalSourcesJson from '@mish/21st-catalog/generated/21st-originals.json' with { type: 'json' };
+import { twenty1stBrowseTags, parseTwenty1stListResponse, parseTwenty1stSourceResponse } from '@mish/contracts';
 import { registerTwenty1stRoutes } from '../src/routes/twenty1st.js';
 import { registerCultRegistryRoutes } from '../src/routes/cult-registry.js';
 import type { CultRegistryRow } from '../src/cult-registry.js';

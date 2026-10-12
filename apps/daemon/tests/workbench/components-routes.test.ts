@@ -2,7 +2,7 @@ import express from 'express';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseResourceSearchRequest, parseResourceSearchResponse, parseResourceDetailResponse, type PreparedAdoptionPlan, type ResourceCandidate, type ResourceSourceSnapshot } from '@open-design/contracts';
+import { parseResourceSearchRequest, parseResourceSearchResponse, parseResourceDetailResponse, type PreparedAdoptionPlan, type ResourceCandidate, type ResourceSourceSnapshot } from '@mish/contracts';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { registerWorkbenchAdoptionRoutes } from '../../src/routes/workbench-adoption.js';
 import { sendApiError } from '../../src/http/api-errors.js';

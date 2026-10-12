@@ -11,7 +11,7 @@ import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   createCritiqueEventsConnection,
@@ -19,8 +19,8 @@ import {
   critiqueEventsUrl,
   sseToPanelEvent,
 } from '../../../../src/components/Theater/state/sse';
-import { CRITIQUE_SSE_EVENT_NAMES } from '@open-design/contracts/critique';
-import type { CritiqueSseEventName } from '@open-design/contracts/critique';
+import { CRITIQUE_SSE_EVENT_NAMES } from '@mish/contracts/critique';
+import type { CritiqueSseEventName } from '@mish/contracts/critique';
 
 type Listener = (evt: Event) => void;
 

@@ -8,7 +8,7 @@ import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
-import { parseResourceDetailResponse, parseResourceSearchResponse } from '@open-design/contracts';
+import { parseResourceDetailResponse, parseResourceSearchResponse } from '@mish/contracts';
 import { createComponentGateForRequest } from '../../src/workbench/component-gate.js';
 import { readComponentTargetForEntry } from '../../src/workbench/component-target.js';
 import { sendApiError } from '../../src/http/api-errors.js';

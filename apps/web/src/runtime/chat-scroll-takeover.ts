@@ -39,7 +39,7 @@
 // detector, is the wrong order to do this in. One false positive costs that
 // user native scrolling — momentum, the compositor's own interpolation,
 // scroll chaining — with no way to tell what happened. So: a `localStorage`
-// switch, the same `open-design:` convention the write trace uses, read once
+// switch, the same `mish:` convention the write trace uses, read once
 // at boot. Off, nothing subscribes and nothing is registered.
 //
 // How it comes off
@@ -107,9 +107,9 @@ import {
  * flipping it takes effect on reload, which is the right granularity for
  * something that changes input handling for a whole session. To turn it on:
  *
- *   localStorage.setItem('open-design:chat-scroll-takeover', '1')  // then reload
+ *   localStorage.setItem('mish:chat-scroll-takeover', '1')  // then reload
  */
-export const CHAT_SCROLL_TAKEOVER_STORAGE_KEY = 'open-design:chat-scroll-takeover';
+export const CHAT_SCROLL_TAKEOVER_STORAGE_KEY = 'mish:chat-scroll-takeover';
 
 /**
  * Capture, so a handler inside the transcript cannot stop the event before we

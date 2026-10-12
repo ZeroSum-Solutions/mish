@@ -1,4 +1,4 @@
-import type { CatalogueTargetReport, ResourceRef } from '@open-design/contracts';
+import type { CatalogueTargetReport, ResourceRef } from '@mish/contracts';
 
 /** One project-relative file a catalogue item contributes, relative to the chosen target directory. */
 export interface CatalogueMaterialFile {

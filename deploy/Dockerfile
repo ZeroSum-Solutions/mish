@@ -33,9 +33,9 @@ RUN corepack enable && \
     pnpm install --frozen-lockfile
 
 COPY apps ./apps
-RUN pnpm --filter @open-design/daemon build && \
-    pnpm --filter @open-design/web build && \
-    pnpm --filter @open-design/daemon deploy --legacy --prod /app/deploy/daemon && \
+RUN pnpm --filter @mish/daemon build && \
+    pnpm --filter @mish/web build && \
+    pnpm --filter @mish/daemon deploy --legacy --prod /app/deploy/daemon && \
     pnpm store prune && \
     rm -rf \
       /root/.cache \
@@ -85,27 +85,27 @@ COPY plugins/_official ./plugins/_official
 FROM ${RUNTIME_IMAGE}
 
 RUN apk add --no-cache tini poppler-utils bash git && \
-    addgroup -S -g 1001 open-design && \
-    adduser -S -D -H -u 1001 -G open-design open-design
+    addgroup -S -g 1001 mish && \
+    adduser -S -D -H -u 1001 -G mish mish
 
 WORKDIR /app
-COPY --from=build --chown=open-design:open-design /app/deploy/daemon ./apps/daemon
-COPY --from=build --chown=open-design:open-design /app/apps/web/out ./apps/web/out
-COPY --from=build --chown=open-design:open-design /app/skills ./skills
-COPY --from=build --chown=open-design:open-design /app/design-systems ./design-systems
-COPY --from=build --chown=open-design:open-design /app/craft ./craft
-COPY --from=build --chown=open-design:open-design /app/data ./data
-COPY --from=build --chown=open-design:open-design /app/assets/frames ./assets/frames
-COPY --from=build --chown=open-design:open-design /app/assets/community-pets ./assets/community-pets
+COPY --from=build --chown=mish:mish /app/deploy/daemon ./apps/daemon
+COPY --from=build --chown=mish:mish /app/apps/web/out ./apps/web/out
+COPY --from=build --chown=mish:mish /app/skills ./skills
+COPY --from=build --chown=mish:mish /app/design-systems ./design-systems
+COPY --from=build --chown=mish:mish /app/craft ./craft
+COPY --from=build --chown=mish:mish /app/data ./data
+COPY --from=build --chown=mish:mish /app/assets/frames ./assets/frames
+COPY --from=build --chown=mish:mish /app/assets/community-pets ./assets/community-pets
 # Plan §3.J4 / spec §23.3.5 — bundled atom plugins registered on
 # daemon boot. The directory contains `plugins/_official/atoms/<atom>/`
-# pairs (SKILL.md + open-design.json); registerBundledPlugins() walks
+# pairs (SKILL.md + mish.json); registerBundledPlugins() walks
 # it on startup so the container ships with first-party atoms reachable
 # via the same registry path third-party plugins use.
-COPY --from=build --chown=open-design:open-design /app/plugins/_official ./plugins/_official
+COPY --from=build --chown=mish:mish /app/plugins/_official ./plugins/_official
 
 RUN mkdir -p /app/.od && \
-    chown -R open-design:open-design /app
+    chown -R mish:mish /app
 
 ENV NODE_ENV=production
 ENV NODE_OPTIONS=--max-old-space-size=192
@@ -114,6 +114,6 @@ ENV OD_PORT=7456
 
 EXPOSE 7456
 
-USER open-design
+USER mish
 ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["node", "apps/daemon/dist/cli.js", "--no-open"]

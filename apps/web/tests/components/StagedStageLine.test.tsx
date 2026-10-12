@@ -2,7 +2,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { StagedRunRecord } from '@open-design/contracts';
+import type { StagedRunRecord } from '@mish/contracts';
 
 import { StagedStageLine, resetStagedEnabledCache } from '../../src/components/chat/StagedStageLine';
 import { I18nProvider } from '../../src/i18n';

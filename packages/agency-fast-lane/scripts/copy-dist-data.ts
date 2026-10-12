@@ -8,7 +8,7 @@
  *    missing file once a caller imports from `dist` instead of `src`.
  *
  * 2. Emit `dist/data.js` and `dist/data.d.ts`, the same three objects as plain JavaScript
- *    literals. This is what the daemon imports (`@open-design/agency-fast-lane/data`).
+ *    literals. This is what the daemon imports (`@mish/agency-fast-lane/data`).
  *    `import.meta.dirname` is a lie inside a bundle: the packaged mac and Windows daemons are
  *    esbuild prebundles that inline every workspace package, so the module's directory becomes the
  *    prebundle's, where no `atlas/` or `taxonomy/` directory exists — the file loaders would throw

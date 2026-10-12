@@ -1305,7 +1305,7 @@ describe('streamViaDaemon', () => {
           sseResponse(
             [
               'event: error',
-              'data: {"message":"AMR balance unavailable","error":{"code":"AMR_INSUFFICIENT_BALANCE","message":"AMR balance unavailable","details":{"kind":"amr_account","action":"recharge","actionUrl":"https://open-design.ai/amr/dashboard"}}}',
+              'data: {"message":"AMR balance unavailable","error":{"code":"AMR_INSUFFICIENT_BALANCE","message":"AMR balance unavailable","details":{"kind":"amr_account","action":"recharge","actionUrl":"https://mish.invalid/amr/dashboard"}}}',
               '',
               '',
             ].join('\n'),
@@ -1328,7 +1328,7 @@ describe('streamViaDaemon', () => {
         details: {
           kind: 'amr_account',
           action: 'recharge',
-          actionUrl: 'https://open-design.ai/amr/dashboard',
+          actionUrl: 'https://mish.invalid/amr/dashboard',
         },
       }),
     );
@@ -1415,7 +1415,7 @@ describe('streamViaDaemon', () => {
                     message,
                     marker: '## user',
                     retryable: true,
-                    promoted_by: 'open_design_acp',
+                    promoted_by: 'mish_acp',
                   },
                 },
               })}`,
@@ -1482,7 +1482,7 @@ describe('streamViaDaemon', () => {
                     message: 'Provider returned error',
                     statusCode: 503,
                     retryable: true,
-                    url: 'https://amr-link.open-design.ai/v1/chat/completions',
+                    url: 'https://amr-link.mish.invalid/v1/chat/completions',
                     suggestion: 'Retry later or switch to another model.',
                     responseBodyPreview,
                   },
@@ -1520,7 +1520,7 @@ describe('streamViaDaemon', () => {
     expect(message).not.toContain('opencode event stream');
     expect(message).not.toContain('opencode session error');
     expect(message).not.toContain('json-rpc id 4');
-    expect(message).not.toContain('https://amr-link.open-design.ai');
+    expect(message).not.toContain('https://amr-link.mish.invalid');
   });
 
   it('treats an explicit succeeded status with a SIGTERM exit as a successful run', async () => {

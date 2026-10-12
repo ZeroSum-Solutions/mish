@@ -3,7 +3,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { connectorResourceRef, parseConnectorDetailResponse, parseConnectorSearchResponse } from '@open-design/contracts';
+import { connectorResourceRef, parseConnectorDetailResponse, parseConnectorSearchResponse } from '@mish/contracts';
 import { writeMcpConfig } from '../../src/mcp-config.js';
 import { setToken } from '../../src/mcp-tokens.js';
 import { ConnectorProxy, connectorDeriveDecision } from '../../src/workbench/connectors/connector-proxy.js';

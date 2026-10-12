@@ -18,9 +18,9 @@
  * op7418/guizang-ppt-skill (pre-flight asset reads, P0 self-check,
  * theme-rhythm rules).
  */
-import type { ExecutionProfile } from '@open-design/contracts';
+import type { ExecutionProfile } from '@mish/contracts';
 
-const HANDOFF_INVARIANT_PLACEHOLDER = '%%OPEN_DESIGN_HANDOFF_INVARIANT%%';
+const HANDOFF_INVARIANT_PLACEHOLDER = '%%MISH_HANDOFF_INVARIANT%%';
 
 export const DISCOVERY_AND_PHILOSOPHY = `# OD core directives (read first — these override anything later in this prompt)
 

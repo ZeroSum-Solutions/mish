@@ -1,4 +1,4 @@
-import { parseRightsAssessment, type ConnectorSearchKind, type RightsAssessment } from '@open-design/contracts';
+import { parseRightsAssessment, type ConnectorSearchKind, type RightsAssessment } from '@mish/contracts';
 
 /**
  * G29 Mobbin facts the connector proxy uses. Every value comes from committed

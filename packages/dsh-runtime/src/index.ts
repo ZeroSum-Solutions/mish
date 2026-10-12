@@ -26,9 +26,9 @@ import {
   type ModelCatalogEntry,
 } from './protocol.js';
 
-export const name = 'open-design-runtime';
+export const name = 'mish-runtime';
 export const inject = [
-  'openDesignStartup',
+  'mishStartup',
   'agentDefaultModel',
   'agents',
   'llm',
@@ -199,7 +199,7 @@ async function listModelCatalog(ctx: Context): Promise<ModelCatalogEntry[]> {
         });
       }
     } catch {
-      ctx.logger.warn(`open-design-runtime: could not list models for provider "${provider.id}"`);
+      ctx.logger.warn(`mish-runtime: could not list models for provider "${provider.id}"`);
     }
   }
   return catalog;
@@ -471,9 +471,9 @@ async function serve(
 }
 
 export function apply(ctx: Context): void {
-  const startup = ctx.openDesignStartup;
+  const startup = ctx.mishStartup;
   const exit = ctx.get('appExit');
-  if (!startup || !exit) throw new Error('open-design-runtime requires startup and appExit services');
+  if (!startup || !exit) throw new Error('mish-runtime requires startup and appExit services');
   if (startup.mode === 'probe') {
     writeFrame(process.stdout, identityFrame('probe', PLUGIN_VERSION));
     exit(0);
@@ -487,7 +487,7 @@ export function apply(ctx: Context): void {
     }
     await serve(ctx, process.stdout, exit);
   }).catch((error: unknown) => {
-    process.stderr.write(`open-design-runtime: ${error instanceof Error ? error.message : String(error)}\n`);
+    process.stderr.write(`mish-runtime: ${error instanceof Error ? error.message : String(error)}\n`);
     exit(1);
   });
 }

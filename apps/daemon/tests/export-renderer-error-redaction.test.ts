@@ -12,7 +12,7 @@ import { describeDesktopRendererFailure } from '../src/import-export-routes.js';
  *
  * The reported string was:
  *
- *   desktop renderer unavailable: connect ENOENT /tmp/open-design/ipc/chatnext/desktop.sock
+ *   desktop renderer unavailable: connect ENOENT /tmp/mish/ipc/chatnext/desktop.sock
  *
  * That is not an internal-only string. The prompt tells the model to render via
  * `"$OD_BIN" export … --format image`; `runExport` POSTs to
@@ -51,9 +51,9 @@ describe('desktop renderer failure — what leaves the daemon', () => {
   it('drops the unix socket path from the message the agent reads', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {});
     const message = describeDesktopRendererFailure(
-      new Error('connect ENOENT /tmp/open-design/ipc/chatnext/desktop.sock'),
+      new Error('connect ENOENT /tmp/mish/ipc/chatnext/desktop.sock'),
     );
-    expect(message).not.toContain('/tmp/open-design/ipc/chatnext/desktop.sock');
+    expect(message).not.toContain('/tmp/mish/ipc/chatnext/desktop.sock');
     expect(message).not.toContain('/tmp/');
     expect(message).not.toContain('.sock');
     // Positive half: the sentence still says what happened.
@@ -64,10 +64,10 @@ describe('desktop renderer failure — what leaves the daemon', () => {
   it('keeps the raw path in the daemon log — the only copy of it', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
     describeDesktopRendererFailure(
-      new Error('connect ENOENT /tmp/open-design/ipc/chatnext/desktop.sock'),
+      new Error('connect ENOENT /tmp/mish/ipc/chatnext/desktop.sock'),
     );
     const logged = spy.mock.calls.map((args) => args.join(' ')).join('\n');
-    expect(logged).toContain('/tmp/open-design/ipc/chatnext/desktop.sock');
+    expect(logged).toContain('/tmp/mish/ipc/chatnext/desktop.sock');
   });
 
   it('preserves the version-skew signature web analytics buckets on', () => {
@@ -86,7 +86,7 @@ describe('desktop renderer failure — what leaves the daemon', () => {
     // packages/sidecar hand-builds `IPC request timed out: ${socketPath}`, so
     // fixing only the ENOENT wording would still leak on timeout.
     const message = describeDesktopRendererFailure(
-      new Error('IPC request timed out: /tmp/open-design/ipc/chatnext/desktop.sock'),
+      new Error('IPC request timed out: /tmp/mish/ipc/chatnext/desktop.sock'),
     );
     expect(message).not.toContain('/tmp/');
     // TIMEOUT is a real analytics bucket; the words must survive.

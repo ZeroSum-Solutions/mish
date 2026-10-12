@@ -2,7 +2,7 @@ import { workspaceContextFixture } from '../helpers/workspace-context';
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import type { IntakeBatchSnapshot } from '@open-design/contracts';
+import type { IntakeBatchSnapshot } from '@mish/contracts';
 import { ChatComposer } from '../../src/components/ChatComposer';
 import { WorkbenchIntake, WorkbenchIntakeTarget } from '../../src/components/WorkbenchIntake';
 import { IntakeStore } from '../../src/runtime/intake/intake-store';

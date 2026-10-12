@@ -3,7 +3,7 @@ import {
   type CreateProjectExampleReference,
   type ProjectMetadata,
   type ProjectScenarioTaskProfile,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 interface EntryStrategyRoutingInput {
   automaticStrategyTaskProfile?: ProjectScenarioTaskProfile | null;

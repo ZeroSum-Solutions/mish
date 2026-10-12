@@ -124,7 +124,7 @@ export interface ConnectorConnectRequest {
 
 /** The message the connector OAuth callback page posts to its opener. */
 export interface ConnectorCallbackMessage {
-  type: 'open-design:connector-connected';
+  type: 'mish:connector-connected';
   connectorId: string;
   connectorLabel: string;
   callbackNonce?: string;

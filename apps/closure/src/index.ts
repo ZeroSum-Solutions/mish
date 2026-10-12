@@ -6,7 +6,7 @@ import {
   type StandaloneShellRequirement,
   type StandaloneShellUpdaterPort,
   type StandaloneShellUpdaterSnapshot,
-} from "@open-design/standalone";
+} from "@mish/standalone";
 
 export const CLOSURE_VERSION = "0.1.0";
 export const CLOSURE_FIXTURE_COMPONENT = "closure-fixture";

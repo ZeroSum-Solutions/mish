@@ -330,7 +330,7 @@ describe('HomeView — dismissing a picked example card', () => {
         await Promise.resolve();
       });
       await waitFor(() => {
-        expect(JSON.parse(window.localStorage.getItem('open-design:home-composer:chip') ?? '{}'))
+        expect(JSON.parse(window.localStorage.getItem('mish:home-composer:chip') ?? '{}'))
           .toMatchObject({ chipId: 'prototype', prototypeSubtypeId: testCase.scene });
       });
     } else if (testCase.scene) {

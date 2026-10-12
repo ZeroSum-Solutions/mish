@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://open-design.ai/schemas/agency-site/marketing-site/recipe.v2.json",
+  "$id": "https://mish.invalid/schemas/agency-site/marketing-site/recipe.v2.json",
   "title": "marketing-site recipe",
   "description": "A static marketing site page kind: a hero, three features, three testimonials, three pricing tiers, one call to action and a footer. Mirrors compiler/scripts/families/marketing-site/{slots.ts,contract.ts} field for field; run render.test.ts's schema cross-check before trusting either copy alone.",
   "type": "object",

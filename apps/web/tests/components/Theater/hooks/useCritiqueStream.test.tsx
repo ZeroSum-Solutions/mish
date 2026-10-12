@@ -13,7 +13,7 @@ import {
   buildWorkspacePermissions,
   buildWorkspaceSeatSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { useCritiqueStream } from '../../../../src/components/Theater/hooks/useCritiqueStream';
 import type {

@@ -2,12 +2,12 @@ import {
   API_ERROR_CODES,
   workspaceSeatCapacityState,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   TrackingCountBucket,
   TrackingWorkspaceDimensions,
   TrackingWorkspacePage,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 
 /** Convert product context to the bounded, PII-free Workspace dimensions. */
 export function workspaceAnalyticsDimensions(

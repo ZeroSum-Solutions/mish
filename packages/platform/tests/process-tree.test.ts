@@ -129,23 +129,23 @@ describe("parseWindowsProcessSnapshots", () => {
 describe("processCommandExactlyRunsExecutable", () => {
   it("accepts exact POSIX and quoted Windows executable commands", () => {
     expect(processCommandExactlyRunsExecutable(
-      "/Applications/Open Design.app/Contents/MacOS/Open Design",
-      "/Applications/Open Design.app/Contents/MacOS/Open Design",
+      "/Applications/Mish.app/Contents/MacOS/Mish",
+      "/Applications/Mish.app/Contents/MacOS/Mish",
       "darwin",
     )).toBe(true);
     expect(processCommandExactlyRunsExecutable(
-      '"C:\\Program Files\\Open Design\\Open Design.exe"',
-      "C:\\Program Files\\Open Design\\Open Design.exe",
+      '"C:\\Program Files\\Mish\\Mish.exe"',
+      "C:\\Program Files\\Mish\\Mish.exe",
       "win32",
     )).toBe(true);
   });
 
   it("rejects arguments and lookalike executable prefixes", () => {
-    const executable = "/Applications/Open Design.app/Contents/MacOS/Open Design";
+    const executable = "/Applications/Mish.app/Contents/MacOS/Mish";
     expect(processCommandExactlyRunsExecutable(`${executable} --inspect`, executable, "darwin")).toBe(false);
     expect(processCommandExactlyRunsExecutable(`${executable} Helper`, executable, "darwin")).toBe(false);
 
-    const windowsExecutable = "C:\\Program Files\\Open Design\\Open Design.exe";
+    const windowsExecutable = "C:\\Program Files\\Mish\\Mish.exe";
     expect(processCommandExactlyRunsExecutable(
       `"${windowsExecutable}" od://project/123`,
       windowsExecutable,
@@ -160,8 +160,8 @@ describe("processCommandExactlyRunsExecutable", () => {
 
   it("compares Windows executable paths case-insensitively", () => {
     expect(processCommandExactlyRunsExecutable(
-      '"C:\\PROGRAM FILES\\OPEN DESIGN\\OPEN DESIGN.EXE"',
-      "c:\\Program Files\\Open Design\\Open Design.exe",
+      '"C:\\PROGRAM FILES\\MISH\\MISH.EXE"',
+      "c:\\Program Files\\Mish\\Mish.exe",
       "win32",
     )).toBe(true);
   });

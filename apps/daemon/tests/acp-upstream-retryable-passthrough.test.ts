@@ -46,7 +46,7 @@ const RAW_SOCKET_CLOSED =
   + '"data":{"isRetryable":true,"message":"Cannot connect to API: The socket connection '
   + 'was closed unexpectedly. For more information, pass `verbose: true` in the second '
   + 'argument to fetch()","metadata":{"retryAttempts":"2","totalAttempts":"3",'
-  + '"retryExhausted":"true","url":"https://amr-link.open-design.ai/v1/chat/completions"}}}},'
+  + '"retryExhausted":"true","url":"https://amr-link.mish.invalid/v1/chat/completions"}}}},'
   + '"type":"session.error"}';
 
 /**

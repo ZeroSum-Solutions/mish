@@ -40,7 +40,7 @@ import { cleanup, fireEvent, render as rtlRender, screen } from '@testing-librar
 import type { ReactElement } from 'react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { ImageRow } from '../../../src/components/chat/primitives/ImageRow';
 import { ExecutionShell } from '../../../src/components/chat/ExecutionShell';

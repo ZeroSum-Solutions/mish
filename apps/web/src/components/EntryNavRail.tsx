@@ -44,7 +44,7 @@ import {
   type WorkspaceCollabContext,
   type WorkspaceDirectoryItem,
   type WorkspaceDirectoryResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   fetchVelaLoginStatus,
   formatVelaBalanceUsd,
@@ -88,7 +88,7 @@ import type { EntryHomeView } from '../router';
 import type {
   AccountMenuClickProps,
   TrackingWorkspacePage,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackAccountMenuClick,

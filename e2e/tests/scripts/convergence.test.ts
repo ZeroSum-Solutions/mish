@@ -73,7 +73,7 @@ function candidate(products: Record<string, unknown>) {
   };
   return {
     schemaVersion: 1,
-    protocol: "nexu-workload-result-v1",
+    protocol: "mish-workload-result-v1",
     repositoryId: 42,
     repository: "example/repo",
     workflow: "ci",
@@ -82,7 +82,7 @@ function candidate(products: Record<string, unknown>) {
     results: [{
       key: `workload-results/v1/repos/42/workflows/ci/policies/test-v1/workloads/a/digests/${digest}.json`,
       receipt: {
-        schemaVersion: 1, protocol: "nexu-workload-result-v1", repositoryId: 42,
+        schemaVersion: 1, protocol: "mish-workload-result-v1", repositoryId: 42,
         workflow: "ci", policy: "test-v1", workload: "a", digest,
         executionClass: { runnerClass: "worker", labels: ["ubuntu-24.04"] }, products, validated: provenance,
       },
@@ -124,7 +124,7 @@ describe("workload convergence", () => {
   test("includes the execution class in the reusable-result digest", () => {
     const fixture = createRepository();
     const hostedPlan = runPlan(fixture, ["ubuntu-24.04"]).pending.workloads;
-    const arcPlan = runPlan(fixture, ["nexu-runners-medium"]).pending.workloads;
+    const arcPlan = runPlan(fixture, ["mish-runners-medium"]).pending.workloads;
     const hosted = workload(hostedPlan, "a").digest;
     const arc = workload(arcPlan, "a").digest;
     expect(arc).not.toBe(hosted);

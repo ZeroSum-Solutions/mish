@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { INTEGRATIONS_MCP_PATH } from '@open-design/contracts';
+import { INTEGRATIONS_MCP_PATH } from '@mish/contracts';
 
 import {
   composeSystemPrompt,

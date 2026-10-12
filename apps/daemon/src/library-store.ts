@@ -21,7 +21,7 @@ import type {
   LibraryTask,
   LibraryTaskError,
   LibraryTaskStatus,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 type SqliteDb = Database.Database;
 

@@ -9,7 +9,7 @@ import {
   SETTINGS_LICENSED_PACKS,
   type InstalledPackSummary,
   type PackGithubAccessStatus,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   LICENSED_PACKS_COPY_KEYS,

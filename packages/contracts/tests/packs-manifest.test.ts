@@ -56,8 +56,8 @@ function full(): Json {
       { path: 'cult/adapters/index.json', bytes: 10, sha256: SHA },
       { path: 'cult/adapters/hero.mjs', bytes: 10, sha256: SHA },
       { path: 'genui/entries.json', bytes: 3, sha256: SHA },
-      { path: 'plugins/alpha/open-design.json', bytes: 4, sha256: SHA },
-      { path: 'plugins/beta-two/open-design.json', bytes: 4, sha256: SHA },
+      { path: 'plugins/alpha/mish.json', bytes: 4, sha256: SHA },
+      { path: 'plugins/beta-two/mish.json', bytes: 4, sha256: SHA },
     ],
   };
 }

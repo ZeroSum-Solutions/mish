@@ -120,7 +120,7 @@ OPEND-2410 / 2414 / 2416 / 2419 全部诞生于同一次会话的同一个 run(`
 - `22e2ee0ec3 fix(daemon): let Claude Code draw the Todos card again` **不在 `origin/main`、不在任何 tag**,只活在若干 feature 分支(含本分支)
 - main **有**解析侧:`claude-stream.ts:145/161/186` 把 `TaskCreate`/`TaskUpdate` 归一成 `TodoWrite`
 - main **没有**那个 env 开关(`CLAUDE_CODE_ENABLE_TODO_TOOLS`)→ Claude Code ≥2.1.x 不向模型暴露 plan 工具族
-- 净效果:**已发布版本里那段归一逻辑在等一个永远不会到达的事件**;`open-design-v0.21.0` 上确认没有
+- 净效果:**已发布版本里那段归一逻辑在等一个永远不会到达的事件**;`mish-v0.21.0` 上确认没有
 - 本分支有(`apps/daemon/src/runtimes/env.ts:99-100`)
 - **待用户拍板**:是否单独往 main 提一条修复(参照模板/插件上下文那次 PR #7533 的打法)
 
@@ -438,7 +438,7 @@ daemon 已有整个 client-environment detail 家族(5 个),web 一个都没接�
 
 ## 交接注意
 
-- **打包命令**:`pnpm tools-pack mac build --to dmg --app-version 0.21.1-beta.N`(频道由版本号决定,beta 会出 `Open Design Beta.app`,不和正式版打架)
+- **打包命令**:`pnpm tools-pack mac build --to dmg --app-version 0.21.1-beta.N`(频道由版本号决定,beta 会出 `Mish Beta.app`,不和正式版打架)
 - **曾经的失败点**:`~/Library/Caches/electron-builder/dmg-builder@1.2.0` 缓存目录损坏导致最后一步 ENOENT,删掉重跑即可
-- **快照为什么在开发环境永远看不到**:抓首屏截图的是 Electron 桌面进程,`tools-dev run web` 不起它,`/tmp/open-design/ipc/<ns>/desktop.sock` 不存在 → 每张 HTML 卡都掉进 live iframe 降级
+- **快照为什么在开发环境永远看不到**:抓首屏截图的是 Electron 桌面进程,`tools-dev run web` 不起它,`/tmp/mish/ipc/<ns>/desktop.sock` 不存在 → 每张 HTML 卡都掉进 live iframe 降级
 - **快照那两张表在所有已发布客户端里都不存在**——是未发布的分支功能。今天线上所有历史会话 100% 走 live iframe,且补不上

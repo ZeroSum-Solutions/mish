@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Badge, Button, Dialog, DialogBody, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Spinner, Textarea } from '@open-design/components';
+import { Badge, Button, Dialog, DialogBody, DialogDescription, DialogFooter, DialogHeader, DialogTitle, Spinner, Textarea } from '@mish/components';
 import {
   DESIGN_BRIEF_TEXT_PATHS, parseDesignBriefPreview,
   type DesignBriefPreview, type DesignBrief, type DesignBriefEditablePath, type DesignBriefField, type DesignBriefRecordView, type DesignBriefTextPath,
   type PatchDesignBriefRequest, type ReferenceFanoutRequest, type ResourceRef, type RunDesignBriefBinding, type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useT } from '../../i18n';
 import type { Dict } from '../../i18n/types';
 import { previewDesignBrief, cancelDesignBrief, createDesignBrief, getDesignBrief, patchDesignBrief, WorkbenchRequestError } from '../../providers/workbench';

@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import type {
@@ -8,7 +8,7 @@ import type {
   RoutineRun,
   RoutineSchedule,
   Weekday,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { Icon } from './Icon';
 import { navigate } from '../router';

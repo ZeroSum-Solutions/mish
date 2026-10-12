@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { IntakeStore } from '../../../src/runtime/intake/intake-store';
-import type { AttachIntakeResponse, IntakeBatchSnapshot } from '@open-design/contracts';
+import type { AttachIntakeResponse, IntakeBatchSnapshot } from '@mish/contracts';
 import { advanceWorkspaceAccountGeneration, resetWorkspaceAccountGeneration } from '../../../src/collab/workspace-identity';
 
 const batchId = '00000000-0000-4000-8000-000000000001';
@@ -9,7 +9,7 @@ const descriptor = { clientFileId: fileId, order: 0, filename: 'a.zip', size: 1 
 const receipt = (state: 'queued' | 'stored' | 'cleared' | 'failed' | 'needs-reselection' = 'queued'): IntakeBatchSnapshot => ({ intakeBatchId: batchId, revision: state === 'queued' ? 1 : 2, destination: { kind: 'pending' }, createdAt: 1, updatedAt: 1, files: [{ clientFileId: fileId, order: 0, descriptor, state, hasSuccessfulAttachment: false, retryable: state !== 'cleared', ...(state === 'stored' ? { stored: { assetId: 'asset', contentHash: 'a'.repeat(64), size: 1, filename: 'a.zip', detectedMime: 'application/zip', kind: 'file', downloadUrl: '/download' } } : {}) }] });
 const deferred = <T>() => { let resolve!: (value: T) => void; const promise = new Promise<T>(r => { resolve = r; }); return { promise, resolve }; };
 function fixture() {
- const api = { create: vi.fn(async (_request: import('@open-design/contracts').CreateIntakeBatchRequest, _context?: import('@open-design/contracts').WorkspaceCollabContext | null) => receipt()), list: vi.fn(async () => ({ batches: [receipt('stored')] })), get: vi.fn(async () => receipt('stored')), put: vi.fn(async (_batchId: string, _fileId: string, _body: Blob) => ({ intakeBatchId: batchId, revision: 2, file: receipt('stored').files[0]! })), clear: vi.fn(async () => receipt('cleared')), attach: vi.fn(async (): Promise<AttachIntakeResponse> => ({ intakeBatchId: batchId, revision: 3, attachments: [], files: receipt('stored').files })) };
+ const api = { create: vi.fn(async (_request: import('@mish/contracts').CreateIntakeBatchRequest, _context?: import('@mish/contracts').WorkspaceCollabContext | null) => receipt()), list: vi.fn(async () => ({ batches: [receipt('stored')] })), get: vi.fn(async () => receipt('stored')), put: vi.fn(async (_batchId: string, _fileId: string, _body: Blob) => ({ intakeBatchId: batchId, revision: 2, file: receipt('stored').files[0]! })), clear: vi.fn(async () => receipt('cleared')), attach: vi.fn(async (): Promise<AttachIntakeResponse> => ({ intakeBatchId: batchId, revision: 3, attachments: [], files: receipt('stored').files })) };
  const ids = [batchId, fileId]; const store = new IntakeStore(api, () => ids.shift() ?? crypto.randomUUID()); return { api, store };
 }
 describe('durable intake projection', () => {

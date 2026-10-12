@@ -1,7 +1,7 @@
 import type http from 'node:http';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import type { ApiErrorResponse, CreateProjectResponse, DeployPreflightResponse, ProjectFileResponse, ProjectFileVersionsResponse, UploadProjectFilesResponse } from '@open-design/contracts';
+import type { ApiErrorResponse, CreateProjectResponse, DeployPreflightResponse, ProjectFileResponse, ProjectFileVersionsResponse, UploadProjectFilesResponse } from '@mish/contracts';
 import { startServer } from '../src/server.js';
 
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a0V0AAAAASUVORK5CYII=', 'base64');

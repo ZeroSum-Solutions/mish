@@ -9,7 +9,7 @@
  * Fetching and committing a copy of that image under `generated/21st-thumbnails/` (served
  * same-origin by `apps/daemon/src/routes/twenty1st.ts`'s `/reference-preview` route) still
  * redistributes the upstream screenshot, so it only happens for a row `twenty1stMayShipLocalImage`
- * (`@open-design/contracts`) allows — today, `rights === 'mit'`. A `reference-only` row is never
+ * (`@mish/contracts`) allows — today, `rights === 'mit'`. A `reference-only` row is never
  * fetched, never written to `generated/21st-thumbnails/`, and never gets a manifest entry, even
  * with `--fetch`: its card shows the neutral "no preview" placeholder instead. `e2e/scripts/
  * catalog-thumbnails.ts` gates its own, separately captured `generated/21st-live-thumbnails/` on
@@ -33,7 +33,7 @@ import { homedir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { twenty1stMayShipLocalImage } from '@open-design/contracts';
+import { twenty1stMayShipLocalImage } from '@mish/contracts';
 import twentyFirstItemsJson from '../generated/21st-items.json' with { type: 'json' };
 import type { TwentyFirstCatalog } from './twenty-first.ts';
 

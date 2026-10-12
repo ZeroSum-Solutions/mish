@@ -6,8 +6,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
 import { createLocalResourceSources } from '../../src/workbench/resources.js';
 import { registerSectionsRoutes } from '../../src/routes/sections.js';
 

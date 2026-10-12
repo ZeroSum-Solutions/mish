@@ -6,7 +6,7 @@ The five original fictional briefs keep their frozen text in `e2e/benchmarks/qua
 
 ## First live baseline
 
-The release candidate `agency-bar/2.0.0-rc1` lives in `e2e/benchmarks/quality/bar.ts`. [agency-bar.md](agency-bar.md) is generated with `pnpm --filter @open-design/e2e bar:docs`; its drift test proves the judge reads the same source. The JSON status is `approved` for this release candidate. **The bar freezes at the end of QT-4. No baseline is taken before then.** After the freeze, a change to anchors, weights, bands or caps needs a version bump, re-calibration and a new baseline. Every criterion has explicit 1–5 anchors, weights total 11.0, and the rubric defines each letter A–F. Its complete text is hashed and retained with the judgments.
+The release candidate `agency-bar/2.0.0-rc1` lives in `e2e/benchmarks/quality/bar.ts`. [agency-bar.md](agency-bar.md) is generated with `pnpm --filter @mish/e2e bar:docs`; its drift test proves the judge reads the same source. The JSON status is `approved` for this release candidate. **The bar freezes at the end of QT-4. No baseline is taken before then.** After the freeze, a change to anchors, weights, bands or caps needs a version bump, re-calibration and a new baseline. Every criterion has explicit 1–5 anchors, weights total 11.0, and the rubric defines each letter A–F. Its complete text is hashed and retained with the judgments.
 
 Use an already running, caller-supplied loopback HTTP daemon and the installed Claude subscription. Select an available agent/model for generation. This example uses Claude; replace the port with the daemon's actual port. From the repository root:
 
@@ -23,7 +23,7 @@ pnpm exec tsx e2e/benchmarks/quality/cli.ts run \
 
 Each build gets a fresh daemon project. `run.json` also carries a fingerprint: the brief/fact fixture digest, kit id and complete kit-inventory content hash when public APIs expose every file, saved local font and non-HTML asset receipts, public prompt routing metadata, actual builder identity when exposed, and capture settings. The harness reads only public APIs and the saved inventory. Every unavailable field has an explicit reason; requested agent/model settings remain separate from actual identity. Non-HTML receipts cover final saved bytes; the API does not identify which assets came from staging rather than the builder. Kit bytes are sampled before generation, not claimed as an immutable build-time snapshot. A missing full kit inventory, font file or actual model identity never gets a guessed hash. The fingerprint has its own digest. Adding structured facts and Brightwater changes the fixture digest, so older case sets need a fresh measurement. QT-1's bar-version fingerprint hookup follows its merge. The harness saves request, returned plan and run identity, terminal run metadata, site-check results, wall time, copied files and file hashes. It uses the public file inventory and raw-file API, including nested assets. Missing planned pages and failed generations stay visible. Timeout handling cancels only the benchmark's own run and verifies a terminal state. An uncertain admission or cancellation stops the batch with retained receipts; inspect its project/run inventory before retrying. It never deletes a benchmark project automatically.
 
-Capture uses the installed e2e Playwright Chromium, one isolated context per page and viewport. If Chromium is absent, install it with `pnpm --filter @open-design/e2e exec playwright install chromium`. Every generated HTML page, excluding staged `_brand-build` fragments, gets full-page screenshots at 320×640, 375×812, 390×844, 768×1024 and 1440×900. `captures.json` now uses `quality-captures/2`; packet verification and scoring reject the old schema. Full-page PNGs retain their SHA-256 receipts and stay at the requested viewport width even when the document overflows. Images and fonts settle; scrolling triggers reveal content. Capture records horizontal overflow, console and page errors, broken images, blocked remote requests and capture failures. Capture blocks off-origin HTTP requests and WebSockets. This diagnostic browser is not a security sandbox for arbitrary imported code. Pages serve from an ephemeral loopback artifact server; it shuts down after capture.
+Capture uses the installed e2e Playwright Chromium, one isolated context per page and viewport. If Chromium is absent, install it with `pnpm --filter @mish/e2e exec playwright install chromium`. Every generated HTML page, excluding staged `_brand-build` fragments, gets full-page screenshots at 320×640, 375×812, 390×844, 768×1024 and 1440×900. `captures.json` now uses `quality-captures/2`; packet verification and scoring reject the old schema. Full-page PNGs retain their SHA-256 receipts and stay at the requested viewport width even when the document overflows. Images and fonts settle; scrolling triggers reveal content. Capture records horizontal overflow, console and page errors, broken images, blocked remote requests and capture failures. Capture blocks off-origin HTTP requests and WebSockets. This diagnostic browser is not a security sandbox for arbitrary imported code. Pages serve from an ephemeral loopback artifact server; it shuts down after capture.
 
 Each page/width gets an id such as `dental-p0-320`. Every visible landmark and section gets a crop with an id such as `dental-p0-320-s0`, its DOM selector, original document bounding box, clipped crop box and PNG hash. Nested landmarks are included. The crop box records any clipping to the full-page PNG. A page without visible landmarks records missing section evidence.
 
@@ -86,7 +86,7 @@ Capture requires no existing `screenshots/` directory. Judge refuses an existing
 `grade` scores one build path against the bar. `compare` answers a different question: which of several inputs, or which build of the same input, makes the better design? Every design is built through a product path, captured with the same protocol as `grade`, then judged against the others blind and in both orders.
 
 ```bash
-pnpm --filter @open-design/e2e exec tsx benchmarks/quality/cli.ts compare --help
+pnpm --filter @mish/e2e exec tsx benchmarks/quality/cli.ts compare --help
 ```
 
 - **`--writers original,claude,terra`** builds every improve-prompt case once per writer: `original` is the client request alone, and every other name is an Improve prompt writer whose brief is attached and bound to the run. Briefs come from the daemon's own lanes, or with `--briefs DIR` from `DIR/<case>/<writer>.preview.json`. Every brief is saved under `briefs/`, so any run can be frozen and replayed without writer calls. Any writer name works with `--briefs`, which is how experimental brief styles are compared before a writer changes.
@@ -114,8 +114,8 @@ pnpm --filter @open-design/e2e exec tsx benchmarks/quality/cli.ts compare --help
 ## Local harness checks
 
 ```bash
-pnpm --filter @open-design/e2e exec vitest run -c vitest.config.ts tests/quality
-pnpm --filter @open-design/e2e typecheck
+pnpm --filter @mish/e2e exec vitest run -c vitest.config.ts tests/quality
+pnpm --filter @mish/e2e typecheck
 pnpm exec tsx e2e/benchmarks/quality/cli.ts run \
   --stub --out "$PWD/.tmp/quality/stub-01"
 ```

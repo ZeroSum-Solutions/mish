@@ -1,38 +1,38 @@
 const { contextBridge, ipcRenderer, webUtils } = require('electron');
 
 import type {
-  OpenDesignHostBridge,
-  OpenDesignHostActionResult,
-  OpenDesignHostBrowserClearDataOptions,
-  OpenDesignHostCaptureOptions,
-  OpenDesignHostCaptureResult,
-  OpenDesignHostDroppedDirectoryListing,
-  OpenDesignHostFailure,
-  OpenDesignHostProjectImportResult,
-  OpenDesignHostProjectImportInit,
-  OpenDesignHostProjectReplaceWorkingDirResult,
-  OpenDesignHostPickWorkingDirResult,
-  OpenDesignHostPreviewNavigationFailure,
-  OpenDesignHostPreviewNavigationFailureListener,
-  OpenDesignHostUpdaterActionOptions,
-  OpenDesignHostUpdaterMenuLabels,
-  OpenDesignHostUpdaterOpenDialogListener,
-  OpenDesignHostUpdaterOpenDialogRequest,
-  OpenDesignHostUpdaterStatusListener,
-  OpenDesignHostUpdaterStatusSnapshot,
-} from '@open-design/host';
+  MishHostBridge,
+  MishHostActionResult,
+  MishHostBrowserClearDataOptions,
+  MishHostCaptureOptions,
+  MishHostCaptureResult,
+  MishHostDroppedDirectoryListing,
+  MishHostFailure,
+  MishHostProjectImportResult,
+  MishHostProjectImportInit,
+  MishHostProjectReplaceWorkingDirResult,
+  MishHostPickWorkingDirResult,
+  MishHostPreviewNavigationFailure,
+  MishHostPreviewNavigationFailureListener,
+  MishHostUpdaterActionOptions,
+  MishHostUpdaterMenuLabels,
+  MishHostUpdaterOpenDialogListener,
+  MishHostUpdaterOpenDialogRequest,
+  MishHostUpdaterStatusListener,
+  MishHostUpdaterStatusSnapshot,
+} from '@mish/host';
 
-const OPEN_DESIGN_HOST_GLOBAL: typeof import('@open-design/host').OPEN_DESIGN_HOST_GLOBAL = '__od__';
-const OPEN_DESIGN_HOST_VERSION: typeof import('@open-design/host').OPEN_DESIGN_HOST_VERSION = 2;
+const MISH_HOST_GLOBAL: typeof import('@mish/host').MISH_HOST_GLOBAL = '__od__';
+const MISH_HOST_VERSION: typeof import('@mish/host').MISH_HOST_VERSION = 2;
 const UPDATER_STATUS_EVENT = 'od:update:status-changed';
 const UPDATER_OPEN_DIALOG_EVENT = 'od:update:open-dialog';
 const APP_CONFIG_CHANGED_IPC_CHANNEL = 'od:app-config-changed';
-const APP_CONFIG_CHANGED_EVENT = 'open-design:app-config-changed';
+const APP_CONFIG_CHANGED_EVENT = 'mish:app-config-changed';
 const PREVIEW_NAVIGATION_FAILURE_IPC_CHANNEL = 'od:preview-navigation-failed';
 
 // Mirror of the argv prefix used by main's `applyOsLocaleSwitch` and
 // runtime's `additionalArguments`. Duplicated literal on purpose: the
-// preload bundle must not pull in `@open-design/desktop/main` (it
+// preload bundle must not pull in `@mish/desktop/main` (it
 // transitively requires non-electron node modules that the sandboxed
 // preload can't load).
 const OS_LOCALE_ARG_PREFIX = '--od-os-locale=';
@@ -64,7 +64,7 @@ function reasonFromError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function failure(reason: string, details?: unknown): OpenDesignHostFailure {
+function failure(reason: string, details?: unknown): MishHostFailure {
   return {
     ...(details === undefined ? {} : { details }),
     ok: false,
@@ -72,19 +72,19 @@ function failure(reason: string, details?: unknown): OpenDesignHostFailure {
   };
 }
 
-function actionFailure(reason: string, details?: unknown): OpenDesignHostActionResult {
+function actionFailure(reason: string, details?: unknown): MishHostActionResult {
   return failure(reason, details);
 }
 
-function importFailure(reason: string): OpenDesignHostProjectImportResult {
+function importFailure(reason: string): MishHostProjectImportResult {
   return failure(reason);
 }
 
-function replaceWorkingDirFailure(reason: string): OpenDesignHostProjectReplaceWorkingDirResult {
+function replaceWorkingDirFailure(reason: string): MishHostProjectReplaceWorkingDirResult {
   return failure(reason);
 }
 
-function normalizeProjectReplaceWorkingDirResult(input: unknown): OpenDesignHostProjectReplaceWorkingDirResult {
+function normalizeProjectReplaceWorkingDirResult(input: unknown): MishHostProjectReplaceWorkingDirResult {
   if (!isRecord(input)) return failure('desktop working-dir replace returned an invalid response', input);
   if (input.ok !== true) {
     if (input.canceled === true) return { canceled: true, ok: false };
@@ -106,11 +106,11 @@ function normalizeProjectReplaceWorkingDirResult(input: unknown): OpenDesignHost
   return { baseDir, entryFile, ok: true };
 }
 
-function pickWorkingDirFailure(reason: string): OpenDesignHostPickWorkingDirResult {
+function pickWorkingDirFailure(reason: string): MishHostPickWorkingDirResult {
   return failure(reason);
 }
 
-function normalizePickWorkingDirResult(input: unknown): OpenDesignHostPickWorkingDirResult {
+function normalizePickWorkingDirResult(input: unknown): MishHostPickWorkingDirResult {
   if (!isRecord(input)) return failure('desktop working-dir pick returned an invalid response', input);
   if (input.ok !== true) {
     if (input.canceled === true) return { canceled: true, ok: false };
@@ -127,7 +127,7 @@ function normalizePickWorkingDirResult(input: unknown): OpenDesignHostPickWorkin
   return { baseDir, ok: true, token };
 }
 
-function normalizeProjectImportResult(input: unknown): OpenDesignHostProjectImportResult {
+function normalizeProjectImportResult(input: unknown): MishHostProjectImportResult {
   if (!isRecord(input)) return failure('desktop import returned an invalid response', input);
   if (input.ok !== true) {
     if (input.canceled === true) return { canceled: true, ok: false };
@@ -183,23 +183,23 @@ type DesktopDiagnosticsExportResult =
 
 const project = {
   pickAndImport: (
-    init?: OpenDesignHostProjectImportInit,
-  ): Promise<OpenDesignHostProjectImportResult> =>
+    init?: MishHostProjectImportInit,
+  ): Promise<MishHostProjectImportResult> =>
     ipcRenderer.invoke('dialog:pick-and-import', init ?? null)
       .then(normalizeProjectImportResult)
       .catch((error: unknown) => importFailure(reasonFromError(error))),
-  pickAndReplaceWorkingDir: (projectId: string): Promise<OpenDesignHostProjectReplaceWorkingDirResult> =>
+  pickAndReplaceWorkingDir: (projectId: string): Promise<MishHostProjectReplaceWorkingDirResult> =>
     ipcRenderer.invoke('dialog:pick-and-replace-working-dir', { projectId })
       .then(normalizeProjectReplaceWorkingDirResult)
       .catch((error: unknown) => replaceWorkingDirFailure(reasonFromError(error))),
-  pickWorkingDir: (): Promise<OpenDesignHostPickWorkingDirResult> =>
+  pickWorkingDir: (): Promise<MishHostPickWorkingDirResult> =>
     ipcRenderer.invoke('dialog:pick-working-dir')
       .then(normalizePickWorkingDirResult)
       .catch((error: unknown) => pickWorkingDirFailure(reasonFromError(error))),
 };
 
 const shell = {
-  openExternal: async (url: string): Promise<OpenDesignHostActionResult> => {
+  openExternal: async (url: string): Promise<MishHostActionResult> => {
     try {
       const opened = await ipcRenderer.invoke('shell:open-external', url);
       return opened === true
@@ -217,7 +217,7 @@ const shell = {
   // to be true (set by the HMAC-gated import flow), so renderer code
   // cannot ask the bridge to open arbitrary local paths even
   // indirectly through legacy or future project-creation routes.
-  openPath: async (projectId: string): Promise<OpenDesignHostActionResult> => {
+  openPath: async (projectId: string): Promise<MishHostActionResult> => {
     try {
       const result = await ipcRenderer.invoke('shell:open-path', projectId);
       if (typeof result === 'string' && result.length > 0) return actionFailure(result);
@@ -229,7 +229,7 @@ const shell = {
 };
 
 const browser = {
-  clearData: async (options?: OpenDesignHostBrowserClearDataOptions): Promise<OpenDesignHostActionResult> => {
+  clearData: async (options?: MishHostBrowserClearDataOptions): Promise<MishHostActionResult> => {
     try {
       return await ipcRenderer.invoke('browser:clear-data', options ?? null);
     } catch (error) {
@@ -239,7 +239,7 @@ const browser = {
 };
 
 const capture = {
-  page: async (options?: OpenDesignHostCaptureOptions): Promise<OpenDesignHostCaptureResult> => {
+  page: async (options?: MishHostCaptureOptions): Promise<MishHostCaptureResult> => {
     try {
       return await ipcRenderer.invoke('od:capture-page', options ?? null);
     } catch (error) {
@@ -248,12 +248,12 @@ const capture = {
   },
 };
 
-let latestPreviewNavigationFailure: OpenDesignHostPreviewNavigationFailure | null = null;
-const previewNavigationFailureListeners = new Set<OpenDesignHostPreviewNavigationFailureListener>();
+let latestPreviewNavigationFailure: MishHostPreviewNavigationFailure | null = null;
+const previewNavigationFailureListeners = new Set<MishHostPreviewNavigationFailureListener>();
 
 ipcRenderer.on(PREVIEW_NAVIGATION_FAILURE_IPC_CHANNEL, (
   _event: unknown,
-  failure: OpenDesignHostPreviewNavigationFailure,
+  failure: MishHostPreviewNavigationFailure,
 ): void => {
   if (
     failure == null
@@ -279,19 +279,19 @@ ipcRenderer.on(PREVIEW_NAVIGATION_FAILURE_IPC_CHANNEL, (
 // own drop gesture; the native path is resolved here and goes straight to the
 // main process, which answers with tree-relative paths only.
 const intake = {
-  listDroppedDirectory: async (file: unknown): Promise<OpenDesignHostDroppedDirectoryListing | null> => {
+  listDroppedDirectory: async (file: unknown): Promise<MishHostDroppedDirectoryListing | null> => {
     if (!(file instanceof File)) return null;
     const path = webUtils.getPathForFile(file);
     if (!path) return null;
-    return ipcRenderer.invoke('intake:list-directory', path) as Promise<OpenDesignHostDroppedDirectoryListing>;
+    return ipcRenderer.invoke('intake:list-directory', path) as Promise<MishHostDroppedDirectoryListing>;
   },
 };
 
 const preview = {
-  getLatestNavigationFailure: (): OpenDesignHostPreviewNavigationFailure | null =>
+  getLatestNavigationFailure: (): MishHostPreviewNavigationFailure | null =>
     latestPreviewNavigationFailure,
   subscribeNavigationFailure: (
-    listener: OpenDesignHostPreviewNavigationFailureListener,
+    listener: MishHostPreviewNavigationFailureListener,
   ): (() => void) => {
     previewNavigationFailureListeners.add(listener);
     return () => {
@@ -302,38 +302,38 @@ const preview = {
 
 function invokeUpdater(
   action: 'check' | 'clear-cache' | 'download' | 'install' | 'status',
-  options?: OpenDesignHostUpdaterActionOptions,
-): Promise<OpenDesignHostUpdaterStatusSnapshot> {
+  options?: MishHostUpdaterActionOptions,
+): Promise<MishHostUpdaterStatusSnapshot> {
   return ipcRenderer.invoke(`od:update:${action}`, options ?? null);
 }
 
 const updater = {
-  check: (options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot> =>
+  check: (options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot> =>
     invokeUpdater('check', options),
-  'clear-cache': (options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot> =>
+  'clear-cache': (options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot> =>
     invokeUpdater('clear-cache', options),
-  download: (options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot> =>
+  download: (options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot> =>
     invokeUpdater('download', options),
-  install: (options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot> =>
+  install: (options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot> =>
     invokeUpdater('install', options),
-  quit: async (options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostActionResult> => {
+  quit: async (options?: MishHostUpdaterActionOptions): Promise<MishHostActionResult> => {
     try {
       return await ipcRenderer.invoke('od:update:quit', options ?? null);
     } catch (error) {
       return actionFailure(reasonFromError(error));
     }
   },
-  setMenuLabels: async (labels: OpenDesignHostUpdaterMenuLabels): Promise<OpenDesignHostActionResult> => {
+  setMenuLabels: async (labels: MishHostUpdaterMenuLabels): Promise<MishHostActionResult> => {
     try {
       return await ipcRenderer.invoke('od:update:set-menu-labels', labels);
     } catch (error) {
       return actionFailure(reasonFromError(error));
     }
   },
-  status: (options?: OpenDesignHostUpdaterActionOptions): Promise<OpenDesignHostUpdaterStatusSnapshot> =>
+  status: (options?: MishHostUpdaterActionOptions): Promise<MishHostUpdaterStatusSnapshot> =>
     invokeUpdater('status', options),
-  subscribe: (listener: OpenDesignHostUpdaterStatusListener): (() => void) => {
-    const handler = (_event: unknown, status: OpenDesignHostUpdaterStatusSnapshot): void => {
+  subscribe: (listener: MishHostUpdaterStatusListener): (() => void) => {
+    const handler = (_event: unknown, status: MishHostUpdaterStatusSnapshot): void => {
       listener(status);
     };
     ipcRenderer.on(UPDATER_STATUS_EVENT, handler);
@@ -341,8 +341,8 @@ const updater = {
       ipcRenderer.removeListener(UPDATER_STATUS_EVENT, handler);
     };
   },
-  subscribeOpenDialog: (listener: OpenDesignHostUpdaterOpenDialogListener): (() => void) => {
-    const handler = (_event: unknown, request: OpenDesignHostUpdaterOpenDialogRequest): void => {
+  subscribeOpenDialog: (listener: MishHostUpdaterOpenDialogListener): (() => void) => {
+    const handler = (_event: unknown, request: MishHostUpdaterOpenDialogRequest): void => {
       if (request == null || typeof request !== 'object' || typeof request.source !== 'string') return;
       listener({ source: request.source });
     };
@@ -360,7 +360,7 @@ ipcRenderer.on(APP_CONFIG_CHANGED_IPC_CHANNEL, () => {
 });
 
 const hostBridge = {
-  version: OPEN_DESIGN_HOST_VERSION,
+  version: MISH_HOST_VERSION,
   client: {
     type: 'desktop',
     platform: process.platform,
@@ -379,7 +379,7 @@ const hostBridge = {
   preview,
   project,
   pdf: {
-    print: async (html: string, nonce?: string, options?: PrintPdfOptions): Promise<OpenDesignHostActionResult> => {
+    print: async (html: string, nonce?: string, options?: PrintPdfOptions): Promise<MishHostActionResult> => {
       try {
         await ipcRenderer.invoke('od:print-pdf', html, nonce, options ?? null);
         return { ok: true };
@@ -393,11 +393,11 @@ const hostBridge = {
       ipcRenderer.send('desktop-pet:set-visible', Boolean(visible)),
   },
   updater,
-} satisfies OpenDesignHostBridge;
+} satisfies MishHostBridge;
 
-contextBridge.exposeInMainWorld(OPEN_DESIGN_HOST_GLOBAL, hostBridge);
+contextBridge.exposeInMainWorld(MISH_HOST_GLOBAL, hostBridge);
 
-contextBridge.exposeInMainWorld('openDesignDesktop', {
+contextBridge.exposeInMainWorld('mishDesktop', {
   exportDiagnostics: (): Promise<DesktopDiagnosticsExportResult> =>
     ipcRenderer.invoke(DESKTOP_DIAGNOSTICS_IPC_CHANNEL) as Promise<DesktopDiagnosticsExportResult>,
 });

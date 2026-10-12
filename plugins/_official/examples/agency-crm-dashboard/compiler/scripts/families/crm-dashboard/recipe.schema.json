@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://open-design.ai/schemas/agency-site/crm-dashboard/recipe.v2.json",
+  "$id": "https://mish.invalid/schemas/agency-site/crm-dashboard/recipe.v2.json",
   "title": "crm-dashboard recipe",
   "description": "A static CRM dashboard page kind: four KPIs, a five-row pipeline table, a six-item activity feed, one contact card, owner and stage filters, and one chart. Mirrors compiler/scripts/families/crm-dashboard/{slots.ts,contract.ts} field for field; run render.test.ts's schema cross-check before trusting either copy alone.",
   "type": "object",

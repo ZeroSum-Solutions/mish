@@ -1,8 +1,8 @@
 import { copyFile, mkdir, readFile, readdir, realpath, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
-import { extractComponentsManifest } from '@open-design/contracts/design-systems/components-manifest';
-import { renderDesignTokensJson, renderTailwindV4Css } from '@open-design/contracts/design-systems/derived-token-outputs';
+import { extractComponentsManifest } from '@mish/contracts/design-systems/components-manifest';
+import { renderDesignTokensJson, renderTailwindV4Css } from '@mish/contracts/design-systems/derived-token-outputs';
 import {
   buildDesignTokenContract,
   buildReportWithSelfCheck,

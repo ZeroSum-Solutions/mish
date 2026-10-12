@@ -2,7 +2,7 @@ import type {
   CollabCloudMemberDirectoryEntry,
   CollabCloudMembersResponse,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   workspaceIdentityCacheKey,
   workspaceProjectHeaders,

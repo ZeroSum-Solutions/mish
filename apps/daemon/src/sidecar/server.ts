@@ -15,7 +15,7 @@ import {
   type DesktopRenderSlidesResult,
   type DesktopStatusSnapshot,
   type MintImportTokenResult,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 
 import { startDaemonRuntime, type StartedDaemonRuntime } from "../daemon-startup.js";
 import {

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ResourceResult } from '@open-design/contracts';
+import type { ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchHtmlPreview } from '../../../src/components/workbench/WorkbenchHtmlPreview';
 import { WorkbenchResourceDetail } from '../../../src/components/workbench/WorkbenchResourceDetail';

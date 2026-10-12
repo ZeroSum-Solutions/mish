@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { isTodoWriteToolName } from '@open-design/contracts';
+import { isTodoWriteToolName } from '@mish/contracts';
 
 import { composeSystemPrompt } from '../../src/prompts/system.js';
 

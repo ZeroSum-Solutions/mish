@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 
-import { releaseChannelDescriptor } from "@open-design/release";
+import { releaseChannelDescriptor } from "@mish/release";
 
 import { optional, required, writeJson } from "../storage/common.ts";
 import { reportReleaseNotePolicyWarnings, reviewReleaseNotePlanPolicy } from "./policy.ts";

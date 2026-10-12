@@ -10,7 +10,7 @@ import {
   evaluateRuntimeFixtureCaseV1,
   normalizeAgentObservationV1,
   type NormalizedAgentObservationV1,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { collectCodexChildEvidence } from '../../src/runtimes/codex-child-evidence.js';
@@ -203,7 +203,7 @@ describe('collectCodexChildEvidence', () => {
       cliVersion: 'codex-cli 0.147.0',
       sourceTag: 'rust-v0.147.0',
       sourceCommit: 'be6e8eac029b183056b7e4402879f15d2c85f61b',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
     });
     const { recordingDigest: _recordingDigest, ...digestInput } = structuredClone(seed);
     expect(seed.recordingDigest).toBe(
@@ -349,7 +349,7 @@ describe('collectCodexChildEvidence', () => {
     ])).toMatchObject({ outcome: 'passed' });
     expect(serialized).not.toContain(secretPrompt);
     expect(serialized).not.toContain(home);
-    expect(serialized).toContain('open-design.child-injected-prompt');
+    expect(serialized).toContain('mish.child-injected-prompt');
     expect(serialized).toContain('Inspect');
     expect(serialized).toContain('[REDACTED:path]');
     expect(serialized).toContain('[REDACTED:sk_key]');

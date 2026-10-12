@@ -1,4 +1,4 @@
-import type { ApiErrorCode } from '@open-design/contracts';
+import type { ApiErrorCode } from '@mish/contracts';
 import { PlacementCoordinationError } from './write-coordinator.js';
 import { PlacementCapabilityError } from './project-registry.js';
 import type { PlacementHostFacts } from './owner-provenance.js';

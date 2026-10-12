@@ -1,5 +1,5 @@
 /** Build an offline review sheet from the package's actual sandboxed demos.
- * Run after build: pnpm --filter @open-design/genui-catalog preview:harvest
+ * Run after build: pnpm --filter @mish/genui-catalog preview:harvest
  * The result is ignored, reproducible, and has no server or external assets.
  */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';

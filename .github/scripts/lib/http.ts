@@ -59,7 +59,7 @@ function githubHeaders(token: string): Record<string, string> {
   return {
     accept: "application/vnd.github+json",
     authorization: `Bearer ${token}`,
-    "user-agent": "open-design-release-notifier",
+    "user-agent": "mish-release-notifier",
     "x-github-api-version": "2022-11-28",
   };
 }

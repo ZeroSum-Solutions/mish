@@ -16,12 +16,12 @@ describe('workspaceTeamTransportEnv', () => {
   });
 
   it('enables the transports on production now that its Vela backend serves them', () => {
-    expect(workspaceTeamTransportEnv('prod', 'https://open-design.ai/cloud')).toEqual({
+    expect(workspaceTeamTransportEnv('prod', 'https://mish.invalid/cloud')).toEqual({
       OD_WORKSPACE_CONTEXT_SOURCE: 'vela',
       OD_TEAM_PROJECTS_TRANSPORT: 'vela-cli',
       OD_COLLAB_TRANSPORT: 'vela-cli',
       OD_RESOURCE_TRANSPORT: 'vela-cli',
-      OD_VELA_WEB_URL: 'https://open-design.ai/cloud',
+      OD_VELA_WEB_URL: 'https://mish.invalid/cloud',
     });
   });
 

@@ -1,4 +1,4 @@
-import type { FontConstraintReport, FontProfile, ProjectDesignContext, ResourceCandidate } from '@open-design/contracts';
+import type { FontConstraintReport, FontProfile, ProjectDesignContext, ResourceCandidate } from '@mish/contracts';
 
 /**
  * AC-R11.3: font requirements read from the saved project context. Deterministic

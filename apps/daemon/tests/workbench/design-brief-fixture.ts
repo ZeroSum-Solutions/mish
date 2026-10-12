@@ -1,7 +1,7 @@
 import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { DesignBriefModelOutput, ResourceRef } from '@open-design/contracts';
+import type { DesignBriefModelOutput, ResourceRef } from '@mish/contracts';
 import type { BriefGeneration, BriefGenerator, BriefGeneratorInput } from '../../src/workbench/brief/generator.js';
 import type { DesignReferenceDocument, DesignReferenceSource } from '../../src/workbench/brief/references.js';
 

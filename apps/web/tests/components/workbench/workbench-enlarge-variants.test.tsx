@@ -6,7 +6,7 @@
 // into the project.
 import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ResourceDetailResponse, ResourceResult } from '@open-design/contracts';
+import type { ResourceDetailResponse, ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchResourceDetail } from '../../../src/components/workbench/WorkbenchResourceDetail';
 import { getWorkbenchResource } from '../../../src/providers/workbench';

@@ -3,7 +3,7 @@ import { mkdtemp, readFile, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { tmpdir } from 'node:os';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { connectorResourceRef } from '@open-design/contracts';
+import { connectorResourceRef } from '@mish/contracts';
 import { writeMcpConfig } from '../../src/mcp-config.js';
 import { setToken } from '../../src/mcp-tokens.js';
 import { CONNECTOR_DEFINITIONS, ConnectorProxy } from '../../src/workbench/connectors/connector-proxy.js';

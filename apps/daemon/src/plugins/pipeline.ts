@@ -27,7 +27,7 @@ import type {
   PluginPipeline,
   PluginPipelineStageEvent,
   PipelineStage,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   buildPipelineStageCompletedEvent,
   buildPipelineStageStartedEvent,

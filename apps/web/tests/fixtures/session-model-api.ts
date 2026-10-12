@@ -1,7 +1,7 @@
 import {
   parsePutSessionModel, parseSessionModelSnapshot,
   type PutSessionModel, type SessionModelSnapshot, type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { workspaceAccountScopedCacheKey } from '../../src/collab/workspace-identity';
 
 // Component fixtures keep the real session controller/save preflight in place.

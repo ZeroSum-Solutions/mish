@@ -2,16 +2,16 @@
 // so it stays SSR-safe: every entry point guards window/localStorage access
 // and falls back to a deterministic-enough fake id under jsdom and Next.js
 // pre-render. The daemon mirrors these values via the x-od-analytics-*
-// headers (see @open-design/contracts/analytics).
+// headers (see @mish/contracts/analytics).
 
-import type { AnalyticsClientType } from '@open-design/contracts/analytics';
-import { detectOpenDesignHostClientType } from '@open-design/host';
+import type { AnalyticsClientType } from '@mish/contracts/analytics';
+import { detectMishHostClientType } from '@mish/host';
 
-const ANONYMOUS_ID_KEY = 'open-design:analytics.anonymous_id';
-const SESSION_ID_KEY = 'open-design:analytics.session_id';
-const RUN_TURN_INDEX_KEY = 'open-design:analytics.run_turn_index';
+const ANONYMOUS_ID_KEY = 'mish:analytics.anonymous_id';
+const SESSION_ID_KEY = 'mish:analytics.session_id';
+const RUN_TURN_INDEX_KEY = 'mish:analytics.run_turn_index';
 // Per-project counter keys are this prefix + the project id (localStorage).
-const PROJECT_TURN_INDEX_KEY_PREFIX = 'open-design:analytics.project_turn_index:';
+const PROJECT_TURN_INDEX_KEY_PREFIX = 'mish:analytics.project_turn_index:';
 
 function randomUuid(): string {
   // Prefer the standard crypto.randomUUID — present in every modern browser
@@ -56,7 +56,7 @@ export function getSessionId(): string {
   }
 }
 
-const FIRST_SESSION_ID_KEY = 'open-design:analytics.first_session_id';
+const FIRST_SESSION_ID_KEY = 'mish:analytics.first_session_id';
 
 // Whether the current browser session is this install's FIRST analytics
 // session. The first analytics session's `getSessionId()` value is pinned in
@@ -152,7 +152,7 @@ export function claimProjectTurnIndex(
 // Falls back to 'web' when the host bridge isn't present.
 export function detectClientType(): AnalyticsClientType {
   if (typeof window === 'undefined') return 'web';
-  return detectOpenDesignHostClientType();
+  return detectMishHostClientType();
 }
 
 // Read the launch_source for app_launch. Best-effort: PerformanceNavigation

@@ -1,4 +1,4 @@
-import type { MechanicalCheckOutcome, VerificationEvidence } from '@open-design/contracts';
+import type { MechanicalCheckOutcome, VerificationEvidence } from '@mish/contracts';
 import { contrastRatio, isLargeText } from './color.js';
 import { digestParam, ev, evidenceKey, evidenceRole, evidenceSelector, list, num, readPageText, rubricKey, vocab, type EvidenceText, type PageText } from './evidence.js';
 import { describeConsoleRecord } from './page-text.js';

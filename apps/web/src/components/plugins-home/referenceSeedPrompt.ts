@@ -12,7 +12,7 @@
 // the brief. The only URL that may appear is `source.ref`, and only when it is
 // a well-formed http(s) address.
 
-import type { DesignProfile, DesignStyleAxis } from '@open-design/contracts';
+import type { DesignProfile, DesignStyleAxis } from '@mish/contracts';
 import {
   archetypeIntentForId,
   archetypeNameForId,

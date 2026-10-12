@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import type { MechanicalCheckResult, ReviewerRecord } from '@open-design/contracts';
+import type { MechanicalCheckResult, ReviewerRecord } from '@mish/contracts';
 import { aggregateReviewRun } from '../../src/workbench/review/run-aggregate.js';
 import { DEFAULT_REVIEWER_PLAN, planChecks, ReviewScopeError, resolveReviewerPlan } from '../../src/workbench/review/reviewer-plan.js';
 import { rubric } from './review-run-fixture.js';

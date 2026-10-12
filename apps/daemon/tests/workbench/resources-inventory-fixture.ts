@@ -2,7 +2,7 @@ import { mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { parseResourceSearchRequest, type InstalledPluginRecord, type ResourceRequestContext, type ResourceResult, type ResourceSearchRequest } from '@open-design/contracts';
+import { parseResourceSearchRequest, type InstalledPluginRecord, type ResourceRequestContext, type ResourceResult, type ResourceSearchRequest } from '@mish/contracts';
 import { createLocalResourceSources, searchResources, type ResourceSourceAdapter } from '../../src/workbench/resources.js';
 import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
 

@@ -9,12 +9,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const platformMocks = vi.hoisted(() => ({
   listProcessSnapshots: vi.fn(),
   stopProcesses: vi.fn(),
-  actualListProcessSnapshots: null as null | typeof import('@open-design/platform').listProcessSnapshots,
-  actualStopProcesses: null as null | typeof import('@open-design/platform').stopProcesses,
+  actualListProcessSnapshots: null as null | typeof import('@mish/platform').listProcessSnapshots,
+  actualStopProcesses: null as null | typeof import('@mish/platform').stopProcesses,
 }));
 
-vi.mock('@open-design/platform', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@open-design/platform')>();
+vi.mock('@mish/platform', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@mish/platform')>();
   platformMocks.actualListProcessSnapshots = actual.listProcessSnapshots;
   platformMocks.actualStopProcesses = actual.stopProcesses;
   platformMocks.listProcessSnapshots.mockImplementation(actual.listProcessSnapshots);
@@ -32,10 +32,10 @@ afterEach(() => {
   platformMocks.listProcessSnapshots.mockReset();
   platformMocks.stopProcesses.mockReset();
   platformMocks.listProcessSnapshots.mockImplementation(
-    platformMocks.actualListProcessSnapshots as typeof import('@open-design/platform').listProcessSnapshots,
+    platformMocks.actualListProcessSnapshots as typeof import('@mish/platform').listProcessSnapshots,
   );
   platformMocks.stopProcesses.mockImplementation(
-    platformMocks.actualStopProcesses as typeof import('@open-design/platform').stopProcesses,
+    platformMocks.actualStopProcesses as typeof import('@mish/platform').stopProcesses,
   );
 });
 
@@ -566,10 +566,10 @@ describe('chat run service shutdown', () => {
       analyticsHints: {
         entrySurface: 'external_mcp',
         hostProduct: 'codex_cli',
-        externalPluginId: 'open-design',
+        externalPluginId: 'mish',
         externalPluginVersion: '0.4.0',
         distributionMechanism: 'git_marketplace',
-        publisherClass: 'open_design_first_party',
+        publisherClass: 'mish_first_party',
         attributionQuality: 'session_correlated',
         pluginWorkflowId: '018f6f2e-4444-7444-8444-444444444444',
         logicalRequestDigest: 'a'.repeat(64),
@@ -1452,14 +1452,14 @@ describe('run event log persistence', () => {
     const runs = createRunsWithLog(tmpDir);
     const run = runs.create({ projectId: 'p1', conversationId: 'c1' }) as any;
     run.deliverableSyntaxRepair = {
-      schema: 'open-design.deliverable-syntax-repair/v1',
+      schema: 'mish.deliverable-syntax-repair/v1',
       attempt: 1,
       maxAttempts: 3,
       checker: 'web-syntax@1',
       candidateHash: 'sha256:failed',
     };
     run.deliverableSyntaxValidation = {
-      schema: 'open-design.deliverable-syntax-tool/v1',
+      schema: 'mish.deliverable-syntax-tool/v1',
       status: 'repairable',
       checkedAt: 1_725_000_000_000,
     };
@@ -1802,10 +1802,10 @@ describe('run event log persistence', () => {
       analyticsHints: {
         entrySurface: 'external_mcp',
         hostProduct: 'codex_unknown',
-        externalPluginId: 'open-design',
+        externalPluginId: 'mish',
         externalPluginVersion: '0.4.0',
         distributionMechanism: 'git_marketplace',
-        publisherClass: 'open_design_first_party',
+        publisherClass: 'mish_first_party',
         attributionQuality: 'session_correlated',
         pluginWorkflowId,
         logicalRequestDigest: 'a'.repeat(64),
@@ -1820,7 +1820,7 @@ describe('run event log persistence', () => {
       id: run.id,
       projectId: 'p1',
       externalPluginAnalytics: {
-        externalPluginId: 'open-design',
+        externalPluginId: 'mish',
         pluginWorkflowId,
         logicalRequestDigest: 'a'.repeat(64),
       },

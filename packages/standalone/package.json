@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/standalone",
+  "name": "@mish/standalone",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -19,7 +19,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tests.json --noEmit"
   },
   "dependencies": {
-    "@open-design/download": "workspace:*",
+    "@mish/download": "workspace:*",
     "jszip": "3.10.1"
   },
   "devDependencies": {

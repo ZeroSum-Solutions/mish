@@ -5,7 +5,7 @@ import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { renderReviewEvidenceText, parseProjectRubric, type ProjectRubric, type VerificationBundle } from '@open-design/contracts';
+import { renderReviewEvidenceText, parseProjectRubric, type ProjectRubric, type VerificationBundle } from '@mish/contracts';
 import { findBrowserExecutable } from '../../src/browser-sessions.js';
 import { createCdpReviewPort } from '../../src/workbench/review/cdp-worker.js';
 import { egressDigest, httpTransport, type EgressResolver, type EgressTransport } from '../../src/workbench/review/egress.js';

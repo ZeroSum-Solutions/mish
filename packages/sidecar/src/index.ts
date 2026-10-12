@@ -1,5 +1,5 @@
 /**
- * @module @open-design/sidecar
+ * @module @mish/sidecar
  *
  * Public boundary for sidecar clients and server-side process atomics. Transport,
  * endpoint derivation, and OS-visible identity are deliberately private package

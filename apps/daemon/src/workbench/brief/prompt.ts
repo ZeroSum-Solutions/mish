@@ -1,4 +1,4 @@
-import { DESIGN_BRIEF_MODEL_FIELD_BASES, DESIGN_BRIEF_TEXT_PATHS } from '@open-design/contracts';
+import { DESIGN_BRIEF_MODEL_FIELD_BASES, DESIGN_BRIEF_TEXT_PATHS } from '@mish/contracts';
 
 const field = { type: 'object', additionalProperties: false, required: ['value', 'basis'], properties: { value: { type: ['string', 'null'] }, basis: { type: 'string', enum: [...DESIGN_BRIEF_MODEL_FIELD_BASES] } } } as const;
 const list = { type: 'array', items: { type: 'string' } } as const;

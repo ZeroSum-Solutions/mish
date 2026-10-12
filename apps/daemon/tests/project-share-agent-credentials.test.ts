@@ -68,8 +68,8 @@ it('allows canonical excluded agent files and homes alongside real project conte
 it('gives the transport only a sanitized stage, independent of its exclusion semantics', async () => {
   await mkdir(path.join(projectDir, 'nested'));
   await writeFile(path.join(projectDir, 'index.html'), '<h1>Public</h1>');
-  await mkdir(path.join(projectDir, '.open-design'));
-  await writeFile(path.join(projectDir, '.open-design', 'project.json'), '{"publicMetadata":true}');
+  await mkdir(path.join(projectDir, '.mish'));
+  await writeFile(path.join(projectDir, '.mish', 'project.json'), '{"publicMetadata":true}');
   await writeFile(path.join(projectDir, '.mcp.json'), 'root-private-canary');
   await writeFile(path.join(projectDir, 'nested', '.mcp.json'), 'nested-private-canary');
   await writeFile(path.join(projectDir, 'nested', '.mcp.json.synthetic.tmp'), 'temp-private-canary');
@@ -82,8 +82,8 @@ it('gives the transport only a sanitized stage, independent of its exclusion sem
       staged = args[3]!;
       expect(staged).not.toBe(projectDir);
       expect(await readFile(path.join(staged, 'index.html'), 'utf8')).toBe('<h1>Public</h1>');
-      expect((await readdir(staged)).sort()).toEqual(['.open-design', 'index.html', 'nested']);
-      expect(await readFile(path.join(staged, '.open-design', 'project.json'), 'utf8')).toBe('{"publicMetadata":true}');
+      expect((await readdir(staged)).sort()).toEqual(['.mish', 'index.html', 'nested']);
+      expect(await readFile(path.join(staged, '.mish', 'project.json'), 'utf8')).toBe('{"publicMetadata":true}');
       expect(await readdir(path.join(staged, 'nested'))).toEqual([]);
       if (process.platform !== 'win32') expect((await stat(staged)).mode & 0o777).toBe(0o700);
       return JSON.stringify({ version: 1 });

@@ -16,7 +16,7 @@ import { randomUUID } from 'node:crypto';
 import type Database from 'better-sqlite3';
 import { readPluginEnvKnobs } from '../app-config.js';
 import {
-  OPEN_DESIGN_PLUGIN_SPEC_VERSION,
+  MISH_PLUGIN_SPEC_VERSION,
   AppliedStrategyBindingV2Schema,
   type AppliedPluginSnapshot,
   type AppliedStrategyBindingV2,
@@ -27,8 +27,8 @@ import {
   type PluginConnectorRef,
   type PluginPipeline,
   type ResolvedContext,
-} from '@open-design/contracts';
-import { strategyPackageHashFromDigests } from '@open-design/plugin-runtime';
+} from '@mish/contracts';
+import { strategyPackageHashFromDigests } from '@mish/plugin-runtime';
 
 type SqliteDb = Database.Database;
 type DbRow = Record<string, unknown>;
@@ -104,7 +104,7 @@ export function createSnapshot(db: SqliteDb, input: CreateSnapshotInput): Applie
     input.conversationId ?? null,
     input.runId ?? null,
     input.pluginId,
-    input.pluginSpecVersion ?? OPEN_DESIGN_PLUGIN_SPEC_VERSION,
+    input.pluginSpecVersion ?? MISH_PLUGIN_SPEC_VERSION,
     input.pluginVersion,
     input.manifestSourceDigest,
     strategy ? JSON.stringify(strategy) : null,
@@ -371,7 +371,7 @@ function buildSnapshot(args: {
   const snapshot: AppliedPluginSnapshot = {
     snapshotId:           id,
     pluginId:             input.pluginId,
-    pluginSpecVersion:    input.pluginSpecVersion ?? OPEN_DESIGN_PLUGIN_SPEC_VERSION,
+    pluginSpecVersion:    input.pluginSpecVersion ?? MISH_PLUGIN_SPEC_VERSION,
     pluginVersion:        input.pluginVersion,
     manifestSourceDigest: input.manifestSourceDigest,
     ...(input.strategy ? { strategy: input.strategy } : {}),

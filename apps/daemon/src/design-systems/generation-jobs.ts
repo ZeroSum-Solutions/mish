@@ -11,7 +11,7 @@ import {
   type UserDesignSystemInput,
   type UserDesignSystemRevisionInput,
 } from './index.js';
-import type { DesignSystemTokenContractRebuildDecision } from '@open-design/contracts';
+import type { DesignSystemTokenContractRebuildDecision } from '@mish/contracts';
 import {
   collectDesignSystemSourceContext,
   mergeSourceContextIntoInput,

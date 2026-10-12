@@ -216,7 +216,7 @@ export async function handleLiveArtifactsMcpRequest(request: JsonRpcRequest): Pr
         result: {
           protocolVersion: '2025-03-26',
           capabilities: { tools: {} },
-          serverInfo: { name: 'open-design-live-artifacts', version: '0.1.0' },
+          serverInfo: { name: 'mish-live-artifacts', version: '0.1.0' },
         },
       };
     }

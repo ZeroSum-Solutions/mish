@@ -1,5 +1,5 @@
 import { randomUUID } from '../../utils/uuid';
-import type { AttachIntakeRequest, AttachIntakeResponse, CreateIntakeBatchRequest, IntakeBatchSnapshot, IntakeDestination, IntakeFileDescriptor, IntakeFilePutResponse, WorkspaceCollabContext } from '@open-design/contracts';
+import type { AttachIntakeRequest, AttachIntakeResponse, CreateIntakeBatchRequest, IntakeBatchSnapshot, IntakeDestination, IntakeFileDescriptor, IntakeFilePutResponse, WorkspaceCollabContext } from '@mish/contracts';
 import { attachIntakeBatch, clearIntakeBatch, createIntakeBatch, getIntakeBatch, listIntakeBatches, putIntakeFile } from '../../providers/intake';
 import { workspaceAccountScopedCacheKey } from '../../collab/workspace-identity';
 

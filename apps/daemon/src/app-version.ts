@@ -1,12 +1,12 @@
 import { readFile, stat } from 'node:fs/promises';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, join, parse as parsePath } from 'node:path';
-import { releaseChannelFromVersion } from '@open-design/release';
+import { releaseChannelFromVersion } from '@mish/release';
 
 export const APP_VERSION_FALLBACK = '0.0.0';
 export const UNKNOWN_APP_VERSION = 'unknown';
 
-// Keep this structurally aligned with `@open-design/contracts` AppVersionInfo.
+// Keep this structurally aligned with `@mish/contracts` AppVersionInfo.
 // Daemon cannot import the package root type directly yet because its NodeNext
 // test typecheck follows the contracts source re-exports and requires explicit
 // `.js` extensions across that package.

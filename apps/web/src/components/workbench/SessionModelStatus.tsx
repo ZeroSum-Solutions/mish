@@ -1,5 +1,5 @@
-import { Button } from '@open-design/components';
-import type { ModelPreflightMismatch, ModelPreflightResult } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import type { ModelPreflightMismatch, ModelPreflightResult } from '@mish/contracts';
 import { useT } from '../../i18n';
 import type { SessionModelState } from '../../runtime/workbench/session-model-controller';
 import styles from './workbench.module.css';

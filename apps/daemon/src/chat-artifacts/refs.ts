@@ -12,7 +12,7 @@
 // which is strictly worse than the live-preview fallback it displaced.
 
 import type Database from 'better-sqlite3';
-import type { ProjectFileKind } from '@open-design/contracts';
+import type { ProjectFileKind } from '@mish/contracts';
 
 import {
   getChatArtifactSnapshot,

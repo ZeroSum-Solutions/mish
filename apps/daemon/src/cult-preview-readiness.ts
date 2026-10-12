@@ -1,5 +1,5 @@
-import { CULT_PREVIEW_MESSAGE_SOURCE } from '@open-design/contracts';
-import { findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { CULT_PREVIEW_MESSAGE_SOURCE } from '@mish/contracts';
+import { findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 import { PREVIEW_CONTENT_SIZE_REPORTER } from './preview-content-size.js';
 
 /**

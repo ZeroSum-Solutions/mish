@@ -47,9 +47,9 @@ if ($IncludeZip -and ([string]::IsNullOrWhiteSpace($sourceZip) -or -not (Test-Pa
   throw "expected portable zip path from build json not found at $sourceZip"
 }
 
-$versionedInstaller = "open-design-$ReleaseVersion$ReleaseAssetSuffix-win-x64-setup.exe"
-$versionedPayload = "open-design-$ReleaseVersion$ReleaseAssetSuffix-win-x64-payload.7z"
-$versionedZip = "open-design-$ReleaseVersion$ReleaseAssetSuffix-win-x64-portable.zip"
+$versionedInstaller = "mish-$ReleaseVersion$ReleaseAssetSuffix-win-x64-setup.exe"
+$versionedPayload = "mish-$ReleaseVersion$ReleaseAssetSuffix-win-x64-payload.7z"
+$versionedZip = "mish-$ReleaseVersion$ReleaseAssetSuffix-win-x64-portable.zip"
 $installerPath = Join-Path $ReleaseAssetsDir $versionedInstaller
 Copy-Item -LiteralPath $sourceInstaller -Destination $installerPath -Force
 $installerHash = (Get-FileHash -LiteralPath $installerPath -Algorithm SHA256).Hash.ToLowerInvariant()

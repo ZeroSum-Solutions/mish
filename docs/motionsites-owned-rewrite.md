@@ -151,11 +151,11 @@ source package.
 | Check | Receipt |
 |---|---|
 | `mise exec -- corepack pnpm guard` | Exit 0. Repository guards passed, including preview-manifest and mirror-URL checks. The structural HTML guard checked zero `template.json`-backed examples here; the dedicated eight real-folder and eight HTTP tests cover these replacements. |
-| `mise exec -- corepack pnpm --filter @open-design/plugin-runtime test` | 11 test files / 80 tests passed, including eight real-folder ownership/manifest/asset/size cases. |
-| `mise exec -- corepack pnpm --filter @open-design/plugin-runtime typecheck` | Exit 0; source and test configurations. |
-| `mise exec -- corepack pnpm --filter @open-design/daemon exec vitest run tests/plugins-preview-route.test.ts tests/plugins-asset-route.test.ts tests/plugins-validate.test.ts` | 3 files / 24 tests passed after local dependency repair. |
-| `mise exec -- corepack pnpm --filter @open-design/daemon exec vitest run tests/plugins-owned-examples-preview.test.ts` | 8 tests passed. Each real package returns HTTP 200 HTML through the preview handler, resolves its linked stylesheet and serves byte-identical local font assets. Uses the production route registrar with a read-only package lookup fixture, not a full running application. |
-| `mise exec -- corepack pnpm --filter @open-design/daemon exec node --max-old-space-size=4096 node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit` | Exit 0 after fixing the new test fixture's constructor signature. |
+| `mise exec -- corepack pnpm --filter @mish/plugin-runtime test` | 11 test files / 80 tests passed, including eight real-folder ownership/manifest/asset/size cases. |
+| `mise exec -- corepack pnpm --filter @mish/plugin-runtime typecheck` | Exit 0; source and test configurations. |
+| `mise exec -- corepack pnpm --filter @mish/daemon exec vitest run tests/plugins-preview-route.test.ts tests/plugins-asset-route.test.ts tests/plugins-validate.test.ts` | 3 files / 24 tests passed after local dependency repair. |
+| `mise exec -- corepack pnpm --filter @mish/daemon exec vitest run tests/plugins-owned-examples-preview.test.ts` | 8 tests passed. Each real package returns HTTP 200 HTML through the preview handler, resolves its linked stylesheet and serves byte-identical local font assets. Uses the production route registrar with a read-only package lookup fixture, not a full running application. |
+| `mise exec -- corepack pnpm --filter @mish/daemon exec node --max-old-space-size=4096 node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit` | Exit 0 after fixing the new test fixture's constructor signature. |
 | EGO browser QA | All eight at 1200, 768 and 320px: no horizontal overflow, all fonts loaded, no external resource requests, all anchor targets present. Working package-specific selectors, mobile menus with Escape/focus return and local-only enquiry feedback. |
 | No-script / reduced motion | Eight checks each: visible heading/navigation, disabled script-dependent controls; reduced-motion media active with zero animations. |
 | Font provenance | Archivo, Bodoni Moda and IBM Plex Mono copies match existing repository font bytes by SHA-256; complete OFL notices preserved. |

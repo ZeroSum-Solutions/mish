@@ -628,13 +628,13 @@ The final catalog has 77 entries, of which 76 have code and demos. The one exist
 | Command | Receipt |
 |---|---|
 | `pnpm install --frozen-lockfile --ignore-scripts` | Passed; pinned Node 24.16.0 / pnpm 10.33.2. Workspace postinstall was skipped to preserve the worker path boundary. |
-| `pnpm --filter @open-design/genui-catalog build` | Passed; generated 77-entry catalog data with 76 implemented previews. |
-| `pnpm --filter @open-design/genui-catalog typecheck` | Passed; source, component, script, and test declarations. |
-| `pnpm --filter @open-design/genui-catalog check` | Passed; catalog matches seed/meta and measured bundles. |
-| `pnpm --filter @open-design/genui-catalog test` | Passed: 763 tests in 69 files. Baseline: 660 tests in 67 files. Added: 103 tests in two files. Existing jsdom canvas/media “not implemented” notices remain non-fatal. |
-| `pnpm guard` | Could not start: missing `@open-design/contracts/dist/index.mjs`. The fresh worktree has no other workspace build outputs. No files in contracts, apps, or other packages were generated or edited. |
+| `pnpm --filter @mish/genui-catalog build` | Passed; generated 77-entry catalog data with 76 implemented previews. |
+| `pnpm --filter @mish/genui-catalog typecheck` | Passed; source, component, script, and test declarations. |
+| `pnpm --filter @mish/genui-catalog check` | Passed; catalog matches seed/meta and measured bundles. |
+| `pnpm --filter @mish/genui-catalog test` | Passed: 763 tests in 69 files. Baseline: 660 tests in 67 files. Added: 103 tests in two files. Existing jsdom canvas/media “not implemented” notices remain non-fatal. |
+| `pnpm guard` | Could not start: missing `@mish/contracts/dist/index.mjs`. The fresh worktree has no other workspace build outputs. No files in contracts, apps, or other packages were generated or edited. |
 | `TSX_TSCONFIG_PATH=packages/genui-catalog/.tmp/guard-tsconfig.json pnpm guard` | Passed, exit 0. Temporary aliases resolve missing workspace exports to their checked-in TypeScript sources. This is a source-mode guard receipt, not proof of built workspace package exports. The ignored config stays in this worktree; integration should bootstrap its normal workspace dependencies and run plain guard. |
-| `pnpm --filter @open-design/genui-catalog preview:harvest` | Passed; generates `.tmp/harvest-preview.html` and standalone normal/reduced demo documents. Offline preview sheet opened in EGO Lite. |
+| `pnpm --filter @mish/genui-catalog preview:harvest` | Passed; generates `.tmp/harvest-preview.html` and standalone normal/reduced demo documents. Offline preview sheet opened in EGO Lite. |
 | `git diff --check` | Passed. All tracked changes stay in the allowed GenUI package and this report. |
 
 Browser checks used the actual built sandbox demos in Chromium, at 390 × 844 and 1,240 × 860 CSS pixels. All 14 mounted at both widths with document width equal to viewport width. All 14 forced-reduced-motion demos had zero running animations. Updated text variants retain words and grapheme clusters; keyboard Space toggled pixel faces and both pause buttons; pixel focus showed an outline; live system reduced motion preserved focus on the rotating-text button and stopped its animation. The reduced logo strip displayed all original marks without the duplicate. These receipts do not claim Safari, physical-device, or assistive-technology testing. Screenshots and JSON receipts remain under `packages/genui-catalog/.tmp/` as ignored local QA artifacts.

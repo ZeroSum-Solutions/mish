@@ -1,12 +1,12 @@
 # nonprofit native example package
 
-Native Mishh Mashh format is this folder's `SKILL.md` plus `open-design.json`. The package carries
+Native Mishh Mashh format is this folder's `SKILL.md` plus `mish.json`. The package carries
 the shared compiler closure under `compiler/` and the `nonprofit` family defined in
 `compiler/scripts/families/nonprofit/`.
 
 | Path | What it is |
 | --- | --- |
-| `open-design.json` | the plugin manifest |
+| `mish.json` | the plugin manifest |
 | `SKILL.md` | how to drive the family: roster, slots, limits and the compile command |
 | `compiler/` | the offline compiler closure (synced from `plugins/_official/shared/agency-compiler`) and the family's own source |
 | `compiler/scripts/families/nonprofit/` | the family module: `slots.ts`, `contract.ts`, `recipe.schema.json`, `render.ts`, `render.test.ts`, `reference.fixture.json` |

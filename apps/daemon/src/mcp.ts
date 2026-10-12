@@ -35,7 +35,7 @@ import {
   buildProjectRawFileUrl,
   type McpAnalyticsContextResponse,
   type WorkspaceProjectsResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { randomUUID } from 'node:crypto';
 
 import { postCreateArtifactRequest } from './artifacts/create.js';
@@ -46,8 +46,8 @@ import {
   type LocalMcpBriefStore,
 } from './mcp-brief.js';
 import {
-  OPEN_DESIGN_BRIEF_APP_HTML,
-  OPEN_DESIGN_BRIEF_APP_VERSION,
+  MISH_BRIEF_APP_HTML,
+  MISH_BRIEF_APP_VERSION,
 } from './mcp-apps/brief-resource.js';
 import { DEFAULT_AMR_RECHARGE_URL } from './integrations/vela-errors.js';
 import {
@@ -55,7 +55,7 @@ import {
   logicalPluginRequestDigest,
   mapMcpHostProduct,
   normalizeExternalPluginRunAnalyticsHints,
-  OPEN_DESIGN_PLUGIN_ID,
+  MISH_PLUGIN_ID,
   pluginContractError,
   resolvePluginGenerationSloWindowMs,
   validateExternalPluginContext,
@@ -63,12 +63,12 @@ import {
   validatePluginWorkflowId,
 } from './mcp-observability.js';
 
-const SERVER_NAME = 'open-design';
+const SERVER_NAME = 'mish';
 const SERVER_VERSION = '0.2.0';
 const DEFAULT_MCP_STDIO_IDLE_EXIT_MS = 30 * 60 * 1000;
 const MAX_MCP_STDIO_IDLE_EXIT_MS = 24 * 60 * 60 * 1000;
-export const OPEN_DESIGN_BRIEF_APP_RESOURCE =
-  'ui://open-design/artifact-card-v8.html';
+export const MISH_BRIEF_APP_RESOURCE =
+  'ui://mish/artifact-card-v8.html';
 
 export const MCP_SERVER_INSTRUCTIONS = [
   'Use only these product names in user-facing replies: AMR and Local Codex.',
@@ -331,7 +331,7 @@ const PLUGIN_WORKFLOW_ID_ARG = {
 const EXTERNAL_PLUGIN_CONTEXT_ARG = {
   type: 'object',
   properties: {
-    id: { type: 'string', const: OPEN_DESIGN_PLUGIN_ID },
+    id: { type: 'string', const: MISH_PLUGIN_ID },
     version: { type: 'string' },
     distributionMechanism: {
       type: 'string',
@@ -339,7 +339,7 @@ const EXTERNAL_PLUGIN_CONTEXT_ARG = {
     },
     publisherClass: {
       type: 'string',
-      enum: ['open_design_first_party', 'third_party', 'unknown'],
+      enum: ['mish_first_party', 'third_party', 'unknown'],
     },
   },
   required: [
@@ -401,9 +401,9 @@ export const TOOL_DEFS = [
     },
     annotations: { ...WRITE_ANNOTATIONS, title: 'Collect Mishh Mashh brief' },
     _meta: {
-      ui: { resourceUri: OPEN_DESIGN_BRIEF_APP_RESOURCE },
-      'ui/resourceUri': OPEN_DESIGN_BRIEF_APP_RESOURCE,
-      'openai/outputTemplate': OPEN_DESIGN_BRIEF_APP_RESOURCE,
+      ui: { resourceUri: MISH_BRIEF_APP_RESOURCE },
+      'ui/resourceUri': MISH_BRIEF_APP_RESOURCE,
+      'openai/outputTemplate': MISH_BRIEF_APP_RESOURCE,
     },
   },
   {
@@ -936,7 +936,7 @@ function validateMcpToolArgs(name: string, args: McpArgs): void {
 export function localMcpResourceDefinitions() {
   return [
     {
-      uri: OPEN_DESIGN_BRIEF_APP_RESOURCE,
+      uri: MISH_BRIEF_APP_RESOURCE,
       name: 'Mishh Mashh brief',
       title: 'Choose the artifact direction',
       description:
@@ -1028,14 +1028,14 @@ export async function _readMcpResource(
   daemonTarget: ReturnType<typeof createMcpDaemonTarget>,
   uri: string,
 ): Promise<{ contents: Array<{ uri: string; mimeType: string; text: string; _meta?: Record<string, unknown> }> }> {
-  if (uri === OPEN_DESIGN_BRIEF_APP_RESOURCE) {
+  if (uri === MISH_BRIEF_APP_RESOURCE) {
     return {
       contents: [
         {
           uri,
           mimeType: 'text/html;profile=mcp-app',
-          text: OPEN_DESIGN_BRIEF_APP_HTML,
-          _meta: { version: OPEN_DESIGN_BRIEF_APP_VERSION },
+          text: MISH_BRIEF_APP_HTML,
+          _meta: { version: MISH_BRIEF_APP_VERSION },
         },
       ],
     };
@@ -1530,12 +1530,12 @@ function mcpFailureFacts(
     errorCode === 'PLUGIN_CONTRACT_REJECTED'
       ? 'local_mcp'
       : errorCode === 'DAEMON_UNREACHABLE'
-        ? 'open_design_daemon'
+        ? 'mish_daemon'
         : errorCode === 'DELIVERABLE_MISSING'
           ? 'artifact_store'
           : message.includes('VELA_') || message.includes('AMR_')
             ? 'vela_api'
-            : 'open_design_daemon';
+            : 'mish_daemon';
   return {
     error_code: errorCode,
     failure_stage: failureStage,
@@ -1551,7 +1551,7 @@ function mcpFailureFacts(
       errorCode === 'PLUGIN_CONTRACT_REJECTED'
         ? 'fix_plugin'
         : errorCode === 'DAEMON_UNREACHABLE'
-          ? 'start_open_design'
+          ? 'start_mish'
           : 'retry',
   };
 }
@@ -1586,13 +1586,13 @@ async function observeMcpToolCall(
       && typeof args.externalPluginContext === 'object'
       && !Array.isArray(args.externalPluginContext)
       && (args.externalPluginContext as JsonObject).id
-        === OPEN_DESIGN_PLUGIN_ID;
+        === MISH_PLUGIN_ID;
     const rejected = errorResult(errorMessage(error));
     const common = {
       ...mcpSourceProperties(session, null),
       ...(rawPlugin
         ? {
-            external_plugin_id: OPEN_DESIGN_PLUGIN_ID,
+            external_plugin_id: MISH_PLUGIN_ID,
             attribution_quality: 'self_reported',
           }
         : {}),

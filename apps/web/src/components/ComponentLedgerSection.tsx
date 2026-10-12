@@ -1,6 +1,6 @@
 import { useEffect, useId, useState } from 'react';
-import { Badge, Button, EmptyState, Select, Spinner, Surface } from '@open-design/components';
-import { parseComponentLedgerReport, type ComponentLedgerReport } from '@open-design/contracts';
+import { Badge, Button, EmptyState, Select, Spinner, Surface } from '@mish/components';
+import { parseComponentLedgerReport, type ComponentLedgerReport } from '@mish/contracts';
 import { useI18n } from '../i18n';
 import styles from './ComponentLedgerSection.module.css';
 

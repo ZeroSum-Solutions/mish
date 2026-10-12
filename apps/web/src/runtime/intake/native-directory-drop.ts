@@ -1,4 +1,4 @@
-import type { OpenDesignHostDroppedDirectoryListing, OpenDesignHostDroppedDirectoryRefusal } from '@open-design/host';
+import type { MishHostDroppedDirectoryListing, MishHostDroppedDirectoryRefusal } from '@mish/host';
 
 /** The FileSystemEntry surface Chromium gives a drop (`webkitGetAsEntry`). */
 export interface DirectoryEntryLike {
@@ -13,10 +13,10 @@ export interface DirectoryEntryLike {
 export interface DroppedDirectory { file: File | null; entry: DirectoryEntryLike }
 
 export interface DirectoryIntakeHost {
-  listDroppedDirectory(file: unknown): Promise<OpenDesignHostDroppedDirectoryListing | null>;
+  listDroppedDirectory(file: unknown): Promise<MishHostDroppedDirectoryListing | null>;
 }
 
-export type DirectoryRefusal = OpenDesignHostDroppedDirectoryRefusal | 'unavailable';
+export type DirectoryRefusal = MishHostDroppedDirectoryRefusal | 'unavailable';
 
 export interface ExpandedDirectory {
   rootName: string;

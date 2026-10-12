@@ -10,7 +10,7 @@ import { load } from 'cheerio';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { reconcileAgencyRecipe } from '../src/artifacts/agency-recipe.js';
 import { startServer } from '../src/server.js';
-import type { CreateProjectResponse, ProjectFileResponse, ProjectFileVersionsResponse, ReconcileAgencyRecipeResponse } from '@open-design/contracts';
+import type { CreateProjectResponse, ProjectFileResponse, ProjectFileVersionsResponse, ReconcileAgencyRecipeResponse } from '@mish/contracts';
 
 const templatesRoot = fileURLToPath(new URL('../../../design-templates/', import.meta.url));
 const roots: string[] = [];

@@ -25,8 +25,8 @@ import type {
   AgencyBuildResponse,
   AgencyBuildSnapshot,
   ApiErrorResponse,
-} from '@open-design/contracts';
-import type { BuildDeps, BuildInput, BuildResult, PreparedBuild } from '@open-design/agency-fast-lane/build';
+} from '@mish/contracts';
+import type { BuildDeps, BuildInput, BuildResult, PreparedBuild } from '@mish/agency-fast-lane/build';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

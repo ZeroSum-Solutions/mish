@@ -24,7 +24,7 @@ async function filesUnder(directory: string): Promise<string[]> {
 describe('owned replacement examples', () => {
   it.each(ownedFolders)('%s retains a valid runnable plugin and local-only assets', async (folder) => {
     const root = path.join(examplesRoot, folder);
-    const manifestText = await readFile(path.join(root, 'open-design.json'), 'utf8');
+    const manifestText = await readFile(path.join(root, 'mish.json'), 'utf8');
     const parsed = parseManifest(manifestText);
     expect(parsed.ok, JSON.stringify(parsed)).toBe(true);
     if (!parsed.ok) throw new Error(parsed.errors.join('; '));
@@ -52,7 +52,7 @@ describe('owned replacement examples', () => {
     const html = await readFile(path.join(root, 'example.html'), 'utf8');
     // An SVG namespace is an identifier, not a network request.
     expect(html.replaceAll('http://www.w3.org/2000/svg', '')).not.toMatch(/https?:\/\/|(?:src|href)\s*=\s*["']\/\//i);
-    expect(`${manifestText}\n${skill}`).not.toMatch(/motionsites\.ai|plugin-assets\.open-design\.ai|CC-BY-4\.0/);
+    expect(`${manifestText}\n${skill}`).not.toMatch(/motionsites\.ai|plugin-assets\.mish\.ai|CC-BY-4\.0/);
     expect(html).toContain('prefers-reduced-motion');
     expect(html).toContain(':focus-visible');
     expect(html).toContain('No details were sent or saved.');

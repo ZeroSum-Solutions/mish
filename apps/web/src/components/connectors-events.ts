@@ -1,5 +1,5 @@
 export { CONNECTOR_CALLBACK_MESSAGE_TYPE } from '../runtime/connector-callback-trust';
-export const CONNECTORS_CHANGED_EVENT = 'open-design:connectors-changed';
+export const CONNECTORS_CHANGED_EVENT = 'mish:connectors-changed';
 
 export function notifyConnectorsChanged(): void {
   if (typeof window === 'undefined') return;

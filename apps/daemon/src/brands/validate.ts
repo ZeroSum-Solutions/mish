@@ -7,7 +7,7 @@ import {
   type BrandColorRole,
   type BrandFontSpec,
   type BrandImagerySample,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { safeFontStylesheetUrl } from './font-url.js';
 import { sanitizeSeedOverrides, type Brand } from './schema.js';
 

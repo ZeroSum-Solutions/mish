@@ -1,7 +1,7 @@
 // AC-R01.1 / AC-R01.4: one folder that cannot be listed must not discard the
 // rest of the same drop gesture (loose files and folders that did expand).
 import { describe, expect, it, vi } from 'vitest';
-import type { OpenDesignHostDroppedDirectoryListing } from '@open-design/host';
+import type { MishHostDroppedDirectoryListing } from '@mish/host';
 import { collectNativeDrop } from '../../../src/runtime/intake/native-drop-intake';
 import type { DirectoryEntryLike } from '../../../src/runtime/intake/native-directory-drop';
 
@@ -20,7 +20,7 @@ describe('collectNativeDrop', () => {
   it('keeps loose files and expanded folders when another folder in the same drop cannot be listed', async () => {
     const loose = new File(['l'], 'loose.txt');
     const good = new File([], 'Good'); const gone = new File([], 'Gone');
-    const listing: OpenDesignHostDroppedDirectoryListing = { rootName: 'Good', files: [{ relativePath: 'a.txt', size: 1 }], refused: [], truncated: false };
+    const listing: MishHostDroppedDirectoryListing = { rootName: 'Good', files: [{ relativePath: 'a.txt', size: 1 }], refused: [], truncated: false };
     const host = { listDroppedDirectory: vi.fn(async (file: unknown) => {
       if (file === gone) throw new Error('The dropped folder is unavailable');
       return listing;

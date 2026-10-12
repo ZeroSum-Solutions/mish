@@ -1,19 +1,19 @@
 /**
  * `GET /api/sections` and `GET /api/sections/:id` — the full selectable section catalog
- * (`sol-design.md` §1/§5, phase D "product surfaces" row): `@open-design/section-catalog`'s
+ * (`sol-design.md` §1/§5, phase D "product surfaces" row): `@mish/section-catalog`'s
  * built-in, validated `catalog.json` (HyperUI blocks + the 13 agency families' own sections +
  * the catalogued, not-yet-insertable Cult UI Pro sections/pages, static, built at author time by `packages/section-catalog/scripts/build-catalog.ts`) merged
  * with the MotionSites bridge's own entries (`apps/daemon/src/motionsites/catalog.ts`'s
  * `fetchMotionSitesCatalogEntries` — bundled `local-corpus` plus the federated
  * `motionsites-mcp` source, phase C), plus the five built-in design directions
- * (`@open-design/agency-fast-lane/section-overlay`'s `listDesignDirections`) a
+ * (`@mish/agency-fast-lane/section-overlay`'s `listDesignDirections`) a
  * `sectionSelection.directionId` may name. Static entries first, then the bridge's own (which
  * itself puts `local-corpus` before the federated half) — the same "local first" order
  * `motionsites/catalog.ts`'s own module doc fixes.
  *
  * `catalog.json` is imported as a JSON module (not read from disk at request time): it is a
  * small, build-time-validated manifest, and a static import survives the daemon's esbuild
- * prebundle the same way `genui-catalog.ts`'s `@open-design/genui-catalog/data` import does —
+ * prebundle the same way `genui-catalog.ts`'s `@mish/genui-catalog/data` import does —
  * unlike an `import.meta.dirname`-relative file read, which would resolve inside the prebundle
  * where the source tree does not exist.
  *
@@ -40,10 +40,10 @@ import type {
   SectionCatalogSpineCode,
   SectionEntryResponse,
   SectionsListResponse,
-} from '@open-design/contracts/api/section-catalog';
-import sectionCatalogJson from '@open-design/section-catalog/catalog.json' with { type: 'json' };
-import { listDesignDirections } from '@open-design/agency-fast-lane/section-overlay';
-import { cultDisplayText, cultLocalOnlyRefusal } from '@open-design/contracts';
+} from '@mish/contracts/api/section-catalog';
+import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
+import { listDesignDirections } from '@mish/agency-fast-lane/section-overlay';
+import { cultDisplayText, cultLocalOnlyRefusal } from '@mish/contracts';
 import { cultPublicId } from '../cult-public-ids.js';
 import { fetchMotionSitesCatalogEntries } from '../motionsites/catalog.js';
 import { renderSectionPreview, SECTION_PREVIEW_FRAME_CSP, type SectionPreviewRoots } from '../workbench/section-previews.js';

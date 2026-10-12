@@ -1,6 +1,6 @@
 /**
  * The adapter registry in `src/section-overlay.ts` resolves the checked Cult adapters from
- * `@open-design/cult-ui-catalog`'s generated registry next to the three HyperUI ids, and a Cult
+ * `@mish/cult-ui-catalog`'s generated registry next to the three HyperUI ids, and a Cult
  * adapter renders through the same overlay path: fill, splice, digest, family CSP.
  */
 

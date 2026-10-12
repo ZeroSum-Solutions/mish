@@ -1,9 +1,9 @@
-import type { RunTerminalLifecycleStatus } from '@open-design/contracts';
+import type { RunTerminalLifecycleStatus } from '@mish/contracts';
 import type {
   TrackingRunCancelOrigin,
   TrackingRunTerminalIntegrity,
   TrackingRunTerminalTrigger,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import type { AnalyticsCaptureResult } from '../analytics.js';
 
 export const RUN_TERMINAL_LIFECYCLE_VERSION =

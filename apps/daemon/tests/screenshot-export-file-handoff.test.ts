@@ -10,7 +10,7 @@ import type {
   DesktopExportArtifactResult,
   DesktopRenderSlidesInput,
   DesktopRenderSlidesResult,
-} from '@open-design/sidecar-proto';
+} from '@mish/sidecar-proto';
 import { createProjectFileVersion } from '../src/project-file-versions.js';
 import { startServer } from '../src/server.js';
 

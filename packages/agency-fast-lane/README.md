@@ -12,7 +12,7 @@ project watcher reloads the canvas after every save.
 ## Run
 
 ```sh
-pnpm --filter @open-design/agency-fast-lane fast-lane -- \
+pnpm --filter @mish/agency-fast-lane fast-lane -- \
   --family maben --brief ./brief.md --name "Riverbend Dental"
 ```
 
@@ -206,7 +206,7 @@ A routed, non-route-only `--report` carries the full `RunReport` with `route` sp
 it; `RunReport` itself is untouched — the route lives at the CLI layer only.
 
 ```sh
-pnpm --filter @open-design/agency-fast-lane fast-lane -- \
+pnpm --filter @mish/agency-fast-lane fast-lane -- \
   --family auto --brief ./brief.md --route-only --report route.json
 ```
 
@@ -224,7 +224,7 @@ variable.
 
 ```sh
 node --experimental-strip-types scripts/import-shape-atlas.ts <path-or-https-url> [--out src/atlas/shape-atlas.json]
-# or: pnpm --filter @open-design/agency-fast-lane import-atlas -- <path-or-https-url>
+# or: pnpm --filter @mish/agency-fast-lane import-atlas -- <path-or-https-url>
 ```
 
 The importer is a regex parse over the static HTML (spine cards, archetype cards, the
@@ -297,7 +297,7 @@ failure and the run continues.
 ## Test
 
 ```sh
-pnpm --filter @open-design/agency-fast-lane test
+pnpm --filter @mish/agency-fast-lane test
 ```
 
 ## Bundled word list

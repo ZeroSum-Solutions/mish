@@ -1,7 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { Dialog, DialogTitle } from '@open-design/components';
-import { genuiCatalogPreviewUrl, type GenuiCatalogEntry } from '@open-design/contracts';
+import { Dialog, DialogTitle } from '@mish/components';
+import { genuiCatalogPreviewUrl, type GenuiCatalogEntry } from '@mish/contracts';
 import { useT } from '../i18n';
 import type { Dict } from '../i18n/types';
 import styles from './CultLivePreview.module.css';

@@ -104,7 +104,7 @@ PostHog 的 `run_finished` 没有原始错误文本,Langfuse 是唯一能看到�
 - `timeout` → `Unsupported service_tier: flex`(codex 配置)
 - `unknown` → Claude Code 掉线、BYOK 没配 key
 - 反向:`rate_limit/hard_quota` 有 28 条原文只是泛化空输出
-另发现的 OD 侧 bug:`unknown agent: undefined` 派发(7 例);pi agent 把 `…/Resources/open-design/skills` 目录当 append-system-prompt 文件(EISDIR);deepseek TUI / aider 只接 argv 而 prompt 超长;opencode 无 AVX2 panic。
+另发现的 OD 侧 bug:`unknown agent: undefined` 派发(7 例);pi agent 把 `…/Resources/mish/skills` 目录当 append-system-prompt 文件(EISDIR);deepseek TUI / aider 只接 argv 而 prompt 超长;opencode 无 AVX2 panic。
 
 ## 2c. 三份源码调研里改变认知的事实(S1 / S3 / S4 摘要,细节见源文件)
 
@@ -113,7 +113,7 @@ PostHog 的 `run_finished` 没有原始错误文本,Langfuse 是唯一能看到�
 3. **契约与实现不一致**:`RunFailureAction` 契约只有 `relogin|recharge|upgrade|retry|none`,daemon 实际写 `login|switch_model|reduce_context|install_cli|fix_config|…`;`HTML_VERSION_SNAPSHOT_FAILED`、`DAEMON_RESTARTED`、`BYOK_PROVIDER_REQUIRED`、`PI_PARENT_SESSION_FAILED`、`DSH_PROFILE_*`、`AMR_WORKSPACE_SCOPE_REQUIRED` 都不在 `API_ERROR_CODES`。
 4. **exit≠0 但本 run 写了产物一律算 succeeded**(chat-run-lifecycle.ts:90-92);critique 分支非 shipped 直接 failed 且不发 error 帧。
 5. **web 解析顺序**(S3 web):agent 无关 code → `model_window_limit` → agent 无关 detail → AMR 分支 → Antigravity → detail 覆盖 → 连接断开 → 非 AMR auth → RATE_LIMITED → UPSTREAM → 兜底「Task failed + 原文 + Retry」。`fatal_rpc_error`、`process_crashed`、`model_not_found`、`prompt_too_large`(detail)、`upstream_client_error`、`network_error` 都**没有**卡片映射;`cpu_unsupported` 无任何按钮;两个死 i18n 键;`InsufficientCreditsDialog` 从未挂载;`json-rpc id N:` 原文直接进兜底。
-6. **vela CLI 到父进程的契约**(S3 CLI):JSON-RPC 只有 4 个标准码,业务信息全在 `error.data.kind`(`model_catalog_unavailable` / `account_suspended` / `no_models_available` / `opencode_prompt_error` / `opencode_retry_exhausted` / `resume_failed` / `billing_recovery_*`)和 `statusCode`(上游网关状态码原样);401 的 HTTP 细节在 session_new 阶段被吞成「AMR model catalog is unavailable」;网关 401/402/403/429 在 prompt 期通过 `session.status retry` 原样透传文本;`vela login` 没有 `--json`、没有 logout、没有已登录短路;登录各阶段有 `OPEN_DESIGN_AMR_AUTH_STAGE` JSONL(error_kind 8 种);AVX2 崩溃在 vela 里**没有检测**,只表现为「opencode exited before readiness」。
+6. **vela CLI 到父进程的契约**(S3 CLI):JSON-RPC 只有 4 个标准码,业务信息全在 `error.data.kind`(`model_catalog_unavailable` / `account_suspended` / `no_models_available` / `opencode_prompt_error` / `opencode_retry_exhausted` / `resume_failed` / `billing_recovery_*`)和 `statusCode`(上游网关状态码原样);401 的 HTTP 细节在 session_new 阶段被吞成「AMR model catalog is unavailable」;网关 401/402/403/429 在 prompt 期通过 `session.status retry` 原样透传文本;`vela login` 没有 `--json`、没有 logout、没有已登录短路;登录各阶段有 `MISH_AMR_AUTH_STAGE` JSONL(error_kind 8 种);AVX2 崩溃在 vela 里**没有检测**,只表现为「opencode exited before readiness」。
 7. **BYOK 不是直连**(S4):UI 的 API 模式全走 `byok-opencode`(daemon 拉 OpenCode,AI SDK 发请求);浏览器直连 `/api/proxy/*` 在 web 已无调用方(7 个路由 + 1,693 行媒体工具 + 测试仍在);OpenCode 日志回捞(#982)和 SSRF 守卫只覆盖 `opencode`/proxy 不覆盖 `byok-opencode`;上下文上限写死 128k/16k;内容审核(除 Gemini)、证书错误、`retry-after`、非流式 2xx 回包零识别;401 文案在劝 BYOK 用户「去本地登录 / 换 Cloud」。
 
 8. **web 的非 AMR 错误面**(S2,76 条 W-xxx):run 失败只有 `ChatPane.tsx:2765` 一张 `UserActionCard(run-recovery)`,而会话加载失败、产物保存失败、BYOK 配置缺失、Side Chat 未选 agent 全塞进同一个 `error` 槽位、顶着「任务执行失败」标题且多数没按钮;**连接类状态几乎全静默**(SSE 断连重连 5 次、自动重试 2 次、协作/记忆 SSE 断开、5 分钟卡死看门狗、预览白屏重挂、首页 daemon 不可达都只有埋点没有 UI);daemon 不可达在 5 个位置有 5 种说法、没有共享横幅;版本不匹配、浏览器离线完全未处理;没有全局 ErrorBoundary;项目 403 被说成「已删除或不存在」、5xx 借 connectors 的「不可用」;`WORKSPACE_CONTEXT_INCOMPLETE` / `AMR_WORKSPACE_SCOPE_*` 在 web 零命中;十几处正文是绕过 i18n 的硬编码英文;上传失败三种形态、导出失败两套 key(一处还是原生 `alert()`)。

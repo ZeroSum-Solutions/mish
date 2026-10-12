@@ -5,7 +5,7 @@ import { assertEgressDigest } from './egress.js';
 import {
   isCurrentVerificationBundle, parseVerificationBundle, renderReviewEvidenceParam, WORKBENCH_REVIEW_BUNDLE_ID_PATTERN, WORKBENCH_REVIEW_CONFORMANCE_NOTE, WORKBENCH_REVIEW_EGRESS_SCHEMA, WORKBENCH_REVIEW_PREVIEW_HOST,
   type ReviewEvidenceMessage, type ReviewEvidenceParam, type VerificationBundle, type VerificationBundleSummary,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { ev, evidenceUrl, PageText, type EvidenceContext } from './evidence.js';
 
 type StoredEgress = NonNullable<VerificationBundle['egress']>;

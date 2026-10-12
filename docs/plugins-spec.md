@@ -6,7 +6,7 @@
 
 A **Plugin** is the unit of distribution for Mishh Mashh. Where a [Skill](skills-protocol.md) describes a single capability that an agent can run, a Plugin is the shippable bundle around it: one or more skills, an optional design system reference, optional craft rules, optional Claude-plugin assets, a preview, a use-case query, an asset folder, and a small machine-readable sidecar that powers OD's marketplace surface. A plugin is always anchored to a portable `SKILL.md` so it is publishable to every existing skill catalog without modification.
 
-> **Compatibility promise (extends [`skills-protocol.md`](skills-protocol.md)):** Any plugin folder that ships a `SKILL.md` works as a plain agent skill in Claude Code, Cursor, Codex, Gemini CLI, OpenClaw, Hermes, etc. Adding `open-design.json` is purely additive — it unlocks OD's marketplace card, preview, one-click "use" flow, and typed context-chip strip, but it never changes how the underlying skill runs. **One repo, two consumption modes.**
+> **Compatibility promise (extends [`skills-protocol.md`](skills-protocol.md)):** Any plugin folder that ships a `SKILL.md` works as a plain agent skill in Claude Code, Cursor, Codex, Gemini CLI, OpenClaw, Hermes, etc. Adding `mish.json` is purely additive — it unlocks OD's marketplace card, preview, one-click "use" flow, and typed context-chip strip, but it never changes how the underlying skill runs. **One repo, two consumption modes.**
 
 ## Executive map for readers
 
@@ -14,7 +14,7 @@ This is an **agent-era plugin system**, not a Figma-era UI extension system. A p
 
 The shortest mental model:
 
-1. **Plugin author ships portable capability.** `SKILL.md` remains the executable agent contract; `open-design.json` adds OD marketplace metadata, input fields, defaults, previews, and context wiring.
+1. **Plugin author ships portable capability.** `SKILL.md` remains the executable agent contract; `mish.json` adds OD marketplace metadata, input fields, defaults, previews, and context wiring.
 2. **User or agent picks a workflow.** The selection can happen from the marketplace, inline in the home input, inside an existing project chat, from CLI, or from CI.
 3. **OD applies the plugin without making the plugin a UI process.** Apply returns a hydrated brief, typed context chips, assets, and capability requirements. It does not start a hidden plugin runtime.
 4. **Agent drives generation.** The daemon creates or updates a project, starts a run, streams events over SSE / CLI ND-JSON, and records artifacts.
@@ -37,7 +37,7 @@ sequenceDiagram
   participant U as User or Agent
   participant S as OD Surface<br/>(Web, Desktop, CLI, CI)
   participant D as OD Daemon
-  participant P as Plugin Manifest<br/>(SKILL.md + open-design.json)
+  participant P as Plugin Manifest<br/>(SKILL.md + mish.json)
   participant A as Code Agent
   participant R as Project Runtime<br/>(files + artifacts)
 
@@ -102,15 +102,15 @@ All four scenarios share the same `ApplyResult`, the same run pipeline, and the 
 2. [Goals and non-goals](#2-goals-and-non-goals)
 3. [Compatibility matrix](#3-compatibility-matrix--what-makes-a-folder-a-valid-plugin-for-whom)
 4. [Plugin folder shape](#4-plugin-folder-shape)
-5. [`open-design.json` schema](#5-open-designjson--schema-v1)
-6. [`open-design-marketplace.json` schema](#6-open-design-marketplacejson--federated-catalog)
+5. [`mish.json` schema](#5-mishjson--schema-v1)
+6. [`mish-marketplace.json` schema](#6-mish-marketplacejson--federated-catalog)
 7. [Discovery and install](#7-discovery-and-install)
 8. [The Apply pipeline](#8-the-apply-pipeline)
 9. [Trust and capabilities](#9-trust-and-capabilities)
 10. [First-party atoms](#10-first-party-atoms--the-atomic-pipeline-plugins-assemble)
 11. [Architecture — what changes in the existing repo](#11-architecture--what-changes-in-the-existing-repo)
 12. [CLI surface](#12-cli-surface)
-13. [Public web surface](#13-public-web-surface-open-designaimarketplace)
+13. [Public web surface](#13-public-web-surface-mishaimarketplace)
 14. [Publishing and catalog distribution](#14-publishing-and-catalog-distribution)
 15. [Deployment and portability — Docker, any cloud](#15-deployment-and-portability--docker-any-cloud)
 16. [Phased implementation plan](#16-phased-implementation-plan)
@@ -128,7 +128,7 @@ All four scenarios share the same `ApplyResult`, the same run pipeline, and the 
 
 - Authoring stage: draft, awaiting review.
 - Defaults locked from the planning round (overridable in review):
-  - **Compatibility = wrap-then-extend.** Existing `SKILL.md` and `.claude-plugin/plugin.json` repos run as-is; `open-design.json` is an additive sidecar.
+  - **Compatibility = wrap-then-extend.** Existing `SKILL.md` and `.claude-plugin/plugin.json` repos run as-is; `mish.json` is an additive sidecar.
   - **Trust = tiered and provenance-aware.** Bundled plugins and official-marketplace plugins are `trusted` by default; user-added third-party marketplaces, arbitrary GitHub / URL / local plugins start `restricted` unless the marketplace or plugin is explicitly trusted.
 
 ## 1. Vision
@@ -141,7 +141,7 @@ Mishh Mashh becomes a **server + CLI + atomic core engine + plugin/marketplace s
 - [`openclaw/clawhub`](https://github.com/openclaw/clawhub)
 - [`skills.sh`](https://skills.sh/)
 
-Each catalog needs a different listing format, but all of them index `SKILL.md`-shaped folders. By keeping `SKILL.md` canonical and `open-design.json` strictly sidecar, a single repo lands in every catalog without per-target rewrites.
+Each catalog needs a different listing format, but all of them index `SKILL.md`-shaped folders. By keeping `SKILL.md` canonical and `mish.json` strictly sidecar, a single repo lands in every catalog without per-target rewrites.
 
 A second axis of the same vision: **the CLI is the canonical agent-facing API for Mishh Mashh.** Code agents (Claude Code, Cursor, Codex, OpenClaw, Hermes, in-house orchestrators) drive OD by shelling out `od …`, not by hitting `/api/*` directly. The CLI wraps every server capability — project creation, conversation/run lifecycle, plugin apply, file system operations on a project, design library introspection, daemon control — behind a stable subcommand contract. The HTTP server is an implementation detail that backs the desktop UI and the CLI itself; agents that talk HTTP are bypassing the contract.
 
@@ -156,8 +156,8 @@ A fifth axis is the product-shape co-evolution with the agent: **UI is requested
 **Goals**
 
 1. Every runnable, distributable OD plugin is a valid agent skill (`SKILL.md`- or `.claude-plugin/plugin.json`-anchored). No fork of the skill spec.
-2. A vanilla skill or claude-plugin repo becomes an OD plugin by adding an optional `open-design.json` sidecar — no rename, no body changes.
-3. Three install sources: local folder, GitHub repo (with optional ref/subpath), arbitrary HTTPS archive, plus federated `open-design-marketplace.json` indexes.
+2. A vanilla skill or claude-plugin repo becomes an OD plugin by adding an optional `mish.json` sidecar — no rename, no body changes.
+3. Three install sources: local folder, GitHub repo (with optional ref/subpath), arbitrary HTTPS archive, plus federated `mish-marketplace.json` indexes.
 4. One-click "use" auto-fills the brief input and a strip of `ContextItem` chips above it (skills, design-system, craft, assets, MCP, claude-plugin, atom).
 5. Tiered trust by default; capability scoping is declarative and optional.
 6. The OD core engine, atomic capabilities, and plugin runtime are all reachable from CLI so any code agent can drive Mishh Mashh headlessly.
@@ -179,14 +179,14 @@ A fifth axis is the product-shape co-evolution with the agent: **UI is requested
 | ------------------------------------------------------------------ | -------------- | ----------------------------------------- | ----------------- | -------------------- | ------- | --------- |
 | `SKILL.md` only                                                    | yes            | yes                                       | yes               | yes                  | yes     | yes       |
 | `.claude-plugin/plugin.json` only                                  | yes            | yes (claude)                              | partial           | listable             | listable| listable  |
-| `open-design.json` only                                            | metadata-only  | no                                        | no                | no                   | no      | no        |
-| `SKILL.md` + `open-design.json`                                    | enriched       | yes                                       | yes               | yes                  | yes     | yes       |
-| `.claude-plugin/...` + `open-design.json`                          | enriched       | yes (claude)                              | partial           | listable             | listable| listable  |
-| `SKILL.md` + `.claude-plugin/...` + `open-design.json`             | fully enriched | yes                                       | yes               | yes                  | yes     | yes       |
+| `mish.json` only                                            | metadata-only  | no                                        | no                | no                   | no      | no        |
+| `SKILL.md` + `mish.json`                                    | enriched       | yes                                       | yes               | yes                  | yes     | yes       |
+| `.claude-plugin/...` + `mish.json`                          | enriched       | yes (claude)                              | partial           | listable             | listable| listable  |
+| `SKILL.md` + `.claude-plugin/...` + `mish.json`             | fully enriched | yes                                       | yes               | yes                  | yes     | yes       |
 
-The takeaway: **`SKILL.md` is the lowest common denominator**. Every plugin recommended for distribution should ship a `SKILL.md` so it lands cleanly in every major catalog, then add `open-design.json` to gain OD's product surface.
+The takeaway: **`SKILL.md` is the lowest common denominator**. Every plugin recommended for distribution should ship a `SKILL.md` so it lands cleanly in every major catalog, then add `mish.json` to gain OD's product surface.
 
-A folder that contains only `open-design.json` is not a runnable plugin in v1; it is a **metadata-only preset**. OD may read it to show a marketplace card, aggregate remote references, or act as a future install stub, but it cannot trigger an agent run and cannot be listed in cross-agent catalogs. `od plugin doctor` must mark this shape as `metadata-only` and prompt the author to add `SKILL.md` or `.claude-plugin/plugin.json` before publishing it as a runnable plugin.
+A folder that contains only `mish.json` is not a runnable plugin in v1; it is a **metadata-only preset**. OD may read it to show a marketplace card, aggregate remote references, or act as a future install stub, but it cannot trigger an agent run and cannot be listed in cross-agent catalogs. `od plugin doctor` must mark this shape as `metadata-only` and prompt the author to add `SKILL.md` or `.claude-plugin/plugin.json` before publishing it as a runnable plugin.
 
 ## 4. Plugin folder shape
 
@@ -195,7 +195,7 @@ my-plugin/
 ├── SKILL.md                          # required for portability; anchors agent behavior
 ├── .claude-plugin/                   # optional: claude-plugin compat (commands/agents/hooks/.mcp.json)
 │   └── plugin.json
-├── open-design.json                  # optional sidecar — unlocks OD product surface
+├── mish.json                  # optional sidecar — unlocks OD product surface
 ├── README.md                         # standard catalog readme
 ├── preview/                          # OD preview assets
 │   ├── index.html
@@ -213,15 +213,15 @@ my-plugin/
 Rules of authorship:
 
 - `SKILL.md` body never carries OD-specific metadata; it stays clean and portable.
-- `open-design.json` only ever **points** at SKILL.md / DESIGN.md / craft files; it never duplicates their bodies.
-- Existing OD-specific frontmatter on SKILL.md (the `od:` namespace already documented in [`skills-protocol.md`](skills-protocol.md) and used in [`design-templates/web-prototype/SKILL.md`](../design-templates/web-prototype/SKILL.md)) is honored as a fallback for plugins without `open-design.json`. We do not deprecate it; we layer over it.
-- A runnable v1 plugin must contain at least one of `SKILL.md` or `.claude-plugin/plugin.json`. `open-design.json` does not define agent behavior by itself; it only tells OD how to display, resolve, and apply that behavior.
+- `mish.json` only ever **points** at SKILL.md / DESIGN.md / craft files; it never duplicates their bodies.
+- Existing OD-specific frontmatter on SKILL.md (the `od:` namespace already documented in [`skills-protocol.md`](skills-protocol.md) and used in [`design-templates/web-prototype/SKILL.md`](../design-templates/web-prototype/SKILL.md)) is honored as a fallback for plugins without `mish.json`. We do not deprecate it; we layer over it.
+- A runnable v1 plugin must contain at least one of `SKILL.md` or `.claude-plugin/plugin.json`. `mish.json` does not define agent behavior by itself; it only tells OD how to display, resolve, and apply that behavior.
 
-## 5. `open-design.json` — schema v1
+## 5. `mish.json` — schema v1
 
 ```json
 {
-  "$schema": "https://open-design.ai/schemas/plugin.v1.json",
+  "$schema": "https://mish.invalid/schemas/plugin.v1.json",
   "specVersion": "1.0.0",
   "name": "make-a-deck",
   "title": "Make a deck",
@@ -234,7 +234,7 @@ Rules of authorship:
   },
   "author":   { "name": "Mishh Mashh", "url": "https://github.com/ZeroSum-Solutions" },
   "license":  "MIT",
-  "homepage": "https://github.com/open-design/plugins/make-a-deck",
+  "homepage": "https://github.com/mish/plugins/make-a-deck",
   "icon":     "./icon.svg",
   "tags":     ["deck", "marketing", "investor"],
 
@@ -410,7 +410,7 @@ Capabilities are not isolated strings; the resolver must compute **implied capab
 
 ### 5.4 `SKILL.md` frontmatter to `PluginManifest` mapping
 
-When a plugin has no `open-design.json`, but its `SKILL.md` already contains the `od:` frontmatter defined in [`skills-protocol.md`](skills-protocol.md), `adapters/agent-skill.ts` synthesizes a minimal `PluginManifest`. The mapping must be stable so the legacy skill protocol and the new plugin schema do not drift into two semantics:
+When a plugin has no `mish.json`, but its `SKILL.md` already contains the `od:` frontmatter defined in [`skills-protocol.md`](skills-protocol.md), `adapters/agent-skill.ts` synthesizes a minimal `PluginManifest`. The mapping must be stable so the legacy skill protocol and the new plugin schema do not drift into two semantics:
 
 | `SKILL.md` field | Plugin manifest field | Rule |
 | --- | --- | --- |
@@ -425,28 +425,28 @@ When a plugin has no `open-design.json`, but its `SKILL.md` already contains the
 | `od.outputs` | `projectMetadata` hints | Used for artifact bookkeeping and preview defaults, not surfaced as user-editable inputs |
 | `od.capabilities_required` | `od.capabilities` | Map only capabilities that can be expressed; unknown capabilities are kept in `compatWarnings[]`, and `od plugin doctor` must surface them |
 
-If `open-design.json` and `SKILL.md` frontmatter both exist, `open-design.json` wins, but the loader must preserve adapter warnings. Authors can migrate incrementally: first keep the old skill runnable as-is, then add OD marketplace metadata.
+If `mish.json` and `SKILL.md` frontmatter both exist, `mish.json` wins, but the loader must preserve adapter warnings. Authors can migrate incrementally: first keep the old skill runnable as-is, then add OD marketplace metadata.
 
-## 6. `open-design-marketplace.json` — federated catalog
+## 6. `mish-marketplace.json` — federated catalog
 
 Mirrors [`anthropics/skills/.claude-plugin/marketplace.json`](https://raw.githubusercontent.com/anthropics/skills/main/.claude-plugin/marketplace.json) so existing community catalogs need only a rename to be reusable.
 
 ```json
 {
-  "$schema": "https://open-design.ai/schemas/marketplace.v1.json",
+  "$schema": "https://mish.invalid/schemas/marketplace.v1.json",
   "specVersion": "1.0.0",
-  "name": "open-design-official",
+  "name": "mish-official",
   "version": "1.0.0",
   "owner":    { "name": "Mishh Mashh", "url": "https://github.com/ZeroSum-Solutions" },
   "metadata": { "description": "First-party plugins", "version": "1.0.0" },
   "plugins": [
-    { "name": "make-a-deck", "version": "1.0.0", "source": "github:open-design/plugins/make-a-deck", "tags": ["deck"] },
+    { "name": "make-a-deck", "version": "1.0.0", "source": "github:mish/plugins/make-a-deck", "tags": ["deck"] },
     { "name": "tweet-card",  "version": "1.0.0", "source": "https://files.../tweet-card-1.0.0.tgz",  "tags": ["marketing"] }
   ]
 }
 ```
 
-The marketplace top-level `version` is the catalog snapshot version; every `plugins[]` entry also declares the listed plugin version. Installers still verify the target folder's own `open-design.json` after fetching, but registry search, audit logs, and marketplace refresh events can now reason about catalog and plugin versions before install.
+The marketplace top-level `version` is the catalog snapshot version; every `plugins[]` entry also declares the listed plugin version. Installers still verify the target folder's own `mish.json` after fetching, but registry search, audit logs, and marketplace refresh events can now reason about catalog and plugin versions before install.
 
 Multiple marketplaces coexist — the user runs `od marketplace add <url>` to register additional indexes (Vercel's, OpenClaw's clawhub, an enterprise team's private catalog). By default, a user-added marketplace is only a discovery source and plugins from it still install as `restricted`; only the built-in official marketplace or a marketplace explicitly trusted through `od marketplace add <url> --trust trusted` / `od marketplace trust <id> --trust trusted` can pass through default `trusted` status.
 
@@ -456,7 +456,7 @@ Multiple marketplaces coexist — the user runs `od marketplace add <url>` to re
 
 | Priority | Path                                             | Resource shape     | Source                                                                 |
 | -------- | ------------------------------------------------ | ------------------ | ---------------------------------------------------------------------- |
-| 1        | `<projectCwd>/.open-design/plugins/<id>/`        | plugin bundle      | New; explicitly installed into the project and committed with user code |
+| 1        | `<projectCwd>/.mish/plugins/<id>/`        | plugin bundle      | New; explicitly installed into the project and committed with user code |
 | 2        | `<projectCwd>/.claude/skills/<id>/`              | legacy `SKILL.md`  | Keeps the project-private skill path from [`skills-protocol.md`](skills-protocol.md) compatible |
 | 3        | Daemon-managed plugin location                   | plugin bundle      | This spec MUST NOT define daemon data paths; read root `AGENTS.md` → **Daemon data directory contract** before documenting storage |
 | 4        | User-global skill location                       | legacy `SKILL.md`  | This spec MUST NOT define daemon data paths; read root `AGENTS.md` → **Daemon data directory contract** before documenting storage |
@@ -474,7 +474,7 @@ od plugin install github:owner/repo@v1.2.0
 od plugin install github:owner/repo/path/to/subfolder
 od plugin install https://example.com/plugin.tar.gz
 od plugin install make-a-deck                   # via configured marketplaces
-od marketplace add https://.../open-design-marketplace.json
+od marketplace add https://.../mish-marketplace.json
 ```
 
 GitHub install path uses `https://codeload.github.com/owner/repo/tar.gz/<ref>`, no git binary required, with path-traversal guards and a configurable size cap.
@@ -821,7 +821,7 @@ Each devloop iteration writes the round's artifact diff, critique output, and co
 
 ### 10.3 Generative UI: AG-UI–inspired surfaces
 
-OD adopts the useful part of [CopilotKit / the AG-UI protocol](https://github.com/CopilotKit/CopilotKit): an agent can ask for interactive UI during a run. OD does **not** let the agent freely invent app UI or styling in the main product surface. v1 ships our own `GenUISurface*` discriminated union and reuses the existing `PersistedAgentEvent` SSE / ND-JSON channel; `@open-design/agui-adapter` projects those events into AG-UI canonical events for external clients.
+OD adopts the useful part of [CopilotKit / the AG-UI protocol](https://github.com/CopilotKit/CopilotKit): an agent can ask for interactive UI during a run. OD does **not** let the agent freely invent app UI or styling in the main product surface. v1 ships our own `GenUISurface*` discriminated union and reuses the existing `PersistedAgentEvent` SSE / ND-JSON channel; `@mish/agui-adapter` projects those events into AG-UI canonical events for external clients.
 
 The product rule is: **agent/plugin output is data; OD owns the renderer.** A plugin can declare a `form`, `choice`, `confirmation`, or `oauth-prompt` surface, with schema and prompt data. The web / desktop / CLI renderer decides layout, typography, controls, validation affordances, accessibility, and persistence UX. This keeps plugin UI extensible across scenarios while preserving a coherent product system. Arbitrary visual or code output belongs in generated artifacts, or behind the separate custom-component sandbox and `genui:custom-component` capability gate; it does not replace the built-in renderer for core collaboration UI.
 
@@ -954,7 +954,7 @@ Repeat `prefill` for each surface. It writes rows in `resolved` state; when the 
 | Wire format | OD-native `PersistedAgentEvent` over SSE / ND-JSON | Also emit AG-UI canonical events (`agent.message`, `tool_call`, `state_update`, `ui.surface_requested`, `ui.surface_responded`) |
 | Surface kinds | Four built-ins + plugin-declared in manifest | Keep OD's built-ins as the product source of truth; custom plugin React paths require the `genui:custom-component` gate and sandbox |
 | Shared state | `genui_surfaces` table + `genui_state_synced` event | Map persisted OD state onto AG-UI's `state` channel for external consumers |
-| Frontend SDK compatibility | OD desktop / web with built-in renderer | `@open-design/agui-adapter` lets CopilotKit / other AG-UI clients consume an OD run unchanged |
+| Frontend SDK compatibility | OD desktop / web with built-in renderer | `@mish/agui-adapter` lets CopilotKit / other AG-UI clients consume an OD run unchanged |
 
 The adapter is an interoperability surface, not the internal UI source of truth. OD should not add CopilotKit as a required product dependency unless a separate external embed/demo/client explicitly needs it. v1 plugins need no change to be consumable inside the AG-UI ecosystem because the adapter is a projection of OD's own events.
 
@@ -964,10 +964,10 @@ The adapter is an interoperability surface, not the internal UI source of truth.
 
 Pure TypeScript, no Next/Express/SQLite/browser deps:
 
-- `parsers/manifest.ts` — read `open-design.json` → `PluginManifest` (Zod-validated).
+- `parsers/manifest.ts` — read `mish.json` → `PluginManifest` (Zod-validated).
 - `adapters/agent-skill.ts` — read `SKILL.md` → synthesize a `PluginManifest` from the `od:` frontmatter documented in [`skills-protocol.md`](skills-protocol.md).
 - `adapters/claude-plugin.ts` — read `.claude-plugin/plugin.json` → synthesize a `PluginManifest`.
-- `merge.ts` — merge sidecar + adapters with `open-design.json` winning; foreign content lands in `compat.*`.
+- `merge.ts` — merge sidecar + adapters with `mish.json` winning; foreign content lands in `compat.*`.
 - `resolve.ts` — resolve `od.context.*` refs against the registry → `ResolvedContext`.
 - `validate.ts` — JSON Schema (drives both runtime checks and `od plugin doctor`).
 
@@ -1005,7 +1005,7 @@ CREATE TABLE installed_plugins (
   source_digest        TEXT,
   trust                TEXT NOT NULL,    -- trusted | restricted
   capabilities_granted TEXT NOT NULL,    -- JSON array
-  manifest_json        TEXT NOT NULL,    -- cached open-design.json (or synthesized)
+  manifest_json        TEXT NOT NULL,    -- cached mish.json (or synthesized)
   fs_path              TEXT NOT NULL,
   installed_at         INTEGER NOT NULL,
   updated_at           INTEGER NOT NULL
@@ -1243,9 +1243,9 @@ In practice this means:
 
 What this unlocks:
 
-- A user with **only Claude Code** (or any code agent) plus `npm i -g @open-design/cli` plus a running headless daemon can do the entire user journey: install plugin → create project → run → consume artifacts. No OD desktop required.
+- A user with **only Claude Code** (or any code agent) plus `npm i -g @mish/cli` plus a running headless daemon can do the entire user journey: install plugin → create project → run → consume artifacts. No OD desktop required.
 - The OD desktop UI installs the same daemon and the same CLI; it just adds a window. Users who later install the desktop find the same projects, plugins, and history that the headless flow produced — there is no "headless project format" vs. "desktop project format". This spec MUST NOT define daemon data paths; read root `AGENTS.md` → **Daemon data directory contract** before changing or documenting shared storage.
-- CI is a first-class citizen: a GitHub Action can `npm i -g @open-design/cli && od daemon start --headless && od plugin install … && od run start --project … --follow`. No display, no electron, no per-step UI scripting.
+- CI is a first-class citizen: a GitHub Action can `npm i -g @mish/cli && od daemon start --headless && od plugin install … && od run start --project … --follow`. No display, no electron, no per-step UI scripting.
 - External products can embed OD by spawning a headless daemon and shelling out — `od` is the public surface, internals are free to evolve.
 
 The cost: a small handful of `od daemon` flags and one new lifecycle subcommand (`od daemon start/stop/status` with `--headless` / `--serve-web`). Implementation lands in Phase 2 alongside the CLI parity slice.
@@ -1498,13 +1498,13 @@ Every group above is additive to [`apps/daemon/src/cli.ts`](../apps/daemon/src/c
 
 ## 13. Public web surface (public marketplace site)
 
-The public marketplace ships as a path on the product website — `/marketplace` (canonical) with `/plugins` as an alias — not as a separate domain. It is a static-rendered catalog rendered from the official `open-design-marketplace.json` index, with plugin detail pages backed by the same `open-design.json` files inside each listed repo. Visually it mirrors what [`skills.sh`](https://skills.sh/) does for skills, but its detail pages render OD-specific previews (the `od.preview.entry` HTML, sample outputs, the use-case query, the chip preview).
+The public marketplace ships as a path on the product website — `/marketplace` (canonical) with `/plugins` as an alias — not as a separate domain. It is a static-rendered catalog rendered from the official `mish-marketplace.json` index, with plugin detail pages backed by the same `mish.json` files inside each listed repo. Visually it mirrors what [`skills.sh`](https://skills.sh/) does for skills, but its detail pages render OD-specific previews (the `od.preview.entry` HTML, sample outputs, the use-case query, the chip preview).
 
 The site shares one source of truth with the in-app marketplace:
 
-- Same JSON Schemas (`https://open-design.ai/schemas/plugin.v1.json`, `https://open-design.ai/schemas/marketplace.v1.json`).
-- Same federated listing format (`open-design-marketplace.json`).
-- Same plugin manifests (`open-design.json` inside each repo).
+- Same JSON Schemas (`https://mish.invalid/schemas/plugin.v1.json`, `https://mish.invalid/schemas/marketplace.v1.json`).
+- Same federated listing format (`mish-marketplace.json`).
+- Same plugin manifests (`mish.json` inside each repo).
 
 Two consumption surfaces, one substrate:
 
@@ -1534,11 +1534,11 @@ A single GitHub repo per plugin, simultaneously usable across every catalog the 
 | [`VoltAgent/awesome-agent-skills`](https://github.com/VoltAgent/awesome-agent-skills)            | PR adds a row pointing at the repo URL                                     | repo URL — automation in §14.1                         |
 | [`openclaw/clawhub`](https://github.com/openclaw/clawhub)                                        | submission via clawhub web app or PR                                       | repo URL                                                |
 | [`skills.sh`](https://skills.sh/)                                                                | indexed automatically once `npx skills add owner/repo` is observed         | repo URL                                                |
-| `open-design-marketplace.json`                                                                   | entry referencing `github:owner/repo`                                      | `open-design.json` enriches the listing                |
+| `mish-marketplace.json`                                                                   | entry referencing `github:owner/repo`                                      | `mish.json` enriches the listing                |
 
 ### 14.1 Author tooling
 
-- `od plugin scaffold` — writes a starter folder containing both `SKILL.md` (industry-standard, with `od:` frontmatter for backward compat) and `open-design.json` (OD enrichment with `compat.agentSkills` pointing at the SKILL.md).
+- `od plugin scaffold` — writes a starter folder containing both `SKILL.md` (industry-standard, with `od:` frontmatter for backward compat) and `mish.json` (OD enrichment with `compat.agentSkills` pointing at the SKILL.md).
 - `od plugin doctor` — runs the JSON Schema, the SKILL.md frontmatter parser, and a "does this look listable on awesome-agent-skills / clawhub / skills.sh?" lint that checks for README presence, license file, and frontmatter completeness.
 - `od plugin publish --to <catalog>` (Phase 4) — opens a browser to the catalog's PR template with a pre-filled row.
 
@@ -1546,7 +1546,7 @@ A single GitHub repo per plugin, simultaneously usable across every catalog the 
 
 Any code agent that consumes a folder via `SKILL.md` works without OD installed. The plugin is one repo with three valid consumption modes:
 
-1. **Skill-only consumption (no OD).** A Cursor user runs `npx skills add open-design/make-a-deck`. Cursor reads `SKILL.md` and runs the workflow. No OD CLI, no OD daemon. The plugin's marketplace polish (`open-design.json`) is ignored — Cursor sees a vanilla skill.
+1. **Skill-only consumption (no OD).** A Cursor user runs `npx skills add mish/make-a-deck`. Cursor reads `SKILL.md` and runs the workflow. No OD CLI, no OD daemon. The plugin's marketplace polish (`mish.json`) is ignored — Cursor sees a vanilla skill.
 2. **Headless OD (CLI + code agent, no OD UI).** A power user keeps using their preferred code agent — Claude Code, Cursor, Codex, etc. — but adds OD as a side service to gain plugin context resolution, project bookkeeping, design library injection, and artifact tracking. No browser, no electron. See §14.3 below for the concrete pipeline.
 3. **Full OD (CLI + code agent + OD UI).** Same as (2) plus the desktop or web UI for live preview, marketplace browsing, chat/canvas split-view, etc.
 
@@ -1557,14 +1557,14 @@ The plugin author writes the SKILL.md once. All three modes consume it.
 This mirrors what cursor-agent + scripts can do for Cursor — code agent does the thinking, OD CLI provides the project / plugin / artifact substrate.
 
 ```bash
-# One-time setup: install the OD CLI as an npm global (publishable as @open-design/cli).
-npm install -g @open-design/cli
+# One-time setup: install the OD CLI as an npm global (publishable as @mish/cli).
+npm install -g @mish/cli
 
 # Start the daemon in headless mode — no web bundle, no electron, no browser.
 od daemon start --headless --port 17456
 
 # Install the OD plugin you want to drive (or an upstream agent skill — both work).
-od plugin install github:open-design/plugins/make-a-deck
+od plugin install github:mish/plugins/make-a-deck
 
 # Create a project bound to the plugin. Inputs are templated into the brief.
 PID=$(od project create \
@@ -1608,7 +1608,7 @@ The mental model:
 | Headless agent CLI    | `cursor-agent` (drives the agent loop)       | `od run start --agent claude --follow` + `od plugin run` |
 | Local services / db   | Cursor's background indexing / state         | OD daemon-managed state. Storage paths are governed only by root `AGENTS.md` → **Daemon data directory contract**. |
 | GUI productivity layer| Cursor IDE                                   | OD desktop / web UI (`apps/web` + `apps/desktop`)    |
-| Plugin / skill format | `.cursor/rules/`, MCP servers                | `SKILL.md` + `open-design.json` + atoms              |
+| Plugin / skill format | `.cursor/rules/`, MCP servers                | `SKILL.md` + `mish.json` + atoms              |
 
 Both products are decoupled the same way: the terminal flow is sufficient; the IDE/desktop is the productivity multiplier. **Plugin authors never have to choose** — they write one SKILL.md plus optional sidecar, and reach all three consumption modes.
 
@@ -1618,7 +1618,7 @@ OD ships as a single multi-arch Docker image so the full plugin/marketplace syst
 
 ### 15.1 Image shape
 
-- **Tag**: `ghcr.io/nexu-io/od:<version>` plus moving `:latest`.
+- **Tag**: `ghcr.io/zerosum-solutions/mish:<version>` plus moving `:latest`.
 - **Architectures**: `linux/amd64` and `linux/arm64` (single manifest list).
 - **Contents**:
   - Node 24 runtime + the daemon `dist/` bundle.
@@ -1667,7 +1667,7 @@ Anything settable via the desktop UI is also settable via `docker exec od od con
 Local laptop:
 
 ```bash
-docker run --rm -p 17456:17456 ghcr.io/nexu-io/od:latest
+docker run --rm -p 17456:17456 ghcr.io/zerosum-solutions/mish:latest
 open http://localhost:17456
 ```
 
@@ -1678,7 +1678,7 @@ directory contract**.
 Reach the same surfaces inside the container:
 
 ```bash
-docker exec od od plugin install github:open-design/plugins/make-a-deck
+docker exec od od plugin install github:mish/plugins/make-a-deck
 docker exec od od project create --plugin make-a-deck --json
 docker exec od od status --json
 ```
@@ -1700,7 +1700,7 @@ The image is deliberately cloud-agnostic. One container image runs on every majo
 Two reference manifests ship with OD and are versioned alongside the image:
 
 - New `tools/pack/docker-compose.yml` — daemon + optional reverse proxy + optional Postgres for §15.6.
-- New `tools/pack/helm/` — Helm chart with values presets for each cloud's volume + secret patterns. The chart deliberately stays generic — cloud-specific bootstrap (CloudFormation / Deployment Manager / ARM / Aliyun ROS / Tencent TIC / Huawei RFS) lives in a separate `open-design/deploy` repo so it can move at its own cadence.
+- New `tools/pack/helm/` — Helm chart with values presets for each cloud's volume + secret patterns. The chart deliberately stays generic — cloud-specific bootstrap (CloudFormation / Deployment Manager / ARM / Aliyun ROS / Tencent TIC / Huawei RFS) lives in a separate `mish/deploy` repo so it can move at its own cadence.
 
 ### 15.6 Pluggable storage and database (Phase 5)
 
@@ -1728,7 +1728,7 @@ Defaults shift toward safer behavior when the daemon runs in a container:
 
 ### 15.8 What this unlocks (ecosystem motions)
 
-1. **Self-hosted enterprise.** A company hosts a private OD instance, registers an internal `open-design-marketplace.json` (`od marketplace add https://internal/...`), restricting plugins to internally vetted ones. Their designers and PMs use the desktop client locally; their CI uses `docker exec od od …`.
+1. **Self-hosted enterprise.** A company hosts a private OD instance, registers an internal `mish-marketplace.json` (`od marketplace add https://internal/...`), restricting plugins to internally vetted ones. Their designers and PMs use the desktop client locally; their CI uses `docker exec od od …`.
 2. **Partner integrations.** Vendors (CMS, design tools, BI platforms, SaaS dashboards) embed OD inside their stack to add design generation. One image, no per-vendor port.
 3. **Cloud-native CI.** "Generate slides for the daily report" becomes a GitHub Action / GitLab pipeline / Tekton task that spins up an ephemeral OD container, applies a plugin, drops artifacts to S3 / OSS / COS / OBS.
 4. **Sovereign-cloud reach.** OD runs unchanged on Aliyun / Tencent / Huawei for customers in regulated regions — no rewrite, no separate distribution channel.
@@ -1738,11 +1738,11 @@ Defaults shift toward safer behavior when the daemon runs in a container:
 ### Phase 0 — Spec freeze (1–2 days)
 
 - This document lands as `docs/plugins-spec.md` (current).
-- JSON Schemas at `docs/schemas/open-design.plugin.v1.json` and `open-design.marketplace.v1.json`.
+- JSON Schemas at `docs/schemas/mish.plugin.v1.json` and `mish.marketplace.v1.json`.
 - Pure-TS contracts at `packages/contracts/src/plugins/{manifest,context,apply,marketplace,installed}.ts`.
 - Migration note: existing `skills/`, `design-systems/`, `craft/` are 100% backward compatible. SKILL.md frontmatter unchanged.
 
-Validation: `pnpm guard`, `pnpm typecheck`, `pnpm --filter @open-design/contracts test`.
+Validation: `pnpm guard`, `pnpm typecheck`, `pnpm --filter @mish/contracts test`.
 
 ### Phase 1 — Loader, installer, persistence + headless MVP CLI loop (5–7 days)
 
@@ -1760,8 +1760,8 @@ Phase 1 contents (merges the original Phase 1 with the minimum subset of the ori
 
 Validation:
 
-- `pnpm --filter @open-design/plugin-runtime test` (parser fixtures: pure SKILL.md, pure claude plugin, metadata-only open-design.json, all three combined, SKILL frontmatter mapping).
-- `pnpm --filter @open-design/daemon test`. `pnpm guard`, `pnpm typecheck`.
+- `pnpm --filter @mish/plugin-runtime test` (parser fixtures: pure SKILL.md, pure claude plugin, metadata-only mish.json, all three combined, SKILL frontmatter mapping).
+- `pnpm --filter @mish/daemon test`. `pnpm guard`, `pnpm typecheck`.
 - **End-to-end headless smoke** (equivalent to the §12.5 walkthrough): `od plugin install ./fixtures/sample-plugin` → `od project create --plugin <id> --json` → `od run start --project <pid> --plugin <id> --follow` → `od files read <pid> <artifact>`. The produced artifact bytes must match exactly what the same plugin produces under the Phase 2A UI flow.
 - **Apply purity smoke:** after `od plugin apply <id>` followed by cancel-before-send, the project cwd is empty of staged assets, no `.mcp.json` is generated, but the `applied_plugin_snapshots` row exists (unreferenced from any run/project).
 
@@ -1848,7 +1848,7 @@ Validation: install plugin from a local mock marketplace.json, rotate ref, unins
 - **Remaining CLI parity:** `od conversation list/new/info`, `od skills/design-systems/craft/atoms list/show`, `od status/doctor/version`, `od config get/set/list`, `od marketplace search`. All purely CLI work — endpoints exist or are trivial.
 - Optional: extract atoms into `skills/_official/<atom>/SKILL.md`. Only after Phases 1–3 are stable.
 - **§10.3.5 full AG-UI alignment:**
-  - New package `@open-design/agui-adapter` — bidirectionally maps OD's `PersistedAgentEvent` + `GenUIEvent` onto AG-UI canonical events (`agent.message`, `tool_call`, `state_update`, `ui.surface_requested`, `ui.surface_responded`).
+  - New package `@mish/agui-adapter` — bidirectionally maps OD's `PersistedAgentEvent` + `GenUIEvent` onto AG-UI canonical events (`agent.message`, `tool_call`, `state_update`, `ui.surface_requested`, `ui.surface_responded`).
   - Daemon adds an optional `/api/runs/:runId/agui` SSE endpoint that emits AG-UI canonical events so CopilotKit / other AG-UI clients can consume an OD run unchanged.
   - Plugin manifest upgrade allows `od.genui.surfaces[].component` — a relative path to a plugin-bundled React component (capability gate `genui:custom-component`), loaded by the desktop / web renderer inside a sandbox.
   - Open-Ended (MCP-Apps / Open-JSON) mode: plugins push arbitrary JSON UI trees through an MCP server, rendered by desktop / web under a constrained schema.
@@ -1865,7 +1865,7 @@ This phase is independent of Phases 1–4 and can run in parallel as soon as Pha
 - **`ProjectStorage` adapter for S3-compatible blob stores** (works for AWS S3, GCS S3-compat, Azure Blob via shim, Aliyun OSS, Tencent COS, Huawei OBS).
 - **`DaemonDb` adapter for Postgres** (so multi-replica deployments share state).
 - **`AppliedPluginSnapshot` retention enforcement worker:** the `expires_at` column added in Phase 1 is now enforced. A daemon background job (default every 6 h, knob `OD_SNAPSHOT_GC_INTERVAL_MS`) deletes rows where `expires_at IS NOT NULL AND expires_at <= now()`. Unreferenced snapshots get `expires_at = applied_at + OD_SNAPSHOT_UNREFERENCED_TTL_DAYS` (default `30`; `0` disables) at insert time; referenced snapshots stay `NULL` (pinned per §8.2.1). Operators may set `OD_SNAPSHOT_RETENTION_DAYS` to additionally retire referenced rows once their referencing run/conversation/project is terminal. Each deletion writes an audit log entry. CLI escape hatch: `od plugin snapshots prune --before <ts>` for forced cleanup.
-- **Per-cloud one-click templates** in a separate `open-design/deploy` repo (CloudFormation, Deployment Manager, ARM, Aliyun ROS, Tencent TIC, Huawei RFS) — non-blocking; track separately.
+- **Per-cloud one-click templates** in a separate `mish/deploy` repo (CloudFormation, Deployment Manager, ARM, Aliyun ROS, Tencent TIC, Huawei RFS) — non-blocking; track separately.
 
 Validation:
 
@@ -1877,7 +1877,7 @@ Validation:
 
 ### 17.1 Minimum-viable plugin (just SKILL.md)
 
-OD reads it as a plugin via the existing `od:` frontmatter loader documented in [`skills-protocol.md`](skills-protocol.md). No `open-design.json` needed — the plugin lacks marketplace polish but is fully runnable.
+OD reads it as a plugin via the existing `od:` frontmatter loader documented in [`skills-protocol.md`](skills-protocol.md). No `mish.json` needed — the plugin lacks marketplace polish but is fully runnable.
 
 ```
 my-plugin/
@@ -1902,7 +1902,7 @@ Workflow steps...
 my-plugin/
 ├── SKILL.md
 ├── README.md
-├── open-design.json
+├── mish.json
 ├── preview/
 │   ├── index.html
 │   ├── poster.png
@@ -1911,14 +1911,14 @@ my-plugin/
     └── b2b-saas/index.html
 ```
 
-`SKILL.md` stays portable — Cursor / Codex / OpenClaw read it directly. `open-design.json` adds preview, query, chip strip, capabilities. The repo lists cleanly on every catalog in §14 without modification.
+`SKILL.md` stays portable — Cursor / Codex / OpenClaw read it directly. `mish.json` adds preview, query, chip strip, capabilities. The repo lists cleanly on every catalog in §14 without modification.
 
 ### 17.3 Bundle plugin (multiple skills + DS + craft in one repo)
 
 ```
 my-bundle/
 ├── SKILL.md                          # bundle-level overview (catalog uses this)
-├── open-design.json                  # kind: 'bundle'; lists nested skills
+├── mish.json                  # kind: 'bundle'; lists nested skills
 ├── skills/
 │   ├── deck-skeleton/SKILL.md
 │   └── deck-finalize/SKILL.md
@@ -1932,12 +1932,12 @@ The installer fans out nested skills/design-systems/craft into the registry unde
 
 | Risk                                                        | Mitigation                                                                                          |
 | ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| Schema drift between OD plugin and the broader skill spec   | `open-design.json` is sidecar-only; it never modifies SKILL.md. CI tests run against the public anthropics/skills repo. |
+| Schema drift between OD plugin and the broader skill spec   | `mish.json` is sidecar-only; it never modifies SKILL.md. CI tests run against the public anthropics/skills repo. |
 | Arbitrary GitHub install = supply-chain risk                | `restricted` default; capability prompt mandatory before bash/hooks/MCP; pinned-ref recording.       |
 | `composeSystemPrompt()` is already 200+ lines               | The `## Active plugin` block is appended in the existing place; no reordering of layers.             |
 | ExamplesTab vs Marketplace overlap                          | Phase 2 keeps ExamplesTab as is; Phase 3 folds it into Marketplace as a "Local skills" tab.         |
 | Atoms-as-plugins is large                                   | Entry slice shipped: bundled atom SKILL.md bodies + `renderActiveStageBlock()` exist, while the base OD designer/discovery prompt remains in daemon code until the remaining §23 migration is complete. |
-| Project-local plugins committed to user repos | Discovery only at `<projectCwd>/.open-design/plugins/`; opt-in via `od plugin install --project`. |
+| Project-local plugins committed to user repos | Discovery only at `<projectCwd>/.mish/plugins/`; opt-in via `od plugin install --project`. |
 | Trust model leaves community plugins half-functional by default | Detail page surfaces a clear capability checklist with a one-click "Grant all" action; restricted-mode behavior is explicit, not silent. |
 | Plugins shipping their own MCP servers may fail to start | `od plugin doctor` runs a dry-launch of declared MCP commands; failures surfaced before "Use". |
 | Unbounded growth of `applied_plugin_snapshots` | Per PB2 (resolved): unreferenced snapshots auto-expire at `applied_at + OD_SNAPSHOT_UNREFERENCED_TTL_DAYS` (default 30 d); referenced snapshots stay pinned forever (reproducibility wins); GC worker lands in Phase 5 (§16). `od plugin snapshots prune --before <ts>` remains as a forced-cleanup escape hatch; rows with `status='stale'` can be archived to external storage in batch. |
@@ -1946,9 +1946,9 @@ The installer fans out nested skills/design-systems/craft into the registry unde
 | `OD_HOST` / `OD_BIND_HOST` naming drift | Spec uses the variable the daemon already reads, `OD_BIND_HOST`; no `OD_HOST` alias is introduced; §15.3 explicitly notes the deviation from earlier draft text. |
 | Hosted deployments without the bound-API-token guard could leak the API publicly (pre-Phase 5 must rely on a reverse proxy) | Once Phase 5 lands, daemon refuses to bind `OD_BIND_HOST=0.0.0.0` without `OD_API_TOKEN`; bearer-token middleware enforced on `/api/*`; §15.3 / §15.7 record the current vs. target gap. |
 | Sovereign-cloud customers (Aliyun / Tencent / Huawei) need provider-specific secret + storage integrations | S3-compatible adapter covers all three for blob storage (Phase 5); env-var-based secrets work everywhere; cloud-specific KMS integrations are non-blocking (post-v1). |
-| Multi-cloud testing matrix is large                         | Phase 5 ships a single canonical compose smoke (one cloud), then adds clouds incrementally; per-cloud one-click templates live in `open-design/deploy` and can move at their own cadence (§15.5). |
+| Multi-cloud testing matrix is large                         | Phase 5 ships a single canonical compose smoke (one cloud), then adds clouds incrementally; per-cloud one-click templates live in `mish/deploy` and can move at their own cadence (§15.5). |
 | Malicious plugins phishing the user via GenUI surfaces      | `od.genui.surfaces[]` must be declared in the manifest and pass `od plugin doctor`; runtime rejects undeclared surface kinds / surface ids; `oauth-prompt` and `confirmation` always show "from plugin <id>, vetted by marketplace <id>"; restricted plugins must explicitly grant `network` before raising an `oauth-prompt` (§9). |
-| AG-UI ecosystem may evolve, drifting OD's wire format from canonical AG-UI | OD-native `GenUIEvent` remains the internal source of truth. `@open-design/agui-adapter` is an external projection layer, so upstream protocol revs do not couple to the daemon or web renderer release cadence. |
+| AG-UI ecosystem may evolve, drifting OD's wire format from canonical AG-UI | OD-native `GenUIEvent` remains the internal source of truth. `@mish/agui-adapter` is an external projection layer, so upstream protocol revs do not couple to the daemon or web renderer release cadence. |
 | Cross-conversation reuse via `genui_surfaces` may make users "forget what they authorized" | The web `GenUIInbox` and `od ui list --project <id>` must enumerate every `persist=project` resolved row with revoke entry points; hosted mode can default-expire via `OD_GENUI_PROJECT_TTL_DAYS`; revoke writes an audit log entry. |
 
 Open questions worth confirming before code lands:
@@ -1966,11 +1966,11 @@ Open questions worth confirming before code lands:
 - **Whether `od.taskKind` becomes a first-class marketplace filter** — does the existing `kind` / `mode` / `scenario` UI need a reorder to surface the new `taskKind`? (Default: marketplace adds a top-level `taskKind` tab; existing filters drop to a secondary tier.)
 - ~~**Should `od.genui.surfaces[].component` ship in v1?**~~ — **resolved as a gated extension path.** The manifest schema accepts the field and `od plugin doctor` enforces `genui:custom-component` plus traversal guards. The built-in product renderer remains the default for `form` / `choice` / `confirmation` / `oauth-prompt`; custom components are sandboxed add-ons, not a replacement for core collaboration UI.
 - **Coupling between GenUI persisted state and `AppliedPluginSnapshot`** — when a plugin upgrades and `surface.schema` changes, old rows auto-`invalidate`; should we additionally **force a re-apply** (generating a new `AppliedPluginSnapshot`) or allow the surface to invalidate while leaving the snapshot untouched? (Default: surface only; `od plugin doctor` flags schema drift; replay still uses the old snapshot.)
-- ~~**Timing of AG-UI protocol adoption**~~ — **resolved.** `@open-design/agui-adapter` and `GET /api/runs/:runId/agui` have shipped as optional interoperability. OD-native GenUI remains the internal renderer and CopilotKit is not a required product dependency.
+- ~~**Timing of AG-UI protocol adoption**~~ — **resolved.** `@mish/agui-adapter` and `GET /api/runs/:runId/agui` have shipped as optional interoperability. OD-native GenUI remains the internal renderer and CopilotKit is not a required product dependency.
 
 ## 19. Why this is a meaningful step for Mishh Mashh
 
-- **Inherited supply.** Every public agent skill on `anthropics/skills`, `awesome-agent-skills`, `clawhub`, and `skills.sh` is one optional `open-design.json` away from being an OD plugin — and reciprocally, every OD plugin is publishable to all four catalogs without modification.
+- **Inherited supply.** Every public agent skill on `anthropics/skills`, `awesome-agent-skills`, `clawhub`, and `skills.sh` is one optional `mish.json` away from being an OD plugin — and reciprocally, every OD plugin is publishable to all four catalogs without modification.
 - **Boundary-clean.** New code lives in two pure-TS packages (`packages/plugin-runtime`, `packages/contracts/src/plugins/*`) and one daemon module group (`apps/daemon/src/plugins/`); no cross-app coupling, no contracts package leaks, no SKILL.md fork. Honors every constraint in the root [`AGENTS.md`](../AGENTS.md).
 - **Reversible refactors.** Existing loaders ([`apps/daemon/src/skills.ts`](../apps/daemon/src/skills.ts) etc.) and `composeSystemPrompt()` keep their public shape; Phase 1 is a drop-in delegate, Phase 2 only **appends** a prompt block.
 - **CLI from day 1.** Every new endpoint has a matching `od plugin …` subcommand, so the same surface is reachable from any code agent without the desktop app.
@@ -2072,7 +2072,7 @@ Original v1 gaps and their current disposition:
 
 - `figma-extract` now fetches and walks the Figma file through REST, writing the extracted tree, tokens, and assets under the run cwd.
 - `token-map` now maps either Figma- or code-extracted tokens onto the active OD design system.
-- `plugins/_official/scenarios/od-figma-migration/open-design.json` supplies the bundled reference pipeline.
+- `plugins/_official/scenarios/od-figma-migration/mish.json` supplies the bundled reference pipeline.
 
 **Why this was the easiest of the three original gaps to land:**
 
@@ -2094,7 +2094,7 @@ Original v1 gaps and their current disposition:
 
 - `code-import`, `design-extract`, `token-map`, `rewrite-plan`, `patch-edit`, `build-test`, `diff-review`, and `handoff` all have daemon workers and first-party atom plugins.
 - `build-test` emits `build.passing` and `tests.passing`, and the `until` evaluator accepts those signals directly.
-- `plugins/_official/scenarios/od-code-migration/open-design.json` supplies the bundled patch/edit ↔ build/test devloop and diff-review handoff.
+- `plugins/_official/scenarios/od-code-migration/mish.json` supplies the bundled patch/edit ↔ build/test devloop and diff-review handoff.
 
 **Why this remains the most input-sensitive scenario:**
 
@@ -2327,7 +2327,7 @@ Category C is the half v1 has shipped, and the first pieces of category A have a
 - The active design system + craft injection that drives "consistency" in §1's product brief is already a plugin-substrate read: there is no privileged path for first-party DESIGN.md vs. third-party DESIGN.md.
 - First-party atom plugins under `plugins/_official/atoms/**` carry atom SKILL.md bodies and manifest metadata; `packages/contracts/src/prompts/atom-block.ts` renders active stage blocks from those bodies.
 - Bundled scenario plugins under `plugins/_official/scenarios/**` carry default pipeline shapes, including `od-default` for Home free-form routing and task shaping. `packages/plugin-runtime/src/pipeline-fallback.ts` resolves an applied pipeline through these bundled scenarios when a plugin omits `od.pipeline`.
-- `@open-design/agui-adapter` and `/api/runs/:runId/agui` provide external AG-UI event projection without changing OD's internal GenUI renderer.
+- `@mish/agui-adapter` and `/api/runs/:runId/agui` provide external AG-UI event projection without changing OD's internal GenUI renderer.
 
 This is why §22 holds: the substrate is already self-hosting for plugin artifacts, snapshots, GenUI declarations, pipeline declarations, bundled scenarios, and the first atom-body injection path. The remaining hard-coded parts are narrower and more product-shaped: the base OD designer/discovery prompt, some stage-entry selection logic, Home's curated scenario rail, and the closed signal / surface vocabularies listed in §22.4.
 
@@ -2339,7 +2339,7 @@ The following patches finish lifting category A out of the daemon. Some have par
 
 Today §5's `od.kind` enum lists `'atom'` but never defines an atom plugin's shape. The patch:
 
-- An atom plugin is a folder with `open-design.json` (`od.kind: 'atom'`) plus `SKILL.md`.
+- An atom plugin is a folder with `mish.json` (`od.kind: 'atom'`) plus `SKILL.md`.
 - The `SKILL.md` body is the atom's prompt fragment, injected by the daemon assembler when a stage references the atom by id.
 - Optional `od.context.mcp[]` declares MCP tools the atom uses (e.g. `live-artifact`, `connector`).
 - Optional `od.atom.untilSignals[]` declares the named signal variables this atom emits, contributing to the `until` vocabulary in §10.1. This is how patch 1 also lifts §22.4's limit 1: each atom owns its own signals (e.g. `build-test` declares `build.passing` and `tests.passing`), and the `until` evaluator looks them up against the active stage's atoms instead of a hard-coded list.
@@ -2355,10 +2355,10 @@ The migration is mechanical: every prose constant in `system.ts` has a one-to-on
 
 Bundled scenario plugins and the pipeline fallback resolver now exist. The remaining work is to remove any product entrypoint that still hand-builds a default stage list instead of selecting a scenario plugin. The target remains: when `od.pipeline` is omitted, daemon/product code resolves a bundled scenario plugin per `taskKind` or explicit entrypoint route, then uses that scenario's `od.pipeline`.
 
-- `plugins/_official/scenarios/od-new-generation/open-design.json`
-- `plugins/_official/scenarios/od-figma-migration/open-design.json`
-- `plugins/_official/scenarios/od-code-migration/open-design.json`
-- `plugins/_official/scenarios/od-tune-collab/open-design.json`
+- `plugins/_official/scenarios/od-new-generation/mish.json`
+- `plugins/_official/scenarios/od-figma-migration/mish.json`
+- `plugins/_official/scenarios/od-code-migration/mish.json`
+- `plugins/_official/scenarios/od-tune-collab/mish.json`
 
 Each ships only an `od.pipeline` and (optionally) some default `od.genui.surfaces[]` for that scenario. Daemon resolution becomes: "no `od.pipeline` provided + has `taskKind` → look up the bundled scenario plugin matching that `taskKind` → use its `od.pipeline`."
 

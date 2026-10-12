@@ -3,7 +3,7 @@ name: import-screenshot-to-prototype
 description: Use this plugin when the user provides a screenshot or image reference and wants it reconstructed as an editable Mishh Mashh prototype with sensible components, layout, and responsive behavior.
 license: MIT
 metadata:
-  author: open-design-spec
+  author: mish-spec
   version: "0.1.0"
 ---
 

@@ -55,7 +55,7 @@ function renderActions(
     onDownload: vi.fn(),
     onToolboxAction: vi.fn(),
     onPickSkill: vi.fn(),
-    onShareToOpenDesign: vi.fn(),
+    onShareToMish: vi.fn(),
   };
   const ui = (
     <NextStepActions
@@ -64,7 +64,7 @@ function renderActions(
       onDownload={handlers.onDownload}
       onToolboxAction={handlers.onToolboxAction}
       onPickSkill={handlers.onPickSkill}
-      onShareToOpenDesign={handlers.onShareToOpenDesign}
+      onShareToMish={handlers.onShareToMish}
       skills={[
         skill('creative-director', 'Creative Director'),
         skill('emilkowalski-motion', 'Emil Kowalski Motion', 'animation-motion'),
@@ -466,7 +466,7 @@ describe('NextStepActions', () => {
     expect(h.onDownload).toHaveBeenCalledWith('landing.html');
 
     expect(screen.queryByTestId('next-step-share-contribute')).toBeNull();
-    expect(h.onShareToOpenDesign).not.toHaveBeenCalled();
+    expect(h.onShareToMish).not.toHaveBeenCalled();
   });
 
   it('hides the More row when nothing behind it is wired', () => {
@@ -474,7 +474,7 @@ describe('NextStepActions', () => {
       onToolboxAction: undefined,
       onShare: undefined,
       onDownload: undefined,
-      onShareToOpenDesign: undefined,
+      onShareToMish: undefined,
       onCreateDesignSystem: undefined,
     });
     expect(screen.queryByTestId('next-step-toolbox-more')).toBeNull();

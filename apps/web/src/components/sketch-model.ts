@@ -67,7 +67,7 @@ const DEFAULT_SKETCH_SHAPE_SIZE = 2;
 const DEFAULT_SKETCH_TEXT_SIZE = 16;
 const DEFAULT_SKETCH_VERSION = 1;
 const EXCALIDRAW_DOCUMENT_VERSION = 2;
-const OPEN_DESIGN_EXCALIDRAW_SOURCE = 'https://open-design.ai/sketch';
+const MISH_EXCALIDRAW_SOURCE = 'https://mish.invalid/sketch';
 
 export function parseSketchDocument(text: string | null): SketchItem[] {
   return parseSketchWorkspaceDocument(text).items;
@@ -193,7 +193,7 @@ export function buildExcalidrawSketchDocument(
   return {
     type: 'excalidraw',
     version: EXCALIDRAW_DOCUMENT_VERSION,
-    source: OPEN_DESIGN_EXCALIDRAW_SOURCE,
+    source: MISH_EXCALIDRAW_SOURCE,
     elements: cloneJsonArray(scene.elements),
     appState,
     files: cloneJsonRecord(scene.files),

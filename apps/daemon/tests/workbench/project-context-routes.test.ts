@@ -4,7 +4,7 @@ import type { AddressInfo } from 'node:net';
 import type Database from 'better-sqlite3';
 import type { RegisterWorkbenchContextRoutesDeps } from '../../src/routes/workbench-context.js';
 import { afterEach, expect, it, vi } from 'vitest';
-import { parseProjectRubricSnapshot } from '@open-design/contracts';
+import { parseProjectRubricSnapshot } from '@mish/contracts';
 import { registerWorkbenchContextRoutes } from '../../src/routes/workbench-context.js';
 import { putProjectContext, readProjectContext, readProjectRubric } from '../../src/workbench/project-context.js';
 import { contextDraft, rubricDraft, database, references } from './project-context-fixture.js';

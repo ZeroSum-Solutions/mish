@@ -14,9 +14,9 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
  * 这个文件**原来**断言的是另一件事:请求没带 skillId 时,评审指标要用项目的
  * **规范** skill id 打标。项目行里存着老 id `editorial-collage-deck`,
  * `resolveSkillId`(`apps/daemon/src/skills.ts` 的 `SKILL_ID_ALIASES`)把它归一成
- * `open-design-landing-deck`,于是 `/api/metrics` 上出现:
+ * `mish-landing-deck`,于是 `/api/metrics` 上出现:
  *
- *   open_design_critique_runs_total{status="shipped",adapter="qwen",skill="open-design-landing-deck"} 1
+ *   mish_critique_runs_total{status="shipped",adapter="qwen",skill="mish-landing-deck"} 1
  *
  * clean-slate catalog 已移除这两个 alias target,所以创建 fixture 先使用保留的
  * `web-clone` / `neutral-product`,再直接写入老 id 来保留历史行形状。把
@@ -156,6 +156,6 @@ setTimeout(() => process.exit(0), 250);
     const metrics = await metricsResponse.text();
     // 3) 编排器没启动 => 一条评审计数都不该落。既然没有序列,也就不存在
     //    把 skill 误标成 `unknown` / `editorial-collage-deck` 的机会。
-    expect(metrics).not.toContain('open_design_critique_runs_total{');
+    expect(metrics).not.toContain('mish_critique_runs_total{');
   });
 });

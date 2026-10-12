@@ -12,7 +12,7 @@ import {
   type DesktopEvalResult,
   type DesktopScreenshotResult,
   type DesktopStatusSnapshot,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import {
   convergeSidecarLaunch,
   findSidecarProcesses,
@@ -20,8 +20,8 @@ import {
   invokeSidecar,
   stopSidecars,
   type SidecarStamp,
-} from "@open-design/sidecar";
-import { createPackageManagerInvocation, readLogTail } from "@open-design/platform";
+} from "@mish/sidecar";
+import { createPackageManagerInvocation, readLogTail } from "@mish/platform";
 
 import type { ToolPackConfig } from "./config/index.js";
 import {
@@ -37,8 +37,8 @@ import { runWorkspaceBuild } from "./workspace-build.js";
 
 const execFileAsync = promisify(execFile);
 
-const PRODUCT_NAME = "Open Design";
-const APP_IMAGE_PRODUCT_NAME = "Open-Design";
+const PRODUCT_NAME = "Mish";
+const APP_IMAGE_PRODUCT_NAME = "Mish";
 const DESKTOP_LOG_ECHO_ENV = "OD_DESKTOP_LOG_ECHO";
 // The containerized build sets this to the standalone pnpm binary fetched by
 // buildDockerArgs; runProductionInstall reads it to avoid invoking `npm` inside
@@ -50,28 +50,28 @@ const CONTAINER_NODE_VERSION = "24.14.1";
 const CONTAINER_TOOLS_PACK_CLI_PATH = "tools/pack/bin/tools-pack.mjs";
 
 export const INTERNAL_PACKAGES = [
-  { directory: "packages/release", name: "@open-design/release" },
-  { directory: "packages/components", name: "@open-design/components" },
-  { directory: "packages/contracts", name: "@open-design/contracts" },
-  { directory: "packages/registry-protocol", name: "@open-design/registry-protocol" },
-  { directory: "packages/sidecar-proto", name: "@open-design/sidecar-proto" },
-  { directory: "packages/launcher-proto", name: "@open-design/launcher-proto" },
-  { directory: "packages/platform", name: "@open-design/platform" },
-  { directory: "packages/sidecar", name: "@open-design/sidecar" },
-  { directory: "packages/download", name: "@open-design/download" },
-  { directory: "packages/host", name: "@open-design/host" },
-  { directory: "packages/agui-adapter", name: "@open-design/agui-adapter" },
-  { directory: "packages/plugin-runtime", name: "@open-design/plugin-runtime" },
-  { directory: "packages/diagnostics", name: "@open-design/diagnostics" },
-  { directory: "packages/cult-ui-catalog", name: "@open-design/cult-ui-catalog" },
-  { directory: "packages/21st-catalog", name: "@open-design/21st-catalog" },
-  { directory: "packages/agency-fast-lane", name: "@open-design/agency-fast-lane" },
-  { directory: "packages/genui-catalog", name: "@open-design/genui-catalog" },
-  { directory: "packages/section-catalog", name: "@open-design/section-catalog" },
-  { directory: "apps/daemon", name: "@open-design/daemon" },
-  { directory: "apps/web", name: "@open-design/web" },
-  { directory: "apps/desktop", name: "@open-design/desktop" },
-  { directory: "apps/packaged", name: "@open-design/packaged" },
+  { directory: "packages/release", name: "@mish/release" },
+  { directory: "packages/components", name: "@mish/components" },
+  { directory: "packages/contracts", name: "@mish/contracts" },
+  { directory: "packages/registry-protocol", name: "@mish/registry-protocol" },
+  { directory: "packages/sidecar-proto", name: "@mish/sidecar-proto" },
+  { directory: "packages/launcher-proto", name: "@mish/launcher-proto" },
+  { directory: "packages/platform", name: "@mish/platform" },
+  { directory: "packages/sidecar", name: "@mish/sidecar" },
+  { directory: "packages/download", name: "@mish/download" },
+  { directory: "packages/host", name: "@mish/host" },
+  { directory: "packages/agui-adapter", name: "@mish/agui-adapter" },
+  { directory: "packages/plugin-runtime", name: "@mish/plugin-runtime" },
+  { directory: "packages/diagnostics", name: "@mish/diagnostics" },
+  { directory: "packages/cult-ui-catalog", name: "@mish/cult-ui-catalog" },
+  { directory: "packages/21st-catalog", name: "@mish/21st-catalog" },
+  { directory: "packages/agency-fast-lane", name: "@mish/agency-fast-lane" },
+  { directory: "packages/genui-catalog", name: "@mish/genui-catalog" },
+  { directory: "packages/section-catalog", name: "@mish/section-catalog" },
+  { directory: "apps/daemon", name: "@mish/daemon" },
+  { directory: "apps/web", name: "@mish/web" },
+  { directory: "apps/desktop", name: "@mish/desktop" },
+  { directory: "apps/packaged", name: "@mish/packaged" },
 ] as const;
 
 export function sanitizeNamespace(value: string): string {
@@ -139,7 +139,7 @@ export function buildDockerArgs(
   //
   // Shell-interpolation safety for the inner `bash -lc` command:
   //   - config.namespace is sanitized at config-time by resolveNamespace() in
-  //     @open-design/sidecar-proto (restricted to namespace charset)
+  //     @mish/sidecar-proto (restricted to namespace charset)
   //   - config.to is enum-validated by resolveToolPackBuildOutput() in config.ts
   //     to one of "all" | "appimage" | "dir"
   //   - config.portable is a boolean
@@ -226,9 +226,9 @@ export function buildDockerArgs(
     `${PRODUCTION_INSTALL_PNPM_BIN_ENV}=${CONTAINER_PNPM_PATH}`,
   ];
   if (config.telemetryRelayUrl != null) {
-    dockerArgs.push("-e", `OPEN_DESIGN_TELEMETRY_RELAY_URL=${config.telemetryRelayUrl}`);
+    dockerArgs.push("-e", `MISH_TELEMETRY_RELAY_URL=${config.telemetryRelayUrl}`);
   }
-  const velaBinHost = process.env.OPEN_DESIGN_VELA_CLI_BIN?.trim();
+  const velaBinHost = process.env.MISH_VELA_CLI_BIN?.trim();
   if (velaBinHost) {
     // The container only mounts /project, /tools-pack and cache/home dirs by
     // default, so a Vela CLI living outside those (a host path like
@@ -240,10 +240,10 @@ export function buildDockerArgs(
     const velaBinBase = basename(velaBinHost);
     const containerVelaDir = "/opt/vela-cli";
     dockerArgs.push("-v", `${hostVelaDir}:${containerVelaDir}:ro`);
-    dockerArgs.push("-e", `OPEN_DESIGN_VELA_CLI_BIN=${containerVelaDir}/${velaBinBase}`);
+    dockerArgs.push("-e", `MISH_VELA_CLI_BIN=${containerVelaDir}/${velaBinBase}`);
   }
   if (config.amrProfile != null) {
-    dockerArgs.push("-e", `OPEN_DESIGN_AMR_PROFILE=${config.amrProfile}`);
+    dockerArgs.push("-e", `MISH_AMR_PROFILE=${config.amrProfile}`);
   }
   // The vela web origin is resolved on the host (from the build-time secret)
   // but the packaged config is written inside the container, so the containerized
@@ -276,7 +276,7 @@ export function renderDesktopTemplate(template: string, values: DesktopTemplateV
 }
 
 export function renderLinuxPackagedMainEntry(): string {
-  return 'import("@open-design/packaged").catch((error) => {\n  console.error("packaged entry failed", error);\n  process.exit(1);\n});\n';
+  return 'import("@mish/packaged").catch((error) => {\n  console.error("packaged entry failed", error);\n  process.exit(1);\n});\n';
 }
 
 export function renderLinuxAppImageAppRun(): string {
@@ -382,11 +382,11 @@ function appImageInstallName(namespace: string): string {
 }
 
 function desktopFileName(namespace: string): string {
-  return `open-design-${sanitizeNamespace(namespace)}.desktop`;
+  return `mish-${sanitizeNamespace(namespace)}.desktop`;
 }
 
 function iconFileName(namespace: string): string {
-  return `open-design-${sanitizeNamespace(namespace)}.png`;
+  return `mish-${sanitizeNamespace(namespace)}.png`;
 }
 
 function resolveLinuxPaths(config: ToolPackConfig): LinuxPaths {
@@ -413,8 +413,8 @@ function resolveLinuxPaths(config: ToolPackConfig): LinuxPaths {
       "apps",
       iconFileName(config.namespace),
     ),
-    packagedConfigPath: join(namespaceRoot, "open-design-config.json"),
-    resourceRoot: join(namespaceRoot, "resources", "open-design"),
+    packagedConfigPath: join(namespaceRoot, "mish-config.json"),
+    resourceRoot: join(namespaceRoot, "resources", "mish"),
     tarballsRoot: join(namespaceRoot, "tarballs"),
   };
 }
@@ -538,7 +538,7 @@ async function writeAssembledApp(
   const version = await readPackagedVersion(config);
   const packageVersion = electronBuilderVersionForAppVersion(version);
   const packageJson = {
-    name: "open-design-packaged",
+    name: "mish-packaged",
     version: packageVersion,
     private: true,
     main: "main.cjs",
@@ -561,7 +561,7 @@ async function writeAssembledApp(
         ...(config.amrProfile == null ? {} : { amrProfile: config.amrProfile }),
         appVersion: version,
         namespace: config.namespace,
-        nodeCommandRelative: "open-design/bin/node",
+        nodeCommandRelative: "mish/bin/node",
         ...(config.telemetryRelayUrl == null ? {} : { telemetryRelayUrl: config.telemetryRelayUrl }),
         ...(config.posthogKey == null ? {} : { posthogKey: config.posthogKey }),
         ...(config.posthogHost == null ? {} : { posthogHost: config.posthogHost }),
@@ -593,7 +593,7 @@ async function writeLinuxBuilderConfig(config: ToolPackConfig, paths: LinuxPaths
   const packageVersion = electronBuilderVersionForAppVersion(packagedVersion);
 
   const builderConfig: Record<string, unknown> = {
-    appId: "io.open-design.desktop",
+    appId: "io.mish.desktop",
     artifactName: `${PRODUCT_NAME}-${namespaceToken}.\${ext}`,
     asar: false,
     buildDependenciesFromSource: false,
@@ -610,14 +610,14 @@ async function writeLinuxBuilderConfig(config: ToolPackConfig, paths: LinuxPaths
     executableName: PRODUCT_NAME,
     extraMetadata: {
       main: "./main.cjs",
-      name: "open-design-packaged-app",
+      name: "mish-packaged-app",
       productName: PRODUCT_NAME,
       version: packageVersion,
       ...(config.portable ? {} : { odToolsPackRuntimeRoot: config.roots.runtime.namespaceBaseRoot }),
     },
     extraResources: [
-      { from: paths.resourceRoot, to: "open-design" },
-      { from: paths.packagedConfigPath, to: "open-design-config.json" },
+      { from: paths.resourceRoot, to: "mish" },
+      { from: paths.packagedConfigPath, to: "mish-config.json" },
       // Vendored dom-to-pptx browser bundle for editable PPTX export (read from
       // process.resourcesPath by the desktop main at runtime).
       domToPptxBundleResource(config),
@@ -638,8 +638,8 @@ async function writeLinuxBuilderConfig(config: ToolPackConfig, paths: LinuxPaths
       target,
       icon: linuxResources.icon,
       category: "Development",
-      synopsis: "Open Design",
-      maintainer: "Open Design Contributors",
+      synopsis: "Mish",
+      maintainer: "Mish Contributors",
     },
     // Keep the AppImage launch fallback explicit. Our top-level AppRun wrapper
     // clears ELECTRON_RUN_AS_NODE before these Chromium flags reach Electron,
@@ -821,7 +821,7 @@ export async function installPackedLinuxApp(config: ToolPackConfig): Promise<Lin
   const rendered = renderDesktopTemplate(template, {
     namespace: sanitizeNamespace(config.namespace),
     execPath: paths.installAppImagePath,
-    iconName: `open-design-${sanitizeNamespace(config.namespace)}`,
+    iconName: `mish-${sanitizeNamespace(config.namespace)}`,
   });
   const tmpDesktopPath = `${paths.installDesktopFilePath}.tmp`;
   await writeFile(tmpDesktopPath, rendered, "utf8");
@@ -1155,12 +1155,12 @@ export type LinuxCleanupResult = {
 
 // Paths resolved relative to the assembled app written during `tools-pack linux build`.
 // The headless entry lives at:
-//   <assembledAppRoot>/node_modules/@open-design/packaged/dist/headless.mjs
+//   <assembledAppRoot>/node_modules/@mish/packaged/dist/headless.mjs
 // The bundled Node binary lives at:
-//   <namespaceRoot>/resources/open-design/bin/node  (populated by copyResourceTree)
+//   <namespaceRoot>/resources/mish/bin/node  (populated by copyResourceTree)
 
 function resolveHeadlessEntryPath(paths: LinuxPaths): string {
-  return join(paths.assembledAppRoot, "node_modules", "@open-design", "packaged", "dist", "headless.mjs");
+  return join(paths.assembledAppRoot, "node_modules", "@mish", "packaged", "dist", "headless.mjs");
 }
 
 function resolveHeadlessBundledNodePath(paths: LinuxPaths): string {
@@ -1168,7 +1168,7 @@ function resolveHeadlessBundledNodePath(paths: LinuxPaths): string {
 }
 
 function headlessLauncherPath(config: ToolPackConfig): string {
-  return join(homedir(), ".local", "bin", `open-design-headless-${sanitizeNamespace(config.namespace)}`);
+  return join(homedir(), ".local", "bin", `mish-headless-${sanitizeNamespace(config.namespace)}`);
 }
 
 function headlessLogPath(config: ToolPackConfig): string {

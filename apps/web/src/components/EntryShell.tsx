@@ -1,6 +1,6 @@
 import { useHomeModel } from '../runtime/workbench/use-home-model';
 import { useDesignSystemDraftPublisher } from './useDesignSystemDraftPublisher';
-import type { SessionModelChoice } from '@open-design/contracts';
+import type { SessionModelChoice } from '@mish/contracts';
 import { useWorkbenchIntake } from './WorkbenchIntake';
 // EntryShell — the centered-hero entry layout.
 //
@@ -37,8 +37,8 @@ import {
   type RunContextSelection,
   type ProjectScenarioTaskProfile,
   type WorkspaceProjectSummary,
-} from '@open-design/contracts';
-import type { OpenDesignHostProjectImportSuccess } from '@open-design/host';
+} from '@mish/contracts';
+import type { MishHostProjectImportSuccess } from '@mish/host';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackHomeNavClick,
@@ -74,8 +74,8 @@ import type {
   TrackingOnboardingCompletionResult,
   TrackingOnboardingCompletionType,
   TrackingCliProviderId,
-} from '@open-design/contracts/analytics';
-import { agentIdToTracking } from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
+import { agentIdToTracking } from '@mish/contracts/analytics';
 import { useI18n, useT } from '../i18n';
 import { navigate, useRoute } from '../router';
 import type {
@@ -149,7 +149,7 @@ import {
 import type { OnboardingEntry } from '../onboarding/onboarding-entry';
 import type { PluginUseAction } from './plugins-home/useActions';
 import { Icon } from './Icon';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import {
   defaultAgentModelId,
   effectiveAgentModelChoice,
@@ -255,7 +255,7 @@ import onboardingSourceStyles from './OnboardingModelSource.module.css';
 // tree) can share them without importing this module's graph.
 export { ENTRY_RAIL_STATE_EVENT, ENTRY_RAIL_TOGGLE_EVENT };
 
-const ONBOARDING_DROPDOWN_OPEN_EVENT = 'open-design:onboarding-dropdown-open';
+const ONBOARDING_DROPDOWN_OPEN_EVENT = 'mish:onboarding-dropdown-open';
 
 // Agent and provider validation share one shape: idle until an attempt starts,
 // then keyed by the inputs that attempt is proving, so a result that no longer
@@ -273,7 +273,7 @@ type OnboardingRuntimeTestState =
 // `display` based on `--compact-topbar` breakpoint (900px).
 
 // Default scenario plugin for each project kind/intent. The mapping
-// lives in `@open-design/contracts` so the daemon's `/api/projects`
+// lives in `@mish/contracts` so the daemon's `/api/projects`
 // and `/api/runs` fallbacks resolve to the same plugin id when no
 // `pluginId` is on the request body — plan §3.3 of
 // `specs/current/plugin-driven-flow-plan.md`.
@@ -459,7 +459,7 @@ interface Props {
   // During a transient Cloud outage it prevents the rail from presenting a
   // still-signed-in user as signed out.
   amrLoggedIn?: boolean | null;
-  amrSessionState?: import('@open-design/contracts').AmrSessionState;
+  amrSessionState?: import('@mish/contracts').AmrSessionState;
   /**
    * vela login-status account/user plan (ACCOUNT-scoped). Used for personal
    * workspaces so a confirmed free account is not stuck as campaign audience
@@ -488,7 +488,7 @@ interface Props {
     file: File,
   ) => Promise<ImportClaudeDesignOutcome | void> | ImportClaudeDesignOutcome | void;
   onImportFolder?: (baseDir: string) => Promise<void> | void;
-  onImportFolderResponse?: (response: OpenDesignHostProjectImportSuccess) => Promise<void> | void;
+  onImportFolderResponse?: (response: MishHostProjectImportSuccess) => Promise<void> | void;
   onOpenProject: (
     id: string,
     fileName?: string,
@@ -510,7 +510,7 @@ interface Props {
   // First-run onboarding intentionally stops after model-source setup.
   // Guided design-system creation stays reachable from the standalone
   // `design-system-create` route and the Design Systems tab.
-  onOpenDesignSystem?: (id: string) => void;
+  onShowDesignSystem?: (id: string) => void;
   onDesignSystemsRefresh?: () => Promise<void> | void;
   onPersistComposioKey: (composio: AppConfig['composio']) => Promise<void> | void;
   onOpenSettings: (section?: EntrySettingsSection) => void;
@@ -616,7 +616,7 @@ export function EntryShell({
   onTeamProjectContentReady,
   onChangeDefaultDesignSystem,
   onCreateDesignSystem,
-  onOpenDesignSystem,
+  onShowDesignSystem,
   onDesignSystemsRefresh,
   onPersistComposioKey,
   onOpenSettings,
@@ -649,11 +649,11 @@ export function EntryShell({
   const railWorkspaceContext = accountFooterState === 'sign-in'
     ? null
     : workspaceContext;
-  const usesOpenDesignCloud = config.mode === 'daemon' && config.agentId === 'amr';
+  const usesMishCloud = config.mode === 'daemon' && config.agentId === 'amr';
   const amrAuthRequired =
     workspaceContextState.failure === 'reauth-required'
     || (
-      usesOpenDesignCloud
+      usesMishCloud
       && requiresAmrReauthentication(amrSessionState, workspaceContextState.failure)
     );
   useEffect(() => {
@@ -661,10 +661,10 @@ export function EntryShell({
     // status and a definitive credential rejection return to the existing
     // Cloud identity gate. Passive reauthentication preserves the saved model
     // source and Home's locally persisted, not-yet-sent draft.
-    const selectedCloudIdentityRejected = usesOpenDesignCloud && amrLoggedIn === false;
+    const selectedCloudIdentityRejected = usesMishCloud && amrLoggedIn === false;
     if ((!selectedCloudIdentityRejected && !amrAuthRequired) || view === 'onboarding') return;
     navigate({ kind: 'home', view: 'onboarding' }, { replace: true });
-  }, [amrAuthRequired, amrLoggedIn, usesOpenDesignCloud, view]);
+  }, [amrAuthRequired, amrLoggedIn, usesMishCloud, view]);
   let accountFooterNotice: ReactNode = null;
   if (accountFooterState === 'syncing') {
     accountFooterNotice = <RailAccountSyncTip />;
@@ -1875,7 +1875,7 @@ export function EntryShell({
                     selectedId={defaultDesignSystemId}
                     onSelect={onChangeDefaultDesignSystem}
                     onCreate={onCreateDesignSystem}
-                    onOpenSystem={onOpenDesignSystem}
+                    onOpenSystem={onShowDesignSystem}
                     onSystemsRefresh={onDesignSystemsRefresh}
                   />
                 </div>
@@ -1888,7 +1888,7 @@ export function EntryShell({
                     selectedId={defaultDesignSystemId}
                     onSelect={onChangeDefaultDesignSystem}
                     onCreate={onCreateDesignSystem}
-                    onOpenSystem={onOpenDesignSystem}
+                    onOpenSystem={onShowDesignSystem}
                     onSystemsRefresh={onDesignSystemsRefresh}
                   />
                 </div>

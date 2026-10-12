@@ -5,7 +5,7 @@
 // rule (AC-R03.2) both on the run and before a run starts.
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ReviewCheckVerdict, ReviewRunView } from '@open-design/contracts';
+import type { ReviewCheckVerdict, ReviewRunView } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchReviewRun } from '../../../src/components/workbench/WorkbenchReviewRun';
 import { WorkbenchReviewPanel } from '../../../src/components/workbench/WorkbenchReviewPanel';

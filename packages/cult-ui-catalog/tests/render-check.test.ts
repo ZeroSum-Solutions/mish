@@ -1,6 +1,6 @@
 /**
  * The pure parts of the Cult render gate (scripts/render-check.ts). The browser pass itself runs
- * as `pnpm --filter @open-design/cult-ui-catalog render-check` (CI: the agency tests job, which
+ * as `pnpm --filter @mish/cult-ui-catalog render-check` (CI: the agency tests job, which
  * installs Chromium) and proves itself on a planted self-test section every run.
  */
 

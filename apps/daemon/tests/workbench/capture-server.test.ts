@@ -2,7 +2,7 @@ import type http from 'node:http';
 import { mkdir, readdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { parseCaptureList, parseCaptureView, parseReusableUnitManifest, parseUnitSavePlan } from '@open-design/contracts';
+import { parseCaptureList, parseCaptureView, parseReusableUnitManifest, parseUnitSavePlan } from '@mish/contracts';
 import { startServer } from '../../src/server.js';
 import { captureHeaders, pngBytes, sha } from './capture-fixture.js';
 

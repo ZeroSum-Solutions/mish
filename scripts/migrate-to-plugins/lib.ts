@@ -18,7 +18,7 @@ export const SKILLS_DIR = path.join(REPO_ROOT, 'skills');
 export const DESIGN_SYSTEMS_DIR = path.join(REPO_ROOT, 'design-systems');
 export const PROMPT_TEMPLATES_DIR = path.join(REPO_ROOT, 'prompt-templates');
 
-export const PLUGIN_SCHEMA = 'https://open-design.ai/schemas/plugin.v1.json';
+export const PLUGIN_SCHEMA = 'https://mish.invalid/schemas/plugin.v1.json';
 export const PLUGIN_VERSION = '0.1.0';
 
 // Generated plugin tiers; each maps to a subfolder under PLUGINS_ROOT.
@@ -285,7 +285,7 @@ export function buildManifest(seed: PluginManifestSeed): Record<string, unknown>
 
 export async function writeManifest(folder: string, manifest: unknown): Promise<void> {
   await ensureDir(folder);
-  const target = path.join(folder, 'open-design.json');
+  const target = path.join(folder, 'mish.json');
   await writeFile(target, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 }
 

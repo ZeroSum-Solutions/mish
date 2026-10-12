@@ -99,8 +99,8 @@ let styleEl: HTMLStyleElement;
 
 beforeEach(() => {
   window.localStorage.clear();
-  window.localStorage.setItem('open-design:locale', "en");
-  window.localStorage.setItem('open-design:locale-source', 'manual');
+  window.localStorage.setItem('mish:locale', "en");
+  window.localStorage.setItem('mish:locale-source', 'manual');
   styleEl = document.createElement('style');
   // 顺序照产品里的层叠:先接缝,再 Button primitive,最后弹窗自己的 Module。
   styleEl.textContent = `${seamCss}\n${buttonCss}\n${dialogCss}`;

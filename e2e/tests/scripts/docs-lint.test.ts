@@ -83,7 +83,7 @@ test('the default set covers docs/*.md, docs/evals/*.md and evals/genui/README.m
     'README.md': '# Readme\n',
     'docs/guide.md': '# Guide\n\n[gone](nowhere.md)\n',
     'docs/evals/report.md': shell('pnpm missing'),
-    'evals/genui/README.md': '# Evals\n\nOpen Design\n',
+    'evals/genui/README.md': '# Evals\n\nMish\n',
   });
   const { code, findings } = lint();
   assert.equal(code, 1);

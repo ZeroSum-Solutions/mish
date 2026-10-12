@@ -1,0 +1,7 @@
+{
+  "name": "mish",
+  "displayName": "Mishh Mashh",
+  "version": "1.0.0",
+  "description": "Local-first design app · exposes projects/files/preview tools to your coding agent over stdio MCP. Requires the `od` daemon on PATH.",
+  "mcpServers": "./.mcp.json"
+}

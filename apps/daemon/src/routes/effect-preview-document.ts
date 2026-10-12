@@ -1,4 +1,4 @@
-import { findRealTagOffset } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealTagOffset } from '@mish/contracts/runtime/html-injection-points';
 import { PREVIEW_CONTENT_SIZE_REPORTER } from '../preview-content-size.js';
 
 // The frame has an opaque origin. Only fixed keyboard and content-size messages cross the

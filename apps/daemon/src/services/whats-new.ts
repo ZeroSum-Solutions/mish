@@ -1,4 +1,4 @@
-import type { WhatsNewContent, WhatsNewLocaleContent } from '@open-design/contracts';
+import type { WhatsNewContent, WhatsNewLocaleContent } from '@mish/contracts';
 
 // Fetches the post-update "what's new" highlight from a single hosted document
 // on a dedicated R2 bucket. Operators edit that one file after a release; the

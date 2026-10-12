@@ -88,10 +88,10 @@ const ENV_KEYS: Record<string, string[]> = {
 function resolveOverrideDir(raw: string, projectRoot: string): string {
   // Share expandHomePrefix with resolveDataDir (server.ts) so OD_DATA_DIR
   // and OD_MEDIA_CONFIG_DIR cannot split state under a $HOME-style value.
-  // A launcher passing OD_DATA_DIR=$HOME/.open-design without a shell to
+  // A launcher passing OD_DATA_DIR=$HOME/.mish without a shell to
   // expand it would otherwise route SQLite/projects/artifacts to the
   // expanded path while media-config.json stayed under
-  // <projectRoot>/$HOME/.open-design, leaving stored credentials
+  // <projectRoot>/$HOME/.mish, leaving stored credentials
   // unreachable on the next read.
   const expanded = expandHomePrefix(raw);
   return path.isAbsolute(expanded)

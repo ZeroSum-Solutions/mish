@@ -33,7 +33,7 @@
 // `capture_exceptions: false` on the posthog-js init — this module is the
 // single source of truth for browser exception capture.
 
-import { EVENT_SCHEMA_VERSION } from '@open-design/contracts/analytics';
+import { EVENT_SCHEMA_VERSION } from '@mish/contracts/analytics';
 import { scrubExceptionList, scrubFilePath } from './scrub';
 
 interface ExceptionTrackingContext {

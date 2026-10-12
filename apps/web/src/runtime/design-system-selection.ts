@@ -1,5 +1,5 @@
-import { isApprovedDesignSystem } from '@open-design/contracts';
-import type { DesignSystemSummary } from '@open-design/contracts';
+import { isApprovedDesignSystem } from '@mish/contracts';
+import type { DesignSystemSummary } from '@mish/contracts';
 
 /** Project selectors share one readiness rule; the library also displays drafts. */
 export function isSelectableDesignSystem(

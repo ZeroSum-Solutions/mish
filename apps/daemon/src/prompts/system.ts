@@ -29,7 +29,7 @@
  * The composed string is what the daemon sees as `systemPrompt` and what
  * the Anthropic path sends as `system`.
  */
-import { DESIGN_SYSTEM_BINDING_INSTRUCTION, renderDesignBriefDirective, renderDesignSystemTokensBlock, type DesignBrief } from '@open-design/contracts';
+import { DESIGN_SYSTEM_BINDING_INSTRUCTION, renderDesignBriefDirective, renderDesignSystemTokensBlock, type DesignBrief } from '@mish/contracts';
 import { renderOfficialDesignerPrompt } from './official-system.js';
 import { renderDiscoveryAndPhilosophy, renderSharedFramesBlock } from './discovery.js';
 import {
@@ -46,7 +46,7 @@ import {
   renderMediaGenerationContract,
 } from './media-contract.js';
 import { renderPanelPrompt } from './panel.js';
-import { defaultCritiqueConfig, type CritiqueConfig } from '@open-design/contracts/critique';
+import { defaultCritiqueConfig, type CritiqueConfig } from '@mish/contracts/critique';
 import {
   composeOdNextStrategyRequestPromptV2,
   executionProfileFromStreamFormat,
@@ -62,7 +62,7 @@ import {
   type MediaExecutionPolicy,
   type MediaSurface,
   type OdNextStrategyRequestRecipeV2,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 // Prepended first in every composed prompt so it wins precedence over all
 // later sections, including skill bodies and user/project instructions.
@@ -746,7 +746,7 @@ export interface ComposeInput {
    * from `planToolNoteForRuntime(agentId, streamFormat)` a few lines down, and
    * a caller that passes nothing gets exactly today's behaviour there. It is an
    * input rather than a second internal derivation so this composer and its
-   * `@open-design/contracts` mirror stay byte-identical for identical inputs —
+   * `@mish/contracts` mirror stay byte-identical for identical inputs —
    * the parity that `tests/plugins-strategy-recipe.test.ts` pins.
    */
   planToolNote?: string | null | undefined;
@@ -953,7 +953,7 @@ export function composeSystemPrompt({
   // Everything below this early return is the legacy stack; OD Next runs never
   // reach it. Their content comes from
   // `plugins/_official/scenarios/od-next-strategy/assets/**` plus the
-  // TypeScript in `@open-design/contracts` `od-next-strategy.ts`, which is
+  // TypeScript in `@mish/contracts` `od-next-strategy.ts`, which is
   // where OD Next carries host runtime contracts. The two sides share no
   // composition floor, so a rule added below holds only for the runs that take
   // this branch, and eligibility is re-evaluated per run
@@ -1082,7 +1082,7 @@ export function composeSystemPrompt({
   const deckFrameworkDirective = renderDeckFrameworkDirective(resolvedExecutionProfile);
 
   // API/BYOK mode (streamFormat === 'plain'): mirrors the same fix from
-  // `@open-design/contracts`'s composer. The daemon hits this path for
+  // `@mish/contracts`'s composer. The daemon hits this path for
   // any plain-stream adapter (e.g. DeepSeek), so without pinning the
   // override above DISCOVERY_AND_PHILOSOPHY here too, those daemon
   // agents still emit the `<todo-list>` / `[读取 X]` pseudo-tool
@@ -1677,7 +1677,7 @@ If the rules below tell you to plan with TodoWrite, write the plan as prose inst
 // after this override (see `isAskMode` gating in composeSystemPrompt) — so this
 // block is the whole behavioral charter for the turn and must read as
 // self-contained, not as a preface that overrides "rules below". Keep it
-// BYTE-IDENTICAL to the @open-design/contracts copy so a daemon chat and a
+// BYTE-IDENTICAL to the @mish/contracts copy so a daemon chat and a
 // BYOK/API chat behave the same.
 const CHAT_MODE_OVERRIDE = `# Ask mode — bare conversation (this is the whole charter for this turn)
 

@@ -41,14 +41,14 @@ import {
   type DesignTaxonomy,
   type DesignTaxonomyLabel,
   type RouteDecision,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   SectionCatalogDirectionOption,
   SectionCatalogEntry,
   SectionCatalogSpineCode,
-} from '@open-design/contracts/api/section-catalog';
+} from '@mish/contracts/api/section-catalog';
 
-import { Badge, Button, EmptyState } from '@open-design/components';
+import { Badge, Button, EmptyState } from '@mish/components';
 
 import { useT } from '../i18n';
 import type { Dict } from '../i18n/types';

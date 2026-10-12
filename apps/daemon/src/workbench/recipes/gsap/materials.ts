@@ -1,6 +1,6 @@
 import { observeComponentTokens } from '../../component-token-evidence.js';
 import { createHash } from 'node:crypto';
-import type { ResourceCandidate, ResourceRef, ResourceSourceSnapshot } from '@open-design/contracts';
+import type { ResourceCandidate, ResourceRef, ResourceSourceSnapshot } from '@mish/contracts';
 import type { CatalogueMaterial, CatalogueMaterialFile, CatalogueMaterialSource } from '../../adoption/catalogue-material.js';
 import { AdoptionError } from '../../placement/adoption-executor.js';
 import { canonicalJson } from '../../placement/adoption-plan.js';

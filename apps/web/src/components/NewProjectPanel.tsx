@@ -1,9 +1,9 @@
 import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Dialog, DialogDescription, DialogFooter, DialogTitle } from '@open-design/components';
-import { createTabToTracking } from '@open-design/contracts/analytics';
-import { isOpenDesignHostAvailable, pickHostWorkingDir } from '@open-design/host';
-import type { OpenDesignHostProjectImportSuccess } from '@open-design/host';
+import { Dialog, DialogDescription, DialogFooter, DialogTitle } from '@mish/components';
+import { createTabToTracking } from '@mish/contracts/analytics';
+import { isMishHostAvailable, pickHostWorkingDir } from '@mish/host';
+import type { MishHostProjectImportSuccess } from '@mish/host';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackDesignSystemApplyResult,
@@ -11,17 +11,17 @@ import {
   trackNewProjectModalSurfaceView,
   trackNewProjectModalTabClick,
 } from '../analytics/events';
-import type { ConnectorDetail } from '@open-design/contracts';
-import { matchesDesignSystemQuery } from '@open-design/contracts';
+import type { ConnectorDetail } from '@mish/contracts';
+import { matchesDesignSystemQuery } from '@mish/contracts';
 import { isSelectableDesignSystem } from '../runtime/design-system-selection';
-import { isApprovedDesignSystem } from '@open-design/contracts';
+import { isApprovedDesignSystem } from '@mish/contracts';
 import { DesignSystemApprovalBrowser } from './DesignSystemApprovalBrowser';
 import { DraftDesignKitList } from './DraftDesignKitList';
 import type {
   TrackingDesignSystemApplyTargetKind,
   TrackingDesignSystemOrigin,
   TrackingDesignSystemStatusValue,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 
 import { useI18n, useT } from '../i18n';
 import { localizeSkillDescription, localizeSkillName, localizeDesignSystemCategory, localizeDesignSystemSummary } from '../i18n/content';
@@ -182,7 +182,7 @@ interface Props {
   // never sees the path or the HMAC token; it only receives the
   // host-owned project identifiers and forwards them here so App-level
   // state can refresh through the daemon API.
-  onImportFolderResponse?: (response: OpenDesignHostProjectImportSuccess) => Promise<void> | void;
+  onImportFolderResponse?: (response: MishHostProjectImportSuccess) => Promise<void> | void;
   mediaProviders?: Record<string, MediaProviderCredentials>;
   connectors?: ConnectorDetail[];
   connectorsLoading?: boolean;
@@ -814,7 +814,7 @@ export function NewProjectPanel({
     setWorkingDirPicking(true);
     setWorkingDirError(null);
     try {
-      if (isOpenDesignHostAvailable()) {
+      if (isMishHostAvailable()) {
         const result = await pickHostWorkingDir();
         if (result.ok) {
           setWorkingDir(result.baseDir);

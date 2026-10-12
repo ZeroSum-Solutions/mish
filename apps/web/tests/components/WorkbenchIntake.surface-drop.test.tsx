@@ -9,7 +9,7 @@
 // drop on each surface stays the open native probe gate (N1-*).
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import type { CreateIntakeBatchRequest, IntakeBatchSnapshot, IntakeFilePutResponse } from '@open-design/contracts';
+import type { CreateIntakeBatchRequest, IntakeBatchSnapshot, IntakeFilePutResponse } from '@mish/contracts';
 import { IntakeStore, type IntakeTarget } from '../../src/runtime/intake/intake-store';
 import { WorkbenchDropModeButton, WorkbenchIntake } from '../../src/components/WorkbenchIntake';
 import { parseRoute, type Route } from '../../src/router';

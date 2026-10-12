@@ -1,4 +1,4 @@
-import { RESOURCE_SOURCE_IDS, type ResourceResult } from '@open-design/contracts';
+import { RESOURCE_SOURCE_IDS, type ResourceResult } from '@mish/contracts';
 
 type SourceId = ResourceResult['ref']['sourceId'];
 /** Sources with their own translated heading, in display order. */

@@ -13,7 +13,7 @@ import {
 import { ProjectConversationsHttpError } from '../../src/state/projects';
 import type { SettingsSection } from '../../src/components/SettingsDialog';
 import type { ProjectWorkspaceScopeState } from '../../src/collab/useProjectWorkspaceScope';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import type { AmrAuthRetryContinuation } from '../../src/runtime/amr-auth-retry-continuation';
 import type {
   AgentInfo,
@@ -3636,13 +3636,13 @@ describe('ProjectView conversation run isolation', () => {
         if (streamViaDaemon.mock.calls.length > 1) return;
         options.onRunCreated?.('run-amr-balance');
         const error = new Error(
-          'AMR Cloud reported insufficient balance for this model. Top up your AMR balance at https://open-design.ai/amr/dashboard, then retry this run.',
+          'AMR Cloud reported insufficient balance for this model. Top up your AMR balance at https://mish.invalid/amr/dashboard, then retry this run.',
         ) as Error & { code: string; details: unknown };
         error.code = 'AMR_INSUFFICIENT_BALANCE';
         error.details = {
           kind: 'amr_account',
           action: 'recharge',
-          actionUrl: 'https://open-design.ai/amr/dashboard',
+          actionUrl: 'https://mish.invalid/amr/dashboard',
         };
         options.handlers.onError(error);
       },

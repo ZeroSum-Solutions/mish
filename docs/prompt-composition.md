@@ -57,7 +57,7 @@ Changing "the prompt" can mean up to four edits. Check each one:
 | Strategy | `odNextStrategyRecipe` (`apps/daemon/src/prompts/system.ts:905`) | `apps/daemon/src/prompts/` | `plugins/_official/scenarios/od-next-strategy/assets/**` plus TypeScript in `packages/contracts/src/prompts/od-next-strategy.ts` |
 | Legacy core | `OD_PROMPT_CORE` (`apps/daemon/src/server.ts:10049`) — **default is `slim`**, `classic` is the opt-out | `apps/daemon/src/prompts/core-slim.ts` | `official-system.ts` + `discovery.ts` |
 | Execution mode | none; hand-maintained mirror | TypeScript in `apps/daemon/src/prompts/` | TypeScript in `packages/contracts/src/prompts/` (API/BYOK) |
-| OD Next internals | none; the same list is declared twice | `OD_NEXT_PROMPT_STAGE_CONTRACT_V2` (`packages/contracts/src/prompts/od-next-strategy.ts:214`) | `od.pipeline.stages` in the plugin's `open-design.json` |
+| OD Next internals | none; the same list is declared twice | `OD_NEXT_PROMPT_STAGE_CONTRACT_V2` (`packages/contracts/src/prompts/od-next-strategy.ts:214`) | `od.pipeline.stages` in the plugin's `mish.json` |
 | Generation route | `/api/runs` versus `/api/workbench/capture-drafts` | General legacy/API-BYOK or OD Next composition above | Dedicated `renderCaptureDraftPrompt` in `packages/contracts/src/prompts/capture-draft.ts`; initial and iteration turns share one host directive |
 
 The capture-draft route bypasses the general composers. Web and CLI both call
@@ -223,7 +223,7 @@ into the prompt bundle
 
 `apps/daemon/src/plugins/strategy-package.ts:158` builds an explicit roster:
 
-- The package's `open-design.json` and `SKILL.md`.
+- The package's `mish.json` and `SKILL.md`.
 - `assets.core.path` and `assets.orchestration.path`.
 - The selected task profile's `path` and `assets.taskProfileMapping.path`.
 - The selected profile's `resources[*].path`.
@@ -232,16 +232,16 @@ Only those files are read, and only those are hashed into the package identity.
 
 - A file the manifest does not declare (that folder's `AGENTS.md`, for
   instance) has **zero** runtime effect — not read, not hashed.
-- `open-design.json` and `SKILL.md` **are** in the roster. Editing either moves
+- `mish.json` and `SKILL.md` **are** in the roster. Editing either moves
   the package identity.
 - Only the *selected* profile's `resources` join the roster, so one task type's
   resources changing does not move another task type's hash.
 - Changing a task profile's body should come with a `version` bump on its entry
-  in `open-design.json`.
+  in `mish.json`.
 
 Two shapes for adding content a profile needs. **Prompt text** goes in the
 profile's own `.md`. **Non-prompt files** (skeletons, shells, stylesheets) get a
-`resources` entry on that profile in `open-design.json`; `prototype` does this
+`resources` entry on that profile in `mish.json`; `prototype` does this
 with `assets/task-profiles/prototype/device-frames/*.html` and `layout.css`,
 staged into the project as `.od-frames/` and referenced by the profile, never
 concatenated into the prompt head. Prefer neither when the content is a host

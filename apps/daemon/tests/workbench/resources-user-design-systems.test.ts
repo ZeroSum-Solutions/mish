@@ -5,7 +5,7 @@ import type { AddressInfo } from 'node:net';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { parseResourceDetailResponse, parseResourceSearchResponse, type ResourceResult } from '@open-design/contracts';
+import { parseResourceDetailResponse, parseResourceSearchResponse, type ResourceResult } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { createLocalResourceSources } from '../../src/workbench/resources.js';

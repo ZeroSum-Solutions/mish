@@ -187,7 +187,7 @@ own sections, catalogued Cult UI Pro sections and pages, owner-authored
 local-corpus prompts, and federated MotionSites prompts, each
 labelled with a rights decision, an access tier and an availability (`insertable`,
 `adapter-needed` or `reference-only`). The insertable rows are the three reviewed HyperUI adapters
-and the reviewed Cult adapters loaded from `@open-design/cult-ui-catalog`.
+and the reviewed Cult adapters loaded from `@mish/cult-ui-catalog`.
 _Avoid_: component library, template gallery
 
 **Block Composition**:

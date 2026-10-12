@@ -20,7 +20,7 @@ test('[P1] agency starter survives canvas editing and scopes publication', async
   const config = { mode: 'daemon', agentId: 'codex', onboardingCompleted: true, skillId: null, designSystemId: null, agentModels: { codex: { model: 'default', reasoning: 'default' } }, agentCliEnv: { codex: fake.codex.env } };
   const priorConfig = await (await page.request.get('/api/app-config')).json();
   expect((await page.request.put('/api/app-config', { data: config })).ok()).toBeTruthy();
-  await page.addInitScript((value) => localStorage.setItem('open-design:config', JSON.stringify(value)), config);
+  await page.addInitScript((value) => localStorage.setItem('mish:config', JSON.stringify(value)), config);
   try {
     const catalog = await (await page.request.get('/api/design-templates')).json();
     expect(catalog.designTemplates.some((s: { id: string }) => s.id === 'agency-site')).toBe(true);

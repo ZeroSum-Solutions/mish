@@ -1,8 +1,8 @@
 import { useEffect, useReducer, useRef, useState } from 'react';
 import type { Dispatch } from 'react';
 
-import type { WorkspaceCollabContext } from '@open-design/contracts';
-import { isPanelEvent, type PanelEvent } from '@open-design/contracts/critique';
+import type { WorkspaceCollabContext } from '@mish/contracts';
+import { isPanelEvent, type PanelEvent } from '@mish/contracts/critique';
 
 import {
   initialState,

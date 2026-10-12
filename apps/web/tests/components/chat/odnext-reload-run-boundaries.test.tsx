@@ -36,7 +36,7 @@
  */
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render } from '@testing-library/react';
-import type { ChatMessage, PersistedAgentEvent } from '@open-design/contracts';
+import type { ChatMessage, PersistedAgentEvent } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { AssistantMessage } from '../../../src/components/AssistantMessage';
 import { foldStrategyTaskTurns } from '../../../src/components/ChatPane';

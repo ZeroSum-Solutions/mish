@@ -1,7 +1,7 @@
-import { parseOdNextPromptBundleV2 } from '@open-design/contracts';
+import { parseOdNextPromptBundleV2 } from '@mish/contracts';
 
 export const OD_NEXT_EXACT_INPUT_MAP_VERSION =
-  'open-design.od-next-exact-input-map/v2' as const;
+  'mish.od-next-exact-input-map/v2' as const;
 
 /**
  * Every addressable node of the v2 Prompt Bundle tree that a text contributor
@@ -9,7 +9,7 @@ export const OD_NEXT_EXACT_INPUT_MAP_VERSION =
  *
  * A contributor names the exact node it fills rather than one of four flat
  * blocks, so the ownership map records where the bytes land. The bare
- * `open_design_core_system_prompt` path stays addressable because the recipe
+ * `mish_core_system_prompt` path stays addressable because the recipe
  * aggregate contributes several of its children at once; the constant head's
  * leaves are listed so a future per-leaf contributor has a legal target without
  * widening the union.
@@ -19,19 +19,19 @@ export const OD_NEXT_EXACT_INPUT_MAP_VERSION =
  * they are not separate union members.
  *
  * The split follows the bundle's cache invariant: only cross-task-constant
- * content may sit in the head (`open_design_core_system_prompt`,
+ * content may sit in the head (`mish_core_system_prompt`,
  * `session_skills`, `active_stages`), which is why the per-run tool prompt, the
  * caller's system prompt, and the first-run form override are `context/*` paths
  * here.
  */
 export const OD_NEXT_BUNDLE_NODE_PATHS_V2 = [
-  'open_design_core_system_prompt',
-  'open_design_core_system_prompt/execution_boundary',
-  'open_design_core_system_prompt/native_execution',
-  'open_design_core_system_prompt/discovery_and_planning_surface',
-  'open_design_core_system_prompt/core_strategy',
-  'open_design_core_system_prompt/output_contract',
-  'open_design_core_system_prompt/echo_guard',
+  'mish_core_system_prompt',
+  'mish_core_system_prompt/execution_boundary',
+  'mish_core_system_prompt/native_execution',
+  'mish_core_system_prompt/discovery_and_planning_surface',
+  'mish_core_system_prompt/core_strategy',
+  'mish_core_system_prompt/output_contract',
+  'mish_core_system_prompt/echo_guard',
   'session_skills/general_orchestration_skill',
   'session_skills/task_type_skill',
   'session_skills/user_selected_skills',
@@ -209,16 +209,16 @@ export const OD_NEXT_EXACT_INPUT_MAP_V1 = [
     classification: 'initial_bundle',
     source: 'composeDaemonSystemPrompt().prompt',
     owner: 'bundle serializer',
-    textTarget: 'open_design_core_system_prompt',
-    note: 'Structured recipe aggregate: contributes open_design_core_system_prompt, session_skills and active_stages as elements. Cross-task constant.',
+    textTarget: 'mish_core_system_prompt',
+    note: 'Structured recipe aggregate: contributes mish_core_system_prompt, session_skills and active_stages as elements. Cross-task constant.',
   },
   {
     id: 'echo_guard',
     classification: 'initial_bundle',
     source: 'startChatRun.ECHO_GUARD',
     owner: 'bundle serializer',
-    textTarget: 'open_design_core_system_prompt/echo_guard',
-    note: 'Constant; references the `<open_design_core_system_prompt>` and `<user_first_prompt>` tag names.',
+    textTarget: 'mish_core_system_prompt/echo_guard',
+    note: 'Constant; references the `<mish_core_system_prompt>` and `<user_first_prompt>` tag names.',
   },
   {
     id: 'user_selected_skills',
@@ -469,7 +469,7 @@ export const OD_NEXT_EXACT_INPUT_MAP_V1 = [
   {
     id: 'runtime_tool_environment',
     classification: 'out_of_band',
-    source: 'createOpenDesignToolEnv() / spawnEnvForAgent() including OD_TOOL_TOKEN',
+    source: 'createMishToolEnv() / spawnEnvForAgent() including OD_TOOL_TOKEN',
     owner: 'runtime transport',
     note: 'Executable paths, daemon/data coordinates and the scoped tool credential are child environment facts, not Bundle text.',
   },
@@ -945,7 +945,7 @@ export function assertOdNextBundleTextContributorCoverage(
 
 /**
  * Fail-closed boundary witness for the canonical first textual payload: the
- * exact text must be one canonical `open_design_prompt_bundle` v2 tree and
+ * exact text must be one canonical `mish_prompt_bundle` v2 tree and
  * nothing else. Delegating to the contract's parser means the witness also
  * rejects a payload that parses but is not in canonical form, so leading or
  * trailing bytes, a second root, and a drifting serializer all fail here.
@@ -955,7 +955,7 @@ export function assertSingleOdNextPromptBundleRoot(exactText: string): void {
     parseOdNextPromptBundleV2(exactText);
   } catch (error) {
     throw new Error(
-      'OD Next initial exact text must be one canonical open_design_prompt_bundle root with no outer bytes',
+      'OD Next initial exact text must be one canonical mish_prompt_bundle root with no outer bytes',
       { cause: error },
     );
   }

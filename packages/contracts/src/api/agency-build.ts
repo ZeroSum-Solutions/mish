@@ -453,7 +453,7 @@ export interface AgencyBuildSnapshot {
    * Set only when the request carried a `sectionSelection` and the build reached `done`
    * (`sol-design.md` §2/§3: <private-notes>/mishh-genui-production/
    * motionsites/sol-design.md). Mirrors `RunReport.sectionOverlay`
-   * (`@open-design/agency-fast-lane`'s `run.ts`) exactly: `flagged`/`remaining` are the
+   * (`@mish/agency-fast-lane`'s `run.ts`) exactly: `flagged`/`remaining` are the
    * selected section's own faithfulness slots, checked against the brief only. Never carries the
    * fetched `designReference` text — see `AgencyBuildRequest.designReferenceId`/
    * `designReferenceText`, neither of which this snapshot type has a field for at all.
@@ -473,7 +473,7 @@ export interface AgencyBuildSnapshot {
 }
 
 /** One selectable section's placement on top of a build's fixed family recipe. Mirrors
- * `@open-design/agency-fast-lane`'s `SectionPlacement` (`section-overlay.ts`) structurally. */
+ * `@mish/agency-fast-lane`'s `SectionPlacement` (`section-overlay.ts`) structurally. */
 export type AgencySectionPlacement =
   | { mode: 'append'; afterSectionId: string }
   | { mode: 'replace-optional'; targetSectionId: string };

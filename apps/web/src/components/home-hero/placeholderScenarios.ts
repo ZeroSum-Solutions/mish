@@ -22,7 +22,7 @@
 // missing translation can't silently break the one-click create.
 
 import type { Dict } from '../../i18n/types';
-import type { ChatSessionMode } from '@open-design/contracts';
+import type { ChatSessionMode } from '@mish/contracts';
 
 // A scenario after its copy has been resolved through `t()`. Carousel display
 // and the submit path consume this shape.

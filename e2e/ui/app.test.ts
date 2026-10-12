@@ -24,7 +24,7 @@ import { T } from '@/timeouts';
 import { automatedUiScenarios } from '@/playwright/resources';
 import type { UiScenario } from '@/playwright/resources';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 const APP_OWNED_SCENARIO_FLOWS = new Set([
   'design-files-upload',
   'design-files-delete',
@@ -459,7 +459,7 @@ async function seedHtmlArtifact(
   expect(resp.ok()).toBeTruthy();
 }
 
-async function openDesignFile(page: Page, fileName: string) {
+async function showDesignFile(page: Page, fileName: string) {
   const tab = tabBySuffix(page, fileName);
   if (await tab.isVisible().catch(() => false)) {
     if ((await tab.getAttribute('aria-selected')) !== 'true') await tab.click();

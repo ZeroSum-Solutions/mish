@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { teamConsoleUrl, workspaceUpgradeUrl } from '../../src/components/EntryNavRail';
 import { setRuntimeAmrConsoleOrigin } from '../../src/runtime/amr-guidance';
-import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@mish/contracts';
 
 // Stand-in for an internal deployment's console origin — the real hostnames are
 // injected at build time and reported by the daemon, never literals in source.
@@ -14,7 +14,7 @@ const RUNTIME_CONSOLE_ORIGIN = 'https://vela.example.invalid';
  * the ruling put the upgrade entries back on the console.
  */
 const PROD_CONSOLE_PLAN_URL =
-  'https://open-design.ai/amr/dashboard?source=open_design&billing=plan';
+  'https://mish.invalid/amr/dashboard?source=mish&billing=plan';
 
 afterEach(() => {
   setRuntimeAmrConsoleOrigin(null);
@@ -192,7 +192,7 @@ describe('workspaceUpgradeUrl', () => {
   it('follows the caller profile for CTA callers that must always link somewhere', () => {
     setRuntimeAmrConsoleOrigin(RUNTIME_CONSOLE_ORIGIN);
     expect(workspaceUpgradeUrl(null, null, { fallbackProfile: 'feature-test' })).toBe(
-      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=open_design&billing=plan`,
+      `${RUNTIME_CONSOLE_ORIGIN}/dashboard?source=mish&billing=plan`,
     );
     expect(workspaceUpgradeUrl(null, null, { fallbackProfile: 'prod' })).toBe(
       PROD_CONSOLE_PLAN_URL,

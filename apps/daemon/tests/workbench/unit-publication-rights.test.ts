@@ -5,7 +5,7 @@ import { mkdir, mkdtemp, readFile, rename, rm, symlink, writeFile } from 'node:f
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, expect, it, vi } from 'vitest';
-import { parseUnitSaveRequest, parseUnitInsertRequest } from '@open-design/contracts';
+import { parseUnitSaveRequest, parseUnitInsertRequest } from '@mish/contracts';
 import * as deploy from '../../src/deploy.js';
 import { registerDeployRoutes, type RegisterDeployRoutesDeps } from '../../src/routes/deploy.js';
 import { createUnitService } from '../../src/workbench/units/unit-service.js';

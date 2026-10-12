@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import type { Request } from 'express';
 import { afterEach, expect, it, vi } from 'vitest';
-import { InstalledPluginRecordSchema } from '@open-design/contracts';
+import { InstalledPluginRecordSchema } from '@mish/contracts';
 import { currentPluginResourceRevision, createPluginResourceRevisionValidator, PLUGIN_SOURCE_VALIDATION_LIMITS, createLocalResourceSources, searchResources } from '../../src/workbench/resources.js';
 import { createProjectContextReferenceResolver } from '../../src/workbench/context-reference-services.js';
 import { closeDatabase, openDatabase, insertProject, ensureWorkspaceResource } from '../../src/db.js';

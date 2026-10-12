@@ -2,10 +2,10 @@
 // @ts-nocheck
 import { APPROVED_ATLAS_SEED } from './design-systems/approved-atlas-seed.js';
 import { approveAtlasSeed } from './design-systems/approved-seed.js';
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 import { streamRunEvents } from './run-watch-cli.js';
 import { assertProviderStdinUsage, readProviderStdin } from './workbench/provider-stdin.js';
-import { packPluginSource, parsePackPluginSource, parsePutSessionModel, parseSessionByokBinding } from '@open-design/contracts';
+import { packPluginSource, parsePackPluginSource, parsePutSessionModel, parseSessionByokBinding } from '@mish/contracts';
 import { runIntegrationsCli } from './workbench/integrations-cli.js';
 import { runReviewCli } from './workbench/review-cli.js';
 import { runWorkbench } from './workbench-cli.js';
@@ -55,10 +55,10 @@ import { runLiveArtifactsToolCli } from './tools-live-artifacts-cli.js';
 import { runDeliverableSyntaxToolCli } from './tools-deliverable-syntax-cli.js';
 import { splitResearchSubcommand } from './research/cli-args.js';
 import { fetchWithScopedToolToken, scopedToolTokenHeaders, resolveDaemonUrl } from './daemon-url.js';
-import { SidecarFactory } from '@open-design/sidecar';
-import { APP_KEYS, SIDECAR_MESSAGES } from '@open-design/sidecar-proto';
-import { CULT_CATALOG_KIND_FILTERS, CULT_CATALOG_STATES, DEFAULT_DESIGN_SYSTEM_ID, EXPORT_FORMATS, EXPORT_IMAGE_FORMATS, isCultCatalogState, mediaFailureNextStep, parseAgencyFamilyEffectsResponse, parseTwenty1stItemResponse, parseTwenty1stListResponse, parseTwenty1stSourceResponse, selectTwenty1stPrimarySourceFile, parseCultCatalogItemResponse, parseCultCatalogListResponse, parseGenuiCatalogResponse, genuiCatalogPreviewUrl, type GenuiCatalogPreviewResponse } from '@open-design/contracts';
-import type { ArtifactLintFinding, DeploymentAccess, LintArtifactCliResultEnvelope, LintArtifactResponse, LintFailOn } from '@open-design/contracts';
+import { SidecarFactory } from '@mish/sidecar';
+import { APP_KEYS, SIDECAR_MESSAGES } from '@mish/sidecar-proto';
+import { CULT_CATALOG_KIND_FILTERS, CULT_CATALOG_STATES, DEFAULT_DESIGN_SYSTEM_ID, EXPORT_FORMATS, EXPORT_IMAGE_FORMATS, isCultCatalogState, mediaFailureNextStep, parseAgencyFamilyEffectsResponse, parseTwenty1stItemResponse, parseTwenty1stListResponse, parseTwenty1stSourceResponse, selectTwenty1stPrimarySourceFile, parseCultCatalogItemResponse, parseCultCatalogListResponse, parseGenuiCatalogResponse, genuiCatalogPreviewUrl, type GenuiCatalogPreviewResponse } from '@mish/contracts';
+import type { ArtifactLintFinding, DeploymentAccess, LintArtifactCliResultEnvelope, LintArtifactResponse, LintFailOn } from '@mish/contracts';
 import { buildExportCliRequestBody, buildExportCliResultEnvelope, resolveExportCliDeckMode } from './export-cli-request.js';
 import { exportRoutePath } from './export-cli-routing.js';
 import {
@@ -155,8 +155,8 @@ const MCP_INSTALL_STRING_FLAGS = new Set([
   'daemon-url',
   'name',
 ]);
-const MCP_INSTALL_CLI_PROBE_FLAG = 'open-design-cli-probe';
-const MCP_INSTALL_CLI_PROBE_TOKEN = 'open-design-cli:mcp-install:v1';
+const MCP_INSTALL_CLI_PROBE_FLAG = 'mish-cli-probe';
+const MCP_INSTALL_CLI_PROBE_TOKEN = 'mish-cli:mcp-install:v1';
 const MCP_INSTALL_BOOLEAN_FLAGS = new Set([
   'help',
   'h',
@@ -1175,7 +1175,7 @@ function printRootHelp() {
       Discover, install, and apply plugins through the local daemon.
   od plugin publish-repo <folder>
       Create/update the author's GitHub repo for a local plugin folder.
-  od plugin open-design-pr <folder>
+  od plugin mish-pr <folder>
       Push a community-catalog branch and open the upstream PR form.
 
   od components ledger [--json] [--core-only]
@@ -1249,7 +1249,7 @@ function printRootHelp() {
   od memory tree <list|view|edit|move> [args]
       Inspect and edit the memory tree that is injected into agent prompts.
 
-  od share <open-design|url> [options]
+  od share <mish|url> [options]
       Build localized social-share targets for the upstream repository or a
       deployed project URL. Use --json for scripted integrations.
 
@@ -2794,7 +2794,7 @@ async function runMcpInstall(args) {
 
   const uninstall = Boolean(flags.uninstall || flags.remove);
   const dryRun = Boolean(flags.print || flags['dry-run']);
-  const serverName = flags.name || 'open-design';
+  const serverName = flags.name || 'mish';
 
   const os = await import('node:os');
   const spec = await resolveMcpLaunchSpec(flags);
@@ -2948,7 +2948,7 @@ Options:
   --uninstall, --remove   Remove the Mishh Mashh MCP server instead.
   --print, --dry-run      Show what would change; write nothing.
   --json                  Machine-readable result (dry runs include launchSpec).
-  --name <name>           MCP server name in the agent config (default: open-design).
+  --name <name>           MCP server name in the agent config (default: mish).
   --daemon-url <url>      Daemon URL used to resolve the launch command.
 
 The launch command is resolved from the running daemon's
@@ -3060,7 +3060,7 @@ async function runPlugin(args) {
     case 'export':   return runPluginExport(rest);
     case 'publish':  return runPluginPublish(rest);
     case 'publish-repo': return runPluginPublishRepo(rest);
-    case 'open-design-pr': return runPluginOpenDesignPr(rest);
+    case 'mish-pr': return runPluginMishPr(rest);
     case 'yank':     return runPluginYank(rest);
     default:
       console.error(`unknown subcommand: od plugin ${sub}`);
@@ -3071,7 +3071,7 @@ async function runPlugin(args) {
 
 // Phase 4 / spec §14.1 — `od plugin scaffold` interactive starter.
 //
-// Side-effect: writes a SKILL.md + open-design.json starter under
+// Side-effect: writes a SKILL.md + mish.json starter under
 // `<targetDir>/<id>/`. Default targetDir is process.cwd() so a code
 // agent can drop the scaffold into the current repo root.
 async function runPluginScaffold(rest) {
@@ -3088,7 +3088,7 @@ async function runPluginScaffold(rest) {
                      [--mode <mode>] [--scenario <scenario>]
                      [--out <dir>] [--with-claude-plugin]
 
-Writes <out|cwd>/<id>/{SKILL.md,open-design.json,README.md}.`);
+Writes <out|cwd>/<id>/{SKILL.md,mish.json,README.md}.`);
     process.exit(rest.length === 0 ? 2 : 0);
   }
   const id = typeof flags.id === 'string' && flags.id.length > 0
@@ -3254,7 +3254,7 @@ rejection at install).
 Exit codes:
   0  archive written
   2  CLI usage error
-  4  pack-time error (missing open-design.json, invalid JSON, etc)`);
+  4  pack-time error (missing mish.json, invalid JSON, etc)`);
     process.exit(rest.length === 0 ? 2 : 0);
   }
   const folder = rest[0];
@@ -4242,7 +4242,7 @@ function resolveCliEntryVersion(entry, range) {
 
 // Plan §3.MM1 — `od plugin manifest <id>`. Prints just the parsed
 // manifest JSON, no wrapper. Useful for plugin authors who want to
-// compare the daemon's view to their on-disk open-design.json
+// compare the daemon's view to their on-disk mish.json
 // without scrolling past the registry record fields (sourceKind /
 // fsPath / installedAt etc).
 async function runPluginManifest(rest) {
@@ -5328,9 +5328,9 @@ async function runPluginPublish(rest) {
   });
   if (rest.length === 0 || flags.help || flags.h) {
     console.log(`Usage:
-  od plugin publish <pluginId> --to open-design|anthropics-skills|awesome-agent-skills|clawhub|skills-sh
+  od plugin publish <pluginId> --to mish|anthropics-skills|awesome-agent-skills|clawhub|skills-sh
                     [--repo <github-url>] [--snapshot-id <id>] [--open] [--json]
-  od plugin publish <pluginId> --to marketplace-json --catalog ./open-design-marketplace.json --repo <github-url>
+  od plugin publish <pluginId> --to marketplace-json --catalog ./mish-marketplace.json --repo <github-url>
 
 The CLI prints the catalog's submission URL + a pre-filled PR body.
 Pass --open to auto-launch the system browser. Use --snapshot-id to
@@ -5347,7 +5347,7 @@ publish from a frozen run snapshot rather than the live installed copy.`);
     process.exit(2);
   }
   if (!target) {
-    console.error('--to <catalog> is required (one of: open-design, anthropics-skills, awesome-agent-skills, clawhub, skills-sh)');
+    console.error('--to <catalog> is required (one of: mish, anthropics-skills, awesome-agent-skills, clawhub, skills-sh)');
     process.exit(2);
   }
   const base = (await pluginDaemonUrl(flags)).replace(/\/$/, '');
@@ -5467,7 +5467,7 @@ GitHub API as a last resort. It never publishes to placeholder owners.`);
     import('node:os'),
   ]);
   const absFolder = resolve(process.cwd(), folder);
-  const manifestPath = resolve(absFolder, 'open-design.json');
+  const manifestPath = resolve(absFolder, 'mish.json');
   const manifest = JSON.parse(await readFile(manifestPath, 'utf8'));
   const host = typeof flags.host === 'string' ? flags.host : 'github.com';
   const target = await resolvePluginGithubTarget({ host, owner: flags.owner, manifest, purpose: 'publish-repo' });
@@ -5601,14 +5601,14 @@ GitHub API as a last resort. It never publishes to placeholder owners.`);
   });
 }
 
-async function runPluginOpenDesignPr(rest) {
+async function runPluginMishPr(rest) {
   const flags = parseFlags(rest, {
     string: new Set(['host', 'owner']),
     boolean: new Set(['help', 'h', 'json', 'dry-run']),
   });
   if (rest.length === 0 || flags.help || flags.h) {
     console.log(`Usage:
-  od plugin open-design-pr <folder> [--host github.com] [--owner github-login-or-fork-owner] [--dry-run] [--json]
+  od plugin mish-pr <folder> [--host github.com] [--owner github-login-or-fork-owner] [--dry-run] [--json]
 
 Copies a local plugin folder into plugins/community/<name>/ on the author's
 fork of the upstream repository, pushes a branch, and opens the PR form with --web.`);
@@ -5616,7 +5616,7 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
   }
   const folder = rest.find((a) => !a.startsWith('-') && a !== flags.host && a !== flags.owner);
   if (!folder) {
-    console.error('Usage: od plugin open-design-pr <folder>');
+    console.error('Usage: od plugin mish-pr <folder>');
     process.exit(2);
   }
   const [{ resolve, join }, fsp, os] = await Promise.all([
@@ -5625,19 +5625,19 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
     import('node:os'),
   ]);
   const absFolder = resolve(process.cwd(), folder);
-  const manifestPath = resolve(absFolder, 'open-design.json');
+  const manifestPath = resolve(absFolder, 'mish.json');
   const manifest = JSON.parse(await fsp.readFile(manifestPath, 'utf8'));
   const host = typeof flags.host === 'string' ? flags.host : 'github.com';
-  const target = await resolvePluginGithubTarget({ host, owner: flags.owner, manifest, purpose: 'open-design-pr' });
+  const target = await resolvePluginGithubTarget({ host, owner: flags.owner, manifest, purpose: 'mish-pr' });
   const name = String(manifest.name ?? '').trim();
   if (!name) {
-    console.error('[open-design-pr] manifest.name is required');
+    console.error('[mish-pr] manifest.name is required');
     process.exit(2);
   }
   const title = String(manifest.title ?? name).trim();
   const branch = `plugin/${name}-${Math.floor(Date.now() / 1000)}`;
-  const tmpRoot = await fsp.mkdtemp(join(os.tmpdir(), 'od-open-design-pr-'));
-  const checkout = join(tmpRoot, 'open-design');
+  const tmpRoot = await fsp.mkdtemp(join(os.tmpdir(), 'od-mish-pr-'));
+  const checkout = join(tmpRoot, 'mish');
   const steps = [];
   const run = async (label, command, args, opts = {}) => {
     steps.push({ label, command: [command, ...args].join(' ') });
@@ -5651,7 +5651,7 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
     if (!result.ok && !opts.tolerate?.(result)) {
       emitPluginWorkflowResult(flags, {
         ok: false,
-        action: 'open-design-pr',
+        action: 'mish-pr',
         folder: absFolder,
         login: target.login,
         owner: target.owner,
@@ -5707,7 +5707,7 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
   const prUrl = extractFirstUrl(pr.stdout || pr.stderr) ?? `https://github.com/${MISHH_MASHH_PLUGIN_REPO}/pull/new/${branch}`;
   emitPluginWorkflowResult(flags, {
     ok: true,
-    action: 'open-design-pr',
+    action: 'mish-pr',
     folder: absFolder,
     login: target.login,
     owner: target.owner,
@@ -5803,12 +5803,12 @@ async function resolvePluginGithubTarget({ host = 'github.com', owner, manifest,
     console.error(`[plugin github] could not resolve the GitHub owner for ${purpose}.`);
     if (apiError?.stderr || apiError?.stdout) console.error(apiError.stderr || apiError.stdout);
     if (apiError && isGhApiRateLimit(apiError)) {
-      const ownerHint = purpose === 'open-design-pr' ? '<github-login-or-fork-owner>' : '<github-login-or-org>';
+      const ownerHint = purpose === 'mish-pr' ? '<github-login-or-fork-owner>' : '<github-login-or-org>';
       console.error(`GitHub API is rate limited. Re-run with --owner ${ownerHint}, or authenticate/refresh gh and retry.`);
     } else {
       console.error('Run: gh auth refresh -h github.com -s repo,workflow');
       console.error('Or:  gh auth login -h github.com -s repo,workflow');
-      console.error(purpose === 'open-design-pr'
+      console.error(purpose === 'mish-pr'
         ? 'If the fork owner differs from your auth login, pass --owner <github-login-or-fork-owner>.'
         : 'If this is an org-owned plugin, pass --owner <github-org>.');
     }
@@ -5898,7 +5898,7 @@ function parseGithubRepoUrl(raw) {
 }
 
 function isPlaceholderRepoOwner(owner) {
-  return /^(open-design-user|<vendor>|vendor|example-user|your-org|your-username|owner|user|username)$/i.test(String(owner ?? '').trim());
+  return /^(mish-user|<vendor>|vendor|example-user|your-org|your-username|owner|user|username)$/i.test(String(owner ?? '').trim());
 }
 
 function isRepoNotFound(result) {
@@ -5937,9 +5937,9 @@ function emitPluginWorkflowResult(flags, payload) {
     if (payload.manifestRewritten) console.log('[publish-repo] manifest repo fields were normalized before publishing.');
     return;
   }
-  if (payload.action === 'open-design-pr') {
-    if (payload.ownerSource) console.log(`[open-design-pr] owner resolved from ${payload.ownerSource}: ${payload.owner}`);
-    if (payload.apiRateLimited) console.log('[open-design-pr] GitHub API was rate limited; continued with the locally resolved owner.');
+  if (payload.action === 'mish-pr') {
+    if (payload.ownerSource) console.log(`[mish-pr] owner resolved from ${payload.ownerSource}: ${payload.owner}`);
+    if (payload.apiRateLimited) console.log('[mish-pr] GitHub API was rate limited; continued with the locally resolved owner.');
     console.log(`Open this URL and click Create to file the PR: ${payload.prUrl}`);
     return;
   }
@@ -5962,7 +5962,7 @@ async function runPluginYank(rest) {
   });
   if (rest.length === 0 || flags.help || flags.h) {
     console.log(`Usage:
-  od plugin yank <vendor/plugin-name>@<version> --reason "<why>" [--to open-design] [--json]
+  od plugin yank <vendor/plugin-name>@<version> --reason "<why>" [--to mish] [--json]
 
 Yanking never deletes metadata or bytes. It opens the registry review flow that
 marks a version unresolvable for new installs while preserving lockfile replay.`);
@@ -5979,9 +5979,9 @@ marks a version unresolvable for new installs while preserving lockfile replay.`
     console.error('--reason is required for yanking');
     process.exit(2);
   }
-  const target = flags.to ?? 'open-design';
-  if (target !== 'open-design') {
-    console.error('Only --to open-design is supported in this v1 GitHub-backed yank flow.');
+  const target = flags.to ?? 'mish';
+  if (target !== 'mish') {
+    console.error('Only --to mish is supported in this v1 GitHub-backed yank flow.');
     process.exit(2);
   }
   const title = `Yank ${parsed.name}@${parsed.range}`;
@@ -6005,7 +6005,7 @@ marks a version unresolvable for new installs while preserving lockfile replay.`
   ].join('\n');
   const params = new URLSearchParams({ title, body });
   const payload = {
-    catalog: 'open-design',
+    catalog: 'mish',
     name: parsed.name,
     version: parsed.range,
     reason,
@@ -6479,9 +6479,9 @@ function printPluginHelp() {
                                           List persisted skill-to-plugin candidates.
   od plugin publish-repo <folder>         Create/update the author's public
                                           GitHub repo for a plugin folder.
-  od plugin open-design-pr <folder>       Push a community-catalog branch and
+  od plugin mish-pr <folder>       Push a community-catalog branch and
                                           open the upstream PR form.
-  od plugin publish <folder> --to open-design|anthropics-skills|awesome-agent-skills|clawhub|skills-sh
+  od plugin publish <folder> --to mish|anthropics-skills|awesome-agent-skills|clawhub|skills-sh
                                           Prepare a registry submission link.
   od plugin login [--host github.com]      Authenticate registry publishing via gh.
   od plugin whoami [--host github.com]     Show the gh account used for publishing.
@@ -6511,7 +6511,7 @@ async function projectDaemonUrl(flags) {
 
 function printShareUsage() {
   console.log(`Usage:
-  od share open-design [--locale <locale>] [--platform <id>] [--json]
+  od share mish [--locale <locale>] [--platform <id>] [--json]
   od share url --url <https-url> [--title <title>] [--text <text>]
                [--copy-text <text>] [--locale <locale>] [--platform <id>] [--json]
 
@@ -6533,7 +6533,7 @@ async function runShare(args) {
     process.exit(args.length === 0 ? 2 : 0);
   }
 
-  const sub = args[0] && !args[0].startsWith('-') ? args[0] : 'open-design';
+  const sub = args[0] && !args[0].startsWith('-') ? args[0] : 'mish';
   const rest = sub === args[0] ? args.slice(1) : args;
   const flags = parseFlags(rest, {
     string: SHARE_STRING_FLAGS,
@@ -6552,14 +6552,14 @@ async function runShare(args) {
         locale: flags.locale,
       }
     : {
-        kind: 'open-design-repo',
+        kind: 'mish-repo',
         title: flags.title,
         text: flags.text,
         copyText: flags['copy-text'],
         locale: flags.locale,
       };
 
-  if (sub !== 'open-design' && sub !== 'url') {
+  if (sub !== 'mish' && sub !== 'url') {
     console.error(`unknown share target: ${sub}`);
     printShareUsage();
     process.exit(2);
@@ -10684,7 +10684,7 @@ into a zip. The bundle is the same one Settings → About → Export
 diagnostics produces.
 
   <path>                 Where to write the zip. Defaults to
-                         ./open-design-diagnostics-<timestamp>.zip in the
+                         ./mish-diagnostics-<timestamp>.zip in the
                          current working directory. Alias: --output <path>.
   --json                 Print {path, sizeBytes} on stdout instead of a
                          human-readable summary. The file is still written
@@ -10705,7 +10705,7 @@ diagnostics produces.
   const base = (await libraryDaemonUrl(flags)).replace(/\/$/, '');
 
   const { DIAGNOSTICS_EXPORT_PATH, DIAGNOSTICS_FILENAME_PREFIX, diagnosticsFileName } =
-    await import('@open-design/diagnostics');
+    await import('@mish/diagnostics');
   const fs = await import('node:fs/promises');
   const path = await import('node:path');
 
@@ -13121,7 +13121,7 @@ async function runTwentyFirst(args) {
     return;
   }
 
-  const { twenty1stListQuery } = await import('@open-design/contracts');
+  const { twenty1stListQuery } = await import('@mish/contracts');
   const resp = await fetch(`${base}/api/21st${twenty1stListQuery({ query: flags.query, tag: flags.tag, rights: flags.rights })}`);
   if (!resp.ok) return structuredHttpFailure(resp);
   let data;
@@ -14091,7 +14091,7 @@ Options:
 
   const body: Record<string, unknown> = { fileName, providerId };
   if (flags['vercel-name'] !== undefined) {
-    const { validateVercelProjectName } = await import('@open-design/contracts');
+    const { validateVercelProjectName } = await import('@mish/contracts');
     if (providerId !== 'vercel-self' || !validateVercelProjectName(flags['vercel-name']).valid) {
       console.error('--vercel-name requires Vercel and a valid lowercase DNS label (1–63 chars).'); process.exitCode = 2; return;
     }

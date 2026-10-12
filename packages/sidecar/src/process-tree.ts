@@ -5,7 +5,7 @@ import {
   readProcessStampFromCommand,
   type ProcessSnapshot,
   type StampedProcessInvocationSnapshot,
-} from "@open-design/platform";
+} from "@mish/platform";
 
 import {
   isSidecarLauncherCommand,

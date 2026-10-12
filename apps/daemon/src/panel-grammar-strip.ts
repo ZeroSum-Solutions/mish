@@ -14,10 +14,10 @@
  *  2. **不吞用户的字**:攒着的半截如果最终不是标记,`flush()` 要原样吐回去。
  */
 
-import { CRITIQUE_GRAMMAR_TAGS, critiqueGrammarTagPattern } from '@open-design/contracts';
+import { CRITIQUE_GRAMMAR_TAGS, critiqueGrammarTagPattern } from '@mish/contracts';
 
 /*
- * 语法本身住在 `@open-design/contracts`(`critique.ts`)—— 那是**唯一出处**。
+ * 语法本身住在 `@mish/contracts`(`critique.ts`)—— 那是**唯一出处**。
  * 这个文件只负责流式那一半:半截标记的缓冲与吐回。
  * web 侧用同一份语法剥**历史**(已经落库的旧对话,这道来不及了)。
  */

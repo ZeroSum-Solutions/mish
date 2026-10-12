@@ -1,7 +1,7 @@
 # Fork pin policy — Mishh-Mashh 2
 
 **Decision (2026-09-12, founder):** this repository is a **hard-pinned, cherry-pick-only fork**
-of the upstream repository ([`nexu-io/open-design`](https://github.com/nexu-io/open-design)). We own this product.
+of the upstream repository ([`ZeroSum-Solutions/mish`](https://github.com/ZeroSum-Solutions/mish)). We own this product.
 Upstream is a source of individual features, **never** a merge target.
 
 ## The pin
@@ -9,8 +9,8 @@ Upstream is a source of individual features, **never** a merge target.
 | | |
 |---|---|
 | Pin point | commit `73953213a6fec2c8092e8e77d229a3074aa828a9` |
-| Release tag | `open-design-v0.22.2` (published 2026-09-10) |
-| Upstream remote | `upstream` → `https://github.com/nexu-io/open-design.git` — **fetch-only**; its push URL is the literal string `DISABLED-no-push` |
+| Release tag | `mish-v0.22.2` (published 2026-09-10) |
+| Upstream remote | `upstream` → `https://github.com/ZeroSum-Solutions/mish.git` — **fetch-only**; its push URL is the literal string `DISABLED-no-push` |
 | Our remote | `origin` → `https://github.com/ZeroSum-Solutions/mish` (public) |
 | License | Apache-2.0 (upstream) — rebranding and private forks are permitted |
 
@@ -121,7 +121,7 @@ inside the updater.
 
 | Date | Upstream commit(s) | What | Why |
 |---|---|---|---|
-| 2026-09-12 | — | Initial pin at `73953213a` (`open-design-v0.22.2`) | Fresh base for Mishh-Mashh 2 |
+| 2026-09-12 | — | Initial pin at `73953213a` (`mish-v0.22.2`) | Fresh base for Mishh-Mashh 2 |
 | 2026-09-22 | `ad9078b87c` | fix(chat): keep footer actions and time visible in narrow panes (#8001) | Upstream bug fix; triage 2026-09-22 |
 | 2026-09-22 | `ab009b1a30` | fix(chat): preserve ranges for repeated file reads (#8019) | Upstream bug fix; triage 2026-09-22 |
 | 2026-09-22 | `712b0db974` | fix(prompts): write next-step suggestions in the run's UI locale (#7920) | Upstream bug fix; triage 2026-09-22 |

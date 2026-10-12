@@ -1,4 +1,4 @@
-import type { FontKitDeclaration, FontKitInventory } from '@open-design/contracts';
+import type { FontKitDeclaration, FontKitInventory } from '@mish/contracts';
 import { useT } from '../../i18n';
 import styles from './workbench.module.css';
 

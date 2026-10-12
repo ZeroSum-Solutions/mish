@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { defaultCritiqueConfig } from '@open-design/contracts/critique';
+import { defaultCritiqueConfig } from '@mish/contracts/critique';
 
 import { composeSystemPrompt, type ComposeInput } from '../../src/prompts/system.js';
 

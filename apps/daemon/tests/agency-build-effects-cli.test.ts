@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { AgencyEffectsResult, AgencyFamilyEffectsResponse } from '@open-design/contracts';
+import type { AgencyEffectsResult, AgencyFamilyEffectsResponse } from '@mish/contracts';
 import { effectsFromFlags, effectsLines, familyEffectsLines } from '../src/agency-build-cli.js';
 
 const execFileP = promisify(execFile);

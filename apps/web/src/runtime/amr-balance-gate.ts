@@ -36,7 +36,7 @@ import type {
   AmrWalletSnapshot,
   WorkspaceCollabContext,
   WorkspaceBillingResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { fetchAmrWalletSnapshot } from '../providers/daemon';
 import { resolveAmrPlan } from './amr-low-balance-plan';
 

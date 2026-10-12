@@ -14,12 +14,12 @@
 // override live in `./plugins-home/usePluginFacets.ts`. This file
 // owns layout only.
 
-import { Button, Input } from '@open-design/components';
+import { Button, Input } from '@mish/components';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   InstalledPluginRecord,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { useI18n, useT } from '../i18n';
 import { Icon } from './Icon';
 import { PluginCard } from './plugins-home/PluginCard';

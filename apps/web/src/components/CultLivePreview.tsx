@@ -25,7 +25,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, Dialog, DialogTitle } from '@open-design/components';
+import { Button, Dialog, DialogTitle } from '@mish/components';
 import {
   cultCatalogPreviewUrl,
   cultPreviewFrameUrl,
@@ -37,7 +37,7 @@ import {
   type CultCatalogRelatedItem,
   type CultPreviewInfo,
   type CultPreviewTheme,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { useT } from '../i18n';
 import type { Dict } from '../i18n/types';

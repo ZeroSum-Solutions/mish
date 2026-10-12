@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { JSDOM } from 'jsdom';
-import { DECK_STRUCTURED_SLIDE_SELECTOR } from '@open-design/contracts/runtime/deck-stage-fallback';
+import { DECK_STRUCTURED_SLIDE_SELECTOR } from '@mish/contracts/runtime/deck-stage-fallback';
 import { buildSrcdoc } from '../../src/runtime/srcdoc';
 
 const deckHtml = `<!doctype html>
@@ -38,7 +38,7 @@ describe('buildSrcdoc', () => {
     );
 
     const dom = new JSDOM(doc, {
-      url: 'http://open-design.local/',
+      url: 'http://mish.local/',
       runScripts: 'dangerously',
     });
     dom.window.dispatchEvent(new dom.window.MessageEvent('message', {
@@ -63,7 +63,7 @@ describe('buildSrcdoc', () => {
       { baseHref: 'od://app/api/projects/project-1/preview/scope-1/' },
     );
     const dom = new JSDOM(doc, {
-      url: 'http://open-design.local/',
+      url: 'http://mish.local/',
       runScripts: 'dangerously',
     });
     const before = dom.window.document.documentElement;

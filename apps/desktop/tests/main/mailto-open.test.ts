@@ -186,7 +186,7 @@ describe("openFirstPartyMailto", () => {
 
   test("refuses anything that is not a mailto", async () => {
     const calls: string[] = [];
-    const opened = await openFirstPartyMailto("https://open-design.ai", {
+    const opened = await openFirstPartyMailto("https://github.com/ZeroSum-Solutions/mish", {
       platform: "darwin",
       readHandlerBundleId: async () => null,
       openWithAppleMail: async (url) => void calls.push(`mail:${url}`),

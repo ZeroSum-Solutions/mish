@@ -1,4 +1,4 @@
-import { updateDesignSystemRevision } from '@open-design/contracts';
+import { updateDesignSystemRevision } from '@mish/contracts';
 import { createHash } from 'node:crypto';
 import { lstat, mkdir, readFile, realpath, writeFile } from 'node:fs/promises';
 import { dirname, extname, join, sep } from 'node:path';

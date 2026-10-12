@@ -1,4 +1,4 @@
-import { WORKBENCH_ADOPTION_HELPER_LAYOUT, WORKBENCH_ADOPTION_ROOT_RECORD } from '@open-design/contracts';
+import { WORKBENCH_ADOPTION_HELPER_LAYOUT, WORKBENCH_ADOPTION_ROOT_RECORD } from '@mish/contracts';
 import { closeSync, constants, fstatSync, lstatSync, openSync, readdirSync, readSync, unlinkSync } from 'node:fs';
 import path from 'node:path';
 import { OWNER_FILE_NAME } from './owner-binding.js';

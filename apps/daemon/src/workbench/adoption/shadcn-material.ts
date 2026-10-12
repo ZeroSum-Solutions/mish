@@ -1,7 +1,7 @@
 import { observeComponentTokens } from '../component-token-evidence.js';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import type { ResourceCandidate, ResourceRef, ResourceSourceSnapshot } from '@open-design/contracts';
+import type { ResourceCandidate, ResourceRef, ResourceSourceSnapshot } from '@mish/contracts';
 import { parseShadcnReference, resolveShadcnRegistryItem, type ShadcnFetch, type ShadcnRegistryItemSource } from '../../design-systems/shadcn-import.js';
 import { AdoptionError } from '../placement/adoption-executor.js';
 import { canonicalJson } from '../placement/adoption-plan.js';

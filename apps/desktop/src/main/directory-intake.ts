@@ -24,15 +24,15 @@
 import { access, constants, lstat, readdir, realpath, stat } from "node:fs/promises";
 import { basename, isAbsolute, join, relative, sep } from "node:path";
 
-import type { OpenDesignHostDroppedDirectoryListing, OpenDesignHostDroppedDirectoryRefusal } from "@open-design/host";
+import type { MishHostDroppedDirectoryListing, MishHostDroppedDirectoryRefusal } from "@mish/host";
 
 export const DIRECTORY_INTAKE_IPC_CHANNEL = "intake:list-directory";
 export const DIRECTORY_INTAKE_MAX_ENTRIES = 2000;
 
 // The listing is typed against the host bridge contract it is sent over, so the
 // main process and the renderer cannot drift apart on refusal reasons.
-export type DirectoryEntryRefusal = OpenDesignHostDroppedDirectoryRefusal;
-export type DroppedDirectoryListing = OpenDesignHostDroppedDirectoryListing;
+export type DirectoryEntryRefusal = MishHostDroppedDirectoryRefusal;
+export type DroppedDirectoryListing = MishHostDroppedDirectoryListing;
 
 export class DirectoryIntakeError extends Error {
   constructor(message: string) {

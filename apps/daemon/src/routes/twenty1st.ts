@@ -5,11 +5,11 @@ import { existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { Express } from 'express';
-import { filterTwenty1stItems, type Twenty1stItem, Twenty1stItemResponse, Twenty1stListResponse, Twenty1stSourceResponse } from '@open-design/contracts';
-import twenty1stJson from '@open-design/21st-catalog/generated/21st-items.json' with { type: 'json' };
-import originalsJson from '@open-design/21st-catalog/generated/21st-originals.json' with { type: 'json' };
-import twenty1stThumbnailsJson from '@open-design/21st-catalog/generated/21st-thumbnails.json' with { type: 'json' };
-import { findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { filterTwenty1stItems, type Twenty1stItem, Twenty1stItemResponse, Twenty1stListResponse, Twenty1stSourceResponse } from '@mish/contracts';
+import twenty1stJson from '@mish/21st-catalog/generated/21st-items.json' with { type: 'json' };
+import originalsJson from '@mish/21st-catalog/generated/21st-originals.json' with { type: 'json' };
+import twenty1stThumbnailsJson from '@mish/21st-catalog/generated/21st-thumbnails.json' with { type: 'json' };
+import { findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 import { PREVIEW_CONTENT_SIZE_REPORTER } from '../preview-content-size.js';
 import type { RouteDeps } from '../server-context.js';
 import { twenty1stLiveThumbnailBytes, twenty1stLiveThumbnailIndex } from '../services/twenty1st-thumbnails.js';
@@ -146,7 +146,7 @@ export function findTwenty1stItem(id: string): Twenty1stItem | undefined {
  */
 function twenty1stGeneratedDir(): string {
   const require = createRequire(import.meta.url);
-  return path.dirname(require.resolve('@open-design/21st-catalog/generated/21st-items.json'));
+  return path.dirname(require.resolve('@mish/21st-catalog/generated/21st-items.json'));
 }
 
 /** The absolute path of a row's 21st.dev preview image, or null. The row id only selects a

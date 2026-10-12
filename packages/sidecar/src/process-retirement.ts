@@ -1,11 +1,11 @@
-import type { ProcessSnapshot, StopProcessesOptions, StopProcessesResult } from "@open-design/platform";
+import type { ProcessSnapshot, StopProcessesOptions, StopProcessesResult } from "@mish/platform";
 import {
   captureProcessSnapshot,
   isProcessAlive,
   matchesStampedProcess,
   signalProcesses,
   stopProcesses,
-} from "@open-design/platform";
+} from "@mish/platform";
 
 import { collectSidecarGenerationPids } from "./process-tree.js";
 import { SIDECAR_STAMP_CONTRACT, type SidecarStamp } from "./stamp.js";

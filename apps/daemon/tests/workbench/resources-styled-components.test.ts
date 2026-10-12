@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import express from 'express';
 import type { Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
-import { parseResourceDetailResponse, parseResourceSearchRequest, type ResourceCandidate } from '@open-design/contracts';
+import { parseResourceDetailResponse, parseResourceSearchRequest, type ResourceCandidate } from '@mish/contracts';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';

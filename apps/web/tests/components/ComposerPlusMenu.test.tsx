@@ -13,7 +13,7 @@ import type { ComponentProps } from 'react';
 import { ComposerPlusMenu } from '../../src/components/ComposerPlusMenu';
 import { I18nProvider } from '../../src/i18n';
 import type { Locale } from '../../src/i18n/types';
-import type { ReusableUnitManifest, UnitInsertReceipt, ResourceSearchResponse, WorkbenchPreferencesSnapshot } from '@open-design/contracts';
+import type { ReusableUnitManifest, UnitInsertReceipt, ResourceSearchResponse, WorkbenchPreferencesSnapshot } from '@mish/contracts';
 import { getWorkbenchPreferences, getProjectDesignContext, putWorkbenchPreferences, searchWorkbenchResources } from '../../src/providers/workbench';
 import { captureApi, unitApi, CaptureRequestError } from '../../src/providers/workbench-capture';
 import * as registry from '../../src/providers/registry';
@@ -804,7 +804,7 @@ describe('ComposerPlusMenu module wiring', () => {
     renderMenu({
       skills: [{ id: 's1', name: 'Wireframe Kit', description: 'Skill fixture.' } as never],
       onPickSkill: vi.fn(),
-      onOpenDesignSystems: vi.fn(),
+      onShowDesignSystems: vi.fn(),
     });
     openMenu();
     expect(screen.queryByTestId('composer-plus-skills')).toBeNull();
@@ -856,7 +856,7 @@ describe('ComposerPlusMenu module wiring', () => {
 });
 
 it('omits the responsive palette action while the toolbar palette is visible', () => {
-  renderMenu({ responsiveToolbar: true, onOpenDesignSystems: vi.fn() });
+  renderMenu({ responsiveToolbar: true, onShowDesignSystems: vi.fn() });
   fireEvent.click(screen.getByTestId('plus-trigger'));
   expect(screen.queryByTestId('composer-plus-design-system')).toBeNull();
 });
@@ -874,12 +874,12 @@ it('responsive overflow reaches the existing palette action when the container q
       },
     });
   });
-  const onOpenDesignSystems = vi.fn();
+  const onShowDesignSystems = vi.fn();
   try {
-    renderMenu({ responsiveToolbar: true, onOpenDesignSystems });
+    renderMenu({ responsiveToolbar: true, onShowDesignSystems });
     fireEvent.click(screen.getByTestId('plus-trigger'));
     fireEvent.click(screen.getByTestId('composer-plus-design-system'));
-    expect(onOpenDesignSystems).toHaveBeenCalledOnce();
+    expect(onShowDesignSystems).toHaveBeenCalledOnce();
     expect(screen.queryByRole('menu')).toBeNull();
   } finally { style.mockRestore(); }
 });

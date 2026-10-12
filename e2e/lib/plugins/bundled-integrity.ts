@@ -8,14 +8,14 @@
 // private implementation as a shared helper (root `AGENTS.md` boundary).
 //
 // Evidence sources are deliberately repository-visible:
-//   - `plugins/_official/**/open-design.json` manifests (scenario + atom)
+//   - `plugins/_official/**/mish.json` manifests (scenario + atom)
 //   - `apps/daemon/src/plugins/atoms.ts` read as TEXT for the built-in atom
 //     registry, which `docs/atoms.md` names the catalog source of truth.
 
 import { promises as fsp } from 'node:fs';
 import path from 'node:path';
 
-const MANIFEST_FILENAME = 'open-design.json';
+const MANIFEST_FILENAME = 'mish.json';
 
 // The array declaration that owns the first-party built-in atom catalog. The
 // parser is intentionally strict: a rename or restructure must fail loudly
@@ -75,7 +75,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 /**
  * Read every immediate child directory of `root` that ships an
- * `open-design.json`. Directories without a manifest are skipped — the bundled
+ * `mish.json`. Directories without a manifest are skipped — the bundled
  * walker supports both `<root>/<plugin>/` and `<root>/<tier>/<plugin>/`, and
  * callers pass the tier folder. Results are sorted by id so failure output is
  * stable.

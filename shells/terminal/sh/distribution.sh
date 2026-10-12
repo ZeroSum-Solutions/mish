@@ -53,9 +53,9 @@ extract_metadata() { plutil -extract "$1" raw "$documents/content-metadata.json"
 case "$release_artifact_base_url" in http://*|https://*) :;; *) fail "release artifact base URL must use HTTP(S)";; esac
 
 mkdir -p "$output" "$(dirname -- "$receipt")"
-stage=$(mktemp -d "${TMPDIR:-/tmp}/nexu-terminal-distribution.XXXXXX")
+stage=$(mktemp -d "${TMPDIR:-/tmp}/mish-terminal-distribution.XXXXXX")
 trap 'rm -rf "$stage"' EXIT HUP INT TERM
-root="$stage/nexu-terminal"
+root="$stage/mish-terminal"
 mkdir "$root"
 (cd "$scene" && tar -cf - .) | (cd "$root" && tar -xf -)
 mkdir -p "$root/release" "$root/trust"
@@ -96,8 +96,8 @@ printf '{"capabilities":{"contentUpdater":"standalone-v4","sharedInstance":"side
   "$carrier_lock_sha" "$contract_index_sha" "$fixture_lifecycle_sha" "$fixture_shell_updater_sha" "$fossil_sha" "$content_sha" "$node_executable" "$node_sha" "$node_version" "$runtime_modules_sha" "$closure_sha" "$standalone_sha" "$shell_build_hash" "$shell_version" "$ps_install_sha" "$ps_terminal_sha" "$sh_install_sha" "$sh_terminal_sha" "$sidecar_bootstrap_sha" "$sidecar_host_sha" "$standalone_sha" "$target" "$trust_sha" > "$root/install-manifest.json"
 manifest_sha=$(sha256_file "$root/install-manifest.json")
 printf '%s  install-manifest.json\n' "$manifest_sha" > "$root/install-manifest.sha256"
-archive="$output/nexu-terminal-$target-$release_version.tar.gz"
-COPYFILE_DISABLE=1 tar -czf "$archive" -C "$stage" nexu-terminal
+archive="$output/mish-terminal-$target-$release_version.tar.gz"
+COPYFILE_DISABLE=1 tar -czf "$archive" -C "$stage" mish-terminal
 archive_sha=$(sha256_file "$archive")
 printf '{"archive":{"file":"%s","mediaType":"application/gzip","sha256":"%s","size":%s},"manifestSha256":"%s","operation":"terminal.distribution.build","schemaVersion":1,"target":"%s"}\n' \
   "$(json_escape "$archive")" "$archive_sha" "$(file_size "$archive")" "$manifest_sha" "$target" > "$receipt"

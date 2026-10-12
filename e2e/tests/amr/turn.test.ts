@@ -29,7 +29,7 @@ import { join } from 'node:path';
 
 import { describe, expect, test } from 'vitest';
 
-import type { AgentsResponse } from '@open-design/contracts';
+import type { AgentsResponse } from '@mish/contracts';
 
 import { AMR_TEST_WORKSPACE_HEADERS } from '@/vitest/amr';
 import { requestJson } from '@/vitest/http';
@@ -84,9 +84,9 @@ function readBalanceState() {
 if (env.FAKE_VELA_SPAWN_ENV_LOG) {
   appendFileSync(env.FAKE_VELA_SPAWN_ENV_LOG, JSON.stringify({
     argv: argv.slice(2),
-    workspaceId: env.OPEN_DESIGN_WORKSPACE_ID ?? null,
-    runId: env.OPEN_DESIGN_RUN_ID ?? null,
-    sessionId: env.OPEN_DESIGN_SESSION_ID ?? null,
+    workspaceId: env.MISH_WORKSPACE_ID ?? null,
+    runId: env.MISH_RUN_ID ?? null,
+    sessionId: env.MISH_SESSION_ID ?? null,
   }) + '\\n', 'utf8');
 }
 

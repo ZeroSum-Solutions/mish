@@ -9,7 +9,7 @@ import {
   parseProjectDesignContextDraft, parseProjectDesignContextSnapshot,
   parseProjectRubricSnapshot, parseResourceSearchResponse, parseWorkbenchPreferencesSnapshot,
   type ProjectDesignContextDraft, type ProjectDesignContextSnapshot, type ResourceSearchResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { test, expect } from '@/playwright/suite';
 import { e2eWorkspaceRoot } from '@/tools-dev/runtime';
 import type { ToolsDevSuite } from '@/tools-dev/types';
@@ -17,7 +17,7 @@ import { T } from '@/timeouts';
 
 const execFileAsync = promisify(execFile);
 const QUERY = 'Build a calm premium dentistry page where new patients book their first appointment';
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 const headers = (projectId: string) => ({ 'x-od-project-id': projectId });
 const recordPath = (id: string, family: string) => `/api/workbench/projects/${encodeURIComponent(id)}/${family}`;
 

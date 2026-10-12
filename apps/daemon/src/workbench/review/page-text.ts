@@ -3,7 +3,7 @@
 // SHA-256 and a source location reduced by the run's serve log and allow-list
 // (see evidence.ts). Findings cite records by id.
 import { createHash } from 'node:crypto';
-import type { ReviewConsoleEntry } from '@open-design/contracts';
+import type { ReviewConsoleEntry } from '@mish/contracts';
 import { consoleRef, digestParam, ev, evidenceLocation, vocab, type EvidenceContext, type EvidenceParam, type EvidenceText, type PageText } from './evidence.js';
 
 const sha256 = (value: string) => createHash('sha256').update(value).digest('hex');

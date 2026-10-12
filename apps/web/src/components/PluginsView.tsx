@@ -10,7 +10,7 @@ import {
   type SetStateAction,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { Button, EmptyState } from '@open-design/components';
+import { Button, EmptyState } from '@mish/components';
 import {
   resolveLocalizedText,
   workspaceContextHasTeamIdentity,
@@ -19,7 +19,7 @@ import {
   type PluginSourceKind,
   type SkillSummary,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   fetchSkills,
   importSkill,
@@ -48,7 +48,7 @@ import {
   stableAnalyticsRequestErrorCode,
   workspaceAnalyticsDimensions,
 } from '../analytics/workspace';
-import type { TrackingWorkspaceScope } from '@open-design/contracts/analytics';
+import type { TrackingWorkspaceScope } from '@mish/contracts/analytics';
 import {
   addPluginMarketplace,
   applyPlugin,
@@ -311,8 +311,8 @@ export function PluginsView({
 
   useEffect(() => {
     void refresh();
-    window.addEventListener('open-design:plugins-changed', refresh);
-    return () => window.removeEventListener('open-design:plugins-changed', refresh);
+    window.addEventListener('mish:plugins-changed', refresh);
+    return () => window.removeEventListener('mish:plugins-changed', refresh);
     // Re-run on workspace switch (not just mount) so "installed" reflects the
     // newly active workspace's binding — see `pluginsWorkspaceContext` above.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1293,7 +1293,7 @@ export function ExtensionsMarketplace({
     setLoading(false);
   }
 
-  // `open-design:plugins-changed` re-reads on mutation. Re-registered per
+  // `mish:plugins-changed` re-reads on mutation. Re-registered per
   // identity so the handler always closes over a current `refresh`.
   const marketplaceAccountGeneration = currentWorkspaceAccountGeneration();
   const marketplaceReadMode = workspaceContext
@@ -1317,8 +1317,8 @@ export function ExtensionsMarketplace({
       if (isActiveRef.current) void refresh();
       else catalogStaleRef.current = true;
     };
-    window.addEventListener('open-design:plugins-changed', onPluginsChanged);
-    return () => window.removeEventListener('open-design:plugins-changed', onPluginsChanged);
+    window.addEventListener('mish:plugins-changed', onPluginsChanged);
+    return () => window.removeEventListener('mish:plugins-changed', onPluginsChanged);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketplaceIdentity]);
 
@@ -2490,7 +2490,7 @@ export function ExtensionsMarketplace({
                   <p>
                     {t('pluginsView.uploadFolderBody', {
                       kind: pluginKindLabel(createKind, t),
-                      manifest: createKind === 'plugin' ? 'open-design.json / SKILL.md' : 'SKILL.md',
+                      manifest: createKind === 'plugin' ? 'mish.json / SKILL.md' : 'SKILL.md',
                     })}
                   </p>
                   <input
@@ -3595,7 +3595,7 @@ function PluginImportModal({
           {kind === 'zip' ? (
             <FileImportPanel
               title="Upload zip"
-              body="Choose a .zip archive containing open-design.json, SKILL.md, or .claude-plugin/plugin.json."
+              body="Choose a .zip archive containing mish.json, SKILL.md, or .claude-plugin/plugin.json."
               accept=".zip,application/zip"
               working={working}
               fileLabel={zipFile?.name ?? 'No zip selected'}

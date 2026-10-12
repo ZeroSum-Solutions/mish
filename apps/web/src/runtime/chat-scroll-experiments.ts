@@ -7,20 +7,20 @@
 // 打开开发者工具的 Console,敲下面这行,然后**刷新/重开窗口**:
 //
 //   // H2:滚动盒不再观察自己
-//   localStorage.setItem('open-design:disable-chat-log-self-resize-observe', '1')
+//   localStorage.setItem('mish:disable-chat-log-self-resize-observe', '1')
 //
 //   // H3:消息不再跑 msg-enter 入场动画
-//   localStorage.setItem('open-design:disable-msg-enter-animation', '1')
+//   localStorage.setItem('mish:disable-msg-enter-animation', '1')
 //
 // 关掉(回到出厂行为),同样要刷新:
 //
-//   localStorage.removeItem('open-design:disable-chat-log-self-resize-observe')
-//   localStorage.removeItem('open-design:disable-msg-enter-animation')
+//   localStorage.removeItem('mish:disable-chat-log-self-resize-observe')
+//   localStorage.removeItem('mish:disable-msg-enter-animation')
 //
 // 看当前状态:
 //
-//   localStorage.getItem('open-design:disable-chat-log-self-resize-observe')
-//   localStorage.getItem('open-design:disable-msg-enter-animation')
+//   localStorage.getItem('mish:disable-chat-log-self-resize-observe')
+//   localStorage.getItem('mish:disable-msg-enter-animation')
 //   document.documentElement.hasAttribute('data-od-msg-enter-disabled')  // H3 生效了没
 //
 // 两个开关**互不相干**,可以单独开、也可以同时开,四种组合都成立。
@@ -69,7 +69,7 @@
 //
 // ═══════════════════════════════════════════════════════════════════
 //
-// 形状照抄 `runtime/chat-scroll-takeover.ts`:`open-design:` 前缀的 localStorage
+// 形状照抄 `runtime/chat-scroll-takeover.ts`:`mish:` 前缀的 localStorage
 // 键 + 刷新生效 + 读不到就当关。**不要**为这两个开关另起一套机制。
 //
 // 这两个开关只是**观察工具**,不是修复。H2 / H3 都还没有被证明是滚动冻结的成因,
@@ -81,10 +81,10 @@
  * 子元素和 QueuedSendStrip 的观察保持不变。
  */
 export const CHAT_LOG_SELF_RESIZE_OBSERVE_DISABLED_KEY =
-  'open-design:disable-chat-log-self-resize-observe';
+  'mish:disable-chat-log-self-resize-observe';
 
 /** H3 —— `.msg` 上的 `msg-enter` 入场动画整条摘掉(含它的 `fill: both`)。 */
-export const MSG_ENTER_ANIMATION_DISABLED_KEY = 'open-design:disable-msg-enter-animation';
+export const MSG_ENTER_ANIMATION_DISABLED_KEY = 'mish:disable-msg-enter-animation';
 
 /**
  * H3 的落点。CSS 关不掉 localStorage,所以开关在启动时翻译成根节点上的一个属性,

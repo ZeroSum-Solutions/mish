@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import {
   evaluateRuntimeEvidenceGraphV1,
   normalizeAgentObservationV1,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { adaptRuntimeChildObservationsV1 } from '../../src/observability/runtime-child-observations.js';
@@ -137,7 +137,7 @@ describe('native OpenCode child evidence', () => {
       }>;
     };
     expect(seed.fixtureKind).toBe('sanitized_real_best_effort');
-    expect(seed.evidenceReview).toBe('open_design_best_effort');
+    expect(seed.evidenceReview).toBe('mish_best_effort');
     expect(seed.recordingDigest).toMatch(/^sha256:[a-f0-9]{64}$/u);
     const { recordingDigest: _recordingDigest, ...digestInput } = structuredClone(seed);
     expect(seed.recordingDigest).toBe(
@@ -290,7 +290,7 @@ describe('native OpenCode child evidence', () => {
     });
     expect(candidate?.promptHash).toMatch(/^[a-f0-9]{64}$/u);
     expect(candidate?.promptSafePayload).toMatchObject({
-      type: 'open-design.child-injected-prompt',
+      type: 'mish.child-injected-prompt',
       messageCount: 1,
     });
     expect(JSON.stringify(candidate)).toContain('Inspect the synthetic fixture');
@@ -805,7 +805,7 @@ describe('native OpenCode child evidence', () => {
       stderr: 'Exporting session: ses_child_synthetic',
     });
     const load = createOpenCodeSanitizedExportLoader({
-      launchPath: '/opt/open-design/opencode',
+      launchPath: '/opt/mish/opencode',
       env: { XDG_DATA_HOME: '/run/od/share' },
     });
 
@@ -813,7 +813,7 @@ describe('native OpenCode child evidence', () => {
       info: { id: 'ses_child_synthetic', parentID: 'ses_root_synthetic' },
     });
     expect(execAgentFileMock).toHaveBeenCalledWith(
-      '/opt/open-design/opencode',
+      '/opt/mish/opencode',
       ['export', 'ses_child_synthetic', '--sanitize', '--pure'],
       expect.objectContaining({
         env: { XDG_DATA_HOME: '/run/od/share' },

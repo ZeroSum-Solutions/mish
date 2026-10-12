@@ -222,7 +222,7 @@ test.skip('[P0] @critical AMR insufficient-balance failures hand the turn to the
         return opened.find((href) => {
           const url = new URL(href, window.location.href);
           return (
-            url.searchParams.get('od_origin') === 'open_design' &&
+            url.searchParams.get('od_origin') === 'mish' &&
             url.searchParams.get('od_entry_source') === 'chat_upgrade_card'
           );
         }) ?? null;
@@ -642,9 +642,9 @@ test('[P1] Settings AMR upgrade opens the attributed plans URL for the active pr
   await expect.poll(() => openedUrl).toBeTruthy();
   const url = new URL(openedUrl);
   expect(url.pathname).toBe('/cloud/dashboard');
-  expect(url.searchParams.get('source')).toBe('open_design');
+  expect(url.searchParams.get('source')).toBe('mish');
   expect(url.searchParams.get('billing')).toBe('plan');
-  expect(url.searchParams.get('od_origin')).toBe('open_design');
+  expect(url.searchParams.get('od_origin')).toBe('mish');
   expect(url.searchParams.get('od_entry_source')).toBe('settings_amr_upgrade');
   expect(url.searchParams.get('od_entry_id')).toBeTruthy();
 });
@@ -707,7 +707,7 @@ test('[P0] @critical Settings preserves AMR account, recharge shortcut, and mode
   await expect(settings.locator('.agent-card-amr-profile-badge')).toContainText(/test/i);
   const amrConsole = settings.getByRole('link', { name: /Manage|管理/i });
   await expect(amrConsole).toBeVisible();
-  await expect(amrConsole).toHaveAttribute('href', /source=open_design/);
+  await expect(amrConsole).toHaveAttribute('href', /source=mish/);
 
   await settings.getByRole('combobox', { name: 'Model', exact: true }).click();
   modelPopover = page.getByTestId('settings-agent-model-popover-amr');
@@ -789,7 +789,7 @@ test.skip('[P0] after an AMR failure the user can switch to Codex and complete a
 test('[P0] upstream outages keep Retry available and offer the Cloud switch', async ({ page }) => {
   await stubCatalogsEmpty(page);
   await stubRuntimeAgents(page);
-  const root = join(tmpdir(), `open-design-upstream-ui-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+  const root = join(tmpdir(), `mish-upstream-ui-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   const runtimes = await createFakeAgentRuntimes({ root: join(root, 'agents'), runtimeIds: ['claude'] });
   const config = {
     mode: 'daemon',
@@ -870,8 +870,8 @@ test('[P0] upstream outages keep Retry available and offer the Cloud switch', as
 
 test("[P1] en run failure guidance shows actionable copy and expandable raw source", async ({ page }) => {
   await page.addInitScript(() => {
-    window.localStorage.setItem('open-design:locale', "en");
-    window.localStorage.setItem('open-design:locale-source', 'manual');
+    window.localStorage.setItem('mish:locale', "en");
+    window.localStorage.setItem('mish:locale-source', 'manual');
   });
   await stubCatalogsEmpty(page);
   await stubRuntimeAgents(page);
@@ -1069,7 +1069,7 @@ async function setupAmrWorkspace(
 ) {
   await stubCatalogsEmpty(page);
 
-  const root = join(tmpdir(), `open-design-amr-ui-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+  const root = join(tmpdir(), `mish-amr-ui-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   const homeDir = join(root, 'home');
   const fakeVelaSessionId = `fake-amr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const velaBin = await writeFakeVelaBin(join(root, 'bin'), {
@@ -1115,7 +1115,7 @@ async function setupAmrWorkspace(
         VELA_LINK_URL: 'http://localhost:18081',
         VELA_RUNTIME_KEY: 'fake-runtime-key',
         FAKE_VELA_SESSION_ID: fakeVelaSessionId,
-        ...(options.profile ? { OPEN_DESIGN_AMR_PROFILE: options.profile } : {}),
+        ...(options.profile ? { MISH_AMR_PROFILE: options.profile } : {}),
       },
       codex: codexRuntime.env,
     },

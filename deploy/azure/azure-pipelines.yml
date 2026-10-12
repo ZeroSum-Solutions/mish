@@ -7,12 +7,12 @@ parameters:
 
 variables:
   vmImageName: ubuntu-latest
-  resourceGroupName: open-design-aci
-  deploymentName: open-design-aci
+  resourceGroupName: mish-aci
+  deploymentName: mish-aci
   location: eastus
   templateFile: deploy/azure/container-instance.bicep
-  openDesignImage: ghcr.io/nexu-io/od:latest
-  dnsNameLabel: open-design-$(Build.BuildId)
+  mishImage: ghcr.io/zerosum-solutions/mish:latest
+  dnsNameLabel: mish-$(Build.BuildId)
   browserOrigin: https://od.example.com
 
 pool:
@@ -51,7 +51,7 @@ steps:
           --template-file "$(templateFile)" \
           --parameters \
             odApiToken="$OD_API_TOKEN" \
-            image="$(openDesignImage)" \
+            image="$(mishImage)" \
             dnsNameLabel="$(dnsNameLabel)" \
             allowedOrigins="$(browserOrigin)"
     env:

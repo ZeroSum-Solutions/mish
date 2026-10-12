@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { AmrWalletSnapshot } from '@open-design/contracts';
+import type { AmrWalletSnapshot } from '@mish/contracts';
 import {
   AMR_HARD_BLOCK_BALANCE_USD,
   HOME_AMR_BALANCE_RETRY_DELAYS_MS,
@@ -240,7 +240,7 @@ describe('checkAmrBalanceGate', () => {
   // directions. Full coverage of the removal lives in
   // `amr-low-balance-optout-removed.test.ts`.
   it('ignores the retired low-balance opt-out bit left on disk', async () => {
-    window.localStorage.setItem('open-design:amr-low-balance-warn-optout:v1', '1');
+    window.localStorage.setItem('mish:amr-low-balance-warn-optout:v1', '1');
     mockedFetch.mockResolvedValueOnce(snapshot({ balanceUsd: '1.20' }));
     await expect(checkAmrBalanceGate()).resolves.toEqual({ kind: 'allow' });
     mockedFetch.mockReset();

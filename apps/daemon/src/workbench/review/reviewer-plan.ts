@@ -1,5 +1,5 @@
 import { assertCurrentEvidence, LegacyEvidenceError } from './evidence-store.js';
-import { parseVerificationBundle, renderReviewEvidenceMessage, WORKBENCH_DEFAULT_REQUIRED_ROLES, WORKBENCH_REVIEWER_ROLES, type ReviewEvidenceMessage, type ReviewEvidenceParam, type ProjectDesignContext, type ProjectRubric, type ReviewerPlan, type ReviewerRole, type ReviewRubricContent, type ReviewScope, type VerificationBundle } from '@open-design/contracts';
+import { parseVerificationBundle, renderReviewEvidenceMessage, WORKBENCH_DEFAULT_REQUIRED_ROLES, WORKBENCH_REVIEWER_ROLES, type ReviewEvidenceMessage, type ReviewEvidenceParam, type ProjectDesignContext, type ProjectRubric, type ReviewerPlan, type ReviewerRole, type ReviewRubricContent, type ReviewScope, type VerificationBundle } from '@mish/contracts';
 import type { EffectiveCheck } from './check-verdicts.js';
 import { CHECKLIST_CRITERIA, CHECKLIST_CRITERIA_VERSION, CHECKLIST_SOURCE, checklistCriterion, checklistSourceCriteria } from './checklist-criteria.js';
 import { JUDGMENT_SEEDS_VERSION, seedContract, seedJudgmentChecks } from './judgment-seeds.js';

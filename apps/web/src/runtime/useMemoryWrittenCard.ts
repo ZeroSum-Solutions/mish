@@ -28,7 +28,7 @@ import type {
   MemoryEntrySummary,
   MemoryExtractionRecord,
   MemoryType,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 // The window opens when a turn ends and the extractor has not reported yet. A
 // small-model pass over one exchange lands in seconds; ~36s of 3s polls covers a

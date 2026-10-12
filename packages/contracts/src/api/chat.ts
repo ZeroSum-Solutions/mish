@@ -630,7 +630,7 @@ export interface ChatRunDiagnosticValue<T> {
   state: ChatRunDiagnosticState;
   value?: T;
   evidence?: ChatRunDiagnosticEvidence;
-  source: 'open-design-daemon' | 'agent-runtime' | 'model-provider';
+  source: 'mish-daemon' | 'agent-runtime' | 'model-provider';
   complete?: boolean;
   definition?: string;
   missingReason?: string;
@@ -644,8 +644,8 @@ export interface ChatRunDiagnosticValue<T> {
 export interface ChatRunExecutionDiagnostics {
   schemaVersion: 1;
   collectorVersion:
-    | 'open-design-execution-diagnostics-v1'
-    | 'open-design-execution-diagnostics-v2';
+    | 'mish-execution-diagnostics-v1'
+    | 'mish-execution-diagnostics-v2';
   collectedAt: number;
   eventStreamCompleteness: 'complete' | 'partial';
   timing: {

@@ -4,7 +4,7 @@ import { routeAgents, suppressWhatsNew } from '@/playwright/mock-factory';
 import { openSettingsDialog, settingsSurface } from '../lib/playwright/amr.js';
 import type { Locator, Page } from '@playwright/test';
 
-const STORAGE_KEY = 'open-design:config';
+const STORAGE_KEY = 'mish:config';
 const APP_ICON_PATH = fileURLToPath(new URL('../../apps/web/public/app-icon.png', import.meta.url));
 
 test.describe.configure({ timeout: 30_000 });
@@ -229,7 +229,7 @@ test.describe('Settings Memory flows', () => {
             {
               id: 'feedback_ui_density',
               parentId: 'folder-feedback',
-              path: '/FEEDBACK/open-design-plugin-authoring-flow',
+              path: '/FEEDBACK/mish-plugin-authoring-flow',
               name: 'Mishh Mashh plugin authoring flow',
               description: 'Keep plugin setup terse and reproducible.',
               kind: 'entry',
@@ -1298,7 +1298,7 @@ test.describe('Settings Memory flows', () => {
     githubConnected = true;
     await page.evaluate(() => {
       window.dispatchEvent(new MessageEvent('message', {
-        data: { type: 'open-design:connector-connected' },
+        data: { type: 'mish:connector-connected' },
         origin: window.location.origin,
       }));
     });
@@ -1540,7 +1540,7 @@ test.describe('Settings Memory flows', () => {
     githubConnected = true;
     await page.evaluate(() => {
       window.dispatchEvent(new MessageEvent('message', {
-        data: { type: 'open-design:connector-connected' },
+        data: { type: 'mish:connector-connected' },
         origin: window.location.origin,
       }));
     });
@@ -1734,7 +1734,7 @@ test.describe('Settings Memory flows', () => {
     statusPhase = 'disconnected';
     await page.evaluate(() => {
       window.dispatchEvent(new MessageEvent('message', {
-        data: { type: 'open-design:connector-connected' },
+        data: { type: 'mish:connector-connected' },
         origin: window.location.origin,
       }));
     });
@@ -1748,7 +1748,7 @@ test.describe('Settings Memory flows', () => {
     statusPhase = 'reconnected';
     await page.evaluate(() => {
       window.dispatchEvent(new MessageEvent('message', {
-        data: { type: 'open-design:connector-connected' },
+        data: { type: 'mish:connector-connected' },
         origin: window.location.origin,
       }));
     });

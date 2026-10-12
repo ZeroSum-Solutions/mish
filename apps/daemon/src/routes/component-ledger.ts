@@ -1,5 +1,5 @@
 import type { Express } from 'express';
-import { parseComponentLedger } from '@open-design/contracts';
+import { parseComponentLedger } from '@mish/contracts';
 import ledgerJson from '../workbench/component-ledger.json' with { type: 'json' };
 import { buildComponentLedgerReport } from '../workbench/component-ledger-report.js';
 import type { PackRegistry } from '../packs/registry.js';

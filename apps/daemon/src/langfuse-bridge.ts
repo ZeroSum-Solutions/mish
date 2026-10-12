@@ -16,7 +16,7 @@ import {
   modelIdForTracking,
   type TrackingRunCancelOrigin,
   type TrackingRunTerminalTrigger,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import {
   DELIVERABLE_SYNTAX_FINALIZATION_REASONS,
   DELIVERABLE_SYNTAX_SAFE_FIX_REFUSALS,
@@ -27,7 +27,7 @@ import {
   type DeliverableSyntaxValidationEvidence,
   type OdNextRolloutDecision,
   type SafeRunQualityV1,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { agentCliEnvForAgent, readAppConfig, type TelemetryPrefs } from './app-config.js';
 import type { AppVersionInfo } from './app-version.js';
@@ -1091,7 +1091,7 @@ function buildTraceSafeManifests(args: {
         ...(extension ? { extension } : {}),
         redacted: false,
         truncated: false,
-        stored_in_open_design: true,
+        stored_in_mish: true,
         retention_policy: 'project_lifetime',
         access_scope: 'project',
         sensitivity: 'private',
@@ -1164,7 +1164,7 @@ function buildTraceSafeManifests(args: {
           : { export_status: 'unavailable' }),
         redacted: false,
         truncated: false,
-        stored_in_open_design: true,
+        stored_in_mish: true,
         retention_policy: 'project_lifetime',
         access_scope: 'project',
         sensitivity: 'private',
@@ -1201,7 +1201,7 @@ function buildTraceObjectSummary(args: {
   const skipReasons: Record<string, number> = {};
   let uploadedCount = 0;
   for (const entry of entries) {
-    if (entry.status === 'ok' && entry.stored_in_open_design === true) {
+    if (entry.status === 'ok' && entry.stored_in_mish === true) {
       uploadedCount += 1;
       continue;
     }

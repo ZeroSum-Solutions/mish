@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 /**
  * Daemon provider — fetch-based SSE client for /api/runs. The daemon can
  * emit three event streams depending on the agent's streamFormat:
@@ -18,7 +18,7 @@ import type {
   AmrAuthStage,
   AmrAuthStageResult,
   AmrAuthStageSource,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import type {
   ApiErrorResponse,
   ChatAnalyticsHints,
@@ -44,9 +44,9 @@ import type {
   StrategyTaskProjectionV2,
   StagedRunRecord,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
-import { OD_NEXT_AGENT_DECLARED_BLOCK_REASON, parseDesignSystemRunNotice, escapeTranscriptRoleDelimiters, runSuccessor, sanitizePriorAssistantTurnForTranscript as sanitizeSharedTranscript } from '@open-design/contracts';
-import type { RunDesignBriefBinding } from '@open-design/contracts';
+} from '@mish/contracts';
+import { OD_NEXT_AGENT_DECLARED_BLOCK_REASON, parseDesignSystemRunNotice, escapeTranscriptRoleDelimiters, runSuccessor, sanitizePriorAssistantTurnForTranscript as sanitizeSharedTranscript } from '@mish/contracts';
+import type { RunDesignBriefBinding } from '@mish/contracts';
 import { readSessionRunAdmission } from '../runtime/workbench/session-admission';
 import type { StreamHandlers } from './anthropic';
 
@@ -628,8 +628,8 @@ export interface DaemonReattachOptions {
   onStrategyTaskSettled?: (strategyTask: StrategyTaskProjectionV2) => void;
 }
 
-export const RUNS_CHANGED_EVENT = 'open-design:runs-changed';
-export const DAEMON_RUN_FINISHED_EVENT = 'open-design:daemon-run-finished';
+export const RUNS_CHANGED_EVENT = 'mish:runs-changed';
+export const DAEMON_RUN_FINISHED_EVENT = 'mish:daemon-run-finished';
 
 export interface DaemonRunFinishedEventDetail {
   agentId: string;
@@ -1325,7 +1325,7 @@ export interface VelaLiveAccount {
 
 export interface VelaLoginStatus {
   loggedIn: boolean;
-  sessionState?: import('@open-design/contracts').AmrSessionState;
+  sessionState?: import('@mish/contracts').AmrSessionState;
   credentialRevision?: string;
   loginInFlight?: boolean;
   profile: string;

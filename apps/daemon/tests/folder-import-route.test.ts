@@ -426,7 +426,7 @@ describe('POST /api/import/folder', () => {
             manifest?: { metadata?: { inferred?: boolean } };
           }>;
         };
-        expect(resultPackage.schema).toBe('open-design.run-result-package.v1');
+        expect(resultPackage.schema).toBe('mish.run-result-package.v1');
         expect(resultPackage.run).toMatchObject({ id: runBody.runId, projectId: project.id });
         expect(resultPackage.workspace).toMatchObject({
           storage: {

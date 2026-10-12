@@ -6,7 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import type { DesignBrief, StagedRunRecord } from '@open-design/contracts';
+import type { DesignBrief, StagedRunRecord } from '@mish/contracts';
 
 import { INTERRUPTED_MESSAGE } from './staged-routing.js';
 

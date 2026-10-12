@@ -3,7 +3,7 @@ import {
   type DeliverableSyntaxCheckResult,
   type DeliverableSyntaxMetrics,
   type DeliverableSyntaxSafeFixRule,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 function finiteNonNegative(value: unknown): number {
   return typeof value === 'number' && Number.isFinite(value) && value >= 0

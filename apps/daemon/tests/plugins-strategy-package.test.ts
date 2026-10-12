@@ -3,7 +3,7 @@ import { chmod, cp, mkdtemp, readFile, rm, symlink, unlink, writeFile } from 'no
 import os from 'node:os';
 import path from 'node:path';
 import Database from 'better-sqlite3';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 import { migratePlugins } from '../src/plugins/persistence.js';
 import { resolvePluginFolder } from '../src/plugins/registry.js';
 import {
@@ -93,7 +93,7 @@ describe('bundled OD Next strategy package identity', () => {
       './assets/task-profiles/prototype/device-frames/iphone.html',
       './assets/task-profiles/prototype/device-frames/neutral.html',
       './assets/task-profiles/prototype/layout.css',
-      './open-design.json',
+      './mish.json',
       './references/task-profile-mapping.md',
     ]);
     // Resources travel with the profile that declares them only.
@@ -102,7 +102,7 @@ describe('bundled OD Next strategy package identity', () => {
       './assets/core-system-prompt.md',
       './assets/general-orchestration.md',
       './assets/task-profiles/marketing.md',
-      './open-design.json',
+      './mish.json',
       './references/task-profile-mapping.md',
     ]);
     expect(prototype.selectedTaskProfile).toEqual(expect.objectContaining({

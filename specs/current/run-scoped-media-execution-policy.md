@@ -727,12 +727,12 @@ daemon must still enforce at the tool/media endpoint.
 ```bash
 pnpm guard
 pnpm typecheck
-pnpm --filter @open-design/daemon test
-pnpm --filter @open-design/web test
+pnpm --filter @mish/daemon test
+pnpm --filter @mish/web test
 ```
 
 Add e2e validation for the first PR that changes run behavior:
 
 ```bash
-pnpm --filter @open-design/e2e test -- <new-media-policy-spec>
+pnpm --filter @mish/e2e test -- <new-media-policy-spec>
 ```

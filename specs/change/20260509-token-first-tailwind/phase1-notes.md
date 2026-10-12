@@ -77,7 +77,7 @@
 
 ### Step 5: Dual-worktree agent visual comparison workflow
 
-- Baseline worktree: `/Users/william/projects/open-design` on `main`; candidate worktree: `/Users/william/projects/open-design-wt-tailwind-phase-1` on `tailwind-phase-1`.
+- Baseline worktree: `/Users/william/projects/mish` on `main`; candidate worktree: `/Users/william/projects/mish-wt-tailwind-phase-1` on `tailwind-phase-1`.
 - Fixed service assignments for Phase 1 and follow-up migration slices:
   | Role | Namespace | Daemon port | Web port | URL |
   | --- | --- | ---: | ---: | --- |
@@ -85,10 +85,10 @@
   | Candidate | `tailwind-candidate` | `18120` | `18121` | `http://127.0.0.1:18121` |
 - Startup commands:
   ```bash
-  # In /Users/william/projects/open-design
+  # In /Users/william/projects/mish
   pnpm tools-dev run web --namespace tailwind-baseline --daemon-port 18110 --web-port 18111
 
-  # In /Users/william/projects/open-design-wt-tailwind-phase-1
+  # In /Users/william/projects/mish-wt-tailwind-phase-1
   pnpm tools-dev run web --namespace tailwind-candidate --daemon-port 18120 --web-port 18121
   ```
 - Scenario list for the agent comparison record:
@@ -150,21 +150,21 @@
 
 - `pnpm install` - passed; pnpm emitted existing workspace bin/link warnings for missing daemon dist CLI during install.
 - `pnpm guard` - passed; residual JavaScript allowlist accepts `apps/web/postcss.config.mjs`.
-- `pnpm --filter @open-design/web build` - passed with Next.js 16/Turbopack.
-- `pnpm --filter @open-design/web build` - passed after adding the Mishh Mashh `@theme` token aliases and source variables.
+- `pnpm --filter @mish/web build` - passed with Next.js 16/Turbopack.
+- `pnpm --filter @mish/web build` - passed after adding the Mishh Mashh `@theme` token aliases and source variables.
 - `pnpm guard` - passed after adding the style policy check; known Phase 1 hardcoded color migration inventory remains classified and does not fail the guard.
 - Temporary sample `apps/web/src/__guard_tailwind_palette_sample.tsx` with `className="text-red-500"` plus temporary sample `scripts/guard-style-policy-fixtures/hardcoded-color-sample.tsx` with `color: "#ff0000"` made `pnpm guard` fail with both expected style policy violations; the sample also included `transparent`, `currentColor`, `currentcolor`, `inherit`, `initial`, `unset`, and `revert`, which stayed exempt. Temporary samples were removed.
 - Temporary sample `scripts/guard-style-policy-fixtures/named-color-sample.tsx` with `color: "red"` made `pnpm guard` fail with the expected unregistered named color violation while CSS-wide/special keywords in the same fixture stayed exempt. Temporary sample was removed.
 - `pnpm guard` - passed after removing the temporary style policy samples.
-- `pnpm --filter @open-design/web test` - passed; 99 files / 925 tests.
+- `pnpm --filter @mish/web test` - passed; 99 files / 925 tests.
 - `pnpm typecheck` - passed.
 - `pnpm guard` - passed after adding the Step 4 migration inventory and guard allowlist policy notes.
 - `pnpm typecheck` - passed after adding the Step 4 documentation.
-- `pnpm --filter @open-design/web test` - passed; 99 files / 925 tests.
-- `pnpm --filter @open-design/web build` - passed with Next.js 16/Turbopack.
+- `pnpm --filter @mish/web test` - passed; 99 files / 925 tests.
+- `pnpm --filter @mish/web build` - passed with Next.js 16/Turbopack.
 - Dual-worktree services started successfully for the Phase 1 workflow smoke run:
-  - Baseline: `/Users/william/projects/open-design`, namespace `tailwind-baseline`, daemon `http://127.0.0.1:18110`, web `http://127.0.0.1:18111`, command `pnpm tools-dev run web --namespace tailwind-baseline --daemon-port 18110 --web-port 18111`.
-  - Candidate: `/Users/william/projects/open-design-wt-tailwind-phase-1`, namespace `tailwind-candidate`, daemon `http://127.0.0.1:18120`, web `http://127.0.0.1:18121`, command `pnpm tools-dev run web --namespace tailwind-candidate --daemon-port 18120 --web-port 18121`.
+  - Baseline: `/Users/william/projects/mish`, namespace `tailwind-baseline`, daemon `http://127.0.0.1:18110`, web `http://127.0.0.1:18111`, command `pnpm tools-dev run web --namespace tailwind-baseline --daemon-port 18110 --web-port 18111`.
+  - Candidate: `/Users/william/projects/mish-wt-tailwind-phase-1`, namespace `tailwind-candidate`, daemon `http://127.0.0.1:18120`, web `http://127.0.0.1:18121`, command `pnpm tools-dev run web --namespace tailwind-candidate --daemon-port 18120 --web-port 18121`.
 - `pnpm tools-dev status --namespace tailwind-baseline --json` and `pnpm tools-dev status --namespace tailwind-candidate --json` - both reported daemon/web running; desktop remained idle, which is expected for web-only comparison.
 - Agent visual comparison smoke run:
   - Tooling: agent-browser CLI opened both web URLs in isolated sessions and captured paired Dashboard/app shell screenshots; Chrome DevTools MCP captured a candidate accessibility snapshot and paired Dashboard/app shell screenshots at a 1440x1000 viewport.

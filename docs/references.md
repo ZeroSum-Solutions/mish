@@ -154,7 +154,7 @@ Every external project this spec leans on. Three questions per entry: what is it
 | [Claude Code skills docs](https://docs.anthropic.com/) | Source of the `SKILL.md` format we adopt |
 | [Cursor rules](https://docs.cursor.com/) | Historical format inspiration only; the current Cursor Agent adapter receives Mishh Mashh's composed prompt over stdin and uses the same CWD-local resource staging as other runtimes |
 | [Reveal.js](https://revealjs.com/) / [Marp](https://marp.app/) | Reference for deck HTML navigation patterns |
-| [Shadcn/ui](https://ui.shadcn.com/) | Component and registry reference; the product shell now uses repository-owned primitives from `@open-design/components` |
+| [Shadcn/ui](https://ui.shadcn.com/) | Component and registry reference; the product shell now uses repository-owned primitives from `@mish/components` |
 | [Vercel AI SDK](https://sdk.vercel.ai/) | Historical API-fallback exploration; current BYOK providers run through the OpenCode adapter rather than a direct SDK adapter |
 | [Puppeteer](https://pptr.dev/) | Reference for template/skill-owned browser rendering; core desktop PDF export uses Electron `printToPDF` or the screenshot/PDF pipeline |
 | [pptxgenjs](https://gitbrent.github.io/PptxGenJS/) | PPTX export engine |

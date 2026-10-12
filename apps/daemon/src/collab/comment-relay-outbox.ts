@@ -8,7 +8,7 @@
 // an old delivery to another Team or silently fall back to Personal.
 
 import type Database from 'better-sqlite3';
-import type { CollabCloudComment } from '@open-design/contracts';
+import type { CollabCloudComment } from '@mish/contracts';
 
 type SqliteDb = Database.Database;
 

@@ -1,7 +1,7 @@
 import type {
   TrackingRunAdmissionPhase,
   TrackingRunPolicyReason,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import type {
   RunEventForFailureClassification,
   RunFailureClassification,
@@ -162,7 +162,7 @@ export function runFailureEvidence(
     return { ...common,
       failure_mechanism: mismatch ? 'invalid_model_selection' : 'model_route_unavailable',
       failure_domain: mismatch ? 'client_product' : 'cross_boundary',
-      repair_owner: mismatch ? 'open_design' : 'shared_boundary',
+      repair_owner: mismatch ? 'mish' : 'shared_boundary',
       ...(mismatch ? { evidence_level: 'structured_error' as const } : {}),
     };
   }

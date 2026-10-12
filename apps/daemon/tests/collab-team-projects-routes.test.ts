@@ -6,7 +6,7 @@ import {
   buildWorkspaceSeatSummary,
   type TeamProject,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { createTeamProjectsLister } from '../src/collab/team-projects.js';
 import type { WorkspaceContextProvider } from '../src/collab/workspace-context.js';
 import {

@@ -82,7 +82,7 @@ describe('OPEND-2566 duplicate answer after an upstream reconnect', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS = STALL_WATCHDOG_TIMEOUT_MS;
 
     started = await startServer({ port: 0, returnServer: true }) as StartedServer;
@@ -322,7 +322,7 @@ const TRACKED_ENV_KEYS = [
   'LANGFUSE_PUBLIC_KEY',
   'LANGFUSE_SECRET_KEY',
   'LANGFUSE_BASE_URL',
-  'OPEN_DESIGN_TELEMETRY_RELAY_URL',
+  'MISH_TELEMETRY_RELAY_URL',
   'OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS',
   'OD_CHAT_RUN_FIRST_OUTPUT_TIMEOUT_MS',
 ] as const;

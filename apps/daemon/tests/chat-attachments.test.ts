@@ -49,7 +49,7 @@ describe('resolveSafeProjectAttachments', () => {
 describe('formatDesignFilesWorkspaceHint', () => {
   it('treats unselected Design Files as searchable project context', () => {
     const hint = formatDesignFilesWorkspaceHint(
-      '/tmp/open-design/project-1',
+      '/tmp/mish/project-1',
       [
         { name: 'slides/pitch.html', path: 'slides/pitch.html', kind: 'html', size: 2048 },
         { name: 'image.png', path: 'image.png', kind: 'image', size: 196_100 },

@@ -9,7 +9,7 @@
 import { act } from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { AgencyBuildSnapshot } from '@open-design/contracts';
+import type { AgencyBuildSnapshot } from '@mish/contracts';
 
 vi.mock('../../src/components/home-hero/PlaceholderCarousel', () => ({
   PlaceholderCarousel: () => null,

@@ -1,0 +1,69 @@
+{
+  "$schema": "https://mish.invalid/schemas/plugin.v1.json",
+  "name": "design-system-neutral-product",
+  "title": "Neutral Product",
+  "version": "0.1.0",
+  "publishedAt": "2026-09-23T02:03:26Z",
+  "description": "Calm, neutral product UI. One steel-blue accent, system fonts, 8px rhythm, light and dark modes.",
+  "license": "Apache-2.0",
+  "tags": [
+    "design-system",
+    "first-party",
+    "design",
+    "productivity-saas"
+  ],
+  "od": {
+    "kind": "scenario",
+    "taskKind": "new-generation",
+    "mode": "design-system",
+    "scenario": "design",
+    "surface": "web",
+    "useCase": {
+      "query": "Generate a {{artifactKind}} using the Neutral Product design system. Stay faithful to its colour palette, typography, spacing, iconography, and component vocabulary as documented in DESIGN.md."
+    },
+    "inputs": [
+      {
+        "name": "artifactKind",
+        "label": "Artifact kind",
+        "type": "select",
+        "options": [
+          "landing page",
+          "dashboard",
+          "marketing site",
+          "app screen"
+        ],
+        "default": "landing page"
+      },
+      {
+        "name": "brief",
+        "label": "Brief",
+        "type": "text",
+        "placeholder": "What should the page communicate?"
+      }
+    ],
+    "context": {
+      "designSystem": {
+        "ref": "neutral-product",
+        "primary": true
+      },
+      "assets": [
+        "./DESIGN.md"
+      ]
+    },
+    "pipeline": {
+      "stages": [
+        {
+          "id": "generate",
+          "atoms": [
+            "file-write",
+            "live-artifact"
+          ]
+        }
+      ]
+    },
+    "capabilities": [
+      "prompt:inject",
+      "fs:write"
+    ]
+  }
+}

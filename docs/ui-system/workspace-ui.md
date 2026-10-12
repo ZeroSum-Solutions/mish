@@ -23,7 +23,7 @@ Use the role tokens in `apps/web/src/styles/workspace-ui.css`. Do not hardcode a
 ## Preview cards
 
 Home Examples uses `PreviewCard`, `PreviewCardMedia`, `PreviewCardCaption`,
-`PreviewCardTitle`, and `PreviewCardDescription` from `@open-design/components`.
+`PreviewCardTitle`, and `PreviewCardDescription` from `@mish/components`.
 Use these primitives for thumbnail selection cards. Keep independent actions
 beside the card button so interactive controls are never nested.
 

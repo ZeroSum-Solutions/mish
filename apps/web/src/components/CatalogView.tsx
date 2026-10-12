@@ -5,7 +5,7 @@
 // two independent mechanisms: the iframe's `sandbox="allow-scripts"` attribute isolates it from
 // the app origin (no `allow-same-origin`, so the demo cannot reach `window.parent` or app
 // storage/cookies), and the document itself, served via `demoDocument()` in
-// `@open-design/genui-catalog/data`, carries a `<meta http-equiv="Content-Security-Policy"
+// `@mish/genui-catalog/data`, carries a `<meta http-equiv="Content-Security-Policy"
 // content="default-src 'none'; ...">` that blocks the demo from making any network request. The
 // data module is loaded on first activation only, so the entry bundle does not carry it. There is
 // no copy-source or export control: React Bits-derived effects are embed-only.
@@ -15,9 +15,9 @@
 // The segment labels carry each view's count once its data has loaded.
 
 import { useCallback, useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
-import { parseGenuiCatalogResponse, type GenuiCatalogEntry } from '@open-design/contracts';
+import { parseGenuiCatalogResponse, type GenuiCatalogEntry } from '@mish/contracts';
 
-import { Badge, Button, Chip, EmptyState } from '@open-design/components';
+import { Badge, Button, Chip, EmptyState } from '@mish/components';
 
 import { useT } from '../i18n';
 import type { Dict } from '../i18n/types';
@@ -136,7 +136,7 @@ function EffectsCatalog({ isActive, previewsActive, onCount }: { isActive: boole
     try {
       const [resp, data] = await Promise.all([
         fetch('/api/genui/catalog'),
-        import('@open-design/genui-catalog/data'),
+        import('@mish/genui-catalog/data'),
       ]);
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
       const body = parseGenuiCatalogResponse(await resp.json());

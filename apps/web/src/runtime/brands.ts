@@ -1,4 +1,4 @@
-import { readApiErrorMessage } from '@open-design/contracts';
+import { readApiErrorMessage } from '@mish/contracts';
 // Brand lookup shared by every design-system picker.
 //
 // A finalized brand registers a `user:<id>` design system (BrandMeta
@@ -16,7 +16,7 @@ import type {
   BrandFinalizeResponse,
   BrandSummary,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { workspaceProjectHeaders } from '../state/projects';
 
 // One-shot cross-route handoff: the design-system id a navigation wants the

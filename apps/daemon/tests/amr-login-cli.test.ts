@@ -145,7 +145,7 @@ describe('od amr login CLI', () => {
             profile: 'default',
             user: null,
             configPath: '/local/private/vela.json',
-            activationUrl: 'https://amr-link.open-design.ai/activate',
+            activationUrl: 'https://amr-link.mish.invalid/activate',
             userCode: 'ABCD-EFGH',
           },
         };
@@ -168,7 +168,7 @@ describe('od amr login CLI', () => {
         profile: 'default',
         user: null,
         configPath: '/local/private/vela.json',
-        activationUrl: 'https://amr-link.open-design.ai/activate',
+        activationUrl: 'https://amr-link.mish.invalid/activate',
         userCode: 'ABCD-EFGH',
       },
     });
@@ -190,7 +190,7 @@ describe('od amr login CLI', () => {
           profile: 'default',
           user: null,
           configPath: '/local/private/vela.json',
-          activationUrl: 'https://amr-link.open-design.ai/activate',
+          activationUrl: 'https://amr-link.mish.invalid/activate',
           userCode: 'ABCD-EFGH',
           browserOpenFailed: true,
         },
@@ -200,7 +200,7 @@ describe('od amr login CLI', () => {
     const result = await runCli(['amr', 'login', '--daemon-url', stub.baseUrl]);
 
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain('https://amr-link.open-design.ai/activate');
+    expect(result.stdout).toContain('https://amr-link.mish.invalid/activate');
     expect(result.stdout).toContain('ABCD-EFGH');
     expect(result.stdout).toContain('browser could not be opened automatically');
   });

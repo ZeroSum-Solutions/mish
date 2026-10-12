@@ -1,4 +1,4 @@
-import type { ResourceResult } from '@open-design/contracts';
+import type { ResourceResult } from '@mish/contracts';
 import { useT } from '../../i18n';
 import styles from './workbench.module.css';
 

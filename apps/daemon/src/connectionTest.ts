@@ -33,7 +33,7 @@ import {
   createCommandInvocation,
   mergeProxyAwareEnv,
   resolveSystemProxyEnv,
-} from '@open-design/platform';
+} from '@mish/platform';
 import { attachAcpSession } from './agent-protocol/index.js';
 import { attachPiRpcSession } from './agent-protocol/index.js';
 import { attachDshProfileSession } from './agent-protocol/index.js';
@@ -79,7 +79,7 @@ import {
   type ConnectionTestResponse,
   type ParsedBaseUrl,
   type ProviderTestRequest,
-} from '@open-design/contracts/api/connectionTest';
+} from '@mish/contracts/api/connectionTest';
 import { googleGenerateContentUrl } from './integrations/google-models.js';
 import { readVelaCredentialRevision, resolveAmrProfile } from './integrations/vela.js';
 import { amrModelLoadingCache } from './runtimes/amr-model-cache.js';
@@ -99,7 +99,7 @@ import {
   buildOpenCodeByokProviderConfig,
 } from './runtimes/byok-opencode.js';
 
-export { validateBaseUrl } from '@open-design/contracts/api/connectionTest';
+export { validateBaseUrl } from '@mish/contracts/api/connectionTest';
 
 // DNS-aware companion to `validateBaseUrl`. The contracts-side check only
 // inspects the literal hostname string, so a public DNS name pointing at
@@ -1351,7 +1351,7 @@ function openAIChatCompletionsProviderCall(
       'content-type': 'application/json',
       authorization: `Bearer ${apiKey}`,
       ...(new URL(baseUrl).hostname === 'openrouter.ai' ? {
-        'HTTP-Referer': 'https://opendesign.dev',
+        'HTTP-Referer': 'https://mish.dev',
         'X-Title': 'Mishh Mashh',
       } : {}),
     },

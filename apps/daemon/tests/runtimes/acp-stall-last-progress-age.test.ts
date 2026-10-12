@@ -112,9 +112,9 @@ describe('ACP stall progress age', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-    process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+    process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
     process.env.OD_ACP_STAGE_TIMEOUT_MS = String(ACP_STAGE_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS = String(OUTER_INACTIVITY_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_FIRST_OUTPUT_TIMEOUT_MS = '0';
@@ -174,9 +174,9 @@ describe('ACP stall progress age', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-    process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+    process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
     process.env.OD_ACP_STAGE_TIMEOUT_MS = String(ACP_STAGE_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS = String(OUTER_INACTIVITY_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_FIRST_OUTPUT_TIMEOUT_MS = '0';
@@ -245,9 +245,9 @@ describe('ACP stall progress age', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-    process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+    process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
     process.env.OD_ACP_STAGE_TIMEOUT_MS = String(ACP_STAGE_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS = String(OUTER_INACTIVITY_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_FIRST_OUTPUT_TIMEOUT_MS = '0';
@@ -306,9 +306,9 @@ describe('ACP stall progress age', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-    process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+    process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
     process.env.OD_ACP_STAGE_TIMEOUT_MS = String(ACP_STAGE_TIMEOUT_MS);
     // Deliberately just above the stage timeout: the ACP watchdog wins the race,
     // and the outer watchdog is still armed and would fire a beat later.
@@ -359,9 +359,9 @@ describe('ACP stall progress age', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-    process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+    process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
     process.env.OD_ACP_STAGE_TIMEOUT_MS = String(ACP_STAGE_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS = String(OUTER_INACTIVITY_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_FIRST_OUTPUT_TIMEOUT_MS = '0';
@@ -416,9 +416,9 @@ describe('ACP stall progress age', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
     process.env.VELA_RUNTIME_KEY = `fake-runtime-key-${randomUUID()}`;
-    process.env.VELA_LINK_URL = 'https://amr-link.open-design.ai/v1';
+    process.env.VELA_LINK_URL = 'https://amr-link.mish.invalid/v1';
     process.env.OD_ACP_STAGE_TIMEOUT_MS = String(ACP_STAGE_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS = String(LINGER_INACTIVITY_TIMEOUT_MS);
     process.env.OD_CHAT_RUN_FIRST_OUTPUT_TIMEOUT_MS = '0';
@@ -647,7 +647,7 @@ function snapshotEnv(): Record<string, string | undefined> {
     LANGFUSE_PUBLIC_KEY: process.env.LANGFUSE_PUBLIC_KEY,
     LANGFUSE_SECRET_KEY: process.env.LANGFUSE_SECRET_KEY,
     LANGFUSE_BASE_URL: process.env.LANGFUSE_BASE_URL,
-    OPEN_DESIGN_TELEMETRY_RELAY_URL: process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL,
+    MISH_TELEMETRY_RELAY_URL: process.env.MISH_TELEMETRY_RELAY_URL,
     OD_ACP_STAGE_TIMEOUT_MS: process.env.OD_ACP_STAGE_TIMEOUT_MS,
     OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS: process.env.OD_CHAT_RUN_INACTIVITY_TIMEOUT_MS,
     OD_CHAT_RUN_FIRST_OUTPUT_TIMEOUT_MS: process.env.OD_CHAT_RUN_FIRST_OUTPUT_TIMEOUT_MS,

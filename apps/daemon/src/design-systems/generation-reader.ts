@@ -1,8 +1,8 @@
-import { designSystemRunNotice, designSystemSelectability } from '@open-design/contracts';
+import { designSystemRunNotice, designSystemSelectability } from '@mish/contracts';
 import { listDesignSystems, type DesignSystemListOptions } from './index.js';
 
 export class DesignSystemGenerationRefusal extends Error {
-  constructor(readonly notice: import('@open-design/contracts').DesignSystemRunNotice) {
+  constructor(readonly notice: import('@mish/contracts').DesignSystemRunNotice) {
     super(`${notice.message}${notice.resolveCommand ? ' ' + notice.resolveCommand : ''}`);
   }
 }
@@ -27,7 +27,7 @@ export async function readGenerationDesignSystem(
 export interface GenerationDesignSystemSelection {
   id: string | null;
   requestedId?: string | null;
-  notice?: import('@open-design/contracts').DesignSystemRunNotice | null;
+  notice?: import('@mish/contracts').DesignSystemRunNotice | null;
   approvalRevision?: string;
   editingKit?: boolean;
   catalogScope?: { workspaceId?: string; workspaceMemberId?: string };

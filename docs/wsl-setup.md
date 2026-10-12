@@ -110,7 +110,7 @@ at `http://127.0.0.1:7456`, build it once and restart the daemon:
 
 ```bash
 cd ~/tools/mishh-mashh
-pnpm --filter @open-design/web build
+pnpm --filter @mish/web build
 ```
 
 Leave the daemon terminal running while using MCP integrations.
@@ -150,7 +150,7 @@ pnpm install
 Then verify the native module loads:
 
 ```bash
-pnpm --filter @open-design/daemon exec node -e "require('better-sqlite3')"
+pnpm --filter @mish/daemon exec node -e "require('better-sqlite3')"
 ```
 
 ## Codex config parse failures

@@ -627,7 +627,7 @@ six Cult UI Pro primitive ports, covered by the purchased licence in
 `mount(el, opts) => { destroy() }`, a demo fragment and a jsdom test; no React, GSAP or three.js.
 Family pages ship `default-src 'none'`, so catalog JS and CSS are inlined; the HyperUI page kinds
 keep `script-src 'none'` unless a reviewed family interaction or `js` effect is applied, and then
-allow only the exact inlined scripts by their SHA-256 hashes. `pnpm --filter @open-design/genui-catalog sync-assets` copies the
+allow only the exact inlined scripts by their SHA-256 hashes. `pnpm --filter @mish/genui-catalog sync-assets` copies the
 components each family declares into that family package under `compiler/scripts/catalog/`.
 
 | Surface | Shape |
@@ -742,7 +742,7 @@ same routes. Both pass `cultLocalOnlyRefusal` first, like the copy routes, becau
 licensed source. A section or page row (`mode: 'converted'`) gets the kit converter's static output
 (`<kit>/converted/<name>/template.html` + `styles.css`, filled from `slots.json` with the item's own
 text, light or dark `--role-*` values), served with `COMPOSED_PAGE_CSP` from
-`@open-design/agency-fast-lane/block-compose` in a meta tag and in the header, where a bare `sandbox`
+`@mish/agency-fast-lane/block-compose` in a meta tag and in the header, where a bare `sandbox`
 directive is added (a meta-tag CSP cannot sandbox); the modal frames it with `sandbox=""`. A primitive or app row (`mode: 'harness'`) is proxied from the local preview harness
 (its own git repo next to the private source kit, never in this repository): `CultPreviewHarness` (`apps/daemon/src/cult-live-preview.ts`) starts it on demand on a free
 loopback port as a child that exits with the daemon (the web sidecar's standalone-backend pattern),
@@ -789,7 +789,7 @@ section selection, the plan reaches the compiler through the overlay's wrapper a
 checked on the composed page (`renderWithEffects`), dropping the lowest-priority effect first.
 `RunReport.effects` (`AgencyEffectsResult`) merges the decision with the compiler's
 `EffectRenderReport`; events carry counts only (`effects` build event). Catalog metadata comes
-from `@open-design/genui-catalog/data` in the daemon (`BuildInput.effectCatalog`) and from the
+from `@mish/genui-catalog/data` in the daemon (`BuildInput.effectCatalog`) and from the
 source `catalog.json` in the fast-lane CLI. `GET /api/agency/families/:family/effects` serves
 `familyEffectsResponse`.
 
@@ -851,13 +851,13 @@ a lazy registry keyed by id. Adapter-name projection lives in
 that pure helper without importing the generated registry they are rebuilding.
 The runtime overlay consumes the catalogue package export, so its generated
 registry remains reachable from a relocated daemon bundle.
-`pnpm --filter @open-design/cult-ui-catalog check` gates them: with
+`pnpm --filter @mish/cult-ui-catalog check` gates them: with
 or without the kit it checks ids, versions, hashes, the root `build-section-adapters.ts`
 `FORBIDDEN`/`assertClean` rules, `--role-*`-only custom properties (a converter `--k-*` variable
 the CSS reads but never sets fails too), `.cult-<name>` scoping, a
 worst-case fill, and 48 KB of minified HTML plus CSS per adapter; with the kit it also compares
 each file to the kit output and recomputes the source hash from the pinned registry items.
-`pnpm --filter @open-design/cult-ui-catalog render-check` (no kit needed; CI runs it in the agency
+`pnpm --filter @mish/cult-ui-catalog render-check` (no kit needed; CI runs it in the agency
 tests job) splices every insertable adapter, filled to its slot maxima, into real family pages
 through the overlay (marketing-site, the strictest family CSP, and watson), composes a page of the
 HyperUI lead section plus the largest Cult `features`, `cta-band` and `footer` blocks against the
@@ -870,7 +870,7 @@ view; a planted self-test section proves each detector on every run. The kit con
 in-block link to a missing id into `#contact` and shows hover-revealed text at rest. The
 fast lane (`section-overlay.ts`, `resolveSectionAdapter`) resolves the three HyperUI ids and every
 id in that registry, and refuses anything else. Every `tools/pack` lane installs
-`@open-design/cult-ui-catalog` from its `pnpm pack` tarball, whose `files` carry `generated/`
+`@mish/cult-ui-catalog` from its `pnpm pack` tarball, whose `files` carry `generated/`
 (adapters, index, shim and previews; `tools/pack/tests/cult-ui-catalog-packaged.test.ts`). Loading
 them from an installed tarball is still open: Node does not strip types under `node_modules`, the
 fast lane finds the registry through `import.meta.dirname` (which a prebundled daemon rewrites),

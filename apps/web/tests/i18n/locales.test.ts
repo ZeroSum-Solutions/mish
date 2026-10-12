@@ -6,7 +6,7 @@ import { en } from '../../src/i18n/locales/en';
 import { LOCALES, LOCALE_LABEL, type Dict, type Locale } from '../../src/i18n/types';
 
 const EXPECTED_LOCALES = ['en'];
-const RETIRED_PRODUCT_NAME = /OpenDesign|Open Design|OPEN DESIGN|OPENDESIGN|Open-Design/;
+const RETIRED_PRODUCT_NAME = /Mish|Mish|MISH|MISH|Mish/;
 
 function placeholders(value: string): string[] {
   const names: string[] = [];

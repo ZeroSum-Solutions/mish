@@ -20,8 +20,8 @@ import path from 'node:path';
 import express from 'express';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { parseCultCopyResponse, parseCultRegistryItem, type CultRegistryFile } from '@open-design/contracts';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
+import { parseCultCopyResponse, parseCultRegistryItem, type CultRegistryFile } from '@mish/contracts';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
 import { runCultAddCli } from '../src/cult-add-cli.js';
 import { CultRegistry, resolveCultKitDir, type CultRegistryRow } from '../src/cult-registry.js';
 import { cultSlugs, registerCultRegistryRoutes } from '../src/routes/cult-registry.js';

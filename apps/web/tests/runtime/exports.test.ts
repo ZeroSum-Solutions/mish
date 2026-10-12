@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { installMockOpenDesignHost } from '@open-design/host/testing';
+import { installMockMishHost } from '@mish/host/testing';
 import {
   archiveFilenameFrom,
   archiveRootFromFilePath,
@@ -224,7 +224,7 @@ describe('injected print-ready parent cache script — runtime behavior (#4458)'
   // is rejected so it cannot blank the page (viewport fallback) or poison it.
   async function extractCacheScript(): Promise<{ body: string; nonce: string }> {
     const printPdfMock = vi.fn().mockResolvedValue({ ok: true });
-    const restoreHost = installMockOpenDesignHost({ host: { pdf: { print: printPdfMock } } });
+    const restoreHost = installMockMishHost({ host: { pdf: { print: printPdfMock } } });
     try {
       await exportAsPdf('<div style="height:4000px">tall artifact</div>', 'Cache Eval');
     } finally {
@@ -398,7 +398,7 @@ describe('buildDesignHandoffContent', () => {
       files: ['index.html', 'src/app.css', 'src/app.js'],
     }));
 
-    expect(manifest.schema).toBe('open-design.design-manifest.v1');
+    expect(manifest.schema).toBe('mish.design-manifest.v1');
     expect(manifest.entryFile).toBe('index.html');
     expect(manifest.sourceFiles.css).toEqual(['src/app.css']);
     expect(manifest.sourceFiles.scriptsAndComponents).toEqual(['src/app.js']);
@@ -1169,8 +1169,8 @@ describe('sandboxed preview Blob exports', () => {
     });
     vi.stubGlobal('window', {
       location: {
-        href: 'https://open-design.test/plugins/example',
-        origin: 'https://open-design.test',
+        href: 'https://mish.test/plugins/example',
+        origin: 'https://mish.test',
       },
       open: (_url: string, _target: string, features?: string) => {
         openCalls.push([_url, _target]);
@@ -1204,7 +1204,7 @@ describe('sandboxed preview Blob exports', () => {
     expect(capturedBlob).toBeDefined();
     const wrapper = await capturedBlob!.text();
     expect(wrapper).toContain(
-      '&lt;base href=&quot;https://open-design.test/&quot; data-od-project-preview-base&gt;',
+      '&lt;base href=&quot;https://mish.test/&quot; data-od-project-preview-base&gt;',
     );
   });
 
@@ -1404,7 +1404,7 @@ describe('sandboxed preview Blob exports', () => {
 
   it('uses the desktop native print bridge when the host PDF bridge is available', async () => {
     const printPdfMock = vi.fn().mockResolvedValue({ ok: true });
-    const restoreHost = installMockOpenDesignHost({
+    const restoreHost = installMockMishHost({
       host: { pdf: { print: printPdfMock } },
     });
 
@@ -1436,7 +1436,7 @@ describe('sandboxed preview Blob exports', () => {
 
   it('passes deck intent through the desktop native print bridge', async () => {
     const printPdfMock = vi.fn().mockResolvedValue({ ok: true });
-    const restoreHost = installMockOpenDesignHost({
+    const restoreHost = installMockMishHost({
       host: { pdf: { print: printPdfMock } },
     });
 
@@ -1453,7 +1453,7 @@ describe('sandboxed preview Blob exports', () => {
 
   it('injects image-waiting logic into the print-ready handshake for the desktop bridge', async () => {
     const printPdfMock = vi.fn().mockResolvedValue({ ok: true });
-    const restoreHost = installMockOpenDesignHost({
+    const restoreHost = installMockMishHost({
       host: { pdf: { print: printPdfMock } },
     });
 
@@ -1501,7 +1501,7 @@ describe('sandboxed preview Blob exports', () => {
 
   it('reports the artifact content size through the handshake so the desktop page is sized to the content, not the wrapper viewport (issue #4067)', async () => {
     const printPdfMock = vi.fn().mockResolvedValue({ ok: true });
-    const restoreHost = installMockOpenDesignHost({
+    const restoreHost = installMockMishHost({
       host: { pdf: { print: printPdfMock } },
     });
 
@@ -1542,7 +1542,7 @@ describe('sandboxed preview Blob exports', () => {
 
   it('injects the readiness cache for non-sandboxed desktop exports too', async () => {
     const printPdfMock = vi.fn().mockResolvedValue({ ok: true });
-    const restoreHost = installMockOpenDesignHost({
+    const restoreHost = installMockMishHost({
       host: { pdf: { print: printPdfMock } },
     });
 

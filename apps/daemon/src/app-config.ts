@@ -21,7 +21,7 @@ import { readFileSync } from 'node:fs';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { createHash, randomBytes } from 'node:crypto';
 import path from 'node:path';
-import type { OdNextRolloutMode } from '@open-design/contracts';
+import type { OdNextRolloutMode } from '@mish/contracts';
 
 import { expandHomePrefix } from './home-expansion.js';
 
@@ -223,7 +223,7 @@ const AGENT_CLI_ENV_KEYS: ReadonlyMap<string, ReadonlySet<string>> = new Map([
     'VELA_LINK_URL',
     'VELA_RUNTIME_KEY',
     'VELA_OPENCODE_BIN',
-    'OPEN_DESIGN_AMR_PROFILE',
+    'MISH_AMR_PROFILE',
     'OPENCODE_TEST_HOME',
   ])],
   ['aider', new Set(['AIDER_BIN'])],

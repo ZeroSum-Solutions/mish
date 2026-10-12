@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { Server } from 'node:http';
-import type { ResourceResult } from '@open-design/contracts';
-import { parseNativeFormatRefusalDetails } from '@open-design/contracts';
+import type { ResourceResult } from '@mish/contracts';
+import { parseNativeFormatRefusalDetails } from '@mish/contracts';
 import { searchResources, createLocalResourceSources } from '../../src/workbench/resources.js';
 import { resourceRefKey } from '../../src/workbench/context-ranking.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';

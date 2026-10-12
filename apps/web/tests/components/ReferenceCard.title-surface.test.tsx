@@ -6,7 +6,7 @@
 
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { DesignProfile } from '@open-design/contracts';
+import type { DesignProfile } from '@mish/contracts';
 
 import { ReferenceCard } from '../../src/components/home-hero/ReferenceCard';
 import { designProfileFixture } from '../fixtures/design-profile';

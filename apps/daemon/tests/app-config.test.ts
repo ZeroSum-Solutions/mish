@@ -494,8 +494,8 @@ describe('app-config', () => {
           amr: {
             VELA_BIN: '~/bin/vela',
             VELA_API_URL: '  https://custom-amr.example  ',
-            OPEN_DESIGN_AMR_PROFILE: '  local  ',
-            OPENCODE_TEST_HOME: '  ~/.open-design-amr-opencode  ',
+            MISH_AMR_PROFILE: '  local  ',
+            OPENCODE_TEST_HOME: '  ~/.mish-amr-opencode  ',
             HOME: 'should-not-persist',
           },
           opencode: {
@@ -521,8 +521,8 @@ describe('app-config', () => {
         amr: {
           VELA_BIN: '~/bin/vela',
           VELA_API_URL: 'https://custom-amr.example',
-          OPEN_DESIGN_AMR_PROFILE: 'local',
-          OPENCODE_TEST_HOME: '~/.open-design-amr-opencode',
+          MISH_AMR_PROFILE: 'local',
+          OPENCODE_TEST_HOME: '~/.mish-amr-opencode',
         },
         opencode: { OPENCODE_BIN: '~/bin/opencode' },
         'trae-cli': { TRAE_CLI_BIN: '~/bin/traecli-public' },
@@ -1002,8 +1002,8 @@ describe('app-config projectLocations', () => {
 
   it('generates distinct ids for sibling paths with long shared prefixes', async () => {
     const locs = [
-      { path: '/tmp/open-design-project-locations/shared-prefix-one' },
-      { path: '/tmp/open-design-project-locations/shared-prefix-two' },
+      { path: '/tmp/mish-project-locations/shared-prefix-one' },
+      { path: '/tmp/mish-project-locations/shared-prefix-two' },
     ];
     await writeAppConfig(dataDir, { projectLocations: locs });
     const cfg = await readAppConfig(dataDir);

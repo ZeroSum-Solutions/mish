@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { FONT_SPINE_CODES, parseResourceSearchRequest, type ResourceCandidate } from '@open-design/contracts';
+import { FONT_SPINE_CODES, parseResourceSearchRequest, type ResourceCandidate } from '@mish/contracts';
 import { searchResources } from '../../src/workbench/resources.js';
 import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import type { ProjectDesignContextDraft } from '@open-design/contracts';
+import type { ProjectDesignContextDraft } from '@mish/contracts';
 import { putProjectContext, readProjectContext, readWorkbenchPreferences } from '../../src/workbench/project-context.js';
 import { savedContext, projectState } from './context-ranking-fixture.js';
 import { database, references } from './project-context-fixture.js';

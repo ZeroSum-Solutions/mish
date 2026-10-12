@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { ResourceResult } from '@open-design/contracts';
+import type { ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { en } from '../../../src/i18n/locales/en';
 

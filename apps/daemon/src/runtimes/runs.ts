@@ -7,12 +7,12 @@ import {
   strategyTaskProvesDelivery,
   todoSnapshotHasUnfinishedWork,
   turnEndedByAskingUser,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   collectProcessTreePids,
   listProcessSnapshots,
   stopProcesses,
-} from '@open-design/platform';
+} from '@mish/platform';
 import { normalizeMediaExecutionPolicyForRun } from '../media/policy.js';
 import {
   normalizeRunToolBundleForRun,
@@ -20,7 +20,7 @@ import {
 } from '../run-tool-bundle.js';
 import { createRunLifecycleTracer } from '../run-lifecycle-tracer.js';
 import { projectWorkspaceProvenance } from '../workspace-contract.js';
-import { OPEN_DESIGN_PLUGIN_ID } from '../mcp-observability.js';
+import { MISH_PLUGIN_ID } from '../mcp-observability.js';
 import {
   scanRunEventsForUsageAnalytics,
   summarizeRunTimingAnalytics,
@@ -218,7 +218,7 @@ function runHasHostRecordedDeliveryFailure(run) {
 
 const RUN_STATE_SCHEMA_VERSION = 1;
 
-const DIAGNOSTIC_SOURCE = 'open-design-daemon';
+const DIAGNOSTIC_SOURCE = 'mish-daemon';
 
 function availableDiagnostic(value, definition, complete = true, source = DIAGNOSTIC_SOURCE) {
   return {
@@ -587,7 +587,7 @@ function buildExecutionDiagnostics(run) {
 
   return {
     schemaVersion: 1,
-    collectorVersion: 'open-design-execution-diagnostics-v2',
+    collectorVersion: 'mish-execution-diagnostics-v2',
     collectedAt: run.updatedAt,
     eventStreamCompleteness: eventStreamComplete ? 'complete' : 'partial',
     timing: {
@@ -937,7 +937,7 @@ export function createChatRunService({
         }
         const pluginWorkflowId =
           state?.externalPluginAnalytics?.externalPluginId
-            === OPEN_DESIGN_PLUGIN_ID
+            === MISH_PLUGIN_ID
           && typeof state.externalPluginAnalytics.pluginWorkflowId === 'string'
             ? state.externalPluginAnalytics.pluginWorkflowId
             : null;
@@ -1096,11 +1096,11 @@ export function createChatRunService({
         meta.analyticsHints
         && typeof meta.analyticsHints === 'object'
         && !Array.isArray(meta.analyticsHints)
-        && meta.analyticsHints.externalPluginId === OPEN_DESIGN_PLUGIN_ID
+        && meta.analyticsHints.externalPluginId === MISH_PLUGIN_ID
           ? {
               entrySurface: meta.analyticsHints.entrySurface,
               hostProduct: meta.analyticsHints.hostProduct,
-              externalPluginId: OPEN_DESIGN_PLUGIN_ID,
+              externalPluginId: MISH_PLUGIN_ID,
               externalPluginVersion: meta.analyticsHints.externalPluginVersion,
               distributionMechanism:
                 meta.analyticsHints.distributionMechanism,
@@ -1207,7 +1207,7 @@ export function createChatRunService({
     runs.set(run.id, run);
     if (run.clientRequestId) runIdsByClientRequestId.set(run.clientRequestId, run.id);
     if (
-      run.externalPluginAnalytics?.externalPluginId === OPEN_DESIGN_PLUGIN_ID
+      run.externalPluginAnalytics?.externalPluginId === MISH_PLUGIN_ID
       && typeof run.externalPluginAnalytics.pluginWorkflowId === 'string'
     ) {
       runIdsByPluginWorkflowId.set(
@@ -1454,7 +1454,7 @@ export function createChatRunService({
       runIdsByClientRequestId.delete(run.clientRequestId);
     }
     const pluginWorkflowId =
-      run.externalPluginAnalytics?.externalPluginId === OPEN_DESIGN_PLUGIN_ID
+      run.externalPluginAnalytics?.externalPluginId === MISH_PLUGIN_ID
       && typeof run.externalPluginAnalytics.pluginWorkflowId === 'string'
         ? run.externalPluginAnalytics.pluginWorkflowId
         : null;

@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { parseMediaGalleryQuery } from '@open-design/contracts';
+import { parseMediaGalleryQuery } from '@mish/contracts';
 
 import { resolveDaemonUrl } from '../daemon-url.js';
 

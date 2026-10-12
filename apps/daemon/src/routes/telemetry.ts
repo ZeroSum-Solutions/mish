@@ -1,12 +1,12 @@
 import { observeUpdateLifecycleStages } from '../migration/update-apply-observations.js';
 import express, { type Express } from 'express';
-import { SIDECAR_DEFAULTS } from '@open-design/sidecar-proto';
+import { SIDECAR_DEFAULTS } from '@mish/sidecar-proto';
 import { randomUUID } from 'node:crypto';
 import {
   type McpAnalyticsEventRequest,
   type McpAnalyticsContextResponse,
   type ObservabilityEventRequest,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import {
   createAnalyticsService,
   readAnalyticsContext,
@@ -18,7 +18,7 @@ import { readCurrentAppVersionInfo, UNKNOWN_APP_VERSION } from '../app-version.j
 import { reportRunFeedbackFromDaemon } from '../langfuse-bridge.js';
 import { observePendingInstallerApplyAttempts } from '../migration/index.js';
 import {
-  OPEN_DESIGN_PLUGIN_ID,
+  MISH_PLUGIN_ID,
 } from '../mcp-observability.js';
 
 export interface DaemonTelemetry {
@@ -373,7 +373,7 @@ const MCP_FAILURE_STAGES = new Set([
 const MCP_FAILURE_SOURCES = new Set([
   'codex_host',
   'local_mcp',
-  'open_design_daemon',
+  'mish_daemon',
   'runtime_cli',
   'vela_api',
   'model_provider',
@@ -409,7 +409,7 @@ const MCP_DISTRIBUTION_MECHANISMS = new Set([
   'unknown',
 ]);
 const MCP_PUBLISHER_CLASSES = new Set([
-  'open_design_first_party',
+  'mish_first_party',
   'third_party',
   'unknown',
 ]);
@@ -499,7 +499,7 @@ export function validateMcpAnalyticsEventProperties(
     MCP_PUBLISHER_CLASSES,
   );
   if (properties.external_plugin_id !== undefined) {
-    if (properties.external_plugin_id !== OPEN_DESIGN_PLUGIN_ID) {
+    if (properties.external_plugin_id !== MISH_PLUGIN_ID) {
       invalidMcpAnalytics('external_plugin_id is invalid');
     }
     if (properties.external_plugin_version !== undefined) {

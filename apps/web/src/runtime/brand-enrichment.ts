@@ -1,4 +1,4 @@
-import type { ProjectFile, ProjectMetadata } from '@open-design/contracts';
+import type { ProjectFile, ProjectMetadata } from '@mish/contracts';
 import type { SkillSummary } from '../types';
 
 export const DEFAULT_BRAND_ENRICHMENT_SKILL_IDS = [

@@ -13,8 +13,8 @@ import path from 'node:path';
 import express from 'express';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import type { AgencyBuildForkResponse, AgencyBuildResponse, AgencyBuildSnapshot, ApiErrorResponse } from '@open-design/contracts';
-import type { BuildDeps, BuildInput, BuildResult } from '@open-design/agency-fast-lane/build';
+import type { AgencyBuildForkResponse, AgencyBuildResponse, AgencyBuildSnapshot, ApiErrorResponse } from '@mish/contracts';
+import type { BuildDeps, BuildInput, BuildResult } from '@mish/agency-fast-lane/build';
 
 import { createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';

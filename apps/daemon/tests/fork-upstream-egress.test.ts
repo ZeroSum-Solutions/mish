@@ -7,13 +7,13 @@ import { describe, expect, it, vi } from 'vitest';
 import { mirrorAmrEntryAnalytics } from '../src/integrations/vela.js';
 
 const payload = {
-  pageName: 'open_design',
+  pageName: 'mish',
   sourcePageName: 'chat_panel',
   area: 'amr_entry',
   element: 'chat_error_recharge',
   action: 'click_amr_entry',
   entryId: 'od-amr-entry-123',
-  sourceProduct: 'open_design',
+  sourceProduct: 'mish',
   sourceDetail: 'chat_error_recharge',
   entryOccurredAt: '2026-06-03T12:00:00.000Z',
 } as Parameters<typeof mirrorAmrEntryAnalytics>[0];
@@ -27,7 +27,7 @@ const analyticsContext = {
 } as const;
 
 describe('AMR analytics mirror in this fork', () => {
-  it('sends nothing when OPEN_DESIGN_AMR_ANALYTICS_URL is unset', async () => {
+  it('sends nothing when MISH_AMR_ANALYTICS_URL is unset', async () => {
     const fetchImpl = vi.fn();
 
     const result = await mirrorAmrEntryAnalytics(payload, { analyticsContext, env: {}, fetchImpl });
@@ -36,12 +36,12 @@ describe('AMR analytics mirror in this fork', () => {
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
-  it('sends to the operator URL when OPEN_DESIGN_AMR_ANALYTICS_URL is set', async () => {
+  it('sends to the operator URL when MISH_AMR_ANALYTICS_URL is set', async () => {
     const fetchImpl = vi.fn(async (_url: string) => new Response('{}', { status: 202 }));
 
     await mirrorAmrEntryAnalytics(payload, {
       analyticsContext,
-      env: { OPEN_DESIGN_AMR_ANALYTICS_URL: 'https://analytics.example/events' },
+      env: { MISH_AMR_ANALYTICS_URL: 'https://analytics.example/events' },
       fetchImpl,
     });
 

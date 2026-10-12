@@ -27,8 +27,8 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { forwardRef } from 'react';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { StrategyTaskProjectionV2Schema } from '@open-design/contracts';
-import type { StrategyTaskProjectionV2 } from '@open-design/contracts';
+import { StrategyTaskProjectionV2Schema } from '@mish/contracts';
+import type { StrategyTaskProjectionV2 } from '@mish/contracts';
 
 import { ChatPane } from '../../src/components/ChatPane';
 import { mergeServerMessagesIntoConversation } from '../../src/components/ProjectView';

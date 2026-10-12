@@ -26,7 +26,7 @@
  *     **它们后来都由各自的 PR 修掉了**,注记已经跟着改口 —— 陈列页不许再报一个不存在的问题。
  *
  * 这个文件平时当测试跑(断言每一格真的渲染出了东西);要重新生成页面时给它一个落点:
- *   `OD_WRITE_MIRROR=<绝对路径>/mirror-exec.html pnpm --filter @open-design/web exec \
+ *   `OD_WRITE_MIRROR=<绝对路径>/mirror-exec.html pnpm --filter @mish/web exec \
  *      vitest run -c vitest.config.ts tests/components/chat/mirror-gallery.test.tsx`
  *
  * 落点**由命令给,不写在这里**:合并闸的 web 车道会跑这个文件,而 `docs/` 属于
@@ -38,7 +38,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { I18nProvider, tForLanguageTag } from '../../../src/i18n';
 import { Icon, type IconName } from '../../../src/components/Icon';
 import type { VisualStyleContext } from '../../../src/runtime/visual-style-catalog';
@@ -54,7 +54,7 @@ import { UserStatusCard } from '../../../src/components/chat/UserStatusCard';
 import { parseTodoWriteInput } from '../../../src/runtime/todos';
 import { QuoteBarView } from '../../../src/components/chat/QuoteBar';
 import { QuotedRefs } from '../../../src/components/chat/QuotedRefs';
-import { Button } from '@open-design/components';
+import { Button } from '@mish/components';
 import { AudioArtifact } from '../../../src/components/chat/AudioArtifact';
 import { RunErrorCard } from '../../../src/components/chat/RunErrorCard';
 import { SupportDialog } from '../../../src/components/chat/SupportDialog';
@@ -1693,7 +1693,7 @@ const EDGE: Cell[] = [
     node: () => supportDialog(),
     notes: [
       '**已建**:`components/chat/SupportDialog.tsx`。渠道由调用方给,组件本身不硬编任何社群地址',
-      'ZeroSum 是 Open Design 的 fork,唯一的支持渠道是邮箱(`devin@zerosumsolutions.com`)—— 上游的飞书社群、Discord 邀请链接都随 fork 去掉了',
+      'ZeroSum 是 Mish 的 fork,唯一的支持渠道是邮箱(`devin@zerosumsolutions.com`)—— 上游的飞书社群、Discord 邀请链接都随 fork 去掉了',
       '⚠️ 归属:它不只服务 chat(设置 / 帮助菜单也要能进),落在 `components/chat/` 下是临时位置,要跟产品确认最终归属'
     ],
   },

@@ -2,7 +2,7 @@ import type {
   ProjectVisibility,
   ProjectWorkspaceScope,
   WorkspaceType,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   workspaceContextFromDirectoryItem,
 } from './vela-workspace-context.js';

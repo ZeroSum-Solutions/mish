@@ -22,7 +22,7 @@ import type {
   AgencyBuildSnapshot,
   AgencyBuildStatus,
   AgencyOutputScope,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { AguiEvent, JsonPatchOp } from './spec-types.js';
 
 /** `CUSTOM.name` of the frame that carries each build event unchanged. Mirrors the contract's

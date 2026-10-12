@@ -22,7 +22,7 @@ const MARKETPLACE_ROW = {
   trust: 'restricted',
   manifest: {
     name: 'Example marketplace',
-    plugins: [{ name: 'sample-plugin', source: 'github:open-design/sample-plugin' }],
+    plugins: [{ name: 'sample-plugin', source: 'github:mish/sample-plugin' }],
   },
 };
 

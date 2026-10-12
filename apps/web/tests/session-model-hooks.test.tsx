@@ -5,7 +5,7 @@ import { advanceWorkspaceAccountGeneration, resetWorkspaceAccountGeneration } fr
 import { DEFAULT_CONFIG } from '../src/state/config';
 import { useSessionModel } from '../src/runtime/workbench/use-session-model';
 import { useHomeModel } from '../src/runtime/workbench/use-home-model';
-import type { SessionModelSnapshot, PutSessionModel } from '@open-design/contracts';
+import type { SessionModelSnapshot, PutSessionModel } from '@mish/contracts';
 const api = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn(), preflight: vi.fn() }));
 vi.mock('../src/providers/workbench', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../src/providers/workbench')>()),

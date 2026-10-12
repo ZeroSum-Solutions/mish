@@ -8,8 +8,8 @@ import {
 } from "../src/notifications/prerelease-fallback.ts";
 import type { FallbackNoticeInput } from "../src/notifications/prerelease-fallback.ts";
 
-const ORIGIN_RUN = "https://github.com/nexu-io/open-design/actions/runs/111";
-const CARD_RUN = "https://github.com/nexu-io/open-design/actions/runs/222";
+const ORIGIN_RUN = "https://github.com/ZeroSum-Solutions/mish/actions/runs/111";
+const CARD_RUN = "https://github.com/ZeroSum-Solutions/mish/actions/runs/222";
 const METADATA = "https://releases.example/prerelease/versions/0.21.1-prerelease.3/metadata.json";
 
 function notice(overrides: Partial<FallbackNoticeInput> = {}): FallbackNoticeInput {

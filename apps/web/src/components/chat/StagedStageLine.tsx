@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
-import type { StagedRunRecord } from '@open-design/contracts';
+import type { StagedRunRecord } from '@mish/contracts';
 
 import { useT } from '../../i18n';
 import { stagedLineState } from '../../runtime/chat/staged-line';

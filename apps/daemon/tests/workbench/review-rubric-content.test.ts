@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   parseProjectRubricDraft, reviewCheckVerdictSchema, WORKBENCH_MANDATORY_CRITERION_IDS,
   type MechanicalCheckResult, type ObservedBehaviorRecord, type ProjectDesignContext, type ProjectRubric, type ReviewerRecord, type ReviewFinding,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   CHECKLIST_ANCHORS, CHECKLIST_CRITERIA, CHECKLIST_CRITERIA_VERSION, CHECKLIST_SOURCE, checklistRubricCheck, ChecklistSelectionError, validateChecklistSelection,
 } from '../../src/workbench/review/checklist-criteria.js';
@@ -11,7 +11,7 @@ import { JUDGMENT_DIMENSIONS, JUDGMENT_SEEDS_VERSION, seedJudgmentChecks } from 
 import { aggregateReviewRun } from '../../src/workbench/review/run-aggregate.js';
 import { effectiveChecks, planChecks } from '../../src/workbench/review/reviewer-plan.js';
 import { summarizeObservedBehaviors } from '../../src/workbench/review/observed-behaviors.js';
-import { observedBehaviorRecordSchema, renderReviewEvidenceMessage } from '@open-design/contracts';
+import { observedBehaviorRecordSchema, renderReviewEvidenceMessage } from '@mish/contracts';
 import { PageText } from '../../src/workbench/review/evidence.js';
 import { knownGoodCapture } from './review-capture-fixture.js';
 

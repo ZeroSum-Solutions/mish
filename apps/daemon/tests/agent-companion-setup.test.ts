@@ -37,7 +37,7 @@ async function fixture(options: { existingProfile?: boolean; validHash?: boolean
   const runtimeDataDir = path.join(root, 'data');
   const dshHome = path.join(root, 'dsh home');
   const bundleRoot = path.join(resourceRoot, 'agent-runtimes', 'deepseek-harness');
-  const tarball = path.join(bundleRoot, 'open-design-dsh-runtime-0.1.0.tgz');
+  const tarball = path.join(bundleRoot, 'mish-dsh-runtime-0.1.0.tgz');
   const stateFile = path.join(root, 'plugin-add-count.txt');
   await mkdir(bundleRoot, { recursive: true });
   await mkdir(runtimeDataDir, { recursive: true });
@@ -46,13 +46,13 @@ async function fixture(options: { existingProfile?: boolean; validHash?: boolean
   const sha256 = createHash('sha256').update(await readFile(tarball)).digest('hex');
   await writeFile(path.join(bundleRoot, 'manifest.json'), `${JSON.stringify({
     file: path.basename(tarball),
-    packageName: '@open-design/dsh-runtime',
+    packageName: '@mish/dsh-runtime',
     schemaVersion: 1,
     sha256: options.validHash === false ? '0'.repeat(64) : sha256,
     version: '0.1.0',
   })}\n`, 'utf8');
   if (options.existingProfile) {
-    const profileRoot = path.join(dshHome, 'profiles', 'open-design');
+    const profileRoot = path.join(dshHome, 'profiles', 'mish');
     await mkdir(profileRoot, { recursive: true });
     await writeFile(path.join(profileRoot, 'package.json'), '{}\n', 'utf8');
   }
@@ -63,24 +63,24 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 const args = process.argv.slice(2);
 const home = process.env.DSH_HOME;
-const profileRoot = path.join(home, 'profiles', 'open-design');
+const profileRoot = path.join(home, 'profiles', 'mish');
 const marker = path.join(profileRoot, '.installed');
 if (args[0] === '--version') {
   process.stdout.write('0.1.0-rc.6\\n');
 } else if (args.includes('--probe')) {
   try {
     await readFile(marker);
-    process.stdout.write(JSON.stringify({v:1,type:'probe',runtime:'open-design',protocol_version:1,plugin_version:'0.1.0',capabilities:{session_resume:true,session_cancel:true,structured_events:true}}) + '\\n');
+    process.stdout.write(JSON.stringify({v:1,type:'probe',runtime:'mish',protocol_version:1,plugin_version:'0.1.0',capabilities:{session_resume:true,session_cancel:true,structured_events:true}}) + '\\n');
   } catch {
     process.exitCode = 1;
   }
-} else if (args[0] === 'plugin' && args[1] === '--profile' && args[2] === 'open-design' && args[3] === 'add') {
+} else if (args[0] === 'plugin' && args[1] === '--profile' && args[2] === 'mish' && args[3] === 'add') {
   if (process.env.OD_DSH_SETUP_FAKE_MODE === 'install-fail') process.exit(7);
   if (process.env.OD_DSH_SETUP_FAKE_MODE === 'require-profile-bundle') {
     const [directory, filename, extra] = args[4].split('/');
     const digest = filename?.endsWith('.tgz') ? filename.slice(0, -4) : '';
     const digestIsHex = digest.length === 64 && digest.replace(/[a-f0-9]/g, '') === '';
-    if (directory !== '.open-design' || extra !== undefined || !digestIsHex) process.exit(8);
+    if (directory !== '.mish' || extra !== undefined || !digestIsHex) process.exit(8);
     const bundle = await readFile(path.join(profileRoot, args[4]), 'utf8');
     if (bundle !== 'fixture runtime package') process.exit(9);
   }
@@ -108,7 +108,7 @@ if (args[0] === '--version') {
   delete process.env.OD_DSH_SETUP_FAKE_MODE;
   return {
     options: { projectRoot: root, resourceRoot, runtimeDataDir },
-    profileRoot: path.join(dshHome, 'profiles', 'open-design'),
+    profileRoot: path.join(dshHome, 'profiles', 'mish'),
     stateFile,
   };
 }

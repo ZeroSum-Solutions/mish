@@ -3,7 +3,7 @@ import {
   captureImportMetadataSchema, unitInsertRequestSchema, unitUndoInsertRequestSchema, unitSaveRequestSchema, createCaptureDraftRequestSchema,
   WORKBENCH_CAPTURE_MAX_BYTES, WORKBENCH_CAPTURE_MEDIA_TYPES, WORKBENCH_CAPTURE_METADATA_HEADER, WORKBENCH_CAPTURE_METADATA_MAX_BYTES,
   type WorkbenchDeclarationSurface,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
 import type { AuthorizeProjectRequest } from '../collab/project-request-authority.js';
 import { requestWithWorkspaceNavigationScope, resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';

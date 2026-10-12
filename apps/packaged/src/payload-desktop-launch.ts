@@ -1,7 +1,7 @@
 import { dirname } from "node:path";
 
-import { buildLauncherAfterQuitArgs, buildLauncherDelegatedArgs } from "@open-design/launcher-proto";
-import { handoffCurrentSidecarGeneration } from "@open-design/sidecar";
+import { buildLauncherAfterQuitArgs, buildLauncherDelegatedArgs } from "@mish/launcher-proto";
+import { handoffCurrentSidecarGeneration } from "@mish/sidecar";
 
 import {
   armPackagedLauncherRuntimeAttempt,
@@ -12,7 +12,7 @@ import {
 const DEFAULT_DELEGATION_TIMEOUT_MS = 60_000;
 
 export function findPackagedDeeplinkArg(argv: readonly string[]): string | null {
-  return argv.find((arg) => arg.startsWith("opendesign://")) ?? null;
+  return argv.find((arg) => arg.startsWith("mish://")) ?? null;
 }
 
 export type PackagedPayloadDesktopLaunchPlan = {
@@ -51,7 +51,7 @@ export function planPackagedPayloadDesktopDelegation(
       // process first; preserve only this explicit protocol argument when the
       // outer delegates to the versioned payload.
       ...(options.forwardedArgs ?? process.argv).filter((arg) =>
-        arg.startsWith("opendesign://")
+        arg.startsWith("mish://")
       ),
     ],
     command: runtime.desktopExecutablePath,

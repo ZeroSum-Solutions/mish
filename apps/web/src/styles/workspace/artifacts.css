@@ -2097,7 +2097,7 @@ button.agent-group-rescan-btn:hover:not(:disabled) {
   border: 1px solid transparent;
   border-radius: var(--radius-pill);
   background: var(--accent);
-  /* 品牌主色 #00ff04 (opendesign spec), not the theme --green: the label and
+  /* 品牌主色 #00ff04 (mish spec), not the theme --green: the label and
      its sparkle icon share currentColor on the ink fill. */
   color: #00ff04;
   font-size: 12px;

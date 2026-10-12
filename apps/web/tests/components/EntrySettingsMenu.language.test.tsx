@@ -74,10 +74,10 @@ describe('EntrySettingsMenu language picker a11y', () => {
     fireEvent.click(screen.getByTestId('entry-settings-menu-trigger'));
 
     const hrefs = Array.from(container.querySelectorAll('a')).map((link) => link.href);
-    expect(hrefs).not.toContain('https://github.com/nexu-io/open-design');
-    expect(hrefs).not.toContain('https://x.com/OpenDesignHQ');
-    expect(container.textContent).not.toContain('OpenDesign');
-    expect(container.textContent).not.toContain('Open Design');
+    expect(hrefs).not.toContain('https://github.com/ZeroSum-Solutions/mish');
+    expect(hrefs).not.toContain('https://x.com/MishHQ');
+    expect(container.textContent).not.toContain('Mish');
+    expect(container.textContent).not.toContain('Mish');
     // Upstream sales/pricing surfaces (the Go-plan pricing page, the
     // "Workspace for Teams" enterprise landing page) must never appear as a
     // rendered link — only AMR-bound destinations stay reachable from here.

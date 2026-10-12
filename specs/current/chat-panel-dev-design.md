@@ -63,7 +63,7 @@ ChatPanel 是用户唯一能看到 agent 在做什么的地方,现在有三个�
 
 ### 跨哪几个仓
 
-**不跨仓,全部在 `open-design`。** 与 vela 的关系只是数据源:AMR 是 vela CLI 的 ACP stdio 模式,事件经 `apps/daemon/src/agent-protocol/acp/` 解析进来 —— 归一的 bug 在 **OD 这边**(`updates.ts:415` 的 `acpToolNameFromKind`),不需要 vela 配合。不新增任何外部服务依赖。
+**不跨仓,全部在 `mish`。** 与 vela 的关系只是数据源:AMR 是 vela CLI 的 ACP stdio 模式,事件经 `apps/daemon/src/agent-protocol/acp/` 解析进来 —— 归一的 bug 在 **OD 这边**(`updates.ts:415` 的 `acpToolNameFromKind`),不需要 vela 配合。不新增任何外部服务依赖。
 
 ### 落在哪个包
 
@@ -391,7 +391,7 @@ flowchart TD
 
 ## 七、上线方案【跨仓必填】
 
-**不跨仓** —— 只动 `open-design`,不改 vela。但 web 与 daemon 在同一个客户端里一起发,仍要写清顺序与影响:
+**不跨仓** —— 只动 `mish`,不改 vela。但 web 与 daemon 在同一个客户端里一起发,仍要写清顺序与影响:
 
 - **契约先行**:`packages/contracts` 的两个可选字段先合,daemon 与 web 再各自消费。合了契约但两侧都没消费时,行为与今天完全一致。
 - **daemon 先上、web 后上**是安全的(多送两个字段,web 不读就没影响);**反过来也安全**(web 读不到就不显示耗时)。所以两侧可以任意顺序合,不需要开关。

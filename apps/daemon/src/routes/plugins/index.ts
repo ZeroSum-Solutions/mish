@@ -7,8 +7,8 @@ import type {
   Project,
   ProjectMetadata,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
-import { TeamResourceCopyForbiddenError } from '@open-design/contracts';
+} from '@mish/contracts';
+import { TeamResourceCopyForbiddenError } from '@mish/contracts';
 import {
   duplicatePluginExampleIntoProject,
   PluginDuplicateProjectError,
@@ -999,9 +999,9 @@ export function registerProjectPluginRoutes(app: Express, deps: RegisterPluginRo
     if (!await authorizeWrite(req, res, req.params.id)) return;
     return helpers.handleCandidateShareTask(req, res);
   });
-  app.post('/api/projects/:id/plugins/contribute-open-design', async (req, res) => {
+  app.post('/api/projects/:id/plugins/contribute-mish', async (req, res) => {
     if (!await authorizeWrite(req, res, req.params.id)) return;
-    return helpers.handleProjectPluginCli(req, res, 'contribute-open-design');
+    return helpers.handleProjectPluginCli(req, res, 'contribute-mish');
   });
   app.post('/api/projects/:id/plugins/share-tasks', async (req, res) => {
     if (!await authorizeWrite(req, res, req.params.id)) return;

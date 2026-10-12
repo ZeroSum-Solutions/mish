@@ -243,9 +243,9 @@ async function runReleaseStableForFailure(env: Record<string, string>): Promise<
       cwd: workspaceRoot,
       env: {
         ...process.env,
-        GITHUB_REPOSITORY: "nexu-io/open-design",
+        GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
         GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
-        OPEN_DESIGN_RELEASE_CHANNEL: "stable",
+        MISH_RELEASE_CHANNEL: "stable",
         ...env,
       },
     });
@@ -424,7 +424,7 @@ describe("packaged smoke workflow", () => {
     expect(job).toContain("fromJSON(needs.runners.outputs.runs_on).windows_tools");
     expect(job).toContain("toJSON(fromJSON(needs.runners.outputs.runs_on).windows_tools)");
     expect(job).toContain("fromJSON(needs.plan.outputs.run).windows_tools_pack_payload_tests");
-    expect(job).toContain("pnpm --filter @open-design/tools-pack exec vitest run tests/launcher/windows/payload.test.ts");
+    expect(job).toContain("pnpm --filter @mish/tools-pack exec vitest run tests/launcher/windows/payload.test.ts");
     expect(validate).toContain("windows_tools_pack_payload_tests");
   });
 
@@ -711,7 +711,7 @@ describe("packaged smoke workflow", () => {
               id: 101,
               name: "Daemon tests (1/4)",
               conclusion: "failure",
-              html_url: `https://github.com/nexu-io/open-design/actions/runs/${runId}/job/101`,
+              html_url: `https://github.com/ZeroSum-Solutions/mish/actions/runs/${runId}/job/101`,
               steps: [
                 { name: "Checkout", conclusion: "success" },
                 { name: "Run daemon test shard", conclusion: "failure" },
@@ -722,7 +722,7 @@ describe("packaged smoke workflow", () => {
               id: 103,
               name: "Merge policy",
               conclusion: mergePolicyConclusion,
-              html_url: `https://github.com/nexu-io/open-design/actions/runs/${runId}/job/103`,
+              html_url: `https://github.com/ZeroSum-Solutions/mish/actions/runs/${runId}/job/103`,
               steps: [{ name: "Block merge while a merge-blocking label is present", conclusion: mergePolicyConclusion }],
             },
             // Replaying a completed run reports the gate itself as failed; it must never be listed.
@@ -769,7 +769,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
           env: workflowFixtureEnv(
             {
               GH_TOKEN: "fake",
-              REPO: "nexu-io/open-design",
+              REPO: "ZeroSum-Solutions/mish",
               RUN_ID: runId,
               NEEDS_JSON: JSON.stringify(args.needs),
               MERGE_GROUP_REF: `gh-readonly-queue/main/pr-6214-${prBase}`,
@@ -835,10 +835,10 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
     });
     expect(workloadFailure.body).toContain("<!-- merge-queue-ci-failure -->");
     expect(workloadFailure.body).toContain(
-      `[run ${runId}](https://github.com/nexu-io/open-design/actions/runs/${runId})`,
+      `[run ${runId}](https://github.com/ZeroSum-Solutions/mish/actions/runs/${runId})`,
     );
     expect(workloadFailure.body).toContain(
-      `- **Daemon tests (1/4)** — failure at \`Run daemon test shard\` ([job log](https://github.com/nexu-io/open-design/actions/runs/${runId}/job/101))`,
+      `- **Daemon tests (1/4)** — failure at \`Run daemon test shard\` ([job log](https://github.com/ZeroSum-Solutions/mish/actions/runs/${runId}/job/101))`,
     );
     expect(workloadFailure.body).not.toContain("Daemon tests (2/4)");
     expect(workloadFailure.body).not.toContain("Validate workspace");
@@ -940,7 +940,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
     expect(workflow).toContain("secrets.RELEASE_BOT_APP_ID");
 
     // Only a non-draft, same-repo PR authored by the release bot, targeting release/v*, is merged.
-    expect(workflow).toContain("steps.pr.outputs.author == 'app/open-design-release-bot'");
+    expect(workflow).toContain("steps.pr.outputs.author == 'app/mish-release-bot'");
     expect(workflow).toContain("steps.pr.outputs.cross == 'false'");
     expect(workflow).toContain("steps.pr.outputs.draft == 'false'");
     expect(workflow).toContain('startswith("release/v")');
@@ -983,7 +983,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
     expect(workflow).toContain("gh pr review");
     expect(workflow).toContain("--approve");
     const approveStep = sectionBetween(workflow, "Approve the clean backport", "gh pr review");
-    expect(approveStep).toContain("steps.pr.outputs.author == 'app/open-design-release-bot'");
+    expect(approveStep).toContain("steps.pr.outputs.author == 'app/mish-release-bot'");
     expect(approveStep).toContain("steps.pr.outputs.pristine == 'true'");
     expect(approveStep).toContain("github.token");
     expect(approveStep).toContain("github.event.workflow_run.conclusion == 'success'");
@@ -992,7 +992,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
     // backport-* PR can't spam the release group and stale failed runs do not page after the PR
     // head advanced. Alert on failure and timed_out, but not routine cancelled runs.
     const feishuStep = sectionBetween(workflow, "Notify Feishu on failed backport CI", "python3");
-    expect(feishuStep).toContain("steps.pr.outputs.author == 'app/open-design-release-bot'");
+    expect(feishuStep).toContain("steps.pr.outputs.author == 'app/mish-release-bot'");
     expect(feishuStep).toContain("steps.pr.outputs.cross == 'false'");
     expect(feishuStep).toContain("steps.pr.outputs.head_oid == github.event.workflow_run.head_sha");
     expect(feishuStep).toContain(
@@ -1011,7 +1011,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
     expect(workflow).toContain("workflow_dispatch:");
     expect(workflow).toContain("github.event_name == 'workflow_dispatch'");
     expect(workflow).toContain("github.event.workflow_run.conclusion == 'success'");
-    expect(workflow).toContain("github.repository == 'nexu-io/open-design'");
+    expect(workflow).toContain("github.repository == 'ZeroSum-Solutions/mish'");
     expect(workflow).not.toContain("github.event.workflow_run.conclusion != 'cancelled'");
 
     // It mints the privileged release App token for label deletion, branch push, PR + merge-queue.
@@ -1021,11 +1021,11 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
     // The shipped version is resolved from the LATEST published release (release-stable marks it
     // --latest) or the dispatch tag — NEVER from workflow_run.head_branch, which can be the
     // dispatch ref rather than the built release branch when release-stable runs with a `ref` input.
-    expect(workflow).toContain("gh release view --repo nexu-io/open-design --json tagName,isDraft,isPrerelease");
+    expect(workflow).toContain("gh release view --repo ZeroSum-Solutions/mish --json tagName,isDraft,isPrerelease");
     expect(workflow).not.toContain("github.event.workflow_run.head_branch");
     expect(workflow).not.toContain("HEAD_BRANCH");
 
-    // Only a published (draft=false), non-prerelease, open-design-vX.Y.Z release finalizes; a
+    // Only a published (draft=false), non-prerelease, mish-vX.Y.Z release finalizes; a
     // dry-run completion (latest stays the previous, already-finalized stable) must no-op.
     expect(workflow).toContain("isDraft");
     expect(workflow).toContain("isPrerelease");
@@ -1041,7 +1041,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
 
     // The bump PR needs one core-maintainer approval (code-owned manifests + require_code_owner_review
     // on main), so finalize requests that review and arms the merge queue pinned to the pushed SHA.
-    expect(workflow).toContain("--add-reviewer nexu-io/core-maintainers");
+    expect(workflow).toContain("--add-reviewer ZeroSum-Solutions/core-maintainers");
     expect(workflow).toContain("--squash --auto --match-head-commit");
     expect(workflow).toContain("head_sha=$(git rev-parse HEAD)");
     expect(workflow).toContain("git ls-remote --exit-code --heads origin \"$BRANCH\"");
@@ -1123,7 +1123,7 @@ process.stdin.on("end", () => {
       runResolve({
         event: "workflow_dispatch",
         inputTag: "0.12.0",
-        state: JSON.stringify({ tagName: "open-design-v0.12.0", isDraft: false, isPrerelease: false }),
+        state: JSON.stringify({ tagName: "mish-v0.12.0", isDraft: false, isPrerelease: false }),
       }),
     ).resolves.toMatchObject({
       output: {
@@ -1132,24 +1132,24 @@ process.stdin.on("end", () => {
         next: "0.12.1",
         branch: "release-bot/bump-main-v0.12.1",
       },
-      ghArgs: [expect.stringContaining("release view open-design-v0.12.0")],
+      ghArgs: [expect.stringContaining("release view mish-v0.12.0")],
     });
 
     await expect(
       runResolve({
         event: "workflow_dispatch",
-        inputTag: "open-design-v1.2.3",
-        state: JSON.stringify({ tagName: "open-design-v1.2.3", isDraft: false, isPrerelease: false }),
+        inputTag: "mish-v1.2.3",
+        state: JSON.stringify({ tagName: "mish-v1.2.3", isDraft: false, isPrerelease: false }),
       }),
     ).resolves.toMatchObject({
       output: { skip: "false", version: "1.2.3", next: "1.2.4" },
-      ghArgs: [expect.stringContaining("release view open-design-v1.2.3")],
+      ghArgs: [expect.stringContaining("release view mish-v1.2.3")],
     });
 
     for (const state of [
-      { tagName: "open-design-v0.12.0", isDraft: true, isPrerelease: false },
-      { tagName: "open-design-v0.12.0", isDraft: false, isPrerelease: true },
-      { tagName: "open-design-v0.12.0-beta.1", isDraft: false, isPrerelease: false },
+      { tagName: "mish-v0.12.0", isDraft: true, isPrerelease: false },
+      { tagName: "mish-v0.12.0", isDraft: false, isPrerelease: true },
+      { tagName: "mish-v0.12.0-beta.1", isDraft: false, isPrerelease: false },
     ]) {
       await expect(runResolve({ event: "workflow_run", state: JSON.stringify(state) })).resolves.toMatchObject({
         output: { skip: "true" },
@@ -1181,11 +1181,11 @@ process.stdin.on("end", () => {
       ]);
       await Promise.all([
         writeJson("package.json", { name: "root", version: "0.12.0", dependencies: { untouched: "0.12.0" } }),
-        writeJson("apps/web/package.json", { name: "@open-design/web", version: "0.12.0" }),
-        writeJson("packages/platform/package.json", { name: "@open-design/platform", version: "0.12.0" }),
-        writeJson("packages/components/package.json", { name: "@open-design/components", version: "0.5.0" }),
-        writeJson("tools/dev/package.json", { name: "@open-design/dev", version: "0.12.0" }),
-        writeJson("e2e/package.json", { name: "@open-design/e2e", version: "0.12.0" }),
+        writeJson("apps/web/package.json", { name: "@mish/web", version: "0.12.0" }),
+        writeJson("packages/platform/package.json", { name: "@mish/platform", version: "0.12.0" }),
+        writeJson("packages/components/package.json", { name: "@mish/components", version: "0.5.0" }),
+        writeJson("tools/dev/package.json", { name: "@mish/dev", version: "0.12.0" }),
+        writeJson("e2e/package.json", { name: "@mish/e2e", version: "0.12.0" }),
       ]);
 
       await execFileAsync("bash", ["-c", script], {
@@ -1285,7 +1285,7 @@ process.stdin.on("end", () => {
     expect(workflow).toContain("secrets.RELEASE_BOT_APP_ID");
 
     // Only a non-draft, same-repo PR authored by the release bot, targeting main, is merged.
-    expect(workflow).toContain("steps.pr.outputs.author == 'app/open-design-release-bot'");
+    expect(workflow).toContain("steps.pr.outputs.author == 'app/mish-release-bot'");
     expect(workflow).toContain("steps.pr.outputs.cross == 'false'");
     expect(workflow).toContain("steps.pr.outputs.draft == 'false'");
     expect(workflow).toContain('select(.base.ref == "main")');
@@ -1319,7 +1319,7 @@ process.stdin.on("end", () => {
     expect(workflow).toContain("gh pr review");
     expect(workflow).toContain("--approve");
     const approveStep = sectionBetween(workflow, "Approve the clean manifest PR", "gh pr review");
-    expect(approveStep).toContain("steps.pr.outputs.author == 'app/open-design-release-bot'");
+    expect(approveStep).toContain("steps.pr.outputs.author == 'app/mish-release-bot'");
     expect(approveStep).toContain("steps.pr.outputs.pristine == 'true'");
     expect(approveStep).toContain("github.token");
     // Approve only when the run CI actually succeeded — dropping this predicate would approve a
@@ -1330,7 +1330,7 @@ process.stdin.on("end", () => {
     // and merges via the native --auto path bound to the validated SHA. Dropping the success
     // predicate here would enqueue a PR whose CI failed.
     const enqueueStep = sectionBetween(workflow, "Enqueue the clean manifest PR", "gh pr merge");
-    expect(enqueueStep).toContain("steps.pr.outputs.author == 'app/open-design-release-bot'");
+    expect(enqueueStep).toContain("steps.pr.outputs.author == 'app/mish-release-bot'");
     expect(enqueueStep).toContain("steps.pr.outputs.pristine == 'true'");
     expect(enqueueStep).toContain("steps.pr.outputs.head_oid == github.event.workflow_run.head_sha");
     expect(enqueueStep).toContain("github.event.workflow_run.conclusion == 'success'");
@@ -1345,7 +1345,7 @@ process.stdin.on("end", () => {
     // The Feishu failure path carries the same identity gates, so a fork / non-bot PR can't spam
     // the release group, and fires only on a CI *failure* (not success).
     const feishuStep = sectionBetween(workflow, "Notify Feishu on failed manifest CI", "python3");
-    expect(feishuStep).toContain("steps.pr.outputs.author == 'app/open-design-release-bot'");
+    expect(feishuStep).toContain("steps.pr.outputs.author == 'app/mish-release-bot'");
     expect(feishuStep).toContain("steps.pr.outputs.cross == 'false'");
     // Page on every terminal RED state that strands the PR — failure AND timed_out (ci.yml has
     // timeout-minutes jobs) — but NOT cancelled, which a routine force-push of the rolling branch
@@ -1394,7 +1394,7 @@ process.stdin.on("end", () => {
     // release/** is guarded by the "Protected branches (preview/*, release/v*)" ruleset whose
     // pull_request rule rejects a direct push (GH013) unless the pusher is a bypass actor. The
     // release-cut bake writes the authoritative manifest straight onto the release branch, so it
-    // must push as open-design-bot — a bypass actor on that ruleset — not github-actions[bot],
+    // must push as mish-bot — a bypass actor on that ruleset — not github-actions[bot],
     // which is NOT and gets rejected (this stranded release/v0.14.2's manifest). These three auth
     // invariants only work together; a refactor that drops any one silently reintroduces the
     // GH013 regression, so lock them here rather than rely on YAML review.
@@ -1404,7 +1404,7 @@ process.stdin.on("end", () => {
     //    token on push and re-authenticate as github-actions[bot] (the same override fixed in the
     //    post-merge bake — #5357).
     expect(workflow).toContain("persist-credentials: false");
-    // 2. The run mints an open-design-bot token via the BOT_APP_* creds — the App that IS a bypass
+    // 2. The run mints an mish-bot token via the BOT_APP_* creds — the App that IS a bypass
     //    actor on the release ruleset. RELEASE_BOT_APP_ID (used by the post-merge bake) is a
     //    different App and is NOT a bypass actor, so pin the correct credentials, not just the
     //    generic token action.
@@ -1465,7 +1465,7 @@ process.stdin.on("end", () => {
 
   it("[P1] builds tools-release before the standalone DSH publisher invokes its bin", async () => {
     const workflow = await readFile(dshBootstrapPublishWorkflowPath, "utf8");
-    const buildIndex = workflow.indexOf("pnpm --filter @open-design/tools-release build");
+    const buildIndex = workflow.indexOf("pnpm --filter @mish/tools-release build");
     const publishIndex = workflow.indexOf("pnpm exec tools-release publish-dsh-bootstrap");
 
     expect(buildIndex).toBeGreaterThanOrEqual(0);
@@ -1508,7 +1508,7 @@ process.stdin.on("end", () => {
   it("[P1] publishes catalog snapshots only from main", async () => {
     const workflow = await readFile(catalogPublishWorkflowPath, "utf8");
     const guardedJobs = workflow.match(
-      /if: github\.repository == 'nexu-io\/open-design' && github\.ref == 'refs\/heads\/main'/g,
+      /if: github\.repository == 'ZeroSum-Solutions\/mish' && github\.ref == 'refs\/heads\/main'/g,
     );
 
     expect(guardedJobs).toHaveLength(2);
@@ -1585,12 +1585,12 @@ process.stdin.on("end", () => {
     const workspaceUnit = sectionBetween(workflow, "  workspace_unit_tests:", "  daemon_unit_tests:");
 
     expect(workspaceUnit).toContain(`if [ "\${{ fromJSON(needs.plan.outputs.scopes).tools_pack_tests_required }}" = "true" ]; then
-            pnpm --filter @open-design/desktop build
-            pnpm --filter @open-design/desktop test
-            pnpm --filter @open-design/packaged test
-            pnpm --filter @open-design/tools-pack test
+            pnpm --filter @mish/desktop build
+            pnpm --filter @mish/desktop test
+            pnpm --filter @mish/packaged test
+            pnpm --filter @mish/tools-pack test
             if [ "\${{ fromJSON(needs.plan.outputs.run).e2e_vitest }}" != "true" ]; then
-              pnpm --filter @open-design/e2e test tests/packaged-launcher-update-loop.test.ts
+              pnpm --filter @mish/e2e test tests/packaged-launcher-update-loop.test.ts
             fi
           fi`);
   });
@@ -1603,7 +1603,7 @@ process.stdin.on("end", () => {
     expect(daemonTests).toContain("if: ${{ fromJSON(needs.plan.outputs.run).daemon_unit_tests }}");
     expect(daemonTests).toContain("fail-fast: false");
     expect(daemonTests).toContain("shard: [1, 2, 3, 4]");
-    expect(daemonTests).toContain("pnpm --filter @open-design/daemon test --shard=${{ matrix.shard }}/4");
+    expect(daemonTests).toContain("pnpm --filter @mish/daemon test --shard=${{ matrix.shard }}/4");
     expect(validate).toContain("- daemon_unit_tests");
     expect(validate).toContain("[$run | to_entries[] | select(.value) | .key]");
   });
@@ -1852,11 +1852,11 @@ process.stdin.on("end", () => {
     expect(webWorkspaceTests).toContain("toJSON(fromJSON(needs.runners.outputs.runs_on).js_hot)");
     expect(webWorkspaceTests).not.toContain('"od-persistent-ci"');
     // Pin two-way vitest sharding so a later YAML edit cannot collapse the split or restore the
-    // monolithic `pnpm --filter @open-design/web test` command while this suite still passes.
+    // monolithic `pnpm --filter @mish/web test` command while this suite still passes.
     expect(webWorkspaceTests).toContain("fail-fast: false");
     expect(webWorkspaceTests).toContain("shard: [1, 2]");
     expect(webWorkspaceTests).toContain(
-      "pnpm --filter @open-design/web exec vitest run -c vitest.config.ts --maxWorkers=2 --shard=${{ matrix.shard }}/2",
+      "pnpm --filter @mish/web exec vitest run -c vitest.config.ts --maxWorkers=2 --shard=${{ matrix.shard }}/2",
     );
     expect(e2eVitest).toContain("fromJSON(needs.runners.outputs.runs_on).js_hot");
     expect(e2eVitest).toContain("toJSON(fromJSON(needs.runners.outputs.runs_on).js_hot)");
@@ -2001,7 +2001,7 @@ process.stdin.on("end", () => {
     expect(action).toContain('if [ "$playwright_workers" -gt 2 ]; then');
     expect(action).toContain("playwright_workers=2");
     expect(action).toContain('echo "OD_PLAYWRIGHT_WORKERS=$playwright_workers"');
-    expect(action).toContain('echo "OPEN_DESIGN_WORKSPACE_CONCURRENCY=$workers"');
+    expect(action).toContain('echo "MISH_WORKSPACE_CONCURRENCY=$workers"');
   });
 
   it("[P1] routes external fork PRs through GitHub-hosted runner profiles", async () => {
@@ -2142,13 +2142,13 @@ process.stdin.on("end", () => {
     expect(e2eVitestGate).toContain("kernel.apparmor_restrict_unprivileged_userns=0");
     expect(e2eVitestGate).not.toContain("--no-sandbox");
     expect(e2eVitestGate.indexOf("kernel.apparmor_restrict_unprivileged_userns=0"))
-      .toBeLessThan(e2eVitestGate.indexOf("pnpm --filter @open-design/e2e test"));
-    expect(e2eVitestGate).toContain("pnpm --filter @open-design/e2e test");
+      .toBeLessThan(e2eVitestGate.indexOf("pnpm --filter @mish/e2e test"));
+    expect(e2eVitestGate).toContain("pnpm --filter @mish/e2e test");
 
     const daemonGate = sectionBetween(tests, "  daemon_unit_tests:", "  verify:");
     expect(daemonGate).toContain("shard: [1, 2, 3, 4]");
     expect(daemonGate).toContain("ref: ${{ inputs.commit }}");
-    expect(daemonGate).toContain("pnpm --filter @open-design/daemon test --shard=${{ matrix.shard }}/4");
+    expect(daemonGate).toContain("pnpm --filter @mish/daemon test --shard=${{ matrix.shard }}/4");
 
     const verifyGate = tests.slice(tests.indexOf("  verify:"));
     expect(verifyGate).toContain("ref: ${{ inputs.commit }}");
@@ -2157,7 +2157,7 @@ process.stdin.on("end", () => {
 
     // A group scoped to the origin run, never the pipeline's.
     expect(tests).toContain("group: release-prerelease-tests-${{ inputs.origin_run_id || inputs.commit }}");
-    expect(tests).not.toContain("open-design-release-prerelease");
+    expect(tests).not.toContain("mish-release-prerelease");
 
     expect(functionalE2e).toContain("workflow_call:");
     expect(functionalE2e).not.toContain("schedule:");
@@ -2362,7 +2362,7 @@ process.stdin.on("end", () => {
     expect(workflow).toContain("Prepare linux_x64 assets");
     expect(workflow).toContain("Publish linux_x64 platform");
     expect(workflow).toContain("Upload linux_x64 publish manifest");
-    expect(workflow).toContain("open-design-beta-linux-x64-publish-manifest");
+    expect(workflow).toContain("mish-beta-linux-x64-publish-manifest");
     expect(workflow).toContain("Download linux_x64 publish manifest");
     expect(workflow).not.toContain(".github/scripts/release/assets/linux.sh");
     expect(workflow).not.toContain(".github/scripts/release/r2/publish-platform.ts");
@@ -2381,7 +2381,7 @@ process.stdin.on("end", () => {
     expect(workflow).toContain("manifest.json");
     expect(workflow).toContain("tools-pack.json");
     expect(workflow).toContain("Upload linux e2e spec report");
-    expect(workflow).toContain("open-design-release-linux-e2e-report");
+    expect(workflow).toContain("mish-release-linux-e2e-report");
     expect(workflow).toContain("Download linux e2e spec report");
     expectReleaseLinuxBuildPreservesEvidence(workflow, "Build release linux artifacts");
     expectReleaseLinuxSmokePreservesEvidenceBeforeApt(workflow, "Smoke release linux AppImage runtime");
@@ -2496,7 +2496,7 @@ process.stdin.on("end", () => {
 
     expectCountedReleaseWorkflowCallContract(prereleaseWorkflow, "prerelease");
 
-    expect(prereleaseWorkflow).toContain("OPEN_DESIGN_STABLE_VERSION: ${{ inputs.release_version }}");
+    expect(prereleaseWorkflow).toContain("MISH_STABLE_VERSION: ${{ inputs.release_version }}");
     expect(prereleaseWorkflow).toContain("Required when ref is not release/vX.Y.Z");
   });
 
@@ -2533,7 +2533,7 @@ process.stdin.on("end", () => {
 
     // The Windows installer is retrievable as a GitHub artifact too, covering
     // every win_x64_target (nsis -> setup exe, zip -> portable zip, all -> both).
-    expect(winJob).toContain("name: open-design-beta-win-x64-installer");
+    expect(winJob).toContain("name: mish-beta-win-x64-installer");
     expect(winJob).toContain("builder\\*-setup.exe");
     expect(winJob).toContain("builder\\*-portable.zip");
 
@@ -2595,7 +2595,7 @@ process.stdin.on("end", () => {
       readFile(releaseStableScriptPath, "utf8"),
     ]);
 
-    expect(workflow).not.toContain("OPEN_DESIGN_STABLE_VERSION:");
+    expect(workflow).not.toContain("MISH_STABLE_VERSION:");
     expect(workflow).not.toContain("inputs.release_version");
     expect(workflow).toContain("Stable release branch to build, for example release/v0.5.1.");
 
@@ -2611,7 +2611,7 @@ process.stdin.on("end", () => {
   it("[P2] rejects stable release runs without the release version branch", async () => {
     const output = await runReleaseStableForFailure({
       GITHUB_REF_NAME: "main",
-      OPEN_DESIGN_STABLE_VERSION: "",
+      MISH_STABLE_VERSION: "",
     });
 
     expect(output).toContain("release-stable requires GITHUB_REF_NAME to be release/vX.Y.Z; got main");
@@ -2620,7 +2620,7 @@ process.stdin.on("end", () => {
   it("[P2] ignores explicit stable version inputs in favor of the release branch gate", async () => {
     const output = await runReleaseStableForFailure({
       GITHUB_REF_NAME: "main",
-      OPEN_DESIGN_STABLE_VERSION: "0.10.1",
+      MISH_STABLE_VERSION: "0.10.1",
     });
 
     expect(output).toContain("release-stable requires GITHUB_REF_NAME to be release/vX.Y.Z; got main");
@@ -2658,8 +2658,8 @@ process.stdin.on("end", () => {
           GITHUB_REF_NAME: "main",
           GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
           NODE_TLS_REJECT_UNAUTHORIZED: "0",
-          OPEN_DESIGN_BETA_METADATA_URL: `${fixture.origin}/beta/latest/metadata.json`,
-          OPEN_DESIGN_STABLE_METADATA_URL: `${fixture.origin}/stable/latest/metadata.json`,
+          MISH_BETA_METADATA_URL: `${fixture.origin}/beta/latest/metadata.json`,
+          MISH_STABLE_METADATA_URL: `${fixture.origin}/stable/latest/metadata.json`,
         },
         maxBuffer: 1024 * 1024,
       });
@@ -2694,7 +2694,7 @@ process.stdin.on("end", () => {
       GITHUB_OUTPUT: outputPath,
       GITHUB_RUN_NUMBER: "4242",
       NODE_TLS_REJECT_UNAUTHORIZED: "0",
-      OPEN_DESIGN_BETA_METADATA_URL: `${fixture.origin}/beta/latest/metadata.json`,
+      MISH_BETA_METADATA_URL: `${fixture.origin}/beta/latest/metadata.json`,
       PACKAGED_VERSION: packagedVersion,
     };
 
@@ -2759,7 +2759,7 @@ process.stdin.on("end", () => {
     expect(publisherGuard).toContain('[ "$built_sha" != "$main_sha" ]');
     expect(publisherGuard).toContain("publish=false");
     expect(betaWorkflow).not.toContain("recover_foreign_beta");
-    expect(betaWorkflow).not.toContain("OPEN_DESIGN_RECOVER_FOREIGN_BETA");
+    expect(betaWorkflow).not.toContain("MISH_RECOVER_FOREIGN_BETA");
     expect(metadataJob).toContain("branch: ${{ steps.identity.outputs.branch }}");
     expect(metadataJob).toContain("commit: ${{ steps.identity.outputs.commit }}");
     expect(metadataJob).toContain("promote: ${{ inputs.promote }}");
@@ -2870,7 +2870,7 @@ process.stdin.on("end", () => {
     expect(gate).toContain("GITHUB_EVENT_NAME: ${{ github.event_name }}");
     expect(gate).toContain("LATEST_RELEASE: ${{ steps.ver.outputs.latest_release }}");
     expect(gate).toContain('[ "$GITHUB_EVENT_NAME" != "schedule" ]');
-    expect(gate).toContain('gh release view "open-design-v$LATEST_RELEASE"');
+    expect(gate).toContain('gh release view "mish-v$LATEST_RELEASE"');
     expect(gate).toContain("--jq '(.isDraft or .isPrerelease) | not'");
     expect(gate).toContain('echo "ready=false" >> "$GITHUB_OUTPUT"');
     expect(gate).toContain('echo "ready=true" >> "$GITHUB_OUTPUT"');
@@ -2899,7 +2899,7 @@ process.stdin.on("end", () => {
     expect(canary).toContain("ref: main");
     expect(canary).not.toContain("inputs.ref");
     expect(canary).toContain("runs-on: windows-latest");
-    expect(canary).toContain("OPEN_DESIGN_AMR_PROFILE: prod");
+    expect(canary).toContain("MISH_AMR_PROFILE: prod");
     expect(canary).toContain("OD_VELA_WEB_URL: ${{ secrets.VELA_WEB_URL_PROD }}");
     expect(canary).toContain("--namespace release-prerelease-canary-win");
     expect(canary).toContain('OD_PACKAGED_E2E_RELEASE_CHANNEL: prerelease');
@@ -2983,8 +2983,8 @@ process.stdin.on("end", () => {
     // The staged path must stay in lockstep with resolveMacPaths().dmgPath and
     // resolveWinPaths().setupPath, which is the only file `tools-pack install`
     // reads. A drift here fails as "no mac dmg found at ...".
-    expect(stage).toContain('join(toolsPackDir, "out", "mac", "namespaces", namespace, "dmg", `Open Design-${token}.dmg`)');
-    expect(stage).toContain('join(toolsPackDir, "out", "win", "namespaces", namespace, "builder", `Open Design-${token}-setup.exe`)');
+    expect(stage).toContain('join(toolsPackDir, "out", "mac", "namespaces", namespace, "dmg", `Mish-${token}.dmg`)');
+    expect(stage).toContain('join(toolsPackDir, "out", "win", "namespaces", namespace, "builder", `Mish-${token}-setup.exe`)');
     // A target that did not build carries no `artifacts` key at all, so status
     // is the only safe thing to branch on.
     expect(stage).toContain('entry?.status === "published"');
@@ -3094,7 +3094,7 @@ process.stdin.on("end", () => {
     expect(dispatchJob).toContain("tools/release/src/notifications/feishu-notice.ts");
     expect(dispatchJob).toContain("STAGE: dispatch");
     // `always()` so a dispatch that failed above still reaches the notifier.
-    expect(dispatchJob).toContain("always() && github.repository == 'nexu-io/open-design' &&");
+    expect(dispatchJob).toContain("always() && github.repository == 'ZeroSum-Solutions/mish' &&");
     expect(dispatchJob).toContain("steps.checkout.outcome == 'success'");
 
     // 3. Silent on a healthy release. A green watcher job is NOT proof of a
@@ -3198,7 +3198,7 @@ process.stdin.on("end", () => {
     // The guard target (MINOR_BASE) must derive from the FINAL version V, not from
     // the highest branch — otherwise a manual `version=` on another line is gated
     // against the wrong minor (e.g. version=0.15.1 while latest is 0.14.0 would
-    // wrongly check open-design-v0.14.0). Assert V's own major/minor drive it.
+    // wrongly check mish-v0.14.0). Assert V's own major/minor drive it.
     expect(workflow).toContain('vmajor=${V%%.*}; vrest=${V#*.}; vminor=${vrest%%.*}');
     expect(workflow).toContain('MINOR_BASE="${vmajor}.${vminor}.0"');
     expect(workflow).not.toContain('MINOR_BASE="${major}.${minor}.0"');
@@ -3209,7 +3209,7 @@ process.stdin.on("end", () => {
     expect(guard).toContain('gh release view "$MINOR_TAG"');
     expect(guard).toContain("--jq '(.isDraft or .isPrerelease) | not'");
     expect(guard).toContain("|| published=false");
-    expect(workflow).toContain('echo "minor_tag=open-design-v$MINOR_BASE"');
+    expect(workflow).toContain('echo "minor_tag=mish-v$MINOR_BASE"');
 
     // Skip path: no branch, no build — only the Feishu notice runs, gated on !published.
     const noticeStep = sectionBetween(workflow, "- name: Notify Feishu that the patch cut was skipped", "- name: Stop here when skipping");
@@ -3280,14 +3280,14 @@ process.stdin.on("end", () => {
     expect(workflow).toContain(
       "Release mode. metadata stops after promotion metadata; prepublish runs build/smoke/report/plan without publishing; publish performs the stable release.",
     );
-    expect(workflow).toContain("group: open-design-release-stable-${{ inputs.dry_run }}");
+    expect(workflow).toContain("group: mish-release-stable-${{ inputs.dry_run }}");
     expect(workflow).toContain("type: choice");
     expect(workflow).toContain("- metadata");
     expect(workflow).toContain("- prepublish");
     expect(workflow).toContain("- publish");
     expect(workflow).toContain("default: metadata");
     expect(workflow).not.toContain("inputs.channel");
-    expect(workflow).toContain("OPEN_DESIGN_RELEASE_DRY_RUN: ${{ inputs.dry_run == 'publish' && 'false' || inputs.dry_run }}");
+    expect(workflow).toContain("MISH_RELEASE_DRY_RUN: ${{ inputs.dry_run == 'publish' && 'false' || inputs.dry_run }}");
     expect(workflow).toContain("RELEASE_PUBLIC_ORIGIN: ${{ vars.CLOUDFLARE_R2_RELEASES_PUBLIC_ORIGIN }}");
     expect(workflow).toContain("run: bash .github/scripts/release/github/stable-notes.sh");
     expect(workflow).toContain("dry_run: ${{ steps.stable.outputs.dry_run }}");
@@ -3296,7 +3296,7 @@ process.stdin.on("end", () => {
     expect(workflow).toContain("RELEASE_PUBLISH_SIDE_EFFECTS: ${{ needs.metadata.outputs.publish_side_effects_enabled }}");
 
     expect(script).toContain("function parseStableDryRunMode");
-    expect(script).toContain("OPEN_DESIGN_RELEASE_DRY_RUN must be metadata, prepublish, true, or false");
+    expect(script).toContain("MISH_RELEASE_DRY_RUN must be metadata, prepublish, true, or false");
     expect(script).toContain('setOutput("dry_run", dryRun ? "true" : "false");');
     expect(script).toContain('setOutput("dry_run_mode", stableDryRunMode);');
     expect(script).toContain('setOutput("run_prepublish_jobs", runPrepublishJobs ? "true" : "false");');
@@ -3305,8 +3305,8 @@ process.stdin.on("end", () => {
 
   it("[P2] writes stable release notes from the release public origin variable", async () => {
     for (const [envName, origin] of [
-      ["RELEASE_PUBLIC_ORIGIN", "https://releases.open-design.ai/current/"],
-      ["CLOUDFLARE_R2_RELEASES_PUBLIC_ORIGIN", "https://releases.open-design.ai/legacy/"],
+      ["RELEASE_PUBLIC_ORIGIN", "https://releases.mish.invalid/current/"],
+      ["CLOUDFLARE_R2_RELEASES_PUBLIC_ORIGIN", "https://releases.mish.invalid/legacy/"],
     ] as const) {
       const runnerTemp = await mkdtemp(join(tmpdir(), "od-stable-notes-"));
       const outputPath = join(runnerTemp, "github-output.txt");
@@ -3318,14 +3318,14 @@ process.stdin.on("end", () => {
             BRANCH_NAME: "release/v0.13.0",
             CLOUDFLARE_R2_RELEASES_PUBLIC_ORIGIN: envName === "CLOUDFLARE_R2_RELEASES_PUBLIC_ORIGIN" ? origin : "",
             GITHUB_OUTPUT: outputPath,
-            GITHUB_REPOSITORY: "nexu-io/open-design",
+            GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
             GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
             RELEASE_CHANNEL: "stable",
             RELEASE_PUBLIC_ORIGIN: envName === "RELEASE_PUBLIC_ORIGIN" ? origin : "",
             RELEASE_SIGNED: "true",
             RELEASE_VERSION: "0.13.0",
             RUNNER_TEMP: runnerTemp,
-            VERSION_TAG: "open-design-v0.13.0",
+            VERSION_TAG: "mish-v0.13.0",
           }),
         });
 
@@ -3358,21 +3358,21 @@ process.stdin.on("end", () => {
         cwd: workspaceRoot,
         env: workflowFixtureEnv({
           GITHUB_REF_NAME: `release/v${baseVersion}`,
-          GITHUB_REPOSITORY: "nexu-io/open-design",
+          GITHUB_REPOSITORY: "ZeroSum-Solutions/mish",
           GITHUB_SHA: "0123456789abcdef0123456789abcdef01234567",
           NODE_TLS_REJECT_UNAUTHORIZED: "0",
-          OPEN_DESIGN_RELEASE_CHANNEL: "stable",
-          OPEN_DESIGN_RELEASE_DRY_RUN: "true",
-          OPEN_DESIGN_RELEASES_PUBLIC_ORIGIN: fixture.origin,
-          OPEN_DESIGN_GH_NODE_SCRIPT: join(runnerTemp, "bin", "gh"),
-          OPEN_DESIGN_STABLE_PRERELEASE_VERSION: prereleaseVersion,
+          MISH_RELEASE_CHANNEL: "stable",
+          MISH_RELEASE_DRY_RUN: "true",
+          MISH_RELEASES_PUBLIC_ORIGIN: fixture.origin,
+          MISH_GH_NODE_SCRIPT: join(runnerTemp, "bin", "gh"),
+          MISH_STABLE_PRERELEASE_VERSION: prereleaseVersion,
         }, join(runnerTemp, "bin")),
       });
 
       expect(result.stdout).toContain(`[release-stable] validated prerelease: ${prereleaseVersion}`);
       expect(result.stdout).toContain("[release-stable] channel: stable");
       expect(result.stdout).toContain("[release-stable] dry run: true");
-      expect(result.stdout).toContain(`[release-stable] version tag: open-design-v${baseVersion}`);
+      expect(result.stdout).toContain(`[release-stable] version tag: mish-v${baseVersion}`);
     } finally {
       await fixture.close();
       await rm(runnerTemp, { force: true, recursive: true });
@@ -3382,11 +3382,11 @@ process.stdin.on("end", () => {
   it("[P2] rejects invalid release dry-run values before remote checks", async () => {
     const output = await runReleaseStableForFailure({
       GITHUB_REF_NAME: "release/v0.10.0",
-      OPEN_DESIGN_RELEASE_DRY_RUN: "maybe",
-      OPEN_DESIGN_STABLE_VERSION: "",
+      MISH_RELEASE_DRY_RUN: "maybe",
+      MISH_STABLE_VERSION: "",
     });
 
-    expect(output).toContain("OPEN_DESIGN_RELEASE_DRY_RUN must be metadata, prepublish, true, or false");
+    expect(output).toContain("MISH_RELEASE_DRY_RUN must be metadata, prepublish, true, or false");
   });
 
   it("keeps beta on the shared payload-aware metadata surface", async () => {
@@ -3402,8 +3402,8 @@ process.stdin.on("end", () => {
     expect(releaseBetaWorkflow).toContain("RELEASE_MANIFEST_DIR:");
     expect(releaseBetaWorkflow).toContain("RELEASE_ASSET_SUFFIX: ${{ needs.metadata.outputs.asset_version_suffix }}");
     expect(platformPublishScript).toContain("artifacts.payload");
-    expect(platformPublishScript).toContain("open-design-${releaseVersion}${assetSuffix}-mac-${arch}-payload.zip");
-    expect(platformPublishScript).toContain("open-design-${releaseVersion}${assetSuffix}-win-x64-payload.7z");
+    expect(platformPublishScript).toContain("mish-${releaseVersion}${assetSuffix}-mac-${arch}-payload.zip");
+    expect(platformPublishScript).toContain("mish-${releaseVersion}${assetSuffix}-win-x64-payload.7z");
     expect(publishMetadataScript).toContain("for (const [artifactName, artifact] of Object.entries(manifest.artifacts ?? {}))");
     expect(publishMetadataScript).toContain("outputs[`${target}_${artifactName}_url`] = artifact.url");
   });
@@ -3432,7 +3432,7 @@ process.stdin.on("end", () => {
           {
         artifacts: {
           dmg: {
-            url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.3.unsigned/Open Design Beta.dmg",
+            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.3.unsigned/Mish Beta.dmg",
           },
         },
         channel: "beta",
@@ -3475,7 +3475,7 @@ process.stdin.on("end", () => {
             RELEASE_MANIFEST_DIR: platformManifestRoot,
             RELEASE_METADATA_DIR: join(runnerTemp, "release-metadata"),
             RELEASE_OUTPUTS_PATH: join(runnerTemp, "release-metadata", "outputs.json"),
-            RELEASE_PUBLIC_ORIGIN: "https://releases.open-design.ai",
+            RELEASE_PUBLIC_ORIGIN: "https://releases.mish.invalid",
             RELEASE_SIGNED: "false",
             RELEASE_STORAGE_ACCESS_KEY_ID: "test-access-key",
             RELEASE_STORAGE_BUCKET: fixture.bucket,
@@ -3516,7 +3516,7 @@ process.stdin.on("end", () => {
           {
         artifacts: {
           dmg: {
-            url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/Open Design Beta.dmg",
+            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/Mish Beta.dmg",
           },
         },
         channel: "beta",
@@ -3559,7 +3559,7 @@ process.stdin.on("end", () => {
             RELEASE_MANIFEST_DIR: platformManifestRoot,
             RELEASE_METADATA_DIR: join(runnerTemp, "release-metadata"),
             RELEASE_OUTPUTS_PATH: join(runnerTemp, "release-metadata", "outputs.json"),
-            RELEASE_PUBLIC_ORIGIN: "https://releases.open-design.ai",
+            RELEASE_PUBLIC_ORIGIN: "https://releases.mish.invalid",
             RELEASE_SIGNED: "false",
             RELEASE_STORAGE_ACCESS_KEY_ID: "test-access-key",
             RELEASE_STORAGE_BUCKET: fixture.bucket,
@@ -3600,7 +3600,7 @@ process.stdin.on("end", () => {
           {
         artifacts: {
           dmg: {
-            url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/Open Design Beta.dmg",
+            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/Mish Beta.dmg",
           },
         },
         channel: "beta",
@@ -3640,7 +3640,7 @@ process.stdin.on("end", () => {
           RELEASE_MANIFEST_DIR: platformManifestRoot,
           RELEASE_METADATA_DIR: join(runnerTemp, "release-metadata"),
           RELEASE_OUTPUTS_PATH: join(runnerTemp, "release-metadata", "outputs.json"),
-          RELEASE_PUBLIC_ORIGIN: "https://releases.open-design.ai",
+          RELEASE_PUBLIC_ORIGIN: "https://releases.mish.invalid",
           RELEASE_SIGNED: "false",
           RELEASE_STORAGE_ACCESS_KEY_ID: "test-access-key",
           RELEASE_STORAGE_BUCKET: fixture.bucket,
@@ -3679,7 +3679,7 @@ process.stdin.on("end", () => {
           {
             artifacts: {
               installer: {
-                url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/open-design-1.2.3-beta.4.unsigned-win-x64-setup.exe",
+                url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/mish-1.2.3-beta.4.unsigned-win-x64-setup.exe",
               },
             },
             channel: "beta",
@@ -3691,7 +3691,7 @@ process.stdin.on("end", () => {
             legacyPlatformKey: "win",
             feed: {
               name: "latest.yml",
-              url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/latest.yml",
+              url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/latest.yml",
             },
             platform: "win",
             platformKey: "win_x64",
@@ -3725,7 +3725,7 @@ process.stdin.on("end", () => {
           RELEASE_MANIFEST_DIR: platformManifestRoot,
           RELEASE_METADATA_DIR: join(runnerTemp, "release-metadata"),
           RELEASE_OUTPUTS_PATH: join(runnerTemp, "release-metadata", "outputs.json"),
-          RELEASE_PUBLIC_ORIGIN: "https://releases.open-design.ai",
+          RELEASE_PUBLIC_ORIGIN: "https://releases.mish.invalid",
           RELEASE_SIGNED: "false",
           RELEASE_STORAGE_ACCESS_KEY_ID: "test-access-key",
           RELEASE_STORAGE_BUCKET: fixture.bucket,
@@ -3771,11 +3771,11 @@ process.stdin.on("end", () => {
           {
             artifacts: {
               dmg: {
-                url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/open-design-1.2.3-beta.4.unsigned-mac-arm64.dmg",
+                url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/mish-1.2.3-beta.4.unsigned-mac-arm64.dmg",
               },
               payload: {
-                sha256Url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/open-design-1.2.3-beta.4.unsigned-mac-arm64-payload.zip.sha256",
-                url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/open-design-1.2.3-beta.4.unsigned-mac-arm64-payload.zip",
+                sha256Url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/mish-1.2.3-beta.4.unsigned-mac-arm64-payload.zip.sha256",
+                url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/mish-1.2.3-beta.4.unsigned-mac-arm64-payload.zip",
               },
             },
             channel: "beta",
@@ -3805,17 +3805,17 @@ process.stdin.on("end", () => {
           {
             artifacts: {
               installer: {
-                url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/open-design-1.2.3-beta.4.unsigned-win-x64-setup.exe",
+                url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/mish-1.2.3-beta.4.unsigned-win-x64-setup.exe",
               },
               payload: {
-                sha256Url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/open-design-1.2.3-beta.4.unsigned-win-x64-payload.7z.sha256",
-                url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/open-design-1.2.3-beta.4.unsigned-win-x64-payload.7z",
+                sha256Url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/mish-1.2.3-beta.4.unsigned-win-x64-payload.7z.sha256",
+                url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/mish-1.2.3-beta.4.unsigned-win-x64-payload.7z",
               },
             },
             channel: "beta",
             feed: {
               name: "latest.yml",
-              url: "https://releases.open-design.ai/betas/versions/1.2.3-beta.4.unsigned/latest.yml",
+              url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/latest.yml",
             },
             github: {
               commit: "current-sha",
@@ -3855,7 +3855,7 @@ process.stdin.on("end", () => {
           RELEASE_MANIFEST_DIR: platformManifestRoot,
           RELEASE_METADATA_DIR: join(runnerTemp, "release-metadata"),
           RELEASE_OUTPUTS_PATH: join(runnerTemp, "release-metadata", "outputs.json"),
-          RELEASE_PUBLIC_ORIGIN: "https://releases.open-design.ai",
+          RELEASE_PUBLIC_ORIGIN: "https://releases.mish.invalid",
           RELEASE_SIGNED: "false",
           RELEASE_STORAGE_ACCESS_KEY_ID: "test-access-key",
           RELEASE_STORAGE_BUCKET: fixture.bucket,
@@ -4064,7 +4064,7 @@ function stablePrereleaseMetadataFixture(baseVersion: string, prereleaseVersion:
     github: {
       branch: `release/v${baseVersion}`,
       commit: "0123456789abcdef0123456789abcdef01234567",
-      repository: "nexu-io/open-design",
+      repository: "ZeroSum-Solutions/mish",
       workflow: "release-prerelease",
     },
     prereleaseNumber: 12,
@@ -4073,8 +4073,8 @@ function stablePrereleaseMetadataFixture(baseVersion: string, prereleaseVersion:
       mac: {
         arch: "arm64",
         artifacts: {
-          dmg: artifact("Open Design.dmg"),
-          zip: artifact("Open Design-mac-arm64.zip"),
+          dmg: artifact("Mish.dmg"),
+          zip: artifact("Mish-mac-arm64.zip"),
         },
         enabled: true,
         signed: true,
@@ -4082,8 +4082,8 @@ function stablePrereleaseMetadataFixture(baseVersion: string, prereleaseVersion:
       macIntel: {
         arch: "x64",
         artifacts: {
-          dmg: artifact("Open Design Intel.dmg"),
-          zip: artifact("Open Design-mac-x64.zip"),
+          dmg: artifact("Mish Intel.dmg"),
+          zip: artifact("Mish-mac-x64.zip"),
         },
         enabled: true,
         signed: true,
@@ -4091,7 +4091,7 @@ function stablePrereleaseMetadataFixture(baseVersion: string, prereleaseVersion:
       win: {
         arch: "x64",
         artifacts: {
-          installer: artifact("Open Design Setup.exe"),
+          installer: artifact("Mish Setup.exe"),
         },
         enabled: true,
       },

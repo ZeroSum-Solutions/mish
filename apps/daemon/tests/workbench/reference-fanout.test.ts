@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { type ReferenceFanoutRequest } from '@open-design/contracts';
+import { type ReferenceFanoutRequest } from '@mish/contracts';
 import { ConnectorError } from '../../src/workbench/connectors/connector-proxy.js';
 import { createReferenceFanout } from '../../src/workbench/references/fanout.js';
 

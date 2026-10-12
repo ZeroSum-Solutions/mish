@@ -25,7 +25,7 @@ import { createReadStream } from 'node:fs';
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
 
-import { PACK_MANIFEST_FILENAME } from '@open-design/contracts';
+import { PACK_MANIFEST_FILENAME } from '@mish/contracts';
 
 import { assertFolderSourceSafe } from './archive.js';
 import { isPackError, PackError, readPackManifestFile } from './manifest.js';

@@ -1,7 +1,7 @@
 import {
   parseSessionModelChoice, parseSessionByokBinding, sessionByokBindingsEqual,
   type SessionModelChoice, type SessionByokBinding, type ByokChatProviderConfig,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { KNOWN_PROVIDERS } from '../../state/config';
 import type { AppConfig, ApiProtocol, ApiProtocolConfig } from '../../types';
 import { byokProviderRequiresApiKey } from '../../utils/byokProvider';

@@ -30,10 +30,10 @@ describe("Terminal macOS carrier", () => {
       writeDistributionRequest(distributionRequest, { target, sceneDirectory: scene, sceneManifestSha256: sceneSha, releaseDocumentsDirectory: directories.documents, trustFile: releases.trustFile, release: releases.beta1.release, outputDirectory: directories.output });
       const distributionReceipt = join(work, "distribution-receipt.json");
       run("sh", [join(terminalRoot, "sh/distribution.sh"), "--request", distributionRequest, "--receipt", distributionReceipt]);
-      const distribution = join(directories.output, `nexu-terminal-${target}-0.1.0-somechan.1.tar.gz`);
+      const distribution = join(directories.output, `mish-terminal-${target}-0.1.0-somechan.1.tar.gz`);
       expect(JSON.parse(readFileSync(distributionReceipt, "utf8"))).toMatchObject({ operation: "terminal.distribution.build", target, archive: { file: distribution } });
       run("tar", ["-xzf", distribution, "-C", directories.unpacked]);
-      const root = join(directories.unpacked, "nexu-terminal");
+      const root = join(directories.unpacked, "mish-terminal");
       const terminal = (installRoot: string, storeRoot: string, channel: string, namespace: string, operation: string, options: TerminalOptions = {}) => {
         const result = run("sh", [join(installRoot, "sh/terminal.sh"), "--root", installRoot, "--store-root", storeRoot, "--channel", channel, "--namespace", namespace, "--operation", operation,
           ...(options.attachmentId == null ? [] : ["--attachment-id", options.attachmentId]),

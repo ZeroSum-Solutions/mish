@@ -37,7 +37,7 @@ import {
   type AmrWalletSnapshot,
   type ProjectWorkspaceScope,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type { ComponentProps, ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -72,9 +72,9 @@ const TEAM_WORKSPACE = 'nt3itfm1b95puq5w33tvzu44';
 const PERSONAL_WORKSPACE = 'ac43mfba3blvfvfmeie1euti';
 const MEMBER_ID = 'dn87ohicuyq4o839pgi37op4';
 const TEAM_SETTINGS_URL =
-  `https://open-design.ai/amr/settings?workspaceId=${TEAM_WORKSPACE}`;
+  `https://mish.invalid/amr/settings?workspaceId=${TEAM_WORKSPACE}`;
 const PERSONAL_SETTINGS_URL =
-  `https://open-design.ai/amr/settings?workspaceId=${PERSONAL_WORKSPACE}`;
+  `https://mish.invalid/amr/settings?workspaceId=${PERSONAL_WORKSPACE}`;
 
 const workspaceScopeMocks = vi.hoisted(() => ({
   projectScope: { loading: true, scope: null } as ProjectWorkspaceScopeState,

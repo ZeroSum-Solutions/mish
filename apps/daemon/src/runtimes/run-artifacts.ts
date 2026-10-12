@@ -32,7 +32,7 @@
 // uniform zero on PostHog and made the same funnel useless from the
 // other direction.
 
-import type { TrackingRunResult } from '@open-design/contracts/analytics';
+import type { TrackingRunResult } from '@mish/contracts/analytics';
 import { emittedRenderableQuestionForm } from '../question-form-detect.js';
 
 // Tool names cover Claude-style, Codex-style, and the ACP/MCP shapes

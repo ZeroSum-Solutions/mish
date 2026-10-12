@@ -54,7 +54,7 @@ import {
 import { forkBoundaryMessageIndex } from '../runtime/chat/fork-boundary';
 import { resolveRecoveryActionBlockReason } from '../runtime/chat/recovery-gating';
 import { loadConversationTranscript } from '../state/load-conversation-transcript';
-import { normalizeCustomReason } from '@open-design/contracts/analytics';
+import { normalizeCustomReason } from '@mish/contracts/analytics';
 import {
   deletePreviewComment,
   fetchConnectorStatuses,
@@ -97,7 +97,7 @@ import {
   type ChatTaskExecutionAnalytics,
   type ProjectWorkspaceScope,
   type ResearchOptions,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   anonymizeArtifactId,
   artifactKindToTracking,
@@ -107,7 +107,7 @@ import {
   projectKindFromMetadataToTrackingOrLegacyDefault,
   projectKindToTracking,
   sessionModeToTracking,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import type {
   TrackingArtifactKind,
   TrackingConversationForkErrorCode,
@@ -116,7 +116,7 @@ import type {
   TrackingDesignSystemOrigin,
   TrackingDesignSystemStatusValue,
   TrackingRunRecoveryActionType,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import { useAnalytics } from '../analytics/provider';
 import {
   trackByokPreflightBlocked,
@@ -206,7 +206,7 @@ import {
   extractBrandFromHtml,
   finalizeBrandProject,
 } from '../runtime/brands';
-import { isOpenDesignHostAvailable } from '@open-design/host';
+import { isMishHostAvailable } from '@mish/host';
 import {
   getBrandBrowser,
   BRAND_BROWSER_TAB_ID,
@@ -268,7 +268,7 @@ import type {
   RunContextSelection,
   WorkspaceCollabContext,
   WorkspaceContextItem,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type {
   AgentEvent,
   AgentInfo,
@@ -929,7 +929,7 @@ interface Props {
   onCreateProjectFromDesignSystem?: (designSystemId: string, title: string) => Promise<void> | void;
   onCreateDesignSystemFromProject?: (
     sourceProjectId: string,
-    input: { name?: string; pendingPrompt?: string; modelChoice?: import('@open-design/contracts').SessionModelChoice },
+    input: { name?: string; pendingPrompt?: string; modelChoice?: import('@mish/contracts').SessionModelChoice },
   ) => Promise<void> | void;
   onDuplicateProject?: (
     sourceProjectId: string,
@@ -970,7 +970,7 @@ let liveArtifactEventSequence = 0;
 // local literal to respect the web↔daemon boundary.
 const BRAND_KIT_FILE = 'brand.html';
 const BRAND_EMPTY_TRANSCRIPT_RETRY_DELAYS_MS = [120, 500, 1_200, 2_000] as const;
-const CHAT_PANEL_WIDTH_STORAGE_KEY = 'open-design.project.chatPanelWidth';
+const CHAT_PANEL_WIDTH_STORAGE_KEY = 'mish.project.chatPanelWidth';
 const DEFAULT_CHAT_PANEL_WIDTH = 460;
 const MIN_CHAT_PANEL_WIDTH = 345;
 const FALLBACK_MAX_CHAT_PANEL_WIDTH = 720;
@@ -5698,7 +5698,7 @@ export function ProjectView({
       // desktop host: the web-only host never exposes a webview, so retrying
       // can't change an `unavailable` verdict.
       let snapshot = await readBrandBrowserSnapshot(tabId, 8000);
-      if (snapshot.status === 'ready' || !isOpenDesignHostAvailable()) return snapshot;
+      if (snapshot.status === 'ready' || !isMishHostAvailable()) return snapshot;
       // Retries cover the mount/registration race only — a ready webview resolves
       // these reads almost instantly. Use a short per-retry cap so a genuinely
       // hung/walled page fails fast instead of stacking full timeout windows.
@@ -11409,7 +11409,7 @@ export function ProjectView({
         return { message: outcome.message };
       }
       const conversationId = activeConversationId;
-      const shareAction = action === 'publish' ? 'publish-github' : 'contribute-open-design';
+      const shareAction = action === 'publish' ? 'publish-github' : 'contribute-mish';
       setActivePluginActionPaths((prev) => new Set(prev).add(relativePath));
       let taskStart;
       try {
@@ -13210,10 +13210,10 @@ export function ProjectView({
           daemonOutcome.result.conversationId,
         );
         if (daemonOutcome.result.status === 'ready') return;
-        if (!isOpenDesignHostAvailable() && !hasBrowserFallback()) return;
+        if (!isMishHostAvailable() && !hasBrowserFallback()) return;
       } else {
         fallbackMessage = daemonOutcome.error;
-        if (!isOpenDesignHostAvailable() && !hasBrowserFallback()) {
+        if (!isMishHostAvailable() && !hasBrowserFallback()) {
           setBrandExtractionStatusOverride({ brandId, status: 'needs_input' });
           setProjectActionsToast({
             message: daemonOutcome.error,
@@ -13231,7 +13231,7 @@ export function ProjectView({
       // from the preview tab, the browser <webview> may be `display:none` and
       // Electron can throttle its renderer; a focus-only request wakes it
       // without navigating/re-triggering a wall.
-      if (isOpenDesignHostAvailable() && brandExtractionSourceUrl) {
+      if (isMishHostAvailable() && brandExtractionSourceUrl) {
         setBrowserOpenRequest({
           tabId: BRAND_BROWSER_TAB_ID,
           url: brandExtractionSourceUrl,
@@ -13252,7 +13252,7 @@ export function ProjectView({
       // Still no readable local source. Recoverable — clear/settle/download the
       // Browser page and click Continue again, or use the agent fallback.
       setBrandExtractionStatusOverride({ brandId, status: 'needs_input' });
-      if (isOpenDesignHostAvailable() && brandExtractionSourceUrl) {
+      if (isMishHostAvailable() && brandExtractionSourceUrl) {
         setBrowserOpenRequest({
           tabId: BRAND_BROWSER_TAB_ID,
           url: brandExtractionSourceUrl,
@@ -13803,9 +13803,9 @@ export function ProjectView({
 
   // Wire the Critique Theater drop-in mount into the project workspace.
   // The hook reads the M1 Settings toggle out of the existing
-  // `open-design:config` localStorage blob and stays in sync with the
+  // `mish:config` localStorage blob and stays in sync with the
   // platform `storage` event (cross-tab) plus the same-tab
-  // `open-design:critique-theater-toggle` CustomEvent. The mount itself
+  // `mish:critique-theater-toggle` CustomEvent. The mount itself
   // returns `null` until the daemon emits a `critique.run_started` for
   // the active project, so the visual surface is unchanged for users
   // who have not opted in. The daemon-side gate
@@ -15107,7 +15107,7 @@ function pluginWorkflowTitle(action: PluginFolderAgentAction): string {
 function pluginWorkflowCliCommand(action: PluginFolderAgentAction, relativePath: string): string {
   return action === 'publish'
     ? `od plugin publish-repo ${relativePath}`
-    : `od plugin open-design-pr ${relativePath}`;
+    : `od plugin mish-pr ${relativePath}`;
 }
 
 function pluginWorkflowPlannedSteps(action: PluginFolderAgentAction): string[] {

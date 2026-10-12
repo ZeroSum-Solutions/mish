@@ -1,4 +1,4 @@
-import { runDesignBriefBindingSchema, type DesignBrief } from '@open-design/contracts';
+import { runDesignBriefBindingSchema, type DesignBrief } from '@mish/contracts';
 import { BriefError, type DesignBriefService } from './service.js';
 
 export type RunDesignBriefResolution =

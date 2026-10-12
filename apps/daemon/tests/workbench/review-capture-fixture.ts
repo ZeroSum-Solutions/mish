@@ -1,4 +1,4 @@
-import { isReviewEvidenceMessage, renderReviewEvidenceText, type ReviewEvidenceMessage } from '@open-design/contracts';
+import { isReviewEvidenceMessage, renderReviewEvidenceText, type ReviewEvidenceMessage } from '@mish/contracts';
 import { ev, evidenceUrl, evidenceVocabulary, PageText, type EvidenceContext, type EvidenceParam } from '../../src/workbench/review/evidence.js';
 import type { CaptureRequest, ReviewBrowserPort, ViewportCapture } from '../../src/workbench/review/types.js';
 

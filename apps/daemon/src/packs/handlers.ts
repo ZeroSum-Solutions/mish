@@ -39,7 +39,7 @@ import {
   type PackContentKind,
   type PackFileEntry,
   type PackManifest,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 /** Kinds consumers read through the registry; they need no handler. */
 export const PACK_PULL_KINDS: ReadonlySet<PackContentKind> = new Set(['component-kit', 'cult-catalog', 'genui-overlay']);

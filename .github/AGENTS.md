@@ -150,7 +150,7 @@ Keep `.github/workflows/ci.yml` as the only approved workflow path unless a main
 5. Run the focused checks:
    - `python3 .github/scripts/handoff.py self-check`
    - `actionlint -color`
-   - `pnpm --filter @open-design/e2e test tests/packaged-smoke-workflow.test.ts`
+   - `pnpm --filter @mish/e2e test tests/packaged-smoke-workflow.test.ts`
 6. Run repo-level checks before handing off:
    - `pnpm guard`
    - `pnpm typecheck`

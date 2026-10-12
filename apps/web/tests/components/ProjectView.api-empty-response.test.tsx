@@ -37,7 +37,7 @@ const chatPaneMockState = vi.hoisted(() => ({
   resizeObserverCallbacks: [] as ResizeObserverCallback[],
 }));
 
-const CHAT_PANEL_WIDTH_STORAGE_KEY = 'open-design.project.chatPanelWidth';
+const CHAT_PANEL_WIDTH_STORAGE_KEY = 'mish.project.chatPanelWidth';
 
 beforeEach(() => { resetSessionModelApiFixture(); window.sessionStorage.clear(); });
 

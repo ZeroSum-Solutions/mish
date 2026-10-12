@@ -18,7 +18,7 @@
  */
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render } from '@testing-library/react';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { ToolRow } from '../../../src/components/chat/primitives/ToolRow';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
@@ -37,7 +37,7 @@ const FAILING_COMMAND =
 
 /** 真实记录里那条 `tool_result.content`,一个字节都没改 */
 const FAILURE_TEXT =
-  '{"error":{"code":"UPSTREAM_UNAVAILABLE","message":"desktop renderer unavailable: connect ENOENT /tmp/open-design/ipc/chatpanel/desktop.sock","data":{}}}\n';
+  '{"error":{"code":"UPSTREAM_UNAVAILABLE","message":"desktop renderer unavailable: connect ENOENT /tmp/mish/ipc/chatpanel/desktop.sock","data":{}}}\n';
 
 const REAL_EVENTS: PersistedAgentEvent[] = [
   {
@@ -90,7 +90,7 @@ const show = (row: ToolRowData) => render(
 );
 
 /** 报错原文里那句人能读的话 —— 界面上要找的就是它 */
-const MESSAGE = 'desktop renderer unavailable: connect ENOENT /tmp/open-design/ipc/chatpanel/desktop.sock';
+const MESSAGE = 'desktop renderer unavailable: connect ENOENT /tmp/mish/ipc/chatpanel/desktop.sock';
 
 describe('工具失败:原因要一路走到界面(真实记录 27eaad58 · codex)', () => {
   /*

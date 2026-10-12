@@ -2,7 +2,7 @@ import type {
   ConnectorMemoryExtractionResult,
   MemorySuggestion,
   MemoryEntrySummary,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import type { BoundedJsonObject, BoundedJsonValue } from './live-artifacts/schema.js';
 import { extractWithLLM, suggestWithLLM } from './memory-llm.js';
@@ -96,7 +96,7 @@ const CONNECTOR_MEMORY_META_PATTERNS = [
   /\bshould be reused as context\b/i,
   /\bmishh mashh read\b/i,
   // Legacy summaries written before the rename.
-  /\bopendesign read\b/i,
+  /\bmish read\b/i,
   /\bfound \d+ readable items?\b/i,
   /\bfound readable content\b/i,
   /\bsummary from\b/i,

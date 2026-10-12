@@ -123,7 +123,7 @@ export type TrackingCampaignConversionSource =
 
 export interface AmrEntryAttribution {
   entryId: string;
-  sourceProduct: 'open_design';
+  sourceProduct: 'mish';
   sourceDetail: TrackingAmrEntrySource;
   occurredAt: string;
   // Campaign joins keep the first entry source stable and record the final
@@ -416,7 +416,7 @@ export type TrackingRunEvidenceLevel =
   | 'legacy_text'
   | 'unknown';
 export type TrackingRunRepairOwner =
-  | 'open_design'
+  | 'mish'
   | 'client_environment'
   | 'provider_owner'
   | 'policy_owner'

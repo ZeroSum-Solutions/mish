@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
-import type { AgencyBuildSnapshot } from '@open-design/contracts';
+import type { AgencyBuildSnapshot } from '@mish/contracts';
 import { AgencyBuildProgress } from '../../src/components/AgencyBuildProgress';
 import { I18nProvider, useT } from '../../src/i18n';
 

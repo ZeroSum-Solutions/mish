@@ -4,8 +4,8 @@ import type {
   ProjectScenarioBinding,
   ProjectScenarioBindingProvenance,
   ProjectScenarioTaskProfile,
-} from '@open-design/contracts';
-import { defaultScenarioTaskProfileForProjectMetadata } from '@open-design/contracts';
+} from '@mish/contracts';
+import { defaultScenarioTaskProfileForProjectMetadata } from '@mish/contracts';
 
 type SqliteDb = Database.Database;
 

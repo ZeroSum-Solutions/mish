@@ -417,7 +417,7 @@ that axis matches the existing daemon ↔ package boundary in the repo.
 The content-addressed key is `hash(raw_event_set, derivation_fn_version)`. The
 version tag has to live somewhere both the writer and reader agree on.
 
-Lean: as an exported constant in `@open-design/creative-memory-system`,
+Lean: as an exported constant in `@mish/creative-memory-system`,
 imported by the daemon when computing the cache key. Bumping the version is a
 package release. This matches how the package already exports
 `schema_version: "1.0"` in `preferences.json`.

@@ -2,7 +2,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { WorkbenchAdoptionStatus } from '@open-design/contracts';
+import type { WorkbenchAdoptionStatus } from '@mish/contracts';
 
 import { LabsAdoptionRow } from '../../src/components/LabsAdoptionRow';
 import { I18nProvider } from '../../src/i18n';

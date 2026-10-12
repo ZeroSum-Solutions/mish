@@ -7,7 +7,7 @@ import {
   buildWorkspacePermissions,
   type WorkspaceBillingResponse,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { workspaceBillingSummaryForContext } from '../../src/collab/useWorkspaceContext';
 import { AvatarMenu } from '../../src/components/AvatarMenu';
@@ -448,7 +448,7 @@ describe('AvatarMenu', () => {
       config: {
         ...baseConfig,
         agentId: 'amr',
-        agentCliEnv: { amr: { OPEN_DESIGN_AMR_PROFILE: 'feature-test' } },
+        agentCliEnv: { amr: { MISH_AMR_PROFILE: 'feature-test' } },
       },
       projectWorkspaceScope: {
         loading: false,
@@ -708,7 +708,7 @@ describe('AvatarMenu', () => {
       config: {
         ...baseConfig,
         agentId: 'amr',
-        agentCliEnv: { amr: { OPEN_DESIGN_AMR_PROFILE: 'feature-test' } },
+        agentCliEnv: { amr: { MISH_AMR_PROFILE: 'feature-test' } },
       },
       projectWorkspaceScope: {
         loading: false,
@@ -768,7 +768,7 @@ describe('AvatarMenu', () => {
     // so without it the plan dialog would open against whichever workspace
     // vela's account-level "active workspace" happens to be.
     expect(target.origin + target.pathname).toBe(
-      'https://open-design.ai/amr/dashboard',
+      'https://mish.invalid/amr/dashboard',
     );
     expect(target.searchParams.get('workspaceId')).toBe('workspace-a');
     expect(target.searchParams.get('billing')).toBe('plan');
@@ -1040,7 +1040,7 @@ describe('AvatarMenu', () => {
 
     expect(onAgentModelChange).not.toHaveBeenCalled();
     const target = new URL(openExternalUrlMock.mock.calls[0]![0]);
-    expect(target.origin + target.pathname).toBe('https://open-design.ai/amr/dashboard');
+    expect(target.origin + target.pathname).toBe('https://mish.invalid/amr/dashboard');
     expect(target.searchParams.get('workspaceId')).toBe('workspace-a');
     expect(target.searchParams.get('billing')).toBe('plan');
 

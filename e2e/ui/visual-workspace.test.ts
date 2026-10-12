@@ -1,6 +1,6 @@
 import { expect, test } from '@/playwright/suite';
 import type { Locator, Page } from '@playwright/test';
-import { parseSessionModelSnapshot, type SessionModelSnapshot } from '@open-design/contracts';
+import { parseSessionModelSnapshot, type SessionModelSnapshot } from '@mish/contracts';
 import {
   captureVisual,
   captureVisualTarget,
@@ -137,7 +137,7 @@ test('[P1] captures the topbar signed-in Mishh Mashh model picker', async ({ pag
     config: {
       agentId: 'amr',
       agentModels: { amr: { model: 'deepseek-v4-flash', reasoning: 'default' } },
-      agentCliEnv: { amr: { OPEN_DESIGN_AMR_PROFILE: 'test' } },
+      agentCliEnv: { amr: { MISH_AMR_PROFILE: 'test' } },
     },
   });
   await mockSignedInVelaAccount(page);
@@ -170,7 +170,7 @@ test('[P1] captures the topbar signed-in Mishh Mashh model picker', async ({ pag
   await expect(popover.getByTestId('inline-model-switcher-account-upgrade')).toHaveCount(0);
   await expect(popover).toContainText('$247.51');
 
-  await captureVisual(page, 'visual-topbar-open-design-model-picker');
+  await captureVisual(page, 'visual-topbar-mish-model-picker');
 });
 
 test('[P2] captures the topbar local CLI model list surface', async ({ page }) => {
@@ -282,7 +282,7 @@ test('[P1] Conversation picker saves the signed-in AMR model choice', async ({ p
       mode: 'daemon',
       agentId: 'amr',
       agentModels: { amr: { model: 'deepseek-v4-flash', reasoning: 'default' } },
-      agentCliEnv: { amr: { OPEN_DESIGN_AMR_PROFILE: 'test' } },
+      agentCliEnv: { amr: { MISH_AMR_PROFILE: 'test' } },
     },
   });
   await mockSignedInVelaAccount(page);
@@ -310,7 +310,7 @@ test('[P1] Conversation picker saves the signed-in AMR model choice', async ({ p
   expect(saved.choice).toEqual({ agentId: 'amr', modelId: 'deepseek-v4-flash' });
   const modelList = page.getByTestId('inline-model-switcher-agent-model-popover');
   await expect(modelList.getByRole('option', { name: 'DeepSeek V4 Flash', exact: true })).toHaveAttribute('aria-selected', 'true');
-  await captureVisual(page, 'visual-avatar-open-design-model-picker');
+  await captureVisual(page, 'visual-avatar-mish-model-picker');
 });
 
 test('[P2] captures the conversation reasoning and service tier selectors', async ({ page }) => {

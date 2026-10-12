@@ -20,7 +20,7 @@ import type Database from 'better-sqlite3';
 import express from 'express';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 import { closeDatabase, openDatabase } from '../../src/db.js';
 import { createPackRegistry, packsDirForDataDir } from '../../src/packs/registry.js';
@@ -81,7 +81,7 @@ function pluginManifest(id: string, version = '1.0.0'): string {
 
 function pluginFiles(id: string, version = '1.0.0'): FixtureFile[] {
   return [
-    { path: `plugins/${id}/open-design.json`, content: pluginManifest(id, version) },
+    { path: `plugins/${id}/mish.json`, content: pluginManifest(id, version) },
     { path: `plugins/${id}/assets/note.txt`, content: `${id} ${version}\n` },
   ];
 }
@@ -153,7 +153,7 @@ function packRows(db: Database.Database): InstalledPluginRecord[] {
 async function installUserPlugin(harness: Harness, id: string): Promise<InstalledPluginRecord> {
   const folder = mkdtempSync(path.join(tmpdir(), 'od-user-plugin-'));
   cleanup.push(folder);
-  writeFileSync(path.join(folder, 'open-design.json'), pluginManifest(id, '9.9.9'));
+  writeFileSync(path.join(folder, 'mish.json'), pluginManifest(id, '9.9.9'));
   let record: InstalledPluginRecord | null = null;
   for await (const event of installFromLocalFolder(harness.db, {
     source: folder,
@@ -242,7 +242,7 @@ function deferred(): { promise: Promise<void>; resolve: () => void } {
 function userPluginFolder(id: string): string {
   const folder = mkdtempSync(path.join(tmpdir(), 'od-user-plugin-'));
   cleanup.push(folder);
-  writeFileSync(path.join(folder, 'open-design.json'), pluginManifest(id, '9.9.9'));
+  writeFileSync(path.join(folder, 'mish.json'), pluginManifest(id, '9.9.9'));
   return folder;
 }
 
@@ -374,7 +374,7 @@ describe('pack plugins handler (P1-5)', () => {
     expect(packRows(harness.db).map((row) => row.id)).toEqual(['alpha']);
     expect(getInstalledPlugin(harness.db, 'beta')).toEqual(user);
     expect(getInstalledPlugin(harness.db, 'delta')).toEqual(bundledBefore);
-    expect(readFileSync(path.join(harness.pluginsRoot, 'beta', 'open-design.json'), 'utf8')).toBe(pluginManifest('beta', '9.9.9'));
+    expect(readFileSync(path.join(harness.pluginsRoot, 'beta', 'mish.json'), 'utf8')).toBe(pluginManifest('beta', '9.9.9'));
 
     // Removing the pack leaves the user's and the bundled plugin alone.
     await harness.service.remove(FIXTURE_PACK_ID);
@@ -421,7 +421,7 @@ describe('pack plugins handler (P1-5)', () => {
     const harness = setup();
     const options = pluginPack(['alpha']);
     options.files = [
-      { path: 'plugins/alpha/open-design.json', content: pluginManifest('not-alpha') },
+      { path: 'plugins/alpha/mish.json', content: pluginManifest('not-alpha') },
     ];
     const result = await harness.service.install({ kind: 'archive-file', path: await archiveOf(options) }, () => undefined);
     expect(result.warnings).toEqual([
@@ -473,7 +473,7 @@ describe('pack plugins handler (P1-5)', () => {
     const alpha = getInstalledPlugin(harness.db, 'alpha')!;
     expect(alpha.version).toBe('9.9.9');
     expect(alpha.resolvedSource).toBeUndefined();
-    expect(readFileSync(path.join(harness.pluginsRoot, 'alpha', 'open-design.json'), 'utf8')).toBe(pluginManifest('alpha', '9.9.9'));
+    expect(readFileSync(path.join(harness.pluginsRoot, 'alpha', 'mish.json'), 'utf8')).toBe(pluginManifest('alpha', '9.9.9'));
     expect(existsSync(path.join(harness.pluginsRoot, 'alpha', 'assets'))).toBe(false);
     expect(packRows(harness.db).map((row) => row.id)).toEqual(['beta']);
   });
@@ -494,7 +494,7 @@ describe('pack plugins handler (P1-5)', () => {
 
     const alpha = getInstalledPlugin(harness.db, 'alpha')!;
     expect(alpha?.version).toBe('9.9.9');
-    expect(readFileSync(path.join(harness.pluginsRoot, 'alpha', 'open-design.json'), 'utf8')).toBe(pluginManifest('alpha', '9.9.9'));
+    expect(readFileSync(path.join(harness.pluginsRoot, 'alpha', 'mish.json'), 'utf8')).toBe(pluginManifest('alpha', '9.9.9'));
     expect(getInstalledPlugin(harness.db, 'beta')).toBeNull();
   });
 
@@ -530,7 +530,7 @@ describe('pack plugins handler (P1-5)', () => {
     );
     expect(error?.code).toBe('RETRACT_FAILED');
     expect(packRows(harness.db).map((row) => row.id)).toEqual(['alpha', 'beta']);
-    expect(existsSync(path.join(harness.pluginsRoot, 'alpha', 'open-design.json'))).toBe(true);
+    expect(existsSync(path.join(harness.pluginsRoot, 'alpha', 'mish.json'))).toBe(true);
     expect(existsSync(path.join(harness.packsDir, FIXTURE_PACK_ID, 'pack.json'))).toBe(true);
 
     delete harness.hooks.removeFolder;

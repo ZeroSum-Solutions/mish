@@ -1,9 +1,9 @@
-import type { MarketplaceManifest } from '@open-design/contracts';
+import type { MarketplaceManifest } from '@mish/contracts';
 import type {
   RegistryPublishOutcome,
   RegistryPublishRequest,
   RegistryYankOutcome,
-} from '@open-design/registry-protocol';
+} from '@mish/registry-protocol';
 import { StaticRegistryBackend } from './static-backend.js';
 
 export interface GithubRegistryClient {
@@ -47,13 +47,13 @@ export class GithubRegistryBackend extends StaticRegistryBackend {
     this.owner = options.owner;
     this.repo = options.repo;
     this.ref = options.ref ?? 'main';
-    this.marketplacePath = options.marketplacePath ?? 'plugins/registry/official/open-design-marketplace.json';
+    this.marketplacePath = options.marketplacePath ?? 'plugins/registry/official/mish-marketplace.json';
     this.client = options.client;
   }
 
   static async create(options: GithubRegistryBackendOptions): Promise<GithubRegistryBackend> {
     const ref = options.ref ?? 'main';
-    const marketplacePath = options.marketplacePath ?? 'plugins/registry/official/open-design-marketplace.json';
+    const marketplacePath = options.marketplacePath ?? 'plugins/registry/official/mish-marketplace.json';
     const manifest = await options.client.readMarketplace(
       options.owner,
       options.repo,

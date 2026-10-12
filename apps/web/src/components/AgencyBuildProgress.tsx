@@ -17,7 +17,7 @@ import type {
   AgencyBuildStatus,
   AgencyEffectSkipReason,
   AgencyEffectsResult,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import type { useT } from '../i18n';
 import type { Dict } from '../i18n/types';

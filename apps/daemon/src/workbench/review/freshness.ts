@@ -1,6 +1,6 @@
 import { stat } from 'node:fs/promises';
 import path from 'node:path';
-import type { ReviewRubricContent, ReviewRun } from '@open-design/contracts';
+import type { ReviewRubricContent, ReviewRun } from '@mish/contracts';
 import { readPreviewFile } from './preview-files.js';
 
 export interface EntryVersion {

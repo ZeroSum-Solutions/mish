@@ -10,7 +10,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { HandoffButton } from '../../src/components/HandoffButton';
 import { I18nProvider } from '../../src/i18n';
-import type { AgentInfo, HostEditorsResponse } from '@open-design/contracts';
+import type { AgentInfo, HostEditorsResponse } from '@mish/contracts';
 
 const fetchHostEditors = vi.fn<() => Promise<HostEditorsResponse>>();
 const openProjectInEditor = vi.fn();
@@ -111,7 +111,7 @@ describe('HandoffButton zero-editors fallback', () => {
           projectId="p1"
           projectKind="prototype"
           projectName="Landing"
-          projectDir="/tmp/open-design/Landing"
+          projectDir="/tmp/mish/Landing"
           agents={agents}
           metricsConsent
           installationId="od-install-abc"
@@ -136,7 +136,7 @@ describe('HandoffButton zero-editors fallback', () => {
 
     await waitFor(() => expect(copyToClipboard).toHaveBeenCalledTimes(1));
     const prompt = copyToClipboard.mock.calls[0]?.[0] as string;
-    expect(prompt).toContain('/tmp/open-design/Landing');
+    expect(prompt).toContain('/tmp/mish/Landing');
     expect(prompt).toContain('Vue.js');
     expect(prompt).toContain('Claude Code');
     expect(prompt).toContain('real runnable');
@@ -154,7 +154,7 @@ describe('HandoffButton zero-editors fallback', () => {
       ],
     });
     copyToClipboard.mockResolvedValue(true);
-    const projectDir = '/tmp/open-design/Landing';
+    const projectDir = '/tmp/mish/Landing';
 
     render(
       <I18nProvider initial="en">

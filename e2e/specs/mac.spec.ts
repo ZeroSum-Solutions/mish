@@ -63,7 +63,7 @@ const updateVersion = normalizeOptionalEnv(process.env.OD_PACKAGED_E2E_MAC_UPDAT
 const updateBuildJsonPath = normalizeOptionalEnv(process.env.OD_PACKAGED_E2E_MAC_UPDATE_BUILD_JSON_PATH);
 const updateFixture = normalizeOptionalEnv(process.env.OD_PACKAGED_E2E_MAC_UPDATE_FIXTURE);
 const packagedInviteDeeplink =
-  'opendesign://workspace/invite/continue?workspace_id=packaged-smoke-workspace&member_id=packaged-smoke-member&invite_id=packaged-smoke-invite&nonce=packaged-smoke-nonce';
+  'mish://workspace/invite/continue?workspace_id=packaged-smoke-workspace&member_id=packaged-smoke-member&invite_id=packaged-smoke-invite&nonce=packaged-smoke-nonce';
 
 const outputNamespaceRoot = join(toolsPackDir, 'out', 'mac', 'namespaces', namespace);
 const runtimeNamespaceRoot = join(toolsPackDir, 'runtime', 'mac', 'namespaces', namespace);
@@ -1243,12 +1243,12 @@ macOnboardingDescribe('packaged mac onboarding AMR smoke', () => {
       const screenshot = await runToolsPackJson<MacInspectResult>('inspect', ['--path', onboardingScreenshotPath]);
       expect(screenshot.screenshot?.path).toBe(onboardingScreenshotPath);
       expect(await fileSizeBytes(onboardingScreenshotPath)).toBeGreaterThan(0);
-      await report.report.save('screenshots/open-design-mac-onboarding-smoke.png', await readFile(onboardingScreenshotPath));
+      await report.report.save('screenshots/mish-mac-onboarding-smoke.png', await readFile(onboardingScreenshotPath));
       await report.report.json('onboarding-summary.json', {
         health,
         initial,
         namespace,
-        screenshot: 'screenshots/open-design-mac-onboarding-smoke.png',
+        screenshot: 'screenshots/mish-mac-onboarding-smoke.png',
         start: {
           appPath: start.appPath,
           executablePath: start.executablePath,
@@ -2641,7 +2641,7 @@ async function buildVersionBumpedMacPayloadFixture(
       throw new Error(`payload manifest has no entry.executable: ${payloadZipPath}`);
     }
     // <bundle>.app/Contents/MacOS/<binary> → <bundle>.app/Contents/Resources
-    const configPath = join(extractRoot, dirname(dirname(executableRelPath)), 'Resources', 'open-design-config.json');
+    const configPath = join(extractRoot, dirname(dirname(executableRelPath)), 'Resources', 'mish-config.json');
     const config = JSON.parse(await readFile(configPath, 'utf8')) as { appVersion?: string };
     config.appVersion = bumpedVersion;
     await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
@@ -2956,7 +2956,7 @@ async function assertMacInviteProtocolRegistration(installedAppPath: string): Pr
   const schemes = (plist.CFBundleURLTypes ?? []).flatMap(
     (entry) => entry.CFBundleURLSchemes ?? [],
   );
-  expect(schemes).toContain('opendesign');
+  expect(schemes).toContain('mish');
 }
 
 async function invokeMacInviteDeeplink(installedAppPath: string): Promise<void> {

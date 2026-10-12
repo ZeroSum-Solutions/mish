@@ -12,18 +12,18 @@ import {
   DIAGNOSTICS_FILENAME_PREFIX,
   diagnosticsFileName,
   type LogSource,
-} from '@open-design/diagnostics';
+} from '@mish/diagnostics';
 import {
   APP_KEYS,
-  OPEN_DESIGN_SIDECAR_CONTRACT,
+  MISH_SIDECAR_CONTRACT,
   SIDECAR_MODES,
   type LegacySidecarRuntimeLayout,
-} from '@open-design/sidecar-proto';
+} from '@mish/sidecar-proto';
 import {
   resolveLogFilePath,
   resolveRuntimeNamespaceRoot,
   type SidecarRuntimeContext,
-} from '@open-design/sidecar';
+} from '@mish/sidecar';
 
 import { readCurrentAppVersionInfo } from './app-version.js';
 import {
@@ -157,7 +157,7 @@ async function buildSidecarLogSources(
   // accounts for that (a plain `resolveNamespaceRoot` here resolved every
   // daemon/web log to an ENOENT phantom path and captured none of them).
   const namespaceRoot = resolveRuntimeNamespaceRoot({
-    contract: OPEN_DESIGN_SIDECAR_CONTRACT,
+    contract: MISH_SIDECAR_CONTRACT,
     runtime,
     runtimeMode: SIDECAR_MODES.RUNTIME,
   });
@@ -166,7 +166,7 @@ async function buildSidecarLogSources(
   for (const app of apps) {
     const absolutePath = resolveLogFilePath({
       app,
-      contract: OPEN_DESIGN_SIDECAR_CONTRACT,
+      contract: MISH_SIDECAR_CONTRACT,
       runtimeRoot: namespaceRoot,
     });
     sources.push({
@@ -268,7 +268,7 @@ export function createDiagnosticsExportHandler(options: DiagnosticsHandlerOption
       const result = await buildDiagnosticsZip({
         context: {
           app: {
-            name: 'open-design',
+            name: 'mish',
             version: versionInfo?.version,
             channel: versionInfo?.channel,
             packaged: versionInfo?.packaged,
@@ -343,7 +343,7 @@ export function createDiagnosticsExportHandler(options: DiagnosticsHandlerOption
           // substring would sweep up crash reports from any other Electron
           // app on the host (VS Code, Slack, …) and leak unrelated user data
           // into the support bundle.
-          matchSubstrings: ['Open Design', 'open-design'],
+          matchSubstrings: ['Mish', 'mish'],
           withinDays: 7,
           maxReports: 10,
           homeDir: home,

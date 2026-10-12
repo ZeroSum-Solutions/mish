@@ -14,7 +14,7 @@ import {
   type StandaloneHandoffRequest,
   type StandaloneRuntimeHandle,
   type StandaloneRuntimeStatus,
-} from "@open-design/standalone";
+} from "@mish/standalone";
 
 import { repoRoot } from "./helpers.js";
 
@@ -94,7 +94,7 @@ describe("Terminal bootloader handoff host", () => {
     const imports = vi.fn(async (selected): Promise<StandaloneGenerationHandoff> => {
       expect(selected.launcher.path).toBe(launcherPath);
       expect(sha256Hex(readFileSync(selected.launcher.path))).toBe(selected.launcher.blobSha256);
-      const module = await import(pathToFileURL(selected.launcher.path).href) as typeof import("@open-design/standalone");
+      const module = await import(pathToFileURL(selected.launcher.path).href) as typeof import("@mish/standalone");
       return module.createStandaloneGenerationBootloader(starts);
     });
     const host = new FossilHandoffHost(imports);

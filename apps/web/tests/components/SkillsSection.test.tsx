@@ -8,7 +8,7 @@ import { I18nProvider } from '../../src/i18n';
 import { en } from '../../src/i18n/locales/en';
 
 import type { AppConfig } from '../../src/types';
-import type { SkillSummary } from '@open-design/contracts';
+import type { SkillSummary } from '@mish/contracts';
 
 const originalFetch = globalThis.fetch;
 

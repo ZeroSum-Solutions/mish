@@ -173,7 +173,7 @@ const CODEX_SHELL_ENVIRONMENT_INCLUDE_KEYS = [
   'OD_TASK_INPUT_DIR',
 ] as const;
 
-export function codexOpenDesignShellEnvironmentArgs(): string[] {
+export function codexMishShellEnvironmentArgs(): string[] {
   const includeOnly = CODEX_SHELL_ENVIRONMENT_INCLUDE_KEYS
     .map((key) => `"${key}"`)
     .join(',');
@@ -377,7 +377,7 @@ export const codexAgentDef = {
       ) {
         args.push('--disable', 'plugins');
       }
-      args.push(...codexOpenDesignShellEnvironmentArgs());
+      args.push(...codexMishShellEnvironmentArgs());
       args.push(...codexReasoningSummaryArgs());
       args.push(...codexUpdatePlanToolArgs());
       // `-C <cwd>` and `--add-dir <dir>` are CREATE-only flags: `codex exec
@@ -588,7 +588,7 @@ function buildCodexAppServerArgs(
   ) {
     args.push('--disable', 'plugins');
   }
-  args.push(...codexOpenDesignShellEnvironmentArgs());
+  args.push(...codexMishShellEnvironmentArgs());
   // The plan tool has no `thread/start` or `turn/start` parameter, so unlike
   // the model / effort / summary knobs it stays on argv on this transport too.
   args.push(...codexUpdatePlanToolArgs());

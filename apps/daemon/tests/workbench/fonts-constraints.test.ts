@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { parseResourceSearchRequest, type ProjectDesignContextDraft, type ResourceResult } from '@open-design/contracts';
+import { parseResourceSearchRequest, type ProjectDesignContextDraft, type ResourceResult } from '@mish/contracts';
 import { searchResources } from '../../src/workbench/resources.js';
 import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
 import { putProjectContext, readProjectContext, readWorkbenchPreferences } from '../../src/workbench/project-context.js';

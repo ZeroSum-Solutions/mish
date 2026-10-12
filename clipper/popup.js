@@ -172,7 +172,7 @@ function reportCapture(res, okText) {
     return;
   }
   if (res.error === 'not running') {
-    setMsg(t('openDesignNotRunning'), 'err');
+    setMsg(t('mishNotRunning'), 'err');
     void refresh();
   } else {
     setMsg(t('failed', { error: res.error || t('unknown') }), 'err');

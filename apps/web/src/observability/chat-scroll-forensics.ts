@@ -60,7 +60,7 @@ import {
 /**
  * Where the daemon receives the capture.
  *
- * Inlined rather than imported from `@open-design/diagnostics`, matching the
+ * Inlined rather than imported from `@mish/diagnostics`, matching the
  * existing precedent in `ExportDiagnosticsButton.tsx` for
  * `/api/diagnostics/export`: `apps/web` does not depend on that package, and
  * adding the dependency for one string would drag a Node-side package into the

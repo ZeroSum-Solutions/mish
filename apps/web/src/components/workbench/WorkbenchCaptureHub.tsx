@@ -1,5 +1,5 @@
 import { useId, useState } from 'react';
-import type { CaptureDraftRevision, WorkspaceCollabContext } from '@open-design/contracts';
+import type { CaptureDraftRevision, WorkspaceCollabContext } from '@mish/contracts';
 import { useT } from '../../i18n';
 import { WorkbenchCapturePanel } from './WorkbenchCapturePanel';
 import { WorkbenchCaptureDraftLibrary, WorkbenchCaptureDraftPanel } from './WorkbenchCaptureDraftPanel';

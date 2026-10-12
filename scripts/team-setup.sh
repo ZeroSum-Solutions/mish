@@ -314,7 +314,7 @@ step "pnpm install"
 run_pnpm install || fail "pnpm install"
 
 step "build the daemon"
-run_pnpm --filter @open-design/daemon build || fail "the daemon build"
+run_pnpm --filter @mish/daemon build || fail "the daemon build"
 
 step "start the daemon and web app (tools-dev namespace: ${NAMESPACE})"
 echo "$DATA_ROOT_LINE"

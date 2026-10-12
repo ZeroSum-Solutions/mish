@@ -2,8 +2,8 @@ import { createHash } from "node:crypto";
 import { tmpdir, userInfo } from "node:os";
 import { join } from "node:path";
 
-import type { ProcessStampContract } from "@open-design/platform";
-import { readProcessStamp } from "@open-design/platform";
+import type { ProcessStampContract } from "@mish/platform";
+import { readProcessStamp } from "@mish/platform";
 
 export const SIDECAR_STAMP_FIELDS = ["channel", "namespace", "source", "mode", "app"] as const;
 
@@ -155,6 +155,6 @@ export function resolvePrivateIpcPath(stamp: SidecarStamp, platform: NodeJS.Plat
     : String(process.getuid?.() ?? process.env.USER ?? "unknown");
   const digest = createHash("sha256").update(`${principal}\n${sidecarStampKey(stamp)}`).digest("hex").slice(0, 32);
   return platform === "win32"
-    ? `\\\\.\\pipe\\open-design-sidecar-${digest}`
+    ? `\\\\.\\pipe\\mish-sidecar-${digest}`
     : join(tmpdir(), `od-sidecar-${principal}`, `${digest}.sock`);
 }

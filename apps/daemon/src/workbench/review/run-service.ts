@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import {
   isIndependentReviewerCompletion, reviewInterruptReasonSchema, WORKBENCH_REVIEW_MAX_CHECK_IDS, type ReviewerRecord, type ReviewerRole, type ReviewFinding, type ReviewInterruptReason, type ReviewRun,
   type ReviewEgressPolicy, type ReviewRunSummary, type ReviewRunView, type StartReviewRunRequest, type VerificationBundle,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { validatedAllowHosts } from './egress.js';
 import { reviewFreshness, type EntryVersion } from './freshness.js';
 import { isLegacyBundle } from './evidence-store.js';

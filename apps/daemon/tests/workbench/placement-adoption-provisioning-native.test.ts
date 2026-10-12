@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchAdoptionRoutes } from '../../src/routes/workbench-adoption.js';
 import { runAdoptionCli } from '../../src/workbench/placement/adoption-cli.js';
-import { WORKBENCH_ADOPTION_ROOT_RECORD } from '@open-design/contracts';
+import { WORKBENCH_ADOPTION_ROOT_RECORD } from '@mish/contracts';
 import {
   createAdoptionLabsSwitch, PLACEMENT_ADOPTION_HELPER_RECORD_SCHEMA, PLACEMENT_ADOPTION_LAYOUT, PLACEMENT_HELPER_SOURCE_SHA256, resolveAdoptionProvisioning,
 } from '../../src/workbench/placement/adoption-provisioning.js';

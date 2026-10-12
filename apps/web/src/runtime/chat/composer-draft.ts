@@ -34,7 +34,7 @@
  * 单条不合格(附件没有 path、注释没有正文、id 不是字符串)→ 只丢那一条。
  * 草稿是便利设施,不是数据源;宁可少回来几个芯片,也不能让输入框打不开。
  */
-import type { ChatAttachment, ChatCommentAttachment, WorkspaceContextItem } from '@open-design/contracts';
+import type { ChatAttachment, ChatCommentAttachment, WorkspaceContextItem } from '@mish/contracts';
 import type { ChatQuote } from './quote-selection';
 
 /** 一次待发送负载里除正文以外的部分。 */

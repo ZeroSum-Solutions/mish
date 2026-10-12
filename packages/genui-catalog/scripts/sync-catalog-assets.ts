@@ -32,7 +32,7 @@
  * The folder is wholly generated: a file in it that the plan does not expect is removed, and a
  * copy that needs nothing has no folder at all.
  *
- * Usage (run `pnpm --filter @open-design/genui-catalog build` first; the JS comes from dist/):
+ * Usage (run `pnpm --filter @mish/genui-catalog build` first; the JS comes from dist/):
  *   node --experimental-strip-types packages/genui-catalog/scripts/sync-catalog-assets.ts
  *   node --experimental-strip-types packages/genui-catalog/scripts/sync-catalog-assets.ts --check
  *
@@ -180,7 +180,7 @@ function planTarget(target: SyncTarget, ported: Map<string, Map<string, Source>>
         continue;
       }
       if (files.size !== COPIED_FILES.length) {
-        report.errors.push(`packages/genui-catalog/dist/components/${id}: missing — run \`pnpm --filter @open-design/genui-catalog build\` first`);
+        report.errors.push(`packages/genui-catalog/dist/components/${id}: missing — run \`pnpm --filter @mish/genui-catalog build\` first`);
         continue;
       }
       for (const [file, source] of files) expected.set(file, source);
@@ -275,7 +275,7 @@ function main(): void {
     return;
   }
   if (report.drift.length > 0) {
-    console.error(`sync-catalog-assets: ${report.drift.length} drifted path(s). Run \`pnpm --filter @open-design/genui-catalog build && pnpm --filter @open-design/genui-catalog sync-assets\` and commit the result.`);
+    console.error(`sync-catalog-assets: ${report.drift.length} drifted path(s). Run \`pnpm --filter @mish/genui-catalog build && pnpm --filter @mish/genui-catalog sync-assets\` and commit the result.`);
     process.exitCode = 1;
     return;
   }

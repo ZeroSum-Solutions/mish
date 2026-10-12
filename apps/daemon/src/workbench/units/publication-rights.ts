@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { reusableUnitManifestSchema, unitInsertReceiptSchema } from '@open-design/contracts';
+import { reusableUnitManifestSchema, unitInsertReceiptSchema } from '@mish/contracts';
 
 // The insertion producer carries this subset of the saved manifest. This is
 // trusted local provenance, not a licence signature or a grant to publish.

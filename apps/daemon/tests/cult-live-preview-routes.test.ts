@@ -15,9 +15,9 @@ import path from 'node:path';
 import express from 'express';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 
-import { parseCultPreviewInfoResponse } from '@open-design/contracts';
-import { COMPOSED_PAGE_CSP } from '@open-design/agency-fast-lane/block-compose';
-import cultInventoryJson from '@open-design/cult-ui-catalog/catalog.json' with { type: 'json' };
+import { parseCultPreviewInfoResponse } from '@mish/contracts';
+import { COMPOSED_PAGE_CSP } from '@mish/agency-fast-lane/block-compose';
+import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
 import { convertedDir, convertedPreviewHtml, convertedPreviewMockNote, CultHarnessUnavailable, CultPreviewHarness, fillConvertedTemplate, harnessEnv } from '../src/cult-live-preview.js';
 import { resolveCultKitDir } from '../src/cult-registry.js';
 import { cultSlugs } from '../src/routes/cult-registry.js';

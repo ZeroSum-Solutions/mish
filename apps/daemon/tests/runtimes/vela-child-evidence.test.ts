@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { ChildEvidenceCoverageV1Schema } from '@open-design/contracts';
+import { ChildEvidenceCoverageV1Schema } from '@mish/contracts';
 
 import { safeTaskObservationRuntimeVersions } from '../../src/observability/task-observation-aggregation.js';
 import {
@@ -140,7 +140,7 @@ describe('Vela OpenCode child evidence adapter', () => {
     );
     expect(seed).toMatchObject({
       fixtureKind: 'sanitized_real_best_effort',
-      evidenceReview: 'open_design_best_effort',
+      evidenceReview: 'mish_best_effort',
       velaVersion: '0.0.1-od-next-local',
       velaCommit: VELA_CHILD_EVIDENCE_CANDIDATE.commit,
       openCodeVersion: '1.18.18',
@@ -400,7 +400,7 @@ describe('Vela OpenCode child evidence adapter', () => {
     const serialized = JSON.stringify(facts[1]);
     expect(serialized).not.toContain('sk-do-not-forward');
     expect(serialized).not.toContain('/private/user/workspace');
-    expect(serialized).toContain('open-design.child-injected-prompt');
+    expect(serialized).toContain('mish.child-injected-prompt');
     expect(serialized).toContain('Inspect');
     expect(serialized).toContain('[REDACTED:path]');
     expect(serialized).toContain('[REDACTED:sk_key]');

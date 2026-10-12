@@ -6,7 +6,7 @@
 import { StrictMode } from 'react';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { DesignBrief, DesignBriefRecordView, WorkspaceCollabContext } from '@open-design/contracts';
+import type { DesignBrief, DesignBriefRecordView, WorkspaceCollabContext } from '@mish/contracts';
 import { homeBriefPreview } from '../../helpers/home-brief-preview';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchImprovePrompt } from '../../../src/components/workbench/WorkbenchImprovePrompt';

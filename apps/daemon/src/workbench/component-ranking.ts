@@ -1,4 +1,4 @@
-import { COMPONENT_TOKEN_AXES, type ComponentApplyBlocker, type ComponentFit, type ComponentRanking, type ProjectDesignContext, type ResourceCandidate, type ResourceRef } from '@open-design/contracts';
+import { COMPONENT_TOKEN_AXES, type ComponentApplyBlocker, type ComponentFit, type ComponentRanking, type ProjectDesignContext, type ResourceCandidate, type ResourceRef } from '@mish/contracts';
 import { compareVersions, parseVersion, rangeLowerBound } from './adoption/installed-packages.js';
 import { checkDependencies } from './adoption/dependency-report.js';
 import { compareResourceTitles } from './context-ranking.js';

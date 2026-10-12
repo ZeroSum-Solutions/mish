@@ -14,7 +14,7 @@ import type { RegisterLiveArtifactRoutesDeps } from './routes/live-artifact.js';
 import type { RegisterMcpRoutesDeps } from './mcp-routes.js';
 import type { RegisterMediaRoutesDeps } from './routes/media.js';
 import type { RegisterMemoryRoutesDeps } from './routes/memory.js';
-import type { RegisterOpenDesignPublicMetadataRoutesDeps } from './routes/open-design-public-metadata.js';
+import type { RegisterMishPublicMetadataRoutesDeps } from './routes/mish-public-metadata.js';
 import type { RegisterProjectChatArtifactRoutesDeps } from './routes/project/chat-artifacts.js';
 import type { RegisterProjectArtifactRoutesDeps, RegisterProjectFileRoutesDeps, RegisterProjectRoutesDeps, RegisterProjectUploadRoutesDeps } from './routes/project/index.js';
 import type { RegisterRoutineRoutesDeps } from './routes/routine.js';
@@ -42,7 +42,7 @@ type AllRegisteredRouteDeps =
   & RegisterMcpRoutesDeps
   & RegisterMediaRoutesDeps
   & RegisterMemoryRoutesDeps
-  & RegisterOpenDesignPublicMetadataRoutesDeps
+  & RegisterMishPublicMetadataRoutesDeps
   & RegisterProjectArtifactRoutesDeps
   & RegisterProjectChatArtifactRoutesDeps
   & RegisterProjectExportRoutesDeps

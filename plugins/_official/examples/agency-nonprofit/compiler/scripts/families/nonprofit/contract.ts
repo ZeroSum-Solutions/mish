@@ -168,7 +168,7 @@ function sectionSchema(spec: SectionSpec): Schema {
 export function recipeSchema(): Schema {
   return {
     $schema: 'https://json-schema.org/draft/2020-12/schema',
-    $id: `https://open-design.ai/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
+    $id: `https://mish.invalid/schemas/agency-site/${FAMILY_ID}/recipe.v2.json`,
     title: `${FAMILY_ID} recipe`,
     description: 'A static nonprofit or charity page kind (atlas MI.01): header, stakes hero, mission, programs, optional impact figures, optional stories, accountability facts, optional events, giving levels, volunteering and footer. Derived from compiler/scripts/families/nonprofit/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.',
     $comment: 'contract.ts additionally enforces markup-free plain text, email and phone formats on the nullable footer contact atoms, and that a null appears only on an x-atom string leaf or in an x-optional section slot (impact, stories, events).',

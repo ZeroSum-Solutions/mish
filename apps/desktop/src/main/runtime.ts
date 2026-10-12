@@ -21,16 +21,16 @@ import {
   type DesktopRenderSlidesInput,
   type DesktopRenderSlidesResult,
   type DesktopUpdateStatusSnapshot,
-} from "@open-design/sidecar-proto";
+} from "@mish/sidecar-proto";
 import type {
-  OpenDesignHostActionResult,
-  OpenDesignHostCaptureResult,
-  OpenDesignHostPreviewNavigationFailure,
-  OpenDesignHostProjectImportInit,
-  OpenDesignHostUpdaterActionOptions,
-  OpenDesignHostUpdaterMenuLabels,
-  OpenDesignHostUpdaterOpenDialogRequest,
-} from "@open-design/host";
+  MishHostActionResult,
+  MishHostCaptureResult,
+  MishHostPreviewNavigationFailure,
+  MishHostProjectImportInit,
+  MishHostUpdaterActionOptions,
+  MishHostUpdaterMenuLabels,
+  MishHostUpdaterOpenDialogRequest,
+} from "@mish/host";
 
 import { renderDeckSlides } from "./deck-capture.js";
 import { renderDeterministicFrames } from "./frame-capture.js";
@@ -67,7 +67,7 @@ export function previewNavigationFailureFromDidFailLoad(input: {
   isMainFrame: boolean;
   occurredAtMs: number;
   validatedUrl: string;
-}): OpenDesignHostPreviewNavigationFailure | null {
+}): MishHostPreviewNavigationFailure | null {
   if (
     input.isMainFrame
     || input.errorCode !== ABORTED_NAVIGATION_ERROR_CODE
@@ -313,7 +313,7 @@ const DESKTOP_PET_WINDOW_HEIGHT = 300;
 const DESKTOP_PET_WINDOW_MARGIN = 24;
 const UPDATER_STATUS_EVENT = "od:update:status-changed";
 const UPDATER_OPEN_DIALOG_EVENT = "od:update:open-dialog";
-const DESIGN_BROWSER_PARTITION = "persist:open-design-design-browser";
+const DESIGN_BROWSER_PARTITION = "persist:mish-design-browser";
 const UPDATER_IPC_CHANNELS = [
   "od:update:status",
   "od:update:check",
@@ -387,7 +387,7 @@ export type DesktopRuntime = {
   eval(input: DesktopEvalInput): Promise<DesktopEvalResult>;
   exportArtifact(input: DesktopExportArtifactInput): Promise<DesktopExportArtifactResult>;
   exportPdf(input: DesktopExportPdfInput): Promise<DesktopExportPdfResult>;
-  openUpdateDialog(request: OpenDesignHostUpdaterOpenDialogRequest): void;
+  openUpdateDialog(request: MishHostUpdaterOpenDialogRequest): void;
   renderFrames(input: DesktopRenderFramesInput): Promise<DesktopRenderFramesResult>;
   renderSlides(input: DesktopRenderSlidesInput): Promise<DesktopRenderSlidesResult>;
   screenshot(input: DesktopScreenshotInput): Promise<DesktopScreenshotResult>;
@@ -476,7 +476,7 @@ export type DesktopRuntimeOptions = {
    * as having reached running for abnormal-exit detection.
    */
   onRevealed?: () => void;
-  onUpdateMenuLabels?: (labels: OpenDesignHostUpdaterMenuLabels) => void;
+  onUpdateMenuLabels?: (labels: MishHostUpdaterMenuLabels) => void;
 };
 
 const DESKTOP_IMPORT_TOKEN_HEADER = "x-od-desktop-import-token";
@@ -521,7 +521,7 @@ export type PickAndImportFolderDeps = {
   baseDir: string;
   desktopAuthSecret: Buffer;
   fetchImpl?: typeof globalThis.fetch;
-  init?: OpenDesignHostProjectImportInit;
+  init?: MishHostProjectImportInit;
   /** Round-5: lazy re-registration hook. Called once on 503. */
   registerDesktopAuth?: () => Promise<boolean>;
   /** Injected for tests; defaults to the production HMAC mint. */
@@ -1115,7 +1115,7 @@ function createRendererCrashHtml(ctx: RendererCrashScreenContext): string {
     </div>
     <script>
       (function () {
-        var diag = window.openDesignDesktop;
+        var diag = window.mishDesktop;
         var logs = document.getElementById("logs");
         var status = document.getElementById("status");
         function say(t) { if (status) status.textContent = t; }
@@ -1735,7 +1735,7 @@ function unavailableUpdaterStatus(): DesktopUpdateStatusSnapshot {
 }
 
 function checkOptionsFromHost(options: unknown): { autoDownload?: boolean } | undefined {
-  const input = options as OpenDesignHostUpdaterActionOptions | null | undefined;
+  const input = options as MishHostUpdaterActionOptions | null | undefined;
   const payload = input?.payload;
   if (payload == null || typeof payload.autoDownload !== "boolean") return undefined;
   return { autoDownload: payload.autoDownload };
@@ -1857,7 +1857,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   // import boundary while leaving web-only deployments untouched.
   ipcMain.handle(
     "dialog:pick-and-import",
-    async (event, init?: OpenDesignHostProjectImportInit) => {
+    async (event, init?: MishHostProjectImportInit) => {
       // Defensive failsafe for non-production runtimes (test harnesses
       // that construct createDesktopRuntime without a secret). Round-5
       // production wiring in runDesktopMain ALWAYS passes the per-process
@@ -2103,19 +2103,19 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     window.setTitle(windowTitle);
   });
   window.webContents.on("did-start-loading", () => {
-    console.info("[open-design desktop] main window did-start-loading", {
+    console.info("[mish desktop] main window did-start-loading", {
       pendingUrl,
       url: window.webContents.getURL(),
     });
   });
   window.webContents.on("dom-ready", () => {
-    console.info("[open-design desktop] main window dom-ready", {
+    console.info("[mish desktop] main window dom-ready", {
       title: window.getTitle(),
       url: window.webContents.getURL(),
     });
   });
   window.webContents.on("did-finish-load", () => {
-    console.info("[open-design desktop] main window did-finish-load", {
+    console.info("[mish desktop] main window did-finish-load", {
       title: window.getTitle(),
       url: window.webContents.getURL(),
     });
@@ -2136,7 +2136,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
       ? undefined
       : previewFrameNameByRoutingId.get(previewFrameRoutingKey(frameProcessId, frameRoutingId));
     const frameName = failedFrame?.name || cachedFrameName;
-    console.error("[open-design desktop] main window did-fail-load", {
+    console.error("[mish desktop] main window did-fail-load", {
       errorCode,
       errorDescription,
       frameName,
@@ -2158,13 +2158,13 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     if (failure) window.webContents.send(PREVIEW_NAVIGATION_FAILURE_IPC_CHANNEL, failure);
   });
   window.on("unresponsive", () => {
-    console.error("[open-design desktop] main window unresponsive", {
+    console.error("[mish desktop] main window unresponsive", {
       pendingUrl,
       url: window.webContents.getURL(),
     });
   });
   window.on("responsive", () => {
-    console.info("[open-design desktop] main window responsive", {
+    console.info("[mish desktop] main window responsive", {
       pendingUrl,
       url: window.webContents.getURL(),
     });
@@ -2184,7 +2184,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     // guard the same way `sendUpdaterStatus` does below and skip crash-report /
     // recovery work once the window is already on its way out.
     const gone = window.isDestroyed() || window.webContents.isDestroyed();
-    console.error("[open-design desktop] main window render-process-gone", {
+    console.error("[mish desktop] main window render-process-gone", {
       exitCode: details.exitCode,
       reason: details.reason,
       url: gone ? null : window.webContents.getURL(),
@@ -2217,7 +2217,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
       // one passive recovery reload after a quiet cooldown.
       if (outcome.justOpened) {
         console.warn(
-          "[open-design desktop] renderer crash-loop breaker OPEN — parking; will attempt recovery after cooldown",
+          "[mish desktop] renderer crash-loop breaker OPEN — parking; will attempt recovery after cooldown",
           { reason: details.reason, exitCode: details.exitCode },
         );
         showRendererCrashScreen({
@@ -2246,7 +2246,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   // `did-navigate-in-page` instead, so app navigation never trips this.
   window.webContents.on("did-navigate", (_event, url, httpResponseCode) => {
     if (!isRendererFailureHttpStatus(httpResponseCode)) return;
-    console.error("[open-design desktop] main window loaded an HTTP error document", {
+    console.error("[mish desktop] main window loaded an HTTP error document", {
       httpResponseCode,
       url,
     });
@@ -2310,7 +2310,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     // in the host renderer, by the visible intake overlay or an Option-drag.
   });
   registerDirectoryIntakeIpc(ipcMain, requireMainWindowSender);
-  ipcMain.handle("browser:clear-data", async (event, rawOptions: unknown): Promise<OpenDesignHostActionResult> => {
+  ipcMain.handle("browser:clear-data", async (event, rawOptions: unknown): Promise<MishHostActionResult> => {
     requireMainWindowSender(event);
     const optionsRecord = rawOptions != null && typeof rawOptions === "object"
       ? rawOptions as { cookies?: unknown; storage?: unknown }
@@ -2380,7 +2380,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     sendUpdaterStatus(status);
     return status;
   });
-  ipcMain.handle("od:update:quit", async (event, updaterOptions: unknown): Promise<OpenDesignHostActionResult> => {
+  ipcMain.handle("od:update:quit", async (event, updaterOptions: unknown): Promise<MishHostActionResult> => {
     requireMainWindowSender(event);
     const blocked = await guardedUpdaterStatus(updaterOptions);
     if (blocked?.error != null) {
@@ -2396,7 +2396,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     setTimeout(() => options.requestQuit?.(), 0);
     return { ok: true };
   });
-  ipcMain.handle("od:update:set-menu-labels", async (event, rawLabels: unknown): Promise<OpenDesignHostActionResult> => {
+  ipcMain.handle("od:update:set-menu-labels", async (event, rawLabels: unknown): Promise<MishHostActionResult> => {
     requireMainWindowSender(event);
     const labels = parseDesktopUpdateMenuLabels(rawLabels);
     if (labels == null) return { ok: false, reason: "invalid updater menu labels" };
@@ -2451,7 +2451,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   });
 
   ipcMain.removeHandler('od:capture-page');
-  ipcMain.handle('od:capture-page', async (event, rawOptions: unknown): Promise<OpenDesignHostCaptureResult> => {
+  ipcMain.handle('od:capture-page', async (event, rawOptions: unknown): Promise<MishHostCaptureResult> => {
     if (event.sender !== window.webContents) {
       return { ok: false, reason: 'capture sender not allowed' };
     }
@@ -2599,7 +2599,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     splashStartedAt = created.startedAt;
   }
 
-  let pendingUpdateDialogRequest: OpenDesignHostUpdaterOpenDialogRequest | null = null;
+  let pendingUpdateDialogRequest: MishHostUpdaterOpenDialogRequest | null = null;
   let revealed = false;
   let revealing = false;
 
@@ -2738,7 +2738,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
         if (rendererCrashLoop.rearmIfCooledDown(Date.now())) {
           rendererRecoveryAttempts += 1;
           console.info(
-            "[open-design desktop] renderer crash-loop cooldown elapsed — attempting recovery reload",
+            "[mish desktop] renderer crash-loop cooldown elapsed — attempting recovery reload",
             { attempt: rendererRecoveryAttempts },
           );
           void reportRendererCrash(options, {
@@ -2766,9 +2766,9 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
         rendererFailed = false;
         // Load the web app into the still-hidden main window as soon as it is
         // discovered; it mounts behind the splash so the swap is instant.
-        console.info("[open-design desktop] main window loadURL start", { currentUrl, url });
+        console.info("[mish desktop] main window loadURL start", { currentUrl, url });
         await window.loadURL(url);
-        console.info("[open-design desktop] main window loadURL success", { url });
+        console.info("[mish desktop] main window loadURL success", { url });
         currentUrl = url;
         pendingUrl = null;
         const nextPetUrl = desktopPetUrl(url);
@@ -2837,14 +2837,14 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     async eval(input) {
       if (window.isDestroyed()) return { error: "desktop window is destroyed", ok: false };
       const startedAt = Date.now();
-      console.info("[open-design desktop] eval executeJavaScript start", {
+      console.info("[mish desktop] eval executeJavaScript start", {
         ...summarizeExpression(input.expression),
         statusUrl: resolveDesktopStatusUrl(currentUrl, pendingUrl),
         webContentsUrl: window.webContents.getURL(),
       });
       try {
         const value = await window.webContents.executeJavaScript(input.expression, true);
-        console.info("[open-design desktop] eval executeJavaScript success", {
+        console.info("[mish desktop] eval executeJavaScript success", {
           durationMs: Date.now() - startedAt,
           statusUrl: resolveDesktopStatusUrl(currentUrl, pendingUrl),
           valueType: typeof value,
@@ -2852,7 +2852,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
         });
         return { ok: true, value };
       } catch (error) {
-        console.error("[open-design desktop] eval executeJavaScript failed", {
+        console.error("[mish desktop] eval executeJavaScript failed", {
           durationMs: Date.now() - startedAt,
           error: error instanceof Error ? error.message : String(error),
           statusUrl: resolveDesktopStatusUrl(currentUrl, pendingUrl),

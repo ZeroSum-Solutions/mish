@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import { isDeepStrictEqual } from 'node:util';
-import { parseSourceAdmission, SOURCE_OPERATIONS, type SourceAdmission, type OperationRight } from '@open-design/contracts';
+import { parseSourceAdmission, SOURCE_OPERATIONS, type SourceAdmission, type OperationRight } from '@mish/contracts';
 import { SourceRecordStore, type SourceRecordSnapshot } from '../storage/workbench-source-store.js';
 import type { AdmissionRecord, AssessmentRecord, EvidenceRecord, TermsRecord } from './source-records.js';
 import { evaluateSourceOperation, type SourceOperationAuthority, type SourceOperationDecision } from './source-rights.js';

@@ -5,7 +5,7 @@
 // counter-fit and rights without inventing a preview for metadata-only fonts.
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { FontCheckResponse, FontProfile, ResourceResult } from '@open-design/contracts';
+import type { FontCheckResponse, FontProfile, ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchResourceDetail } from '../../../src/components/workbench/WorkbenchResourceDetail';
 import { getWorkbenchResource, postWorkbenchFontCheck } from '../../../src/providers/workbench';

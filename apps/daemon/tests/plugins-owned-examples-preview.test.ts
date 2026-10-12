@@ -21,7 +21,7 @@ beforeAll(async () => {
       const folder = folders.find((candidate) => id === `example-${candidate}`);
       if (!folder) return null;
       const fsPath = path.join(root, folder);
-      return { fsPath, manifest: JSON.parse(await readFile(path.join(fsPath, 'open-design.json'), 'utf8')) };
+      return { fsPath, manifest: JSON.parse(await readFile(path.join(fsPath, 'mish.json'), 'utf8')) };
     },
     pluginAssetCache: { get: async () => { throw new Error('Owned previews must not fetch remote assets'); } },
     AssetCacheError: class extends Error {

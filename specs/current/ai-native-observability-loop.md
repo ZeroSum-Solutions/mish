@@ -32,7 +32,7 @@ The current Langfuse tree is still mostly runtime-oriented. A typical trace is
 shaped like:
 
 ```text
-open-design-turn
+mish-turn
   agent-run
     llm
     tool:read
@@ -106,7 +106,7 @@ The target trace tree should expose product stages in addition to low-level
 runtime spans:
 
 ```text
-open-design-turn
+mish-turn
   brief-intake
     attachment-manifest
   route-task-kind
@@ -188,7 +188,7 @@ The minimum manifest shape should be stable across traces:
       "summary": "Brand reference image with dark UI styling.",
       "redacted": false,
       "truncated": false,
-      "stored_in_open_design": true,
+      "stored_in_mish": true,
       "langfuse_media_id": null,
       "storage_ref": "od://objects/workspaces/ws_1/projects/proj_1/runs/run_1/attachment/att_123"
     }

@@ -165,7 +165,7 @@ export function createDebugDirOnCall(debugDir: string): CliOnCall {
 
 /**
  * The GenUI catalog manifest, read from the workspace source tree (the CLI runs from source). The
- * daemon never calls this: it passes the bundle-safe `@open-design/genui-catalog/data` manifest.
+ * daemon never calls this: it passes the bundle-safe `@mish/genui-catalog/data` manifest.
  * A missing or unreadable file gives `undefined`, and auto effects then offer ids without
  * descriptions and treat every kind as `js` (the stricter guard).
  */

@@ -130,7 +130,7 @@ export function wellKnownUserToolchainBins(
     // in most third-party "fix npm EACCES" tutorials, and
     // ~/.npm-packages is the second-most common variant. Without
     // these, GUI-launched daemons miss `npm i -g`'d CLIs even though
-    // they resolve cleanly from the user's shell. See open-design
+    // they resolve cleanly from the user's shell. See mish
     // issue #442.
     join(home, ".npm-global", "bin"),
     join(home, ".npm-packages", "bin"),

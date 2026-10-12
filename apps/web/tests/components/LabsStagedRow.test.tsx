@@ -2,7 +2,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { StagedDraftingStatus } from '@open-design/contracts';
+import type { StagedDraftingStatus } from '@mish/contracts';
 
 import { LabsStagedRow } from '../../src/components/LabsStagedRow';
 import { I18nProvider } from '../../src/i18n';

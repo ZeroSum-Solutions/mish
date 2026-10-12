@@ -3,7 +3,7 @@ import {
   parseReusableUnitManifest, parseUnitSavePlan, parseUnitSaveRequest,
   type CaptureDraftRevision, type CaptureView, type CreateCaptureDraftRequest,
   type ReusableUnitManifest, type UnitSavePlan, type UnitSaveRequest, type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { workspaceProjectHeaders } from '../collab/workspace-identity';
 import DOMPurify from 'dompurify';
 

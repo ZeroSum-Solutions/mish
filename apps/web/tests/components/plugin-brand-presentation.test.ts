@@ -1,6 +1,6 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 
 import {
   brandOfficialPluginText,
@@ -14,21 +14,21 @@ describe('official plugin UI branding', () => {
       'utf8',
     );
     expect(source).toContain('placeholder="https://example.com/plugin-marketplace.json"');
-    expect(source).not.toContain('placeholder="https://example.com/open-design-marketplace.json"');
+    expect(source).not.toContain('placeholder="https://example.com/mish-marketplace.json"');
   });
 
   it('removes upstream product names from official marketplace copy', () => {
-    expect(brandOfficialPluginText('Build an editable OpenDesign artifact.')).toBe(
+    expect(brandOfficialPluginText('Build an editable Mish artifact.')).toBe(
       'Build an editable Mishh Mashh artifact.',
     );
     expect(brandOfficialPluginText('Pairs Open Claude Design with motion tools.')).toBe(
       'Pairs Mishh Mashh with motion tools.',
     );
-    expect(brandOfficialPluginText('Open Design workflow')).toBe('Mishh Mashh workflow');
-    expect(brandOfficialPluginText('See open-design.ai and @OpenDesignHQ.')).toBe(
+    expect(brandOfficialPluginText('Mish workflow')).toBe('Mishh Mashh workflow');
+    expect(brandOfficialPluginText('See mish.invalid and @MishHQ.')).toBe(
       'See Mishh Mashh and Mishh Mashh.',
     );
-    expect(brandOfficialPluginText('Contribute to nexu-io/open-design.')).toBe(
+    expect(brandOfficialPluginText('Contribute to ZeroSum-Solutions/mish.')).toBe(
       'Contribute to Mishh Mashh.',
     );
   });
@@ -48,7 +48,7 @@ describe('official plugin UI branding', () => {
       manifest: {
         name: 'plugin',
         version: '1.0.0',
-        description: 'Build an OpenDesign artifact.',
+        description: 'Build an Mish artifact.',
       },
     } as InstalledPluginRecord;
 
@@ -56,7 +56,7 @@ describe('official plugin UI branding', () => {
       'Build a Mishh Mashh artifact.',
     );
     expect(localizePluginDescription('en', { ...base, sourceKind: 'user' })).toBe(
-      'Build an OpenDesign artifact.',
+      'Build an Mish artifact.',
     );
   });
 

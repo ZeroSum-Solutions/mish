@@ -65,7 +65,7 @@ its existing system. Change the root mapping rather than individual components.
 其他硬约束(继承自根 `AGENTS.md`):
 
 - 不新增裸 primitive 类(`primary` / `ghost` / `subtle` / `icon-btn` / `sr-only`)
-- 按钮用 `@open-design/components` 的 `Button`,隐藏文本用 `VisuallyHidden`
+- 按钮用 `@mish/components` 的 `Button`,隐藏文本用 `VisuallyHidden`
 - 不往 `apps/web/src/index.css` 加选择器,它是 import-only 入口
 - 不在 `styles/chat.css` 里给新组件加样式;新组件一律共置 Module
 
@@ -98,7 +98,7 @@ aider / antigravity / atomcode),**opencode 直连不吐 thinking**,
 - [ ] 每条缺席数据都有明确形态(§3)
 - [ ] 文案走 i18n:先加 `i18n/types.ts`,再补齐全部 19 个 locale
 - [ ] 测试断言行为 / ARIA / `data-testid`,**不断言 CSS 类名**
-- [ ] `pnpm --filter @open-design/web typecheck` 与相关测试通过
+- [ ] `pnpm --filter @mish/web typecheck` 与相关测试通过
 
 ## 5. 测试规约
 

@@ -1,4 +1,4 @@
-import type { ResourceCandidate } from '@open-design/contracts';
+import type { ResourceCandidate } from '@mish/contracts';
 
 /**
  * Shared, pure helpers for owned token resources (project tokens, brief-derived

@@ -3,7 +3,7 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import { InlineModelSwitcher } from '../../src/components/InlineModelSwitcher';
 import {
   AMR_LOGIN_POLL_INTERVAL_MS,
@@ -227,7 +227,7 @@ function expectVelaLoginWithAttribution(
   };
   expect(body.attribution).toEqual(expect.objectContaining({
     entryId: expect.stringMatching(/^od-amr-/u),
-    sourceProduct: 'open_design',
+    sourceProduct: 'mish',
     sourceDetail,
   }));
   expect(Number.isFinite(Date.parse(body.attribution?.occurredAt ?? ''))).toBe(true);
@@ -865,7 +865,7 @@ describe('InlineModelSwitcher AMR row', () => {
     // The point of this case is the PROFILE: a signed-in test-profile account
     // must not be handed a production upgrade link. While the plans URL ignored
     // its profile argument this assertion read the prod host (T54).
-    expect(parsed.origin).toBe('https://open-design.powerformer.net');
+    expect(parsed.origin).toBe('https://mish.powerformer.net');
     expect(parsed.pathname).toBe('/cloud/dashboard');
     expect(parsed.searchParams.get('billing')).toBe('plan');
     expect(parsed.searchParams.get('od_entry_source')).toBe('inline_amr_upgrade');

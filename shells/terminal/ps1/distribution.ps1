@@ -41,8 +41,8 @@ if ([string]$contentMetadata.metadata.sourceCommit -ne $ReleaseCommit) { Fail "c
 if ([string]$contentMetadata.metadata.publishedAt -ne $ReleasePublishedAt) { Fail "content metadata publication time differs from release request" }
 [IO.Directory]::CreateDirectory($Output) | Out-Null
 [IO.Directory]::CreateDirectory((Split-Path -Parent ([IO.Path]::GetFullPath($Receipt)))) | Out-Null
-$stage = Join-Path ([IO.Path]::GetTempPath()) ("nexu-terminal-distribution-" + [Guid]::NewGuid().ToString("N"))
-$root = Join-Path $stage "nexu-terminal"
+$stage = Join-Path ([IO.Path]::GetTempPath()) ("mish-terminal-distribution-" + [Guid]::NewGuid().ToString("N"))
+$root = Join-Path $stage "mish-terminal"
 try {
   [IO.Directory]::CreateDirectory($root) | Out-Null
   Get-ChildItem -LiteralPath $Scene -Force | Copy-Item -Destination $root -Recurse -Force
@@ -101,7 +101,7 @@ try {
   [IO.File]::WriteAllText($manifestPath, (($manifest | ConvertTo-Json -Compress -Depth 8) + "`n"), [Text.UTF8Encoding]::new($false))
   $manifestSha = Digest $manifestPath
   [IO.File]::WriteAllText((Join-Path $root "install-manifest.sha256"), "$manifestSha  install-manifest.json`n", [Text.UTF8Encoding]::new($false))
-  $archive = Join-Path $Output "nexu-terminal-$Target-$ReleaseVersion.zip"
+  $archive = Join-Path $Output "mish-terminal-$Target-$ReleaseVersion.zip"
   Compress-Archive -LiteralPath $root -DestinationPath $archive
   $receiptValue = [ordered]@{ archive = [ordered]@{ file = [IO.Path]::GetFullPath($archive); mediaType = "application/zip"; sha256 = Digest $archive; size = Size $archive }; manifestSha256 = $manifestSha; operation = "terminal.distribution.build"; schemaVersion = 1; target = $Target }
   [IO.File]::WriteAllText($Receipt, (($receiptValue | ConvertTo-Json -Compress -Depth 5) + "`n"), [Text.UTF8Encoding]::new($false))

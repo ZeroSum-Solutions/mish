@@ -441,7 +441,7 @@ describe('connector execution policy', () => {
         issuedAt: '2026-04-30T00:00:00.000Z',
         expiresAt: '2026-04-30T00:15:00.000Z',
       },
-      projectsRoot: '/tmp/open-design-test',
+      projectsRoot: '/tmp/mish-test',
       service,
     })).resolves.toEqual([
       expect.objectContaining({
@@ -487,7 +487,7 @@ describe('connector execution policy', () => {
         issuedAt: '2026-04-30T00:00:00.000Z',
         expiresAt: '2026-04-30T00:15:00.000Z',
       },
-      projectsRoot: '/tmp/open-design-test',
+      projectsRoot: '/tmp/mish-test',
       service,
       useCase: 'personal_daily_digest',
     })).resolves.toEqual([
@@ -525,7 +525,7 @@ describe('connector execution policy', () => {
         issuedAt: '2026-04-30T00:00:00.000Z',
         expiresAt: '2026-04-30T00:15:00.000Z',
       },
-      projectsRoot: '/tmp/open-design-test',
+      projectsRoot: '/tmp/mish-test',
       service,
       useCase: 'personal_daily_digest',
     });
@@ -552,7 +552,7 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'external_docs', toolName: 'docs.search', input: { unexpected: true } },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'agent_preview' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'agent_preview' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_INPUT_SCHEMA_MISMATCH' });
   });
 
@@ -575,12 +575,12 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'external_docs', toolName: 'docs.search', input: { limit: 25 } },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'agent_preview' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'agent_preview' },
     )).resolves.toMatchObject({ ok: true });
 
     await expect(service.execute(
       { connectorId: 'external_docs', toolName: 'docs.search', input: { limit: 1.5 } },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'agent_preview' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'agent_preview' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_INPUT_SCHEMA_MISMATCH' });
   });
 
@@ -602,7 +602,7 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'external_docs', toolName: 'docs.search', input: {} },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'artifact_refresh' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'artifact_refresh' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_SAFETY_DENIED' });
   });
 
@@ -624,7 +624,7 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'external_docs', toolName: 'docs.search', input: {}, expectedAccountLabel: 'old-account@example.com' },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'artifact_refresh' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'artifact_refresh' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_NOT_CONNECTED' });
   });
 
@@ -649,7 +649,7 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'github', toolName: 'github.search', input: {} },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'artifact_refresh' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'artifact_refresh' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_EXECUTION_FAILED' });
 
     await expect(service.getConnector('github')).resolves.toMatchObject({
@@ -675,7 +675,7 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'github', toolName: 'github.search', input: {} },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'artifact_refresh' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'artifact_refresh' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_EXECUTION_FAILED', status: 401 });
 
     await expect(service.getConnector('github')).resolves.toMatchObject({
@@ -705,7 +705,7 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'github', toolName: 'github.search', input: {} },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'artifact_refresh' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'artifact_refresh' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_EXECUTION_FAILED', status: 502 });
 
     await expect(service.getConnector('github')).resolves.toMatchObject({
@@ -733,7 +733,7 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'external_docs', toolName: 'docs.update_page', input: {} },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', purpose: 'artifact_refresh' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', purpose: 'artifact_refresh' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_SAFETY_DENIED' });
   });
 
@@ -754,7 +754,7 @@ describe('connector execution policy', () => {
 
     const response = await service.execute(
       { connectorId: 'external_docs', toolName: 'docs.search', input: {} },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', runId: 'run-redact', purpose: 'agent_preview' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', runId: 'run-redact', purpose: 'agent_preview' },
     );
 
     expect(response.output).toMatchObject({
@@ -781,7 +781,7 @@ describe('connector execution policy', () => {
 
     await expect(service.execute(
       { connectorId: 'external_docs', toolName: 'docs.search', input: {} },
-      { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', runId: 'run-large', purpose: 'agent_preview' },
+      { projectsRoot: '/tmp/mish-test', projectId: 'project-a', runId: 'run-large', purpose: 'agent_preview' },
     )).rejects.toMatchObject({ code: 'CONNECTOR_OUTPUT_TOO_LARGE', status: 502 });
   });
 
@@ -793,7 +793,7 @@ describe('connector execution policy', () => {
     statusService.connect(definition, 'docs@example.com');
     const service = new OutputTestConnectorService(definition, statusService, { toolName: 'docs.search', count: 0 });
     const request = { connectorId: 'external_docs', toolName: 'docs.search', input: {} };
-    const context = { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', runId: 'run-limits', purpose: 'agent_preview' } as const;
+    const context = { projectsRoot: '/tmp/mish-test', projectId: 'project-a', runId: 'run-limits', purpose: 'agent_preview' } as const;
 
     for (let index = 0; index < CONNECTOR_RUN_RATE_LIMIT_CALLS; index += 1) {
       await expect(service.execute(request, context)).resolves.toMatchObject({ ok: true });
@@ -816,7 +816,7 @@ describe('connector execution policy', () => {
     statusService.connect(definition, 'docs@example.com');
     const service = new OutputTestConnectorService(definition, statusService, { toolName: 'docs.search', count: 0 });
     const request = { connectorId: 'external_docs', toolName: 'docs.search', input: {} };
-    const context = { projectsRoot: '/tmp/open-design-test', projectId: 'project-a', runId: 'run-stale', purpose: 'agent_preview' } as const;
+    const context = { projectsRoot: '/tmp/mish-test', projectId: 'project-a', runId: 'run-stale', purpose: 'agent_preview' } as const;
 
     for (let index = 0; index < CONNECTOR_RUN_TOTAL_CALL_LIMIT; index += 1) {
       vi.advanceTimersByTime(60_000);

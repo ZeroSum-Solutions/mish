@@ -14,13 +14,13 @@
 // internet-facing HTTPS use app-service.bicep.
 
 @description('Base name for the deployment. A globally-unique suffix is appended to the DNS label.')
-param name string = 'open-design'
+param name string = 'mish'
 
 @description('Azure region. Defaults to the resource group location.')
 param location string = resourceGroup().location
 
 @description('Container image to run. Pin to a digest (image@sha256:...) for production.')
-param image string = 'docker.io/vanjayak/open-design:latest'
+param image string = 'docker.io/vanjayak/mish:latest'
 
 @secure()
 @minLength(32)
@@ -68,7 +68,7 @@ resource containerGroup 'Microsoft.ContainerInstance/containerGroups@2023-05-01'
     }
     containers: [
       {
-        name: 'open-design'
+        name: 'mish'
         properties: {
           image: image
           ports: [

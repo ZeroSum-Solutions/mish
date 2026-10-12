@@ -44,7 +44,7 @@ function renderMessage(role: 'user' | 'assistant'): HTMLElement {
   return el;
 }
 
-describe('H3 开关:msg-enter 入场动画(open-design:disable-msg-enter-animation)', () => {
+describe('H3 开关:msg-enter 入场动画(mish:disable-msg-enter-animation)', () => {
   it('默认(根节点上没有属性):消息照常跑 msg-enter,并且带 fill: both', () => {
     for (const role of ['user', 'assistant'] as const) {
       const animation = getComputedStyle(renderMessage(role)).animation;

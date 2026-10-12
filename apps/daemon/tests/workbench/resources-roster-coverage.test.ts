@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { RESOURCE_SOURCE_IDS, parseResourceSearchRequest } from '@open-design/contracts';
+import { RESOURCE_SOURCE_IDS, parseResourceSearchRequest } from '@mish/contracts';
 import { searchResources } from '../../src/workbench/resources.js';
 import { authority, localInventorySources } from './resources-inventory-fixture.js';
 

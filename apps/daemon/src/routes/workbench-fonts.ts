@@ -1,5 +1,5 @@
 import type { Express, Response } from 'express';
-import { parseFontCheckRequest, parseFontCheckResponse } from '@open-design/contracts';
+import { parseFontCheckRequest, parseFontCheckResponse } from '@mish/contracts';
 import { checkFont } from '../fonts/check.js';
 import { FONT_SPECIMEN_TEXT_LIMIT, renderFontSpecimen } from '../fonts/specimen.js';
 import { ResourceError, inspectResource } from '../workbench/resources.js';

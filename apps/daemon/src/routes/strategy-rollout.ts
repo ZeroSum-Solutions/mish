@@ -1,5 +1,5 @@
 import type { Express, RequestHandler } from 'express';
-import type { OdNextRolloutControlResponse } from '@open-design/contracts';
+import type { OdNextRolloutControlResponse } from '@mish/contracts';
 
 import {
   readOdNextRolloutControlStatus,

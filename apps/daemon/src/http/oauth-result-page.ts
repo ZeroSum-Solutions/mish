@@ -78,7 +78,7 @@ export function renderOAuthResultPage(opts: OAuthResultPageOptions): string {
         window.opener.postMessage(payload, '*');
       }
       if (window.BroadcastChannel) {
-        var bc = new BroadcastChannel('open-design-mcp-oauth');
+        var bc = new BroadcastChannel('mish-mcp-oauth');
         bc.postMessage(payload);
         bc.close();
       }

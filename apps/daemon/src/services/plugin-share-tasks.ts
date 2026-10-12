@@ -1,6 +1,6 @@
 import type { randomUUID } from 'node:crypto';
 
-export type PluginShareAction = 'publish-github' | 'contribute-open-design';
+export type PluginShareAction = 'publish-github' | 'contribute-mish';
 
 export interface PluginShareTask {
   id: string;
@@ -74,11 +74,11 @@ function pluginShareActionToCli(action: PluginShareAction) {
     };
   }
   return {
-    argv: ['plugin', 'open-design-pr'],
+    argv: ['plugin', 'mish-pr'],
     title: 'Upstream PR',
-    command: 'od plugin open-design-pr',
+    command: 'od plugin mish-pr',
     successMessage: 'Opened upstream PR flow.',
-    failureCode: 'open-design-pr-failed',
+    failureCode: 'mish-pr-failed',
   };
 }
 

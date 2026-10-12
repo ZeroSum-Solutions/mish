@@ -66,7 +66,7 @@ A design template is a **packaged shape for producing one kind of artifact**. It
 - A duplicate of an existing template with marginal differentiation. Before opening, search `design-templates/` and read the descriptions of the closest 2–3 — if you can't articulate the differentiator in one sentence, fold your work into the existing template instead.
 - A template whose only output is a static screenshot or pre-rendered video. The artifact has to be generated from a prompt, not merely shipped in `assets/`.
 
-**Third option: ship an external plugin bundle.** If your workflow is genuinely a recipe (not a daemon feature) but is too vendor-specific or audience-narrow to land in-tree, publish a portable `SKILL.md` bundle with an `open-design.json` manifest and distribute it through the plugin workflow. The current `od skills` CLI is read-only; installation belongs to `od plugin`, not the retired `od skill add` shape. This is the right path for payment-provider workflows, regional marketplace integrations, in-house design systems, and similar — not a rejection, just a different distribution channel.
+**Third option: ship an external plugin bundle.** If your workflow is genuinely a recipe (not a daemon feature) but is too vendor-specific or audience-narrow to land in-tree, publish a portable `SKILL.md` bundle with an `mish.json` manifest and distribute it through the plugin workflow. The current `od skills` CLI is read-only; installation belongs to `od plugin`, not the retired `od skill add` shape. This is the right path for payment-provider workflows, regional marketplace integrations, in-house design systems, and similar — not a rejection, just a different distribution channel.
 
 If you're not sure your idea fits, **open a discussion in this repository first** — we'd rather spend 5 minutes redirecting than have you build the wrong thing for a week.
 
@@ -200,7 +200,7 @@ For a non-featured template, the cheap path is to keep the source metadata compl
 
 - [ ] **Ensure `SKILL.md` has complete English display copy**: title/name, description, example prompt, and any picker metadata required by the skill schema. The localized runtime uses these fields as the fallback display path.
 - [ ] **Use optional localized display fields when useful**: `en_name` / `zh_name`, `en_description` / `zh_description`, and `od.example_prompt_i18n.<locale>`. Keep `description` and `od.example_prompt` in English because those are the fallback fields for every locale without localized copy.
-- [ ] **Run `pnpm --filter @open-design/web test` and `pnpm --filter @open-design/e2e test tests/localized-content.test.ts`** locally before pushing. These suites catch undisplayable discovered resources and verify localized fallback behavior.
+- [ ] **Run `pnpm --filter @mish/web test` and `pnpm --filter @mish/e2e test tests/localized-content.test.ts`** locally before pushing. These suites catch undisplayable discovered resources and verify localized fallback behavior.
 
 ### Featured templates (optional path)
 
@@ -243,7 +243,7 @@ they don't cover this case. If you can't, fold into the existing template instea
 - [ ] Verified export works (PPTX / PDF / etc.) if the mode supports it
 - [ ] Ran `pnpm typecheck`
 - [ ] Verified `SKILL.md` has complete English display copy for localized fallback — **required for every template**
-- [ ] Ran `pnpm --filter @open-design/web test` and `pnpm --filter @open-design/e2e test tests/localized-content.test.ts`; localized-content coverage is green
+- [ ] Ran `pnpm --filter @mish/web test` and `pnpm --filter @mish/e2e test tests/localized-content.test.ts`; localized-content coverage is green
 
 ## Screenshot
 (Required if `od.featured` is set. Otherwise nice-to-have.)

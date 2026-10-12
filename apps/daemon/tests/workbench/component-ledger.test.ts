@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { RESOURCE_SOURCE_IDS, parseComponentLedger, summarizeComponentLedger, type ComponentLedger } from '@open-design/contracts';
+import { RESOURCE_SOURCE_IDS, parseComponentLedger, summarizeComponentLedger, type ComponentLedger } from '@mish/contracts';
 import { checkComponentLedger, collectComponentInventory, refreshComponentLedger, validateComponentLedgerCitations } from '../../src/workbench/component-ledger.js';
 
 const repo = path.resolve(import.meta.dirname, '../../../..');

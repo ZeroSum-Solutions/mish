@@ -4,7 +4,7 @@ import {
   type CreateIntakeBatchRequest, type IntakeBatchSnapshot, type ListIntakeBatchesResponse,
   type IntakeFilePutResponse, type ClearIntakeRequest, type AttachIntakeRequest, type AttachIntakeResponse,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { workspaceProjectHeaders, workspaceResourceUrl } from '../collab/workspace-identity';
 import { transferWithRetry, TransferRetryAfterError } from '../runtime/intake/transfer-queue';
 import { readApiErrorBody } from './api-error';

@@ -46,7 +46,7 @@ describe('buildPluginFolderAgentActionPrompt', () => {
       // the agent had been routing back to it. The mention must be in a
       // negative imperative ("Do NOT call …"), not a recommendation.
       expect(prompt).toMatch(
-        /Do NOT (call|route through) `?od plugin publish --to open-design`?/i,
+        /Do NOT (call|route through) `?od plugin publish --to mish`?/i,
       );
       expect(prompt).toMatch(
         /registry[- ]submission|registry-submission flow|Mishh Mashh PR/i,
@@ -78,7 +78,7 @@ describe('buildPluginFolderAgentActionPrompt', () => {
 
     it('delegates upstream catalog PR creation to the deterministic plugin CLI helper', () => {
       expect(prompt).toContain('upstream community catalog');
-      expect(prompt).toContain(`"$OD_NODE_BIN" "$OD_BIN" plugin open-design-pr ${FOLDER}`);
+      expect(prompt).toContain(`"$OD_NODE_BIN" "$OD_BIN" plugin mish-pr ${FOLDER}`);
     });
 
     it('states the CLI-owned PR workflow instead of re-listing shell steps', () => {
@@ -88,9 +88,9 @@ describe('buildPluginFolderAgentActionPrompt', () => {
       expect(prompt).toMatch(/fork\/clone\/copy\/branch\/push/i);
       expect(prompt).toContain('gh pr create --web');
       // The legacy CLI is named in the prompt only as part of an explicit
-      // ban ("Do NOT call the legacy `od plugin publish --to open-design`")
+      // ban ("Do NOT call the legacy `od plugin publish --to mish`")
       // — verify the ban is in place, not the bare command.
-      expect(prompt).toMatch(/do not call the legacy `od plugin publish --to open-design`/i);
+      expect(prompt).toMatch(/do not call the legacy `od plugin publish --to mish`/i);
     });
 
     it('uses --web so the author confirms the PR in browser', () => {
@@ -116,7 +116,7 @@ describe('buildPluginFolderAgentActionPrompt', () => {
     it('interpolates the actual folder path into manifest and copy steps', () => {
       // Sanity check that template-string interpolation didn't regress into
       // literal `${folderPath}` substrings (we already shipped that bug once).
-      expect(prompt).toContain(`plugin open-design-pr ${FOLDER}`);
+      expect(prompt).toContain(`plugin mish-pr ${FOLDER}`);
       expect(prompt).not.toContain('${folderPath}');
     });
 

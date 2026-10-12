@@ -93,7 +93,7 @@ function runCheck(): void {
   const fresh = buildFromKit();
   const drift = catalogDrift(committed, fresh);
   if (drift.length > 0 || catalogFileText(fresh) !== readFileSync(catalogPath, 'utf8')) {
-    fail('catalog.json drifted from the source kit; run `pnpm --filter @open-design/cult-ui-catalog import`', drift.length > 0 ? drift : ['formatting differs']);
+    fail('catalog.json drifted from the source kit; run `pnpm --filter @mish/cult-ui-catalog import`', drift.length > 0 ? drift : ['formatting differs']);
   }
   console.log(`catalog.json matches the source kit (${committed.rows.length} rows, snapshot ${committed.snapshot.id})`);
 }

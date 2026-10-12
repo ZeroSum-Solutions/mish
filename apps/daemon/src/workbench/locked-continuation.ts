@@ -1,6 +1,6 @@
 import type Database from 'better-sqlite3';
 import { createHash } from 'node:crypto';
-import { composeOdNextFreshContinuationV1, parseOdNextRequestTurnV1, type SessionRunAdmission } from '@open-design/contracts';
+import { composeOdNextFreshContinuationV1, parseOdNextRequestTurnV1, type SessionRunAdmission } from '@mish/contracts';
 import type { StrategyTaskExecutionRecord } from '../strategies/task-store.js';
 import { assertOdNextSemanticRequestFactProducerCoverage } from '../runtimes/od-next-exact-input.js';
 import { AdmissionError, executionIdentitiesEqual, readConversationCursor, sourceRequiresFresh, type PreparedAdmission } from './admission.js';

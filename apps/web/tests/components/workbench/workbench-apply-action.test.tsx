@@ -6,7 +6,7 @@
 // adoption catalogue-prepare|apply|undo` drives the same endpoints.
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import type { AdoptionOperationView, CatalogueAdoptionResponse, PreparedAdoptionPlan, ResourceResult } from '@open-design/contracts';
+import type { AdoptionOperationView, CatalogueAdoptionResponse, PreparedAdoptionPlan, ResourceResult } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchApplyAction } from '../../../src/components/workbench/WorkbenchApplyAction';
 import { WorkbenchResourceDetail } from '../../../src/components/workbench/WorkbenchResourceDetail';

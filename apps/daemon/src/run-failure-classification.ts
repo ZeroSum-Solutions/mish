@@ -12,11 +12,11 @@ import type {
   TrackingRunPolicyReason,
   TrackingRunRepairOwner,
   TrackingRunTerminalTrigger,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import {
   isMembershipConcurrencyLimitFailure,
   isModelWindowLimitFailure,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   classifyAmrAccountFailure,
@@ -934,7 +934,7 @@ function classification(
       : failure_domain === 'client_environment'
         ? 'client_environment'
         : failure_domain === 'client_product'
-          ? 'open_design'
+          ? 'mish'
           : failure_domain === 'cross_boundary'
             ? 'shared_boundary'
             : 'unknown';

@@ -21,7 +21,7 @@
  *   tail, which must contain a directory segment (`hooks/use-x`, never a bare `./types`), ends
  *   exactly one such target. A file never points at itself, and anything else (CSS `@import`, an
  *   ambiguous or unmatched path) is left exactly as it is.
- * - Every name the item carries is brand-free (`@open-design/contracts` api/cult-brand.ts): it is
+ * - Every name the item carries is brand-free (`@mish/contracts` api/cult-brand.ts): it is
  *   published under its public slug (`generated/slugs.json`; the internal name and `cult:<name>`
  *   id still resolve as aliases and are never echoed), with a scrubbed title and description,
  *   brand-free file and folder names (`cultBrandFreePath`, import paths following them), branded
@@ -35,7 +35,7 @@
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
-import type { CultCopyInfo, CultRegistryFile } from '@open-design/contracts';
+import type { CultCopyInfo, CultRegistryFile } from '@mish/contracts';
 import {
   CULT_REGISTRY_NAME,
   cultBrandFreeIdentifier,
@@ -44,7 +44,7 @@ import {
   cultDisplayTitle,
   cultRegistryName,
   isCultBrandFree,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import { expandHomePrefix } from './home-expansion.js';
 import { cultRefinedSourceCopy } from './cult-copy-refinements.js';

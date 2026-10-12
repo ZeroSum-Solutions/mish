@@ -314,7 +314,7 @@ describe('PreviewModal unavailable state', () => {
         ]}
         shareTarget={{
           title: 'Media Template',
-          url: 'https://open-design.ai/plugins/media-template',
+          url: 'https://mish.invalid/plugins/media-template',
         }}
         onView={() => {}}
         onClose={() => {}}

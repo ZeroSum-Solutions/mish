@@ -39,7 +39,7 @@ describe('read-only component ledger', () => {
     for (const [, options] of vi.mocked(fetch).mock.calls) expect(options?.method ?? 'GET').toBe('GET');
   });
   it("renders in English and the qualified licensed claim", async () => {
-    localStorage.setItem('open-design:locale', "en"); localStorage.setItem('open-design:locale-source', 'manual');
+    localStorage.setItem('mish:locale', "en"); localStorage.setItem('mish:locale-source', 'manual');
     stub(); render(<I18nProvider><ComponentLedgerSection /></I18nProvider>);
     expect(await screen.findByText('genui:private')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: "Component ledger" })).toBeInTheDocument();

@@ -193,7 +193,7 @@ describe('ACP stdio MCP servers are withheld from runtimes that reject them', ()
   it('still sends the live-artifacts stdio MCP server to Kimi 0.36.1', async () => {
     const { params } = await runTurnAndReadSessionNew({ version: '0.36.1' });
     const names = (params.mcpServers ?? []).map((s) => s.name);
-    expect(names).toContain('open-design-live-artifacts');
+    expect(names).toContain('mish-live-artifacts');
   }, 60_000);
 
   it('trusts the version the agent reports in the ACP handshake, not the `--version` probe', async () => {
@@ -231,7 +231,7 @@ describe('ACP stdio MCP servers are withheld from runtimes that reject them', ()
     const { params } = await runTurnAndReadSessionNew({ version: '0.38.0' });
     const names = (params.mcpServers ?? []).map((s) => s.name);
     expect(names).not.toContain('user-stdio-server');
-    expect(names).not.toContain('open-design-live-artifacts');
+    expect(names).not.toContain('mish-live-artifacts');
   }, 60_000);
 
   it('leaves another mature-acp runtime (hermes) receiving its stdio MCP server', async () => {
@@ -244,6 +244,6 @@ describe('ACP stdio MCP servers are withheld from runtimes that reject them', ()
       binName: 'hermes',
     });
     const names = (params.mcpServers ?? []).map((s) => s.name);
-    expect(names).toContain('open-design-live-artifacts');
+    expect(names).toContain('mish-live-artifacts');
   }, 60_000);
 });

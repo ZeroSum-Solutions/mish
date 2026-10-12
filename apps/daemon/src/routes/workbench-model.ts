@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import { parsePutSessionModel, sessionModelChoicesEqual } from '@open-design/contracts';
+import { parsePutSessionModel, sessionModelChoicesEqual } from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
 import type { AuthorizeProjectRequest } from '../collab/project-request-authority.js';
 import { resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';

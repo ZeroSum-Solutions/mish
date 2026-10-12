@@ -31,7 +31,7 @@
 import { JSDOM } from 'jsdom';
 import { describe, expect, it } from 'vitest';
 
-import { defaultPackageDir, loadFamilyPackage } from '@open-design/agency-fast-lane/family';
+import { defaultPackageDir, loadFamilyPackage } from '@mish/agency-fast-lane/family';
 
 describe('emmpo demo controls with no brief-supplied destination are real <button>s, not anchors with no href', () => {
   it('is a <button> (Enter/Space-activatable by the HTML spec in a real browser) whose own click handler opens the dialog', async () => {

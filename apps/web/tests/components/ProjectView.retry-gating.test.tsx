@@ -25,7 +25,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ProjectView } from '../../src/components/ProjectView';
 import type { ProjectWorkspaceScopeState } from '../../src/collab/useProjectWorkspaceScope';
-import type { WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceCollabContext } from '@mish/contracts';
 import type {
   AgentInfo,
   AppConfig,
@@ -246,7 +246,7 @@ vi.mock('../../src/components/ChatPane', () => ({
       meta?: unknown,
     ) => unknown;
     onResumeRun?: (message: ChatMessage) => void;
-    onShareToOpenDesign?: (assistantMessageId: string) => void;
+    onShareToMish?: (assistantMessageId: string) => void;
     onContinueRemainingTasks?: (
       message: ChatMessage,
       todos: Array<{ content: string; status: string }>,
@@ -314,9 +314,9 @@ vi.mock('../../src/components/ChatPane', () => ({
           */}
         <button
           type="button"
-          data-testid="share-to-open-design"
+          data-testid="share-to-mish"
           onClick={() => {
-            if (failed) props.onShareToOpenDesign?.(failed.id);
+            if (failed) props.onShareToMish?.(failed.id);
           }}
         >
           share

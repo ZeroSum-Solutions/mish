@@ -7,7 +7,7 @@
 // card read a composed build the same way. `data-testid="agency-composition"` and each block's
 // `data-block-id` are stable hooks for e2e.
 
-import type { AgencyBuildCompositionResult } from '@open-design/contracts';
+import type { AgencyBuildCompositionResult } from '@mish/contracts';
 
 import type { useT } from '../i18n';
 import styles from './AgencyCompositionSummary.module.css';

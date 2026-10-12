@@ -1,4 +1,4 @@
-import type { ProjectContentTransferState } from '@open-design/contracts';
+import type { ProjectContentTransferState } from '@mish/contracts';
 
 export interface ProjectContentTransferScope {
   projectId: string;

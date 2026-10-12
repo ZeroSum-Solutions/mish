@@ -318,7 +318,7 @@ describe('renderVelaImage', () => {
     expect(optionsSeen[1]).toEqual(optionsSeen[0]);
     expect(optionsSeen[1]).toMatchObject({
       configuredEnv: {
-        VELA_INVOCATION_SOURCE: 'open-design',
+        VELA_INVOCATION_SOURCE: 'mish',
         VELA_WORKSPACE_ID: 'team-1',
       },
       timeoutMs: 330_000,

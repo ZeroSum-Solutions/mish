@@ -1,4 +1,4 @@
-import type { ConnectorErrorCode } from '@open-design/contracts';
+import type { ConnectorErrorCode } from '@mish/contracts';
 
 export class ConnectorError extends Error {
   constructor(readonly status: number, readonly code: ConnectorErrorCode, message: string, readonly details: Record<string, unknown> = {}) {

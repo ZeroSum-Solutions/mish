@@ -2,7 +2,7 @@
 // preview image 21st.dev itself publishes for each `rights: "mit"` hand-picked library row,
 // fetched once from its own CDN (cdn.21st.dev) and re-encoded — never the item's own source.
 // Committing (and same-origin serving) that image still redistributes the upstream screenshot, so
-// a `reference-only` row never gets one — `twenty1stMayShipLocalImage` (@open-design/contracts) is
+// a `reference-only` row never gets one — `twenty1stMayShipLocalImage` (@mish/contracts) is
 // the one shared rule this file and e2e/scripts/catalog-thumbnails.ts both gate on. Shape,
 // provenance and byte-budget invariants against the committed manifest and images; the fetch path
 // itself needs the kit and the network, so it is exercised by `pnpm run 21st-thumbnails`, not here.
@@ -14,7 +14,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { test } from 'node:test';
 
-import { twenty1stMayShipLocalImage } from '@open-design/contracts';
+import { twenty1stMayShipLocalImage } from '@mish/contracts';
 import twentyFirstJson from '../generated/21st-items.json' with { type: 'json' };
 import thumbnailsJson from '../generated/21st-thumbnails.json' with { type: 'json' };
 

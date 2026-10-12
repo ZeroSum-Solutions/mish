@@ -10,7 +10,7 @@ const bytes = (value: string) => new TextEncoder().encode(value);
 describe('strategy package identity', () => {
   const assets = [
     { path: './SKILL.md', bytes: bytes('skill') },
-    { path: './open-design.json', bytes: bytes('{"name":"od-next-strategy"}') },
+    { path: './mish.json', bytes: bytes('{"name":"od-next-strategy"}') },
     { path: './assets/core.md', bytes: bytes('core') },
     { path: './assets/orchestration.md', bytes: bytes('orchestration') },
     { path: './assets/task-profiles/prototype.md', bytes: bytes('prototype') },

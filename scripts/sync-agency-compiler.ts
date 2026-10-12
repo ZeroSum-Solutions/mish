@@ -56,7 +56,7 @@
 // What it never touches:
 //   - a family module's OWN package, `scripts/families/<family>/**` inside `agency-<family>` —
 //     that copy is package-owned (`registry.ts` sits beside it, not inside it)
-//   - `families/`, `preview/`, `assets/`, `README.md`, `SKILL.md`, `open-design.json`
+//   - `families/`, `preview/`, `assets/`, `README.md`, `SKILL.md`, `mish.json`
 //   - `compiler/FAMILY-PATCH.json` — it records hashes of family sources only, never a shared or
 //     mirrored file, so it has nothing to say about this sync
 //   - every `COMMIT.json` entry for a file this script does not write. That file records a

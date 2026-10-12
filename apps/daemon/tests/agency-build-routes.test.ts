@@ -26,21 +26,21 @@ import type {
   AgencyBuildResponse,
   AgencyBuildSnapshot,
   ApiErrorResponse,
-} from '@open-design/contracts';
-import { AGENCY_BUILD_HISTORY_LIMIT, AGENCY_ROUTE_MAX_CHARS } from '@open-design/contracts';
-import { loadFamilyPackage } from '@open-design/agency-fast-lane/family';
-import type { BuildDeps, BuildEvent, BuildInput, BuildResult } from '@open-design/agency-fast-lane/build';
-import { parseSectionCatalogResponse, type SectionEntryResponse, type SectionsListResponse } from '@open-design/contracts/api/section-catalog';
-import { buildSite, RenderQualityError, UnitDeadlineError, UnitRefusedError } from '@open-design/agency-fast-lane/build';
-import { createJevRouter } from '@open-design/agency-fast-lane/route';
-import { loadAtlasData } from '@open-design/agency-fast-lane/atlas';
+} from '@mish/contracts';
+import { AGENCY_BUILD_HISTORY_LIMIT, AGENCY_ROUTE_MAX_CHARS } from '@mish/contracts';
+import { loadFamilyPackage } from '@mish/agency-fast-lane/family';
+import type { BuildDeps, BuildEvent, BuildInput, BuildResult } from '@mish/agency-fast-lane/build';
+import { parseSectionCatalogResponse, type SectionEntryResponse, type SectionsListResponse } from '@mish/contracts/api/section-catalog';
+import { buildSite, RenderQualityError, UnitDeadlineError, UnitRefusedError } from '@mish/agency-fast-lane/build';
+import { createJevRouter } from '@mish/agency-fast-lane/route';
+import { loadAtlasData } from '@mish/agency-fast-lane/atlas';
 
 import { AgencyModelKeyUnavailableError, createAgencyJevKeyStore } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';
 import { createSseResponse } from '../src/server.js';
 import { familyPackageDir, registerAgencyBuildRoutes } from '../src/routes/agency-build.js';
 import { publicCultEntry, registerSectionsRoutes } from '../src/routes/sections.js';
-import cultSlugsJson from '@open-design/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
+import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
 import { brandHit } from './helpers/cult-brands.js';
 
 /** The public id `GET /api/sections` serves for the insertable Cult section `cult:marketing-cta-cosmic`. */

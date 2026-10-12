@@ -10,7 +10,7 @@ export type DshBootstrapObject = {
   name: (typeof DSH_BOOTSTRAP_FILES)[number];
 };
 
-const LANDING_PS1_URL = "https://open-design.ai/install-dsh.ps1?version=1";
+const LANDING_PS1_URL = "https://mish.invalid/install-dsh.ps1?version=1";
 
 function sha256(body: Buffer): string {
   return createHash("sha256").update(body).digest("hex");

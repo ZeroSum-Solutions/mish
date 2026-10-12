@@ -7,7 +7,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { Twenty1stItem, Twenty1stListResponse, CultCatalogListResponse } from '@open-design/contracts';
+import type { Twenty1stItem, Twenty1stListResponse, CultCatalogListResponse } from '@mish/contracts';
 
 import { Twenty1stPanel } from '../../src/components/Twenty1stPanel';
 import { CatalogView } from '../../src/components/CatalogView';
@@ -524,7 +524,7 @@ describe('actual private upstream implementations', () => {
   // privateImplementation/ownedAlternative, so the card's <img> points at `/reference-preview`
   // instead. That route is same-origin, served by apps/daemon/src/routes/twenty1st.ts from a file
   // under generated/21st-thumbnails/ — never a 21st.dev CDN URL handed to the browser — and it now
-  // only has a committed copy for a `mit` row (twenty1stMayShipLocalImage, @open-design/contracts);
+  // only has a committed copy for a `mit` row (twenty1stMayShipLocalImage, @mish/contracts);
   // a reference-only row's `/reference-preview` answers 404 (see
   // apps/daemon/tests/twenty1st-routes.test.ts). So if this row's preview state is ever stale
   // enough to still claim `preview.kind: "image"`, the resulting <img> 404s at runtime and must

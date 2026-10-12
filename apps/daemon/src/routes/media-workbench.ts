@@ -21,7 +21,7 @@ import {
   type MediaTaskCancelResponse,
   type MediaTaskRetryResponse,
   type ProjectFile,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import type Database from 'better-sqlite3';
 
 import type { AuthorizeProjectRequest } from '../collab/project-request-authority.js';

@@ -2,7 +2,7 @@
 
 import { act, cleanup, render, screen } from '@testing-library/react';
 import { afterEach, expect, it, vi } from 'vitest';
-import type { InstalledPluginRecord } from '@open-design/contracts';
+import type { InstalledPluginRecord } from '@mish/contracts';
 import { ComposerPluginOption } from '../../src/components/ComposerPluginPreview';
 
 vi.mock('../../src/components/plugins-home/cards/PreviewSurface', () => ({

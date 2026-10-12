@@ -1,5 +1,5 @@
 import { readFile } from 'node:fs/promises';
-import { parseDesignBrief, parseReferenceFanoutRequest, parseReferenceFanoutResponse } from '@open-design/contracts';
+import { parseDesignBrief, parseReferenceFanoutRequest, parseReferenceFanoutResponse } from '@mish/contracts';
 import { mayForwardScopedToolToken, resolveDaemonUrl } from '../../daemon-url.js';
 import type { WorkbenchCliOptions } from '../../workbench-cli.js';
 

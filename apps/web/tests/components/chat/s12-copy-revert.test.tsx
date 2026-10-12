@@ -21,7 +21,7 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render as rtlRender, screen } from '@testing-library/react';
 import type { ReactElement } from 'react';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { ExecutionShell, SLOW_UPSTREAM_AFTER_MS } from '../../../src/components/chat/ExecutionShell';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';

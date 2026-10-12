@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 import type Database from 'better-sqlite3';
-import type { DesignSystemWorkspaceSyncConflict } from '@open-design/contracts';
+import type { DesignSystemWorkspaceSyncConflict } from '@mish/contracts';
 
 /**
  * The sync baseline of one file a design-system package materialised into

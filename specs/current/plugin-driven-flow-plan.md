@@ -120,7 +120,7 @@ Deferred to a follow-up:
 ## File map
 
 **Added by the shipped stages**
-- `plugins/_official/scenarios/od-media-generation/{open-design.json,SKILL.md}`
+- `plugins/_official/scenarios/od-media-generation/{mish.json,SKILL.md}`
 - `apps/daemon/src/plugins/atoms/registry.ts`
 - `apps/web/src/components/home-hero/chips.ts`
 - `packages/contracts/src/plugins/scenario-defaults.ts`
@@ -157,6 +157,6 @@ Deferred to a follow-up:
 ```bash
 pnpm guard
 pnpm typecheck
-pnpm --filter @open-design/daemon test
-pnpm --filter @open-design/web test
+pnpm --filter @mish/daemon test
+pnpm --filter @mish/web test
 ```

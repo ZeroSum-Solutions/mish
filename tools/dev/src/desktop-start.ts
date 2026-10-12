@@ -1,4 +1,4 @@
-import { APP_KEYS, type DesktopStatusSnapshot } from "@open-design/sidecar-proto";
+import { APP_KEYS, type DesktopStatusSnapshot } from "@mish/sidecar-proto";
 import type { ToolDevConfig, ToolDevOptions } from "./config.js";
 
 export type DesktopStartOptions = ToolDevOptions & { parentPid?: number };

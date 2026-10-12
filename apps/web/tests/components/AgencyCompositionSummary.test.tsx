@@ -5,7 +5,7 @@
 
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { AgencyBuildCompositionResult } from '@open-design/contracts';
+import type { AgencyBuildCompositionResult } from '@mish/contracts';
 
 import { AgencyCompositionSummary } from '../../src/components/AgencyCompositionSummary';
 import { I18nProvider, useT } from '../../src/i18n';

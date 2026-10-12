@@ -6,7 +6,7 @@ import type { AddressInfo } from 'node:net';
 import { mkdir, mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import type { ProjectDesignContext, ProjectRubric, ReviewerRole } from '@open-design/contracts';
+import type { ProjectDesignContext, ProjectRubric, ReviewerRole } from '@mish/contracts';
 import { verifyWorkspaceRequestContext } from '../../src/collab/request-workspace-context.js';
 import type { WorkspaceDirectoryFetchResult } from '../../src/collab/vela-workspace-context.js';
 import { registerWorkbenchReviewRoutes } from '../../src/routes/workbench-review.js';
@@ -154,7 +154,7 @@ export async function bootReviewRuns(options: BootOptions = {}) {
   const output: unknown[] = [];
   const cli = (args: string[], stdin = '') => runReviewCli(args, { env: { OD_DAEMON_URL: url }, write: value => output.push(value), readStdin: async () => stdin });
   const start = (body: Record<string, unknown>, key = `k-${Math.random()}`) => fetch(`${url}/api/workbench/reviews`, { method: 'POST', headers: { 'content-type': 'application/json', 'idempotency-key': key }, body: JSON.stringify({ projectId: 'p', snapshot: { entry: 'index.html' }, rubricRevision: state.rubric?.revision ?? 0, ...body }) });
-  const show = async (id: string) => (await fetch(`${url}/api/workbench/reviews/${id}?projectId=p`)).json() as Promise<{ run: import('@open-design/contracts').ReviewRun; freshness: { state: string; reasons: string[] } }>;
+  const show = async (id: string) => (await fetch(`${url}/api/workbench/reviews/${id}?projectId=p`)).json() as Promise<{ run: import('@mish/contracts').ReviewRun; freshness: { state: string; reasons: string[] } }>;
   const close = () => new Promise<void>(resolve => server.close(() => resolve()));
   const mechanicalRun = (entry = 'index.html') => fetch(`${url}/api/workbench/projects/p/review/mechanical`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-od-project-id': 'p' }, body: JSON.stringify({ entry }) });
   return { url, data, root, state, runs, cli, output, start, show, close, mechanicalRun };

@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import { parsePreparedAdoptionPlan, type PreparedAdoptionPlan } from '@open-design/contracts';
+import { parsePreparedAdoptionPlan, type PreparedAdoptionPlan } from '@mish/contracts';
 import type { StoredBlob } from './adoption-files.js';
 
 /** Owned versioned migration (`placement-adoption`): stored plans and apply/undo lineage. */

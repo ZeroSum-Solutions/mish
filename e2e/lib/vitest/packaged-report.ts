@@ -18,7 +18,7 @@ export async function createPackagedSmokeReport(platform: PackagedReportPlatform
     process.env.OD_PACKAGED_E2E_REPORT_DIR ?? join('.tmp', 'e2e-release-report', platform),
   );
   const report = await createReport(root);
-  const screenshotRelpath = `screenshots/open-design-${platform}-smoke.png`;
+  const screenshotRelpath = `screenshots/mish-${platform}-smoke.png`;
 
   return {
     report,

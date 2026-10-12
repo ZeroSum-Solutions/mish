@@ -1,7 +1,7 @@
 import { JSDOM } from 'jsdom';
 import { describe, expect, it } from 'vitest';
 
-import { findRealTagOffset, HTML_TAG_PATTERNS } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 // --------------------------------------------------------------------------
 // Differential oracle for the shared injection-point scanner.

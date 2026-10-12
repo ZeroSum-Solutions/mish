@@ -17,9 +17,9 @@
  * surface badges next to each saved artifact.
  */
 
-import type { ArtifactLintFinding, ArtifactLintSeverity } from '@open-design/contracts';
+import type { ArtifactLintFinding, ArtifactLintSeverity } from '@mish/contracts';
 
-// The shared wire contract in @open-design/contracts is the authority for
+// The shared wire contract in @mish/contracts is the authority for
 // the finding shape; the legacy names alias it so existing importers keep
 // compiling while incompatible producer changes now fail compilation here
 // rather than drifting silently behind a consumer-side assertion.

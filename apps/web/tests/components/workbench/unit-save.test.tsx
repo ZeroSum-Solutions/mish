@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseUnitSaveRequest, type ReusableUnitManifest, type UnitSavePlan } from '@open-design/contracts';
+import { parseUnitSaveRequest, type ReusableUnitManifest, type UnitSavePlan } from '@mish/contracts';
 import { I18nProvider } from '../../../src/i18n';
 import { WorkbenchUnitSave } from '../../../src/components/workbench/WorkbenchUnitSave';
 

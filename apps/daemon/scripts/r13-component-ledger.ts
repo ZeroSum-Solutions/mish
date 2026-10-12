@@ -8,7 +8,7 @@
  * the content changes. Review the diff: a new row starts repair-pending and owned by C1.
  */
 import { writeFileSync } from 'node:fs';
-import { summarizeComponentLedger } from '@open-design/contracts';
+import { summarizeComponentLedger } from '@mish/contracts';
 import { checkComponentLedger, collectComponentInventory, componentLedgerPath, readComponentLedger, refreshComponentLedger } from '../src/workbench/component-ledger.js';
 
 const mode = process.argv.includes('--write') ? 'write' : 'check';

@@ -10,7 +10,7 @@
  * 事件的种类、顺序、入参形状全部保持原样。
  */
 import { describe, expect, it } from 'vitest';
-import type { PersistedAgentEvent } from '@open-design/contracts';
+import type { PersistedAgentEvent } from '@mish/contracts';
 import { buildTurnBlocks } from '../../../src/runtime/chat/build-turn-blocks';
 import { isExpandable } from '../../../src/runtime/chat/contract';
 import type { ExecutionShell, ProseBlock, ShellItem, ToolRow } from '../../../src/runtime/chat/contract';

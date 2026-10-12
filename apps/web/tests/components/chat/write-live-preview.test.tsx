@@ -116,7 +116,7 @@ describe('Write 只落一行(N4 / D3)', () => {
     /* 一行,不是一行 + 一块代码 */
     expect(body?.children.length).toBe(1);
     expect(body?.textContent ?? '').toContain("Wrote");
-    expect(screen.getByRole('button', { name: "Open design-manifesto-parchment.html" })).toBeTruthy();
+    expect(screen.getByRole('button', { name: "Mish-manifesto-parchment.html" })).toBeTruthy();
     /* 5 行正文 → +5 −0 */
     expect(body?.textContent ?? '').toContain('+5');
     expect(container.textContent ?? '').not.toContain(SOURCE_MARKER);

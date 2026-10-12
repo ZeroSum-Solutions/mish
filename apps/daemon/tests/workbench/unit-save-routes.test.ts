@@ -5,7 +5,7 @@ import { mkdir, mkdtemp, readdir, readFile, rm, symlink, writeFile } from 'node:
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { parseCaptureView, parseReusableUnitManifest, parseUnitList, parseUnitSavePlan, type UnitSaveRequest } from '@open-design/contracts';
+import { parseCaptureView, parseReusableUnitManifest, parseUnitList, parseUnitSavePlan, type UnitSaveRequest } from '@mish/contracts';
 import { registerWorkbenchCaptureRoutes } from '../../src/routes/workbench-capture.js';
 import { createCaptureService } from '../../src/workbench/capture/capture-service.js';
 import { createUnitService, type UnitServiceDeps } from '../../src/workbench/units/unit-service.js';

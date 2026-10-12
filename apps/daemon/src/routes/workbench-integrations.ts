@@ -1,6 +1,6 @@
 import type { Express, Request, Response } from 'express';
 import type Database from 'better-sqlite3';
-import type { LicenceWriteSurface } from '@open-design/contracts';
+import type { LicenceWriteSurface } from '@mish/contracts';
 import { buildConnectorInventory, buildIntegrationRoster, type RosterMcpServer } from '../workbench/integration-roster.js';
 import { IntegrationStatusError, type IntegrationStatusService } from '../workbench/integration-status.js';
 import { LicenceRecordError, putLicenceRecord, readAllLicenceRecords, readLicenceRecord } from '../workbench/licence-record.js';

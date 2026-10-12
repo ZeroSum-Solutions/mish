@@ -1,6 +1,6 @@
 import { WorkbenchIntake, useWorkbenchIntake } from '../../src/components/WorkbenchIntake';
 import { IntakeStore } from '../../src/runtime/intake/intake-store';
-import type { IntakeBatchSnapshot } from '@open-design/contracts';
+import type { IntakeBatchSnapshot } from '@mish/contracts';
 import { createDropCoordinator } from '../../src/runtime/intake/drop-coordinator';
 // @vitest-environment jsdom
 
@@ -12,7 +12,7 @@ import {
   buildWorkspaceSeatSummary,
   type ConnectorDetail,
   type WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 import {
   buildDesignSystemPackageAuditRepairPrompt,
@@ -293,7 +293,7 @@ afterEach(() => {
 beforeEach(() => {
   sessionStorage.clear();
   mocks.getSessionModel.mockImplementation(async (sessionId: string, projectId: string) => ({ sessionId, projectId, revision: 0, choice: null, updatedAt: 0 }));
-  mocks.putSessionModel.mockImplementation(async (sessionId: string, projectId: string, input: import('@open-design/contracts').PutSessionModel) => ({ sessionId, projectId, revision: input.expectedRevision + 1, choice: { agentId: input.agentId, modelId: input.modelId, ...(input.byokBinding ? { byokBinding: input.byokBinding } : {}) }, updatedAt: 0 }));
+  mocks.putSessionModel.mockImplementation(async (sessionId: string, projectId: string, input: import('@mish/contracts').PutSessionModel) => ({ sessionId, projectId, revision: input.expectedRevision + 1, choice: { agentId: input.agentId, modelId: input.modelId, ...(input.byokBinding ? { byokBinding: input.byokBinding } : {}) }, updatedAt: 0 }));
   mocks.postModelPreflight.mockImplementation(async (sessionId: string, projectId: string, input: { agentId: string; modelId: string }) => ({ agentId: input.agentId, modelId: input.modelId, ok: true, mismatches: [] }));
   workspaceContextState.context = null;
   mocks.connectConnector.mockResolvedValue({ connector: null });
@@ -1473,7 +1473,7 @@ describe('DesignSystemCreationFlow', () => {
     mocks.uploadProjectFile.mockImplementation(async (_projectId: string, file: File, desiredName?: string) => { if (phase === 'upload') await gate; return { name: desiredName ?? file.name, size: file.size, mtime: 1, kind: 'code', mime: 'text/css' }; });
     mocks.writeProjectTextFile.mockImplementation(async (_projectId: string, name: string) => { if (phase === 'manifest') await gate; return { name, size: 1, mtime: 1, kind: 'document', mime: 'text/markdown' }; });
     mocks.patchProject.mockImplementation(async () => { if (phase === 'patch') await gate; return project; });
-    mocks.putSessionModel.mockImplementation(async (sessionId: string, projectId: string, input: import('@open-design/contracts').PutSessionModel) => {
+    mocks.putSessionModel.mockImplementation(async (sessionId: string, projectId: string, input: import('@mish/contracts').PutSessionModel) => {
       if (phase === 'model-put') await gate;
       return { sessionId, projectId, revision: 1, choice: { agentId: input.agentId, modelId: input.modelId }, updatedAt: 0 };
     });
@@ -2211,7 +2211,7 @@ describe('DesignSystemCreationFlow', () => {
 
   it.skip('adds website source links with Enter and keeps them out of GitHub intake', async () => {
     const system: DesignSystemDetail = {
-      id: 'user:open-design-website-design-system',
+      id: 'user:mish-website-design-system',
       title: 'Mishh Mashh Website Design System',
       category: 'Custom',
       summary: 'Mishh Mashh website source.',
@@ -2221,10 +2221,10 @@ describe('DesignSystemCreationFlow', () => {
       source: 'user',
       status: 'draft',
       isEditable: true,
-      projectId: 'ds-open-design-website-design-system',
+      projectId: 'ds-mish-website-design-system',
     };
     const project: Project = {
-      id: 'ds-open-design-website-design-system',
+      id: 'ds-mish-website-design-system',
       name: 'Mishh Mashh Website Design System',
       skillId: null,
       designSystemId: system.id,
@@ -2251,11 +2251,11 @@ describe('DesignSystemCreationFlow', () => {
     );
 
     const sourceInput = screen.getByPlaceholderText('https://example.com or https://github.com/owner/repo') as HTMLInputElement;
-    fireEvent.change(sourceInput, { target: { value: 'open-design.ai' } });
+    fireEvent.change(sourceInput, { target: { value: 'mish.invalid' } });
     fireEvent.keyDown(sourceInput, { key: 'Enter', code: 'Enter' });
 
-    const previewLink = screen.getByRole('link', { name: 'Open open-design.ai' }) as HTMLAnchorElement;
-    expect(previewLink.href).toBe('https://open-design.ai/');
+    const previewLink = screen.getByRole('link', { name: 'Open mish.invalid' }) as HTMLAnchorElement;
+    expect(previewLink.href).toBe('https://github.com/ZeroSum-Solutions/mish');
     expect(sourceInput.value).toBe('');
 
     fireEvent.change(screen.getByPlaceholderText(/Mission Impastabowl/i), {
@@ -2271,7 +2271,7 @@ describe('DesignSystemCreationFlow', () => {
       githubRepoCount: 0,
     }));
     const draftInput = mocks.createDesignSystemDraft.mock.calls[0]?.[0];
-    expect(draftInput?.provenance?.sourceUrls).toEqual(['https://open-design.ai']);
+    expect(draftInput?.provenance?.sourceUrls).toEqual(['https://github.com/ZeroSum-Solutions/mish']);
     expect(draftInput?.provenance?.githubUrls).toBeUndefined();
 
     await waitFor(() => expect(mocks.writeProjectTextFile).toHaveBeenCalled());
@@ -2279,7 +2279,7 @@ describe('DesignSystemCreationFlow', () => {
       (call) => call[0] === project.id && call[1] === 'context/source-context.md',
     );
     expect(sourceManifestCall?.[2]).toEqual(expect.stringContaining('## Source Links'));
-    expect(sourceManifestCall?.[2]).toEqual(expect.stringContaining('- https://open-design.ai'));
+    expect(sourceManifestCall?.[2]).toEqual(expect.stringContaining('- https://github.com/ZeroSum-Solutions/mish'));
     expect(sourceManifestCall?.[2]).not.toEqual(expect.stringContaining('GitHub Connector Intake Runbook'));
     expect(mocks.patchProject).toHaveBeenCalledWith(
       project.id,
@@ -3089,7 +3089,7 @@ describe('DesignSystemDetailView', () => {
   // PATCH/DELETE verdict onto the GET response — false only for a team-synced
   // design system the caller (a plain member, not the original sharer or a
   // workspace owner/admin) may not manage. This surface is the direct
-  // `/design-systems/:id` route (e.g. the Library's "Open design system"
+  // `/design-systems/:id` route (e.g. the Library's "Open the design system"
   // link), separate from — and previously ungated unlike — DesignSystemsTab's
   // own team-tab detail pane.
   it('disables the Publish toggle, DESIGN.md save, and revision accept/reject when canMutate is false', async () => {
@@ -3579,7 +3579,7 @@ describe('DesignSystemDetailView', () => {
       function holdPut(modelId: string): Gate {
         const gate: Gate = { modelId, release: () => {} };
         let held = false;
-        mocks.putSessionModel.mockImplementation(async (sessionId: string, projectId: string, input: import('@open-design/contracts').PutSessionModel) => {
+        mocks.putSessionModel.mockImplementation(async (sessionId: string, projectId: string, input: import('@mish/contracts').PutSessionModel) => {
           const snapshot = { sessionId, projectId, revision: input.expectedRevision + 1, choice: { agentId: input.agentId, modelId: input.modelId }, updatedAt: 0 };
           if (input.modelId !== modelId || held) return snapshot;
           held = true;

@@ -12,7 +12,7 @@ import type {
   CollabCloudComment,
   CollabCloudMemberDirectoryEntry,
   CollabMemberRole,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 
 const DEFAULT_FETCH_TIMEOUT_MS = 8_000;
 

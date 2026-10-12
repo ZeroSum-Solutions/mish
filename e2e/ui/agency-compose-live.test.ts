@@ -5,7 +5,7 @@
  * never run it. It uses `clusterTest`, which boots no worker tools-dev runtime of its own.
  *
  *   OD_LIVE_WEB_URL=http://127.0.0.1:3012 OD_LIVE_DAEMON_URL=http://127.0.0.1:7468 \
- *   OD_LIVE_ARTIFACT_DIR=<dir> pnpm --filter @open-design/e2e exec playwright test \
+ *   OD_LIVE_ARTIFACT_DIR=<dir> pnpm --filter @mish/e2e exec playwright test \
  *     -c playwright.config.ts ui/agency-compose-live.test.ts --workers 1
  *
  * Two surfaces, the same brief and the same checks: Home -> "Build with Jev" (which sends
@@ -97,7 +97,7 @@ async function completeOnboarding(page: Page): Promise<() => Promise<void>> {
   const prior = await (await page.request.get(`${DAEMON}/api/app-config`)).json() as Record<string, unknown>;
   const config = { ...(prior.config as Record<string, unknown> ?? prior), onboardingCompleted: true, privacyDecisionAt: 1 };
   expect((await page.request.put(`${DAEMON}/api/app-config`, { data: config })).ok()).toBeTruthy();
-  await page.addInitScript((value) => localStorage.setItem('open-design:config', JSON.stringify(value)), config);
+  await page.addInitScript((value) => localStorage.setItem('mish:config', JSON.stringify(value)), config);
   return async () => { await page.request.put(`${DAEMON}/api/app-config`, { data: prior.config ?? prior }); };
 }
 

@@ -24,8 +24,8 @@ import type {
   WorkspaceInviteRole,
   WorkspaceInvalidationSsePayload,
   WorkspaceTeamProjectsResponse,
-} from '@open-design/contracts';
-import { workspaceSeatCapacityState } from '@open-design/contracts';
+} from '@mish/contracts';
+import { workspaceSeatCapacityState } from '@mish/contracts';
 import {
   parseWorkspaceCollabContext,
   type WorkspaceContextProvider,
@@ -378,7 +378,7 @@ export function registerCollabContextRoutes(app: Express, deps: RegisterCollabCo
       });
 
   // Desktop invite hand-off ("桌面唤起和本地恢复"): the desktop app parses the
-  // opendesign:// invite deeplink and POSTs the nonce here. The daemon consumes
+  // mish:// invite deeplink and POSTs the nonce here. The daemon consumes
   // the one-time continuation on B with the signed-in vela session and returns
   // the resolved workspace context so the client can switch into the team
   // workspace. The nonce is single-use — B enforces subject match + one consume.

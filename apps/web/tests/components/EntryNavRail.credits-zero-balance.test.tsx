@@ -12,7 +12,7 @@
 // overdrawn wallet keeps it on every plan.
 
 import { cleanup, render, screen } from '@testing-library/react';
-import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@open-design/contracts';
+import type { WorkspaceBillingSummary, WorkspaceCollabContext } from '@mish/contracts';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { EntryNavRail, resetWorkspaceDirectoryCache } from '../../src/components/EntryNavRail';

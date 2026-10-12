@@ -1,6 +1,6 @@
 import type { Server } from 'node:http';
 import { describe, expect, it } from 'vitest';
-import { parseFontCheckResponse, parseResourceSearchResponse } from '@open-design/contracts';
+import { parseFontCheckResponse, parseResourceSearchResponse } from '@mish/contracts';
 import { startServer } from '../../src/server.js';
 
 describe('AC-R11 fonts on a real daemon', () => {

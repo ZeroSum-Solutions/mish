@@ -1,4 +1,4 @@
-import { SOURCE_OPERATIONS, type ReferenceFanoutResponse } from '@open-design/contracts';
+import { SOURCE_OPERATIONS, type ReferenceFanoutResponse } from '@mish/contracts';
 export function referenceFanout(): ReferenceFanoutResponse {
   return {
     schema: 'reference-fanout/1', partial: false, spineCode: 'TL', sectionBasis: 'provided',

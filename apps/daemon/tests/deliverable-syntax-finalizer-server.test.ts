@@ -43,7 +43,7 @@ const originalEnv = {
   LANGFUSE_PUBLIC_KEY: process.env.LANGFUSE_PUBLIC_KEY,
   LANGFUSE_SECRET_KEY: process.env.LANGFUSE_SECRET_KEY,
   LANGFUSE_BASE_URL: process.env.LANGFUSE_BASE_URL,
-  OPEN_DESIGN_TELEMETRY_RELAY_URL: process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL,
+  MISH_TELEMETRY_RELAY_URL: process.env.MISH_TELEMETRY_RELAY_URL,
 };
 
 describe('successful run deliverable syntax finalizer (HTTP)', () => {
@@ -60,7 +60,7 @@ describe('successful run deliverable syntax finalizer (HTTP)', () => {
     delete process.env.LANGFUSE_PUBLIC_KEY;
     delete process.env.LANGFUSE_SECRET_KEY;
     delete process.env.LANGFUSE_BASE_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
 
     vi.resetModules();
     const serverModule = await import('../src/server.js') as unknown as ServerModule;

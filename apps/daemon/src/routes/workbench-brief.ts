@@ -1,5 +1,5 @@
 import type { Express, Request, Response } from 'express';
-import { type BriefTransformerStatus, type BriefTransformerStatusResponse, attachDesignBriefRequestSchema, previewDesignBriefRequestSchema, createDesignBriefRequestSchema, patchDesignBriefRequestSchema } from '@open-design/contracts';
+import { type BriefTransformerStatus, type BriefTransformerStatusResponse, attachDesignBriefRequestSchema, previewDesignBriefRequestSchema, createDesignBriefRequestSchema, patchDesignBriefRequestSchema } from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
 import type { AuthorizeProjectRequest } from '../collab/project-request-authority.js';
 import { resolveOptionalLocalWorkspaceRequestAuthority } from '../collab/workspace-resource-mutation.js';

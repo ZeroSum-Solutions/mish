@@ -3,16 +3,16 @@
 // Deliberately NOT part of the plugin-catalog cache: the index is mutable
 // state a user edits in the Design index view (add, remove) and expects to see
 // reflected on Home, while the plugin catalog is a slow-moving install list
-// with its own TTL and its own `open-design:plugins-changed` event. Sharing
+// with its own TTL and its own `mish:plugins-changed` event. Sharing
 // one cache would tie a reference add to a plugin refresh and back.
 
-import type { DesignIndexFindResponse, DesignProfile } from '@open-design/contracts';
+import type { DesignIndexFindResponse, DesignProfile } from '@mish/contracts';
 
 /**
  * Dispatched on `window` after the Design index view successfully stores or
  * removes a profile. Home listens and re-reads the index; nothing else does.
  */
-export const DESIGN_INDEX_CHANGED_EVENT = 'open-design:design-index-changed';
+export const DESIGN_INDEX_CHANGED_EVENT = 'mish:design-index-changed';
 
 /** Home asks for the whole index; the endpoint caps a page at 500. */
 export const DESIGN_INDEX_HOME_LIMIT = 500;

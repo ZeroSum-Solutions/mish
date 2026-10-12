@@ -1,4 +1,4 @@
-import type { MarketplacePluginEntry } from '@open-design/contracts';
+import type { MarketplacePluginEntry } from '@mish/contracts';
 
 export interface ParsedPluginSpecifier {
   name: string;

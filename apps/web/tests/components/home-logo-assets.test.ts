@@ -21,7 +21,7 @@ const appIconSvg = read('../../public/app-icon.svg');
 
 const masterMark = read('../../../../assets/brand/mishh-mashh-mark.svg');
 const markPaths = [...masterMark.matchAll(/ d="([^"]+)"/g)].map(match => match[1]);
-const RETIRED_OPEN_DESIGN_MARKERS = ['M41 0.726562', 'M212.059', 'clip0_1389_574'];
+const RETIRED_MISH_MARKERS = ['M41 0.726562', 'M212.059', 'clip0_1389_574'];
 
 describe('Home logo assets', () => {
   it('ships the Mishh Mashh monogram without the retired upstream glyph', () => {
@@ -29,7 +29,7 @@ describe('Home logo assets', () => {
     for (const source of [logoSvg, brandIconSvg, appIconSvg]) {
       for (const markPath of markPaths) expect(source).toContain(markPath);
     }
-    for (const marker of RETIRED_OPEN_DESIGN_MARKERS) {
+    for (const marker of RETIRED_MISH_MARKERS) {
       expect(logoSvg).not.toContain(marker);
       expect(brandIconSvg).not.toContain(marker);
       expect(appIconSvg).not.toContain(marker);

@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { parsePackManifest, type PackInstallEvent } from '@open-design/contracts';
+import { parsePackManifest, type PackInstallEvent } from '@mish/contracts';
 
 import { PackError, packManifestDigest } from '../../src/packs/manifest.js';
 import { createPackRegistry, packsDirForDataDir, type PackRegistry } from '../../src/packs/registry.js';

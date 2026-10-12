@@ -1,9 +1,9 @@
 {
-  "name": "@open-design/section-catalog",
+  "name": "@mish/section-catalog",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "The selectable section catalog: HyperUI blocks, the 13 agency families' own sections, the Cult UI Pro section/page projection, and federated MotionSites prompt metadata, normalized to one rights-labeled DTO (see @open-design/contracts's section-catalog.ts) behind catalog.json.",
+  "description": "The selectable section catalog: HyperUI blocks, the 13 agency families' own sections, the Cult UI Pro section/page projection, and federated MotionSites prompt metadata, normalized to one rights-labeled DTO (see @mish/contracts's section-catalog.ts) behind catalog.json.",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [

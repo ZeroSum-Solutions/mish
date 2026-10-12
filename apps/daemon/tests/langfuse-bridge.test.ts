@@ -112,10 +112,10 @@ function bodyOf(
 }
 
 const TEST_VELA_TELEMETRY_URL =
-  'https://vela.example.test/api/v1/open-design/telemetry';
+  'https://vela.example.test/api/v1/mish/telemetry';
 
 function enableTestVelaTelemetry(): void {
-  vi.stubEnv('OPEN_DESIGN_VELA_TELEMETRY', 'on');
+  vi.stubEnv('MISH_VELA_TELEMETRY', 'on');
   vi.stubEnv('VELA_CONTROL_KEY', 'ck_test');
   vi.stubEnv('VELA_API_URL', 'https://vela.example.test');
 }
@@ -133,7 +133,7 @@ describe('langfuse-bridge deliverable syntax telemetry', () => {
   it('derives repaired value and accumulated checker timing from durable Run state', () => {
     expect(projectDeliverableSyntaxTelemetry(makeRun({
       deliverableSyntaxRepair: {
-        schema: 'open-design.deliverable-syntax-repair/v1',
+        schema: 'mish.deliverable-syntax-repair/v1',
         attempt: 2,
         maxAttempts: 3,
         checker: 'web-syntax@1',
@@ -141,7 +141,7 @@ describe('langfuse-bridge deliverable syntax telemetry', () => {
         mode: 'host_safe_fixer',
       },
       deliverableSyntaxValidation: {
-        schema: 'open-design.deliverable-syntax-tool/v1',
+        schema: 'mish.deliverable-syntax-tool/v1',
         status: 'pass',
         checker: 'web-syntax@1',
         candidateHash: 'content-free-not-exported',
@@ -155,7 +155,7 @@ describe('langfuse-bridge deliverable syntax telemetry', () => {
           committedRepairRules: ['insert_missing_closing_delimiter'],
         },
         metrics: {
-          schema: 'open-design.deliverable-syntax-metrics/v1',
+          schema: 'mish.deliverable-syntax-metrics/v1',
           checkCount: 3,
           checkerDurationMs: 16,
           repairableCheckCount: 2,
@@ -213,14 +213,14 @@ describe('langfuse-bridge deliverable syntax telemetry', () => {
     expect(projectDeliverableSyntaxTelemetry(makeRun({
       status: 'failed',
       deliverableSyntaxRepair: {
-        schema: 'open-design.deliverable-syntax-repair/v1',
+        schema: 'mish.deliverable-syntax-repair/v1',
         attempt: 3,
         maxAttempts: 3,
         checker: 'web-syntax@1',
         candidateHash: 'not-exported',
       },
       deliverableSyntaxValidation: {
-        schema: 'open-design.deliverable-syntax-tool/v1',
+        schema: 'mish.deliverable-syntax-tool/v1',
         status: 'repairable',
         checker: 'web-syntax@1',
         candidateHash: 'not-exported',
@@ -245,7 +245,7 @@ describe('langfuse-bridge deliverable syntax telemetry', () => {
   });
 
   const terminalEvidence = () => ({
-    schema: 'open-design.deliverable-syntax-tool/v1' as const,
+    schema: 'mish.deliverable-syntax-tool/v1' as const,
     status: 'pass' as const, checker: 'web-syntax@1' as const,
     candidateHash: 'private-hash', checkedFiles: ['/private/index.html'], diagnostics: [],
     source: 'run_finalizer' as const, checkedAt: 123,
@@ -255,7 +255,7 @@ describe('langfuse-bridge deliverable syntax telemetry', () => {
       committedRepairRules: ['normalize_mismatched_string_quote' as const],
     },
     metrics: {
-      schema: 'open-design.deliverable-syntax-metrics/v1' as const,
+      schema: 'mish.deliverable-syntax-metrics/v1' as const,
       checkCount: 2, checkerDurationMs: 10, repairableCheckCount: 1,
       initialDiagnosticCount: 1, latestDiagnosticCount: 0, repairExecutor: 'host_safe_fixer' as const,
     },
@@ -295,7 +295,7 @@ describe('langfuse-bridge deliverable syntax telemetry', () => {
     const { refusal: _unusedRefusal, ...finalization } = warningEvidence().finalization;
     const result = projectDeliverableSyntaxTelemetry({
       status: 'succeeded', deliverableSyntaxValidation: {
-        schema: 'open-design.deliverable-syntax-tool/v1', status: 'incomplete',
+        schema: 'mish.deliverable-syntax-tool/v1', status: 'incomplete',
         reason: 'checker_error', source: 'run_finalizer', checkedAt: 123,
         finalization: {
           ...finalization, initialStatus: 'incomplete',
@@ -541,7 +541,7 @@ describe('langfuse-bridge deliverable syntax telemetry', () => {
     })).toMatchObject({ blockedBrokenDeliveryCount: 1, recoveredDeliveryCount: 0 });
     expect(projectDeliverableSyntaxTelemetry({
       status: 'failed', deliverableSyntaxValidation: {
-        schema: 'open-design.deliverable-syntax-tool/v1', status: 'incomplete',
+        schema: 'mish.deliverable-syntax-tool/v1', status: 'incomplete',
         reason: 'process_tree_not_quiescent', source: 'run_finalizer', checkedAt: 123,
         finalization: { action: 'fail', reason: 'check_incomplete' },
       },
@@ -555,10 +555,10 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
   let objectRelayUrl: string | undefined;
 
   beforeEach(async () => {
-    telemetryRelayUrl = process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
-    objectRelayUrl = process.env.OPEN_DESIGN_OBJECT_RELAY_URL;
-    delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
-    delete process.env.OPEN_DESIGN_OBJECT_RELAY_URL;
+    telemetryRelayUrl = process.env.MISH_TELEMETRY_RELAY_URL;
+    objectRelayUrl = process.env.MISH_OBJECT_RELAY_URL;
+    delete process.env.MISH_TELEMETRY_RELAY_URL;
+    delete process.env.MISH_OBJECT_RELAY_URL;
     dataDir = await mkdtemp(path.join(tmpdir(), 'od-bridge-'));
   });
 
@@ -611,10 +611,10 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
   });
 
   afterEach(async () => {
-    if (telemetryRelayUrl === undefined) delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
-    else process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL = telemetryRelayUrl;
-    if (objectRelayUrl === undefined) delete process.env.OPEN_DESIGN_OBJECT_RELAY_URL;
-    else process.env.OPEN_DESIGN_OBJECT_RELAY_URL = objectRelayUrl;
+    if (telemetryRelayUrl === undefined) delete process.env.MISH_TELEMETRY_RELAY_URL;
+    else process.env.MISH_TELEMETRY_RELAY_URL = telemetryRelayUrl;
+    if (objectRelayUrl === undefined) delete process.env.MISH_OBJECT_RELAY_URL;
+    else process.env.MISH_OBJECT_RELAY_URL = objectRelayUrl;
     await rm(dataDir, { recursive: true, force: true });
     vi.restoreAllMocks();
     vi.unstubAllEnvs();
@@ -814,7 +814,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         extension: 'pdf',
         redacted: false,
         truncated: false,
-        stored_in_open_design: true,
+        stored_in_mish: true,
         retention_policy: 'project_lifetime',
         access_scope: 'project',
         sensitivity: 'private',
@@ -844,7 +844,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         export_status: 'available',
         redacted: false,
         truncated: false,
-        stored_in_open_design: true,
+        stored_in_mish: true,
         retention_policy: 'project_lifetime',
         access_scope: 'project',
         sensitivity: 'private',
@@ -868,7 +868,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     // useful telemetry but varies between dev / CI environments — assert
     // its presence by prefix rather than pinning a value.
     expect(trace.tags).toEqual(
-      expect.arrayContaining(['open-design', 'project:proj-1', 'agent:qoder']),
+      expect.arrayContaining(['mish', 'project:proj-1', 'agent:qoder']),
     );
     expect((trace.tags as string[]).some((t) => t.startsWith('os:'))).toBe(true);
     expect(trace.metadata.eventsSummary.toolCalls).toBe(2);
@@ -1337,7 +1337,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     const priorNodeEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'production';
     enableTestVelaTelemetry();
-    process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL = 'https://telemetry.open-design.ai/api/langfuse';
+    process.env.MISH_TELEMETRY_RELAY_URL = 'https://telemetry.mish.invalid/api/langfuse';
     process.env.LANGFUSE_PUBLIC_KEY = 'pk';
     process.env.LANGFUSE_SECRET_KEY = 'sk';
     try {
@@ -1377,15 +1377,15 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
       } else {
         process.env.NODE_ENV = priorNodeEnv;
       }
-      delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+      delete process.env.MISH_TELEMETRY_RELAY_URL;
       delete process.env.LANGFUSE_PUBLIC_KEY;
       delete process.env.LANGFUSE_SECRET_KEY;
     }
 
     expect(fetchSpy).toHaveBeenCalledTimes(4);
     expect(fetchSpy.mock.calls[0]![0]).toBe(TEST_VELA_TELEMETRY_URL);
-    expect(fetchSpy.mock.calls[1]![0]).toBe('https://telemetry.open-design.ai/api/objects/authorize');
-    expect(fetchSpy.mock.calls[2]![0]).toBe('https://telemetry.open-design.ai/api/objects/batch');
+    expect(fetchSpy.mock.calls[1]![0]).toBe('https://telemetry.mish.invalid/api/objects/authorize');
+    expect(fetchSpy.mock.calls[2]![0]).toBe('https://telemetry.mish.invalid/api/objects/batch');
     expect(fetchSpy.mock.calls[3]![0]).toBe(TEST_VELA_TELEMETRY_URL);
     const telemetryBody = fetchSpy.mock.calls[3]![1]!.body as string;
     expect(telemetryBody).not.toContain('private attachment body');
@@ -1395,13 +1395,13 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     expect(trace.metadata.attachment_manifest[0]).toMatchObject({
       object_class: 'attachment',
       status: 'ok',
-      stored_in_open_design: true,
+      stored_in_mish: true,
       size_bytes: 'private attachment body'.length,
     });
     expect(trace.metadata.artifact_manifest[0]).toMatchObject({
       object_class: 'artifact',
       status: 'ok',
-      stored_in_open_design: true,
+      stored_in_mish: true,
       size_bytes: '<!doctype html><h1>private artifact</h1>'.length,
     });
   });
@@ -1464,7 +1464,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     });
 
     enableTestVelaTelemetry();
-    process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL = 'https://telemetry.open-design.ai/api/langfuse';
+    process.env.MISH_TELEMETRY_RELAY_URL = 'https://telemetry.mish.invalid/api/langfuse';
     process.env.LANGFUSE_PUBLIC_KEY = 'pk';
     process.env.LANGFUSE_SECRET_KEY = 'sk';
     try {
@@ -1499,7 +1499,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         fetchImpl: fetchSpy as any,
       });
     } finally {
-      delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+      delete process.env.MISH_TELEMETRY_RELAY_URL;
       delete process.env.LANGFUSE_PUBLIC_KEY;
       delete process.env.LANGFUSE_SECRET_KEY;
     }
@@ -1529,7 +1529,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     expect(trace.metadata.attachment_manifest[0]).toMatchObject({
       object_class: 'attachment',
       status: 'ok',
-      stored_in_open_design: true,
+      stored_in_mish: true,
       source: 'user_upload',
       retention_policy: 'observability_90d',
       access_scope: 'project',
@@ -1539,7 +1539,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     expect(trace.metadata.artifact_manifest[0]).toMatchObject({
       object_class: 'artifact',
       status: 'ok',
-      stored_in_open_design: true,
+      stored_in_mish: true,
       source: 'agent_generated',
       retention_policy: 'observability_90d',
     });
@@ -1547,7 +1547,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     expect(trace.metadata.input_text_snapshot_manifest[0]).toMatchObject({
       object_class: 'input_text_snapshot',
       status: 'ok',
-      stored_in_open_design: true,
+      stored_in_mish: true,
       source: 'user_prompt',
     });
     expect(trace.metadata.input_text_snapshot_manifest[0]).not.toHaveProperty('reason');
@@ -1566,14 +1566,14 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     await writeFile(path.join(projectDir, 'index.html'), '<!doctype html><h1>artifact body</h1>');
     const fetchSpy = vi.fn().mockResolvedValue(new Response('{}', { status: 207 }));
 
-    const velaTelemetryEnabled = process.env.OPEN_DESIGN_VELA_TELEMETRY;
+    const velaTelemetryEnabled = process.env.MISH_VELA_TELEMETRY;
     const velaControlKey = process.env.VELA_CONTROL_KEY;
     const amrHome = process.env.AMR_HOME;
-    process.env.OPEN_DESIGN_VELA_TELEMETRY = 'on';
+    process.env.MISH_VELA_TELEMETRY = 'on';
     delete process.env.VELA_CONTROL_KEY;
     process.env.AMR_HOME = path.join(dataDir, 'signed-out-amr-home');
-    process.env.OPEN_DESIGN_OBJECT_RELAY_URL =
-      'https://telemetry.open-design.ai/api/objects/batch';
+    process.env.MISH_OBJECT_RELAY_URL =
+      'https://telemetry.mish.invalid/api/objects/batch';
     process.env.LANGFUSE_PUBLIC_KEY = 'pk';
     process.env.LANGFUSE_SECRET_KEY = 'sk';
     try {
@@ -1594,13 +1594,13 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         fetchImpl: fetchSpy as any,
       });
     } finally {
-      if (velaTelemetryEnabled === undefined) delete process.env.OPEN_DESIGN_VELA_TELEMETRY;
-      else process.env.OPEN_DESIGN_VELA_TELEMETRY = velaTelemetryEnabled;
+      if (velaTelemetryEnabled === undefined) delete process.env.MISH_VELA_TELEMETRY;
+      else process.env.MISH_VELA_TELEMETRY = velaTelemetryEnabled;
       if (velaControlKey === undefined) delete process.env.VELA_CONTROL_KEY;
       else process.env.VELA_CONTROL_KEY = velaControlKey;
       if (amrHome === undefined) delete process.env.AMR_HOME;
       else process.env.AMR_HOME = amrHome;
-      delete process.env.OPEN_DESIGN_OBJECT_RELAY_URL;
+      delete process.env.MISH_OBJECT_RELAY_URL;
       delete process.env.LANGFUSE_PUBLIC_KEY;
       delete process.env.LANGFUSE_SECRET_KEY;
     }
@@ -1625,16 +1625,16 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     await writeFile(path.join(projectDir, 'index.html'), '<!doctype html><h1>artifact body</h1>');
     const fetchSpy = vi.fn().mockResolvedValue(new Response('{}', { status: 207 }));
 
-    const velaTelemetryEnabled = process.env.OPEN_DESIGN_VELA_TELEMETRY;
+    const velaTelemetryEnabled = process.env.MISH_VELA_TELEMETRY;
     const velaControlKey = process.env.VELA_CONTROL_KEY;
     const amrHome = process.env.AMR_HOME;
-    process.env.OPEN_DESIGN_VELA_TELEMETRY = 'on';
+    process.env.MISH_VELA_TELEMETRY = 'on';
     delete process.env.VELA_CONTROL_KEY;
     process.env.AMR_HOME = path.join(dataDir, 'signed-out-relay-amr-home');
-    process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL =
-      'https://telemetry.open-design.ai/api/langfuse';
-    process.env.OPEN_DESIGN_OBJECT_RELAY_URL =
-      'https://telemetry.open-design.ai/api/objects/batch';
+    process.env.MISH_TELEMETRY_RELAY_URL =
+      'https://telemetry.mish.invalid/api/langfuse';
+    process.env.MISH_OBJECT_RELAY_URL =
+      'https://telemetry.mish.invalid/api/objects/batch';
     process.env.LANGFUSE_PUBLIC_KEY = 'pk';
     process.env.LANGFUSE_SECRET_KEY = 'sk';
     try {
@@ -1655,21 +1655,21 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         fetchImpl: fetchSpy as any,
       });
     } finally {
-      if (velaTelemetryEnabled === undefined) delete process.env.OPEN_DESIGN_VELA_TELEMETRY;
-      else process.env.OPEN_DESIGN_VELA_TELEMETRY = velaTelemetryEnabled;
+      if (velaTelemetryEnabled === undefined) delete process.env.MISH_VELA_TELEMETRY;
+      else process.env.MISH_VELA_TELEMETRY = velaTelemetryEnabled;
       if (velaControlKey === undefined) delete process.env.VELA_CONTROL_KEY;
       else process.env.VELA_CONTROL_KEY = velaControlKey;
       if (amrHome === undefined) delete process.env.AMR_HOME;
       else process.env.AMR_HOME = amrHome;
-      delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
-      delete process.env.OPEN_DESIGN_OBJECT_RELAY_URL;
+      delete process.env.MISH_TELEMETRY_RELAY_URL;
+      delete process.env.MISH_OBJECT_RELAY_URL;
       delete process.env.LANGFUSE_PUBLIC_KEY;
       delete process.env.LANGFUSE_SECRET_KEY;
     }
 
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     expect(fetchSpy.mock.calls[0]![0]).toBe(
-      'https://telemetry.open-design.ai/api/langfuse',
+      'https://telemetry.mish.invalid/api/langfuse',
     );
     expect(fetchSpy.mock.calls.some(([url]) => String(url).includes('/api/objects/')))
       .toBe(false);
@@ -1692,12 +1692,12 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
 
     const velaEnvelopes: any[] = [];
     const fetchSpy = vi.fn(async (url: string, init: RequestInit) => {
-      if (url === 'https://vela.example.test/api/v1/open-design/telemetry') {
+      if (url === 'https://vela.example.test/api/v1/mish/telemetry') {
         const envelope = JSON.parse(init.body as string);
         velaEnvelopes.push(envelope);
         return new Response(JSON.stringify({ ok: true }), { status: 202 });
       }
-      if (url === 'https://telemetry.open-design.ai/api/objects/authorize') {
+      if (url === 'https://telemetry.mish.invalid/api/objects/authorize') {
         const parsed = JSON.parse(init.body as string) as {
           run_id: string;
           objects: Array<{ storage_ref: string }>;
@@ -1706,7 +1706,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         expect(parsed.objects[0]?.storage_ref).toContain('/runs/run-id-1/');
         return new Response(JSON.stringify({ upload_token: 'upload-token' }), { status: 200 });
       }
-      if (url === 'https://telemetry.open-design.ai/api/objects/batch') {
+      if (url === 'https://telemetry.mish.invalid/api/objects/batch') {
         const parsed = JSON.parse(init.body as string) as {
           run_id: string;
           objects: Array<{ storage_ref: string; content_base64: string }>;
@@ -1725,14 +1725,14 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
       throw new Error(`unexpected telemetry request: ${url}`);
     });
 
-    const velaTelemetryEnabled = process.env.OPEN_DESIGN_VELA_TELEMETRY;
+    const velaTelemetryEnabled = process.env.MISH_VELA_TELEMETRY;
     const velaControlKey = process.env.VELA_CONTROL_KEY;
     const velaApiUrl = process.env.VELA_API_URL;
-    process.env.OPEN_DESIGN_VELA_TELEMETRY = 'on';
+    process.env.MISH_VELA_TELEMETRY = 'on';
     process.env.VELA_CONTROL_KEY = 'ck_test';
     process.env.VELA_API_URL = 'https://vela.example.test';
-    process.env.OPEN_DESIGN_OBJECT_RELAY_URL =
-      'https://telemetry.open-design.ai/api/objects/batch';
+    process.env.MISH_OBJECT_RELAY_URL =
+      'https://telemetry.mish.invalid/api/objects/batch';
     try {
       await reportRunCompletedFromDaemon({
         db: makeDbWithListMessages({
@@ -1751,19 +1751,19 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         fetchImpl: fetchSpy as any,
       });
     } finally {
-      if (velaTelemetryEnabled === undefined) delete process.env.OPEN_DESIGN_VELA_TELEMETRY;
-      else process.env.OPEN_DESIGN_VELA_TELEMETRY = velaTelemetryEnabled;
+      if (velaTelemetryEnabled === undefined) delete process.env.MISH_VELA_TELEMETRY;
+      else process.env.MISH_VELA_TELEMETRY = velaTelemetryEnabled;
       if (velaControlKey === undefined) delete process.env.VELA_CONTROL_KEY;
       else process.env.VELA_CONTROL_KEY = velaControlKey;
       if (velaApiUrl === undefined) delete process.env.VELA_API_URL;
       else process.env.VELA_API_URL = velaApiUrl;
-      delete process.env.OPEN_DESIGN_OBJECT_RELAY_URL;
+      delete process.env.MISH_OBJECT_RELAY_URL;
     }
 
     expect(fetchSpy).toHaveBeenCalledTimes(4);
     expect(velaEnvelopes).toHaveLength(2);
     expect(fetchSpy.mock.calls.map((call) => call[0])).not.toContain(
-      'https://telemetry.open-design.ai/api/langfuse',
+      'https://telemetry.mish.invalid/api/langfuse',
     );
 
     const velaRegistrationEvent = velaEnvelopes[0].events.find(
@@ -1791,7 +1791,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
       run_id: 'run-id-1',
       storage_ref: expect.stringContaining('/runs/run-id-1/'),
       status: 'ok',
-      stored_in_open_design: true,
+      stored_in_mish: true,
     });
   });
 
@@ -1832,7 +1832,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     });
 
     enableTestVelaTelemetry();
-    process.env.OPEN_DESIGN_OBJECT_RELAY_URL = 'https://telemetry.open-design.ai/api/objects/batch';
+    process.env.MISH_OBJECT_RELAY_URL = 'https://telemetry.mish.invalid/api/objects/batch';
     process.env.LANGFUSE_PUBLIC_KEY = 'pk';
     process.env.LANGFUSE_SECRET_KEY = 'sk';
     try {
@@ -1861,7 +1861,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         fetchImpl: fetchSpy as any,
       });
     } finally {
-      delete process.env.OPEN_DESIGN_OBJECT_RELAY_URL;
+      delete process.env.MISH_OBJECT_RELAY_URL;
       delete process.env.LANGFUSE_PUBLIC_KEY;
       delete process.env.LANGFUSE_SECRET_KEY;
     }
@@ -1924,8 +1924,8 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     });
 
     enableTestVelaTelemetry();
-    process.env.OPEN_DESIGN_OBJECT_RELAY_URL = 'https://telemetry.open-design.ai/api/objects/batch';
-    process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL = 'https://telemetry.open-design.ai/api/langfuse';
+    process.env.MISH_OBJECT_RELAY_URL = 'https://telemetry.mish.invalid/api/objects/batch';
+    process.env.MISH_TELEMETRY_RELAY_URL = 'https://telemetry.mish.invalid/api/langfuse';
     process.env.LANGFUSE_PUBLIC_KEY = 'pk';
     process.env.LANGFUSE_SECRET_KEY = 'sk';
     try {
@@ -1951,8 +1951,8 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
         fetchImpl: fetchSpy as any,
       });
     } finally {
-      delete process.env.OPEN_DESIGN_OBJECT_RELAY_URL;
-      delete process.env.OPEN_DESIGN_TELEMETRY_RELAY_URL;
+      delete process.env.MISH_OBJECT_RELAY_URL;
+      delete process.env.MISH_TELEMETRY_RELAY_URL;
       delete process.env.LANGFUSE_PUBLIC_KEY;
       delete process.env.LANGFUSE_SECRET_KEY;
     }
@@ -1972,7 +1972,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     expect(trace.metadata.artifact_manifest[0]).toMatchObject({
       object_class: 'artifact',
       status: 'ok',
-      stored_in_open_design: true,
+      stored_in_mish: true,
     });
   });
 
@@ -2033,7 +2033,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     expect(trace.metadata.artifact_manifest[0]).toMatchObject({
       object_class: 'artifact',
       status: 'ok',
-      stored_in_open_design: true,
+      stored_in_mish: true,
       extension: 'html',
     });
   });
@@ -2606,7 +2606,7 @@ describe('langfuse-bridge.reportRunCompletedFromDaemon', () => {
     const generation = bodyOf(batch, 'generation-create', 'llm');
     expect(trace.input).toBe('design a coffee landing page');
     expect(generation.input).toMatchObject({
-      type: 'open-design.prompt-stack',
+      type: 'mish.prompt-stack',
       sections: [
         expect.objectContaining({
           kind: 'daemonSystemPrompt',

@@ -80,8 +80,8 @@ const skills: SkillSummary[] = [
     featured: 1,
   }),
   skill({
-    id: 'open-design-landing',
-    name: 'open-design-landing',
+    id: 'mish-landing',
+    name: 'mish-landing',
     description: 'Editorial marketing landing page',
     examplePrompt: 'Produce a world-class single-page editorial landing site.',
     scenario: 'marketing',
@@ -164,7 +164,7 @@ describe('ExamplesTab', () => {
             examplePrompt: 'Duplicate prompt',
           }),
           skill({
-            id: 'open-design-landing',
+            id: 'mish-landing',
             name: 'Mishh Mashh landing',
             examplePrompt: 'Unique prompt',
           }),
@@ -174,7 +174,7 @@ describe('ExamplesTab', () => {
     );
 
     expect(screen.getAllByTestId('example-card-xhs-white-editorial')).toHaveLength(1);
-    expect(screen.getByTestId('example-card-open-design-landing')).toBeTruthy();
+    expect(screen.getByTestId('example-card-mish-landing')).toBeTruthy();
 
     fireEvent.click(screen.getByTestId('example-use-prompt-xhs-white-editorial'));
     expect(onUsePrompt).toHaveBeenCalledWith(
@@ -193,7 +193,7 @@ describe('ExamplesTab', () => {
     });
 
     expect(screen.getByTestId('example-card-live-dashboard')).toBeTruthy();
-    expect(screen.queryByTestId('example-card-open-design-landing')).toBeNull();
+    expect(screen.queryByTestId('example-card-mish-landing')).toBeNull();
 
     fireEvent.change(screen.getByRole('searchbox', { name: 'Search examples by name' }), {
       target: { value: 'no matching example' },
@@ -216,7 +216,7 @@ describe('ExamplesTab', () => {
 
     fireEvent.click(within(filterRow('Type')).getByRole('tab', { name: /All7/ }));
     fireEvent.click(within(filterRow('Scenario')).getByRole('button', { name: /Marketing3/ }));
-    expect(screen.getByTestId('example-card-open-design-landing')).toBeTruthy();
+    expect(screen.getByTestId('example-card-mish-landing')).toBeTruthy();
     expect(screen.getByTestId('example-card-brand-deck')).toBeTruthy();
     expect(screen.getByTestId('example-card-launch-video')).toBeTruthy();
     expect(screen.queryByTestId('example-card-live-dashboard')).toBeNull();
@@ -246,12 +246,12 @@ describe('ExamplesTab', () => {
   it('passes the selected example to the Use this prompt callback', () => {
     const { onUsePrompt } = renderExamples();
 
-    fireEvent.click(screen.getByTestId('example-use-prompt-open-design-landing'));
+    fireEvent.click(screen.getByTestId('example-use-prompt-mish-landing'));
 
     expect(onUsePrompt).toHaveBeenCalledTimes(1);
     expect(onUsePrompt).toHaveBeenCalledWith(
       expect.objectContaining({
-        id: 'open-design-landing',
+        id: 'mish-landing',
         examplePrompt: 'Produce a world-class single-page editorial landing site.',
       }),
     );

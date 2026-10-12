@@ -2,7 +2,7 @@
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import type { MediaGalleryPlaceResponse, MediaGalleryEntryDetail, MediaGalleryReuseRequest, MediaGalleryReuseResponse } from '@open-design/contracts';
+import type { MediaGalleryPlaceResponse, MediaGalleryEntryDetail, MediaGalleryReuseRequest, MediaGalleryReuseResponse } from '@mish/contracts';
 import { openDatabase, updateProject } from '../../src/db.js';
 import { generate, lastJson, postJson, runCli, startFakeImageProvider, startR10Daemon, waitTerminal, type FakeProvider, type R10Daemon } from './r10-harness.js';
 

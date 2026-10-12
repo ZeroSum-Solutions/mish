@@ -9,7 +9,7 @@ import {
   type TrackingRunTerminalIntegrity,
   type TrackingRunTerminalTrigger,
   type RunTaskLineageProps,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 
 import { appendMessageStatusEvent } from '../db.js';
 import {

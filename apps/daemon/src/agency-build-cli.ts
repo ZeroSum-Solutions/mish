@@ -28,8 +28,8 @@ import type {
   AgencySectionPlacement,
   AgencySectionSelectionInput,
   ApiErrorResponse,
-} from '@open-design/contracts';
-import { AGENCY_EFFECT_PLACEMENT_IDS, parseAgencyEffectsInput } from '@open-design/contracts';
+} from '@mish/contracts';
+import { AGENCY_EFFECT_PLACEMENT_IDS, parseAgencyEffectsInput } from '@mish/contracts';
 
 /**
  * Exit codes. 0-3 are the fast-lane CLI's own meanings; 4 is this surface's addition.

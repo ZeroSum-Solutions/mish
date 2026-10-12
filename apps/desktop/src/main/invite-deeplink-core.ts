@@ -1,7 +1,7 @@
 // Pure core of the desktop invite hand-off — no electron import, so it is unit
 // testable. The electron scheme registration lives in `invite-deeplink.ts`.
 
-export const INVITE_DEEPLINK_SCHEME = "opendesign";
+export const INVITE_DEEPLINK_SCHEME = "mish";
 const INVITE_DEEPLINK_HOST = "workspace";
 const INVITE_DEEPLINK_PATH = "/invite/continue";
 const WORKSPACE_OPEN_DEEPLINK_PATH = "/open";
@@ -16,7 +16,7 @@ interface ParsedInviteDeeplink {
 }
 
 /**
- * Parse `opendesign://workspace/invite/continue?workspace_id=&member_id=&invite_id=
+ * Parse `mish://workspace/invite/continue?workspace_id=&member_id=&invite_id=
  * &nonce=` into its four required fields, or null if the scheme/host/path is wrong
  * or any field is missing. The desktop only forwards the nonce to the daemon, but
  * all four are validated so a malformed deeplink is rejected rather than
@@ -43,7 +43,7 @@ function parseInviteDeeplink(url: string): ParsedInviteDeeplink | null {
 }
 
 /**
- * True for `opendesign://workspace/open[?...]` — the cloud device-activation
+ * True for `mish://workspace/open[?...]` — the cloud device-activation
  * page fires this after a client-originated sign-in completes in the browser,
  * to hand the user back to the desktop app. It carries no payload on purpose:
  * the login itself lands through the daemon's `vela login` polling, so handling
@@ -63,25 +63,25 @@ export function isWorkspaceOpenDeeplink(url: string): boolean {
   );
 }
 
-/** How this process may claim the `opendesign://` scheme with the OS, if at all. */
+/** How this process may claim the `mish://` scheme with the OS, if at all. */
 export type ProtocolClientRegistration =
   | { register: false }
   /** `clientPath` is the executable to register, or null to register this process. */
   | { register: true; clientPath: string | null };
 
 /**
- * Only a packaged install may claim `opendesign://` with the OS.
+ * Only a packaged install may claim `mish://` with the OS.
  *
  * A source/dev run is hosted by the shared `electron` binary from
  * `node_modules`, so claiming the scheme there points the OS at that binary —
  * `com.github.electron` in macOS LaunchServices, a throwaway `electron.exe` in
  * the Windows registry — for every channel at once. The cloud authorization
- * page's `opendesign://workspace/open` hand-off then launches a bare Electron
+ * page's `mish://workspace/open` hand-off then launches a bare Electron
  * welcome window from a checkout that may not even exist any more, instead of
  * focusing the installed app (OPEND-2352).
  *
  * Packaged builds already declare the scheme statically (Info.plist
- * `CFBundleURLTypes` on macOS, `Software\Classes\opendesign` from the Windows
+ * `CFBundleURLTypes` on macOS, `Software\Classes\mish` from the Windows
  * installer) and re-assert it on every start, which is also what takes a
  * handler back from a dev run that poisoned it before this fix shipped.
  */
@@ -155,7 +155,7 @@ export function createInviteDeeplinkDispatcher(
   };
 }
 
-/** Extract an `opendesign://` url from a process argv list, if present. */
+/** Extract an `mish://` url from a process argv list, if present. */
 export function findDeeplinkArg(argv: readonly string[]): string | null {
   return argv.find((arg) => arg.startsWith(`${INVITE_DEEPLINK_SCHEME}://`)) ?? null;
 }

@@ -9,7 +9,7 @@
 //
 // Evidence is repository-visible only:
 //   - scenario + atom manifests under `plugins/_official/`
-//   - the shared default-route table exported by `@open-design/contracts`
+//   - the shared default-route table exported by `@mish/contracts`
 //   - `apps/daemon/src/plugins/atoms.ts` read as TEXT for the built-in atom
 //     registry (`docs/atoms.md` names that file the catalog source of truth).
 //
@@ -29,7 +29,7 @@ import {
   type DefaultScenarioPluginId,
   type ProjectKind,
   type ProjectMetadata,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import {
@@ -155,7 +155,7 @@ describe('bundled capability integrity', () => {
 
     for (const id of CURATED_SCENARIO_IDS) {
       const manifest = await readPluginManifest(path.join(SCENARIOS_ROOT, id));
-      expect(manifest, `plugins/_official/scenarios/${id} must ship open-design.json`).not.toBeNull();
+      expect(manifest, `plugins/_official/scenarios/${id} must ship mish.json`).not.toBeNull();
       expect(
         manifest?.id,
         `plugins/_official/scenarios/${id} manifest name must match its folder id`,
@@ -247,7 +247,7 @@ describe('bundled capability integrity', () => {
   it('declares the figma connector and files.get tool in od-figma-migration', async () => {
     const manifest = await readPluginManifest(path.join(SCENARIOS_ROOT, 'od-figma-migration'));
     if (!manifest) {
-      throw new Error('plugins/_official/scenarios/od-figma-migration/open-design.json is missing');
+      throw new Error('plugins/_official/scenarios/od-figma-migration/mish.json is missing');
     }
 
     const figma = manifest.requiredConnectors.find((connector) => connector.id === 'figma');
@@ -268,7 +268,7 @@ describe('bundled capability integrity', () => {
       const fixtureFolder = path.join(fixtureRoot, 'fixture-unresolved-atom');
       await fsp.mkdir(fixtureFolder, { recursive: true });
       await fsp.writeFile(
-        path.join(fixtureFolder, 'open-design.json'),
+        path.join(fixtureFolder, 'mish.json'),
         JSON.stringify({
           name: 'fixture-unresolved-atom',
           version: '0.0.0',

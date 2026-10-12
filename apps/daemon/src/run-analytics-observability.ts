@@ -7,11 +7,11 @@ import type {
   TrackingRunLifecyclePhase,
   TrackingRunPhaseTimingStatus,
   TrackingRuntimeType,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import {
   agentIdToTracking,
   byokProtocolToTracking,
-} from '@open-design/contracts/analytics';
+} from '@mish/contracts/analytics';
 import type { VelaLoginStatus } from './integrations/vela.js';
 
 const RUNTIME_TYPES: readonly TrackingRuntimeType[] = [

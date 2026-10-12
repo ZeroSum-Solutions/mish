@@ -11,7 +11,7 @@ import type {
   RunContextSelection,
   DesignBriefPreview,
   Project,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import {
   applyPlugin,
   duplicatePluginAsProject,

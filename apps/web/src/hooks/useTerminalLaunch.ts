@@ -11,9 +11,9 @@
 
 import { useMemo } from 'react';
 import {
-  isOpenDesignHostAvailable,
+  isMishHostAvailable,
   openHostProjectPath,
-} from '@open-design/host';
+} from '@mish/host';
 
 export interface TerminalLaunchResult {
   kind: 'host' | 'web-fallback';
@@ -27,7 +27,7 @@ export interface TerminalLauncher {
 
 export function useTerminalLaunch(): TerminalLauncher {
   return useMemo<TerminalLauncher>(() => {
-    const isHost = isOpenDesignHostAvailable();
+    const isHost = isMishHostAvailable();
 
     async function open(projectId: string): Promise<TerminalLaunchResult> {
       if (!isHost) {

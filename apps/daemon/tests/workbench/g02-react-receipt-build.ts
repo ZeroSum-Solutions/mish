@@ -19,7 +19,7 @@ import type { ReactTargetReceipt } from '../../src/workbench/targets/react/recei
  * static preview on the server (no window), hydrates that preview with the
  * production bundle under Strict Mode in jsdom, and records toolchain,
  * build options and output hashes. Regenerate with
- * `OD_UPDATE_G02_RECEIPT=1 pnpm --filter @open-design/daemon exec vitest run tests/workbench/g02-react-receipt.test.ts`.
+ * `OD_UPDATE_G02_RECEIPT=1 pnpm --filter @mish/daemon exec vitest run tests/workbench/g02-react-receipt.test.ts`.
  */
 const daemonRoot = fileURLToPath(new URL('../../', import.meta.url));
 const repoRoot = fileURLToPath(new URL('../../../../', import.meta.url));

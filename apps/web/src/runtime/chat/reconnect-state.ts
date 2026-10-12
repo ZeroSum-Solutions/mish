@@ -25,7 +25,7 @@
  *      报「已手动停止」,不再追加 PauseLine;`succeeded` 同样不留「已恢复」。所以这里
  *      让任何 terminal status 立刻撤掉重连行,避免历史回放残留一条陈年连接状态。
  */
-import type { ChatRunStatus } from '@open-design/contracts';
+import type { ChatRunStatus } from '@mish/contracts';
 
 /**
  * 这一行在说哪一件「系统在自救」。

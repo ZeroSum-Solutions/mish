@@ -41,13 +41,13 @@ describe('brand enrichment runtime helpers', () => {
     const prompt = buildBrandEnrichmentPrompt('Existing extraction prompt', {
       metadata: {
         kind: 'brand',
-        brandSourceUrl: 'https://open-design.ai/',
-        brandId: 'brand_open_design',
-        brandDesignSystemId: 'user:open-design-6',
+        brandSourceUrl: 'https://github.com/ZeroSum-Solutions/mish',
+        brandId: 'brand_mish',
+        brandDesignSystemId: 'user:mish-6',
         entryFile: 'brand.html',
         importedFrom: 'brand-extraction',
       },
-      designSystemId: 'user:open-design-6',
+      designSystemId: 'user:mish-6',
       designSystemTitle: 'Mishh Mashh',
       projectFiles: [
         {
@@ -66,8 +66,8 @@ describe('brand enrichment runtime helpers', () => {
     });
 
     expect(prompt).toContain('Current programmatic extraction context:');
-    expect(prompt).toContain('Existing registered design system: Mishh Mashh (user:open-design-6)');
-    expect(prompt).toContain('Source to re-check: https://open-design.ai/');
+    expect(prompt).toContain('Existing registered design system: Mishh Mashh (user:mish-6)');
+    expect(prompt).toContain('Source to re-check: https://github.com/ZeroSum-Solutions/mish');
     expect(prompt).toContain('system/variables.css');
     expect(prompt).toContain('fonts/Inter.woff2');
     expect(prompt).toContain('Programmatic modules to inspect and reconcile');

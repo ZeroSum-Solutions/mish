@@ -26,7 +26,7 @@ import type {
   MediaTaskRetryResponse,
   MediaTaskStatus,
   WorkspaceCollabContext,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { workspaceProjectHeaders } from '../../collab/workspace-identity';
 
 /** One model as `GET /api/media/models` lists it. */

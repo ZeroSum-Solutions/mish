@@ -1,6 +1,6 @@
 import { withVercelSiteProvider, resetVercelSiteProviderFixtures } from './helpers/vercel-site-provider.js';
 import type http from 'node:http';
-import type { DeployPreflightResponse } from '@open-design/contracts';
+import type { DeployPreflightResponse } from '@mish/contracts';
 import { createHash } from 'node:crypto';
 import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';

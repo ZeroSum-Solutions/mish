@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
-import { Button } from '@open-design/components';
-import type { FontLocalFile, FontProfile } from '@open-design/contracts';
+import { Button } from '@mish/components';
+import type { FontLocalFile, FontProfile } from '@mish/contracts';
 import { useT } from '../../i18n';
 import styles from './workbench.module.css';
 

@@ -18,7 +18,7 @@
  * Playwright copy.
  */
 
-import { findRealTagEnd } from '@open-design/contracts/runtime/html-injection-points';
+import { findRealTagEnd } from '@mish/contracts/runtime/html-injection-points';
 
 import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';

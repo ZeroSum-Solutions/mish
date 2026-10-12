@@ -62,7 +62,7 @@
 | B25 | 「已回答这些问题」那张卡「怎么没变成最新的设计稿样式」 | 产品还是**灰底圆角卡 + ✓ 圆圈 + 胶囊对**;稿子第 23/24/25 格是**绿色「已确认」+ 纯行式 `标签 值`**,视觉方向那格还带选中的那张缩略图。`AnsweredSummary` 没按稿子重做 | `[x]` **真因是有两份实现**:`QuestionForm` 里的 `AnsweredSummary` 早就按稿子写好了,但产品历史回放走的是 `AssistantMessage` 里另一份 `question-form-summary`(灰卡 + ✓ 圆圈 + 胶囊)。已把后者改成同一套 `.answered / .k / .ab / .ak / .al / .av` |
 | B26 | 「思考中 + 时间」那一行重复了 | 壳头已经在报「进行中」,底下的老回合状态行又报一次「思考中」。现有抑制开关 `hideRunStatus = recordHasContent \|\| hasTodoSnapshot \|\| 报错卡` —— 壳**刚建出来还没内容**时三条都不成立,于是两行同时在 | `[x]` 与 B31 / B36 同一条规则:**运行中整行不出**(壳头已经在报状态),跑完才出并报终态 |
 | B27 | 「上面的 title 是啥东西?」 | `<od-title>…</od-title>` 原样漏进正文。**真因**:调用点写的 `enabled: Boolean(titleGenerationRequested)` —— 不请求标题就把剥离器整个关掉;而模型是按系统提示词吐这个标记的,它不知道这一轮我们要不要标题 | `[x]` 语义拆开:**永远剥离**,只有请求过标题才上报。红测先行,并删掉了与之直接矛盾的旧规格 |
-| B33 | 「这些是啥啊?」(`<CRITIQUE_RUN>` / `<PANELIST>` / `<ROUND_END>` 整块漏进正文) | 评审团(critique)的通信协议原样打给了用户。**根因方向**:`apps/daemon/src/*.ts` 的可见文本路径上**根本没有 panel 语法的剥离器**(`<od-title>` 有,critique 没有)—— 一旦提示词注入了面板语法而编排器没接管这条流,协议就直接进正文。要定位是哪道门失灵,得拿这一次 run 的事件流看。属 `apps/daemon/src/critique/`(有自己的 AGENTS.md) | `[x]` **已修并在真机验过**:语法搬到 `@open-design/contracts`(`stripCritiqueGrammar`)作为唯一出处 —— daemon 用它剥**流**(带半截缓冲,不闪),web 在 `AssistantMessage` 的 `cleaned` 里用它剥**历史**。旧对话不能因为「以后不会再有了」就烂在那儿:真机上那条消息原来有 **16 处**标记,修完 **0 处**,标记之间那几句人话原样留着。剥的是壳不是字(`<PANELIST role="Critic" score="9.0">已完成…</PANELIST>` → 「已完成…」)。红测先行,撤掉实现复验会红
+| B33 | 「这些是啥啊?」(`<CRITIQUE_RUN>` / `<PANELIST>` / `<ROUND_END>` 整块漏进正文) | 评审团(critique)的通信协议原样打给了用户。**根因方向**:`apps/daemon/src/*.ts` 的可见文本路径上**根本没有 panel 语法的剥离器**(`<od-title>` 有,critique 没有)—— 一旦提示词注入了面板语法而编排器没接管这条流,协议就直接进正文。要定位是哪道门失灵,得拿这一次 run 的事件流看。属 `apps/daemon/src/critique/`(有自己的 AGENTS.md) | `[x]` **已修并在真机验过**:语法搬到 `@mish/contracts`(`stripCritiqueGrammar`)作为唯一出处 —— daemon 用它剥**流**(带半截缓冲,不闪),web 在 `AssistantMessage` 的 `cleaned` 里用它剥**历史**。旧对话不能因为「以后不会再有了」就烂在那儿:真机上那条消息原来有 **16 处**标记,修完 **0 处**,标记之间那几句人话原样留着。剥的是壳不是字(`<PANELIST role="Critic" score="9.0">已完成…</PANELIST>` → 「已完成…」)。红测先行,撤掉实现复验会红
 | B28 | 「下面不是有 5 步吗?怎么后四步没显示?」 | 「执行计划 · 5 步」在,但壳里只列出了第 1 条 todo 抽屉,后 4 条没出 | `[x]` **真因**:落块时写着「`status !== pending` 才推成行」,还没开始的那几条连行都不建。「说好几步」和「看得见几步」必须同一个数。红测先行 |
 | B29 | 「上面已完成的怎么还在倒计时」 | 已经「已完成」的壳,秒数还跟着下面那个「进行中」的壳一起往前走(两个都显示 1m 37s 并同步递增)。跑完的壳该把秒数**定死在结束那一刻** | `[x]` 耗时改成**按壳自己**算(每张壳记自己的起止),只有还在跑的那张跟着 now 走。红测先行 |
 | B30 | 「这个命令没什么可读性呢」 | 工具行显示成 `执行 node - <<'NODE'` —— heredoc 被原样截断,读不出这条命令在干什么 | `[~]` 先修了 heredoc:新增 `commandHeadline`,把 `<<EOF` 这类开启标记和其后孤立的 `-` 去掉(`node - <<NODE` → `node`)。**更根本的健壮性正在调研**(已派 subagent 捞真实语料 + 压测现有正则 + 对比开源方案) |
@@ -79,7 +79,7 @@
 排查过程中证伪的三条假设留档,免得下次再追:①目录 **96 张**预览图逐个探过,非 200 的 **0** 张;②真实客户端 `new Image()` 拉那个域秒回 1600×1200,不是 CSP;③CSS 画的降级骨架也都在。
 **方法教训**:我一度在陈列页量到「52 张图全 pending、一张不 error」差点当成 bug —— 真因是**那个标签页在后台**,Chrome 会推迟 `loading="lazy"`。量 lazy 图必须让标签页在前台。
 ①**不是资源缺失** —— 目录里全部 **96 张**预览图逐个探过,**非 200 的 0 张**(deck 25 / prototype 26 / document 11 / image 22 / video 12);
-②**不是 CSP / 网络** —— 在真实客户端页面里 `new Image()` 拉 `repo-assets.open-design.ai` 的图,秒回 1600×1200;
+②**不是 CSP / 网络** —— 在真实客户端页面里 `new Image()` 拉 `repo-assets.mish.invalid` 的图,秒回 1600×1200;
 ③**不是降级样式丢了** —— `.qf-visual-preview-prototype` / `.qf-preview-app` 那套 CSS 画的骨架都在。
 顺带记一条**方法教训**:我一度在陈列页量到「52 张图全 pending、一张不 error」,差点当成 bug ——
 真因是**那个标签页在后台**,Chrome 会推迟 `loading="lazy"` 的图;切到前台立刻开始加载。
@@ -247,7 +247,7 @@
 - **真功能是活的**:内置目录挂在 discovery 简报的 `tone` 那道题上,宿主认到
   `q.id === 'tone'` 就把模型给的纯文字选项换成目录卡。共 **96 张**预览图(deck 25 /
   prototype 26 / document 11 / image 22 / video 12),住在 R2
-  `repo-assets.open-design.ai/style-catalog/v1/` —— 逐张探过,**非 200 的 0 张**。
+  `repo-assets.mish.invalid/style-catalog/v1/` —— 逐张探过,**非 200 的 0 张**。
 - **用户截到的「四张纯色卡」不是这条路**:那是模型**自己现开**的 `direction-cards`
   (提示词允许它在「用户明确要看视觉方向」时发)。模型现开的卡**没有素材**,
   预览面只能画占位块。
@@ -477,8 +477,8 @@ printf '%s' '{"type":"user","message":{"role":"user","content":[{"type":"text","
 |---|---|
 | `pnpm typecheck` | 0 错(含 e2e 那套更严的) |
 | `pnpm guard` | exit 0 |
-| `@open-design/web` 全量 | **700 / 700 文件、7287 条全绿**。开工时是 **14 条红的** —— 逐条把每个 chat 源文件 checkout 回合并前的提交复跑过,**同样红 14 条**,所以全是先前就欠下的,不是今天弄坏的。它们钉的都是**后来被用户推翻的形态**(B47 空壳、回合状态行只在最后一轮、D43 正文归属、分界线落在新会话、TodoCard 已删),逐条按现行裁决改了断言并写清依据 |
-| `@open-design/daemon` 全量 | 8743 / 8750。3 条是并行压力下的抖动(`codex-session-resume` / `media/tasks-routes` 单跑即绿),1 条是**分支落后 main 104 个提交**导致的:`chat-project-skill-critique-label` 打的是 odNext strategy recipe 那套 main 上有、分支上还没有的代码;分支内改它等于修一份 104 个提交前的快照,**留给 rebase/merge main 时自然消解** |
+| `@mish/web` 全量 | **700 / 700 文件、7287 条全绿**。开工时是 **14 条红的** —— 逐条把每个 chat 源文件 checkout 回合并前的提交复跑过,**同样红 14 条**,所以全是先前就欠下的,不是今天弄坏的。它们钉的都是**后来被用户推翻的形态**(B47 空壳、回合状态行只在最后一轮、D43 正文归属、分界线落在新会话、TodoCard 已删),逐条按现行裁决改了断言并写清依据 |
+| `@mish/daemon` 全量 | 8743 / 8750。3 条是并行压力下的抖动(`codex-session-resume` / `media/tasks-routes` 单跑即绿),1 条是**分支落后 main 104 个提交**导致的:`chat-project-skill-critique-label` 打的是 odNext strategy recipe 那套 main 上有、分支上还没有的代码;分支内改它等于修一份 104 个提交前的快照,**留给 rebase/merge main 时自然消解** |
 | 真机(用户自己的 Chrome + 真 daemon) | S29 三态、R9、R10、R11、E2 兜底、S12 全部现场跑过并截图 |
 
 ### F-5 这一轮学到的几条(避免重犯)
@@ -682,7 +682,7 @@ claude 会出。39 个录制里 5 个中招;顺带确认 `file_change` 是**唯�
 带 `noUncheckedIndexedAccess` 的 tsconfig。这一轮合完分支后 web 全量 7351 条全绿、
 根 typecheck 干净,而 `tools-dev` 起不来,因为 daemon build 挂了 6 条
 (正则捕获组解构成 `string | undefined`)。**改过 `apps/daemon/src/**` 必须单跑
-`pnpm --filter @open-design/daemon build`。**
+`pnpm --filter @mish/daemon build`。**
 
 ## F-13 真机端到端验收结果(2026-08-27,浏览器 + 真 daemon)
 

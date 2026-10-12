@@ -7,4 +7,4 @@ export {
   DECK_SKELETON_HTML,
   renderDeckFrameworkDirective,
   renderLegacyDeckCompatibilityDirective,
-} from '@open-design/contracts';
+} from '@mish/contracts';

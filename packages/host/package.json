@@ -1,5 +1,5 @@
 {
-  "name": "@open-design/host",
+  "name": "@mish/host",
   "version": "0.22.1",
   "private": true,
   "type": "module",
@@ -29,7 +29,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tests.json --noEmit"
   },
   "dependencies": {
-    "@open-design/release": "workspace:*"
+    "@mish/release": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.12.2",

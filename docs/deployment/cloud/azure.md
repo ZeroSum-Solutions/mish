@@ -120,7 +120,7 @@ az deployment group create \
     odApiToken="$OD_API_TOKEN" \
     dnsNameLabel="$DNS_LABEL" \
     allowedOrigins="$BROWSER_ORIGIN" \
-    image="ghcr.io/nexu-io/od:latest" \
+    image="ghcr.io/zerosum-solutions/mish:latest" \
     cpuCores=1 \
     memoryInGB=1 \
     fileShareQuotaGB=10
@@ -136,7 +136,7 @@ Before running it:
 
 - Create an Azure Resource Manager service connection.
 - Set `OD_API_TOKEN` as a secret pipeline variable.
-- Update `resourceGroupName`, `location`, `openDesignImage`, and `browserOrigin`.
+- Update `resourceGroupName`, `location`, `mishImage`, and `browserOrigin`.
 - Replace `<your-azure-service-connection>` with your service connection name.
 
 ## Operations

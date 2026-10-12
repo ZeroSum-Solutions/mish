@@ -126,10 +126,10 @@ describe('local MCP telemetry privacy boundary', () => {
       duration_ms: 123,
       error_code: 'DAEMON_UNREACHABLE',
       failure_stage: 'run_accept',
-      failure_source: 'open_design_daemon',
+      failure_source: 'mish_daemon',
       failure_category: 'availability',
       retryable: true,
-      user_action: 'start_open_design',
+      user_action: 'start_mish',
     })).toMatchObject({
       result: 'failed',
       duration_ms: 123,

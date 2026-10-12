@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { buildProjectRawFileUrl } from '@open-design/contracts';
+import { buildProjectRawFileUrl } from '@mish/contracts';
 
 import { handleMcpToolCall, localMcpToolDefinitions } from '../src/mcp.js';
 import { _resetMcpWorkspaceContextCacheForTests } from '../src/mcp-workspace-context.js';
@@ -332,7 +332,7 @@ describe('public MCP discovery + generation tools', () => {
     expect(parsed).toMatchObject({
       status: 'failed',
       failureAction: 'recharge',
-      rechargeUrl: 'https://open-design.ai/amr/dashboard?source=open_design',
+      rechargeUrl: 'https://mish.invalid/amr/dashboard?source=mish',
     });
     expect(parsed.hint).toContain('same requestId');
     expect(parsed.hint).toContain('resume:true');

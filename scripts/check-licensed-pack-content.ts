@@ -8,7 +8,7 @@
  *
  *   1. Path rules (no content read): the Cult UI Pro kit, the Cult-keyed data
  *      in packages/cult-ui-catalog, the genui Cult seed and six port folders, and every plugin
- *      folder whose open-design.json names the MotionSites homepage.
+ *      folder whose mish.json names the MotionSites homepage.
  *   2. Blob rule: the git blob id of every tracked file (from
  *      `git ls-files -s`, no file read) against the committed denylist
  *      scripts/data/licensed-pack-blobs.txt, so a renamed or moved copy is
@@ -319,7 +319,7 @@ export async function findLicensedPackPathMatches(
   // licensed as a whole, so a 19th example is caught without a name list.
   const motionSitesFolders: string[] = [];
   for (const repositoryPath of paths) {
-    if (!repositoryPath.startsWith("plugins/") || path.posix.basename(repositoryPath) !== "open-design.json") continue;
+    if (!repositoryPath.startsWith("plugins/") || path.posix.basename(repositoryPath) !== "mish.json") continue;
     if (isLicensedPackFixturePath(repositoryPath)) continue;
     const text = await readText(repositoryPath);
     if (text !== undefined && isMotionSitesManifestText(text)) {

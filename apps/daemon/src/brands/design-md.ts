@@ -7,7 +7,7 @@
 // This is the body passed to createUserDesignSystem so a brand becomes an
 // applyable, swatch-listed user design system.
 
-import type { Brand, BrandColor, BrandFontSpec } from '@open-design/contracts';
+import type { Brand, BrandColor, BrandFontSpec } from '@mish/contracts';
 
 import { brandFontStylesheet } from './font-source.js';
 

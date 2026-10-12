@@ -4,7 +4,7 @@ import { untilAborted } from '../references/abort.js';
 import {
   CONNECTOR_IDS, CONNECTOR_PLATFORMS, SOURCE_OPERATIONS, parseConnectorDetailRequest, parseConnectorDetailResponse, parseConnectorSearchRequest, parseConnectorSearchResponse, parseConnectorSelectionRequest,
   type ConnectorErrorCode, type ConnectorId, type ConnectorReceipt, type ConnectorReferenceDetailResponse, type ConnectorResource, type ConnectorSearchRequest, type ConnectorSearchResponse,
-} from '@open-design/contracts';
+} from '@mish/contracts';
 import { MobbinImageCache, mobbinImageUrl } from './mobbin-image-cache.js';
 import { ConnectorError } from './connector-error.js';
 export { ConnectorError } from './connector-error.js';

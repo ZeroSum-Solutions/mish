@@ -28,7 +28,7 @@ function platform(
     key,
     label: PLATFORM_LABELS[key],
     build,
-    downloadUrl: build === "success" ? `${R2}/open-design-0.21.1-prerelease.3-${key}` : "",
+    downloadUrl: build === "success" ? `${R2}/mish-0.21.1-prerelease.3-${key}` : "",
     smoke: "skipped",
     timing: { startedAt: null, completedAt: null },
     ...overrides,
@@ -42,8 +42,8 @@ function state(overrides: Partial<PrereleaseCardState> = {}): PrereleaseCardStat
     branch: "release/v0.21.1",
     commit: "0123456789abcdef0123456789abcdef01234567",
     previousCommit: "fedcba9876543210fedcba9876543210fedcba98",
-    repo: "nexu-io/open-design",
-    originRunUrl: "https://github.com/nexu-io/open-design/actions/runs/1",
+    repo: "ZeroSum-Solutions/mish",
+    originRunUrl: "https://github.com/ZeroSum-Solutions/mish/actions/runs/1",
     testsRunUrl: "",
     smokeRunUrl: "",
     changelog: { lines: ["fix(web): keep the composer mounted (abc1234567)"], total: 1, truncated: false },
@@ -156,7 +156,7 @@ describe("prerelease progress card", () => {
     expect(texts(card).join("\n")).toContain("✅ macOS (Apple Silicon) · 已发布");
     expect(texts(card).join("\n")).toContain("⏳ Windows · 排队中");
     // Only the published platform gets a button; the others would 404.
-    expect(buttonUrls(card)).toEqual([`${R2}/open-design-0.21.1-prerelease.3-mac_arm64`]);
+    expect(buttonUrls(card)).toEqual([`${R2}/mish-0.21.1-prerelease.3-mac_arm64`]);
   });
 
   it("adds a row and a button as each further platform publishes", () => {
@@ -173,9 +173,9 @@ describe("prerelease progress card", () => {
     expect(later.header.template).toBe("green");
     expect(later.header.title?.content).toBe("🚀 Mishh Mashh Prerelease 0.21.1-prerelease.3");
     expect(buttonUrls(later)).toEqual([
-      `${R2}/open-design-0.21.1-prerelease.3-mac_arm64`,
-      `${R2}/open-design-0.21.1-prerelease.3-mac_x64`,
-      `${R2}/open-design-0.21.1-prerelease.3-win_x64`,
+      `${R2}/mish-0.21.1-prerelease.3-mac_arm64`,
+      `${R2}/mish-0.21.1-prerelease.3-mac_x64`,
+      `${R2}/mish-0.21.1-prerelease.3-win_x64`,
     ]);
     const platformBlock = texts(later).find((text) => text.startsWith("**平台产物**")) ?? "";
     expect(platformBlock.split("\n")).toHaveLength(4);
@@ -534,7 +534,7 @@ describe("prerelease progress card", () => {
       );
       expect(noteText(shipped)).toContain("本轮总耗时 47m09s");
       // Still next to the links it has always sat beside.
-      expect(noteText(shipped)).toContain("[打包运行](https://github.com/nexu-io/open-design/actions/runs/1)");
+      expect(noteText(shipped)).toContain("[打包运行](https://github.com/ZeroSum-Solutions/mish/actions/runs/1)");
     });
 
     it("says nothing about the round when it does not know when the run started", () => {
@@ -547,13 +547,13 @@ describe("prerelease progress card", () => {
     const card = render(
       state({
         platforms: [platform("mac_arm64", "success")],
-        testsRunUrl: "https://github.com/nexu-io/open-design/actions/runs/2",
-        smokeRunUrl: "https://github.com/nexu-io/open-design/actions/runs/3",
+        testsRunUrl: "https://github.com/ZeroSum-Solutions/mish/actions/runs/2",
+        smokeRunUrl: "https://github.com/ZeroSum-Solutions/mish/actions/runs/3",
       }),
     );
     const note = card.elements.at(-1)?.elements?.[0]?.content ?? "";
-    expect(note).toContain("[打包运行](https://github.com/nexu-io/open-design/actions/runs/1)");
-    expect(note).toContain("[代码测试](https://github.com/nexu-io/open-design/actions/runs/2)");
-    expect(note).toContain("[包 smoke](https://github.com/nexu-io/open-design/actions/runs/3)");
+    expect(note).toContain("[打包运行](https://github.com/ZeroSum-Solutions/mish/actions/runs/1)");
+    expect(note).toContain("[代码测试](https://github.com/ZeroSum-Solutions/mish/actions/runs/2)");
+    expect(note).toContain("[包 smoke](https://github.com/ZeroSum-Solutions/mish/actions/runs/3)");
   });
 });

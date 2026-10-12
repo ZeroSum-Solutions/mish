@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { evaluateRuntimeEvidenceGraphV1 } from '@open-design/contracts';
+import { evaluateRuntimeEvidenceGraphV1 } from '@mish/contracts';
 import { describe, expect, it } from 'vitest';
 
 import { buildStructuredMainRunObservationV1 } from '../../src/observability/main-run-observation.js';
@@ -336,7 +336,7 @@ describe('Claude native Child evidence side channel', () => {
           availability: 'exact',
           source: 'provider_stream',
           safePayload: {
-            type: 'open-design.child-injected-prompt',
+            type: 'mish.child-injected-prompt',
             messages: [{
               redactedContent: expect.stringContaining('[REDACTED:path]'),
             }],

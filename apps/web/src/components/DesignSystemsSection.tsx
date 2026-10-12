@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogFooter, DialogTitle } from '@open-design/components';
+import { Button, Dialog, DialogFooter, DialogTitle } from '@mish/components';
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 import type { Dispatch, FormEvent, SetStateAction } from 'react';
 import { useT } from '../i18n';

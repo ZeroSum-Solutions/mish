@@ -5,8 +5,8 @@ import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { expect } from "vitest";
 
-import { stopSidecars, type SidecarStamp } from "@open-design/sidecar";
-import { canonicalJson, sha256Hex, signStandaloneChannelHead, signStandaloneMetadata, type StandaloneMetadata } from "@open-design/standalone";
+import { stopSidecars, type SidecarStamp } from "@mish/sidecar";
+import { canonicalJson, sha256Hex, signStandaloneChannelHead, signStandaloneMetadata, type StandaloneMetadata } from "@mish/standalone";
 
 export const repoRoot = resolve(import.meta.dirname, "../../..");
 export const terminalRoot = resolve(import.meta.dirname, "..");
@@ -95,7 +95,7 @@ function startToolsServeReleaseStorage(root: string): string {
   const stderrFile = join(root, "tools-serve.stderr");
   const stdout = openSync(stdoutFile, "w");
   const stderr = openSync(stderrFile, "w");
-  const server = spawn("pnpm", ["--silent", "--filter", "@open-design/tools-serve", "dev", "start", "release-storage", "--json", "--port", "0"], {
+  const server = spawn("pnpm", ["--silent", "--filter", "@mish/tools-serve", "dev", "start", "release-storage", "--json", "--port", "0"], {
     cwd: repoRoot,
     stdio: ["ignore", stdout, stderr],
   });

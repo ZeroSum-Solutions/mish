@@ -1,15 +1,15 @@
 /**
  * Loads the daemon's bundled owner-authored local prompt corpus (see
- * `@open-design/section-catalog`'s `src/local-corpus.ts` for the importer/validator and the
+ * `@mish/section-catalog`'s `src/local-corpus.ts` for the importer/validator and the
  * 2026-09-24 phase-C coordination note this implements). The data ships with the package at
- * `@open-design/section-catalog/data/zerosum-local-corpus.json` — it is NOT fetched over the
+ * `@mish/section-catalog/data/zerosum-local-corpus.json` — it is NOT fetched over the
  * network and is NOT the same thing as the federated `motionsites-mcp` source in `catalog.ts`.
  */
 
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { importLocalCorpus, resolveLocalCorpusText, type LocalCorpusRow } from '@open-design/section-catalog/local-corpus';
-import type { SectionCatalogEntry } from '@open-design/contracts/api/section-catalog';
+import { importLocalCorpus, resolveLocalCorpusText, type LocalCorpusRow } from '@mish/section-catalog/local-corpus';
+import type { SectionCatalogEntry } from '@mish/contracts/api/section-catalog';
 
 const require = createRequire(import.meta.url);
 
@@ -19,7 +19,7 @@ let cachedRows: LocalCorpusRow[] | null = null;
  * package's `exports` map), rather than a relative `../../../` walk that breaks the moment this
  * file moves. */
 function resolveDataFilePath(): string {
-  return require.resolve('@open-design/section-catalog/data/zerosum-local-corpus.json');
+  return require.resolve('@mish/section-catalog/data/zerosum-local-corpus.json');
 }
 
 async function loadRows(): Promise<LocalCorpusRow[]> {
@@ -42,7 +42,7 @@ export function resetLocalCorpusCache(rows: LocalCorpusRow[] | null = null): voi
  * `importLocalCorpus`'s own guarantee. */
 export async function getLocalCorpusEntries(): Promise<SectionCatalogEntry[]> {
   const rows = await loadRows();
-  // `@open-design/section-catalog`'s `SectionCatalogEntry` and `@open-design/contracts`'s mirror
+  // `@mish/section-catalog`'s `SectionCatalogEntry` and `@mish/contracts`'s mirror
   // it (section-catalog.ts's file header) are kept structurally identical on purpose — this plain
   // return is itself the compile-time check that they still agree, the same role
   // `packages/section-catalog/src/motionsites.ts`'s header describes for phase D's catalog route.

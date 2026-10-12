@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { gunzipSync } from 'node:zlib';
-import type { CultPreviewTheme } from '@open-design/contracts';
+import type { CultPreviewTheme } from '@mish/contracts';
 import type { HarnessInfo, HarnessPage } from '../cult-live-preview.js';
 
 interface Entry { name: string; live: boolean; supportsDark?: boolean; mockNote?: string | null; reason?: string; light?: string; dark?: string }

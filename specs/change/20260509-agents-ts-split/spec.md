@@ -46,7 +46,7 @@ created: '2026-05-09'
 - The executable resolver has module-level `cachedToolchainDirs`/toolchain path behavior, with tests covering OD_AGENT_HOME, NPM_CONFIG_PREFIX, VP_HOME, PATHEXT, fallbackBins, and configured `*_BIN` overrides. Source: `apps/daemon/src/agents.ts:900-983`; `apps/daemon/tests/agents.test.ts:1060-1361,1858-2004`
 - `fetchModels`/`probe` have intentional fallback behavior: model listing and version/help probing failures keep fallback models or availability state. Source: `apps/daemon/src/agents.ts:985-1069`
 - Test changes should stay in `apps/daemon/tests/`, while `src/` remains source-only. Source: `apps/AGENTS.md:14-24`
-- Verification commands should use daemon-scoped checks: `pnpm --filter @open-design/daemon typecheck` and `pnpm --filter @open-design/daemon test`. Source: `apps/AGENTS.md:39-46`; `specs/change/20260509-agents-ts-split/agents-merge-conflict-report.md:244-249,262-266`
+- Verification commands should use daemon-scoped checks: `pnpm --filter @mish/daemon typecheck` and `pnpm --filter @mish/daemon test`. Source: `apps/AGENTS.md:39-46`; `specs/change/20260509-agents-ts-split/agents-merge-conflict-report.md:244-249,262-266`
 - The main risks listed in the report are module initialization order, circular dependencies, ESM suffixes, test isolation, and export compatibility. Source: `specs/change/20260509-agents-ts-split/agents-merge-conflict-report.md:278-299`
 
 ### Key References
@@ -126,7 +126,7 @@ flowchart TD
 - Env: preserve configured env merge, `~` expansion, and Claude Code API key/base URL case-insensitive handling. Source: `apps/daemon/src/agents.ts:1342-1392`
 - Detection and models: preserve probing, help capability flags, fetch model fallback behavior, and live model cache updates. Source: `apps/daemon/src/agents.ts:985-1105,1394-1419`
 - MCP and prompt budget: preserve mature ACP MCP live artifacts behavior and argv/Windows command-line budget checks. Source: `apps/daemon/src/agents.ts:1111-1330`
-- Validation: run `pnpm --filter @open-design/daemon typecheck` and `pnpm --filter @open-design/daemon test` after each implementation step. Source: `apps/AGENTS.md:39-46`; `specs/change/20260509-agents-ts-split/agents-merge-conflict-report.md:244-266`
+- Validation: run `pnpm --filter @mish/daemon typecheck` and `pnpm --filter @mish/daemon test` after each implementation step. Source: `apps/AGENTS.md:39-46`; `specs/change/20260509-agents-ts-split/agents-merge-conflict-report.md:244-266`
 
 ### Pseudocode
 
@@ -184,10 +184,10 @@ Flow:
 - [x] Step 3: Split tests by responsibility
   - [x] Substep 3.1 Implement: extract shared env/fetch/platform/tmp executable helpers under `apps/daemon/tests/runtimes/helpers/`.
   - [x] Substep 3.2 Implement: split `agents.test.ts` into registry, args, executables, env, detection, MCP, and prompt-budget test files.
-  - [x] Substep 3.3 Verify: run `pnpm --filter @open-design/daemon test` and ensure split tests still import compatibility APIs through the facade where relevant.
+  - [x] Substep 3.3 Verify: run `pnpm --filter @mish/daemon test` and ensure split tests still import compatibility APIs through the facade where relevant.
 - [x] Step 4: Stabilize edge cases and review boundaries
   - [x] Substep 4.1 Implement: fix movement-only circular imports, `.js` import suffixes, and singleton ownership issues found by validation.
-  - [x] Substep 4.2 Verify: run `pnpm --filter @open-design/daemon typecheck` and `pnpm --filter @open-design/daemon test`.
+  - [x] Substep 4.2 Verify: run `pnpm --filter @mish/daemon typecheck` and `pnpm --filter @mish/daemon test`.
   - [x] Substep 4.3 Verify: review changed files against app test placement and facade compatibility boundaries.
 
 ## Notes
@@ -204,7 +204,7 @@ Flow:
 
 ### Verification
 
-- `pnpm --filter @open-design/daemon typecheck` ✅
-- `pnpm --filter @open-design/daemon exec vitest run -c vitest.config.ts tests/runtimes` ✅
-- `pnpm --filter @open-design/daemon exec vitest run -c vitest.config.ts tests/chat-route.test.ts` ✅ after one full-suite flaky failure in `tests/chat-route.test.ts`.
-- `pnpm --filter @open-design/daemon test` ⚠️ runtime split tests passed; full suite still fails in existing unrelated `tests/finalize-design.test.ts` assertions where resolved artifact names include long relative temp paths.
+- `pnpm --filter @mish/daemon typecheck` ✅
+- `pnpm --filter @mish/daemon exec vitest run -c vitest.config.ts tests/runtimes` ✅
+- `pnpm --filter @mish/daemon exec vitest run -c vitest.config.ts tests/chat-route.test.ts` ✅ after one full-suite flaky failure in `tests/chat-route.test.ts`.
+- `pnpm --filter @mish/daemon test` ⚠️ runtime split tests passed; full suite still fails in existing unrelated `tests/finalize-design.test.ts` assertions where resolved artifact names include long relative temp paths.

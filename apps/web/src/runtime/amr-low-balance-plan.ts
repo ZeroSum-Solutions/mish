@@ -1,4 +1,4 @@
-import type { AmrWalletSnapshot } from '@open-design/contracts';
+import type { AmrWalletSnapshot } from '@mish/contracts';
 import { fetchVelaLoginStatus } from '../providers/daemon';
 
 function normalizeAmrPlan(plan: string | null | undefined): string | null {

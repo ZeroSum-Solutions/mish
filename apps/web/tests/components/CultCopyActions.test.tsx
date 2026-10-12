@@ -5,7 +5,7 @@
 
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { CultCatalogItem, CultCatalogListResponse, CultCopyResponse } from '@open-design/contracts';
+import type { CultCatalogItem, CultCatalogListResponse, CultCopyResponse } from '@mish/contracts';
 
 import { CatalogView } from '../../src/components/CatalogView';
 import { CultCopyActions } from '../../src/components/CultCopyActions';

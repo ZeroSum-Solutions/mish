@@ -251,7 +251,7 @@ export function connectorDefinitionToDetail(definition: ConnectorCatalogDefiniti
       : { featuredToolNames: [...definition.featuredToolNames] }),
     ...(definition.minimumApproval === undefined ? {} : { minimumApproval: definition.minimumApproval }),
     auth: {
-      provider: definition.authentication ?? (definition.provider === 'open-design' ? 'local' : 'oauth'),
+      provider: definition.authentication ?? (definition.provider === 'mish' ? 'local' : 'oauth'),
       configured: definition.authentication === 'local' || definition.authentication === 'none',
     },
   };

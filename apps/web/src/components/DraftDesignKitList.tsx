@@ -2,9 +2,9 @@
 // draft. Every surface that offers kits for a project shows drafts through
 // this list, with a Publish action, instead of hiding them: a hidden draft is
 // how a teammate ended up generating off-brand with no error (Track B P0).
-import { Badge, Button } from '@open-design/components';
+import { Badge, Button } from '@mish/components';
 import { useState } from 'react';
-import type { DesignSystemSummary } from '@open-design/contracts';
+import type { DesignSystemSummary } from '@mish/contracts';
 import { useT } from '../i18n';
 import styles from './DraftDesignKitList.module.css';
 

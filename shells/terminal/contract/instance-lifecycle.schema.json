@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://nexu.io/contracts/terminal/instance-lifecycle-v1.schema.json",
+  "$id": "https://mish.invalid/contracts/terminal/instance-lifecycle-v1.schema.json",
   "title": "Shared Shell instance lifecycle v1",
   "type": "object",
   "additionalProperties": false,

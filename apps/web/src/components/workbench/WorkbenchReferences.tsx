@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { Badge, Button } from '@open-design/components';
-import { parseReferenceFanoutRequest, type ReferenceFanoutResponse, type ReferenceSection } from '@open-design/contracts';
+import { Badge, Button } from '@mish/components';
+import { parseReferenceFanoutRequest, type ReferenceFanoutResponse, type ReferenceSection } from '@mish/contracts';
 import { useT } from '../../i18n';
 import type { Dict } from '../../i18n/types';
 import { fanoutReferences, type ReferenceFanoutInput } from '../../providers/workbench-references';

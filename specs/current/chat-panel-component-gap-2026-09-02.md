@@ -223,7 +223,7 @@ OPEND-2188「镜像陈列页」**已经存在**,但不是 web 的 dev 路由,而
 - 重建命令(落点由命令给,不写死在测试里):
   ```
   OD_WRITE_MIRROR="$PWD/docs/design/chat-mirror/mirror-exec.html" \
-    pnpm --filter @open-design/web exec vitest run \
+    pnpm --filter @mish/web exec vitest run \
     -c vitest.config.ts tests/components/chat/mirror-gallery.test.tsx
   ```
 

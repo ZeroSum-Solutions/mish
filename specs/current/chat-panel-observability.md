@@ -49,7 +49,7 @@ thing**. Everything above measures either the whole page or one iframe.
 
 ### Transport choice, and why it is not the product-analytics path
 
-`open-design-tracking` governs the consent-gated
+`mish-tracking` governs the consent-gated
 `page_view`/`surface_view`/`ui_click`/`*_result` path with the
 `page_name`+`area`+`element` triple. These events do **not** go there. They
 are stability telemetry, in the same category as `client_long_task` and
