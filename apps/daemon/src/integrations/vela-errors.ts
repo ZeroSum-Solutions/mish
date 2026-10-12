@@ -41,6 +41,12 @@ export function amrRechargeUrl(): string | undefined {
 const AMR_AUTH_REQUIRED_MESSAGE =
   'AMR sign-in is required. Sign in to AMR Cloud again, then retry this run.';
 
+/** `{ actionUrl }` when a console URL is configured, else nothing. */
+function recharge(): { actionUrl?: string } {
+  const url = amrRechargeUrl();
+  return url ? { actionUrl: url } : {};
+}
+
 function insufficientBalanceMessage(): string {
   const url = amrRechargeUrl();
   return url
@@ -203,7 +209,7 @@ export function classifyAmrAccountFailureDetails(details: unknown): AmrAccountFa
       code: 'AMR_INSUFFICIENT_BALANCE',
       message: insufficientBalanceMessage(),
       action: 'recharge',
-      ...(amrRechargeUrl() ? { actionUrl: amrRechargeUrl() } : {}),
+      ...recharge(),
     };
   }
 
@@ -267,7 +273,7 @@ export function classifyAmrAccountFailure(text: string): AmrAccountFailure | nul
       code: 'AMR_INSUFFICIENT_BALANCE',
       message: insufficientBalanceMessage(),
       action: 'recharge',
-      ...(amrRechargeUrl() ? { actionUrl: amrRechargeUrl() } : {}),
+      ...recharge(),
     };
   }
 

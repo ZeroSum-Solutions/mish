@@ -19,7 +19,7 @@ const summary = {
 };
 
 function fakeFetch(handler: (url: string, init?: RequestInit) => { status?: number; body: unknown }) {
-  const calls: Array<{ url: string; init?: RequestInit }> = [];
+  const calls: Array<{ url: string; init?: RequestInit | undefined }> = [];
   const fn = (async (url: string, init?: RequestInit) => {
     calls.push({ url, init });
     const { status = 200, body } = handler(url, init);
