@@ -52,7 +52,7 @@ exports[`composeSystemPrompt — scenario × section golden matrix > keeps the s
       "asset-fetch-identity",
       "role-marker-guard",
     ],
-    "totalChars": 56309,
+    "totalChars": 56273,
   },
   "critique-enabled": {
     "sections": [
@@ -266,7 +266,7 @@ exports[`composeSystemPrompt — scenario × section golden matrix > keeps the s
       "asset-fetch-identity",
       "role-marker-guard",
     ],
-    "totalChars": 56307,
+    "totalChars": 56271,
   },
   "memory-hooks-off": {
     "sections": [
