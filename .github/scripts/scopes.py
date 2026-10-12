@@ -306,6 +306,7 @@ def emit_plan(plan, output_path=None):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     append_outputs({
+        "run": compact_json(plan["enabled"]),
         "scopes": compact_json(plan["scopes"]),
         "ui_p0_matrix": compact_json(plan["matrices"]["ui_p0"]),
         "visual_matrix": compact_json(plan["matrices"]["visual"]),

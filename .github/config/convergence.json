@@ -15,8 +15,7 @@
       ".github/actions/configure-ci-parallelism/",
       ".github/actions/setup-playwright/",
       ".github/actions/setup-workspace/",
-      ".github/workflows/ci.yml",
-      ".github/workflows/convergence.atom.yml"
+      ".github/workflows/ci.yml"
     ],
     "workspace-install": [
       "package.json",
