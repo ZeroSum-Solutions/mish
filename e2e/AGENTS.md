@@ -208,3 +208,8 @@ Use a specific file path when validating a single case. Do not add root e2e alia
 Case-level priority tags use test-name prefixes: `[P0]`, `[P1]`, `[P2]`.
 
 Playwright UI runs use one tools-dev daemon/web/data root per Playwright worker. The single-worker fallback is `--workers=1` (or `OD_PLAYWRIGHT_WORKERS=1`); do not reintroduce a shared daemon/web runtime mode.
+
+## Playwright suite runtime
+
+- The suite owns one isolated tools-dev daemon/web/data root per Playwright worker. Do not add a shared-runtime fallback; set Playwright workers to `1` when constrained.
+- Playwright suite code does not own workspace prebuild policy. CI and callers keep the existing prebuild steps; `tools-dev` daemon freshness checks are only a fallback guard.

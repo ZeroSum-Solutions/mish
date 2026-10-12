@@ -120,3 +120,13 @@ aider / antigravity / atomcode),**opencode 直连不吐 thinking**,
 遇到新的稿内矛盾:**以说明文字(`cmp-ops` 段)为准**,它记录的是设计意图;
 状态标题是随手写的,历史上多次没跟上改动。矛盾要回写进
 `specs/current/chat-panel-next.md` 的待决表,不要在代码里默默选一个。
+
+## Chat UI conventions
+
+- TodoWrite has **no pinned card above the composer**. The task list appears in full exactly once, inside the turn's execution record, as `执行计划 · N 步` plus one drawer per step (`components/chat/ExecutionShell.tsx`, decisions D29 / B17 in `specs/current/chat-panel-next.md`). The old `PinnedTodoSlot` in `ChatPane.tsx` was removed when the new execution record landed; do not reintroduce it.
+- What *is* pinned above the composer is the **Plan pill** (`components/chat/PlanPill.tsx`, delivered-matrix cell #71): a one-line `第 N / M 步` capsule, with the whole list in a hover-only popover that opens **upward**. It is a second view of the same TodoWrite snapshot, not a second copy of the card — `N` is *which step is running now* (not `{done}/{total}`), and the pill disappears entirely once the run ends or nothing in the list is unfinished. Visibility, `N`/`M`, and the per-step mark all live in the pure `runtime/chat/plan-pill.ts`; the component only draws. The expanded standalone Plan card (cell #70) stays **not built** (D33 / S9).
+- Because the pill sits **outside** the `.chat-log` scroll container, it is wired into the same auto-scroll plumbing as `QueuedSendStrip`: it takes a `containerRef`, `ChatPane`'s `ResizeObserver` observes that element, and the pane-level `MutationObserver` re-attaches the observation whenever it mounts or unmounts. Any future pinned element there needs the same three pieces or new messages stop scrolling into view. The pill renders **before** `QueuedSendStrip` in DOM order so a growing queue pushes it up instead of overlapping it.
+- `latestTodoWriteInputFromMessages` is the conversation-level discovery link (used by the pill); `unfinishedTodosFromEvents` (the daemon's own criterion) is untouched.
+- One capability travelled on that pinned card and has **not** been re-homed yet: continuing a turn's remaining tasks (`onContinueRemainingTasks`). The delivered design never drew it, so where it goes is an open product decision (T33). `AssistantMessage` still accepts the prop; nothing renders it today.
+- Clarifying questions render through the `<question-form>` artifact directly inside the chat — see root `AGENTS.md` → "Asking the user questions".
+- Tool group rendering uses `dedupeSnapshotToolRetries` to collapse `TodoWrite` snapshots (only the most recent call survives, since each call is a state replace). `SNAPSHOT_TOOL_NAMES` lists the snapshot-style tools; non-snapshot tools pass through untouched.

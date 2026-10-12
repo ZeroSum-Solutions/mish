@@ -1596,7 +1596,7 @@ async function checkRunStartChokePoint(): Promise<boolean> {
   if (violations.length > 0) {
     console.error("Run start choke-point violations found:");
     console.error("Start physical Runs through `internalRunCreation.start(run, analytics, starter)`");
-    console.error("so the Run analytics lifecycle is installed. See AGENTS.md -> Starting a physical Run.");
+    console.error("so the Run analytics lifecycle is installed. See apps/daemon/AGENTS.md -> Starting a physical Run.");
     for (const violation of violations) console.error(`- ${violation}`);
     return false;
   }
