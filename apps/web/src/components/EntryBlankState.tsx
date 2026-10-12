@@ -9,14 +9,22 @@ interface Props {
 }
 
 /**
- * Inline SVG remake of the old `/drafts-empty-mark.png` mark (sans the PNG's
- * blueprint guide lines — product dropped them). Geometry is lifted from
- * `clipper/assets/mark.svg`; the gradient axis and stops are sampled from the
- * PNG so the resting frame is pixel-faithful. Being real strokes (normalized
- * via pathLength) lets hover replay a draw-on demo that always settles back
- * to this exact resting frame. The viewBox keeps the PNG's framing so the
- * mark's on-page size and position are unchanged.
+ * Inline SVG of the Mish brand mark (`assets/brand/mishh-mashh-mark.svg`),
+ * drawn as outlines so the empty state reads as line art. Path data is the
+ * brand mark's geometry rescaled into this 0–93 design box; the strokes are
+ * normalized via pathLength so hover replays a draw-on demo (left to right)
+ * that always settles back to the fully drawn resting frame. The viewBox
+ * keeps the original framing so the mark's on-page size and position are
+ * unchanged.
  */
+const MARK_PATHS = [
+  'M31.32 25.62C31.46 25.77 31.4 27.94 31.4 28.33L31.4 33.5L31.38 51.12C28.09 55.54 24.54 59.89 21.27 64.34C20.16 65.86 18.86 67.41 17.81 68.96C15.98 67.29 13.77 65.51 11.87 63.85C10.05 62.34 8.19 60.68 6.4 59.13L31.32 25.62Z',
+  'M32.3 24.34C33.06 24.85 34.13 25.89 34.88 26.52C36.75 28.1 38.6 29.7 40.44 31.32C41.74 32.45 43.05 33.64 44.41 34.68C43.79 35.58 43.11 36.45 42.47 37.34C40.8 39.69 39.1 42.03 37.35 44.33C35.59 46.69 33.85 49.06 32.13 51.45C32.22 50.49 32.2 49.28 32.2 48.29L32.2 43.44L32.22 32.84C32.22 30.13 32.2 27.03 32.3 24.34Z',
+  'M53.53 24.25C53.87 24.39 56.63 26.87 57.08 27.26L64.87 34.02C64.01 35.31 62.82 36.77 61.86 38.01L57.3 43.9L43.81 61.55C42.02 63.92 39.97 66.42 38.26 68.82L38.13 68.92C37.64 68.74 28.32 60.53 27.15 59.46C27.9 58.31 28.95 56.96 29.78 55.84L35.19 48.56C41.24 40.4 47.35 32.3 53.53 24.25Z',
+  'M74.48 23.99C74.96 24.26 77.34 26.39 77.89 26.86C80.5 29.17 83.13 31.44 85.79 33.68C84.92 34.94 83.64 36.52 82.68 37.73L78.2 43.51L68.49 56.19C65.3 60.33 61.97 64.57 58.88 68.77C58.87 68.79 58.78 68.84 58.76 68.86C57.68 67.77 55.76 66.2 54.55 65.17L47.74 59.34C48.05 58.78 48.61 58.05 49 57.52C49.71 56.52 50.44 55.54 51.18 54.56L56.33 47.72L74.48 23.99Z',
+  'M86.4 34.24C86.7 34.64 86.08 65.75 86.11 69.01L70.87 69.01C70.72 68.42 70.82 64.08 70.83 63.25L70.87 54.4L86.4 34.24Z',
+] as const;
+
 function BlankMark() {
   const gradientId = useId();
   return (
@@ -32,14 +40,14 @@ function BlankMark() {
         <linearGradient
           id={gradientId}
           gradientUnits="userSpaceOnUse"
-          x1="46.4"
-          y1="75.9"
-          x2="75.1"
-          y2="46.4"
+          x1="6"
+          y1="69"
+          x2="86.4"
+          y2="24"
         >
-          <stop offset="0" stopColor="#01220b" />
-          <stop offset="0.5" stopColor="#016a21" />
-          <stop offset="1" stopColor="#00b238" />
+          <stop offset="0" stopColor="#151719" />
+          <stop offset="0.55" stopColor="#a8432f" />
+          <stop offset="1" stopColor="#ff674f" />
         </linearGradient>
       </defs>
       <g
@@ -47,23 +55,14 @@ function BlankMark() {
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path
-          className="entry-blank__mark-line"
-          pathLength={1}
-          d="M46.3765 17.8047C62.2253 17.8047 75.0733 30.6527 75.0733 46.5015C75.0732 62.3503 62.2253 75.1983 46.3765 75.1983H21.4977C19.3845 75.1983 17.6798 73.4938 17.6798 71.3806C17.6798 64.9804 17.6797 52.2256 17.6797 46.5015C17.6797 30.6527 30.5277 17.8047 46.3765 17.8047Z"
-        />
-        <circle
-          className="entry-blank__mark-line"
-          pathLength={1}
-          cx="46.3766"
-          cy="46.5016"
-          r="22.9575"
-        />
-        <path
-          className="entry-blank__mark-line entry-blank__mark-line--cursor"
-          pathLength={1}
-          d="M44.5871 59.9762L35.8379 36.9521C35.5548 36.207 36.2825 35.4765 37.0227 35.7628L60.0576 44.6746C61.0056 45.0413 60.7444 46.4564 59.7287 46.4564H46.3592V59.6471C46.3592 60.6699 44.9502 60.9315 44.5871 59.9762Z"
-        />
+        {MARK_PATHS.map((d) => (
+          <path
+            key={d}
+            className="entry-blank__mark-line"
+            pathLength={1}
+            d={d}
+          />
+        ))}
       </g>
     </svg>
   );

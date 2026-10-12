@@ -4,8 +4,6 @@ import { describe, expect, it } from "vitest";
 
 const setupWorkspaceAction = new URL("../../.github/actions/setup-workspace/action.yml", import.meta.url);
 const setupPlaywrightAction = new URL("../../.github/actions/setup-playwright/action.yml", import.meta.url);
-const cacheMaintenanceWorkflow = new URL("../../.github/workflows/cache-maintenance.yml", import.meta.url);
-const visualBaselineWorkflow = new URL("../../.github/workflows/visual-baseline.yml", import.meta.url);
 const ciWorkflow = new URL("../../.github/workflows/ci.yml", import.meta.url);
 
 function sectionBetween(content: string, start: string, end: string): string {
@@ -62,9 +60,10 @@ describe("GitHub Actions cache workflows", () => {
     expect(action).not.toContain('blacksmith-');
     expect(action).not.toContain('blacksmith-ubuntu-mirrors.txt');
     expect(action).toContain('run: ${{ inputs.install-command }}');
-    const baseline = await readFile(visualBaselineWorkflow, "utf8");
-    const setup = sectionBetween(baseline, '- name: Setup Playwright', '- name: Prebuild');
-    expect(setup).toContain('runner-labels:');
+    const workflow = await readFile(ciWorkflow, "utf8");
+    for (const setup of workflow.split("uses: ./.github/actions/setup-playwright").slice(1)) {
+      expect(setup.slice(0, setup.indexOf("\n      - name:"))).toContain("runner-labels:");
+    }
   });
 
   it("[P1] keeps pnpm cache writes on explicit trusted main seed jobs", async () => {
@@ -119,69 +118,23 @@ describe("GitHub Actions cache workflows", () => {
     expect(saveStep).toContain("github.event_name == 'schedule'");
   });
 
-  it("[P1] seeds Windows and Linux from main and deletes only closed-PR BuildKit cache families", async () => {
-    const workflow = await readFile(cacheMaintenanceWorkflow, "utf8");
-    const windowsSeedJob = sectionBetween(workflow, "  seed-pnpm-windows:", "  seed-pnpm-linux:");
-    const linuxSeedJob = sectionBetween(workflow, "  seed-pnpm-linux:", "  clean-closed-pr-buildkit:");
-    const cleanupJob = workflow.slice(workflow.indexOf("  clean-closed-pr-buildkit:"));
+  // The pnpm store cache is written only from main: `ci.yml` runs on every push to main,
+  // so its unconditional Linux preflight job and the Windows payload job are the seeds.
+  // The action's own save condition still refuses pull_request and merge_group events.
+  it("[P1] seeds the Linux and Windows pnpm caches from ci.yml pushes to main", async () => {
+    const workflow = await readFile(ciWorkflow, "utf8");
+    expect(workflow).toMatch(/^  push:\n    branches: \[main\]$/m);
 
-    expect(workflow).toContain("pull_request_target:");
-    expect(workflow).toContain("types: [closed]");
-    expect(workflow).toContain("push:");
-    expect(workflow).toContain("branches: [main]");
-    expect(workflow).toContain("workflow_dispatch:");
-    expect(workflow).toContain("actions: write");
-    expect(workflow).toContain("contents: read");
-
-    for (const seedJob of [windowsSeedJob, linuxSeedJob]) {
-      expect(seedJob).toContain("github.event_name == 'push'");
-      expect(seedJob).toContain("github.event_name == 'workflow_dispatch'");
-      expect(seedJob).toContain("github.ref == 'refs/heads/main'");
-      expect(seedJob).toContain("uses: actions/checkout@v6.0.2");
-      expect(seedJob).toContain("uses: ./.github/actions/setup-workspace");
-      expect(seedJob).toContain("save-pnpm-cache: 'true'");
+    const jobs = workflow.split(/(?=^  [\w]+:\s*$)/m);
+    const seedJobs = jobs.filter((job) => job.includes("save-pnpm-cache: 'true'"));
+    expect(seedJobs.map((job) => job.match(/^  ([\w]+):/m)?.[1])).toEqual([
+      "preflight", "windows_tools_pack_payload_tests",
+    ]);
+    for (const job of seedJobs) {
+      const setup = sectionBetween(job, "uses: ./.github/actions/setup-workspace", "\n      - name:");
+      expect(setup).toContain("save-pnpm-cache: 'true'");
     }
-
-    expect(windowsSeedJob).toContain("runs-on: windows-latest");
-    // One hosted Linux seed is enough: actions/cache is repo-scoped and shared
-    // by every self-hosted runner size (small/medium/large) once the store path is pinned.
-    expect(linuxSeedJob).toContain("runs-on: ubuntu-24.04");
-
-    expect(cleanupJob).toContain("github.event_name == 'pull_request_target'");
-    expect(cleanupJob).toContain("refs/pull/${{ github.event.pull_request.number }}/merge");
-    expect(cleanupJob).toContain('startswith("buildkit-blob-")');
-    expect(cleanupJob).toContain('startswith("index-buildkit-")');
-    expect(cleanupJob).toContain("--json id,key,sizeInBytes");
-    expect(cleanupJob).toContain("gh cache delete \"$cache_id\"");
-    expect(cleanupJob).not.toContain("gh cache delete --all");
-    expect(cleanupJob).not.toContain("actions/checkout");
-    expect(cleanupJob).not.toContain("github.event.pull_request.head");
+    expect(sectionBetween(workflow, "  preflight:", "  workspace_unit_tests:")).toContain(".general_medium");
+    expect(sectionBetween(workflow, "  windows_tools_pack_payload_tests:", "  web_workspace_tests:")).toContain(".windows_tools");
   });
-
-
-  it("[P1] keeps visual-baseline as a secondary Linux pnpm seed on main", async () => {
-    const workflow = await readFile(visualBaselineWorkflow, "utf8");
-    const setupStep = sectionBetween(workflow, "      - name: Setup workspace", "      - name: Setup Playwright");
-
-    expect(workflow).toContain("push:");
-    expect(workflow).toContain("- main");
-    expect(setupStep).toContain("uses: ./.github/actions/setup-workspace");
-    expect(setupStep).toContain("save-pnpm-cache: 'true'");
-  });
-
-  it("[P1] captures visual baselines only when they can be uploaded or on demand", async () => {
-    const workflow = await readFile(visualBaselineWorkflow, "utf8");
-    const capture = "env.HAS_R2 == 'true' || github.event_name == 'workflow_dispatch'";
-
-    expect(workflow).toContain("runs-on: ubuntu-24.04");
-    for (const step of ["Setup Playwright", "Prebuild workspace type declarations", "Capture baseline screenshots", "Upload baseline debug artifact"]) {
-      const start = workflow.indexOf(`      - name: ${step}`);
-      expect(start).toBeGreaterThanOrEqual(0);
-      const next = workflow.indexOf("      - name:", start + 1);
-      const body = workflow.slice(start, next === -1 ? undefined : next);
-      expect(body, step).toContain(capture);
-    }
-  });
-
-
 });

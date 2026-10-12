@@ -2503,11 +2503,9 @@
   stroke-dasharray: 1;
   stroke-dashoffset: 0;
 }
-.entry-blank__mark-line--cursor {
-  stroke-width: 0.7;
-}
-/* Hovering the mark replays a draw-on demo (outline → circle → cursor).
-   It settles at the resting frame; nothing about the mark persists changed. */
+/* Hovering the mark replays a draw-on demo (the mark's strokes, left to
+   right). It settles at the resting frame; nothing about the mark persists
+   changed. */
 @media (prefers-reduced-motion: no-preference) {
   .entry-blank__mark:hover .entry-blank__mark-line {
     animation: entry-blank-mark-draw 760ms var(--ease-out) backwards;
@@ -2517,6 +2515,12 @@
   }
   .entry-blank__mark:hover .entry-blank__mark-line:nth-child(3) {
     animation-delay: 260ms;
+  }
+  .entry-blank__mark:hover .entry-blank__mark-line:nth-child(4) {
+    animation-delay: 380ms;
+  }
+  .entry-blank__mark:hover .entry-blank__mark-line:nth-child(5) {
+    animation-delay: 500ms;
   }
 }
 @keyframes entry-blank-mark-draw {

@@ -1,15 +1,7 @@
+# CI runs on GitHub-hosted runners only, so no self-hosted runner labels are
+# declared: actionlint rejects any label it does not know as a hosted image.
 paths:
   .github/workflows/*.lock.yml:
     ignore:
       - 'shellcheck reported issue in this script: SC2016:.+'
       - 'shellcheck reported issue in this script: SC2086:.+'
-self-hosted-runner:
-  labels:
-    - agent-pr-explore
-    - mish-spark
-    - mish-mac
-    - mish-win
-    - od-ci-hot-poc
-    - od-persistent-ci
-    - mish-ci
-    - release-beta

@@ -11,6 +11,10 @@ on:
   # (docs/ci/RUNNERS.md).
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
+  # A push to main re-validates the pushed range at pull-request strength; an
+  # unresolvable range (branch creation, force push) takes the full plan.
+  push:
+    branches: [main]
   merge_group:
   workflow_dispatch:
     inputs:
@@ -21,14 +25,6 @@ on:
           - full
           - hot
         default: full
-      runner_mode:
-        description: >-
-          Per-run OD_CI_RUNNER_MODE override (e.g. aws). Applies to this manual
-          run only and never writes the repo variable — use this to validate a
-          runner mode that exists only on a branch, before it reaches main.
-          Leave empty to use the repo variable as usual.
-        type: string
-        default: ''
 
 permissions:
   actions: read
@@ -42,13 +38,17 @@ concurrency:
   # failures for commits reviewers no longer need to evaluate. Release workflows
   # use cancel-in-progress: false where preserving build evidence matters more.
   # Manual comparison runs need isolated groups so queued/stuck experiments do
-  # not block the next measurement on this branch.
-  cancel-in-progress: true
+  # not block the next measurement on this branch. Pushes to main queue instead
+  # of cancelling, so every landed commit keeps its own validation record.
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 jobs:
   runners:
     name: Resolve runner profiles
     # Bootstrap on GitHub hosted Linux before the checked-in profile is available.
+    # Every profile in .github/config/runners.json is a GitHub-hosted image, and the
+    # workflow reads no repository variables or secrets, so fork PRs and the base
+    # repository resolve the same `defaultMode` placement.
     # Draft gate: every other job needs this one, so skipping it skips the whole run.
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     runs-on: ubuntu-24.04
@@ -62,29 +62,6 @@ jobs:
 
       - name: Resolve runner profiles
         id: runners
-        env:
-          # Fork PRs cannot rely on repository variables, so keep their required
-          # validation on GitHub-hosted runners even when private pools are down.
-          #
-          # A manual workflow_dispatch run may pass `runner_mode` to validate a
-          # mode that exists only on the dispatched branch's runners.json (e.g.
-          # a new self-hosted profile under review) without writing the shared
-          # repo variable — which would otherwise apply to every other PR and
-          # merge-queue run immediately, including ones on branches that don't
-          # have that mode yet (incident 2026-10-09: OD_CI_RUNNER_MODE=aws was
-          # set directly while `aws` existed only on a feature branch, and every
-          # other concurrent run failed "Resolve runner profiles" with "unknown
-          # runner mode: aws" until it was reverted). This input never touches
-          # `vars.OD_CI_RUNNER_MODE`; it only overrides the value this one run's
-          # own "Resolve runner profiles" step uses.
-          OD_CI_RUNNER_MODE: >-
-            ${{ (github.event_name == 'pull_request'
-                 && github.event.pull_request.head.repo.full_name != github.repository
-                 && 'economic')
-              || (github.event_name == 'workflow_dispatch'
-                 && inputs.runner_mode != ''
-                 && inputs.runner_mode)
-              || vars.OD_CI_RUNNER_MODE }}
         run: python3 .github/scripts/runners.py
 
   plan:
@@ -93,10 +70,7 @@ jobs:
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.draft == false }}
     runs-on: ${{ fromJSON(needs.runners.outputs.runs_on).control }}
     outputs:
-      run: ${{ steps.convergence.outputs.run }}
-      convergence_plan: ${{ steps.pending_plan.outputs.plan }}
-      convergence_hit: ${{ steps.convergence.outputs.hit }}
-      convergence_would_run: ${{ steps.convergence.outputs.would_run }}
+      run: ${{ steps.scopes.outputs.run }}
       scopes: ${{ steps.scopes.outputs.scopes }}
       ui_p0_matrix: ${{ steps.scopes.outputs.ui_p0_matrix }}
       visual_matrix: ${{ steps.scopes.outputs.visual_matrix }}
@@ -111,82 +85,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: python3 .github/scripts/scopes.py github-output --output "$RUNNER_TEMP/scope-plan.json"
 
-      - name: Resolve reusable workload results
-        id: convergence
-        env:
-          RUNNER_PLAN_JSON: ${{ needs.runners.outputs.runs_on }}
-          OD_WORKLOAD_RESULTS_BASE_URL: ${{ secrets.OD_WORKLOAD_RESULTS_BASE_URL }}
-        run: >-
-          python3 .github/scripts/convergence.py github-output
-          --workflow ci
-          --scope-plan "$RUNNER_TEMP/scope-plan.json"
-          --runner-plan-json "$RUNNER_PLAN_JSON"
-          --mode shadow
-          --pending "$RUNNER_TEMP/pending-convergence.json"
-
-      # Shadow mode records reusable-result hits without omitting validation.
-      # The successful gate later turns this exact plan into a trusted handoff.
-      # Handed off as a job output, not an artifact, so an exhausted artifact
-      # quota cannot break it. gzip+base64 keeps it one line, well under the
-      # 1 MB output limit, and stops secret masking from dropping the output
-      # when result URLs share the OD_WORKLOAD_RESULTS_BASE_URL origin.
-      - name: Expose pending convergence plan
-        id: pending_plan
-        continue-on-error: true
-        shell: bash
-        run: |
-          set -euo pipefail
-          plan="$(gzip -9c "$RUNNER_TEMP/pending-convergence.json" | base64 -w0)"
-          if [ "${#plan}" -gt 900000 ]; then
-            echo "::warning::pending convergence plan is ${#plan} bytes encoded; skipping the handoff output."
-            exit 0
-          fi
-          echo "plan=$plan" >> "$GITHUB_OUTPUT"
-
-      - name: Create visual report handoff
-        id: visual_report_handoff
-        if: ${{ github.event_name == 'pull_request' && fromJSON(steps.convergence.outputs.run).playwright_visual }}
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          RUN_ID: ${{ github.run_id }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          handoff_id="visual-pr"
-          handoff_root="$RUNNER_TEMP/handoff-report-$handoff_id"
-          handoff_dir="$(python3 .github/scripts/handoff.py dir report "$handoff_id" --root "$handoff_root")"
-          mkdir -p "$handoff_dir"
-          jq -n \
-            --arg kind "report" \
-            --arg id "$handoff_id" \
-            --arg head "$HEAD_SHA" \
-            --arg base "$BASE_SHA" \
-            --arg report_type "visual-pr" \
-            --arg artifact_pattern "visual-pr-capture-$PR_NUMBER-$RUN_ID-*" \
-            --arg output_comment_id "visual-pr-report" \
-            --arg marker "<!-- visual-regression-bot -->" \
-            --argjson schema_version 1 \
-            --argjson pr_number "$PR_NUMBER" \
-            --argjson run_id "$RUN_ID" \
-            '{schema_version: $schema_version, kind: $kind, id: $id, pr_number: $pr_number, head_sha: $head, base_sha: $base, run_id: $run_id, report_type: $report_type, artifact_pattern: $artifact_pattern, output_comment_id: $output_comment_id, marker: $marker}' \
-            > "$handoff_dir/metadata.json"
-          python3 .github/scripts/handoff.py validate report "$handoff_dir" >/dev/null
-          {
-            echo "name=$(python3 .github/scripts/handoff.py artifact-name report "$handoff_id")"
-            echo "path=$handoff_root"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Upload visual report handoff
-        if: ${{ steps.visual_report_handoff.outputs.name != '' }}
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.visual_report_handoff.outputs.name }}
-          path: ${{ steps.visual_report_handoff.outputs.path }}
-          if-no-files-found: error
-          retention-days: 7
+      # Reusable workload results (the upstream "convergence" path) are not used here:
+      # they need a trusted publisher and an R2 result store this repository does not
+      # have. Every workload the scope plan enables runs on every qualifying event.
 
   static_gate:
     name: Static gate
@@ -229,6 +130,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           MAX_CHANGED_FILE_BYTES: "1048576"
+          PUSH_BEFORE: ${{ github.event.before }}
         shell: bash
         run: |
           set -euo pipefail
@@ -247,6 +149,14 @@ jobs:
             gh api --paginate \
               "repos/${{ github.repository }}/compare/main...${{ github.sha }}" \
               --jq '(.files // [])[] | select(.status != "removed") | .filename' > "$changed_files"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+            # Only the pushed range: every file that reached main already passed this
+            # guard as part of its pull request. Branch creation has no range to check.
+            if [ -n "$PUSH_BEFORE" ] && [ "$PUSH_BEFORE" != "0000000000000000000000000000000000000000" ]; then
+              gh api --paginate \
+                "repos/${{ github.repository }}/compare/${PUSH_BEFORE}...${{ github.sha }}" \
+                --jq '(.files // [])[] | select(.status != "removed") | .filename' > "$changed_files"
+            fi
           else
             git ls-files > "$changed_files"
           fi
@@ -300,10 +210,13 @@ jobs:
       - name: Configure CI parallelism
         uses: ./.github/actions/configure-ci-parallelism
 
+      # Preflight runs on every event, so on a push to main it is the Linux pnpm store
+      # seed; the action itself refuses to save from any other ref or event.
       - name: Setup workspace
         uses: ./.github/actions/setup-workspace
         with:
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).general_medium) }}
+          save-pnpm-cache: 'true'
 
       # Setup workspace runs root postinstall, including the daemon build.
       # Fresh CI typecheck/test still need the app outputs not built there:
@@ -509,10 +422,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6.0.2
 
+      # The Windows pnpm store seed on pushes to main (see preflight).
       - name: Setup workspace
         uses: ./.github/actions/setup-workspace
         with:
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).windows_tools) }}
+          save-pnpm-cache: 'true'
 
       - name: Windows launcher payload archive tests
         run: pnpm --filter @mish/tools-pack exec vitest run tests/launcher/windows/payload.test.ts
@@ -1054,46 +969,6 @@ jobs:
             echo "$required_misses"
             exit 1
           fi
-
-      - name: Checkout convergence control plane
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
-        continue-on-error: true
-        uses: actions/checkout@v6.0.2
-
-      - name: Restore pending convergence plan
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
-        continue-on-error: true
-        env:
-          # A failed-job rerun reuses the successful plan job and its outputs.
-          CONVERGENCE_PLAN: ${{ needs.plan.outputs.convergence_plan }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "$CONVERGENCE_PLAN" ]; then
-            echo "::warning::plan job exposed no pending convergence plan; skipping the convergence handoff."
-            exit 1
-          fi
-          printf '%s' "$CONVERGENCE_PLAN" | base64 -d | gunzip > "$RUNNER_TEMP/pending-convergence.json"
-
-      - name: Create convergence handoff
-        id: convergence_handoff
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'merge_group' }}
-        continue-on-error: true
-        run: >-
-          python3 .github/scripts/convergence.py handoff
-          --pending "$RUNNER_TEMP/pending-convergence.json"
-          --products-root "$RUNNER_TEMP/convergence-products"
-          --handoff-root "$RUNNER_TEMP/handoff-convergence-ci-results"
-
-      - name: Upload convergence handoff
-        if: ${{ steps.convergence_handoff.outputs.name != '' }}
-        continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ steps.convergence_handoff.outputs.name }}
-          path: ${{ steps.convergence_handoff.outputs.path }}
-          if-no-files-found: error
-          retention-days: 1
 
       # A failed workload ejects the queued PR just as invisibly as a blocking label does: this
       # required check fails on the queue's transient ref, the PR's own checks stay green, and

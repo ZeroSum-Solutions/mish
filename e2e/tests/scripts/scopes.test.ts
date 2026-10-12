@@ -237,16 +237,13 @@ describe("workflow scope planner", () => {
   test("runs planner contract tests for CI control-plane changes", () => {
     const controlPlaneFiles = [
       ".github/config/scopes.json",
-      ".github/config/convergence.json",
       ".github/config/runners.json",
       ".github/scripts/scopes.py",
-      ".github/scripts/convergence.py",
       ".github/scripts/runners.py",
       ".github/scripts/handoff.py",
       ".github/scripts/lib/config.py",
       ".github/scripts/lib/github.py",
       ".github/scripts/lib/r2.py",
-      ".github/workflows/convergence.atom.yml",
     ];
     for (const file of controlPlaneFiles) {
       expect(plan("pr", [file]), file).toMatchObject({
@@ -264,8 +261,6 @@ describe("workflow scope planner", () => {
       "shells/terminal/src/cli.ts",
       ".github/scripts/pack.py",
       ".github/scripts/release.py",
-      ".github/workflows/convergence-exact.atom.yml",
-      ".github/workflows/release-exact.yml",
     ]) {
       const prPlan = plan("pr", [file]);
       expect(prPlan, file).toMatchObject({
@@ -331,7 +326,86 @@ describe("workflow scope planner", () => {
       workflow.indexOf("  windows_tools_pack_payload_tests:"),
       workflow.indexOf("  web_workspace_tests:"),
     );
-    expect(windowsPayload).not.toMatch(/\.github\/scripts\/(?:scopes|convergence|runners)\.py/);
+    expect(windowsPayload).not.toMatch(/\.github\/scripts\/(?:scopes|runners)\.py/);
     expect(workflow).not.toContain("  terminal_scene:");
+  });
+
+  test("gates every workload on the planner's own run map, with no reusable-result layer", () => {
+    const workflow = readFileSync(path.join(repoRoot, ".github/workflows/ci.yml"), "utf8");
+    expect(workflow).toContain("run: ${{ steps.scopes.outputs.run }}");
+    expect(workflow).not.toMatch(/convergence\.py|steps\.convergence\.|secrets\.|vars\./);
+    for (const workload of Object.keys(plan("full").enabled)) {
+      expect(workflow, workload).toContain(`if: \${{ fromJSON(needs.plan.outputs.run).${workload} }}`);
+    }
+  });
+
+  describe("github-output event resolution", () => {
+    const fakeGh = (response: string) => {
+      const root = mkdtempSync(path.join(tmpdir(), "scope-event-"));
+      const gh = path.join(root, "gh.mjs");
+      writeFileSync(gh, `process.stdout.write(${JSON.stringify(response)});\n`);
+      return { root, gh };
+    };
+
+    function githubOutput(eventName: string, event: unknown, ghResponse: string) {
+      const { root, gh } = fakeGh(ghResponse);
+      try {
+        const eventPath = path.join(root, "event.json");
+        const outputPath = path.join(root, "output.txt");
+        writeFileSync(eventPath, JSON.stringify(event));
+        writeFileSync(outputPath, "");
+        const result = spawnSync("python3", [script, "github-output", "--output", path.join(root, "plan.json")], {
+          cwd: repoRoot,
+          encoding: "utf8",
+          env: {
+            ...process.env,
+            GITHUB_EVENT_NAME: eventName,
+            GITHUB_EVENT_PATH: eventPath,
+            GITHUB_REPOSITORY: "example/repository",
+            GITHUB_SHA: "b".repeat(40),
+            GITHUB_OUTPUT: outputPath,
+            GITHUB_STEP_SUMMARY: path.join(root, "summary.md"),
+            MISH_GH_NODE_SCRIPT: gh,
+          },
+        });
+        expect(result.status, result.stderr).toBe(0);
+        const planJson = JSON.parse(readFileSync(path.join(root, "plan.json"), "utf8")) as Plan & { source: string };
+        const outputs = Object.fromEntries(
+          readFileSync(outputPath, "utf8").split("\n").filter(Boolean).map((line) => {
+            const index = line.indexOf("=");
+            return [line.slice(0, index), line.slice(index + 1)];
+          }),
+        );
+        return { plan: planJson, outputs };
+      } finally {
+        rmSync(root, { force: true, recursive: true });
+      }
+    }
+
+    test("routes a fast-forward push to main by its pushed range", () => {
+      const { plan: pushPlan, outputs } = githubOutput(
+        "push",
+        { before: "a".repeat(40), after: "b".repeat(40) },
+        JSON.stringify({ status: "ahead", files: [{ filename: "docs/spec.md" }] }),
+      );
+      expect(pushPlan.source).toBe("push");
+      expect(pushPlan.enabled).toMatchObject({ static_gate: true, preflight: true, ui_p0: false, e2e_vitest: false });
+      expect(JSON.parse(outputs.run!)).toEqual(pushPlan.enabled);
+    });
+
+    test("takes the full plan when a push range cannot be resolved exactly", () => {
+      const created = githubOutput("push", { before: "0".repeat(40), after: "b".repeat(40) }, "{}");
+      const full = plan("full").enabled;
+      expect(created.plan.source).toBe("push:unresolved-range");
+      expect(created.plan.enabled).toEqual(full);
+
+      const forced = githubOutput(
+        "push",
+        { before: "a".repeat(40), after: "b".repeat(40) },
+        JSON.stringify({ status: "diverged", files: [{ filename: "docs/spec.md" }] }),
+      );
+      expect(forced.plan.source).toBe("push:resolution-error");
+      expect(forced.plan.enabled).toEqual(full);
+    });
   });
 });

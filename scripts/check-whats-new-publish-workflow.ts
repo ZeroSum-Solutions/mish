@@ -381,6 +381,17 @@ export async function checkWhatsNewPublishWorkflow(root: string = repoRoot): Pro
   try {
     workflow = await readFile(workflowPath, "utf8");
   } catch (error) {
+    // This repository publishes only `.github/workflows/ci.yml`; the What's New publish
+    // workflow (and its R2-backed environment) is intentionally not part of it. With no
+    // workflow there is no publication path to bind, so an absent file passes. Any other
+    // read failure (permissions, a directory in its place) still fails closed, and the
+    // moment the workflow is added back every rule below applies to it again.
+    if ((error as NodeJS.ErrnoException | null)?.code === "ENOENT") {
+      console.log(
+        `What's New publish workflow check skipped: ${WHATS_NEW_WORKFLOW_PATH} is not published in this repository, so there is no publication path to bind.`,
+      );
+      return true;
+    }
     console.error(`What's New publish workflow check failed: cannot read ${WHATS_NEW_WORKFLOW_PATH}`);
     console.error(error);
     return false;

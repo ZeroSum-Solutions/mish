@@ -1,4 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
+import { existsSync } from "node:fs";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -12,12 +13,18 @@ import {
 } from "../../../scripts/check-whats-new-document.ts";
 import {
   WHATS_NEW_WORKFLOW_PATH,
+  checkWhatsNewPublishWorkflow,
   findWhatsNewWorkflowViolations,
   parseWorkflowJobs,
   workflowJobNames,
 } from "../../../scripts/check-whats-new-publish-workflow.ts";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+
+// This repository publishes only `.github/workflows/ci.yml`. The suites that read the
+// shipped What's New publish workflow run whenever it is present and are skipped while
+// it is not; the guard's own absent/present behavior is covered unconditionally below.
+const publishWorkflowShipped = existsSync(path.join(repoRoot, WHATS_NEW_WORKFLOW_PATH));
 
 // The daemon resolves a malformed What's New document to "no highlight"
 // instead of an error, so every failure mode below is invisible at publish
@@ -179,7 +186,7 @@ describe("what's new publisher", () => {
   });
 });
 
-describe("what's new publish branch policy", () => {
+describe.skipIf(!publishWorkflowShipped)("what's new publish branch policy", () => {
   async function runGate(jobName: string, stepName: string, ref: string, dryRun = false) {
     const workflow = await readFile(path.join(repoRoot, WHATS_NEW_WORKFLOW_PATH), "utf8");
     const job = parseWorkflowJobs(workflow)?.jobs.get(jobName) as {
@@ -258,7 +265,7 @@ describe("what's new publish branch policy", () => {
 // still publishes correctly from `main`. Each case below mutates the real
 // workflow into exactly one of those regressions and requires the checker to
 // name it, so the assertions cannot pass by never looking at anything.
-describe("what's new publish workflow trust boundary", () => {
+describe.skipIf(!publishWorkflowShipped)("what's new publish workflow trust boundary", () => {
   let workflow: string;
 
   beforeEach(async () => {
@@ -456,6 +463,50 @@ describe("what's new publish workflow trust boundary", () => {
       "  validate:\n    name: validate document\n    secrets: inherit\n",
     );
     expect(findWhatsNewWorkflowViolations(mutated).join("\n")).toContain("job `validate` declares a `secrets:` key");
+  });
+});
+
+describe("what's new publish workflow guard", () => {
+  const roots: string[] = [];
+  afterEach(async () => {
+    await Promise.all(roots.splice(0).map((root) => rm(root, { recursive: true, force: true })));
+  });
+
+  test("passes when the publish workflow is not published at all", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "whats-new-workflow-"));
+    roots.push(root);
+    const log = vi.spyOn(console, "log").mockImplementation(() => {});
+    try {
+      await expect(checkWhatsNewPublishWorkflow(root)).resolves.toBe(true);
+      expect(log.mock.calls.flat().join("\n")).toContain("skipped");
+    } finally {
+      log.mockRestore();
+    }
+  });
+
+  test("still fails closed when the workflow path exists but cannot be read", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "whats-new-workflow-"));
+    roots.push(root);
+    await mkdir(path.join(root, WHATS_NEW_WORKFLOW_PATH), { recursive: true });
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      await expect(checkWhatsNewPublishWorkflow(root)).resolves.toBe(false);
+    } finally {
+      error.mockRestore();
+    }
+  });
+
+  test("still enforces the boundary on a workflow that is present", async () => {
+    const root = await mkdtemp(path.join(tmpdir(), "whats-new-workflow-"));
+    roots.push(root);
+    await mkdir(path.dirname(path.join(root, WHATS_NEW_WORKFLOW_PATH)), { recursive: true });
+    await writeFile(path.join(root, WHATS_NEW_WORKFLOW_PATH), "name: whats-new-publish\non: workflow_dispatch\njobs: {}\n");
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      await expect(checkWhatsNewPublishWorkflow(root)).resolves.toBe(false);
+    } finally {
+      error.mockRestore();
+    }
   });
 
   // The boundary has to be checked by something that actually runs. An edit to

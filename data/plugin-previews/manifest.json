@@ -43,13 +43,6 @@
       "holdMs": 2500,
       "hash": "a45bacd41a7e48d2"
     },
-    "example-velar-luxury-real-estate": {
-      "video": "example-velar-luxury-real-estate/3033ac6b3976d835/preview.mp4",
-      "poster": "example-velar-luxury-real-estate/3033ac6b3976d835/poster.jpg",
-      "durationMs": 10267,
-      "holdMs": 2500,
-      "hash": "3033ac6b3976d835"
-    },
     "example-web-prototype": {
       "video": "example-web-prototype/aeb5731d76378b6b/preview.mp4",
       "poster": "example-web-prototype/aeb5731d76378b6b/poster.jpg",

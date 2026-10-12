@@ -281,6 +281,29 @@ def changed_files_for_environment():
             output = run_gh(["api", "--paginate", f"repos/{repository}/compare/main...{sha}", "--jq", "(.files // [])[] | .filename, (.previous_filename // empty)"])
             return "workflow_dispatch:hot", output.splitlines(), "medium", "hot", False, False, True
         return event_name, [], None, "full", True, False, False
+    if event_name == "push":
+        # A push to main follows a validated pull request (or merge-queue run), so it
+        # re-validates the pushed range at pull-request strength. Anything the planner
+        # cannot resolve exactly (branch creation, a force push whose base is gone, a
+        # range at the compare API's 300-file ceiling, an API error) takes the
+        # conservative full plan instead of guessing.
+        before, after = event.get("before"), event.get("after") or os.environ.get("GITHUB_SHA")
+        if not before or not after or set(before) == {"0"}:
+            return "push:unresolved-range", [], None, "full", True, True, False
+        try:
+            comparison = json.loads(run_gh(["api", f"repos/{repository}/compare/{before}...{after}"]))
+            if comparison.get("status") not in {"ahead", "identical"}:
+                raise ConfigError(f"push range is {comparison.get('status')!r}, not a fast-forward")
+            records = comparison.get("files", [])
+            if len(records) >= 300:
+                raise ConfigError("push comparison reached the 300-file ceiling")
+            files = [name for record in records for name in (record.get("filename"), record.get("previous_filename")) if isinstance(name, str)]
+            if not files:
+                return "push:empty-resolution", [], None, "full", True, True, False
+            return event_name, files, "medium", "hot", False, True, True
+        except (subprocess.SubprocessError, json.JSONDecodeError, ConfigError) as error:
+            print(f"::warning::push resolution failed; using full plan: {error}", file=sys.stderr)
+            return "push:resolution-error", [], None, "full", True, True, False
     if event_name == "merge_group":
         group = event.get("merge_group", {})
         base, head = group.get("base_sha"), group.get("head_sha")
@@ -306,6 +329,9 @@ def emit_plan(plan, output_path=None):
         output_path.parent.mkdir(parents=True, exist_ok=True)
         output_path.write_text(json.dumps(plan, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     append_outputs({
+        # `run` gates every workload job in ci.yml and lists the jobs the
+        # `Validate workspace` gate requires to succeed.
+        "run": compact_json(plan["enabled"]),
         "scopes": compact_json(plan["scopes"]),
         "ui_p0_matrix": compact_json(plan["matrices"]["ui_p0"]),
         "visual_matrix": compact_json(plan["matrices"]["visual"]),

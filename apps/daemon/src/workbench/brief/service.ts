@@ -6,7 +6,7 @@ import {
   type AttachDesignBriefRequest, type PreviewDesignBriefRequest, type DesignBriefPreview, type CreateDesignBriefRequest, type DesignBrief, type DesignBriefEditablePath, type DesignBriefField, type DesignBriefModelOutput,
   type DesignBriefRecordView, type DesignBriefTextPath, type PatchDesignBriefRequest, type ResourceRef, type RunDesignBriefBinding,
 } from '@mish/contracts';
-import type { BriefGenerator } from './generator.js';
+import { BriefGeneratorError, type BriefGenerator } from './generator.js';
 import { detectStyleDirections, detectTargetRuntime, modernDrift } from './intent.js';
 import { groundBriefOutput, type BriefGroundingChecker } from './grounding.js';
 import { buildRepairPrompt, buildTransformPrompt, type TransformPromptInput } from './prompt.js';
@@ -14,7 +14,11 @@ import { buildReferenceChanges, NO_REVIEWED_REFERENCES, ReferenceSelectionError,
 import { createBriefStore, type StoredBriefRecord } from './store.js';
 
 export class BriefError extends Error {
-  constructor(readonly status: 400 | 403 | 404 | 409 | 422 | 503, readonly code: string, message: string) { super(message); this.name = 'BriefError'; }
+  /**
+   * `message` is the whole sentence an HTTP caller shows. `failure`, when present, keeps its
+   * reason and recovery apart so a stored record can carry each once.
+   */
+  constructor(readonly status: 400 | 403 | 404 | 409 | 422 | 503, readonly code: string, message: string, readonly failure?: { reason: string; recovery: string }) { super(message); this.name = 'BriefError'; }
 }
 
 export interface DesignBriefServiceDeps {
@@ -92,7 +96,7 @@ export function createDesignBriefService(deps: DesignBriefServiceDeps) {
   async function generateDraft(record: StoredBriefRecord, request: CreateDesignBriefRequest, selected: SelectedReference[], signal: AbortSignal, context: { contextRevision: number | null; rubricRevision: number | null; context: unknown | null }, transient = false, onTransformer?: (transformer: StoredBriefRecord['transformer']) => void): Promise<Draft | null> {
     const fail = async (code: string, message: string, recovery: string) => {
       if (signal.aborted) return null;
-      throw new BriefError(503, code, `${message}. ${recovery}`);
+      throw new BriefError(503, code, `${message}. ${recovery}`, { reason: message, recovery });
     };
     const generator = deps.generator;
     const availability = generator ? await generator.available() : { available: false as const, reason: 'No transformer lane is configured', recovery: 'Use your original prompt.' };
@@ -115,8 +119,10 @@ export function createDesignBriefService(deps: DesignBriefServiceDeps) {
         transformer = { requestedModel: generation.requestedModel ?? generator.modelId, reportedModel: generation.reportedModel };
         ({ output, problems } = validateOutput(generation.text, request.originalText, styles));
       }
-    } catch {
+    } catch (error) {
       if (signal.aborted) return null;
+      // A lane that knows why it failed (signed out, CLI too old) says so; retrying would not help.
+      if (error instanceof BriefGeneratorError) return fail('transformer-failed', error.message, error.recovery);
       return fail('transformer-failed', 'The transformer could not produce a brief', 'Use your original prompt, or try Improve prompt again.');
     }
     // R15-1: the caller owns the stored record; hand it the requested and reported model.
@@ -160,10 +166,11 @@ export function createDesignBriefService(deps: DesignBriefServiceDeps) {
       await store.writeRecord({ ...record, transformer, status: 'ready', revisions: [1], updatedAt: now() });
     } catch (error) {
       if (signal.aborted) return;
+      const known = error instanceof BriefError ? error : null;
       await store.writeRecord({ ...record, status: 'failed', failure: {
-        code: error instanceof BriefError ? error.code : 'transformer-failed',
-        message: error instanceof BriefError ? error.message.slice(0, 500) : 'The transformer could not produce a brief',
-        recovery: 'Use your original prompt, or try Improve prompt again.',
+        code: known?.code ?? 'transformer-failed',
+        message: (known?.failure?.reason ?? known?.message ?? 'The transformer could not produce a brief').slice(0, 500),
+        recovery: (known?.failure?.recovery ?? 'Use your original prompt, or try Improve prompt again.').slice(0, 500),
       }, updatedAt: now() });
     }
   }
