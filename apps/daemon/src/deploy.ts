@@ -625,9 +625,7 @@ export async function deployToVercel({ config, files, projectId, projectName, pr
   const ready = deploymentId
     ? await pollVercelDeployment(config, deploymentId)
     : created;
-  if (ready?.readyState === 'ERROR') {
-    throw new DeployError(ready?.error?.message || 'Vercel deployment failed.', 502, ready, 'VERCEL_DEPLOY_FAILED');
-  }
+  assertVercelDeploymentReady(ready);
 
   if (!deploymentId || String(created.projectId || ready?.projectId || '') !== binding.vercelProjectId ||
     (ready?.projectId && ready.projectId !== binding.vercelProjectId) || (ready?.id && ready.id !== deploymentId)) {
@@ -2536,6 +2534,10 @@ function referenceSuffix(raw: string) {
   return suffixIdx === -1 ? '' : raw.slice(suffixIdx);
 }
 
+// Vercel's failed terminal deployment states (readyState). READY is the only
+// other terminal state; QUEUED, INITIALIZING and BUILDING are in progress.
+const VERCEL_FAILED_READY_STATES = new Set(['ERROR', 'CANCELED', 'BLOCKED']);
+
 async function pollVercelDeployment(config: DeployConfig, id: string) {
   let last: JsonObject | null = null;
   for (let i = 0; i < 30; i += 1) {
@@ -2547,9 +2549,32 @@ async function pollVercelDeployment(config: DeployConfig, id: string) {
     const json = await readVercelJson(resp);
     if (!resp.ok) throw vercelError(json, resp.status);
     last = json;
-    if (json.readyState === 'READY' || json.readyState === 'ERROR') return json;
+    if (json.readyState === 'READY' || VERCEL_FAILED_READY_STATES.has(json.readyState)) return json;
   }
   return last;
+}
+
+/**
+ * Only a READY deployment may receive the project's stable alias. A failed,
+ * canceled or blocked deployment is a deploy failure, and one still building
+ * when the poll budget runs out is a timeout: moving the stable address onto
+ * either would replace a working site with one that does not serve.
+ */
+function assertVercelDeploymentReady(ready: JsonObject | null | undefined): void {
+  const state = typeof ready?.readyState === 'string' ? ready.readyState : '';
+  // A create response without a readyState (older API shapes) is accepted as before.
+  if (!state || state === 'READY') return;
+  if (VERCEL_FAILED_READY_STATES.has(state)) {
+    const reason = ready?.error?.message || ready?.errorMessage || ready?.readyStateReason;
+    throw new DeployError(
+      reason ? `Vercel deployment ${state.toLowerCase()}: ${reason}` : `Vercel deployment ${state.toLowerCase()}.`,
+      502, ready ?? undefined, 'VERCEL_DEPLOY_FAILED',
+    );
+  }
+  throw new DeployError(
+    `Vercel is still preparing the deployment (${state}). Check the Vercel dashboard, then deploy again.`,
+    504, { readyState: state, id: ready?.id ?? ready?.uid ?? null }, 'VERCEL_DEPLOY_TIMEOUT',
+  );
 }
 
 export async function waitForReachableDeploymentUrl(

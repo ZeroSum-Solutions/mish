@@ -1,7 +1,7 @@
 import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { resolveAgentBin } from '../../runtimes/resolution.js';
-import { maxLaneEnv, runClaudeProcess, summarizeClaudeStream, type ClaudeProcessRunner } from '../review/reviewers/claude-visual.js';
+import { maxLaneEnv, runClaudeProcess, signedOut, summarizeClaudeStream, type ClaudeProcessRunner } from '../review/reviewers/claude-visual.js';
 import { DESIGN_BRIEF_MODEL_JSON_SCHEMA } from './prompt.js';
 
 export interface BriefGeneratorInput { system: string; user: string }
@@ -71,6 +71,20 @@ export interface ClaudeMaxBriefGeneratorOptions {
   jsonSchema?: unknown;
 }
 
+const SIGN_IN_RECOVERY = 'Run `claude auth status`; if it is signed out, run `claude auth login` with the Max subscription, then try Improve prompt again.';
+
+/**
+ * Why a `claude -p` brief turn produced no brief, in words that say what fixes it.
+ * The CLI's own text is only matched, never echoed: it can carry account details.
+ */
+function claudeFailure(stderr: string, envelopeResult: unknown): BriefGeneratorError {
+  if (signedOut(envelopeResult, stderr)) return new BriefGeneratorError('The Claude Code CLI is not signed in', SIGN_IN_RECOVERY);
+  if (/unknown option|unrecognized|invalid (?:value|choice)/iu.test(stderr)) {
+    return new BriefGeneratorError('This Claude Code CLI does not support the Improve prompt flags', 'Update Claude Code (it needs --json-schema, --restricted and dontAsk support), then try again.');
+  }
+  return new BriefGeneratorError('The Claude Code CLI did not return a brief', 'Run `claude auth status` to confirm the Max sign-in, then try again.');
+}
+
 /** `claude -p` with no tools, no MCP, no session and a JSON schema: a pure text-to-JSON turn on the Max subscription. */
 export function claudeBriefArgs(model: string, system: string, jsonSchema: unknown = DESIGN_BRIEF_MODEL_JSON_SCHEMA): string[] {
   return [
@@ -116,9 +130,7 @@ export function createClaudeMaxBriefGenerator(options: ClaudeMaxBriefGeneratorOp
         if (temporary) await rm(cwd, { recursive: true, force: true });
       }
       const { result: envelope } = summarizeClaudeStream(result.stdout);
-      if (!envelope || result.exitCode !== 0 || envelope.is_error === true) {
-        throw new BriefGeneratorError('The Claude Code CLI did not return a brief', 'Run `claude auth status` to confirm the Max sign-in, then try again.');
-      }
+      if (!envelope || result.exitCode !== 0 || envelope.is_error === true) throw claudeFailure(result.stderr, envelope?.result);
       const reportedModel = reportedInitModel(result.stdout);
       if (envelope.structured_output !== undefined && envelope.structured_output !== null) return { text: JSON.stringify(envelope.structured_output), reportedModel };
       return { text: typeof envelope.result === 'string' ? envelope.result : '', reportedModel };

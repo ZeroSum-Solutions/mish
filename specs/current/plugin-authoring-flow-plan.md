@@ -1,6 +1,6 @@
 # Plugin authoring flow plan
 
-**Parent:** [`spec.md`](../../docs/spec.md) · **Related:** [`plugin-driven-flow-plan.md`](plugin-driven-flow-plan.md) · [`plugins-implementation.md`](../../docs/plans/plugins-implementation.md)
+**Parent:** [`spec.md`](../../docs/spec.md) · **Related:** [`plugin-driven-flow-plan.md`](plugin-driven-flow-plan.md) · `plugins-implementation.md` (private product plan, not in this repository)
 
 ## Purpose
 

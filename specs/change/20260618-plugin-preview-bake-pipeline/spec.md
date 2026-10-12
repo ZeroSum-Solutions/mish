@@ -93,7 +93,7 @@ PRs.
     hash } } }`. 125 entries at base.
 - **How to pull:**
   ```
-  gh repo clone ZeroSum-Solutions/Mishh-Mashh-2 && cd Mishh-Mashh-2
+  gh repo clone ZeroSum-Solutions/mish && cd mish
   git checkout spec/plugin-preview-bake-pipeline   # this spec
   # the described code is on main:
   git show origin/main:.github/workflows/bake-plugin-previews.yml

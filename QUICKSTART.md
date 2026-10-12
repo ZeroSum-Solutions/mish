@@ -143,9 +143,13 @@ Open the project, choose **Share → Vercel**, paste a Vercel token once, and de
 od deploy <projectId> --file <family>-r1.html --public
 ```
 
-The deploy reports `access: public` only when Vercel confirms protection is off and an anonymous
-request reaches the page. `protected` and `unknown` are reported as such, and `--public` exits 1
-unless access is `public`.
+Both go through the daemon (`POST /api/projects/:id/deploy`), which talks to the Vercel REST API
+with the token you configured. A deployment that ends in `ERROR`, `CANCELED` or `BLOCKED` fails with
+`VERCEL_DEPLOY_FAILED`, and one that does not become ready in time fails with
+`VERCEL_DEPLOY_TIMEOUT`; only a `READY` deployment takes the project's stable alias. The deploy
+reports `access: public` only when Vercel confirms protection is off and an anonymous request
+reaches the page. `protected` and `unknown` are reported as such, and `--public` exits 1 unless
+access is `public`.
 
 ### 6. Check the setup
 
@@ -192,9 +196,28 @@ and Mobbin from the app. To remove everything the packet added, run `od packs re
 Team leads build the packet with `node scripts/build-pack.mjs`; see
 [`docs/packs.md`](docs/packs.md#mish-packs-a-team-packet).
 
+## Deploy the web UI to Vercel
+
+The root [`vercel.json`](vercel.json) builds the web app as a static export
+(`OD_WEB_OUTPUT_MODE= pnpm --filter @mish/web build`, output `apps/web/out`) and rewrites app
+routes to `index.html`, except `/api`, `/artifacts`, `/frames` and `/_next`. Browser source maps
+are off when `VERCEL=1`. In the Vercel project, set `ENABLE_EXPERIMENTAL_COREPACK=1` so the pinned
+`pnpm@10.33.2` is used; Node comes from `package.json#engines` (`~24`).
+
+The result is a static UI shell only. The daemon does not run on Vercel, so every `/api/*` request
+returns 404 and projects, agents and generation do not work on the Vercel URL. To use the product,
+run the daemon locally (above) or with Docker (below). This is separate from the in-product
+**Share → Vercel** deploy, which publishes one project's page.
+
 ## Docker Setup
 
 Run Mishh Mashh in a fully containerised environment without installing Node.js or pnpm locally.
+
+The compose file uses the image `ghcr.io/zerosum-solutions/mish` (set by `MISH_IMAGE`). No GitHub
+workflow in this repository publishes it; an operator pushes it with
+[`deploy/scripts/publish-images.sh`](deploy/scripts/publish-images.sh). If you cannot pull it,
+build it from this checkout with `docker build -t mish-local -f deploy/Dockerfile .` and set
+`MISH_IMAGE=mish-local` in `deploy/.env`.
 
 ### Requirements
 
@@ -240,7 +263,7 @@ Open the app in your browser:
 http://127.0.0.1:7456
 ```
 
-The first startup may take a few seconds while Docker pulls the latest image.
+The first startup may take a few seconds while Docker pulls the image.
 
 ---
 
@@ -343,7 +366,7 @@ pnpm tools-dev # starts daemon + web + desktop in the background
 
 On first load, the app detects the available local runtimes and also offers BYOK runtimes configured in Settings. Choose a runtime, a design template, and a design system, then type a prompt and hit **Send**. Structured local runtimes write canonical project files and stream file/tool events; the file workspace and preview update from those writes. Plain text-only and BYOK runs instead return a complete `<artifact>` block for the host to parse. Before documenting or changing any artifact storage path, you MUST read `AGENTS.md` → **Daemon data directory contract**.
 
-The **Design systems** catalog is loaded from the `DESIGN.md` packages in [`design-systems/`](design-systems/). Pick one to apply that brand's visual language to the artifact.
+The **Design systems** catalog is loaded from the `DESIGN.md` packages in [`design-systems/`](design-systems/). This repository ships one, **Neutral Product**; pick it to apply its visual language to the artifact.
 
 The **Templates** catalog comes from [`design-templates/`](design-templates/) and groups artifact formats for prototypes, decks, documents, images, video, and audio. [`skills/`](skills/) is reserved for functional capabilities that the agent invokes while it works. Pair a template with a design system to produce an artifact in the chosen visual language.
 
@@ -428,13 +451,13 @@ location /api/ {
 | Mode | Picker value | How a request flows |
 |---|---|---|
 | **Local CLI** (default when daemon detects an agent) | "Local CLI" | Frontend → daemon `/api/chat` → `spawn(<agent>, ...)` → structured tool/file events over SSE → project files → preview. Plain-stream CLIs use the text-artifact path instead. |
-| **API mode** (fallback / no CLI) | "Anthropic API" / "OpenAI API" / "Atlas Cloud" / "Azure OpenAI" / "Google Gemini" | Frontend → daemon `/api/proxy/{provider}/stream` → provider SSE normalized to `delta/end/error` → `<artifact>` parser → preview |
+| **API mode** (fallback / no CLI) | A BYOK provider configured in Settings (Anthropic, OpenAI-compatible gateways such as OpenAI or Atlas Cloud, Azure OpenAI, Google Gemini, Ollama, and others) | Frontend → daemon `/api/proxy/{protocol}/stream` → provider SSE normalized to `delta/end/error` → `<artifact>` parser → preview |
 
 Both modes end in the same file workspace and sandboxed preview, but their handoff contracts differ. Filesystem-capable runtimes write the canonical files and must not echo their source in `<artifact>`; plain/text-only and BYOK runs have no file tools, so their canonical deliverable is the complete HTML inside `<artifact>`. The execution profile is selected from the runtime transport, and local CLIs receive the composed prompt through the invocation shape declared by their runtime definition.
 
 ## Prompt composition
 
-For every send, the app builds a system prompt from three layers and sends it to the provider:
+A run's system prompt comes from one of two implementations, chosen per run by the Design Harness switch (Settings → Labs). [`docs/prompt-composition.md`](docs/prompt-composition.md) describes both. On the classic path, the app builds the system prompt from three layers and sends it to the provider:
 
 ```
 BASE_SYSTEM_PROMPT   (execution-profile-specific file or <artifact> handoff)
@@ -442,12 +465,12 @@ BASE_SYSTEM_PROMPT   (execution-profile-specific file or <artifact> handoff)
    + active skill body          (SKILL.md — workflow and output rules)
 ```
 
-Swap the skill or the design system in the top bar and the next send uses the new stack. Bodies are cached in-memory per session so this is a single daemon fetch per pick.
+Swap the skill or the design system and the next send uses the new stack.
 
 ## File map
 
 ```
-Mishh-Mashh/
+mish/
 ├── apps/
 │   ├── daemon/                # Node/Express — spawns local agents + serves APIs
 │   │   └── src/
@@ -486,7 +509,7 @@ Mishh-Mashh/
 ├── skills/                    # functional capabilities invoked mid-task
 ├── design-templates/          # rendering catalog for prototypes, decks, docs, and media
 ├── design-systems/            # brand packages rooted at DESIGN.md
-├── plugins/_official/examples/agency-*/  # the thirteen agency families
+├── plugins/_official/examples/agency-*/  # the twelve bundled agency families
 ├── evals/genui/               # GenUI eval scripts and fixed briefs
 ├── scripts/sync-design-systems.ts    # re-import from upstream getdesign tarball
 ├── docs/                      # product vision + spec; docs/evals/ holds eval reports
@@ -507,13 +530,14 @@ Mishh-Mashh/
   If the smoke test reports `401`, `apiKeySource: "none"`, or another auth error without a custom endpoint, run `claude`, use `/login`, exit Claude, and retry Mishh Mashh. If you use multiple Claude profiles, set **Models & providers → Local CLI → Claude Code config directory** to the profile path such as `~/.claude-2`. If `ANTHROPIC_BASE_URL` or a proxy is set, check the endpoint URL, proxy credentials, endpoint auth environment, and model access; remove the custom endpoint only if you want to retry with standard Claude Code auth. On Windows, native PowerShell and WSL use separate Claude installs and credential stores; re-authenticate in the same environment Mishh Mashh uses, and check Windows Credential Manager if `/login` does not repair native Windows credentials.
 - **daemon 500 on /api/chat** — check the daemon terminal for the stderr tail; usually the CLI rejected its args. Different CLIs take different argv shapes; inspect the matching definition in `apps/daemon/src/runtimes/defs/` if you need to adjust one.
 - **media generation says `OD_BIN` is missing or daemon URL is `:0`** — run the media dispatcher checks above. Do not resume the old CLI session; reopen the project from the Mishh Mashh app so the daemon can inject fresh `OD_*` variables.
+- **Improve prompt fails** — it needs one model lane. With an OpenRouter key and **Settings → Labs → Faster Improve prompt** on, GPT Terra writes the brief through OpenRouter; otherwise, or if Terra fails, a no-tool `claude -p` turn writes it, which needs a signed-in Claude Code CLI on the daemon's `PATH`. With neither, Improve prompt cannot work, and the error says which one is missing. Store the OpenRouter key with `od agency config set --provider openrouter --key-stdin`. From the CLI, `od workbench transform --prompt-file <path|-> --json` runs the same transform.
 - **Codex loads too much plugin context** — start Mishh Mashh with `OD_CODEX_DISABLE_PLUGINS=1 pnpm tools-dev` to make daemon-spawned Codex processes run with `--disable plugins`.
 - **artifact never renders** — first identify the run's handoff profile. For a filesystem-capable local runtime, confirm the agent created a previewable project file and that file-write events reached the daemon; it should not emit source in `<artifact>`. For a plain/text-only or BYOK run, confirm the response contains one complete `<artifact>` block. Check daemon logs for the first failed boundary instead of asking a filesystem runtime to fall back to inline source.
 - **Browser authentication prompt on macOS** — keep Docker Desktop's default bridge networking. Sign in with username `mish` and the `OD_API_TOKEN` value from `deploy/.env` as the password. Host networking is not required. See [`deploy/README.md` — Docker Desktop on macOS](deploy/README.md#docker-desktop-on-macos).
 
 ## Mapping back to the vision
 
-This Quickstart is the runnable seed of the spec in [`docs/`](docs/). The spec describes where this grows (see [`docs/roadmap.md`](docs/roadmap.md)). Highlights:
+[`docs/spec.md`](docs/spec.md) and [`docs/roadmap.md`](docs/roadmap.md) are archived history; do not read their dated decisions as current behavior. The current documents are:
 
 - `docs/architecture.md` describes the shipped stack: Next.js 16 App Router in front, local daemon behind it, and `apps/web/next.config.ts` rewrites in dev to keep the browser talking to the same `/api` surface.
 - `docs/skills-protocol.md` describes the current `SKILL.md`/`od:` frontmatter and the split between functional skills and rendering templates. The parser and normalization source of truth is `apps/daemon/src/skills.ts`.

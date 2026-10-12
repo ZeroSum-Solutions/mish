@@ -14,8 +14,11 @@ repository at:
 docs/whats-new.json
 ```
 
-`.github/workflows/whats-new-publish.yml` publishes that file to the object the
-daemon reads:
+In the upstream project, a `whats-new-publish.yml` workflow publishes that file
+to the object the daemon reads. That workflow is **not published in this
+repository** (it ships only `.github/workflows/ci.yml`), so the publication
+steps below describe the upstream process; here, the hosted object is updated
+out of band:
 
 ```
 https://whatsnew.mish.invalid/whats-new.json
@@ -102,22 +105,17 @@ parser rather than trusting review:
    field would be silently dropped, or if a field name is misspelled. This
    matters because the runtime is fail-safe: a malformed document does not
    error, it just makes the card disappear.
-3. On merge to `main`, `whats-new-publish.yml` uploads the file
+3. Upstream, on merge to `main`, `whats-new-publish.yml` uploads the file
    (`application/json`, `cache-control: public, max-age=300`) and then reads it
    back from `https://whatsnew.mish.invalid/whats-new.json` with the edge
    cache bypassed. The job fails unless the bytes served match the bytes
    uploaded — an exit code from the upload alone is not treated as proof.
 
-To publish release copy, run **whats-new-publish** manually
-(`workflow_dispatch`) against the corresponding `release/vX.Y.Z` branch:
-
-```bash
-gh workflow run whats-new-publish.yml --repo ZeroSum-Solutions/mish \
-  --ref release/v0.22.0 -f dry_run=true
-# After reviewing the proposed document and id:
-gh workflow run whats-new-publish.yml --repo ZeroSum-Solutions/mish \
-  --ref release/v0.22.0 -f dry_run=false
-```
+Upstream, release copy is published by running **whats-new-publish** manually
+(`workflow_dispatch`) against the corresponding `release/vX.Y.Z` branch, first
+with `dry_run=true` and then, after reviewing the proposed document and id,
+with `dry_run=false`. There is no such workflow to dispatch in this
+repository.
 
 The selected branch must contain this workflow, its publisher and validation
 scripts, and `docs/whats-new.json`. Both jobs check out the run's fixed
@@ -165,7 +163,9 @@ from any job on any branch, which would let anyone with write access publish
 unreviewed content by dispatching a modified workflow from their own branch.
 
 That shape is pinned by the `what's new publish workflow` check in `pnpm guard`
-(`scripts/check-whats-new-publish-workflow.ts`): the credential-bearing job is
+(`scripts/check-whats-new-publish-workflow.ts`). In this repository the workflow
+file is absent, so the check reports the publisher as retired and passes; when
+the file is present: the credential-bearing job is
 the one that declares the environment, it cannot start without a green
 `validate`, and no other job may hold an environment or read a secret. The
 check runs from CI's unconditional preflight job rather than a path-routed

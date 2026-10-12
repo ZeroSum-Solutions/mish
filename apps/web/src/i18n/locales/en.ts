@@ -3506,7 +3506,7 @@ export const en: Dict = {
   'fileViewer.share': 'Share',
   'fileViewer.binaryMeta': 'Binary · {size}',
   'fileViewer.binaryNote': 'Binary file ({size} bytes). Download or open from disk to inspect.',
-  'fileViewer.pdfMeta': 'PDF · {size}',
+  'fileViewer.pdfMeta': 'PDF',
   'fileViewer.documentMeta': 'Document',
   'fileViewer.presentationMeta': 'Presentation',
   'fileViewer.spreadsheetMeta': 'Spreadsheet',

@@ -1,6 +1,6 @@
 # Azure deployment (evaluation)
 
-Deploy Mishh Mashh to Microsoft Azure from the published runtime image — the
+Deploy Mishh Mashh to Microsoft Azure from a runtime image you publish — the
 same single Alpine image used by [`deploy/docker-compose.yml`](../docker-compose.yml)
 and the [Helm chart](../../charts/mish). The daemon serves both the API
 and the built web UI on one port, so there is no separate web container.
@@ -33,6 +33,10 @@ Both run as a single instance (Mishh Mashh uses single-writer SQLite).
 - [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli) (`az`), logged in with `az login`
 - An API token. Generate one with `openssl rand -hex 32`; the daemon requires
   `OD_API_TOKEN` and will not start without it.
+- A Mishh Mashh image in a registry Azure can pull. No public image is
+  published; build and push one with
+  [`deploy/scripts/publish-images.sh`](../scripts/publish-images.sh) (see
+  [`deploy/README.md`](../README.md)). The `image` parameter is required.
 
 ## Quick start
 
@@ -44,13 +48,15 @@ supply one, deploys the chosen template, and prints the URL:
 deploy/azure/deploy-azure.sh \
   --target app-service \
   --resource-group mish-rg \
-  --location eastus
+  --location eastus \
+  --image ghcr.io/your-org/od:0.1.0
 
 # Azure Container Instances (serverless, pay-per-second)
 deploy/azure/deploy-azure.sh \
   --target aci \
   --resource-group mish-rg \
-  --location eastus
+  --location eastus \
+  --image ghcr.io/your-org/od:0.1.0
 ```
 
 First container start takes a couple of minutes while Azure pulls the image.
@@ -75,7 +81,7 @@ az group create --name mish-rg --location eastus
 az deployment group create \
   --resource-group mish-rg \
   --template-file deploy/azure/app-service.bicep \
-  --parameters apiToken="$(openssl rand -hex 32)"
+  --parameters apiToken="$(openssl rand -hex 32)" image=ghcr.io/your-org/od:0.1.0
 ```
 
 Swap `app-service.bicep` for `aci.bicep` to use the ACI lane.
@@ -88,7 +94,7 @@ Both templates share these parameters (defaults in parentheses):
 | --- | --- |
 | `name` (`mish`) | Base name; a unique suffix is appended to globally-scoped resources |
 | `location` (resource group location) | Azure region |
-| `image` (`docker.io/vanjayak/mish:latest`) | Container image; pin to a digest for production |
+| `image` (**required**) | Container image you published; pin to a digest for production |
 | `apiToken` (**required**, secure) | API token guarding the daemon |
 | `nodeOptions` (`--max-old-space-size=192`) | Node.js heap cap |
 | `extraAllowedOrigins` (empty) | Extra comma-separated browser origins allowed to call `/api` |
@@ -108,7 +114,7 @@ Use a digest instead of the mutable `latest` tag for reproducible deployments:
 deploy/azure/deploy-azure.sh \
   --target app-service \
   --resource-group mish-rg \
-  --image docker.io/vanjayak/mish@sha256:<digest>
+  --image ghcr.io/your-org/od@sha256:<digest>
 ```
 
 ## Security notes

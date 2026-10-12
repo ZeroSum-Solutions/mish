@@ -3742,6 +3742,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
   });
 
   app.post('/api/workspaces/:workspaceId/projects/batch-delete', async (req, res) => {
+    const releaseDeletions: Array<() => void> = [];
     try {
       const ctx = await authoritativeWorkspaceProjectContext(req, res, req.params.workspaceId);
       if (!ctx) return;
@@ -3763,6 +3764,16 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
         return sendApiError(res, 403, 'PROJECT_BATCH_CONTAINS_FORBIDDEN_ITEMS', 'batch contains forbidden projects');
       }
       const finalProjectIds = projectIds.filter((id: string) => countWorkspaceProjectRefs(db, id) <= 1);
+      // A project this batch removes for good gets the same run fence as a
+      // single delete; bulk deletion refuses (never cancels) active work, and
+      // the fence stays held until the directories are gone.
+      for (const id of finalProjectIds) {
+        const release = beginProjectDeletion(design.runs, id, { ifIdle: true });
+        if (!release) {
+          return sendApiError(res, 409, 'PROJECT_BUSY', 'Project has queued or running runs (or other active work). Wait for them to finish before deleting it.');
+        }
+        releaseDeletions.push(release);
+      }
       const deleteMany = db.transaction((ids: string[], finalIds: string[]) => {
         for (const id of ids) deleteWorkspaceProject(db, ctx.workspaceId, id);
         for (const id of finalIds) {
@@ -3782,6 +3793,8 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
       res.json({ ok: true, deletedProjectIds: projectIds });
     } catch (err: any) {
       sendApiError(res, 400, 'BAD_REQUEST', String(err));
+    } finally {
+      for (const release of releaseDeletions) release();
     }
   });
 
@@ -4357,7 +4370,12 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
         typeof metadata.templateId === 'string'
       ) {
         const tpl = getTemplate(db, metadata.templateId);
-        if (tpl && Array.isArray(tpl.files) && tpl.files.length > 0) {
+        if (
+          tpl
+          && Array.isArray(tpl.files)
+          && tpl.files.length > 0
+          && await templateReadableByRequest(req, tpl)
+        ) {
           await ensureProject(PROJECTS_DIR, id, projectMetadata);
           for (const f of tpl.files) {
             if (
@@ -4373,7 +4391,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
                 id,
                 f.name,
                 Buffer.from(f.content, 'utf8'),
-                {},
+                { verbatimName: true },
                 projectMetadata,
               );
             } catch {
@@ -4663,7 +4681,10 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
             file.name,
             sourceProject.metadata,
           );
-          await writeProjectFile(
+          // Copy under the exact source name: renaming would break the
+          // project's own references, and two names that sanitize alike
+          // would overwrite each other.
+          const written = await writeProjectFile(
             PROJECTS_DIR,
             targetProjectId,
             sourceFile.name,
@@ -4675,7 +4696,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
             },
             metadata,
           );
-          copiedFiles.push(sourceFile.name);
+          copiedFiles.push(written.name);
         }
 
         const now = Date.now();
@@ -4818,18 +4839,22 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
             file.name,
             sourceProject.metadata,
           );
-          await writeProjectFile(
+          // Copy under the exact source name: renaming would break the
+          // project's own references, and two names that sanitize alike
+          // would overwrite each other.
+          const written = await writeProjectFile(
             PROJECTS_DIR,
             targetProjectId,
             sourceFile.name,
             sourceFile.buffer,
             {
-              overwrite: true,
+              overwrite: false,
+              verbatimName: true,
               ...(sourceFile.artifactManifest ? { artifactManifest: sourceFile.artifactManifest } : {}),
             },
             metadata,
           );
-          copiedFiles.push(sourceFile.name);
+          copiedFiles.push(written.name);
         }
 
         const pendingPrompt = requestedPendingPrompt ?? buildDesignSystemCopyPendingPrompt({
@@ -5582,13 +5607,37 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
   // starting point. Created via the project's Share menu (snapshots
   // every .html file in the project folder at the moment of save).
 
-  app.get('/api/templates', (_req, res) => {
-    res.json({ templates: listTemplates(db) });
+  // A template is a copy of its source project's files, so it is readable
+  // exactly when that source project is: same workspace read scope, same
+  // revoked-mirror quarantine. Denials are silent (filtered / 404) so a
+  // template's existence does not leak either.
+  async function templateReadableByRequest(req: any, template: any): Promise<boolean> {
+    const sourceProjectId = typeof template?.sourceProjectId === 'string' ? template.sourceProjectId : null;
+    if (!sourceProjectId) return true;
+    if (ctx.isProjectRevoked?.(sourceProjectId)) return false;
+    const source = getProject(db, sourceProjectId);
+    if (source?.metadata?.teamMirrorRevokedAt) return false;
+    return enforceLocalProjectDataPlaneRequest({
+      req,
+      projectId: sourceProjectId,
+      options: { mode: 'read' },
+      db,
+      getWorkspaceProject,
+      getWorkspaceProjectByProjectId,
+    });
+  }
+
+  app.get('/api/templates', async (req, res) => {
+    const templates = [];
+    for (const template of listTemplates(db)) {
+      if (await templateReadableByRequest(req, template)) templates.push(template);
+    }
+    res.json({ templates });
   });
 
-  app.get('/api/templates/:id', (req, res) => {
+  app.get('/api/templates/:id', async (req, res) => {
     const t = getTemplate(db, req.params.id);
-    if (!t) return res.status(404).json({ error: 'not found' });
+    if (!t || !await templateReadableByRequest(req, t)) return res.status(404).json({ error: 'not found' });
     res.json({ template: t });
   });
 
@@ -5605,9 +5654,15 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
         return res.status(400).json({ error: 'sourceProjectId required' });
       }
       const sourceProject = getProject(db, sourceProjectId);
-      if (!sourceProject) {
+      const locations = await configuredProjectLocations();
+      if (
+        !sourceProject
+        || !projectVisibleForLocations(sourceProject, locations)
+        || sourceProject.metadata?.teamMirrorRevokedAt
+      ) {
         return res.status(404).json({ error: 'source project not found' });
       }
+      if (!await authorizeProjectRequest(req, res, sourceProject.id, { mode: 'read' })) return;
       // Snapshot every HTML / sketch / text file in the source project.
       // We deliberately skip binary uploads — templates are about the
       // generated design, not the user's reference imagery.
@@ -5656,7 +5711,9 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
     }
   });
 
-  app.delete('/api/templates/:id', (req, res) => {
+  app.delete('/api/templates/:id', async (req, res) => {
+    const t = getTemplate(db, req.params.id);
+    if (t && !await templateReadableByRequest(req, t)) return res.status(404).json({ error: 'not found' });
     deleteTemplate(db, req.params.id);
     res.json({ ok: true });
   });
@@ -6756,17 +6813,41 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
         project.id,
         'writeFiles',
       )) return;
-      await deleteProjectFolder(
-        PROJECTS_DIR,
-        req.params.id,
-        folderPath,
-        project.metadata,
-      );
+      // Same project write gate and per-file bookkeeping as a single file
+      // delete, applied to every file the folder held.
+      await writesFor(req, project.id).run(project.id, async (finalIO) => {
+        const removedFiles = (await listFiles(PROJECTS_DIR, project.id, { metadata: project.metadata }))
+          .map((file: any) => file?.name)
+          .filter((name: unknown): name is string => typeof name === 'string');
+        const folder = await deleteProjectFolder(
+          PROJECTS_DIR,
+          project.id,
+          folderPath,
+          project.metadata,
+          finalIO,
+        );
+        for (const name of removedFiles) {
+          if (!name.startsWith(`${folder}/`)) continue;
+          try {
+            await markProjectFileVersionStoreDeleted(PROJECTS_DIR, project.id, name, project.metadata, finalIO);
+            deleteWorkspaceArtifact(db, project.id, name);
+          } catch (error) {
+            console.warn('[chat-artifacts] folder delete bookkeeping failed', error);
+          }
+        }
+      }, { signal: projectWriteSignal(res) });
       /** @type {import('@mish/contracts').DeleteProjectFolderResponse} */
       const body = { ok: true };
       res.json(body);
     } catch (err: any) {
-      sendApiError(res, 400, 'BAD_REQUEST', String(err?.message || err));
+      if (sendProjectWriteRefusal(res, sendApiError, err, true)) return;
+      const status = err && err.code === 'ENOENT' ? 404 : 400;
+      sendApiError(
+        res,
+        status,
+        status === 404 ? 'FILE_NOT_FOUND' : 'BAD_REQUEST',
+        String(err?.message || err),
+      );
     }
   });
 

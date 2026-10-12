@@ -14,8 +14,8 @@ registry / distribution / website / multi-source 的细分用例。
 | --- | --- | --- | --- |
 | REG-001 | Sources 添加的是 raw `mish-marketplace.json`，不是 GitHub tree 页面 | GitHub tree HTML 会被 marketplace parser 拒绝并返回 422 | `apps/daemon/tests/plugins-marketplaces.test.ts` |
 | REG-002 | 默认 official registry seed 是真实 catalog，不是空数组 | `plugins/registry/official/mish-marketplace.json` 包含 bundled official entries，trust 为 `official`，且 `mish/build-test` 可 resolve | `apps/daemon/tests/plugins-marketplaces.test.ts` |
-| REG-003 | 默认 community registry seed 可被 daemon 当作 restricted source 加载 | `plugins/registry/community/mish-marketplace.json` 可 seed，`community/registry-starter` 可 resolve，trust 为 `restricted` | `apps/daemon/tests/plugins-marketplaces.test.ts` |
-| REG-004 | checked-in registry entry 指向真实可打包插件源码 | `community/registry-starter` 的 source 指向 `plugins/community/registry-starter`，源码 `mish.json` 带 `plugin.repo` | `apps/daemon/tests/plugins-marketplaces.test.ts` |
+| REG-003 | 默认 community registry seed 可被 daemon 当作 restricted source 加载 | `plugins/registry/community/mish-marketplace.json` 可 seed，trust 为 `restricted`；本仓库的 community seed 为空（`plugins: []`），不含 `community/registry-starter` | `apps/daemon/tests/plugins-marketplaces.test.ts` |
+| REG-004 | checked-in registry entry 指向真实可打包插件源码 | 本仓库没有 `plugins/community/`，community seed 也没有条目，此项在本仓库不适用；official seed 的 entry source 指向 `plugins/_official/` 下的真实源码 | `apps/daemon/tests/plugins-marketplaces.test.ts` |
 | REG-005 | marketplace install 会保留 provenance 并继承 trust | installed record 写入 `sourceMarketplaceId`、entry name/version、resolved source/ref、digest/integrity；official/trusted source 默认 trusted | `apps/daemon/tests/plugins-installer.test.ts` |
 | REG-006 | restricted marketplace install 不会被自动提权 | restricted source 安装出的 plugin 仍是 `restricted` | `apps/daemon/tests/plugins-installer.test.ts` |
 | REG-007 | 直接 GitHub source import 与 registry source 是两条入口 | Import dialog 会把 `github:ZeroSum-Solutions/mish@.../plugins/community/registry-starter` 原样交给 install API | `apps/web/tests/components/PluginsView.test.tsx` |

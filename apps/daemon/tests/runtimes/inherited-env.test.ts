@@ -130,6 +130,18 @@ describe('declared inherited agent environment', () => {
     } finally { fs.rmSync(root, { recursive: true, force: true }); }
   });
 
+  it('keeps the mocks/ replay selection knobs so a PATH-overlay mock CLI plays the pinned trace', () => {
+    const knobs = {
+      OD_MOCKS_TRACE: 'abcd1234', OD_MOCKS_POOL: 'synthetic-pool', OD_MOCKS_BY_PROMPT_HASH: '1',
+      OD_MOCKS_SEED: '7', OD_MOCKS_NO_DELAY: '1', OD_MOCKS_RECORDINGS_DIR: '/synthetic/recordings',
+    };
+    for (const agent of ['claude', 'codex', 'opencode', 'kimi']) {
+      const env = spawnEnvForAgent(agent, { PATH: '/bin', ...knobs, OD_MOCKS_TRACE_EXTRA: 'unused' }, {}, {});
+      expect(env, agent).toMatchObject(knobs);
+      expect(env.OD_MOCKS_TRACE_EXTRA, agent).toBeUndefined();
+    }
+  });
+
   it('applies the same inherited-name boundary to Codex management calls', () => {
     const env = codexCliEnv({ CUSTOM_AUTH: 'synthetic', EMAIL: 'synthetic@example.invalid' }, {
       PATH: '/bin', CODEX_HOME: '/synthetic', OPENAI_API_KEY: 'synthetic', UNRELATED_SECRET: 'unused',

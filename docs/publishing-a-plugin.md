@@ -43,7 +43,8 @@ od plugin publish figma-workflow --to mish --repo https://github.com/acme/figma-
 
 v1 opens the GitHub registry review flow. The publish payload includes the
 plugin ID, version, repo, capability summary, and target registry entry path.
-After merge, CI regenerates `mish-marketplace.json`.
+No CI job in this repository regenerates `mish-marketplace.json` after merge;
+a registry entry lands by editing that file in a reviewed pull request.
 
 ## 5. Install From The Registry
 

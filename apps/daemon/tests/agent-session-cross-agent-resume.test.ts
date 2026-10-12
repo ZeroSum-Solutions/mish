@@ -5,7 +5,7 @@
 //
 // These cases exercise the resume guard at the DB boundary
 // (`resolveAgentResumeContext`); they do not consume CLI stream frames, so the
-// recorded CLI fixtures in tests/fixtures/claude-cli-recordings/ do not apply.
+// recorded CLI fixtures in tests/fixtures/daemon-b/claude-stream/ do not apply.
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import os from 'node:os';

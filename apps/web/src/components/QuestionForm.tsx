@@ -2051,7 +2051,10 @@ function VisualStylePreview({
   /** The active six-card batch should be ready before a hidden card rotates forward. */
   eager?: boolean;
 }) {
-  if (preview) {
+  // A preview whose image cannot load (unreachable or misconfigured asset
+  // origin) falls back to the placeholder art below instead of a broken image.
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  if (preview && failedSrc !== preview.thumbnailSrc) {
     return (
       <span className="qf-visual-preview" data-style={variant}>
         <img
@@ -2062,6 +2065,7 @@ function VisualStylePreview({
           height={480}
           loading={eager ? 'eager' : 'lazy'}
           decoding="async"
+          onError={() => setFailedSrc(preview.thumbnailSrc)}
         />
       </span>
     );

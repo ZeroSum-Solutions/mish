@@ -32,7 +32,7 @@ Upstream is a source of individual features, **never** a merge target.
    ```
 
    Each cherry-pick gets a one-line entry in the log at the bottom of this file.
-3. **`origin` is our private repo.** Local `main` and every working branch push to `origin`,
+3. **`origin` is our repo.** Local `main` and every working branch push to `origin`,
    never to `upstream`. `remote.pushDefault` is set to `origin` so a bare `git push` cannot
    reach upstream.
 4. **Enforcement.** `.git/hooks/pre-merge-commit` rejects any merge whose `MERGE_MSG`

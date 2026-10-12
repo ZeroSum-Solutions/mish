@@ -45,6 +45,12 @@ async function writeReleaseNote(
   );
 }
 
+// The four-channel round trip runs prepare/publish/verify/publish-metadata/
+// verify-metadata as separate Node processes for every channel (20+ cold
+// starts in sequence). It routinely takes ~4.5s on an idle machine, so
+// vitest's default 5s budget times it out under any parallel load.
+const FOUR_CHANNEL_PUBLISH_TIMEOUT_MS = 30_000;
+
 describe("shared release metadata publisher", () => {
   it("publishes complete beta, prerelease, preview, and stable metadata through the release storage fixture", async () => {
     const repoRoot = resolve(import.meta.dirname, "../../..");
@@ -243,7 +249,7 @@ describe("shared release metadata publisher", () => {
     } finally {
       await server.close();
     }
-  });
+  }, FOUR_CHANNEL_PUBLISH_TIMEOUT_MS);
 
   it("rejects a launcher version floor above the release version", async () => {
     // A floor the published release cannot satisfy would make the updater's

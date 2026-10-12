@@ -1,34 +1,38 @@
 <p align="center">
-  <img src="./assets/readme/hero.svg" width="100%" alt="Mish!, the local-first AI design workspace from ZeroSum Solutions: a client brief becomes a routed, fact-checked, editable page, built on your own machine.">
+  <img src="./assets/readme/hero.webp" width="100%" alt="Mish!, the local-first AI design workspace from ZeroSum Solutions. A client brief becomes a routed, fact-checked, editable page, built on your own machine. Beside the title: three phone UI mock-ups, two light meal-planning screens and one dark wine-cellar screen, in front of the coral and lime paper M of the Mish! brand.">
 </p>
 
 <p align="center"><b>English</b></p>
 
-# Mish!
+<p align="center">
+  <a href="https://github.com/ZeroSum-Solutions/mish/releases/latest"><b>Download for Mac</b></a>
+  &nbsp;·&nbsp;
+  <a href="#run-it-locally">Run it locally</a>
+  &nbsp;·&nbsp;
+  <a href="#how-an-agency-build-works">How a build works</a>
+  &nbsp;·&nbsp;
+  <a href="QUICKSTART.md">Quickstart</a>
+</p>
 
 **Mish!** (formerly Mishh Mashh) is the design workspace ZeroSum Solutions uses to deliver client work. You write a brief. An AI agent on your own machine makes the design. The result stays in a project where you preview it, edit it, and share it.
 
-This is the public repository. It is a modified fork of an Apache-2.0 project. See [License](#license).
-
-Licensed and third-party content (paid component kits, reference studies, scraped catalogues, fan art) is **not** in this repository. It will be installed separately as private packs through the pack system ([`docs/packs.md`](docs/packs.md)). Features that depend on that content show as unavailable until a pack is installed.
-
 <p align="center">
-  <img src="./assets/readme/studio-generation.png" width="100%" alt="A Mishh Mashh project: the chat on the left explains the result and offers follow-up steps; the preview on the right shows the generated &quot;Coffee, on repeat&quot; subscription pricing card with three tiers and a Start Daily Cup button.">
-  <br>
-  <sub>A project after one run: the conversation on the left, the generated page on the right.</sub>
+  <img src="./assets/readme/mockups.webp" width="100%" alt="UI mock-ups: a dark desktop wine-cellar dashboard, a light weekly meal plan, a dark wine list screen, and a light companion shop screen.">
 </p>
 
-## Contents
+## Download for Mac
 
-- [What it does](#what-it-does)
-- [Status](#status)
-- [How an agency build works](#how-an-agency-build-works)
-- [Download for Mac](#download-for-mac)
-- [Run it locally](#run-it-locally)
-- [Repository map](#repository-map)
-- [Documentation](#documentation)
-- [How we work](#how-we-work)
-- [License](#license)
+Apple Silicon Macs can install a ready-made build. No clone or Node needed.
+
+1. Open the [latest release](https://github.com/ZeroSum-Solutions/mish/releases/latest) and download `Mish-<version>-mac-arm64.dmg`. Check it against `SHA256SUMS` if you like.
+2. Open the dmg and drag the app to Applications.
+3. The build is not signed by Apple, so macOS blocks the first launch. Right-click the app, choose **Open**, then **Open** again. Or run:
+
+   ```bash
+   xattr -dr com.apple.quarantine "/Applications/Mishh Mashh.app"
+   ```
+
+You also need an agent CLI such as `claude` or `codex` on your `PATH`; the app uses it to run builds. Apps started from Finder do not always see your shell `PATH`. If the app cannot find your CLI, start it from Terminal with `open -a "Mishh Mashh"`. A `.zip` of the same build is on the release page too. Releases are cut by tagging `v*` (workflow `release-mac`).
 
 ## What it does
 
@@ -39,36 +43,24 @@ Licensed and third-party content (paid component kits, reference studies, scrape
 | **Agency build** | Turns a client brief into a checked website page. This is the part ZeroSum added. |
 | **Local agents** | Uses the agent CLI you already have (Claude Code, Codex, Gemini and others). When one is installed and signed in, it is the first choice on the welcome screen. |
 
-Home offers prototypes, slide decks, images, documents, website clones, video and audio. Project chat also supports explicit workspace context; see [composer workspace context](docs/architecture.md#composer-workspace-context) for folder access and queued draft behavior.
-
-Home remembers the project owner, type, sort order and Archived toggle in this
-browser for each workspace member and project collection. Local mode keeps a
-separate set of preferences for each collection. Clear filters keeps
-the chosen sort order. If browser storage is unavailable, the controls still
-work for the current visit. Escape closes a slide deck opened in a new tab.
+Home offers prototypes, slide decks, images, documents, website clones, video and audio. The composer's **Improve prompt** button rewrites a short prompt into a structured brief before you run it. It needs either an OpenRouter key with **Settings → Labs → Faster Improve prompt** on (the default) or a signed-in Claude Code CLI.
 
 <p align="center">
-  <img src="./assets/readme/home-composer.png" width="100%" alt="The Mishh Mashh Home screen: the sidebar, the chip rail with Prototype selected, the prompt box, and the Design system and Working directory pickers.">
+  <img src="./assets/readme/home-composer.png" width="100%" alt="The Mish! Home screen: the sidebar, the chip rail with Prototype selected, the prompt box, and the Design system and Working directory pickers.">
   <br>
   <sub>Home: choose the kind of output, write the brief, then pick a design system and a working directory.</sub>
 </p>
 
-## Status
+<details>
+<summary>More about Home and project chat</summary>
 
-Updated 2026-09-23.
+Project chat supports explicit workspace context; see [composer workspace context](docs/architecture.md#composer-workspace-context) for folder access and queued draft behavior.
 
-| Area | State |
-|---|---|
-| Languages | English only. |
-| Design systems | One: **Neutral Product**, our own. It is the default. Its status is `candidate`, not `promoted`: the checks in [`QUALITY-STANDARD.md`](docs/design-systems/QUALITY-STANDARD.md) found work left to do. The five brand-copied systems from upstream were removed. |
-| Agency build | Works end to end: route, fill, verify, publish. Seven site families and three page kinds (marketing site, app shell, CRM dashboard). |
-| Desktop app | Not ready to give to anyone. See [Limits](#limits). |
-| CI | GitHub Actions on GitHub-hosted runners validates pull requests. |
+Home remembers the project owner, type, sort order and Archived toggle in this browser for each workspace member and project collection. Local mode keeps a separate set of preferences for each collection. Clear filters keeps the chosen sort order. If browser storage is unavailable, the controls still work for the current visit. Escape closes a slide deck opened in a new tab.
 
-### Limits
+</details>
 
-- A desktop build must not go to anyone yet. The open items are in [`docs/legal/LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md): license files in the installer, the closed-license `vela` CLI, the installer name, and the upstream cloud sign-in card.
-- Internal package scopes, the `od` command and the `OD_*` variables keep their upstream names. They are internal, and we keep them for compatibility.
+Licensed and third-party content (paid component kits, reference studies, scraped catalogues, fan art) is **not** in this repository. It is installed separately as private packs through the pack system ([`docs/packs.md`](docs/packs.md)). Features that depend on that content show as unavailable until a pack is installed.
 
 ## How an agency build works
 
@@ -92,20 +84,6 @@ pnpm exec od agency build --from "$BUILD_ID"                                # re
 
 Routing and verification need a Jev key: `od agency config set --key-stdin`. `od agency --help` lists every flag and exit code. Details: [`packages/agency-fast-lane/README.md`](packages/agency-fast-lane/README.md) and [`docs/agency-site.md`](docs/agency-site.md).
 
-## Download for Mac
-
-Apple Silicon Macs can install a ready-made build. No clone or Node needed.
-
-1. Open the [latest release](https://github.com/ZeroSum-Solutions/mish/releases/latest) and download `Mish-<version>-mac-arm64.dmg`. Check it against `SHA256SUMS` if you like.
-2. Open the dmg and drag the app to Applications.
-3. The build is not signed by Apple, so macOS blocks the first launch. Right-click the app, choose **Open**, then **Open** again. Or run:
-
-   ```bash
-   xattr -dr com.apple.quarantine "/Applications/Mishh Mashh.app"
-   ```
-
-Requirement: an agent CLI such as `claude` or `codex` on your `PATH`. The app uses it to run builds. Apps started from Finder do not always see your shell `PATH`; if the app cannot find your CLI, start it from Terminal with `open -a "Mishh Mashh"`. A `.zip` of the same build is on the release page too. Releases are cut by tagging `v*` (workflow `release-mac`).
-
 ## Run it locally
 
 **New teammates:** run `sh scripts/team-setup.sh`. It checks prerequisites, installs, builds and starts the web app in one command. See [`QUICKSTART.md` → Team setup](QUICKSTART.md#team-setup).
@@ -119,7 +97,28 @@ pnpm tools-dev start web --daemon-port 7456 --web-port 3000
 
 Open <http://127.0.0.1:3000>. [`QUICKSTART.md`](QUICKSTART.md) covers other setups.
 
-## Repository map
+## Status
+
+Updated 2026-10-12.
+
+| Area | State |
+|---|---|
+| Languages | English only. |
+| Design systems | One: **Neutral Product**, our own. It is the default. Its status is `candidate`, not `promoted`: the checks in [`QUALITY-STANDARD.md`](docs/design-systems/QUALITY-STANDARD.md) found work left to do. The five brand-copied systems from upstream were removed. |
+| Agency build | Works end to end: route, fill, verify, publish. Twelve bundled families in three page kinds: ten `site` families, one `app` (app shell) and one `dashboard` (CRM dashboard). `od agency families` lists them. |
+| Desktop app | Not ready to give to anyone. See [Limits](#limits). |
+| CI | GitHub Actions on GitHub-hosted runners validates pull requests. |
+
+### Limits
+
+- A desktop build must not go to anyone yet. The open items are in [`docs/legal/LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md): license files in the installer, the closed-license `vela` CLI, the installer name, and the upstream cloud sign-in card.
+- Workspace packages use the `@mish/*` scope. The `od` command and the `OD_*` variables keep their upstream names for compatibility, and parts of the UI still show the earlier name Mishh Mashh.
+- The web app can be deployed to Vercel from the root `vercel.json`, but that deploy is a static UI shell only: there is no daemon behind it, so every `/api/*` call fails and projects, agents and generation do not work there. See [`QUICKSTART.md` → Deploy the web UI to Vercel](QUICKSTART.md#deploy-the-web-ui-to-vercel).
+
+## For contributors
+
+<details>
+<summary><b>Repository map</b></summary>
 
 | Path | What it holds |
 |---|---|
@@ -134,7 +133,10 @@ Open <http://127.0.0.1:3000>. [`QUICKSTART.md`](QUICKSTART.md) covers other setu
 | `tools/dev`, `tools/pack` | The local lifecycle and packaged builds |
 | `e2e/` | End-to-end and Playwright UI tests |
 
-## Documentation
+</details>
+
+<details>
+<summary><b>Documentation</b></summary>
 
 | Read this | When |
 |---|---|
@@ -145,11 +147,14 @@ Open <http://127.0.0.1:3000>. [`QUICKSTART.md`](QUICKSTART.md) covers other setu
 | [`docs/design-systems/QUALITY-STANDARD.md`](docs/design-systems/QUALITY-STANDARD.md) | Before you add or change a design system. |
 | [`docs/FORK-PIN.md`](docs/FORK-PIN.md) | Before you take a change from upstream. |
 | [`docs/legal/LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md) | Before you give a build to anyone. |
+| [`docs/deployment/vercel.md`](docs/deployment/vercel.md) | Before you deploy a project page to Vercel, or this repository's web UI. |
 | [`PRIVACY.md`](PRIVACY.md) | To see what data the app sends and when. |
 | [`docs/testing/diagnostics-environment.md`](docs/testing/diagnostics-environment.md#local-download-policy) | Before saving or sharing a diagnostics bundle; local download, redaction and collection limits. |
 | [`TRANSLATIONS.md`](TRANSLATIONS.md) | Before you add or change UI text. |
 
-## How we work
+</details>
+
+### How we work
 
 - **Fork policy.** This is a hard-pinned, cherry-pick-only fork of upstream commit `73953213a` (release v0.22.2). We take single upstream commits, never merges. Each one is logged in [`docs/FORK-PIN.md`](docs/FORK-PIN.md).
 - **Changes.** Every change goes through a pull request with green CI and is squash-merged. Details are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
@@ -157,6 +162,4 @@ Open <http://127.0.0.1:3000>. [`QUICKSTART.md`](QUICKSTART.md) covers other setu
 
 ## License
 
-Mish! is a modified version of an upstream project licensed under the Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). ZeroSum Solutions changed the product name, removed upstream community links, removed brand-copied design systems, kept two languages, and turned off most upstream network calls (the rest are listed in [`LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md)). This repository starts from a snapshot of ZeroSum's private working repository; see [`NOTICE`](NOTICE).
-
-Upstream names and logos belong to their owners. This product is not affiliated with or endorsed by the upstream project or its owners. Bundled components with their own `LICENSE` files keep those licenses, for example [`skills/web-clone/`](skills/web-clone/) (MIT).
+Mish! is a modified version of an upstream project licensed under the Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). ZeroSum Solutions changed the product name, removed upstream community links, removed brand-copied design systems, ships English only, and turned off most upstream network calls (the rest are listed in [`LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md)). This repository starts from a snapshot of ZeroSum's private working repository; see [`NOTICE`](NOTICE).

@@ -12,17 +12,13 @@
 
 ## 0. 先看模拟器,再看文字
 
-附件 `simulator.standalone.html` 双击就能打开(仓库里是 `docs/design/chat-sim/`,`python3 serve.py` 起服务看多文件版)。
+附件 `simulator.standalone.html` 双击就能打开(原在 `docs/design/chat-sim/`,`python3 serve.py` 起服务看多文件版;该目录未纳入公开仓库)。
 
 它把 agent 真实跑出来的事件流逐帧回放,用设计稿自己的标记和样式渲染。**看到的就是按当前规则做出来之后的样子**,不是示意图。10 个场景:3 个真实数据(Claude 本地实测、OpenCode / Codex 录制)+ 7 个构造场景(长会话、中断后继续、中途作废、意图澄清、工具失败、plain 系、空态)。
 
 怎么看:每个场景 ▶ 播放或 ⇤ 直接跳到结尾;⤢ 展开面板不内滚;顶部切换 T3 的四个候选,所有场景同步重画。每个场景头部有一行统计(执行记录几块、工具行几条、壳外正文几块)。
 
-下面两张图是同一轮 Claude 真实记录,左边是现行规则,右边是场景稿的做法:
-
-![Claude 真实一轮 · 策略 A](../../docs/design/chat-sim/shots/claude-A.png)
-
-![Claude 真实一轮 · 策略 E](../../docs/design/chat-sim/shots/claude-E.png)
+原文此处附两张同一轮 Claude 真实记录的截图(`docs/design/chat-sim/shots/claude-A.png` 现行规则、`claude-E.png` 场景稿做法),截图随模拟器目录一起未纳入公开仓库。
 
 ---
 

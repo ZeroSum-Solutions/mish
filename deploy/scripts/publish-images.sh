@@ -5,7 +5,7 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 PLATFORMS="${PLATFORMS:-linux/amd64,linux/arm64}"
 IMAGE_TAG="${IMAGE_TAG:-latest}"
 REGISTRY="${REGISTRY:-ghcr.io}"
-IMAGE_NAMESPACE="${IMAGE_NAMESPACE:-ZeroSum-Solutions}"
+IMAGE_NAMESPACE="${IMAGE_NAMESPACE:-zerosum-solutions}"
 IMAGE_REPOSITORY="${IMAGE_REPOSITORY:-mish}"
 NODE_BASE_IMAGE="${NODE_BASE_IMAGE:-docker.io/library/node:24-alpine}"
 RUNTIME_BASE_IMAGE="${RUNTIME_BASE_IMAGE:-docker.io/library/node:24-alpine}"
@@ -104,7 +104,7 @@ Options:
   --arch <amd64|arm64>            publish a single platform as <tag>-<arch>
   --image_tag <tag>               default: latest
   --registry <registry>           default: ghcr.io
-  --image_namespace <namespace>   default: ZeroSum-Solutions
+  --image_namespace <namespace>   default: zerosum-solutions
   --image_repository <name>       default: od
   --image <image-ref>             override full image ref
   --node_base_image <image-ref>   default: docker.io/library/node:24-alpine

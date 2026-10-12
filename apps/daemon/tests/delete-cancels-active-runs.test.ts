@@ -361,6 +361,46 @@ describe('DELETE project cancellation and idle-only admission', () => {
     } finally { await app.close(); }
   });
 
+  // Batch delete removes whole projects, so it must apply the same run
+  // fence as single delete: a project with queued/running work is refused,
+  // and nothing in the batch is deleted.
+  it('refuses a batch delete that contains a project with active runs', async () => {
+    const runs = makeRunService();
+    const active = runs.create({ projectId: 'p1', conversationId: 'c1' });
+    for (const projectId of ['p1', 'p2']) {
+      ensureWorkspaceProject(db, {
+        projectId,
+        workspaceId: 'ws-batch',
+        visibility: 'personal',
+        createdByWorkspaceMemberId: 'm1',
+        updatedByWorkspaceMemberId: 'm1',
+      });
+    }
+    const app = await mountProjectApp(db, runs, tempDir);
+    try {
+      const res = await fetch(`${app.base}/api/workspaces/ws-batch/projects/batch-delete`, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-od-workspace-id': 'ws-batch',
+          'x-od-workspace-member-id': 'm1',
+          'x-od-workspace-role': 'owner',
+        },
+        body: JSON.stringify({ projectIds: ['p1', 'p2'] }),
+      });
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as { error: { code: string } };
+      expect(body.error.code).toBe('PROJECT_BUSY');
+    } finally {
+      await app.close();
+    }
+    expect(active.status).not.toBe('canceled');
+    expect(getProject(db, 'p1')).toBeTruthy();
+    expect(getProject(db, 'p2')).toBeTruthy();
+    // The fence is released afterwards: an idle project deletes normally.
+    expect(runs.beginProjectDeletion('p2', { ifIdle: true })).not.toBeNull();
+  });
+
   it('keeps the project and its active runs intact for ifIdle', async () => {
     const runs = makeRunService();
     const first = runs.create({ projectId: 'p1', conversationId: 'c1' });

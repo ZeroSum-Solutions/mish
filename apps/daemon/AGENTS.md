@@ -104,6 +104,11 @@ User-facing capabilities must be reachable through both:
 - Web/API routes in the daemon.
 - `od` CLI subcommands in `src/cli.ts`.
 
+Two capabilities that depend on external services and are easy to misdescribe:
+
+- Improve prompt (`src/routes/workbench-brief.ts`, `src/workbench/brief/`; `od workbench transform`, `od workbench brief …`): the `terra` lane (GPT Terra on OpenRouter, Settings → Labs) needs an OpenRouter key and falls back to a no-tool `claude -p` turn, which needs a signed-in Claude Code CLI. With neither available it cannot run, and its availability reply says which recovery applies.
+- Deploy (`src/routes/deploy.ts`, `src/deploy.ts`; `od deploy`): `POST /api/projects/:id/deploy` deploys to Vercel (the default `providerId`) or Cloudflare Pages. The Vercel provider drives the Vercel REST API with the user's saved Vercel token; polling stops on `READY`, `ERROR`, `CANCELED` or `BLOCKED`; only `READY` takes the stable alias; failures surface as `VERCEL_DEPLOY_FAILED` (502) or `VERCEL_DEPLOY_TIMEOUT` (504).
+
 When adding a user-facing capability, close the loop in one change: contract type, daemon route, web surface if applicable, and CLI command with `--json` plus `--prompt-file <path|->` for long prompts where relevant.
 
 ## Runtime and Agent Changes
@@ -119,6 +124,8 @@ When adding a user-facing capability, close the loop in one change: contract typ
 - Use the cheapest layer that can observe the behavior: pure helper test, route-level Vitest with `startServer`, then broader integration only when necessary.
 - For bug fixes, prefer a red spec that fails before the fix.
 - If a test depends on native modules such as `better-sqlite3`, make sure local dependencies were built for the active Node version before blaming the code.
+- `tests/setup.ts` scrubs `ANTHROPIC_BASE_URL`, `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN` and `CLAUDE_CONFIG_DIR` from the inherited environment, because the daemon forwards them to spawned Claude processes and the Claude diagnostics change guidance on them. A test that needs one sets it explicitly.
+- Tests that make a file or directory unreadable with `chmod` cannot fail as root (`CAP_DAC_OVERRIDE`), and process-group tests that wait for orphans to be reaped need a reaping PID 1. A failure of that kind in a container running as uid 0 is an environment limit to prove and report, not a reason to weaken the test.
 
 ## Commands
 

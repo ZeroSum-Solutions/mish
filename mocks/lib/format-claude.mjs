@@ -14,8 +14,9 @@
 // CLIs and argv-compatible forks, which the parser still supports.
 //
 // Do NOT treat what this file emits as "what the CLI produces today". For the
-// current shape, replay the verbatim recordings in
-// `apps/daemon/tests/fixtures/claude-cli-recordings/` (see its README) instead.
+// current shape, use the owned synthetic fixtures in
+// `apps/daemon/tests/fixtures/daemon-b/claude-stream/` instead (the verbatim
+// recordings they reproduce are not published in this repository).
 
 import { writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';

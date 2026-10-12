@@ -7,8 +7,9 @@
 
 执行记录的动词与状态词(读取 / 新建 / 改写 / 搜索 / 执行 / 失败 / 进行中 / 思考中 /
 已完成 / 运行失败 / N 处 / 执行计划 · N 步)已经建成 `chat.record.*` 这一组 key,
-19 个语言 + `types.ts` 都补齐了。**新增任何用户可见的字,同样要补满 20 个文件** ——
-`types.ts` 里没有的 key 过不了 typecheck,这是这条规约的强制点。
+`types.ts` 与 `locales/en.ts` 都已补齐。产品只有英文(根 `AGENTS.md` 的 "i18n keys",
+owner 决定 2026-10-10),只有 `en.ts` 一个 locale。**新增任何用户可见的字,先加 `types.ts`
+再补 `en.ts`** —— `types.ts` 里没有的 key 过不了 typecheck,这是这条规约的强制点。
 
 措辞以 wangchenglong 交付稿为准,不自己改写(产品的文案逐字照用)。
 
@@ -96,7 +97,7 @@ aider / antigravity / atomcode),**opencode 直连不吐 thinking**,
 - [ ] 新 `--chat-*` 在亮暗两个作用域都定义
 - [ ] 复用了 `Foldable` / `StatusMark` / `ToolRow` 等已有原子,没有另造一个
 - [ ] 每条缺席数据都有明确形态(§3)
-- [ ] 文案走 i18n:先加 `i18n/types.ts`,再补齐全部 19 个 locale
+- [ ] 文案走 i18n:先加 `i18n/types.ts`,再补 `i18n/locales/en.ts`(唯一的 locale)
 - [ ] 测试断言行为 / ARIA / `data-testid`,**不断言 CSS 类名**
 - [ ] `pnpm --filter @mish/web typecheck` 与相关测试通过
 

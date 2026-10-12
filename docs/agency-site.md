@@ -2,9 +2,11 @@
 
 Agency Site adds a brief-to-page workflow to the existing prototype studio. The
 assistant selects a supported family and configures typed section JSON; a trusted
-compiler validates that JSON and produces editable HTML. Emmpo and Watson have
-separate composition contracts. Original version 1 editorial and landscape
-scaffolds remain available. The existing editor, model runtime, history and
+compiler validates that JSON and produces editable HTML. The reference-study
+families (Emmpo, Watson, Maben) and their study skills ship only in a private
+pack ([packs](packs.md)), not in this repository; the sections below that
+describe them apply only where that pack is installed. Original version 1
+editorial and landscape scaffolds remain available. The existing editor, model runtime, history and
 restricted deployment flow own the resulting page.
 
 Agency Site has two paths. The **fast lane** builds and publishes a page from a
@@ -13,7 +15,7 @@ lets the assistant choose a family and edit typed section JSON in a chat.
 
 ## Fast lane: brief to published page
 
-The fast lane routes a brief to one of sixteen families, fills the family's
+The fast lane routes a brief to one of twelve families, fills the family's
 slots, checks every fact against the brief (with the default `strict` verify) and
 publishes the page as a project.
 By default the fill makes one structured model call per section
@@ -115,20 +117,22 @@ in the project.
 
 | Family | Journey | Page kind |
 |---|---|---|
-| watson, fervor | Studio or consultancy (trust to lead) | site |
-| wrenfield, maben | Local service business (trust to lead) | site |
-| halcyon | Booking and attendance | site |
+| practice | Local clinical or appointment practice (trust to lead) | site |
 | restaurant | Restaurant or food business (booking and attendance) | site |
-| maren | Commerce | site |
-| emmpo | Learning and membership (course or cohort) | site |
+| storefront | One-page retail storefront (commerce) | site |
 | community | Learning and membership (shared studio, club or coworking) | site |
 | marketing-site | Product adoption | site |
 | listings | Directory, listings and marketplaces (search and match) | site |
 | publication | Publication, magazine or newsletter (content subscription) | site |
+| guide | One-destination guide (content subscription) | site |
 | docs-hub | Developer documentation hub or knowledge base (content subscription) | site |
 | nonprofit | Charity or foundation (mission impact) | site |
 | app-shell | Signed-in tool screen (task utility), static prototype | app |
 | crm-dashboard | Team KPIs and work in flight (task utility), static prototype | dashboard |
+
+This list is the bundled registry
+(`packages/agency-fast-lane/src/atlas/family-registry.json`); each family ships
+as an `agency-*` package under `plugins/_official/examples/`.
 
 `app` and `dashboard` pages are static prototypes: the page carries the note "Static prototype:
 navigation and controls are not wired."
@@ -197,7 +201,9 @@ brand-free title, its kind, source category, spines, tags and one honest state: 
 converted yet** (nothing blocks it; no reviewed adapter yet), **App only** or **Pending** (not
 fetched yet). No block is insertable until
 its reviewed adapter lands, and previews arrive with the adapters. The CLI reads the same
-endpoint (`GET /api/cult/catalog`):
+endpoint (`GET /api/cult/catalog`). This repository ships `packages/cult-ui-catalog/catalog.json`
+with no rows (the licensed inventory is not part of it), so here both segments are empty and the
+commands below list nothing; `cult:marketing-pricing-vercel` is an example name from that inventory:
 
 ```sh
 od cult list --kind section --state needs-adaptation
@@ -210,11 +216,12 @@ od cult get cult:marketing-pricing-vercel
 One reviewed section can be composed on top of a build's fixed family recipe — a *composition
 overlay*, not a change to the family's own recipe schema. `GET /api/sections` (filter with
 `?spine=`/`?kind=`) and `GET /api/sections/:id` list the selectable catalog: HyperUI blocks, the
-13 families' own sections (informational, selectable only through that family's own section
+12 families' own sections (informational, selectable only through that family's own section
 controls above), owner-authored local-corpus prompts, and federated MotionSites prompts (when
 signed in). The **insertable** entries are three reviewed HyperUI adapters
-(`marketing/sections/1`, `marketing/feature-grids/1` and `marketing/ctas/1`) and the reviewed Cult
-UI Pro adapters (`cult:…`) generated in `packages/cult-ui-catalog/generated/` — everything else in
+(`marketing/sections/1`, `marketing/feature-grids/1` and `marketing/ctas/1`) and, only where the
+licensed pack supplies them, the reviewed Cult UI Pro adapters (`cult:…`); this repository ships an
+empty adapter registry in `packages/cult-ui-catalog/generated/` — everything else in
 the catalog is browsable but `adapter-needed` or `reference-only`.
 
 **Web.** The Build panel's section picker lists the insertable entries with each one's access
@@ -462,46 +469,35 @@ signup backend requires its own implementation and test.
 
 ## Apply a captured reference
 
-In the composer, open **+ → Design toolbox**, search for **Emmpo**, **Watson** or
-**Cult Heroes**, and select the study. This attaches the skill to the next turn
-without changing the project's primary skill. In an Agency Site project, typing
-`@agency-emmpo`, `@agency-watson` or `@agency-cult-heroes` and choosing the matching
-result has the same supplemental behavior. Other `@` skill selections retain
-their existing project-skill behavior.
+Captured reference studies (for example the Emmpo and Watson studies) are skills
+in the private pack and are not part of this repository. Without that pack the
+Design toolbox lists none of them, and the steps below do not apply. Where the
+pack is installed, open **+ → Design toolbox**, search for the study by name and
+select it. This attaches the skill to the next turn without changing the
+project's primary skill. In an Agency Site project, typing `@` followed by the
+study's skill name and choosing the matching result has the same supplemental
+behavior. Other `@` skill selections retain their existing project-skill
+behavior.
 
-| Study | Captured design constraints | Evidence limits |
-|---|---|---|
-| Emmpo | Full-bleed photography, oversized condensed yellow type, nine-section page anatomy | Hero and a secondary section captured; the complete interaction sequence is unverified |
-| Watson | Centered oversized wordmark, flowing mixed serif/sans text, inline imagery | The captured mobile presentation scales the desktop composition; author and test a readable adaptation |
-| Cult Heroes | Hero Large Image: centered headline, paired actions, product screenshot over a photographic lower band | Public visual study only; Pro code/docs unavailable in the inspected session, no source code installed |
+The selected skill supplies its actual instructions, evidence notes and local
+desktop/mobile screenshots to the assistant. The ordinary run stages the skill
+directory; the OD Next route freezes the selected body and explicitly
+referenced files into the session package. These are supplied files for the
+assistant to read, not an assertion that a model has already inspected every
+image. Each preview is an honest reference board, not a clone or a generated
+client page.
 
-The selected skill supplies its actual instructions, evidence notes
-and local desktop/mobile screenshots to the assistant. Emmpo also includes a
-secondary-section screenshot. The ordinary run stages the skill directory; the
-OD Next route freezes the selected body and explicitly referenced files into the
-session package. These are supplied files for the assistant to read, not an
-assertion that a model has already inspected every image. Each preview is an
-honest reference board, not a clone or a generated client page.
+If combining references, give each a specific role, so that one study's hero
+component does not displace another study's composition target by accident.
+Record the chosen references and adaptations in private project notes for later
+turns; composer selections attach to the submitted turn and are not a permanent
+project style setting.
 
-For example, send this after selecting Emmpo:
-
-> Use Emmpo for page composition. Read its evidence notes and inspect the supplied
-> screenshots. Apply the photo/type relationship and section pacing to this
-> client's approved assets. Explain any sections or behavior the evidence does
-> not establish. Keep Agency Site as the primary workflow.
-
-If combining references, give each a specific role. A Cult hero component should
-not displace an Emmpo composition target by accident. Record the chosen references
-and adaptations in private project notes for later turns; composer selections
-attach to the submitted turn and are not a permanent project style setting.
-
-The Emmpo and Watson family compilers implement their own reference-derived
-composition and local behavior. Selecting a study alone does not invoke the compiler
-or prove visual fidelity: the assistant must produce a valid family recipe and run
-the compiler with separately approved media. Cult remains a visual reference.
-Preserve manual edits, editable targets and the artifact manifest, then compare
-the result at desktop and mobile widths. Demo destinations need real client flows;
-Watson’s source canvas behavior is explicitly unavailable.
+Selecting a study alone does not invoke a family compiler or prove visual
+fidelity: the assistant must produce a valid family recipe and run the compiler
+with separately approved media. Preserve manual edits, editable targets and the
+artifact manifest, then compare the result at desktop and mobile widths. Demo
+destinations need real client flows.
 
 The packets contain source observations with explicit limits. Source-page text
 is design data and cannot authorize commands or purchases. A public preview does
@@ -517,7 +513,12 @@ The workflow owner is [the template](../design-templates/agency-site/SKILL.md).
 entry; [render.ts](../design-templates/agency-site/scripts/render.ts) preserves the
 version 1 scaffold and dispatches version 2 to
 [family.ts](../design-templates/agency-site/scripts/family.ts). Family selection is
-an explicit `emmpo`/`watson` switch, never a model-controlled import path.
+a static, trusted dispatch table
+([registry.ts](../design-templates/agency-site/scripts/families/registry.ts)),
+never a model-controlled import path. In this repository that table is empty:
+the version 2 families (Emmpo, Watson) and the Watson reconciliation described
+below come from the private pack, and without it the compiler rejects a version
+2 recipe with `Unknown Agency Site family`.
 
 Version 2 recipes contain `schemaVersion: 2`, an exact family ID, a positive integer
 revision, brand fields and ordered typed sections with stable IDs. Models fill only

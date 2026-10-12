@@ -101,7 +101,7 @@ A named business pattern inside one spine, such as SM.02 directory or listings, 
 _Avoid_: persona, template
 
 **Family**:
-A reviewed page design with a typed recipe schema, named slots, a trusted renderer and fixed section order. A family has one spine, one archetype and one page kind. The families are watson, fervor, wrenfield, maben, halcyon, restaurant, maren, emmpo, community, marketing-site, app-shell, crm-dashboard, listings, publication, nonprofit and docs-hub.
+A reviewed page design with a typed recipe schema, named slots, a trusted renderer and fixed section order. A family has one spine, one archetype and one page kind. The bundled families are restaurant, practice, storefront, listings, publication, guide, nonprofit, docs-hub, community and marketing-site (page kind `site`), app-shell (`app`) and crm-dashboard (`dashboard`); `od agency families` lists them.
 _Avoid_: theme, template, layout
 
 **Page Kind**:
@@ -113,7 +113,7 @@ Jev's decision that assigns a brief to one family, or leaves it unrouted when no
 _Avoid_: classification, recommendation
 
 **Fill**:
-The structured model calls that write a family's text slots from the brief: one call per section by default (`sections` mode), or one call for the whole page (`single` mode). It runs on DeepSeek `deepseek-v4-flash` or Cerebras `gpt-oss-120b`, and fails over to the other provider on a rate limit, server error or timeout that comes before any output.
+The structured model calls that write a family's text slots from the brief: one call per section by default (`sections` mode), or one call for the whole page (`single` mode). It runs on DeepSeek `deepseek-flash` or Cerebras `gpt-oss-120b`, and fails over to the other provider on a rate limit, server error or timeout that comes before any output.
 _Avoid_: generation, completion
 
 **Fill-Model Key**:
@@ -143,12 +143,14 @@ _Avoid_: component library, UI kit, HyperUI
 **Blocks view**:
 The Catalog tab's segment for the licensed Cult UI Pro section and page rows, grouped by section
 kind, each with a brand-free title and one state: Insertable, Needs adaptation, Not converted
-yet, App only or Pending. `od cult list --kind section|page` prints the same rows from `GET /api/cult/catalog`.
+yet, App only or Pending. The rows come from an installed licensed pack (**Settings → Licensed
+packs**); this public repository ships none, so without a pack the view says nothing is
+catalogued yet. `od cult list --kind section|page` prints the same rows from `GET /api/cult/catalog`.
 _Avoid_: templates, block library
 
 **Components view**:
 The Catalog tab's segment for the licensed Cult UI Pro primitive and app rows, grouped by source
-category, with the same states as the Blocks view. App-only rows need a live server and never
+category, with the same states as the Blocks view, and the same licensed-pack requirement. App-only rows need a live server and never
 enter a static site. `od cult list --kind primitive|app` prints the same rows.
 _Avoid_: component library, UI kit
 
@@ -182,12 +184,12 @@ server keys, or throws, says why it can't preview live and shows its thumbnail i
 _Avoid_: demo page, sandbox, playground
 
 **Section Catalog**:
-The selectable list a build's `sectionSelection` chooses from: HyperUI blocks, the 13 families'
-own sections, catalogued Cult UI Pro sections and pages, owner-authored
+The selectable list a build's `sectionSelection` chooses from: HyperUI blocks, the bundled families'
+own sections, Cult UI Pro sections and pages from an installed licensed pack, owner-authored
 local-corpus prompts, and federated MotionSites prompts, each
 labelled with a rights decision, an access tier and an availability (`insertable`,
 `adapter-needed` or `reference-only`). The insertable rows are the three reviewed HyperUI adapters
-and the reviewed Cult adapters loaded from `@mish/cult-ui-catalog`.
+and, when a licensed pack supplies Cult rows, the reviewed Cult adapters loaded through `@mish/cult-ui-catalog`.
 _Avoid_: component library, template gallery
 
 **Block Composition**:

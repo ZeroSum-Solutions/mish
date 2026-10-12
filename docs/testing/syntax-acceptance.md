@@ -86,7 +86,8 @@ The native Langfuse environment reuses the existing telemetry environment
 source. No new production privacy policy or sink-priority rule is introduced.
 
 Explicit, fixed-synthetic upload canary (never accepts an external dataset,
-fixture manifest, real mode, production profile or more than one repeat):
+fixture manifest, real mode, production profile or more than one repeat), also
+run from `e2e/`:
 
 ```bash
 MISH_TELEMETRY_RELAY_URL=https://telemetry-test.mish.invalid/api/langfuse \

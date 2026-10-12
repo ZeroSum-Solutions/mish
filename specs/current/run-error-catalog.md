@@ -7,9 +7,9 @@
 
 ## 0. 接手须知
 
-> **优先级看这里**:各场景的线上频次、影响设备数、环比与 P0/P1/P2 分档,在设计方案 `docs/design/run-errors/error-ux-design.md` 文末《附:线上频次与优先级》(2026-08-24 拉的数,覆盖 93.3% 的失败)。重拉的方法在 `docs/design/run-errors/README.md`。
+> **优先级看这里**:各场景的线上频次、影响设备数、环比与 P0/P1/P2 分档,在设计方案 `docs/design/run-errors/error-ux-design.md` 文末《附:线上频次与优先级》(2026-08-24 拉的数,覆盖 93.3% 的失败)。重拉的方法原在 `docs/design/run-errors/README.md`(未纳入公开仓库)。
 
-- 调研原始材料在 `docs/design/run-errors/sources/`(9 份,按来源分;见 §1;S3 拆成 `amr-vela-errors.md` + `vela-cli-error-surface.md` + `web-amr-error-ui.md`),本文只放结论与待决项。主表 §4 共 R-001–R-103(六层),流程 §5 共 F0–F10,待决 §7 共 Q-01–Q-25。
+- 调研原始材料原在 `docs/design/run-errors/sources/`(未纳入公开仓库;9 份,按来源分;见 §1;S3 拆成 `amr-vela-errors.md` + `vela-cli-error-surface.md` + `web-amr-error-ui.md`),本文只放结论与待决项。主表 §4 共 R-001–R-103(六层),流程 §5 共 F0–F10,待决 §7 共 Q-01–Q-25。
 - 每一行错误都要有**证据**(文件:行号 / issue / PostHog 数字 / 飞书原话),没有证据的写「未找到」,不编。
 - 展示形式与后续流程是**产品 + 设计的决定**,本文给候选与建议,不替他们选。决定落在 §6,未决的留在 §7。
 - 旧 PRD 的 12 类、文案、CTA 规则作为基线保留在 §2,新清单每一行都要映射回这 12 类之一或标「旧分类覆盖不到」。

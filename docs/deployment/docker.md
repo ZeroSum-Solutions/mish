@@ -63,9 +63,7 @@ Success looks like:
 - `mish` container is listed
 - `STATUS` shows `Up` and eventually `healthy`
 - Port mapping includes `127.0.0.1:7456->7456/tcp`
-
-![Docker Desktop container running](../screenshots/deployment/docker/02-docker-desktop-container-running.png)
-![docker-compose ps healthy output (sanitized)](../screenshots/deployment/docker/04-docker-compose-ps-healthy.png)
+- In Docker Desktop, the `mish` container shows as running under the `mish` project
 
 ## Step 5: Verify Container Health Over HTTP
 
@@ -74,9 +72,7 @@ curl -i http://127.0.0.1:7456/api/health
 ```
 
 Success looks like:
-- HTTP status `200 OK`
-
-![curl HTTP 200 output (sanitized)](../screenshots/deployment/docker/05-curl-http-200-proof.png)
+- HTTP status `200 OK` on the first line of the response, followed by a JSON body
 
 ## Step 6: Open Mishh Mashh in Your Browser
 
@@ -88,9 +84,6 @@ and the `OD_API_TOKEN` value from `deploy/.env` as the password. You should then
 see the Mishh Mashh interface. Docker bridge peers remain authenticated; no host
 networking override is required.
 
-![Mishh Mashh home (desktop)](../screenshots/deployment/docker/01-mish-home.png)
-![Mishh Mashh home (mobile)](../screenshots/deployment/docker/03-mish-mobile.png)
-
 ## Common Issues
 
 - `failed to connect to the docker API`: Docker Desktop is not running yet
@@ -99,3 +92,8 @@ networking override is required.
 - `pull access denied` or `authentication required` for `ghcr.io/zerosum-solutions/mish`: no public image is published. Build it locally with `docker compose build` in `deploy/`.
 - reverse proxy + `OD_API_TOKEN`: either inject `Authorization: Bearer <OD_API_TOKEN>` at the proxy, or set `MISH_DISABLE_API_AUTH=1` only when that proxy already authenticates every request and the daemon is not directly exposed.
 - browser sign-in repeats: use username `mish` and the exact `OD_API_TOKEN` value from `deploy/.env`; recreate the container after changing the token.
+
+## Other deployment targets
+
+- Cloud guides: [Azure Container Instances](cloud/azure.md) and [Alibaba Cloud](cloud/aliyun.md).
+- Vercel cannot host the daemon. The root `vercel.json` deploys only a static UI shell; see [`vercel.md`](vercel.md).

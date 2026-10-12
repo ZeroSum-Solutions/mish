@@ -22,6 +22,15 @@ const LAN_ADDRESS = Object.values(networkInterfaces())
   .flat()
   .find((entry) => entry != null && entry.family === 'IPv4' && !entry.internal)?.address;
 
+// The proxy only rewrites a same-host Origin to the daemon's for loopback/private-LAN hosts
+// (`isLoopbackOrPrivateLanHost` in sidecar/server.ts). A host whose only external interface is
+// outside those ranges (e.g. a CI sandbox on 192.0.2.0/24) keeps its Origin untouched.
+function isPrivateLanIpv4(address: string): boolean {
+  const [a, b] = address.split('.').map(Number) as [number, number];
+  return a === 10 || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168)
+    || (a === 169 && b === 254) || (a === 100 && b >= 64 && b <= 127);
+}
+
 const cleanups: (() => Promise<void>)[] = [];
 
 afterEach(async () => {
@@ -72,7 +81,9 @@ describe('sidecar daemon proxy X-Forwarded-For', () => {
       expect(headers.host).toBe(`127.0.0.1:${daemon.port}`);
       expect(headers['x-forwarded-for']).toBe(LAN_ADDRESS);
     }
-    expect(daemon.seen[1]!.origin).toBe(`http://127.0.0.1:${daemon.port}`);
+    expect(daemon.seen[1]!.origin).toBe(
+      isPrivateLanIpv4(LAN_ADDRESS!) ? `http://127.0.0.1:${daemon.port}` : origin,
+    );
   });
 
   it('keeps a client-sent chain and appends the real peer, so a spoofed loopback hop cannot hide it', async () => {

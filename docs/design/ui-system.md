@@ -5,8 +5,8 @@ The rules every web UI change follows. Tokens live in
 (raw `--spacing-*` / `--font-size-*` steps); glass materials live in
 `apps/web/src/styles/material.css`; reusable components live in
 `packages/components`. This document says which token to reach for and why.
-When a design draft for a surface (for example the chat panel drafts under
-`docs/design/chat-panel`) pins a value, the draft wins for that surface.
+When a design draft for a surface (for example the chat panel drafts, which
+are not part of this repository) pins a value, the draft wins for that surface.
 
 ## 1. Character
 

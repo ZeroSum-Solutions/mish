@@ -30,4 +30,4 @@ pnpm --filter @mish/web test -- tests/i18n
 
 `pnpm i18n:coverage` reports dictionary coverage. The locale registry, English
 dictionary, README language marker, and tests must agree on `en` as the only
-shipped locale. Historical files under `docs/plans/` retain their original policy.
+shipped locale.

@@ -15,8 +15,12 @@
 // daemon that wants a different origin reads its env and passes `origin` in —
 // this file never reads env.
 
-// Canonical public site origin for shareable plugin links.
-export const MISH_SITE_ORIGIN = 'https://github.com/ZeroSum-Solutions/mish';
+// Canonical public site origin for shareable plugin links. Mishh Mashh has no
+// public plugin-detail site yet: the GitHub repository root does not serve
+// `/plugins/<slug>/` routes, so pointing at it would produce links that 404.
+// Until a real site exists this stays `null` and `pluginShareUrl` returns
+// `null` unless a caller supplies an origin that serves the detail routes.
+export const MISH_SITE_ORIGIN: string | null = null;
 
 // Slugify one path segment: lower-cased, non-url-safe runs collapsed to `-`,
 // leading/trailing `-` trimmed. Must match the landing site byte-for-byte.
@@ -59,13 +63,24 @@ export function pluginPreviewPath(id: string): string {
   return `/plugins/previews/${pluginSlug(id)}/`;
 }
 
-// Fully-qualified shareable URL for a plugin detail page. `origin` defaults to
-// the public site; a self-hosted daemon may pass its own origin (read from env
-// on the daemon side, never here). A trailing slash on `origin` is trimmed so
-// we never emit `//plugins/...`.
+// Fully-qualified shareable URL for a plugin detail page, or `null` when no
+// origin serving the detail routes is known. `origin` defaults to the public
+// site (none today); a self-hosted daemon may pass its own origin (read from
+// env on the daemon side, never here). A trailing slash on `origin` is trimmed
+// so we never emit `//plugins/...`.
 export function pluginShareUrl(
   id: string,
-  origin: string = MISH_SITE_ORIGIN,
-): string {
-  return `${origin.replace(/\/+$/, '')}${pluginDetailPath(id)}`;
+  origin: string | null = MISH_SITE_ORIGIN,
+): string | null {
+  const base = origin == null ? null : trimTrailingSlashes(origin);
+  if (!base) return null;
+  return `${base}${pluginDetailPath(id)}`;
+}
+
+// Linear-time trim: a `/\/+$/` regex backtracks quadratically on long runs of
+// slashes that are not at the end of the string.
+function trimTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 47) end -= 1;
+  return value.slice(0, end);
 }

@@ -12,7 +12,7 @@
 //   - clawhub                → openclaw/clawhub
 //   - skills-sh              → skills.sh discovery hint
 //   - mish            → ZeroSum-Solutions/mish
-//                              (plugins/community/<plugin-name>/), the private
+//                              (plugins/community/<plugin-name>/), the public
 //                              Mishh Mashh repository. See docs/plugins/PLAYBOOK.md.
 //
 // The function is pure: it accepts the plugin's metadata and returns

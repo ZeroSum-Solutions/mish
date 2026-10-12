@@ -1287,9 +1287,10 @@ export function summary(report: Report): string {
   return lines.join('\n');
 }
 
-/** Families checked by default: the strictest CSP (no images, no script) and one with approved
- * media, fonts and inline script (watson, the family the overlay test uses). */
-export const DEFAULT_FAMILIES = [DEFAULT_FAMILY, 'watson'] as const;
+/** Families checked by default. The public repository ships only the strictest-CSP family here
+ * (no images, no script); the media-and-script family this check also covered lives in a private
+ * pack. Pass `--family <name>` to check an installed one. */
+export const DEFAULT_FAMILIES = [DEFAULT_FAMILY] as const;
 
 if (import.meta.main) {
   const args = process.argv.slice(2);

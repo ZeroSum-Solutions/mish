@@ -642,7 +642,7 @@ sh 2033   layoutMax 1450   wheelReached 1449.5   frozen: false
 | OPEND-2500 | [ChatPanel] PPT 生成完成后未展示下一步引导 | 未立项 | Medium | 描述为空。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2543 | [ChatPanel] 媒体产物路径变更后缩略图裂图 | 未立项 | High | 媒体路径规范化 / 移动 / 重命名后，会话卡仍请求旧路径并 404；需同步最终地址并容忍注册延迟。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2544 | [ChatPanel] 思考过程中不展示媒体 Retry，避免与 Agent 自动重试冲突 | 进行中 | High | Agent 仍在自动切换 Provider 时不得展示手动 Retry；仅整次 run 终态失败后给一次 Retry。 | API 阻塞，未确认 | API 阻塞，未确认 |
-| OPEND-2545 | [ChatPanel] 图片修改生成后会话产物卡片仍展示旧图 | 未立项 | High | 同一图片修改完成后右侧已是新图、该轮会话卡仍是旧图；要求新旧产物版本语义稳定且点击、预览、导出一致。[诊断包原件](evidence/plane-chatpanel-2026-09-01/attachments/OPEND-2545-01-mish-diagnostics-2026-09-01T11-09-27Z.zip) | API 阻塞，未确认 | API 阻塞，未确认 |
+| OPEND-2545 | [ChatPanel] 图片修改生成后会话产物卡片仍展示旧图 | 未立项 | High | 同一图片修改完成后右侧已是新图、该轮会话卡仍是旧图；要求新旧产物版本语义稳定且点击、预览、导出一致。诊断包原件 `OPEND-2545-01-mish-diagnostics-2026-09-01T11-09-27Z.zip`（未纳入公开仓库） | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2546 | [ChatPanel] 重复添加同一文案时提示“会话已添加” | 未立项 | None | 再次添加同一选中文案时无反馈；应去重并显示一致的轻提示。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2547 | [ChatPanel] 9:16 图片在左侧预览卡片中被居中裁剪 | 未立项 | None | 竖图在会话产物卡被横向容器裁掉上下区域；应保持宽高比并以 contain / 留白完整显示。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2548 | [ChatPanel] 侧栏宽度不足时步骤耗时换行显示 | 未立项 | None | 窄栏下 `1m 59s` 被拆成两行；耗时与展开按钮需保留固定空间，标题优先压缩。 | API 阻塞，未确认 | API 阻塞，未确认 |
@@ -650,10 +650,10 @@ sh 2033   layoutMax 1450   wheelReached 1449.5   frozen: false
 | OPEND-2550 | 生成产物之后，没有在会话栏里面出现那个产物卡片 | 未立项 | Urgent | 描述为空。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2551 | [ChatPanel] 添加到注释后输入框显示为空且发送按钮禁用，但回车仍可发送 | 未立项 | None | 注释已进入内部 Composer，但 UI 为空、按钮禁用、Enter 却可发；三者需共用同一 `canSend` 状态并正确清空。 | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2552 | 点击 Share 和 Export 按钮：点击一下应该展开，再点击一下应该关闭这个面板 | 未立项 | High | 描述为空；标题要求同一按钮第二次点击关闭面板。 | API 阻塞，未确认 | API 阻塞，未确认 |
-| OPEND-2557 | 任务运行结束后，应该默认收起 | 未立项 | Urgent | 仅截图附件（asset `f7d7ecf7…`），无文本描述。[本地原件](evidence/plane-chatpanel-2026-09-01/attachments/OPEND-2557-01-f7d7ecf7.png) | API 阻塞，未确认 | API 阻塞，未确认 |
+| OPEND-2557 | 任务运行结束后，应该默认收起 | 未立项 | Urgent | 仅截图附件（asset `f7d7ecf7…`），无文本描述。本地原件 `OPEND-2557-01-f7d7ecf7.png`（未纳入公开仓库） | API 阻塞，未确认 | API 阻塞，未确认 |
 | OPEND-2558 | next step 视觉重心加强 | 未立项 | Urgent | 描述为空。 | API 阻塞，未确认 | API 阻塞，未确认 |
-| OPEND-2559 | 导出有icon，但是分享没有icon，应该统一一下 | 未立项 | High | 仅截图附件（asset `0ba7dbbe…`），无文本描述。[本地原件](evidence/plane-chatpanel-2026-09-01/attachments/OPEND-2559-01-0ba7dbbe.png) | API 阻塞，未确认 | API 阻塞，未确认 |
-| OPEND-2560 | 导出和分享的按钮有点小，可以变成跟右上角的按钮相同大小的 | 未立项 | High | 仅截图附件（asset `7a76068c…`），无文本描述。[本地原件](evidence/plane-chatpanel-2026-09-01/attachments/OPEND-2560-01-7a76068c.png) | API 阻塞，未确认 | API 阻塞，未确认 |
+| OPEND-2559 | 导出有icon，但是分享没有icon，应该统一一下 | 未立项 | High | 仅截图附件（asset `0ba7dbbe…`），无文本描述。本地原件 `OPEND-2559-01-0ba7dbbe.png`（未纳入公开仓库） | API 阻塞，未确认 | API 阻塞，未确认 |
+| OPEND-2560 | 导出和分享的按钮有点小，可以变成跟右上角的按钮相同大小的 | 未立项 | High | 仅截图附件（asset `7a76068c…`），无文本描述。本地原件 `OPEND-2560-01-7a76068c.png`（未纳入公开仓库） | API 阻塞，未确认 | API 阻塞，未确认 |
 
 ### 当前可见的修复分组
 

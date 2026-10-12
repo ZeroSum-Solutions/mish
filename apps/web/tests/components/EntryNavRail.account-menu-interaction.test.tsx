@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
-import type { WorkspaceCollabContext } from '@mish/contracts';
+import { MISH_GITHUB_REPO_URL, type WorkspaceCollabContext } from '@mish/contracts';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EntryNavRail, resetWorkspaceDirectoryCache } from '../../src/components/EntryNavRail';
@@ -177,5 +177,22 @@ describe('EntryNavRail account menu interaction state', () => {
 
     expect(onOpenSettings).toHaveBeenCalledOnce();
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('sends help and feature requests to the public repository issue tracker', () => {
+    renderRail();
+    const trigger = screen.getByTestId('entry-nav-account');
+    fireEvent.mouseEnter(trigger);
+    fireEvent.click(trigger);
+
+    const links = screen
+      .getAllByRole('menuitem')
+      .map((item) => item.getAttribute('href'))
+      .filter((href): href is string => !!href && href.includes('/issues/new'));
+    expect(links).toHaveLength(2);
+    for (const href of links) {
+      expect(href.startsWith(`${MISH_GITHUB_REPO_URL}/issues/new`)).toBe(true);
+    }
+    expect(MISH_GITHUB_REPO_URL).toBe('https://github.com/ZeroSum-Solutions/mish');
   });
 });

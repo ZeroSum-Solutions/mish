@@ -158,10 +158,25 @@ describe('marketplaces', () => {
     expect(result.row.url).toBe(expectedUrl);
   });
 
+  it('reads the default registry from the public repository', () => {
+    expect(marketplaceManifestUrlForRegistry('official')).toBe(
+      'https://raw.githubusercontent.com/ZeroSum-Solutions/mish/main/plugins/registry/official/mish-marketplace.json',
+    );
+  });
+
   it('normalizes legacy branch raw urls to the canonical raw registry', () => {
     expect(resolveMarketplaceFetchUrl(
       'https://raw.githubusercontent.com/ZeroSum-Solutions/mish/garnet-hemisphere/plugins/registry/community/mish-marketplace.json',
     )).toBe(marketplaceManifestUrlForRegistry('community'));
+  });
+
+  it('migrates registry urls saved against the former private catalog repository', () => {
+    // Older installs stored raw registry URLs on the private working
+    // repository, which public users cannot read. They must resolve to the
+    // public registry instead of 404ing on every refresh.
+    expect(resolveMarketplaceFetchUrl(
+      'https://raw.githubusercontent.com/ZeroSum-Solutions/Mishh-Mashh-2/main/plugins/registry/official/mish-marketplace.json',
+    )).toBe(marketplaceManifestUrlForRegistry('official'));
   });
 
   it('requires a raw mish-marketplace.json document, not a GitHub tree page', async () => {

@@ -1,6 +1,6 @@
 // `until` expression evaluator (spec §10.1 / §10.2). Closed vocabulary;
-// not arbitrary JS. The grammar is a comma-/`||`-separated disjunction of
-// AND-joined comparisons over four known signal variables:
+// not arbitrary JS. The grammar is a `||`-separated disjunction of
+// AND-joined comparisons (parentheses group) over known signal variables:
 //
 //   critique.score         number  — last critique-theater dim score (0..5)
 //   iterations             number  — completed devloop iterations on this stage
@@ -8,6 +8,7 @@
 //   preview.ok             boolean — last `live-artifact` preview load result
 //
 // Comparison operators: == != >= <= > < (booleans support ==/!= only).
+// A bare boolean signal is shorthand for `<signal> == true`.
 // Boolean literals: true / false. Number literals: any JSON number.
 //
 // The evaluator is intentionally tiny so `od plugin doctor` can syntax-check
@@ -64,23 +65,41 @@ export function parseUntil(source: string): UntilExpression {
   if (trimmed.length === 0) {
     throw new UntilSyntaxError('empty until expression');
   }
-  const ors = splitTopLevel(trimmed, '||');
-  const any: UntilComparison[][] = [];
-  for (const orTerm of ors) {
-    const ands = splitTopLevel(orTerm, '&&');
-    const inner: UntilComparison[] = [];
-    for (const andTerm of ands) {
-      inner.push(parseComparison(andTerm.trim()));
-    }
-    if (inner.length === 0) {
-      throw new UntilSyntaxError(`empty conjunction in "${source}"`);
-    }
-    any.push(inner);
-  }
+  const any = parseDisjunction(trimmed, source);
   if (any.length === 0) {
     throw new UntilSyntaxError(`no terms in "${source}"`);
   }
   return { any };
+}
+
+// Parses `a || b` / `a && b` with parenthesized groups into disjunctive
+// normal form: a group nested in a conjunction is distributed over it, so
+// `(build.passing && tests.passing) || iterations>=8` stays one flat list
+// of conjunctions for the evaluator.
+function parseDisjunction(input: string, source: string): UntilComparison[][] {
+  const any: UntilComparison[][] = [];
+  for (const orTerm of splitTopLevel(input, '||')) {
+    let conjunctions: UntilComparison[][] = [[]];
+    const ands = splitTopLevel(orTerm, '&&');
+    if (ands.length === 0) {
+      throw new UntilSyntaxError(`empty conjunction in "${source}"`);
+    }
+    for (const andTerm of ands) {
+      const inner = stripOuterParens(andTerm.trim()).trim();
+      const grouped = inner !== andTerm.trim()
+        && (splitTopLevel(inner, '||').length > 1 || splitTopLevel(inner, '&&').length > 1);
+      const alternatives = grouped
+        ? parseDisjunction(inner, source)
+        : [[parseComparison(andTerm.trim())]];
+      const next: UntilComparison[][] = [];
+      for (const prefix of conjunctions) {
+        for (const alternative of alternatives) next.push([...prefix, ...alternative]);
+      }
+      conjunctions = next;
+    }
+    any.push(...conjunctions);
+  }
+  return any;
 }
 
 function splitTopLevel(input: string, sep: '||' | '&&'): string[] {
@@ -104,6 +123,10 @@ function splitTopLevel(input: string, sep: '||' | '&&'): string[] {
 function parseComparison(raw: string): UntilComparison {
   const expression = stripOuterParens(raw).trim();
   const opMatch = expression.match(/(==|!=|>=|<=|>|<)/);
+  // A bare boolean signal (`build.passing`) is shorthand for `== true`.
+  if (!opMatch && SIGNAL_KINDS[expression as keyof UntilSignals] === 'boolean') {
+    return { signal: expression as keyof UntilSignals, op: '==', value: true };
+  }
   if (!opMatch || opMatch.index === undefined) {
     throw new UntilSyntaxError(`expected comparison operator in "${raw}"`);
   }

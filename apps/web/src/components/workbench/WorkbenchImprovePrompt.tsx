@@ -63,6 +63,7 @@ export function WorkbenchImprovePrompt({ projectId, draft, workspaceContext, sel
   const [edits, setEdits] = useState<Partial<Record<DesignBriefEditablePath, string>>>({});
   const started = useRef(false);
   const alive = useRef(true);
+  const dismissed = useRef(false);
   const previewWorkspaceKey = workspaceAccountScopedCacheKey(workspaceContext);
   const previewWorkspaceRef = useRef(workspaceContext);
   previewWorkspaceRef.current = workspaceContext;
@@ -112,7 +113,11 @@ export function WorkbenchImprovePrompt({ projectId, draft, workspaceContext, sel
     (async () => {
       try {
         let next = await createDesignBrief({ projectId, originalText: draft, ...(selectedReferenceRefs?.length ? { selectedReferenceRefs } : {}) }, workspaceContext);
-        if (!alive.current) return;
+        if (!alive.current || dismissed.current) {
+          // Closed before the daemon answered: cancel() had no id to cancel, so the model turn would run on unseen.
+          if (next.status === 'pending') await cancelDesignBrief(projectId, next.id, workspaceContext).catch(() => undefined);
+          return;
+        }
         setRecord(next);
         while (next.status === 'pending' && alive.current) {
           await new Promise(resolve => setTimeout(resolve, pollMs));
@@ -178,6 +183,7 @@ export function WorkbenchImprovePrompt({ projectId, draft, workspaceContext, sel
     if (accepted && accepted.state === 'accepted') onUse?.({ id: accepted.id, revision: accepted.revision, hash: accepted.hash });
   }
   async function cancel() {
+    dismissed.current = true;
     previewController.current?.abort();
     if (projectId && record?.status === 'pending') await cancelDesignBrief(projectId, record.id, workspaceContext).catch(() => undefined);
     onClose();

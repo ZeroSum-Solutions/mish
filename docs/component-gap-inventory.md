@@ -2,6 +2,8 @@
 
 Snapshot: 2026-10-08. Baseline: `f65f2117dc930aaeb22137a606ac1522c06717a6` on `codex/t5-component-harvest`.
 
+> Public repository note: the licensed Cult UI Pro material counted below (the Cult rows and the six licensed GenUI ports) is not part of this repository. Here `packages/cult-ui-catalog/catalog.json` has no rows and `packages/genui-catalog/catalog.json` has 71 entries, none of them licensed.
+
 Public discovery: [React Bits names index](https://reactbits.dev/get-started/index) and [21st community index](https://21st.dev/community/components). The React Bits index exposes 181 unique entries in the four requested categories. Its homepage advertises a larger total; this inventory covers the visible four-category index, excluding separate micro-interaction products. The 21st sample contains 101 unique listings across its featured, newest, popular, and category sections. It is a public-index sample, not a claim to enumerate the entire community. Names and URLs are retained in `packages/genui-catalog/data/harvest-index-snapshot.json`.
 
 The React Bits homepage fetch included an incidental usage example. No implementation source or individual component documentation was opened or used. Subsequent discovery extracted index anchors only. Every behavior summary below is authored from the index name, or comes from existing local catalog metadata; descriptions are not upstream implementation specifications.
