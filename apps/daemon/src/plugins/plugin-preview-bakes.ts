@@ -17,11 +17,6 @@ import path from 'node:path';
 
 export const PLUGIN_PREVIEWS_ROUTE = '/api/plugin-previews';
 
-// Public R2 (Cloudflare CDN) origin the baked clips are published to. Used as
-// the default so the packaged desktop app and the web deployment both serve
-// previews with zero configuration; OD_PLUGIN_PREVIEWS_BASE_URL overrides it.
-const DEFAULT_PUBLIC_BASE = 'https://repo-assets.mish.invalid/plugin-previews';
-
 interface BakeEntry {
   video: string;
   poster: string;
@@ -89,13 +84,14 @@ export function bakedPreviewBlock(id: string, dir: string): BakedPreviewBlock | 
   //   1. an explicit OD_PLUGIN_PREVIEWS_BASE_URL override;
   //   2. the daemon's own /api/plugin-previews route when the clips are on disk
   //      (local dev / a freshly-baked dir);
-  //   3. the public R2 origin — the default for the packaged desktop app and the
-  //      web deployment, so neither needs any config: the checked-in manifest
-  //      names the clips and they're served from R2's CDN.
+  //   3. otherwise null: the card keeps the live preview.
   const envBase = process.env.OD_PLUGIN_PREVIEWS_BASE_URL?.replace(/\/+$/, '');
   const onDisk =
     existsSync(path.join(dir, entry.video)) && existsSync(path.join(dir, entry.poster));
-  const base = envBase || (onDisk ? PLUGIN_PREVIEWS_ROUTE : DEFAULT_PUBLIC_BASE);
+  // No override and no clips on disk: the default public origin is a placeholder
+  // that does not resolve, so fall back to the live preview instead.
+  if (!envBase && !onDisk) return null;
+  const base = envBase || PLUGIN_PREVIEWS_ROUTE;
   return {
     poster: `${base}/${entry.poster}`,
     video: `${base}/${entry.video}`,

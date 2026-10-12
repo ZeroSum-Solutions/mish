@@ -11,7 +11,7 @@
 //   - awesome-agent-skills   → VoltAgent/awesome-agent-skills
 //   - clawhub                → openclaw/clawhub
 //   - skills-sh              → skills.sh discovery hint
-//   - mish            → ZeroSum-Solutions/Mishh-Mashh-2
+//   - mish            → ZeroSum-Solutions/mish
 //                              (plugins/community/<plugin-name>/), the private
 //                              Mishh Mashh repository. See docs/plugins/PLAYBOOK.md.
 //

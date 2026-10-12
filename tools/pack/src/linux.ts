@@ -547,7 +547,7 @@ async function writeAssembledApp(
     author: "ZeroSum Solutions",
     repository: {
       type: "git",
-      url: "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git"
+      url: "https://github.com/ZeroSum-Solutions/mish.git"
     }
   };
   await writeFile(paths.assembledPackageJsonPath, `${JSON.stringify(packageJson, null, 2)}\n`, "utf8");

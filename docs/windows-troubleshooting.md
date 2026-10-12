@@ -37,7 +37,7 @@ If you downloaded the installer from an official source, you can proceed:
 
 Only run the installer if you got it from an official source:
 
-- [GitHub Releases](https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/releases) on this repository.
+- [GitHub Releases](https://github.com/ZeroSum-Solutions/mish/releases) on this repository.
 
 Do not run an installer from a mirror, a re-upload, or a link you cannot trace back to one of those two sources. If a release publishes a SHA-256 checksum, you can confirm the file is intact before running it:
 

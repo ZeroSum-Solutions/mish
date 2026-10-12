@@ -16,8 +16,8 @@ If you only have ten seconds, the picture is:
 
 ```bash
 # 1. Fork & clone
-git clone git@github.com:<your-username>/Mishh-Mashh-2.git
-cd Mishh-Mashh-2
+git clone git@github.com:<your-username>/mish.git
+cd mish
 git checkout -b template/<your-template-name>
 
 # 2. Bootstrap (Node 24, pnpm 10.33.x)

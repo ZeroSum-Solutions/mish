@@ -104,7 +104,7 @@ import {
 } from '../analytics/workspace';
 import { workspaceChromeAccountActionsHost } from './workspaceChromeActions';
 
-const REPO_URL = 'https://github.com/ZeroSum-Solutions/Mishh-Mashh-2';
+const REPO_URL = 'https://github.com/ZeroSum-Solutions/mish';
 const GITHUB_HELP_URL = `${REPO_URL}/issues/new`;
 const GITHUB_FEATURE_URL = `${REPO_URL}/issues/new?labels=enhancement`;
 const CONTACT_EMAIL_URL = 'mailto:devin@zerosumsolutions.com';

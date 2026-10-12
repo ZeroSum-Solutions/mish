@@ -254,7 +254,7 @@ Two more real CLI paths matter for the "publish to our own repo" question:
 - `od plugin publish-repo <folder>` creates or updates a public GitHub repo named by the
   plugin's manifest — a standalone-repo publish, independent of any registry.
 - `od plugin mish-pr <folder>` copies the plugin into
-  `plugins/community/<name>/` on a new branch of `ZeroSum-Solutions/Mishh-Mashh-2` and
+  `plugins/community/<name>/` on a new branch of `ZeroSum-Solutions/mish` and
   opens a PR there. It does not fork: contributors push the branch directly to the
   private org repository. `od plugin publish --to mish` and `od plugin yank` open
   issues on the same repository. All three read `MISHH_MASHH_PLUGIN_REPO` in
@@ -263,7 +263,7 @@ Two more real CLI paths matter for the "publish to our own repo" question:
 ### 3.2 What this means for ZeroSum
 
 We publish to one place only: our own private repo,
-`ZeroSum-Solutions/Mishh-Mashh-2`. There is no external registry, no `skills.sh`
+`ZeroSum-Solutions/mish`. There is no external registry, no `skills.sh`
 listing, no ClawHub submission, unless a future decision changes that.
 
 **Recommended ZeroSum flow**, built from verified primitives above:
@@ -298,7 +298,7 @@ listing, no ClawHub submission, unless a future decision changes that.
    `OD_MARKETPLACE_REPO_REF` and `OD_MARKETPLACE_REGISTRY_PATH` still override it.
    `OFFICIAL_PLUGIN_SOURCE_REPO` in `marketplace-seed.ts` and the `source` fields in
    `plugins/registry/official/mish-marketplace.json` use
-   `github:ZeroSum-Solutions/Mishh-Mashh-2@main`. The official registry is read from the
+   `github:ZeroSum-Solutions/mish@main`. The official registry is read from the
    local `plugins/registry/` folder, so the private repository needs no public access.
 
 ## 4. Checklist for a new Mishh Mashh plugin
@@ -361,7 +361,7 @@ listing, no ClawHub submission, unless a future decision changes that.
   synced, and its `--check` mode is what CI runs.
 - **`docs/FORK-PIN.md` names a different owner than the goal's target repo.** The
   recorded `origin` remote is `<private origin>`, not
-  `ZeroSum-Solutions/Mishh-Mashh-2`. Confirm the live remote before wiring publish
+  `ZeroSum-Solutions/mish`. Confirm the live remote before wiring publish
   automation to either name.
 - **A preview 404 fails the plugin even when the overall bake job is green.**
   `plugins/spec/AGENT-DEVELOPMENT.md`'s quality bar states this explicitly; it is easy

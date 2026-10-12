@@ -49,7 +49,7 @@
     "name": "Mishh Mashh",
     "url": "https://github.com/ZeroSum-Solutions"
   },
-  "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/x-research",
+  "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/x-research",
   "tags": [
     "example",
     "first-party",
@@ -80,10 +80,6 @@
     "mode": "prototype",
     "scenario": "design",
     "surface": "web",
-    "preview": {
-      "type": "markdown",
-      "entry": "./example.html"
-    },
     "useCase": {
       "query": {
         "en": "X/Twitter public sentiment research for recent market, company, product, or community discourse. Use when the brief asks what people are saying on X, Twitter sentiment, CT sentiment, public opinion, expert posts, or social reaction around a stock, sector, company, product, or market event.",

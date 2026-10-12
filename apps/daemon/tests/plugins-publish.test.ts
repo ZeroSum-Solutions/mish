@@ -63,8 +63,8 @@ describe('buildPublishLink', () => {
     // Submissions land in the private Mishh Mashh repository
     // (plugins/community/<plugin-name>/), not in the upstream project.
     const link = buildPublishLink({ catalog: 'mish', meta: META });
-    expect(link.catalogLabel).toBe('ZeroSum-Solutions/Mishh-Mashh-2');
-    expect(link.url).toMatch(/^https:\/\/github\.com\/ZeroSum-Solutions\/Mishh-Mashh-2\/issues\/new\?/);
+    expect(link.catalogLabel).toBe('ZeroSum-Solutions/mish');
+    expect(link.url).toMatch(/^https:\/\/github\.com\/ZeroSum-Solutions\/mish\/issues\/new\?/);
     expect(link.prBody).toContain('plugins/community/<plugin-name>/mish.json');
     expect(link.prBody).toContain('plugins/registry/community/mish-marketplace.json');
   });

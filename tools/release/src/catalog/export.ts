@@ -30,8 +30,8 @@ import {
 } from "./schema.ts";
 import { loadCatalogSystemTokens } from "./system-tokens.ts";
 
-const REPO_TREE = "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main";
-const REPO_BLOB = "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/blob/main";
+const REPO_TREE = "https://github.com/ZeroSum-Solutions/mish/tree/main";
+const REPO_BLOB = "https://github.com/ZeroSum-Solutions/mish/blob/main";
 const PLUGIN_PREVIEWS_BASE_URL = "https://repo-assets.mish.invalid/plugin-previews";
 
 const OFFICIAL_BUCKETS = [

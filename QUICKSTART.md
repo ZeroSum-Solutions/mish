@@ -41,8 +41,8 @@ machine: keys come from the environment or from Settings.
 ### 1. Clone and install
 
 ```bash
-git clone --filter=blob:none https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git
-cd Mishh-Mashh-2
+git clone --filter=blob:none https://github.com/ZeroSum-Solutions/mish.git
+cd mish
 sh scripts/team-setup.sh     # checks prerequisites, installs, builds, starts the web app
 ```
 
@@ -236,10 +236,11 @@ docker compose restart
 docker compose down
 ```
 
-### Pull the latest image
+### Rebuild after pulling new code
 
 ```bash
-docker compose pull
+git pull
+docker compose build
 docker compose up -d
 ```
 
@@ -271,8 +272,8 @@ MISH_MEM_LIMIT=384m
 # Allowed CORS origins
 MISH_ALLOWED_ORIGINS=https://yourdomain.com
 
-# Docker image tag (this fork's private image; run `docker login ghcr.io` first)
-MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest
+# Image name; `docker compose build` produces this tag locally
+MISH_IMAGE=ghcr.io/zerosum-solutions/mish:latest
 
 # Required API token for daemon security
 # Generate one with: openssl rand -hex 32
