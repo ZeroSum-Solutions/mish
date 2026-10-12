@@ -904,6 +904,11 @@ export async function resolveProjectFilePath(projectsRoot, projectId, name, meta
   };
 }
 
+// The mode a plain writeFile would have produced for a new file.
+function defaultFileMode() {
+  return 0o666 & ~process.umask();
+}
+
 // Write through a sibling temp file so readers and watchers never see a
 // truncated file. overwrite:false links the temp file into place, which fails
 // with EEXIST atomically instead of racing a prior stat().
@@ -913,7 +918,9 @@ async function commitProjectFile(target, body, overwrite) {
     `.${path.basename(target)}.${process.pid}.${Math.random().toString(36).slice(2, 10)}.tmp`,
   );
   try {
-    await writeFile(tmp, body);
+    // Create the temp file private so new contents never sit in a wider-mode
+    // sibling; the final mode is set below before it becomes visible.
+    await writeFile(tmp, body, { mode: 0o600 });
     if (overwrite) {
       // rename() replaces the target inode, so carry over the existing file's
       // permission bits (an executable stays executable, a 0600 file stays
@@ -922,10 +929,11 @@ async function commitProjectFile(target, body, overwrite) {
         if (err && err.code === 'ENOENT') return null;
         throw err;
       });
-      if (existing) await chmod(tmp, existing.mode & 0o7777);
+      await chmod(tmp, existing ? existing.mode & 0o7777 : defaultFileMode());
       await rename(tmp, target);
       return;
     }
+    await chmod(tmp, defaultFileMode());
     try {
       await link(tmp, target);
     } catch (err) {

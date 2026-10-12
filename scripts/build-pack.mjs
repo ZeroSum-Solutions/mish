@@ -262,9 +262,11 @@ const handlers = {
     } catch {
       return fail('esbuild is not installed; run pnpm install in this repository');
     }
+    if (await ctx.uncontained(entry, resource.entry)) return;
     const out = await mkdtemp(path.join(tmpdir(), 'mish-pack-bundle-'));
     ctx.cleanup.push(() => rm(out, { recursive: true, force: true }));
-    await esbuild.build({
+    const built = await esbuild.build({
+      metafile: true,
       entryPoints: { index: entry },
       outdir: out,
       bundle: true,
@@ -277,6 +279,12 @@ const handlers = {
       logLevel: 'silent',
       absWorkingDir: ctx.source,
     });
+    // Every file esbuild read must also live inside the source checkout, so a
+    // symlinked import cannot pull outside files into the bundle.
+    for (const input of Object.keys(built.metafile.inputs)) {
+      if (input.startsWith('<') || input.includes(':')) continue;
+      if (await ctx.uncontained(path.resolve(ctx.source, input), input)) return;
+    }
     const folder = path.posix.dirname(resource.to);
     const realOut = await realpath(out);
     await planPath(ctx.plan, realOut, realOut, folder, resource.provides);
