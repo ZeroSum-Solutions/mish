@@ -1051,6 +1051,19 @@ describe('collab-cloud client', () => {
     expect((calls[0]!.body as any).comment.id).toBe('c1');
   });
 
+  it('keeps a path prefix on the configured base url', async () => {
+    const urls: string[] = [];
+    const client = createCollabCloudClient({
+      config: { baseUrl: 'https://host/collab/v1/', token: 'secret' },
+      fetch: (async (input: any) => {
+        urls.push(String(input));
+        return jsonResponse(200, { ok: true, seq: 1 });
+      }) as unknown as typeof fetch,
+    });
+    await client.pushComment('team-1', 'p1', cloudComment('c1'));
+    expect(urls[0]).toBe('https://host/collab/v1/teams/team-1/projects/p1/comments');
+  });
+
   it('sends If-None-Match and treats a 304 as "not modified"', async () => {
     let seenIfNoneMatch: string | null = null;
     const client = createCollabCloudClient({
