@@ -21,10 +21,13 @@ export function localizePluginDescription(locale: string, record: InstalledPlugi
 export function brandOfficialPluginText(value: string): string {
   return value
     .replace(/\bZeroSum-Solutions\/mish\b/gi, 'Mishh Mashh')
-    .replace(/\b(?:www\.)?mish\.ai\b/gi, 'Mishh Mashh')
+    .replace(/\b(?:www\.)?mish\.(?:ai|invalid)\b/gi, 'Mishh Mashh')
     .replace(/@?(?:MishHQ|Mish-ai)\b/gi, 'Mishh Mashh')
     .replace(/\ban\s+Open(?:\s+Claude)?[\s-]*Design\b/gi, 'a Mishh Mashh')
-    .replace(/\bOpen(?:\s+Claude)?[\s-]*Design\b/gi, 'Mishh Mashh');
+    .replace(/\bOpen(?:\s+Claude)?[\s-]*Design\b/gi, 'Mishh Mashh')
+    // The upstream name was renamed to the bare "Mish" in official copy.
+    .replace(/\ban\s+Mish\b(?![\w-])/g, 'a Mishh Mashh')
+    .replace(/\bMish\b(?![\w-])/g, 'Mishh Mashh');
 }
 
 export function localizedText(value: unknown): LocalizedText | undefined {

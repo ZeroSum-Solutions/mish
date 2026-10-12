@@ -317,7 +317,7 @@ describe('AmrLoginPill', () => {
     const fetchMock = vi.fn(async (input: string | URL | Request) => {
       const url = typeof input === 'string' ? input : input.toString();
       if (url === '/api/attribution/bridge-url') {
-        return jsonResponse({ body: { url: 'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?od_bridge=odbr_12345678' } });
+        return jsonResponse({ body: { url: 'https://mish.invalid/amr/dashboard?od_bridge=odbr_12345678' } });
       }
       if (url === '/api/system/open-external') return jsonResponse({ body: { ok: true } });
       return new Response('{}', { status: 202 });
@@ -330,7 +330,10 @@ describe('AmrLoginPill', () => {
           initialStatus={{
             loggedIn: true,
             loginInFlight: false,
-            profile: 'prod',
+            // The prod console URL is not a first-party host after the rebrand,
+            // so exercise the bridge through a first-party feature-test origin.
+            profile: 'feature-test',
+            consoleOrigin: 'https://staging.mish.invalid',
             configPath: '/x',
             user: { id: 'u', email: 'leaf@example.com', plan: 'free' },
           }}
@@ -366,7 +369,7 @@ describe('AmrLoginPill', () => {
       '/api/system/open-external',
       expect.objectContaining({
         method: 'POST',
-        body: JSON.stringify({ url: 'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?od_bridge=odbr_12345678' }),
+        body: JSON.stringify({ url: 'https://mish.invalid/amr/dashboard?od_bridge=odbr_12345678' }),
       }),
     );
   });

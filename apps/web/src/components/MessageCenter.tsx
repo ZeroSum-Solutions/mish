@@ -384,7 +384,7 @@ function safeExternalUrl(value: string | null): string | null {
     const host = parsed.hostname.toLowerCase();
     const path = parsed.pathname.toLowerCase();
     if (host === 'mish.invalid' || host.endsWith('.mish.invalid')) return null;
-    if (host === 'github.com' && path.startsWith('/ZeroSum-Solutions/mish')) return null;
+    if (host === 'github.com' && path.startsWith('/zerosum-solutions/mish')) return null;
     if ((host === 'x.com' || host === 'twitter.com') && path.startsWith('/mishhq')) return null;
     return parsed.toString();
   } catch {

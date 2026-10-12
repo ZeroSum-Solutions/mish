@@ -150,21 +150,48 @@ export async function readWorkspaceScopedTeamResourceFile(
  * failure is a revocation verdict, never permission to commit downloaded
  * bytes.
  */
-export async function materializeWorkspaceScopedTeamResource(input: {
+type MaterializeWorkspaceScopedTeamResourceInput = {
   kindRoot: string;
   identity: Omit<TeamResourceMaterializationIdentity, 'sourceKey'>;
   storageName?: string;
   pullInto: (stagedDir: string) => Promise<void>;
   verifyWorkspaceScope: () => Promise<boolean>;
   verifyStillShared: () => Promise<boolean>;
-}): Promise<TeamResourceMaterializationResult> {
-  const sourceKey = teamResourceSourceKey(input.identity);
+};
+
+// Two refreshes can pull the same resource at once. Their move-aside and
+// commit renames would interleave, and the loser fails with ENOTEMPTY, so
+// commits to one target directory run one at a time.
+const materializationQueues = new Map<string, Promise<unknown>>();
+
+export async function materializeWorkspaceScopedTeamResource(
+  input: MaterializeWorkspaceScopedTeamResourceInput,
+): Promise<TeamResourceMaterializationResult> {
   const targetDir = teamResourceMaterializationDir(
     input.kindRoot,
     input.identity.workspaceId,
     input.identity.resourceId,
     input.storageName,
   );
+  const previous = materializationQueues.get(targetDir) ?? Promise.resolve();
+  const run = previous
+    .catch(() => undefined)
+    .then(() => materializeWorkspaceScopedTeamResourceNow(input, targetDir));
+  materializationQueues.set(targetDir, run);
+  try {
+    return await run;
+  } finally {
+    if (materializationQueues.get(targetDir) === run) {
+      materializationQueues.delete(targetDir);
+    }
+  }
+}
+
+async function materializeWorkspaceScopedTeamResourceNow(
+  input: MaterializeWorkspaceScopedTeamResourceInput,
+  targetDir: string,
+): Promise<TeamResourceMaterializationResult> {
+  const sourceKey = teamResourceSourceKey(input.identity);
   const workspaceRoot = path.dirname(targetDir);
   await fs.mkdir(workspaceRoot, { recursive: true });
   const stagedDir = await fs.mkdtemp(

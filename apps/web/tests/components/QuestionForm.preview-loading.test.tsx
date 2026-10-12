@@ -39,7 +39,7 @@ describe('visual-direction preview loading', () => {
 
     for (const image of images) {
       expect(image.getAttribute('src')).toMatch(
-        /^https:\/\/repo-assets\.mish\.ai\/cdn-cgi\/image\/width=640,quality=75,format=auto\/style-catalog\/v1\/deck-.*-v1\.webp$/,
+        /^https:\/\/repo-assets\.mish\.invalid\/cdn-cgi\/image\/width=640,quality=75,format=auto\/style-catalog\/v1\/deck-.*-v1\.webp$/,
       );
       expect(image.getAttribute('loading')).toBe('eager');
       expect(image.getAttribute('decoding')).toBe('async');
