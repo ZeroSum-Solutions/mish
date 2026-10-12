@@ -2,10 +2,10 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import test from 'node:test';
 import { atomKindsFor, clipToLimits, editableTemplate, fromModelShape, getAtPath, isObject, limitsFor, mergeAtPath, mergeIntoSpine, nullablePathsOf, softLimits, toModelShape, unchangedTextPaths, unitsOf, type Json, type JsonObject, type MergeReport } from '../src/spine.ts';
-import { MABEN_DIR, WATSON_DIR, WRENFIELD_DIR, readJson } from './fixtures.ts';
+import { TEST_SITE_DIR, TEST_EDITORIAL_DIR, TEST_CONTRACTOR_DIR, readJson } from './fixtures.ts';
 
-const spine = await readJson(path.join(MABEN_DIR, 'families/maben/recipe.json'));
-const schema = await readJson(path.join(MABEN_DIR, 'compiler/scripts/families/maben/recipe.schema.json'));
+const spine = await readJson(path.join(TEST_SITE_DIR, 'families/ownedsite/recipe.json'));
+const schema = await readJson(path.join(TEST_SITE_DIR, 'compiler/scripts/families/ownedsite/recipe.schema.json'));
 
 function keysIn(value: Json, found = new Set<string>()): Set<string> {
   if (Array.isArray(value)) value.forEach((item) => keysIn(item, found));
@@ -21,7 +21,7 @@ test('editableTemplate keeps text and ids and drops every locked subtree', () =>
   assert.deepEqual(Object.keys(template.brand as JsonObject), ['name', 'descriptor']);
   const keys = keysIn(template);
   for (const locked of ['assets', 'destinations', 'type', 'wordmark', 'revision', 'family', 'schemaVersion']) assert.equal(keys.has(locked), false, locked);
-  assert.equal(getAtPath(template, ['sections', 2, 'id']), 'maben-hero');
+  assert.equal(getAtPath(template, ['sections', 2, 'id']), 'ownedsite-hero');
   assert.equal(typeof getAtPath(template, ['sections', 2, 'text', 'statement']), 'string');
   assert.equal((getAtPath(template, ['sections', 3, 'items', 'steps']) as Json[]).length, 3);
 });
@@ -99,7 +99,7 @@ test('mergeIntoSpine takes text only and keeps locked values', () => {
   const merge = report();
   const merged = mergeIntoSpine(spine, candidate, merge) as JsonObject;
   assert.equal(getAtPath(merged, ['sections', 2, 'text', 'statement']), 'New statement');
-  assert.equal(getAtPath(merged, ['sections', 2, 'id']), 'maben-hero');
+  assert.equal(getAtPath(merged, ['sections', 2, 'id']), 'ownedsite-hero');
   assert.equal(getAtPath(merged, ['sections', 2, 'assets', 'media']), getAtPath(spine, ['sections', 2, 'assets', 'media']));
   assert.equal(merged.revision, spine.revision);
   assert.equal(merge.applied, 1);
@@ -114,7 +114,7 @@ test('mergeIntoSpine treats a section whose id was altered as dropped: spine id 
   (hero.text as JsonObject).statement = 'New statement';
   const merge = report();
   const merged = mergeIntoSpine(spine, candidate, merge) as JsonObject;
-  assert.equal(getAtPath(merged, ['sections', 2, 'id']), 'maben-hero');
+  assert.equal(getAtPath(merged, ['sections', 2, 'id']), 'ownedsite-hero');
   assert.equal(getAtPath(merged, ['sections', 2, 'text', 'statement']), getAtPath(spine, ['sections', 2, 'text', 'statement']));
   assert.ok(merge.missing.includes('sections[2].text.statement'));
   assert.equal(merge.applied, 0);
@@ -123,7 +123,7 @@ test('mergeIntoSpine treats a section whose id was altered as dropped: spine id 
 test('mergeIntoSpine reports a dropped anchored section as missing instead of filling it by position', () => {
   const candidate = structuredClone(editableTemplate(spine)) as JsonObject;
   const sections = candidate.sections as JsonObject[];
-  const shifted = sections.filter((section) => section.id !== 'maben-hero');
+  const shifted = sections.filter((section) => section.id !== 'ownedsite-hero');
   for (const section of shifted) if (isObject(section.text)) for (const key of Object.keys(section.text)) (section.text as JsonObject)[key] = `${section.id} ${key}`;
   candidate.sections = shifted;
   const merge = report();
@@ -131,17 +131,17 @@ test('mergeIntoSpine reports a dropped anchored section as missing instead of fi
   assert.equal(getAtPath(merged, ['sections', 2, 'text', 'eyebrow']), getAtPath(spine, ['sections', 2, 'text', 'eyebrow']), 'the hero keeps the spine text');
   assert.ok(merge.missing.includes('sections[2].text.eyebrow'));
   assert.ok(merge.missing.every((at) => at.startsWith('sections[2].')), 'only the dropped section is missing');
-  assert.equal(getAtPath(merged, ['sections', 3, 'text', 'eyebrow']), 'maben-how-we-work eyebrow', 'the section that moved into its position still lands on its own slot');
+  assert.equal(getAtPath(merged, ['sections', 3, 'text', 'eyebrow']), 'ownedsite-how-we-work eyebrow', 'the section that moved into its position still lands on its own slot');
 });
 
 test('mergeIntoSpine matches sections by id when the candidate order differs', () => {
   const candidate = structuredClone(editableTemplate(spine)) as JsonObject;
   const sections = (candidate.sections as JsonObject[]).reverse();
-  const hero = sections.find((section) => section.id === 'maben-hero')!;
+  const hero = sections.find((section) => section.id === 'ownedsite-hero')!;
   (hero.text as JsonObject).eyebrow = 'Reordered eyebrow';
   const merged = mergeIntoSpine(spine, candidate, report());
   assert.equal(getAtPath(merged, ['sections', 2, 'text', 'eyebrow']), 'Reordered eyebrow');
-  assert.equal(getAtPath(merged, ['sections', 0, 'id']), 'maben-site-rail');
+  assert.equal(getAtPath(merged, ['sections', 0, 'id']), 'ownedsite-site-rail');
 });
 
 test('mergeIntoSpine reports a missing or empty string and keeps the spine text', () => {
@@ -157,7 +157,7 @@ test('mergeIntoSpine reports a missing or empty string and keeps the spine text'
 
 test('mergeAtPath touches only the addressed unit', () => {
   const merge = report();
-  const merged = mergeAtPath(spine, ['sections', 2], { id: 'maben-hero', text: { statement: 'Only this' } }, merge) as JsonObject;
+  const merged = mergeAtPath(spine, ['sections', 2], { id: 'ownedsite-hero', text: { statement: 'Only this' } }, merge) as JsonObject;
   assert.equal(getAtPath(merged, ['sections', 2, 'text', 'statement']), 'Only this');
   assert.deepEqual((merged.sections as Json[])[3], (spine.sections as Json[])[3]);
   assert.deepEqual(merged.brand, spine.brand);
@@ -183,16 +183,16 @@ test('a locked path is hidden from the template and kept from the spine without 
 test('unitsOf yields the brand and one unit per section with limits attached', () => {
   const template = editableTemplate(spine)!;
   const units = unitsOf(template, limitsFor(schema, template));
-  assert.deepEqual(units.map((unit) => unit.label), ['brand', 'maben-site-rail', 'maben-overlay-menu', 'maben-hero', 'maben-how-we-work', 'maben-latest-projects', 'maben-editorial-grid', 'maben-site-footer']);
+  assert.deepEqual(units.map((unit) => unit.label), ['brand', 'ownedsite-site-rail', 'ownedsite-overlay-menu', 'ownedsite-hero', 'ownedsite-how-we-work', 'ownedsite-latest-projects', 'ownedsite-editorial-grid', 'ownedsite-site-footer']);
   assert.equal(getAtPath(units[3]!.limits, ['text', 'statement']), 400);
   assert.deepEqual(units[3]!.path, ['sections', 2]);
 });
 
-test('atomKindsFor names exactly the watson slots the schema marks nullable, with their kind', async () => {
-  const watson = await readJson(path.join(WATSON_DIR, 'families/watson/recipe.json'));
-  const watsonSchema = await readJson(path.join(WATSON_DIR, 'compiler/scripts/families/watson/recipe.schema.json'));
-  const template = editableTemplate(watson)!;
-  const kinds = atomKindsFor(watsonSchema, template);
+test('atomKindsFor names exactly the ownededitorial slots the schema marks nullable, with their kind', async () => {
+  const ownededitorial = await readJson(path.join(TEST_EDITORIAL_DIR, 'families/ownededitorial/recipe.json'));
+  const ownededitorialSchema = await readJson(path.join(TEST_EDITORIAL_DIR, 'compiler/scripts/families/ownededitorial/recipe.schema.json'));
+  const template = editableTemplate(ownededitorial)!;
+  const kinds = atomKindsFor(ownededitorialSchema, template);
   assert.deepEqual(getAtPath(kinds, ['sections', 4, 'content']), {
     awardCaption: 'plain', locations: 'address', campaigns: 'plain', businessEmail: 'email', jobsEmail: 'email',
     addressFirst: 'address', addressSecond: 'address', phone: 'phone',
@@ -205,11 +205,11 @@ test('atomKindsFor names exactly the watson slots the schema marks nullable, wit
   ]));
   assert.equal(getAtPath(kinds, ['sections', 4, 'content', 'network']), undefined, 'a copy slot is not nullable');
   assert.equal(getAtPath(kinds, ['brand', 'name']), undefined);
-  assert.equal(getAtPath(limitsFor(watsonSchema, template), ['sections', 4, 'content', 'phone']), 60, 'a nullable slot keeps its length limit');
+  assert.equal(getAtPath(limitsFor(ownededitorialSchema, template), ['sections', 4, 'content', 'phone']), 60, 'a nullable slot keeps its length limit');
 });
 
 test('atomKindsFor finds nothing in a family whose schema marks no slot nullable', () => {
-  // maben itself now marks a few footer atoms nullable (`x-atom`), so the schema is stripped of
+  // ownedsite itself now marks a few footer atoms nullable (`x-atom`), so the schema is stripped of
   // them here: what is under test is that no `x-atom` means no nullable slot.
   const withoutAtoms = JSON.parse(JSON.stringify(schema), (key, value: unknown) => (key === 'x-atom' ? undefined : value)) as JsonObject;
   assert.equal(atomKindsFor(withoutAtoms, editableTemplate(spine)!), undefined);
@@ -231,21 +231,21 @@ test('mergeIntoSpine takes null on a nullable path, reports it, and refuses it a
 });
 
 test('a slot the spine already holds null in stays visible to the model, with its limit and kind', async () => {
-  const watsonSchema = await readJson(path.join(WATSON_DIR, 'compiler/scripts/families/watson/recipe.schema.json'));
-  const template = editableTemplate(await nulledWatson('phone'))!;
+  const ownededitorialSchema = await readJson(path.join(TEST_EDITORIAL_DIR, 'compiler/scripts/families/ownededitorial/recipe.schema.json'));
+  const template = editableTemplate(await nulledTestEditorial('phone'))!;
   assert.equal(getAtPath(template, ['sections', 4, 'content', 'phone']), null, 'the slot is in the template, not dropped');
-  assert.equal(getAtPath(limitsFor(watsonSchema, template), ['sections', 4, 'content', 'phone']), 60);
-  assert.equal(getAtPath(atomKindsFor(watsonSchema, template), ['sections', 4, 'content', 'phone']), 'phone');
+  assert.equal(getAtPath(limitsFor(ownededitorialSchema, template), ['sections', 4, 'content', 'phone']), 60);
+  assert.equal(getAtPath(atomKindsFor(ownededitorialSchema, template), ['sections', 4, 'content', 'phone']), 'phone');
   assert.equal(getAtPath(toModelShape(template), ['sections', 4, 'content', 'phone']), null, 'reshaping keeps it');
   assert.equal(getAtPath(fromModelShape(toModelShape(template), template), ['sections', 4, 'content', 'phone']), null);
-  const units = unitsOf(template, limitsFor(watsonSchema, template));
-  assert.equal(units.at(-1)!.label, 'watson-footer');
+  const units = unitsOf(template, limitsFor(ownededitorialSchema, template));
+  assert.equal(units.at(-1)!.label, 'ownededitorial-footer');
   assert.equal(getAtPath(units.at(-1)!.limits, ['content', 'phone']), 60, 'the unit carries the limit for its nulled slot');
 });
 
-/** The watson reference recipe with the named footer atoms nulled, as an earlier run left it. */
-async function nulledWatson(...keys: string[]): Promise<JsonObject> {
-  const recipe = structuredClone(await readJson(path.join(WATSON_DIR, 'families/watson/recipe.json')));
+/** The ownededitorial reference recipe with the named footer atoms nulled, as an earlier run left it. */
+async function nulledTestEditorial(...keys: string[]): Promise<JsonObject> {
+  const recipe = structuredClone(await readJson(path.join(TEST_EDITORIAL_DIR, 'families/ownededitorial/recipe.json')));
   const content = (recipe.sections as JsonObject[])[4]!.content as JsonObject;
   for (const key of keys) content[key] = null;
   return recipe;
@@ -255,7 +255,7 @@ const footerUnit = (template: Json): JsonObject => structuredClone(getAtPath(tem
 const contentOf = (unit: JsonObject): JsonObject => unit.content as JsonObject;
 
 test('re-targeting a nulled recipe: a string candidate fills the slot back in and counts as applied', async () => {
-  const spineWithNull = await nulledWatson('phone');
+  const spineWithNull = await nulledTestEditorial('phone');
   const candidate = footerUnit(editableTemplate(spineWithNull)!);
   contentOf(candidate).phone = '+1 555 0100';
   const merge: MergeReport = { applied: 0, missing: [], nullablePaths: new Set(['sections[4].content.phone']), nulled: [] };
@@ -267,7 +267,7 @@ test('re-targeting a nulled recipe: a string candidate fills the slot back in an
 });
 
 test('re-targeting a nulled recipe: null keeps null without counting as a change, and a locked path is untouched', async () => {
-  const spineWithNull = await nulledWatson('phone', 'businessEmail');
+  const spineWithNull = await nulledTestEditorial('phone', 'businessEmail');
   const locked = new Set(['sections[4].content.businessEmail']);
   const template = editableTemplate(spineWithNull, undefined, locked)!;
   assert.equal(getAtPath(template, ['sections', 4, 'content', 'businessEmail']), undefined, 'a locked nulled slot is not shown to the model');
@@ -283,7 +283,7 @@ test('re-targeting a nulled recipe: null keeps null without counting as a change
 });
 
 test('re-targeting a nulled recipe: a candidate that is neither a string nor null is reported as missing', async () => {
-  const spineWithNull = await nulledWatson('phone');
+  const spineWithNull = await nulledTestEditorial('phone');
   const candidate = footerUnit(editableTemplate(spineWithNull)!);
   contentOf(candidate).phone = 42;
   const merge: MergeReport = { applied: 0, missing: [], nullablePaths: new Set(['sections[4].content.phone']), nulled: [] };
@@ -301,9 +301,9 @@ test('softLimits and clipToLimits leave a nulled slot alone', () => {
   assert.equal(getAtPath(softLimits({ text: { a: 60 } }), ['text', 'a']), 51, 'limits stay numeric for a nullable slot');
 });
 
-test('watson: brand colors and fonts are locked, content stays editable', async () => {
-  const watson = await readJson(path.join(WATSON_DIR, 'families/watson/recipe.json'));
-  const template = editableTemplate(watson);
+test('ownededitorial: brand colors and fonts are locked, content stays editable', async () => {
+  const ownededitorial = await readJson(path.join(TEST_EDITORIAL_DIR, 'families/ownededitorial/recipe.json'));
+  const template = editableTemplate(ownededitorial);
   assert.ok(isObject(template));
   assert.deepEqual(Object.keys(template.brand as JsonObject), ['name']);
   assert.equal(typeof getAtPath(template, ['sections', 2, 'content', 'city']), 'string');
@@ -311,7 +311,7 @@ test('watson: brand colors and fonts are locked, content stays editable', async 
 });
 
 test('brand.wordmark (an image reference) is locked and untouched on merge, even by key name alone', () => {
-  assert.ok(isObject(getAtPath(spine, ['brand', 'wordmark'])), 'fixture sanity: maben brand carries an image wordmark');
+  assert.ok(isObject(getAtPath(spine, ['brand', 'wordmark'])), 'fixture sanity: ownedsite brand carries an image wordmark');
   const template = editableTemplate(spine) as JsonObject;
   assert.equal(getAtPath(template, ['brand', 'wordmark']), undefined);
   const candidate = structuredClone(template) as JsonObject;
@@ -321,15 +321,15 @@ test('brand.wordmark (an image reference) is locked and untouched on merge, even
 });
 
 test('a section content.wordmark string is editable and merges back, unlike brand.wordmark', async () => {
-  const wrenfield = await readJson(path.join(WRENFIELD_DIR, 'families/wrenfield/recipe.json'));
-  const wrenfieldSections = wrenfield.sections as JsonObject[];
-  const footer = wrenfieldSections.findIndex((section) => isObject(section.content) && typeof (section.content as JsonObject).wordmark === 'string');
-  assert.ok(footer >= 0, 'fixture sanity: the wrenfield footer carries a text wordmark, not an asset');
-  const template = editableTemplate(wrenfield) as JsonObject;
-  assert.equal(getAtPath(template, ['sections', footer, 'content', 'wordmark']), 'Wrenfield Remodeling');
+  const ownedcontractor = {sections: [{content: {wordmark: 'Fixture Workshop'}}]};
+  const ownedcontractorSections = ownedcontractor.sections as JsonObject[];
+  const footer = ownedcontractorSections.findIndex((section) => isObject(section.content) && typeof (section.content as JsonObject).wordmark === 'string');
+  assert.ok(footer >= 0, 'fixture sanity: the ownedcontractor footer carries a text wordmark, not an asset');
+  const template = editableTemplate(ownedcontractor) as JsonObject;
+  assert.equal(getAtPath(template, ['sections', footer, 'content', 'wordmark']), 'Fixture Workshop');
   const candidate = structuredClone(template) as JsonObject;
   ((candidate.sections as JsonObject[])[footer]!.content as JsonObject).wordmark = 'New Wordmark Co';
-  const merged = mergeIntoSpine(wrenfield, candidate, report());
+  const merged = mergeIntoSpine(ownedcontractor, candidate, report());
   assert.equal(getAtPath(merged, ['sections', footer, 'content', 'wordmark']), 'New Wordmark Co');
 });
 

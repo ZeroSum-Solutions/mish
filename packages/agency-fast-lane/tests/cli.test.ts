@@ -7,12 +7,13 @@
  * sentinel test below); every other test replaces them outright.
  */
 
+import { TEST_SITE_DIR } from './fixtures.ts';
 import assert from 'node:assert/strict';
 import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { main, type CliDeps } from '../src/cli.ts';
+import { main as cliMain, type CliDeps } from '../src/cli.ts';
 import { createJevChecker, type FaithfulnessChecker, type FaithfulnessSlot } from '../src/jev.ts';
 import type { RouteDecision } from '../src/route.ts';
 import type { JsonObject } from '../src/spine.ts';
@@ -86,7 +87,7 @@ function baseDeps(overrides: Partial<CliDeps> = {}): { deps: Partial<CliDeps>; d
   };
 }
 
-/** A minimal, valid `decision: 'routed'` `RouteDecision` — routes to the real bundled `maben`
+/** A minimal, valid `decision: 'routed'` `RouteDecision` — routes to the retained public `practice`
  * family, so a test that lets the build continue past routing loads a real package. */
 const fakeRoutedDecision: RouteDecision = {
   decision: 'routed',
@@ -94,7 +95,7 @@ const fakeRoutedDecision: RouteDecision = {
   spines: [{ code: 'TL', probability: 0.9 }],
   archetype: { id: 'TL.01', name: 'Fake archetype', confidence: 0.9 },
   skin: { choice: 'Minimal and quiet', confidence: 0.8 },
-  family: { id: 'maben', probability: 0.9, basis: 'exact', transfer: 3 },
+  family: { id: 'practice', probability: 0.9, basis: 'exact', transfer: 3 },
   candidates: [],
   warnings: [],
   ms: 1,
@@ -121,7 +122,7 @@ test('default strict: a fabricated fact surviving repair exits 2 and reaches the
     createModelCaller: () => fakeModel({ fill: fabricatingFill }),
     createJevChecker: () => fakeJevChecker(),
   });
-  const code = await main(['--family', 'maben', '--brief', briefPath], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath], deps);
 
   assert.equal(code, 2);
   assert.equal(daemonCalls.length, 0, 'strict defers every daemon write; a failed gate must send none of them');
@@ -135,7 +136,7 @@ test('explicit advisory: the same fabricated fact still publishes, flagged loudl
     createModelCaller: () => fakeModel({ fill: fabricatingFill }),
     createJevChecker: () => fakeJevChecker(),
   });
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--verify-mode', 'advisory'], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--verify-mode', 'advisory'], deps);
 
   assert.equal(code, 0);
   assert.ok(daemonCalls.length > 0, 'advisory publishes regardless of what the gate flags');
@@ -151,7 +152,7 @@ test('off: the checker factory is never called', async () => {
       return fakeJevChecker();
     },
   });
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--verify-mode', 'off', '--dry-run'], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--verify-mode', 'off', '--dry-run'], deps);
 
   assert.equal(code, 0);
   assert.equal(checkerFactoryCalls, 0);
@@ -163,7 +164,7 @@ test('legacy --verify jev alone resolves advisory: a remaining flag does not fai
     createModelCaller: () => fakeModel({ fill: fabricatingFill }),
     createJevChecker: () => fakeJevChecker(),
   });
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--verify', 'jev', '--dry-run', '--report', reportPath], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--verify', 'jev', '--dry-run', '--report', reportPath], deps);
 
   assert.equal(code, 0, 'advisory never fails the build on a remaining flag');
   const report = JSON.parse(await readFile(reportPath, 'utf8')) as { verifyMode: string };
@@ -175,7 +176,7 @@ test('legacy --verify jev --verify-strict together resolves strict', async () =>
     createModelCaller: () => fakeModel({ fill: fabricatingFill }),
     createJevChecker: () => fakeJevChecker(),
   });
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--verify', 'jev', '--verify-strict', '--dry-run'], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--verify', 'jev', '--verify-strict', '--dry-run'], deps);
 
   assert.equal(code, 2);
   assert.ok(stdout.some((line) => line.includes('VERIFY-STRICT FAILED')));
@@ -189,7 +190,7 @@ test('conflicting --verify-strict / --verify-mode exits 2 before the model calle
       return fakeModel();
     },
   });
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--verify-strict', '--verify-mode', 'advisory'], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--verify-strict', '--verify-mode', 'advisory'], deps);
 
   assert.equal(code, 2);
   assert.equal(modelFactoryCalls, 0);
@@ -207,13 +208,13 @@ test('a preflight failure precedes every model call and every daemon/file mutati
       return fakeModel();
     },
   });
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--out-dir', outDir], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--out-dir', outDir], deps);
 
   assert.equal(code, 2);
   assert.equal(modelFactoryCalls, 0, 'the preflight runs before the model caller is ever built');
   assert.equal(daemonCalls.length, 0);
   assert.ok(stderr.some((line) => line.includes('needs a Jev credential')));
-  await assert.rejects(readFile(path.join(outDir, 'maben-r1.html')), /ENOENT/, '--out-dir was never even created, let alone written into');
+  await assert.rejects(readFile(path.join(outDir, 'ownedsite-r1.html')), /ENOENT/, '--out-dir was never even created, let alone written into');
 });
 
 test('a broken credential is reported before the brief file is even read', async () => {
@@ -224,7 +225,7 @@ test('a broken credential is reported before the brief file is even read', async
     resolveJevCredential: async () => { throw new Error('zsvault returned no value for typesafe_api_key'); },
   });
   const missingBrief = path.join(briefDir, 'no-such-brief.md');
-  const code = await main(['--family', 'maben', '--brief', missingBrief], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', missingBrief], deps);
 
   assert.equal(code, 2);
   assert.equal(daemonCalls.length, 0);
@@ -266,12 +267,15 @@ test('--family auto, strict, a SUCCESSFUL run: routing and verification both use
   // resolver would still pass it. This test lets the credential succeed and has the fake router
   // and the fake checker each actually call the `apiKey` they were given, so a second resolver
   // anywhere in that chain would show up as more than one underlying read.
+  const publicBrief = path.join(briefDir, 'practice.md');
+  await writeFile(publicBrief, (await readFile(new URL('../../../plugins/_official/examples/agency-practice/compiler/scripts/families/practice/reference.fixture.brief.txt', import.meta.url), 'utf8')) + '\nStep 1: Check-in and history. Step 2: Exam and X-rays. Step 3: Cleaning and plan. We work with most major PPO plans and offer a straightforward cash-pay option for routine care.');
   let credentialCalls = 0;
   let routerApiKeyCalls = 0;
   let checkerApiKeyCalls = 0;
   const resolveGivenApiKey = async (apiKey: string | (() => Promise<string>)): Promise<string> => (typeof apiKey === 'function' ? apiKey() : apiKey);
 
-  const { deps, daemonCalls } = baseDeps({
+  const { deps, daemonCalls, stderr, stdout } = baseDeps({
+    createModelCaller: () => fakeModel({ fill: (_key, value) => value }),
     resolveJevCredential: async () => {
       credentialCalls += 1;
       return 'shared-key';
@@ -291,11 +295,11 @@ test('--family auto, strict, a SUCCESSFUL run: routing and verification both use
       },
     }),
   });
-  const code = await main(['--family', 'auto', '--brief', briefPath], deps);
+  const code = await main(['--family', 'auto', '--brief', publicBrief], deps);
 
-  assert.equal(code, 0, `expected a clean strict pass, got exit ${code}`);
+  assert.equal(code, 0, `expected a clean strict pass, got exit ${code}: ${JSON.stringify({stderr, stdout})}`);
   assert.equal(routerApiKeyCalls, 1, 'the fake router did resolve the key it was given');
-  assert.equal(checkerApiKeyCalls, 1, 'the fake checker did resolve the key it was given');
+  assert.equal(checkerApiKeyCalls, 4, 'the public practice fixture checks its units and final page with the shared resolver');
   assert.equal(credentialCalls, 1, 'exactly one underlying credential read across the preflight, routing and verification');
   assert.ok(daemonCalls.length > 0, 'a clean strict pass still publishes');
 });
@@ -355,7 +359,7 @@ test('--family auto, unrouted (not --route-only): exits 3 and builds nothing', a
 test('verifyMode is named in both the written report and the console summary', async () => {
   const reportPath = path.join(await mkdtemp(path.join(tmpdir(), 'fast-lane-cli-test-')), 'report.json');
   const { deps, stdout } = baseDeps();
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--verify-mode', 'off', '--dry-run', '--report', reportPath], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--verify-mode', 'off', '--dry-run', '--report', reportPath], deps);
 
   assert.equal(code, 0);
   assert.ok(stdout.some((line) => line === 'verify-mode: off'));
@@ -365,7 +369,7 @@ test('verifyMode is named in both the written report and the console summary', a
 
 test('strict + dry-run: a clean pass says nothing was registered, not "registered"', async () => {
   const { deps, stdout } = baseDeps({ createJevChecker: () => fakeJevChecker() });
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--verify-mode', 'strict', '--dry-run'], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--verify-mode', 'strict', '--dry-run'], deps);
 
   assert.equal(code, 0);
   assert.ok(stdout.includes('verify-strict: passed — dry run, nothing registered.'));
@@ -382,7 +386,7 @@ test('sentinel: a raw upstream body never reaches stderr or the written report, 
   const { deps, stdout, stderr } = baseDeps({
     createJevChecker: (options) => createJevChecker({ ...options, fetchImpl: sentinelFetch }),
   });
-  const code = await main(['--family', 'maben', '--brief', briefPath, '--verify-mode', 'advisory', '--dry-run', '--report', reportPath], deps);
+  const code = await main(['--family', 'ownedsite', '--brief', briefPath, '--verify-mode', 'advisory', '--dry-run', '--report', reportPath], deps);
 
   assert.equal(code, 0, 'a skipped advisory check never fails the build');
   for (const line of stdout) assert.ok(!line.includes(sentinel), `stdout leaked the sentinel: ${line}`);
@@ -391,3 +395,5 @@ test('sentinel: a raw upstream body never reaches stderr or the written report, 
   assert.ok(!reportText.includes(sentinel), 'the written report leaked the sentinel');
   assert.ok(stdout.some((line) => line.includes('SKIPPED')), 'the skip is still visible, just sanitized');
 });
+
+function main(args: string[], deps: Partial<CliDeps>) { return cliMain(args.includes('ownedsite') ? ['--package', TEST_SITE_DIR, ...args] : args, deps); }

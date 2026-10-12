@@ -299,7 +299,10 @@ export function collectComponentInventory(root: string = defaultRepositoryRoot()
   const originals = (originalsJson as { items: Original[] }).items;
   const genui = genuiCatalog.manifest.components.map(entry => genuiRow(root, entry as CatalogEntry)).sort(byId);
   const hyperui = sections.filter(entry => entry.sourceKind === 'hyperui').map(entry => hyperuiRow(root, manifest, entry)).sort(byId);
-  const families = sections.filter(entry => entry.sourceKind === 'family-section').map(familySectionRow).sort(byId);
+  // Reference metadata can outlive a removed private study; only shipped families enter the ledger.
+  const families = sections.filter(entry => entry.sourceKind === 'family-section' && entry.content.kind === 'family-section'
+    && existsSync(path.join(root, 'plugins/_official/examples', `agency-${entry.content.family}`, 'README.md')))
+    .map(familySectionRow).sort(byId);
   const twentyFirst = (twenty1stJson as { rows: Array<{ id: string; name: string; itemUrl: string; rights: string }> }).rows
     .map(row => twentyFirstRow(row, originals.find(original => original.id === row.id))).sort(byId);
   const shadcn = shadcnRows().sort(byId);

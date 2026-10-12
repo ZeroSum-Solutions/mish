@@ -12,6 +12,7 @@ import { checkComponentLedger, collectComponentInventory, refreshComponentLedger
 
 const repo = path.resolve(import.meta.dirname, '../../../..');
 const readJson = <T>(relative: string): T => JSON.parse(readFileSync(path.join(repo, relative), 'utf8')) as T;
+const REMOVED_FAMILIES = new Set(['emmpo', 'watson', 'maben', 'halcyon', 'maren', 'wrenfield', 'fervor', 'velar']);
 const committed = (): ComponentLedger => parseComponentLedger(readJson('apps/daemon/src/workbench/component-ledger.json'));
 
 type Section = { id: string; sourceKind: string; content: { kind: string; blockId?: string; sha256?: string } };
@@ -34,15 +35,23 @@ describe('AC-R13.1 frozen component ledger', () => {
     expect(new Set(ids).size).toBe(ids.length);
     const expected = [
       ...genui.map(entry => `genui:${entry.id}`),
-      ...sections.filter(entry => entry.sourceKind === 'hyperui' || entry.sourceKind === 'family-section').map(entry => `sections:${entry.id}`),
+      ...sections.filter(entry => entry.sourceKind === 'hyperui' || (entry.sourceKind === 'family-section' && !REMOVED_FAMILIES.has(entry.id.split(':')[1]!))).map(entry => `sections:${entry.id}`),
       ...twentyFirst.map(row => `21st-dev:${row.id}`),
       'shadcn:button',
       ...collectComponentInventory().items.filter(item => item.sourceId === 'react95' || item.sourceId === 'gsap').map(item => item.id),
     ];
     expect([...ids].sort()).toEqual([...expected].sort());
-    // T5 harvested 14 more generative-UI components (63 + 14).
-    expect(genui).toHaveLength(77);
+    // The public catalogue excludes the six licensed GenUI ports.
+    expect(genui).toHaveLength(71);
     expect(sections.filter(entry => entry.sourceKind === 'hyperui')).toHaveLength(80);
+  });
+
+  it('omits removed private study families from the shipped inventory', () => {
+    const inventory = collectComponentInventory();
+    const removed = sections.filter(entry => entry.sourceKind === 'family-section' && REMOVED_FAMILIES.has(entry.id.split(':')[1]!));
+    expect(removed.length).toBeGreaterThan(0);
+    for (const entry of removed) expect(inventory.items.map(item => item.id)).not.toContain(`sections:${entry.id}`);
+    expect(inventory.items).toContainEqual(expect.objectContaining({ id: 'sections:hyperui:application/charts/1', built: true }));
   });
 
   it('assigns reference, states, dependencies, version, rights and owner to every row', () => {

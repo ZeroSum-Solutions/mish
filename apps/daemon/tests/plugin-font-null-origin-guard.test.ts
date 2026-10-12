@@ -17,8 +17,8 @@ let fixtureRoot = '';
 let started: StartedServer | null = null;
 
 // A real plugin under plugins/_official/, registered as bundled at boot.
-const BUNDLED_ID = 'example-agency-halcyon';
-const BUNDLED_FONT = 'families/halcyon/assets/archivo-latin.woff2';
+const BUNDLED_ID = 'example-dreamcore-landing';
+const BUNDLED_FONT = 'assets/archivo.woff2';
 const USER_ID = 'user-font-null-origin-fixture';
 const GUARD_ERROR = { error: 'Origin: null not allowed for this route' };
 

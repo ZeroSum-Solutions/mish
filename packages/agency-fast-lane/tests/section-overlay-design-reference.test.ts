@@ -28,16 +28,16 @@ import { loadFamilyPackage } from '../src/family.ts';
 import { runFastLane } from '../src/run.ts';
 import { DESIGN_REFERENCE_WITHHELD_MARKER } from '../src/section-overlay.ts';
 import type { ProjectPublisher } from '../src/publish.ts';
-import { fakeModel, WATSON_DIR, type Filler } from './fixtures.ts';
+import { fakeModel, TEST_EDITORIAL_DIR, type Filler } from './fixtures.ts';
 
-const loadWatson = () => loadFamilyPackage(WATSON_DIR, 'watson');
-const ENTRY = 'watson-r1.html';
-const BRIEF = 'Watson, a design and technology studio in Los Angeles. Brand, product and motion work for ambitious teams.';
+const loadTestEditorial = () => loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
+const ENTRY = 'ownededitorial-r1.html';
+const BRIEF = 'TestEditorial, a design and technology studio in Los Angeles. Brand, product and motion work for ambitious teams.';
 const SENTINEL = 'ZZ-DR-BOUNDARY-SENTINEL-9f3c1a-ZZ';
 const SECTION_LABEL = 'section:hyperui:marketing/ctas/1';
 
 const NULLABLE_ATOMS = ['awardCaption', 'businessEmail', 'jobsEmail', 'addressFirst', 'addressSecond', 'phone'];
-const watsonFill: Filler = (key, _value, _at, limit) => (NULLABLE_ATOMS.includes(key) ? null : `New ${key} for Watson`.slice(0, limit ?? Infinity));
+const ownededitorialFill: Filler = (key, _value, _at, limit) => (NULLABLE_ATOMS.includes(key) ? null : `New ${key} for TestEditorial`.slice(0, limit ?? Infinity));
 
 /** Wraps a `ModelCall` to record every request's `label` alongside its prompt, so an assertion
  * can be tied to ONE specific unit (the section fill) rather than "some" call among every unit
@@ -75,8 +75,8 @@ function recordingPublisher(): ProjectPublisher & { saves: Save[] } {
 }
 
 test('designReference sentinel: reaches the model transport for the section unit only, and never onCall, RunReport, the real debug-dir writer, or a build record', async () => {
-  const pkg = await loadWatson();
-  const model = recordingModel(fakeModel({ fill: watsonFill }));
+  const pkg = await loadTestEditorial();
+  const model = recordingModel(fakeModel({ fill: ownededitorialFill }));
   const onCalls: Array<{ label: string; attempt: number; prompt: string; answer: string }> = [];
   const publisher = recordingPublisher();
 
@@ -104,7 +104,7 @@ test('designReference sentinel: reaches the model transport for the section unit
       lockPaths: ['brand.name'],
       publisher,
       designReference: `Editorial layout, tight grid, restrained motion: ${SENTINEL}`,
-      sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' }, directionId: 'modern-minimal' },
+      sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' }, directionId: 'modern-minimal' },
       onCall,
     });
 

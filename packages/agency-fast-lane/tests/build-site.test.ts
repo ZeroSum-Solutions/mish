@@ -3,7 +3,7 @@
  *
  * Every dependency is faked — the router, the model caller, the faithfulness checker, the daemon's
  * `fetch` and the provider lock — so nothing here opens a socket, reads a credential or touches a
- * real daemon. The family package is the real bundled `maben` one, since the fill, the render and
+ * real daemon. The family package is the real bundled `ownedsite` one, since the fill, the render and
  * the publish shape are what these tests are about.
  *
  * The cancellation cases are the point of the file: an aborted build must settle everything it
@@ -23,11 +23,11 @@ import type { RouteDecision } from '../src/route.ts';
 import type { VerifySkipReason } from '../src/run.ts';
 import type { JsonObject } from '../src/spine.ts';
 import { loadAtlasData } from '../src/atlas.ts';
-import { fakeModel, loadMaben, type Filler } from './fixtures.ts';
+import { fakeModel, loadTestSite, type Filler } from './fixtures.ts';
 import { ProviderFailoverError } from '../src/failover.ts';
 
-const pkg = await loadMaben();
-const ENTRY = 'maben-r1.html';
+const pkg = await loadTestSite();
+const ENTRY = 'ownedsite-r1.html';
 const BRIEF = 'Riverbend Dental, a family dental practice in Boise. Same-day crowns, sedation options, open Saturdays.';
 const DAEMON = 'http://daemon.test';
 
@@ -101,13 +101,13 @@ function fakeJevChecker(markers: string[] = ['FABRICATED']): FaithfulnessChecker
 const fabricatingFill: Filler = (key, _value, at, limit) =>
   (at.endsWith('text.statement') ? 'FABRICATED phone 555-0100' : (typeof limit === 'number' ? `New ${key}`.slice(0, limit) : `New ${key}`));
 
-const routedToMaben: RouteDecision = {
+const routedToTestSite: RouteDecision = {
   decision: 'routed',
   spine: { code: 'TL', name: 'Trust the maker', confidence: 0.9, probabilities: { TL: 0.9 } },
   spines: [{ code: 'TL', probability: 0.9 }],
   archetype: { id: 'TL.01', name: 'Fake archetype', confidence: 0.9 },
   skin: { choice: 'Minimal and quiet', confidence: 0.8 },
-  family: { id: 'maben', probability: 0.9, basis: 'exact', transfer: 3 },
+  family: { id: 'ownedsite', probability: 0.9, basis: 'exact', transfer: 3 },
   candidates: [],
   warnings: [],
   ms: 1,
@@ -245,7 +245,7 @@ function gatedModel(log: string[]): ModelCall & { gates: Deferred[] } {
 function baseInput(overrides: Partial<BuildInput> = {}): BuildInput {
   return {
     brief: BRIEF,
-    family: 'maben',
+    family: 'ownedsite',
     mode: 'sections',
     revision: 1,
     verify: 'off',
@@ -260,7 +260,7 @@ function baseDeps(overrides: Partial<BuildDeps> = {}): BuildDeps {
   return {
     createModelCaller: () => fakeModel(),
     createJevChecker: () => fakeJevChecker(),
-    createJevRouter: () => ({ route: async () => routedToMaben }),
+    createJevRouter: () => ({ route: async () => routedToTestSite }),
     resolveJevCredential: async () => 'fake-jev-key',
     resolveModelKey: async () => 'fake-model-key',
     daemonFetch: fakeDaemonFetch([]),
@@ -350,10 +350,10 @@ test('a routed build reports built, with the route and the project decided befor
 
   assert.equal(result.outcome, 'built');
   if (result.outcome !== 'built') return;
-  assert.equal(result.family, 'maben');
-  assert.deepEqual(result.route, { ...routedToMaben, routeAttempts: 1 }, 'a first-call route takes one attempt');
+  assert.equal(result.family, 'ownedsite');
+  assert.deepEqual(result.route, { ...routedToTestSite, routeAttempts: 1 }, 'a first-call route takes one attempt');
   assert.equal(result.report.entry, ENTRY);
-  assert.equal(result.report.family, 'maben');
+  assert.equal(result.report.family, 'ownedsite');
   assert.equal(result.projectId, result.report.projectId);
   assert.ok(result.projectId, 'a build that publishes reports the project it published to');
 
@@ -380,7 +380,7 @@ test('the brief is read only after the credential preflight has passed', async (
 test('a named family never builds a router', async () => {
   let routerFactoryCalls = 0;
   const result = await buildSite(
-    baseInput({ family: 'maben' }),
+    baseInput({ family: 'ownedsite' }),
     baseDeps({
       createJevRouter: () => {
         routerFactoryCalls += 1;
@@ -415,7 +415,7 @@ test('provider omitted with a defaultModelFor callback resolves it once, after r
       },
     },
     baseDeps({
-      createJevRouter: () => ({ route: async () => routedToMaben }),
+      createJevRouter: () => ({ route: async () => routedToTestSite }),
       createModelCaller: (options) => {
         calls.push(`createModelCaller:${options.provider}:${options.model}`);
         return fakeModel();
@@ -429,7 +429,7 @@ test('provider omitted with a defaultModelFor callback resolves it once, after r
   // caller is built after, from exactly what `defaultModelFor` returned. Order proves "resolved
   // once, after routing, before the first model call" all at once: a second call, a call before
   // routing, or the model caller using some other provider would all show up as a different list.
-  assert.deepEqual(calls, ['defaultModelFor:maben', 'createModelCaller:cerebras:gpt-oss-120b']);
+  assert.deepEqual(calls, ['defaultModelFor:ownedsite', 'createModelCaller:cerebras:gpt-oss-120b']);
 });
 
 test('an unrouted brief builds nothing: no package prepared, no model call, no project', async () => {
@@ -502,7 +502,7 @@ test('cancelled mid-fill: every unit settles before the project this build creat
   for (const gate of model.gates.slice(1)) gate.open();
   const result = await build;
 
-  assert.deepEqual(result, { outcome: 'cancelled', family: 'maben' });
+  assert.deepEqual(result, { outcome: 'cancelled', family: 'ownedsite' });
   const created = daemonCalls.find((call) => call.url.endsWith('/api/projects'));
   assert.ok(created, 'the project was created before the abort');
   const deleted = daemonCalls.filter((call) => call.method === 'DELETE');
@@ -526,7 +526,7 @@ test('cancelled mid-fill: a project the caller supplied is kept, never created a
   for (const gate of model.gates) gate.open();
   const result = await build;
 
-  assert.deepEqual(result, { outcome: 'cancelled', family: 'maben', projectId: 'given-project' });
+  assert.deepEqual(result, { outcome: 'cancelled', family: 'ownedsite', projectId: 'given-project' });
   assert.equal(daemonCalls.some((call) => call.url.endsWith('/api/projects')), false, 'a given project id is never created');
   assert.equal(daemonCalls.some((call) => call.method === 'DELETE'), false, 'a caller-supplied project is never deleted');
 });
@@ -639,7 +639,7 @@ test('a create the daemon refused rolls back cleanly: a missing project is alrea
     }),
   );
 
-  assert.deepEqual(result, { outcome: 'cancelled', family: 'maben' });
+  assert.deepEqual(result, { outcome: 'cancelled', family: 'ownedsite' });
   assert.ok(daemonCalls.some((call) => call.method === 'DELETE'), 'the rollback was still attempted');
 });
 
@@ -809,7 +809,7 @@ test('cancelled, and the rollback itself fails: the project left behind is still
 
   assert.equal(result.outcome, 'rollback-failed');
   if (result.outcome !== 'rollback-failed') return;
-  assert.equal(result.family, 'maben');
+  assert.equal(result.family, 'ownedsite');
   assert.equal(result.projectId, daemonCalls.find((call) => call.url.endsWith('/api/projects'))!.body!.id as string);
   assert.match(result.message, /removing it again failed/);
 });
@@ -838,7 +838,7 @@ test('strict: a rollback that fails is its own outcome, carrying the project lef
 
   assert.equal(result.outcome, 'rollback-failed');
   if (result.outcome !== 'rollback-failed') return;
-  assert.equal(result.family, 'maben');
+  assert.equal(result.family, 'ownedsite');
   assert.equal(result.projectId, daemonCalls.find((call) => call.url.endsWith('/api/projects'))!.body!.id as string);
   assert.match(result.message, /removing it also failed/);
 });
@@ -977,7 +977,7 @@ test('cancelled while queued for the lock: the build ends cancelled, having run 
     }),
   );
 
-  assert.deepEqual(result, { outcome: 'cancelled', family: 'maben' });
+  assert.deepEqual(result, { outcome: 'cancelled', family: 'ownedsite' });
   assert.equal(daemonCalls.length, 0);
 });
 
@@ -992,7 +992,7 @@ test('no credential ever reaches an event, a result or an error', async () => {
       resolveModelKey: async () => modelKey,
       // Both resolvers are called the way the real router, checker and model caller call them:
       // at use time, from inside the call that needs the key.
-      createJevRouter: (options) => ({ route: async () => { await (options.apiKey as () => Promise<string>)(); return routedToMaben; } }),
+      createJevRouter: (options) => ({ route: async () => { await (options.apiKey as () => Promise<string>)(); return routedToTestSite; } }),
       createJevChecker: (options) => ({ checkFaithfulness: async () => { await (options.apiKey as () => Promise<string>)(); return { flagged: [], ms: 1, calls: 1 }; } }),
       createModelCaller: (options) => { void options.apiKey?.(); return fakeModel(); },
     }),

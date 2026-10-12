@@ -1,7 +1,7 @@
 /**
  * storefront family proficiency-bar tests: registry exclusions, the byte budget, the three
  * fixture briefs (rich, near-miss, sparse), no-invented-facts on the sparse fixture, and route
- * negatives — the maren near-miss brief must never resolve to storefront, and vice versa.
+ * negatives — the ownedmaker near-miss brief must never resolve to storefront, and vice versa.
  *
  * `resolveRoute` is the same pure, no-network policy `route.test.ts` exercises directly (see its
  * restaurant/community examples this file follows); these route-negative cases stand in for the
@@ -13,7 +13,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
-import { loadAtlasData } from '../src/atlas.ts';
+import { loadAtlasData } from './routing-fixture.ts';
 import { buildRouteQuestions, createJevRouter, resolveRoute, type ChoiceAnswer } from '../src/route.ts';
 import { loadFamilyPackage } from '../src/family.ts';
 import { runFastLane } from '../src/run.ts';
@@ -55,14 +55,14 @@ function choice(choiceValue: string, probabilities: Record<string, number>, conf
 // Registry: positive fit and named exclusions
 // ---------------------------------------------------------------------------
 
-test('registry: storefront is CO / CO.01 / site, and its summary names maren, marketing-site and listings as exclusions', () => {
+test('registry: storefront is CO / CO.01 / site, and its summary excludes a phone-only maker, marketing-site and listings as exclusions', () => {
   const entry = registry.families.find((f) => f.family === 'storefront');
   assert.ok(entry, 'storefront is registered');
   assert.equal(entry!.spine, 'CO');
   assert.equal(entry!.archetype, 'CO.01');
   assert.equal(entry!.pageKind, 'site');
   const summary = entry!.summary.toLowerCase();
-  assert.ok(summary.includes('maren'), 'names maren as an exclusion');
+  assert.ok(summary.includes('made-to-order atelier'), 'excludes a phone-only maker');
   assert.ok(summary.includes('marketing-site'), 'names marketing-site as an exclusion');
   assert.ok(summary.includes('listings'), 'names listings as an exclusion');
   assert.ok(summary.includes('buy') || summary.includes('preorder'), 'states the positive fit');
@@ -278,48 +278,48 @@ test('strict run (contact atoms, FIX 5): an invented buy email, URL and hyphenat
 // Route negatives (pure resolveRoute policy, no network)
 // ---------------------------------------------------------------------------
 
-test('route policy (hand-built answers): resolveRoute picks storefront over maren given storefront-leaning probabilities, all else CO.01-shaped', () => {
-  // maren moved from spine CO/archetype CO.01 to spine TL/archetype TL.06 (G7 task f8 root cause
-  // (b) — see atlas.ts and eval-v7/G7-DIAGNOSIS.md), so under a CO/CO.01 answer set maren is not
+test('route policy (hand-built answers): resolveRoute picks storefront over ownedmaker given storefront-leaning probabilities, all else CO.01-shaped', () => {
+  // ownedmaker moved from spine CO/archetype CO.01 to spine TL/archetype TL.06 (G7 task f8 root cause
+  // (b) — see atlas.ts and eval-v7/G7-DIAGNOSIS.md), so under a CO/CO.01 answer set ownedmaker is not
   // even a candidate any more (CO -> TL transfer is 1, below minTransfer 2); this still checks
   // storefront wins its own home spine/archetype cleanly.
   const answers = {
     spine: choice('CO', { CO: 1 }),
     archetype_CO: choice('CO.01', { 'CO.01': 1, none: 0 }),
-    family: choice('storefront', { storefront: 0.83, maren: 0.1, 'marketing-site': 0.03, listings: 0.02, watson: 0.01, none: 0.01 }),
+    family: choice('storefront', { storefront: 0.83, ownedmaker: 0.1, 'marketing-site': 0.03, listings: 0.02, ownededitorial: 0.01, none: 0.01 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
   assert.equal(decision.family?.id, 'storefront');
-  assert.notEqual(decision.family?.id, 'maren');
+  assert.notEqual(decision.family?.id, 'ownedmaker');
   assert.equal(decision.archetype?.id, 'CO.01');
 });
 
 // Deliberately NOT named or described as exercising near-miss.txt: this is a pure resolveRoute
-// policy check against a hand-built answer set, proving only that resolveRoute itself picks maren
-// when handed maren-leaning probabilities. It says nothing about what a real classifier would
+// policy check against a hand-built answer set, proving only that resolveRoute itself picks ownedmaker
+// when handed ownedmaker-leaning probabilities. It says nothing about what a real classifier would
 // actually decide when given near-miss.txt's own text — that is the separate, fixture-driving
 // test below (`route (live pipeline, near-miss.txt text)`). Keeping these two claims apart is the
 // fix for the exact conflation the coordinator's audit caught: the same test shape with
 // choice('storefront', ...) here would "prove" the opposite of what the brief says, since this
 // test never reads the brief at all.
-test('route policy (hand-built answers): resolveRoute picks maren over watson given maren-leaning probabilities, all else TL.06-shaped', () => {
-  // maren's own home is now spine TL/archetype TL.06 (G7 task f8 root cause (b) — see atlas.ts
+test('route policy (hand-built answers): resolveRoute picks ownedmaker over ownededitorial given ownedmaker-leaning probabilities, all else TL.06-shaped', () => {
+  // ownedmaker's own home is now spine TL/archetype TL.06 (G7 task f8 root cause (b) — see atlas.ts
   // and eval-v7/G7-DIAGNOSIS.md: a made-to-order maker/atelier brief with no cart is a TL
   // "personal expert or portfolio" story, not a CO one). storefront is not even a candidate here
-  // (CO -> TL transfer is 1, below minTransfer 2), so this checks maren over its real same-spine
-  // competitor, watson.
+  // (CO -> TL transfer is 1, below minTransfer 2), so this checks ownedmaker over its real same-spine
+  // competitor, ownededitorial.
   const answers = {
     spine: choice('TL', { TL: 1 }),
     archetype_TL: choice('TL.06', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0, 'TL.06': 1, none: 0 }),
-    family: choice('maren', { maren: 0.79, watson: 0.12, wrenfield: 0.05, fervor: 0.02, maben: 0.01, none: 0.01 }),
+    family: choice('ownedmaker', { ownedmaker: 0.79, ownededitorial: 0.12, ownedcontractor: 0.05, ownedcinematic: 0.02, ownedsite: 0.01, none: 0.01 }),
     skin: choice('unspecified', { unspecified: 1 }),
   };
   const decision = resolveRoute(answers, atlas, registry);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'maren');
-  assert.notEqual(decision.family?.id, 'watson');
+  assert.equal(decision.family?.id, 'ownedmaker');
+  assert.notEqual(decision.family?.id, 'ownededitorial');
   assert.ok(!decision.candidates.some((c) => c.family === 'storefront'), 'storefront is not reachable from TL: CO -> TL transfer is 1, below minTransfer 2');
   assert.equal(decision.archetype?.id, 'TL.06');
 });
@@ -330,11 +330,11 @@ test('route policy (hand-built answers): resolveRoute picks maren over watson gi
 // (`buildRouteQuestions`) inside `createJevRouter`, proving the pipeline reads this specific
 // file's content into the request it actually sends, not a paraphrase of it in a test comment.
 //
-// This does NOT prove "near-miss.txt routes to maren." A second audit pass caught that an earlier
-// version of this test misleadingly implied that: its fake HTTP response was a canned maren-
+// This does NOT prove "near-miss.txt routes to ownedmaker." A second audit pass caught that an earlier
+// version of this test misleadingly implied that: its fake HTTP response was a canned ownedmaker-
 // leaning answer that ignored the request body entirely (`() => ({...fixedAnswers})`), so ANY
 // brief text — including storefront's own rich.txt — would have produced the identical "routes to
-// maren" assertion passing. That is not evidence the classifier itself would decide maren for
+// ownedmaker" assertion passing. That is not evidence the classifier itself would decide ownedmaker for
 // THIS brief; it only exercises resolveRoute's policy given an arbitrary fixed answer, exactly
 // like the hand-built `route policy` tests above (and those already cover that claim). Recording
 // a genuine classifier answer for this specific fixture (model, date, prompt) would be the real
@@ -366,7 +366,7 @@ test('route request construction (near-miss.txt): the real fixture text reaches 
       answers: {
         spine: choice('CO', { CO: 1 }),
         archetype_CO: choice('CO.01', { 'CO.01': 1, none: 0 }),
-        family: choice('maren', { maren: 1 }),
+        family: choice('ownedmaker', { ownedmaker: 1 }),
         skin: choice('unspecified', { unspecified: 1 }),
       } satisfies Record<string, ChoiceAnswer>,
     })),

@@ -1,0 +1,20 @@
+{
+  "assets": [
+    {
+      "id": "wordmark",
+      "file": "wordmark.png",
+      "kind": "image",
+      "sha256": "e5dd92acd7d1f9550a1848c765289b33b408f0f6c002fd935696ac778965182d",
+      "bytes": 69,
+      "mediaType": "image/png"
+    },
+    {
+      "id": "hero",
+      "file": "hero-frame.png",
+      "kind": "image",
+      "sha256": "e5dd92acd7d1f9550a1848c765289b33b408f0f6c002fd935696ac778965182d",
+      "bytes": 69,
+      "mediaType": "image/png"
+    }
+  ]
+}

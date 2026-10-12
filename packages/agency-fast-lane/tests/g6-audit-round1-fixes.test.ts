@@ -22,12 +22,12 @@ function properNounFlagsFor(brief: string, text: string): number {
 // ---------------------------------------------------------------------------
 
 test('B1: "GC" is NOT exempt on a brief that never mentions being a contractor, even though "general"/"contractor" are ordinary dictionary words', () => {
-  const brief = 'Halcyon Hall is a contemporary art and design museum in Providence, Rhode Island.';
+  const brief = 'TestInstitution Hall is a contemporary art and design museum in Providence, Rhode Island.';
   assert.equal(properNounFlagsFor(brief, 'Every project is managed by a licensed GC.'), 1);
 });
 
 test('B1: "GC" IS exempt when the brief itself states the business is a general contractor', () => {
-  const brief = 'Wrenfield Remodeling is a general contractor in Raleigh, North Carolina.';
+  const brief = 'TestContractor Remodeling is a general contractor in Raleigh, North Carolina.';
   assert.equal(properNounFlagsFor(brief, 'Every job is run by a licensed GC.'), 0);
 });
 
@@ -69,7 +69,7 @@ test('B3: an INVENTED internal-apostrophe name (no brief support) still flags', 
 // ---------------------------------------------------------------------------
 
 test('F5: an invented name that happens to be a dictionary-word prefix ("Dan" of "dance") still flags on a brief that never states it', () => {
-  const brief = 'Maren Atelier is a two-person studio in Providence, Rhode Island.';
+  const brief = 'TestMaker Atelier is a two-person studio in Providence, Rhode Island.';
   assert.equal(properNounFlagsFor(brief, 'Founded by Dan Miller and Tim Brown.'), 1);
 });
 

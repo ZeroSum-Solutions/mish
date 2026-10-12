@@ -1,0 +1,12 @@
+{"type":"system","subtype":"thinking_tokens","estimated_tokens":100}
+{"type":"system","subtype":"thinking_tokens","estimated_tokens":300}
+{"type":"system","subtype":"thinking_tokens","estimated_tokens":520}
+{"type":"system","subtype":"thinking_tokens","estimated_tokens":100}
+{"type":"system","subtype":"thinking_tokens","estimated_tokens":306}
+{"type":"system","subtype":"thinking_tokens","estimated_tokens":100}
+{"type":"system","subtype":"thinking_tokens","estimated_tokens":302}
+{"type":"assistant","session_id":"synthetic-session","message":{"id":"m1","role":"assistant","type":"message","content":[{"type":"tool_use","id":"write-1","name":"Write","input":{"file_path":"/repo/alpha.html","content":"<!doctype html><html><body><h1>Alpha</h1></body></html>"}}]}}
+{"type":"assistant","session_id":"synthetic-session","message":{"id":"m2","role":"assistant","type":"message","content":[{"type":"text","text":"DONE1"}]}}
+{"type":"result","subtype":"success","session_id":"synthetic-session","is_error":false,"result":"","usage":{"input_tokens":1,"output_tokens":1},"stop_reason":"end_turn"}
+{"type":"assistant","session_id":"synthetic-session","message":{"id":"m3","role":"assistant","type":"message","content":[{"type":"text","text":"<artifact type=\"text/html\" title=\"Beta\"><h1>Beta</h1></artifact>"}]}}
+{"type":"result","subtype":"success","session_id":"synthetic-session","is_error":false,"result":"","usage":{"input_tokens":1,"output_tokens":1},"stop_reason":"end_turn"}

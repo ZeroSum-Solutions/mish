@@ -955,7 +955,7 @@ describe('connector memory extraction', () => {
 const fs = require('node:fs');
 const args = process.argv.slice(2);
 const stdin = fs.readFileSync(0, 'utf8');
-fs.writeFileSync(process.env.OD_MEMORY_CODEX_ARGS_OUT, JSON.stringify({ args, stdin }));
+fs.writeFileSync(${JSON.stringify(capturePath)}, JSON.stringify({ args, stdin }));
 process.stdout.write(JSON.stringify({
   type: 'item.completed',
   item: {
@@ -1051,7 +1051,7 @@ if (fileFlag >= 0) {
     files.push(args[i]);
   }
 }
-fs.writeFileSync(process.env.OD_MEMORY_OPENCODE_ARGS_OUT, JSON.stringify({ args, stdin, files }));
+fs.writeFileSync(${JSON.stringify(capturePath)}, JSON.stringify({ args, stdin, files }));
 for (const f of files) {
   if (!fs.existsSync(f)) {
     process.stderr.write('Error: File not found: ' + f + '\\n');

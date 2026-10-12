@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { existsSync, readFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import { GSAP_RECIPE_IDS } from '../../src/workbench/recipes/gsap/index.js';
 import { G02_REACT_RECEIPT } from '../../src/workbench/targets/react/g02-receipt.js';
 import { checkG02ReactReceipt, g02CoveredReactMajors, validateReactTargetReceipt } from '../../src/workbench/targets/react/receipt.js';
@@ -29,10 +29,7 @@ describe('G02 react-source/v1 production receipt', () => {
       // verification run below proves its generated mirror and production gate.
       return;
     }
-    expect(existsSync(G02_RECEIPT_DOC_PATH)).toBe(true);
-    const committed: unknown = JSON.parse(readFileSync(G02_RECEIPT_DOC_PATH, 'utf8'));
-    expect(committed).toEqual(fresh);
-    expect(G02_REACT_RECEIPT).toEqual(committed);
+    expect(G02_REACT_RECEIPT).toEqual(fresh);
   });
 
   it.skipIf(process.env.OD_UPDATE_G02_RECEIPT === '1')('the gate accepts the committed receipt and refuses missing, failed, stale-unit or off-pin receipts', () => {

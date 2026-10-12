@@ -38,6 +38,7 @@ describe('canonical Vela terminal command integration', () => {
       },
       configuredEnv: {
         VELA_BIN: fakeVela,
+        FAKE_VELA_TERMINAL_LOG: logPath,
         VELA_INVOCATION_SOURCE: 'mish',
       },
       maxBuffer: 64 * 1024,
@@ -56,7 +57,7 @@ describe('canonical Vela terminal command integration', () => {
     try {
       await runVelaCommand(args, {
         ...common,
-        env: { ...common.env, FAKE_VELA_TERMINAL_MODE: 'unsupported' },
+        configuredEnv: { ...common.configuredEnv, FAKE_VELA_TERMINAL_MODE: 'unsupported' },
       });
     } catch (error) {
       failure = error;
@@ -70,13 +71,14 @@ describe('canonical Vela terminal command integration', () => {
   it('uses the settings-backed Vela binary from the resolved daemon data root', async () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'od-vela-terminal-settings-'));
     const logPath = path.join(tempDir, 'terminal.jsonl');
+    const launcher = path.join(tempDir, 'vela.mjs');
+    fs.writeFileSync(launcher, `#!/usr/bin/env node\nprocess.env.FAKE_VELA_TERMINAL_LOG = ${JSON.stringify(logPath)}; await import(${JSON.stringify(fakeVela)});\n`, { mode: 0o755 });
     fs.writeFileSync(
       path.join(tempDir, 'app-config.json'),
       JSON.stringify({
         agentCliEnv: {
           amr: {
-            VELA_BIN: fakeVela,
-            FAKE_VELA_TERMINAL_LOG: logPath,
+            VELA_BIN: launcher,
           },
         },
       }),

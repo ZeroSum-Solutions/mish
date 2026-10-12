@@ -190,7 +190,7 @@ async function writeVelaStub(root: string): Promise<string> {
     script,
     `import { appendFileSync } from 'node:fs';
 const args = process.argv.slice(2);
-appendFileSync(process.env.OD_TEST_VELA_LOG, 'profile=' + (process.env.MISH_AMR_PROFILE || '') + ' ' + args.join(' ') + '\\n');
+appendFileSync(${JSON.stringify(join(root, 'vela-calls.log'))}, 'profile=' + (process.env.MISH_AMR_PROFILE || '') + ' ' + args.join(' ') + '\\n');
 if (args[0] !== 'billing') process.exit(1);
 if (process.env.MISH_AMR_PROFILE !== 'test' && args[1] === 'workspace-snapshot') {
   process.stderr.write('API request failed with status 403: workspace_not_authorized\\n');

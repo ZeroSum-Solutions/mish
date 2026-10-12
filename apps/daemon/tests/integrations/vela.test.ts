@@ -549,10 +549,10 @@ describe('spawnVelaLogin', () => {
         HOME: tmpHome,
         MISH_AMR_PROFILE: 'feature-test',
         VELA_PROFILE: 'prod',
-        FAKE_VELA_LOGIN_USER_EMAIL: 'spawn-login@example.com',
       },
       configuredEnv: {
         VELA_BIN: FAKE_VELA,
+        FAKE_VELA_LOGIN_USER_EMAIL: 'spawn-login@example.com',
       },
     });
 
@@ -584,11 +584,11 @@ describe('spawnVelaLogin', () => {
         HOME: tmpHome,
         MISH_AMR_PROFILE: 'prod',
         VELA_PROFILE: 'prod',
-        FAKE_VELA_LOGIN_USER_EMAIL: 'settings-profile@example.com',
       },
       configuredEnv: {
         VELA_BIN: FAKE_VELA,
         MISH_AMR_PROFILE: 'local',
+        FAKE_VELA_LOGIN_USER_EMAIL: 'settings-profile@example.com',
       },
     });
 

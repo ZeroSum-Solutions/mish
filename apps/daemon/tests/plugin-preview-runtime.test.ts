@@ -1,5 +1,5 @@
 import express from 'express';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { runInNewContext } from 'node:vm';
@@ -97,9 +97,13 @@ it('runs storage-dependent preview scripts with isolated memory when storage get
   }
 });
 
-for (const family of ['fervor', 'wrenfield']) {
-  it(`serves ${family} gallery grain as a local PNG under its unchanged CSP`, async () => {
-    const root = path.resolve(import.meta.dirname, `../../../plugins/_official/examples/agency-${family}`);
+it('serves an owned gallery grain fixture as a local PNG under its unchanged CSP', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'mish-preview-gallery-'));
+  await mkdir(path.join(root, 'preview'));
+  const pngBytes = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aN3cAAAAASUVORK5CYII=', 'base64');
+  await writeFile(path.join(root, 'preview/grain.png'), pngBytes);
+  await writeFile(path.join(root, 'preview/gallery.html'), `<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="img-src 'self';"><style>body{background-image:url("grain.png")}</style></head><body></body></html>`);
+  try {
     await withPreview(root, 'preview/gallery.html', async (base) => {
       const response = await fetch(`${base}/api/plugins/example/preview`);
       expect(response.status).toBe(200);
@@ -111,25 +115,30 @@ for (const family of ['fervor', 'wrenfield']) {
       const png = await fetch(`${base}/api/plugins/example/asset/preview/grain.png`);
       expect(png.status).toBe(200);
       expect(png.headers.get('content-type')).toBe('image/png');
-      expect(Buffer.from(await png.arrayBuffer())).toEqual(await readFile(path.join(root, 'preview/grain.png')));
+      expect(Buffer.from(await png.arrayBuffer())).toEqual(pngBytes);
     });
-  });
-}
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
 
-it('serves the maben gallery with in-page section links that stay in the document', async () => {
-  const root = path.resolve(import.meta.dirname, '../../../plugins/_official/examples/agency-maben');
-  await withPreview(root, 'preview/gallery.html', async (base) => {
-    const response = await fetch(`${base}/api/plugins/example/preview`);
-    expect(response.status).toBe(200);
-    const html = await response.text();
-    // A <base> would resolve "#maben-how-we-work" against the asset directory and navigate away.
-    expect(html).not.toMatch(/<base\b/i);
-    const fragments = [...html.matchAll(/\shref="(#[^"]+)"/g)].map((match) => match[1]!);
-    expect(fragments).toContain('#maben-how-we-work');
-    for (const fragment of fragments) expect(html).toContain(`id="${fragment.slice(1)}"`);
-    // Every image still reaches the plugin asset route without a base.
-    const sources = [...html.matchAll(/<img\b[^>]*\ssrc="([^"]+)"/g)].map((match) => match[1]!);
-    expect(sources.length).toBeGreaterThan(0);
-    for (const src of sources) expect(src.startsWith('/api/plugins/example/asset/preview/assets/')).toBe(true);
-  });
+it('serves owned gallery section links in the document and rewrites relative images', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'mish-preview-links-'));
+  await mkdir(path.join(root, 'preview/assets'), { recursive: true });
+  await writeFile(path.join(root, 'preview/gallery.html'), '<!doctype html><html><head></head><body><a href="#how-we-work">Process</a><section id="how-we-work"><img src="assets/fixture.png" alt="Fixture"></section></body></html>');
+  try {
+    await withPreview(root, 'preview/gallery.html', async (base) => {
+      const response = await fetch(`${base}/api/plugins/example/preview`);
+      expect(response.status).toBe(200);
+      const html = await response.text();
+      expect(html).not.toMatch(/<base\b/i);
+      const fragments = [...html.matchAll(/\shref="(#[^"]+)"/g)].map((match) => match[1]!);
+      expect(fragments).toEqual(['#how-we-work']);
+      for (const fragment of fragments) expect(html).toContain(`id="${fragment.slice(1)}"`);
+      const sources = [...html.matchAll(/<img\b[^>]*\ssrc="([^"]+)"/g)].map((match) => match[1]!);
+      expect(sources).toEqual(['/api/plugins/example/asset/preview/assets/fixture.png']);
+    });
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
 });

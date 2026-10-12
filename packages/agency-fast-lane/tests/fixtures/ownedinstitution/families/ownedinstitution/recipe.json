@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 2,
+  "family": "ownedinstitution",
+  "revision": 1,
+  "brand": {
+    "name": "Fixture"
+  },
+  "sections": [
+    {
+      "id": "ownedinstitution-0",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "hero",
+      "type": "hero",
+      "content": {
+        "heading": "Fixture hours",
+        "railKey4": "Contact",
+        "railValue4": "Fixture",
+        "railKey1": "Hours",
+        "railValue1": "Hours example",
+        "railKey2": "Hours",
+        "railValue2": "Hours example",
+        "railKey3": "Hours",
+        "railValue3": "Hours example"
+      }
+    },
+    {
+      "id": "ownedinstitution-2",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedinstitution-3",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedinstitution-4",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail",
+        "event1Date": "Thu 2 Oct",
+        "event2Date": "Sat 11 Oct",
+        "event3Date": "Wed 22 Oct",
+        "event4Date": "Sun 2 Nov"
+      }
+    },
+    {
+      "id": "ownedinstitution-5",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "visit",
+      "type": "visit",
+      "content": {
+        "title": "Visit",
+        "block1Key1": "Wednesday-Friday",
+        "block1Value1": "11:00-18:00",
+        "block1Key2": "Saturday",
+        "block1Value2": "10:00-19:00",
+        "block1Key3": "Sunday",
+        "block1Value3": "10:00-17:00",
+        "block1Key4": "Monday and Tuesday",
+        "block1Value4": "closed"
+      }
+    },
+    {
+      "id": "ownedinstitution-7",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "ownedinstitution-8",
+      "type": "detail",
+      "content": {
+        "heading": "Fixture detail"
+      }
+    },
+    {
+      "id": "footer",
+      "type": "footer",
+      "content": {
+        "col2Row1": "Wednesday-Friday, 11:00-18:00",
+        "col2Row2": "Saturday, 10:00-19:00",
+        "col2Row3": "Sunday, 10:00-17:00",
+        "col2Row4": "Monday and Tuesday, closed"
+      }
+    }
+  ]
+}

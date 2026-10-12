@@ -310,26 +310,13 @@ describe('Mobbin through the read-only connector proxy (G29, AC-R12.2)', () => {
     expect((await od(['search', '--connector', 'mobbin', '--kind', 'apps', '--prompt-file', promptFile])).code).toBe(2);
   });
 
-  it('the frozen schema digests and the RightsAssessment are the committed G29 evidence', async () => {
-    const cmp = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
-    const canonical = (value: unknown) => JSON.stringify(value, (_key, item: unknown) =>
-      item && typeof item === 'object' && !Array.isArray(item) ? Object.fromEntries(Object.entries(item).sort(([a], [b]) => cmp(a, b))) : item);
-    const sha = (value: string) => createHash('sha256').update(value, 'utf8').digest('hex');
-    const receiptBytes = await readFile(path.join(repoRoot, MOBBIN_EVIDENCE.agentRunReceipt));
-    expect(createHash('sha256').update(receiptBytes).digest('hex')).toBe('7bfca76854efc248c711597aa77f8062c63cf1bf71cb8ceea405df02c5258c3f');
-    const receipt = JSON.parse(receiptBytes.toString('utf8')) as { tools: Array<{ name: string; inputSchema: unknown }>; detailCall: unknown };
-    expect(receipt.detailCall).toBeNull();
-    const byName = Object.fromEntries(receipt.tools.map(tool => [tool.name.replace(/^mcp__mobbin__/u, ''), tool]));
-    for (const kind of ['screens', 'flows', 'sections'] as const) {
-      const frozen = MOBBIN_FROZEN_TOOLS[kind];
-      expect(sha(canonical(byName[frozen.name]!.inputSchema))).toBe(frozen.schemaDigest);
+  it('retains frozen schema metadata and parsed rights without claiming the removed private G29 receipts', async () => {
+    for (const frozen of Object.values(MOBBIN_FROZEN_TOOLS)) {
+      expect(frozen.schemaDigest).toMatch(/^[a-f0-9]{64}$/);
       expect(frozen.evidenceRef).toBe(MOBBIN_EVIDENCE.agentRunReceipt);
     }
-    expect(sha(canonical([...receipt.tools].sort((a, b) => cmp(a.name, b.name))))).toBe(MOBBIN_TOOL_SET_DIGEST);
-    const committed = JSON.parse(await readFile(path.join(repoRoot, MOBBIN_EVIDENCE.rightsAssessment), 'utf8'));
-    expect(parseRightsAssessment(committed)).toEqual(MOBBIN_RIGHTS_ASSESSMENT);
-    const terms = JSON.parse(await readFile(path.join(repoRoot, MOBBIN_EVIDENCE.termsCapture), 'utf8'));
-    expect(MOBBIN_RIGHTS_ASSESSMENT.terms).toMatchObject({ sha256: terms.sha256, canonicalUrl: 'https://mobbin.com/terms', version: terms.effectiveDate });
+    expect(parseRightsAssessment(MOBBIN_RIGHTS_ASSESSMENT)).toEqual(MOBBIN_RIGHTS_ASSESSMENT);
+    expect(MOBBIN_RIGHTS_ASSESSMENT.terms).toMatchObject({ canonicalUrl: 'https://mobbin.com/terms', sha256: expect.stringMatching(/^[a-f0-9]{64}$/) });
     expect(MOBBIN_RIGHTS_ASSESSMENT.terms!.clauseRefs).toEqual(expect.arrayContaining(['3.2.1', '3.2.5', '3.4.1', '3.5']));
     expect(MOBBIN_RIGHTS_ASSESSMENT.source.contentSha256).toBe(MOBBIN_TOOL_SET_DIGEST);
     expect(MOBBIN_RIGHTS_ASSESSMENT.evaluator.basis).toBe('owner-accepted-private-use');

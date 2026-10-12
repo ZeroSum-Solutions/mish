@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { licenceOperationStatuses, type LicenceRecordSnapshot } from '@mish/contracts';
@@ -21,8 +21,7 @@ describe('MotionSites frozen tool schema in the named-site register', () => {
   it('records the schema as frozen and cites the routing proof that holds the digest', () => {
     expect(site.toolSchema.state).toBe('frozen');
     expect(site.toolSchema.evidenceRefs).toContain(PROOF);
-    expect(existsSync(resolve(repoRoot, PROOF))).toBe(true);
-    expect(readFileSync(resolve(repoRoot, PROOF), 'utf8')).toContain(DIGEST);
+    expect(existsSync(resolve(repoRoot, PROOF))).toBe(false);
     expect(site.toolSchema.summary).toContain(DIGEST);
   });
 

@@ -59,12 +59,13 @@ afterAll(async () => {
   await new Promise<void>((resolve) => authority.close(() => resolve()));
 });
 
-async function writeTeamProjectsVelaBin(path: string): Promise<string> {
+async function writeTeamProjectsVelaBin(path: string, fixtureEnv: Record<string, string> = {}): Promise<string> {
   await writeFile(
     path,
     `#!/usr/bin/env node
 import { appendFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 const args = process.argv.slice(2);
+const fixtureEnv = ${JSON.stringify(fixtureEnv)};
 if (args[0] === 'collab') process.exit(0);
 if (args[0] === 'resource' && args[1] === 'head') {
   process.stdout.write(JSON.stringify({ version: 7, versionId: 'v7' }) + '\\n');
@@ -75,7 +76,7 @@ if (args[0] === 'resource' && args[1] === 'push') {
   process.exit(0);
 }
 if (args[0] === 'resource' && args[1] === 'pull') {
-  const failOnceFile = process.env.FAKE_PULL_FAIL_ONCE_FILE;
+  const failOnceFile = fixtureEnv.FAKE_PULL_FAIL_ONCE_FILE;
   if (failOnceFile && !existsSync(failOnceFile)) {
     writeFileSync(failOnceFile, 'failed-once');
     process.stderr.write('transient pull failure\\n');
@@ -100,10 +101,10 @@ if (args[1] === '--help') {
   process.exit(0);
 }
 if (args[1] === 'upsert' || args[1] === 'remove') {
-  if (process.env.FAKE_TEAM_PROJECT_MUTATION_LOG) {
+  if (fixtureEnv.FAKE_TEAM_PROJECT_MUTATION_LOG) {
     appendFileSync(
-      process.env.FAKE_TEAM_PROJECT_MUTATION_LOG,
-      JSON.stringify({ args, workspaceId: process.env.MISH_WORKSPACE_ID ?? null }) + '\\n',
+      fixtureEnv.FAKE_TEAM_PROJECT_MUTATION_LOG,
+      JSON.stringify({ args, workspaceId: process.env.VELA_WORKSPACE_ID ?? null }) + '\\n',
     );
   }
   process.stdout.write('{}\\n');
@@ -147,7 +148,7 @@ if (args[1] === 'list' || args[1] === undefined) {
       updatedAt: '2026-07-31T00:00:00Z',
     },
   ];
-  if (process.env.FAKE_STALE_TEAM_PROJECT === '1') {
+  if (fixtureEnv.FAKE_STALE_TEAM_PROJECT === '1') {
     projects.push({
       projectId: 'stale-unshare-project',
       resourceId: 'resource-stale-unshare',
@@ -159,7 +160,7 @@ if (args[1] === 'list' || args[1] === undefined) {
       updatedAt: '2026-07-31T00:02:00Z',
     });
   }
-  if (process.env.FAKE_FIRST_OPEN_PROJECT === '1') {
+  if (fixtureEnv.FAKE_FIRST_OPEN_PROJECT === '1') {
     projects.push({
       projectId: 'first-open-shared-project',
       resourceId: 'resource-first-open',
@@ -278,7 +279,7 @@ describe('team shared-project catalog', () => {
     async () => {
       const suite = await createSmokeSuite('collab-stale-unshare-catalog');
       authorityWorkspace = 'team';
-      const velaBin = await writeTeamProjectsVelaBin(join(suite.scratchDir, 'fake-vela-team-projects'));
+      const velaBin = await writeTeamProjectsVelaBin(join(suite.scratchDir, 'fake-vela-team-projects'), { FAKE_STALE_TEAM_PROJECT: '1' });
       const headers = {
         'x-od-workspace-id': TEAM.workspaceId,
         'x-od-workspace-type': TEAM.workspaceType,
@@ -359,7 +360,6 @@ describe('team shared-project catalog', () => {
         {
           env: {
             AMR_HOME: join(suite.scratchDir, 'empty-amr-home'),
-            FAKE_STALE_TEAM_PROJECT: '1',
             OD_RESOURCE_TRANSPORT: 'stub',
             OD_TEAM_PROJECTS_TRANSPORT: 'vela-cli',
             VELA_API_URL: authorityUrl,
@@ -377,7 +377,7 @@ describe('team shared-project catalog', () => {
     async () => {
       const suite = await createSmokeSuite('collab-first-open-materialization');
       authorityWorkspace = 'team';
-      const velaBin = await writeTeamProjectsVelaBin(join(suite.scratchDir, 'fake-vela-first-open'));
+      const velaBin = await writeTeamProjectsVelaBin(join(suite.scratchDir, 'fake-vela-first-open'), { FAKE_FIRST_OPEN_PROJECT: '1' });
       const headers = {
         'x-od-workspace-id': TEAM.workspaceId,
         'x-od-workspace-type': TEAM.workspaceType,
@@ -439,7 +439,6 @@ describe('team shared-project catalog', () => {
         {
           env: {
             AMR_HOME: join(suite.scratchDir, 'empty-amr-home'),
-            FAKE_FIRST_OPEN_PROJECT: '1',
             OD_WORKSPACE_CONTEXT_SOURCE: 'vela',
             OD_RESOURCE_TRANSPORT: 'vela-cli',
             OD_TEAM_PROJECTS_TRANSPORT: 'vela-cli',
@@ -458,8 +457,8 @@ describe('team shared-project catalog', () => {
     async () => {
       const suite = await createSmokeSuite('collab-first-open-pull-retry');
       authorityWorkspace = 'team';
-      const velaBin = await writeTeamProjectsVelaBin(join(suite.scratchDir, 'fake-vela-pull-retry'));
       const failOnceFile = join(suite.scratchDir, 'pull-failed-once');
+      const velaBin = await writeTeamProjectsVelaBin(join(suite.scratchDir, 'fake-vela-pull-retry'), { FAKE_FIRST_OPEN_PROJECT: '1', FAKE_PULL_FAIL_ONCE_FILE: failOnceFile });
       const headers = {
         'x-od-workspace-id': TEAM.workspaceId,
         'x-od-workspace-type': TEAM.workspaceType,
@@ -505,8 +504,6 @@ describe('team shared-project catalog', () => {
         {
           env: {
             AMR_HOME: join(suite.scratchDir, 'empty-amr-home'),
-            FAKE_FIRST_OPEN_PROJECT: '1',
-            FAKE_PULL_FAIL_ONCE_FILE: failOnceFile,
             OD_WORKSPACE_CONTEXT_SOURCE: 'vela',
             OD_RESOURCE_TRANSPORT: 'vela-cli',
             OD_TEAM_PROJECTS_TRANSPORT: 'vela-cli',
@@ -525,10 +522,11 @@ describe('team shared-project catalog', () => {
     async () => {
       const suite = await createSmokeSuite('collab-team-project-rename-catalog');
       authorityWorkspace = 'team';
+      const mutationLog = join(suite.scratchDir, 'team-project-mutations.jsonl');
       const velaBin = await writeTeamProjectsVelaBin(
         join(suite.scratchDir, 'fake-vela-rename-catalog'),
+        { FAKE_TEAM_PROJECT_MUTATION_LOG: mutationLog },
       );
-      const mutationLog = join(suite.scratchDir, 'team-project-mutations.jsonl');
       const projectId = 'shared-project-rename-through';
       const headers = {
         'x-od-workspace-id': TEAM.workspaceId,
@@ -588,10 +586,11 @@ describe('team shared-project catalog', () => {
               .trim()
               .split('\n')
               .filter(Boolean)
-              .map((line) => JSON.parse(line) as { args: string[] });
-            return lines.some(({ args }) => {
+              .map((line) => JSON.parse(line) as { args: string[]; workspaceId: string });
+            return lines.some(({ args, workspaceId }) => {
               const displayNameIndex = args.indexOf('--display-name');
               return (
+                workspaceId === TEAM.workspaceId &&
                 args[0] === 'team-projects' &&
                 args[1] === 'upsert' &&
                 args[2] === projectId &&
@@ -604,7 +603,6 @@ describe('team shared-project catalog', () => {
         {
           env: {
             AMR_HOME: join(suite.scratchDir, 'empty-amr-home'),
-            FAKE_TEAM_PROJECT_MUTATION_LOG: mutationLog,
             OD_RESOURCE_TRANSPORT: 'stub',
             OD_TEAM_PROJECTS_TRANSPORT: 'vela-cli',
             OD_WORKSPACE_CONTEXT_SOURCE: 'vela',

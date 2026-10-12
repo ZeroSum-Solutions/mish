@@ -6,8 +6,8 @@
  * package's own compiler — the contract runs first, so a refused drop throws here — and checks
  * what a drop must leave behind: no element, edit target or in-page link for the section, every
  * other section still present, none of its own assets requested, and no new dangling in-page
- * anchor. Some families already route by hash anchors that point at no element (watson's
- * `#watson-ui-route-*`, maben's `#projects`), so the last check compares against the full render
+ * anchor. Some families already route by hash anchors that point at no element (an editorial fixture's
+ * `#an editorial fixture-ui-route-*`, a site fixture's `#projects`), so the last check compares against the full render
  * rather than demanding none at all.
  */
 

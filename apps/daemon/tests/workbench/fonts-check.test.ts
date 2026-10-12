@@ -4,8 +4,8 @@ import { checkFont } from '../../src/fonts/check.js';
 import { parseUnicodeRanges, rangesContain } from '../../src/fonts/catalogue.js';
 import { renderFontSpecimen } from '../../src/fonts/specimen.js';
 import { resourceRefKey } from '../../src/workbench/context-ranking.js';
-import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
-import { REPO_BUNDLED_PLUGINS_ROOT, authority, catalogueCopy } from './fonts-fixture.js';
+import { createFontsResourceSource } from '../fixtures/daemon-b/fonts.js';
+import { REPO_BUNDLED_PLUGINS_ROOT, authority, catalogueCopy } from '../fixtures/daemon-b/fonts.js';
 
 async function font(id: string) {
   const source = createFontsResourceSource({ root: REPO_BUNDLED_PLUGINS_ROOT });

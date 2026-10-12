@@ -38,22 +38,22 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.79,
         "probabilities": {
           "marketing-site": 0,
           "none": 0.01,
-          "halcyon": 0,
+          "ownedinstitution": 0,
           "publication": 0,
-          "wrenfield": 0,
-          "maben": 0,
+          "ownedcontractor": 0,
+          "ownedsite": 0,
           "app-shell": 0,
-          "fervor": 0.81,
-          "maren": 0,
+          "ownedcinematic": 0.81,
+          "ownedmaker": 0,
           "nonprofit": 0,
           "listings": 0,
-          "emmpo": 0,
-          "watson": 0.17,
+          "ownedlearning": 0,
+          "ownededitorial": 0.17,
           "crm-dashboard": 0
         }
       },
@@ -112,20 +112,20 @@
         "choice": "marketing-site",
         "confidence": 0.83,
         "probabilities": {
-          "halcyon": 0,
+          "ownedinstitution": 0,
           "marketing-site": 0.85,
-          "watson": 0.03,
-          "emmpo": 0,
-          "wrenfield": 0,
+          "ownededitorial": 0.03,
+          "ownedlearning": 0,
+          "ownedcontractor": 0,
           "listings": 0,
-          "fervor": 0.08,
+          "ownedcinematic": 0.08,
           "publication": 0,
           "nonprofit": 0,
           "crm-dashboard": 0,
           "app-shell": 0,
           "none": 0.04,
-          "maben": 0,
-          "maren": 0
+          "ownedsite": 0,
+          "ownedmaker": 0
         }
       },
       "archetype": {
@@ -178,23 +178,23 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.4,
         "probabilities": {
-          "fervor": 0.45,
+          "ownedcinematic": 0.45,
           "app-shell": 0,
-          "maren": 0.01,
-          "emmpo": 0,
-          "wrenfield": 0,
-          "watson": 0.12,
+          "ownedmaker": 0.01,
+          "ownedlearning": 0,
+          "ownedcontractor": 0,
+          "ownededitorial": 0.12,
           "listings": 0,
           "crm-dashboard": 0,
-          "maben": 0,
+          "ownedsite": 0,
           "publication": 0.03,
           "none": 0.12,
           "marketing-site": 0.26,
           "nonprofit": 0,
-          "halcyon": 0.01
+          "ownedinstitution": 0.01
         }
       },
       "archetype": {
@@ -249,20 +249,20 @@
         "choice": "marketing-site",
         "confidence": 0.76,
         "probabilities": {
-          "halcyon": 0,
-          "maben": 0,
+          "ownedinstitution": 0,
+          "ownedsite": 0,
           "nonprofit": 0,
           "marketing-site": 0.79,
-          "fervor": 0.06,
+          "ownedcinematic": 0.06,
           "publication": 0,
-          "watson": 0.1,
+          "ownededitorial": 0.1,
           "listings": 0,
-          "maren": 0,
+          "ownedmaker": 0,
           "crm-dashboard": 0,
           "none": 0.05,
           "app-shell": 0,
-          "emmpo": 0,
-          "wrenfield": 0
+          "ownedlearning": 0,
+          "ownedcontractor": 0
         }
       },
       "archetype": {
@@ -315,22 +315,22 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.36,
         "probabilities": {
-          "maren": 0,
+          "ownedmaker": 0,
           "listings": 0,
-          "watson": 0.14,
+          "ownededitorial": 0.14,
           "crm-dashboard": 0,
           "app-shell": 0,
-          "emmpo": 0.12,
-          "fervor": 0.4,
+          "ownedlearning": 0.12,
+          "ownedcinematic": 0.4,
           "marketing-site": 0.19,
-          "wrenfield": 0,
+          "ownedcontractor": 0,
           "publication": 0.05,
-          "halcyon": 0,
+          "ownedinstitution": 0,
           "none": 0.08,
-          "maben": 0,
+          "ownedsite": 0,
           "nonprofit": 0.02
         }
       },
@@ -383,23 +383,23 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.94,
         "probabilities": {
           "nonprofit": 0,
-          "maben": 0,
-          "halcyon": 0,
-          "watson": 0.05,
+          "ownedsite": 0,
+          "ownedinstitution": 0,
+          "ownededitorial": 0.05,
           "app-shell": 0,
           "listings": 0,
-          "fervor": 0.95,
-          "wrenfield": 0,
-          "emmpo": 0,
+          "ownedcinematic": 0.95,
+          "ownedcontractor": 0,
+          "ownedlearning": 0,
           "none": 0,
           "publication": 0,
           "crm-dashboard": 0,
           "marketing-site": 0,
-          "maren": 0
+          "ownedmaker": 0
         }
       },
       "archetype": {
@@ -454,23 +454,23 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.69,
         "probabilities": {
           "marketing-site": 0,
-          "halcyon": 0,
-          "watson": 0.1,
-          "emmpo": 0.01,
-          "wrenfield": 0,
+          "ownedinstitution": 0,
+          "ownededitorial": 0.1,
+          "ownedlearning": 0.01,
+          "ownedcontractor": 0,
           "listings": 0.01,
           "app-shell": 0,
           "publication": 0,
           "nonprofit": 0,
           "crm-dashboard": 0,
-          "fervor": 0.72,
+          "ownedcinematic": 0.72,
           "none": 0.16,
-          "maben": 0,
-          "maren": 0
+          "ownedsite": 0,
+          "ownedmaker": 0
         }
       },
       "archetype": {
@@ -525,20 +525,20 @@
         "choice": "marketing-site",
         "confidence": 0.98,
         "probabilities": {
-          "wrenfield": 0,
+          "ownedcontractor": 0,
           "listings": 0,
           "none": 0.01,
           "crm-dashboard": 0,
-          "emmpo": 0,
+          "ownedlearning": 0,
           "publication": 0,
-          "maben": 0,
+          "ownedsite": 0,
           "marketing-site": 0.98,
           "nonprofit": 0,
-          "halcyon": 0,
+          "ownedinstitution": 0,
           "app-shell": 0,
-          "watson": 0.01,
-          "maren": 0,
-          "fervor": 0
+          "ownededitorial": 0.01,
+          "ownedmaker": 0,
+          "ownedcinematic": 0
         }
       },
       "archetype": {
@@ -594,18 +594,18 @@
         "choice": "marketing-site",
         "confidence": 0.76,
         "probabilities": {
-          "maben": 0,
+          "ownedsite": 0,
           "listings": 0,
           "nonprofit": 0,
-          "halcyon": 0,
-          "emmpo": 0,
+          "ownedinstitution": 0,
+          "ownedlearning": 0,
           "marketing-site": 0.78,
-          "watson": 0.13,
-          "maren": 0,
+          "ownededitorial": 0.13,
+          "ownedmaker": 0,
           "crm-dashboard": 0,
           "publication": 0,
-          "wrenfield": 0,
-          "fervor": 0.03,
+          "ownedcontractor": 0,
+          "ownedcinematic": 0.03,
           "app-shell": 0,
           "none": 0.06
         }
@@ -660,22 +660,22 @@
         }
       },
       "family": {
-        "choice": "watson",
+        "choice": "ownededitorial",
         "confidence": 0.54,
         "probabilities": {
           "publication": 0,
-          "wrenfield": 0.31,
-          "emmpo": 0,
+          "ownedcontractor": 0.31,
+          "ownedlearning": 0,
           "crm-dashboard": 0,
-          "watson": 0.59,
+          "ownededitorial": 0.59,
           "app-shell": 0,
-          "fervor": 0.01,
+          "ownedcinematic": 0.01,
           "nonprofit": 0,
-          "maren": 0,
+          "ownedmaker": 0,
           "none": 0.05,
           "marketing-site": 0.03,
-          "halcyon": 0,
-          "maben": 0.01,
+          "ownedinstitution": 0,
+          "ownedsite": 0.01,
           "listings": 0
         }
       },
@@ -731,23 +731,23 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.55,
         "probabilities": {
-          "fervor": 0.59,
-          "watson": 0.27,
-          "emmpo": 0.03,
+          "ownedcinematic": 0.59,
+          "ownededitorial": 0.27,
+          "ownedlearning": 0.03,
           "none": 0.02,
-          "halcyon": 0,
-          "maren": 0,
+          "ownedinstitution": 0,
+          "ownedmaker": 0,
           "nonprofit": 0,
           "app-shell": 0,
-          "maben": 0,
+          "ownedsite": 0,
           "listings": 0,
           "publication": 0.02,
           "marketing-site": 0.07,
           "crm-dashboard": 0,
-          "wrenfield": 0
+          "ownedcontractor": 0
         }
       },
       "archetype": {
@@ -802,20 +802,20 @@
         "choice": "listings",
         "confidence": 0.44,
         "probabilities": {
-          "halcyon": 0.01,
+          "ownedinstitution": 0.01,
           "nonprofit": 0,
           "publication": 0,
-          "watson": 0.35,
-          "maben": 0.01,
+          "ownededitorial": 0.35,
+          "ownedsite": 0.01,
           "listings": 0.49,
-          "wrenfield": 0,
+          "ownedcontractor": 0,
           "app-shell": 0,
-          "emmpo": 0,
+          "ownedlearning": 0,
           "none": 0.09,
           "marketing-site": 0.01,
-          "fervor": 0.03,
+          "ownedcinematic": 0.03,
           "crm-dashboard": 0,
-          "maren": 0.01
+          "ownedmaker": 0.01
         }
       },
       "archetype": {
@@ -873,19 +873,19 @@
         "confidence": 0.76,
         "probabilities": {
           "marketing-site": 0.17,
-          "halcyon": 0,
+          "ownedinstitution": 0,
           "none": 0.01,
           "publication": 0.78,
-          "wrenfield": 0,
-          "maben": 0,
+          "ownedcontractor": 0,
+          "ownedsite": 0,
           "app-shell": 0,
-          "fervor": 0,
-          "maren": 0,
+          "ownedcinematic": 0,
+          "ownedmaker": 0,
           "nonprofit": 0,
           "listings": 0,
           "crm-dashboard": 0,
-          "emmpo": 0.04,
-          "watson": 0
+          "ownedlearning": 0.04,
+          "ownededitorial": 0
         }
       },
       "archetype": {
@@ -937,7 +937,7 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.78,
         "probabilities": {
           "crm-dashboard": 0,
@@ -945,15 +945,15 @@
           "none": 0,
           "marketing-site": 0,
           "app-shell": 0,
-          "watson": 0.19,
-          "fervor": 0.81,
-          "maren": 0,
+          "ownededitorial": 0.19,
+          "ownedcinematic": 0.81,
+          "ownedmaker": 0,
           "publication": 0,
-          "emmpo": 0,
-          "maben": 0,
-          "wrenfield": 0,
+          "ownedlearning": 0,
+          "ownedsite": 0,
+          "ownedcontractor": 0,
           "listings": 0,
-          "halcyon": 0
+          "ownedinstitution": 0
         }
       },
       "archetype": {
@@ -1012,19 +1012,19 @@
         "confidence": 0.56,
         "probabilities": {
           "nonprofit": 0,
-          "halcyon": 0.23,
-          "maben": 0,
+          "ownedinstitution": 0.23,
+          "ownedsite": 0,
           "none": 0.6,
           "app-shell": 0,
           "listings": 0,
-          "fervor": 0.13,
-          "wrenfield": 0,
-          "emmpo": 0,
-          "watson": 0.02,
+          "ownedcinematic": 0.13,
+          "ownedcontractor": 0,
+          "ownedlearning": 0,
+          "ownededitorial": 0.02,
           "crm-dashboard": 0,
           "publication": 0.02,
           "marketing-site": 0,
-          "maren": 0
+          "ownedmaker": 0
         }
       }
     },
@@ -1068,20 +1068,20 @@
         "choice": "marketing-site",
         "confidence": 0.68,
         "probabilities": {
-          "halcyon": 0,
-          "maben": 0,
+          "ownedinstitution": 0,
+          "ownedsite": 0,
           "nonprofit": 0,
           "marketing-site": 0.7,
-          "fervor": 0.12,
-          "watson": 0.12,
+          "ownedcinematic": 0.12,
+          "ownededitorial": 0.12,
           "publication": 0,
           "listings": 0,
-          "wrenfield": 0,
+          "ownedcontractor": 0,
           "crm-dashboard": 0,
           "app-shell": 0,
           "none": 0.05,
-          "emmpo": 0,
-          "maren": 0.01
+          "ownedlearning": 0,
+          "ownedmaker": 0.01
         }
       },
       "archetype": {
@@ -1137,20 +1137,20 @@
         "choice": "listings",
         "confidence": 0.45,
         "probabilities": {
-          "watson": 0.03,
+          "ownededitorial": 0.03,
           "publication": 0,
           "crm-dashboard": 0,
-          "wrenfield": 0,
-          "halcyon": 0.02,
-          "fervor": 0.04,
+          "ownedcontractor": 0,
+          "ownedinstitution": 0.02,
+          "ownedcinematic": 0.04,
           "marketing-site": 0.08,
           "listings": 0.5,
-          "maren": 0.17,
+          "ownedmaker": 0.17,
           "nonprofit": 0,
-          "maben": 0,
+          "ownedsite": 0,
           "none": 0.16,
           "app-shell": 0,
-          "emmpo": 0
+          "ownedlearning": 0
         }
       },
       "archetype": {
@@ -1202,20 +1202,20 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.41,
         "probabilities": {
           "none": 0.16,
-          "watson": 0.37,
-          "wrenfield": 0,
-          "halcyon": 0,
-          "fervor": 0.46,
+          "ownededitorial": 0.37,
+          "ownedcontractor": 0,
+          "ownedinstitution": 0,
+          "ownedcinematic": 0.46,
           "listings": 0,
-          "maren": 0,
+          "ownedmaker": 0,
           "publication": 0,
-          "emmpo": 0,
+          "ownedlearning": 0,
           "crm-dashboard": 0,
-          "maben": 0,
+          "ownedsite": 0,
           "app-shell": 0,
           "nonprofit": 0,
           "marketing-site": 0.01
@@ -1273,20 +1273,20 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.49,
         "probabilities": {
-          "emmpo": 0.23,
+          "ownedlearning": 0.23,
           "publication": 0,
-          "watson": 0.11,
-          "wrenfield": 0,
-          "maben": 0,
+          "ownededitorial": 0.11,
+          "ownedcontractor": 0,
+          "ownedsite": 0,
           "nonprofit": 0,
           "marketing-site": 0.08,
-          "maren": 0,
+          "ownedmaker": 0,
           "none": 0.03,
-          "halcyon": 0.01,
-          "fervor": 0.54,
+          "ownedinstitution": 0.01,
+          "ownedcinematic": 0.54,
           "listings": 0,
           "crm-dashboard": 0,
           "app-shell": 0
@@ -1341,22 +1341,22 @@
         }
       },
       "family": {
-        "choice": "maren",
+        "choice": "ownedmaker",
         "confidence": 0.76,
         "probabilities": {
           "listings": 0.04,
           "crm-dashboard": 0,
           "nonprofit": 0,
-          "watson": 0,
+          "ownededitorial": 0,
           "marketing-site": 0.02,
-          "fervor": 0.02,
-          "maren": 0.78,
+          "ownedcinematic": 0.02,
+          "ownedmaker": 0.78,
           "none": 0.04,
-          "wrenfield": 0,
+          "ownedcontractor": 0,
           "publication": 0,
-          "emmpo": 0,
-          "maben": 0,
-          "halcyon": 0.09999999999999999,
+          "ownedlearning": 0,
+          "ownedsite": 0,
+          "ownedinstitution": 0.09999999999999999,
           "app-shell": 0
         }
       },
@@ -1409,18 +1409,18 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.6,
         "probabilities": {
-          "wrenfield": 0,
-          "fervor": 0.64,
-          "halcyon": 0,
+          "ownedcontractor": 0,
+          "ownedcinematic": 0.64,
+          "ownedinstitution": 0,
           "listings": 0,
-          "emmpo": 0.15,
-          "maren": 0,
-          "watson": 0.05,
+          "ownedlearning": 0.15,
+          "ownedmaker": 0,
+          "ownededitorial": 0.05,
           "none": 0.15,
-          "maben": 0,
+          "ownedsite": 0,
           "crm-dashboard": 0,
           "app-shell": 0,
           "nonprofit": 0,
@@ -1477,21 +1477,21 @@
         }
       },
       "family": {
-        "choice": "watson",
+        "choice": "ownededitorial",
         "confidence": 0.19,
         "probabilities": {
-          "wrenfield": 0,
+          "ownedcontractor": 0,
           "app-shell": 0,
-          "watson": 0.25,
-          "emmpo": 0.12,
-          "halcyon": 0.15,
+          "ownededitorial": 0.25,
+          "ownedlearning": 0.12,
+          "ownedinstitution": 0.15,
           "nonprofit": 0,
           "none": 0.08,
           "crm-dashboard": 0,
-          "maben": 0,
+          "ownedsite": 0,
           "publication": 0,
-          "fervor": 0.18,
-          "maren": 0.01,
+          "ownedcinematic": 0.18,
+          "ownedmaker": 0.01,
           "listings": 0.02,
           "marketing-site": 0.19
         }
@@ -1545,23 +1545,23 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.62,
         "probabilities": {
           "publication": 0,
           "none": 0.08,
           "app-shell": 0,
           "listings": 0,
-          "fervor": 0.66,
-          "halcyon": 0,
-          "emmpo": 0,
-          "wrenfield": 0,
+          "ownedcinematic": 0.66,
+          "ownedinstitution": 0,
+          "ownedlearning": 0,
+          "ownedcontractor": 0,
           "crm-dashboard": 0,
           "marketing-site": 0.01,
-          "watson": 0.14,
+          "ownededitorial": 0.14,
           "nonprofit": 0,
-          "maben": 0.11,
-          "maren": 0
+          "ownedsite": 0.11,
+          "ownedmaker": 0
         }
       },
       "archetype": {
@@ -1616,21 +1616,21 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.73,
         "probabilities": {
           "marketing-site": 0,
-          "halcyon": 0,
+          "ownedinstitution": 0,
           "none": 0.01,
           "publication": 0,
-          "wrenfield": 0,
-          "maben": 0,
-          "watson": 0.23,
-          "fervor": 0.76,
-          "maren": 0,
+          "ownedcontractor": 0,
+          "ownedsite": 0,
+          "ownededitorial": 0.23,
+          "ownedcinematic": 0.76,
+          "ownedmaker": 0,
           "nonprofit": 0,
           "listings": 0,
-          "emmpo": 0,
+          "ownedlearning": 0,
           "crm-dashboard": 0,
           "app-shell": 0
         }
@@ -1687,23 +1687,23 @@
         }
       },
       "family": {
-        "choice": "fervor",
+        "choice": "ownedcinematic",
         "confidence": 0.93,
         "probabilities": {
           "marketing-site": 0,
           "publication": 0,
           "app-shell": 0,
           "crm-dashboard": 0,
-          "maben": 0,
+          "ownedsite": 0,
           "none": 0,
-          "maren": 0,
+          "ownedmaker": 0,
           "nonprofit": 0,
           "listings": 0,
-          "emmpo": 0,
-          "wrenfield": 0,
-          "watson": 0.06,
-          "fervor": 0.9400000000000001,
-          "halcyon": 0
+          "ownedlearning": 0,
+          "ownedcontractor": 0,
+          "ownededitorial": 0.06,
+          "ownedcinematic": 0.9400000000000001,
+          "ownedinstitution": 0
         }
       },
       "archetype": {

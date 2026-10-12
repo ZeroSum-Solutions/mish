@@ -45,7 +45,7 @@ test('HTML naming semantics handle hidden ancestors, nested referenced labels an
   assert.equal(error.message, 'Rendered output failed structure checks');
   assert(error.report.issues.length > 0, 'detailed local report remains available without leaking through message');
 });
-test('all 19 bundled family reference and minimum-length variable recipes pass the structural contract', async () => {
+test('all 12 public bundled family reference and minimum-length variable recipes pass the structural contract', async () => {
   const root=path.resolve(import.meta.dirname,'../../../plugins/_official/examples');let count=0;
   for(const name of readdirSync(root).filter(name=>name.startsWith('agency-'))){
     const family=name.slice(7),scripts=path.join(root,name,'compiler/scripts');
@@ -67,7 +67,7 @@ test('all 19 bundled family reference and minimum-length variable recipes pass t
     }
     count++;
   }
-  assert.equal(count,19);
+  assert.equal(count,12);
 });
 test('a control hidden from assistive technology and out of the tab order is decoration, not an unlabelled control', () => {
   assert.equal(checkRenderQuality(page('<input type="range" disabled aria-hidden="true" tabindex="-1">')).passed, true);

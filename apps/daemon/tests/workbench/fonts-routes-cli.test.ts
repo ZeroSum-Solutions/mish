@@ -7,8 +7,8 @@ import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { registerWorkbenchFontRoutes } from '../../src/routes/workbench-fonts.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';
-import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
-import { REPO_BUNDLED_PLUGINS_ROOT } from './fonts-fixture.js';
+import { createFontsResourceSource } from '../fixtures/daemon-b/fonts.js';
+import { REPO_BUNDLED_PLUGINS_ROOT } from '../fixtures/daemon-b/fonts.js';
 import { savedContext, projectState } from './context-ranking-fixture.js';
 
 let server: Server | undefined;

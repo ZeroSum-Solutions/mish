@@ -58,7 +58,7 @@ let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { input += chunk; });
 process.stdin.on('end', () => {
-  fs.writeFileSync(process.env.OD_CAPTURE_PROMPT_PATH, input, 'utf8');
+  fs.writeFileSync(${JSON.stringify(capturePath)}, input, 'utf8');
   console.log(JSON.stringify({ type: 'text', part: { text: '好了。' } }));
 });
 `,

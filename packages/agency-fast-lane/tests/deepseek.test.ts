@@ -255,7 +255,7 @@ test('a network error before any byte arrives is retried', async () => {
 });
 
 // -- transportRetryReasonOf: what `run.ts`'s bounded unit-level retry may retry (G8 final on
-// 857a46b982, halcyon x deepseek ECONNRESET mid-request, --no-failover) ------------------------
+// 857a46b982, ownedinstitution x deepseek ECONNRESET mid-request, --no-failover) ------------------------
 
 test('transportRetryReasonOf: an exhausted pre-first-byte network error is retryable, by its code', async () => {
   const captured: Captured[] = [];
@@ -298,7 +298,7 @@ test('transportRetryReasonOf: an exhausted 429/5xx with no body read is retryabl
 });
 
 // Round 2 audit (Opus F2): a mid-stream failure carrying a recognized network-reset code IS
-// retryable at this classifier's level (G8 final root cause (b): halcyon x deepseek's own failure
+// retryable at this classifier's level (G8 final root cause (b): ownedinstitution x deepseek's own failure
 // was exactly this shape, ECONNRESET after the first token). Whether `run.ts`'s `callModel`
 // actually retries it is a separate, higher-layer decision — see `ModelRequest.hasMergedOutput`'s
 // own doc — this function only classifies the error.

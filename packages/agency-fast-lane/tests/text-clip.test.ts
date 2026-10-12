@@ -6,10 +6,23 @@
 
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import type { SectionAdapter } from '../../../plugins/_official/shared/agency-compiler/scripts/section-adapter.ts';
 import type { ModelCall } from '../src/deepseek.ts';
-import { budgetsFor, clipAdapterFill, fillSectionAdapter, resolveSectionAdapter, SectionSelectionRefusedError } from '../src/section-overlay.ts';
+import { budgetsFor, clipAdapterFill, fillSectionAdapter, resolveSectionAdapter as resolvePublicAdapter, SectionSelectionRefusedError } from '../src/section-overlay.ts';
 import { briefNames, clipWholeWords, cutNames, isWholeWordPrefix, NUMBER_WORDS, promptLimit, tinyValueStands, wordBudget, wordFragments } from '../src/text-clip.ts';
 import { promptBlock } from './fixtures.ts';
+
+// Owned slot-only fixtures exercise fill policy independently of unavailable vendor markup.
+async function resolveSectionAdapter(id: string): Promise<SectionAdapter> {
+  if (!id.startsWith('test:')) return resolvePublicAdapter(id);
+  const text: SectionAdapter['text'] = id === 'test:word-budgets'
+    ? [{ name: 'label', max: 7 }, { name: 'detail', max: 80, atom: 'plain' }, { name: 'body', max: 80 }]
+    : id === 'test:tiny-budgets'
+      ? [1, 2, 3, 4].map(n => ({ name: `item${n}`, max: 3, atom: 'plain' as const }))
+      : [{ name: 'heading3b', max: 40 }, { name: 'body', max: 80 }];
+  assert.ok(['test:word-budgets', 'test:name-budgets', 'test:tiny-budgets'].includes(id));
+  return { id, version: '1', sourceBlockId: id, sourceSha256: '', roles: [], text, css: '', render: () => '<section>Fixture</section>' };
+}
 
 const BRIEF = 'Ledgerline, accounting for small creative studios: invoices, time tracking and payroll in one place. Connects to Stripe, QuickBooks and Gusto. Free trial, no card needed.';
 
@@ -79,7 +92,7 @@ test('promptLimit and wordBudget: headroom only above small limits, at least one
 });
 
 test('fill prompt (composed): carries every slot\'s character limit and word budget, and LIMITS below the hard maxima', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-footer-apple');
+  const adapter = await resolveSectionAdapter('test:word-budgets');
   const prompts: string[] = [];
   const model: ModelCall = async ({ user }) => {
     prompts.push(user);
@@ -102,7 +115,7 @@ test('fill prompt (composed): carries every slot\'s character limit and word bud
 });
 
 test('fill prompt: an item group gets one budget line per field', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-bento-shadcn');
+  const adapter = { ...await resolveSectionAdapter('test:name-budgets'), items: {name: 'rows', count: 2, fields: [{name: 'label', max: 40}]} };
   const lines = budgetsFor(adapter);
   if (adapter.items) {
     for (const field of adapter.items.fields) assert.ok(lines.some((line) => line.includes(`items.${adapter.items!.name}[0-${adapter.items!.count - 1}].${field.name}: at most ${promptLimit(field.max)} characters`)));
@@ -129,7 +142,7 @@ function overLimitModel(adapter: Awaited<ReturnType<typeof resolveSectionAdapter
 
 test('fillSectionAdapter: a model that stays over every limit still yields whole words only', async () => {
   let accepted = 0;
-  for (const id of ['cult:marketing-cta-cosmic', 'cult:marketing-bento-shadcn', 'hyperui:marketing/sections/1']) {
+  for (const id of ['hyperui:marketing/ctas/1', 'test:name-budgets', 'hyperui:marketing/sections/1']) {
     const adapter = await resolveSectionAdapter(id);
     const answers: Record<string, string>[] = [];
     const model = overLimitModel(adapter, answers);
@@ -157,7 +170,7 @@ test('fillSectionAdapter: a model that stays over every limit still yields whole
 });
 
 test('clipAdapterFill: a nullable slot no word fits is omitted; a required one is left over its limit to be refused', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-footer-apple');
+  const adapter = await resolveSectionAdapter('test:word-budgets');
   const nullable = adapter.text.find((slot) => slot.atom)!;
   const required = adapter.text.find((slot) => !slot.atom && slot.max <= 7)!;
   const long = 'Supercalifragilisticexpialidociousness'.repeat(3);
@@ -175,7 +188,7 @@ test('clipAdapterFill: a nullable slot no word fits is omitted; a required one i
 });
 
 test('fillSectionAdapter: a required label no word of which fits gets one narrow shorten request, never a fragment', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-footer-apple');
+  const adapter = await resolveSectionAdapter('test:word-budgets');
   const tiny = adapter.text.find((slot) => !slot.atom && slot.max >= 5 && slot.max <= 7)!;
   const prompts: string[] = [];
   const model: ModelCall = async ({ user }) => {
@@ -198,7 +211,7 @@ test('fillSectionAdapter: a required label no word of which fits gets one narrow
 });
 
 test('fillSectionAdapter: when the shorten request fails too, the fill is refused rather than rendered with a fragment', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-footer-apple');
+  const adapter = await resolveSectionAdapter('test:word-budgets');
   const model: ModelCall = async () => {
     const text: Record<string, string> = Object.fromEntries(adapter.text.map((slot) => [slot.name, 'Ledgerline']));
     return { text: JSON.stringify({ text }), usage: { input: 1, output: 1, cachedRead: 0 }, firstTokenMs: 1, ms: 1, retries: 0 };
@@ -218,7 +231,7 @@ test('briefNames and cutNames: a brief name cut short is found; whole names and 
 });
 
 test('fillSectionAdapter: a name cut to fit is sent back once for repair', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-bento-shadcn');
+  const adapter = await resolveSectionAdapter('test:name-budgets');
   const prompts: string[] = [];
   const model: ModelCall = async ({ user }) => {
     prompts.push(user);
@@ -234,7 +247,7 @@ test('fillSectionAdapter: a name cut to fit is sent back once for repair', async
 });
 
 test('fillSectionAdapter: a nullable step label still cut after the repair is omitted, never shown', async () => {
-  const adapter = await resolveSectionAdapter('cult:sass-colorful--how-it-works');
+  const adapter = await resolveSectionAdapter('test:tiny-budgets');
   const tiny = adapter.text.filter((slot) => slot.atom && slot.max <= 3);
   assert.ok(tiny.length >= 3, 'the step labels are 3-character nullable slots');
   const model: ModelCall = async () => {
@@ -270,7 +283,7 @@ test('briefNames: a business name that opens the brief (or a sentence) is a name
 });
 
 test('fillSectionAdapter (composed): a required slot that still cuts an opening name gets one rewrite, then is refused', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-bento-shadcn');
+  const adapter = await resolveSectionAdapter('test:name-budgets');
   const required = adapter.text.find((slot) => !slot.atom && slot.max >= 14)!;
   const answer = (value: string) => {
     const text: Record<string, string | null> = Object.fromEntries(adapter.text.map((slot) => [slot.name, slot.atom ? null : 'Payroll']));
@@ -292,7 +305,7 @@ test('fillSectionAdapter (composed): a required slot that still cuts an opening 
 });
 
 test('fillSectionAdapter (family overlay, default policy): the prompt, repairs and accepted fill are unchanged', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-bento-shadcn');
+  const adapter = await resolveSectionAdapter('test:name-budgets');
   const prompts: string[] = [];
   const model: ModelCall = async ({ user }) => {
     prompts.push(user);
@@ -384,7 +397,7 @@ test('fillSectionAdapter (composed): "invoi" in a long required slot gets one re
 });
 
 test('fillSectionAdapter (composed): a word cut short in a long nullable slot is omitted', async () => {
-  const adapter = await resolveSectionAdapter('cult:marketing-footer-apple');
+  const adapter = await resolveSectionAdapter('test:word-budgets');
   const nullable = adapter.text.find((slot) => slot.atom && slot.max >= 20)!;
   const model: ModelCall = async () => {
     const text: Record<string, string | null> = Object.fromEntries(adapter.text.map((slot) => [slot.name, slot.atom ? null : (slot.max >= 7 ? 'Payroll' : 'Go')]));

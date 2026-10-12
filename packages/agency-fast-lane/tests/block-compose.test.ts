@@ -30,7 +30,7 @@ const BRIEF = 'Riverbend Dental, a family dental practice in Boise. Same-day cro
 const PLAN = {
   spine: 'PA',
   directionId: 'modern-minimal',
-  blocks: ['hyperui:marketing/sections/1', 'cult:marketing-bento-vite', 'cult:marketing-faq-vite', 'cult:marketing-cta-cosmic', 'cult:marketing-footer-vercel'],
+  blocks: ['hyperui:marketing/sections/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/ctas/1', 'hyperui:marketing/ctas/1'],
 };
 const KINDS = ['hero', 'features', 'faq', 'cta-band', 'footer'];
 
@@ -75,12 +75,12 @@ function options(overrides: Partial<ComposeOptions> = {}): ComposeOptions {
 
 const selectedIds = (html: string) => [...html.matchAll(/data-od-selected-section="([^"]+)"/g)].map((match) => match[1]);
 
-test('composeBlocks: renders every block in plan order with data-od-selected-section, three or more Cult ids', async () => {
+test('composeBlocks: renders every block in plan order with data-od-selected-section, no removed Cult ids', async () => {
   const events: RunEvent[] = [];
   const report = await composeBlocks(options({ onEvent: (event) => events.push(event) }));
   // The page names Cult blocks by public id; the report and recipe keep the internal ones.
   assert.deepEqual(selectedIds(report.html), PLAN.blocks.map(pub));
-  assert.ok(new Set(selectedIds(report.html).filter((id) => id!.startsWith('cult:'))).size >= 3);
+  assert.ok(new Set(selectedIds(report.html).filter((id) => id!.startsWith('cult:'))).size === 0);
   assert.equal(report.family, 'composed');
   assert.equal(report.calls, PLAN.blocks.length + 1, 'one fill per block plus the page chrome');
   assert.deepEqual(report.composition, {
@@ -90,7 +90,7 @@ test('composeBlocks: renders every block in plan order with data-od-selected-sec
   assert.equal(events.filter((event) => event.type === 'unit').length, PLAN.blocks.length + 1);
   // The fixed call-to-action target resolves: the cta band carries id="contact".
   const contactAt = report.html.indexOf('id="contact"');
-  assert.ok(contactAt > 0 && report.html.indexOf('data-od-selected-section="cult:cta-cosmic"') > contactAt);
+  assert.ok(contactAt > 0 && report.html.indexOf('data-od-selected-section="hyperui:marketing/ctas/1"') > contactAt);
 });
 
 test('composed page promotes only its hero heading, preserving adapter copy, classes, edit slots and CSS', async () => {
@@ -129,13 +129,13 @@ function anchorsOf(html: string): { hrefs: string[]; ids: string[] } {
 
 test('composeBlocks: every in-page href="#…" resolves to an id on the page, and exactly one element is #contact', async () => {
   const cases: Array<{ blocks: string[]; kinds: string[]; owner: string }> = [
-    { blocks: PLAN.blocks, kinds: KINDS, owner: 'cult:marketing-cta-cosmic' },
+    { blocks: PLAN.blocks, kinds: KINDS, owner: 'hyperui:marketing/ctas/1' },
     // No CTA band: the footer owns #contact.
-    { blocks: PLAN.blocks.filter((id) => id !== 'cult:marketing-cta-cosmic'), kinds: KINDS.filter((kind) => kind !== 'cta-band'), owner: 'cult:marketing-footer-vercel' },
+    { blocks: PLAN.blocks.filter((_id, index) => index !== 3), kinds: KINDS.filter((kind) => kind !== 'cta-band'), owner: 'hyperui:marketing/ctas/1' },
     // HyperUI ctas/1 as the band, and no footer.
-    { blocks: ['hyperui:marketing/sections/1', 'cult:marketing-bento-vite', 'hyperui:marketing/ctas/1'], kinds: ['hero', 'features', 'cta-band'], owner: 'hyperui:marketing/ctas/1' },
+    { blocks: ['hyperui:marketing/sections/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/ctas/1'], kinds: ['hero', 'features', 'cta-band'], owner: 'hyperui:marketing/ctas/1' },
     // Neither: the last block owns it.
-    { blocks: ['hyperui:marketing/sections/1', 'cult:marketing-bento-vite', 'cult:marketing-faq-vite'], kinds: ['hero', 'features', 'faq'], owner: 'cult:marketing-faq-vite' },
+    { blocks: ['hyperui:marketing/sections/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/feature-grids/1'], kinds: ['hero', 'features', 'faq'], owner: 'hyperui:marketing/feature-grids/1' },
   ];
   for (const { blocks, kinds, owner } of cases) {
     const report = await composeBlocks(options({ plan: { ...PLAN, blocks }, kinds }));
@@ -179,14 +179,14 @@ test('composeBlocks: the saved recipe and state note name Cult blocks by public 
 test('publicAdapterText swaps only the exact scope and symbol names', () => {
   const css = '.cult-marketing-footer-vercel .a{} .cult-marketing-footer-vercel-x{} #sym-marketing-footer-vercel-3{} .cult-marketing-footer{} marketing-footer-vercel';
   assert.equal(
-    publicAdapterText('cult:marketing-footer-vercel', css, 'css'),
-    '.cult-footer-series-v .a{} .cult-marketing-footer-vercel-x{} #sym-footer-series-v-3{} .cult-marketing-footer{} marketing-footer-vercel',
+    publicAdapterText('hyperui:marketing/ctas/1', css, 'css'),
+    css,
   );
   assert.equal(publicAdapterText('hyperui:marketing/ctas/1', css), css);
 });
 
 test('composeBlocks: one <style>, each adapter\'s CSS once, the family CSP, no script, no remote URL', async () => {
-  const report = await composeBlocks(options({ plan: { ...PLAN, blocks: [...PLAN.blocks.slice(0, 2), 'cult:marketing-bento-texture', ...PLAN.blocks.slice(2)] }, kinds: ['hero', 'features', 'features', 'faq', 'cta-band', 'footer'] }));
+  const report = await composeBlocks(options({ plan: { ...PLAN, blocks: [...PLAN.blocks.slice(0, 2), 'hyperui:marketing/feature-grids/1', ...PLAN.blocks.slice(2)] }, kinds: ['hero', 'features', 'features', 'faq', 'cta-band', 'footer'] }));
   const html = report.html;
   assert.equal(html.match(/<style>/g)?.length, 1, 'exactly one style element');
   for (const id of PLAN.blocks) {
@@ -209,10 +209,16 @@ test('composeBlocks: one <style>, each adapter\'s CSS once, the family CSP, no s
   assert.ok(Buffer.byteLength(html, 'utf8') < 200 * 1024);
 });
 
+function heroModel(fill: Filler): ModelCall {
+  const hero = fakeModel({ fill });
+  const base = fakeModel({ fill: wholeWords });
+  return request => (request.label === 'section:hyperui:marketing/sections/1' ? hero : base)(request);
+}
+
 test('composeBlocks: facts come from the brief only — a fabricated slot is flagged, repaired and never published', async () => {
   let fabricated = 0;
   const fill: Filler = (key, _value, at, limit) => {
-    if (at === 'text.headline' && fabricated === 0) {
+    if (at === 'text.heading' && fabricated === 0) {
       fabricated += 1;
       return 'FABRICATED Plans from $49 since 1999';
     }
@@ -220,7 +226,7 @@ test('composeBlocks: facts come from the brief only — a fabricated slot is fla
   };
   const checker = fakeJevChecker();
   const publisher = fakePublisher();
-  const report = await composeBlocks(options({ model: fakeModel({ fill }), verify: checker, strict: true, ensurePublisher: async () => ({ publisher, created: true }) }));
+  const report = await composeBlocks(options({ model: heroModel(fill), verify: checker, strict: true, ensurePublisher: async () => ({ publisher, created: true }) }));
   assert.ok(fabricated > 0, 'the fake did fabricate once');
   assert.ok(report.verify!.flagged.length > 0);
   assert.deepEqual(report.verify!.remaining, []);
@@ -231,8 +237,8 @@ test('composeBlocks: facts come from the brief only — a fabricated slot is fla
 });
 
 test('composeBlocks strict: an unrepaired fabrication publishes nothing and creates no project', async () => {
-  const fill: Filler = (key, value, at, limit) => (at === 'text.headline' ? 'FABRICATED forever' : wholeWords(key, value, at, limit));
-  const alwaysFabricates = fakeModel({ fill });
+  const fill: Filler = (key, value, at, limit) => (at === 'text.heading' ? 'FABRICATED forever' : wholeWords(key, value, at, limit));
+  const alwaysFabricates = heroModel(fill);
   let ensured = 0;
   const report = await composeBlocks(options({ model: alwaysFabricates, verify: fakeJevChecker(), strict: true, maxFaithfulnessRounds: 0, ensurePublisher: async () => { ensured += 1; return { publisher: fakePublisher(), created: true }; } }));
   assert.equal(report.strict?.passed, false);
@@ -270,8 +276,8 @@ test('renderWithinBudget: drops body blocks from the end — never the hero, the
   const fits = await renderWithinBudget(input, bytes + 1);
   assert.deepEqual(fits.dropped, []);
   const tight = await renderWithinBudget(input, bytes - 10);
-  assert.deepEqual(tight.dropped, ['cult:marketing-faq-vite']);
-  assert.deepEqual(tight.rendered, PLAN.blocks.filter((id) => id !== 'cult:marketing-faq-vite'));
+  assert.deepEqual(tight.dropped, ['hyperui:marketing/feature-grids/1']);
+  assert.deepEqual(tight.rendered, PLAN.blocks.filter((_id, index) => index !== 2));
   // One body block left: nothing more may go.
   await assert.rejects(renderWithinBudget(input, Buffer.byteLength(tight.html, 'utf8') - 10), ComposedPageTooLargeError);
 });
@@ -282,8 +288,8 @@ test('composeBlocks over budget: every saved page fits, and ONE published plan i
   const publisher = fakePublisher();
   const report = await composeBlocks(options({ pageByteLimit: limit, ensurePublisher: async () => ({ publisher, created: true }) }));
   for (const save of publisher.saves.filter((entry) => entry.html)) assert.ok(Buffer.byteLength(save.html!, 'utf8') < limit, 'every saved page is under the budget');
-  const published = PLAN.blocks.filter((id) => id !== 'cult:marketing-faq-vite');
-  assert.deepEqual(report.composition?.budgetDropped, ['cult:marketing-faq-vite']);
+  const published = PLAN.blocks.filter(id => id !== 'hyperui:marketing/feature-grids/1');
+  assert.deepEqual(report.composition?.budgetDropped, ['hyperui:marketing/feature-grids/1']);
   assert.deepEqual(report.composition?.blocks, published);
   assert.deepEqual(selectedIds(report.html), published.map(pub));
   if (!isComposedRecipe(report.recipe)) throw new Error('not a composed recipe');
@@ -297,7 +303,7 @@ test('composeBlocks over budget: every saved page fits, and ONE published plan i
     if (index !== undefined) assert.ok(Number(index) < published.length, path);
   }
   // Replaying the published plan (a fork) composes the same blocks, without a drop.
-  const replay = await composeBlocks(options({ plan: report.recipe.plan, kinds: ['hero', 'features', 'cta-band', 'footer'], planSource: 'replay', pageByteLimit: limit }));
+  const replay = await composeBlocks(options({ plan: report.recipe.plan, kinds: ['hero', 'cta-band', 'footer'], planSource: 'replay', pageByteLimit: limit }));
   assert.deepEqual(replay.composition?.blocks, published);
 });
 
@@ -388,7 +394,7 @@ const WORDY_BODY = 'Riverbend Dental offers same-day crowns and sedation options
  * faithfulness repair answer fixes the heading but repeats the over-long body. */
 function claimThenWordyRepair(): ModelCall & { prompts: string[] } {
   const wordy = (heading: string): Filler => (key, value, at, limit) => (at === 'text.body' ? WORDY_BODY : at === 'text.heading' ? heading : wholeWords(key, value, at, limit));
-  const first = fakeModel({ fill: wordy('FABRICATED Trusted by 40,000 patients') });
+  const first = heroModel(wordy('FABRICATED Trusted by 40,000 patients'));
   // The repair answer also rewrites the unflagged body: that change must never be taken.
   const repair = fakeModel({ fill: (key, value, at, limit) => (at === 'text.body' ? 'UNFLAGGED REWRITE of the body' : at === 'text.heading' ? 'Riverbend Dental' : wholeWords(key, value, at, limit)) });
   const prompts: string[] = [];
@@ -402,7 +408,7 @@ function claimThenWordyRepair(): ModelCall & { prompts: string[] } {
 
 test('B-113: a discarded faithfulness repair is reported with its reason, and the text still flagged is on the report', async () => {
   // A required slot answered with null cannot be taken: the repair is discarded and the slot stays flagged.
-  const first = fakeModel({ fill: (key, value, at, limit) => (at === 'text.heading' ? 'FABRICATED Trusted by 40,000 patients' : wholeWords(key, value, at, limit)) });
+  const first = heroModel((key, value, at, limit) => (at === 'text.heading' ? 'FABRICATED Trusted by 40,000 patients' : wholeWords(key, value, at, limit)));
   const nulls = fakeModel({ fill: (key, value, at, limit) => (at === 'text.heading' ? null as unknown as string : wholeWords(key, value, at, limit)) });
   const model = (async (request: Parameters<ModelCall>[0]) => (request.user.includes('Flagged as unsupported by the brief') ? nulls : first)(request)) as ModelCall;
   const events: RunEvent[] = [];
@@ -434,7 +440,7 @@ test('B-113: a faithfulness repair changes only the flagged slot; the rest of th
 });
 
 test('B-113: a repair answer that is not JSON is discarded as malformed; the slot stays flagged and nothing publishes', async () => {
-  const first = fakeModel({ fill: (key, value, at, limit) => (at === 'text.heading' ? 'FABRICATED Trusted by 40,000 patients' : wholeWords(key, value, at, limit)) });
+  const first = heroModel((key, value, at, limit) => (at === 'text.heading' ? 'FABRICATED Trusted by 40,000 patients' : wholeWords(key, value, at, limit)));
   const model = (async (request: Parameters<ModelCall>[0]) => (request.user.includes('Flagged as unsupported by the brief')
     ? { text: 'Sorry, I cannot help with that.', usage: { input: 1, output: 1, cachedRead: 0 }, ms: 1, retries: 0 }
     : first(request))) as ModelCall;
@@ -451,7 +457,7 @@ test('B-113: a repair answer that is not JSON is discarded as malformed; the slo
 // flagged as unsupported numbers and could never be repaired. A slot whose whole text is the number
 // its own name ends with is a step marker, not a fact; any other number is still checked.
 test('B-113: step markers ("item3": "3") are structure, never checked as facts; other numbers still are', async () => {
-  const adapter = await resolveSectionAdapter('cult:sass-colorful--how-it-works');
+  const adapter: SectionAdapter = { id: 'cult:sass-colorful--how-it-works', version: '1', sourceBlockId: 'test:steps', sourceSha256: '', roles: [], text: [1, 2, 3, 4].map(n => ({name: `item${n}`, max: 3, atom: 'plain' as const})), css: '', render: () => '<section>Fixture step badges</section>' };
   const bareNumbers = { async checkFaithfulness({ slots }: { slots: Array<{ path: string; text: string }> }) {
     return { flagged: slots.filter((slot) => /^\d+$/.test(slot.text.trim())).map((slot) => ({ path: slot.path, probability: 0.9 })), ms: 1, calls: 1 };
   } };
@@ -510,7 +516,7 @@ test('B-113 (Sol r2): a numbered slot outside a declared step block is always ch
   } };
   // "7" + "Years in business" and "4" + "/mo": the number in a slot named for it is a claim here.
   for (const [id, slotName, value] of [['cult:marketing-stats-hex', 'body7', '7'], ['cult:marketing-pricing-apple', 'label4', '4']] as const) {
-    const adapter = await resolveSectionAdapter(id);
+    const adapter: SectionAdapter = { id, version: '1', sourceBlockId: 'test:number', sourceSha256: '', roles: [], text: [{name: slotName, max: 40}], css: '', render: () => '<p>Fixture number</p>' };
     const fill: Filler = (key, v, at, limit) => (at === `text.${slotName}` ? value : wholeWords(key, v, at, limit));
     await assert.rejects(fillSectionAdapter({ adapter, brief: BRIEF, model: fakeModel({ fill }), composed: true, verify: bareNumbers, strict: true, maxFaithfulnessRounds: 0 }), new RegExp(`text\\.${slotName}`), id);
   }

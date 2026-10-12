@@ -100,14 +100,14 @@ function workspaceHeaders(workspace: Workspace): Record<string, string> {
   };
 }
 
-async function writeResourceVelaBin(path: string): Promise<string> {
+async function writeResourceVelaBin(path: string, stateFile: string, logFile: string): Promise<string> {
   await writeFile(
     path,
     `#!/usr/bin/env node
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 const args = process.argv.slice(2);
-const stateFile = process.env.FAKE_RESOURCE_STATE_FILE;
-const logFile = process.env.FAKE_RESOURCE_LOG_FILE;
+const stateFile = ${JSON.stringify(stateFile)};
+const logFile = ${JSON.stringify(logFile)};
 const appendLog = () => {
   if (!logFile) return;
   const previous = existsSync(logFile) ? readFileSync(logFile, 'utf8') : '';
@@ -177,7 +177,7 @@ describe('workspace-scoped skill resources', () => {
       const suite = await createSmokeSuite('collab-workspace-skill-resource-isolation');
       const resourceStateFile = join(suite.scratchDir, 'resource-state.json');
       const resourceLogFile = join(suite.scratchDir, 'resource-calls.jsonl');
-      const velaBin = await writeResourceVelaBin(join(suite.scratchDir, 'fake-vela-resource'));
+      const velaBin = await writeResourceVelaBin(join(suite.scratchDir, 'fake-vela-resource'), resourceStateFile, resourceLogFile);
 
       await suite.with.toolsDev(
         async ({ webUrl }) => {
@@ -296,8 +296,6 @@ describe('workspace-scoped skill resources', () => {
         {
           env: {
             AMR_HOME: join(suite.scratchDir, 'empty-amr-home'),
-            FAKE_RESOURCE_LOG_FILE: resourceLogFile,
-            FAKE_RESOURCE_STATE_FILE: resourceStateFile,
             OD_WORKSPACE_CONTEXT_SOURCE: 'vela',
             VELA_API_URL: authorityUrl,
             VELA_BIN: velaBin,
@@ -319,10 +317,9 @@ describe('workspace-scoped skill resources', () => {
       const resourceLogFile = join(ownerSuite.scratchDir, 'shared-resource-calls.jsonl');
       const velaBin = await writeResourceVelaBin(
         join(ownerSuite.scratchDir, 'fake-vela-shared-resource'),
+        resourceStateFile, resourceLogFile,
       );
       const commonEnv = {
-        FAKE_RESOURCE_LOG_FILE: resourceLogFile,
-        FAKE_RESOURCE_STATE_FILE: resourceStateFile,
         OD_RESOURCE_TRANSPORT: 'vela-cli',
         OD_WORKSPACE_CONTEXT_SOURCE: 'vela',
         VELA_API_URL: authorityUrl,

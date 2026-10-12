@@ -1,3 +1,4 @@
+import {TEST_INSTITUTION_DIR} from './fixtures.ts';
 import assert from 'node:assert/strict';
 import { createServer, type Server } from 'node:http';
 import test from 'node:test';
@@ -9,10 +10,10 @@ import { ensureProject, projectPublisher, type ProjectPublisher } from '../src/p
 import { withoutUntracedClaims } from '../src/repair-hints.ts';
 import { faithfulnessRepairError, refusalDetail, runFastLane, UnitRefusedError, withAdapterDeterministicGates, type RunEvent } from '../src/run.ts';
 import { atomKindsFor, editableTemplate, getAtPath, isObject, nullablePathsOf, type Json, type JsonObject } from '../src/spine.ts';
-import { fakeJevChecker, fakeModel, fillTemplate, loadMaben, promptBlock, WATSON_DIR, type Filler } from './fixtures.ts';
+import { fakeJevChecker, fakeModel, fillTemplate, loadTestSite, promptBlock, TEST_EDITORIAL_DIR, type Filler } from './fixtures.ts';
 
-const pkg = await loadMaben();
-const ENTRY = 'maben-r1.html';
+const pkg = await loadTestSite();
+const ENTRY = 'ownedsite-r1.html';
 const BRIEF = 'Riverbend Dental, a family dental practice in Boise. Same-day crowns, sedation options, open Saturdays.';
 
 type Save = { kind: 'page' | 'file' | 'delete'; name: string; encoding?: string; manifestEntry?: string; label?: string };
@@ -39,14 +40,14 @@ function stubPublisher(): ProjectPublisher & { saves: Save[] } {
 function overflowHero(template: Json, limits: Json | undefined): Json | undefined {
   const filled = fillTemplate(template, limits) as JsonObject;
   const hero = Array.isArray(filled.sections)
-    ? (filled.sections as JsonObject[]).find((section) => section.id === 'maben-hero')
-    : filled.id === 'maben-hero' ? filled : undefined;
+    ? (filled.sections as JsonObject[]).find((section) => section.id === 'ownedsite-hero')
+    : filled.id === 'ownedsite-hero' ? filled : undefined;
   if (!hero) return undefined;
   (hero.text as JsonObject).statement = 'x'.repeat(401);
   return filled;
 }
 
-// -- callModel's bounded transport retry (G8 final on 857a46b982: halcyon x deepseek BUILD_FAILED,
+// -- callModel's bounded transport retry (G8 final on 857a46b982: ownedinstitution x deepseek BUILD_FAILED,
 // ECONNRESET mid-request on the "support" unit, --no-failover). Never a provider failover, never
 // more than 2 extra attempts, never on a non-transport failure. --------------------------------
 
@@ -484,10 +485,10 @@ test('sections mode makes one call per unit and publishes assets before pages, t
   assert.equal(report.projectId, 'p1');
   assert.ok(report.paints >= 1);
   const firstPage = publisher.saves.findIndex((save) => save.kind === 'page');
-  const assetSaves = publisher.saves.filter((save) => save.kind === 'file' && save.name.startsWith('assets/agency-site/maben-r1/'));
-  assert.equal(assetSaves.length, 17);
+  const assetSaves = publisher.saves.filter((save) => save.kind === 'file' && save.name.startsWith('assets/agency-site/ownedsite-r1/'));
+  assert.equal(assetSaves.length, 2);
   assert.ok(assetSaves.every((save) => save.encoding === 'base64'));
-  assert.ok(publisher.saves.slice(0, firstPage).filter((save) => save.kind === 'file').length >= 17, 'every asset lands before the first page save');
+  assert.ok(publisher.saves.slice(0, firstPage).filter((save) => save.kind === 'file').length >= 2, 'every asset lands before the first page save');
   assert.ok(publisher.saves.filter((save) => save.kind === 'page').every((save) => save.manifestEntry === ENTRY));
   const names = publisher.saves.map((save) => save.name);
   for (const expected of ['agency-site-state/r1/recipe.json', 'agency-site-state/r1/approved-assets.json', 'AGENCY-SITE-STATE.md', 'agency-site-state/r1/assets/hero-frame.png']) assert.ok(names.includes(expected), expected);
@@ -515,7 +516,7 @@ test('single mode repairs one unit the validator refuses, without re-asking for 
   assert.equal(report.calls, 2);
   assert.equal(report.repairs, 1);
   assert.ok((getAtPath(report.recipe, ['sections', 2, 'text', 'statement']) as string).length <= 400);
-  assert.equal(report.units.find((unit) => unit.label === 'maben-hero')?.repairs, 1);
+  assert.equal(report.units.find((unit) => unit.label === 'ownedsite-hero')?.repairs, 1);
   assert.ok(model.prompts[1]!.includes('at most 400 characters'));
 });
 
@@ -523,7 +524,7 @@ test('a unit that comes back with text missing is repaired', async () => {
   const model = fakeModel({
     firstAnswer: (template, limits) => {
       const filled = fillTemplate(template, limits) as JsonObject;
-      const hero = (filled.sections as JsonObject[] | undefined)?.find((section) => section.id === 'maben-hero');
+      const hero = (filled.sections as JsonObject[] | undefined)?.find((section) => section.id === 'ownedsite-hero');
       if (!hero) return undefined;
       delete (hero.text as JsonObject).mediaNote;
       return filled;
@@ -537,7 +538,7 @@ test('a unit that comes back with text missing is repaired', async () => {
 });
 
 test('sections mode: an incomplete repair on a REQUIRED slot (outside any nullable group) is narrowed to the missing slot(s) — sibling text in the same unit is locked to its accepted answer, and the repair TEMPLATE shows that accepted text rather than the original example', async () => {
-  // G8 final 32f08a40cd (emmpo x cerebras): emmpo-talents came back with a required slot empty,
+  // G8 final 32f08a40cd (ownedlearning x cerebras): ownedlearning-talents came back with a required slot empty,
   // and BOTH technical repairs — each re-asking the WHOLE unit again with no memory of what the
   // first answer already got right — came back with a (possibly different) slot empty too,
   // exhausting the budget. The fix narrows an 'incomplete' repair to exactly the paths
@@ -548,11 +549,11 @@ test('sections mode: an incomplete repair on a REQUIRED slot (outside any nullab
     firstAnswer: (template, limits) => {
       const filled = fillTemplate(template, limits) as JsonObject;
       // Sections mode calls once per unit, so the per-call TEMPLATE is already the hero unit's
-      // own shape (`{id: 'maben-hero', text: {...}}`), not the whole-page shape `overflowHero`
+      // own shape (`{id: 'ownedsite-hero', text: {...}}`), not the whole-page shape `overflowHero`
       // (single mode) matches against — handle both, like that helper does.
       const hero = Array.isArray(filled.sections)
-        ? (filled.sections as JsonObject[]).find((section) => section.id === 'maben-hero')
-        : filled.id === 'maben-hero' ? filled : undefined;
+        ? (filled.sections as JsonObject[]).find((section) => section.id === 'ownedsite-hero')
+        : filled.id === 'ownedsite-hero' ? filled : undefined;
       if (!hero) return undefined;
       delete (hero.text as JsonObject).mediaNote;
       return filled;
@@ -568,7 +569,7 @@ test('sections mode: an incomplete repair on a REQUIRED slot (outside any nullab
   const heroUnitIndex = model.prompts.findIndex((prompt) => prompt.includes('missing or empty values: sections[2].text.mediaNote'));
   assert.ok(heroUnitIndex >= 0, 'the repair prompt names the missing slot');
   const repairTemplate = promptBlock(model.prompts[heroUnitIndex]!, 'TEMPLATE') as JsonObject;
-  const heroTemplate = ((repairTemplate.sections as JsonObject[] | undefined) ?? [repairTemplate]).find((section) => section === repairTemplate || (section as JsonObject).id === 'maben-hero') as JsonObject;
+  const heroTemplate = ((repairTemplate.sections as JsonObject[] | undefined) ?? [repairTemplate]).find((section) => section === repairTemplate || (section as JsonObject).id === 'ownedsite-hero') as JsonObject;
   const heroText = (Array.isArray(repairTemplate.sections) ? heroTemplate.text : repairTemplate.text) as JsonObject;
   // The accepted first-fill text for the locked sibling slot is what the repair TEMPLATE shows —
   // not the family's own reference example, and not empty.
@@ -593,16 +594,16 @@ function lockOutsideSection(recipe: Json, sectionIndex: number): string[] {
 }
 
 for (const [templateCity, acceptedCity] of [[null, 'Denver'], ['(Los Angeles)', null]] as const) {
-  test(`narrowed repair context reflects Watson accepted city ${JSON.stringify(acceptedCity)} from template ${JSON.stringify(templateCity)}`, async () => {
-    const watson = await loadFamilyPackage(WATSON_DIR, 'watson');
-    const spine = structuredClone(watson.fixture);
-    const sectionIndex = (spine.sections as JsonObject[]).findIndex((section) => section.id === 'watson-statement');
+  test(`narrowed repair context reflects TestEditorial accepted city ${JSON.stringify(acceptedCity)} from template ${JSON.stringify(templateCity)}`, async () => {
+    const ownededitorial = await loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
+    const spine = structuredClone(ownededitorial.fixture);
+    const sectionIndex = (spine.sections as JsonObject[]).findIndex((section) => section.id === 'ownededitorial-statement');
     const content = (spine.sections as JsonObject[])[sectionIndex]!.content as JsonObject;
     content.city = templateCity;
     const model = fakeModel({
       firstAnswer: (template, limits) => {
         const filled = fillTemplate(template, limits) as JsonObject;
-        if (filled.id !== 'watson-statement') return undefined;
+        if (filled.id !== 'ownededitorial-statement') return undefined;
         const text = filled.content as JsonObject;
         text.city = acceptedCity;
         text.opening = '';
@@ -610,7 +611,7 @@ for (const [templateCity, acceptedCity] of [[null, 'Denver'], ['(Los Angeles)', 
       },
       fill: (key) => `REPAIR-${key}`,
     });
-    const report = await runFastLane({ pkg: watson, spine, lockPaths: lockOutsideSection(spine, sectionIndex), brief: 'Riverbend Dental in Denver.', mode: 'sections', entry: 'watson-r1.html', revision: 1, model, modelName: 'fake' });
+    const report = await runFastLane({ pkg: ownededitorial, spine, lockPaths: lockOutsideSection(spine, sectionIndex), brief: 'Riverbend Dental in Denver.', mode: 'sections', entry: 'ownededitorial-r1.html', revision: 1, model, modelName: 'fake' });
     assert.equal(report.repairs, 1);
     assert.deepEqual(report.missing, []);
     const repair = model.prompts.find((prompt) => prompt.includes(`missing or empty values: sections[${sectionIndex}].content.opening`));
@@ -623,9 +624,9 @@ for (const [templateCity, acceptedCity] of [[null, 'Denver'], ['(Los Angeles)', 
   });
 }
 
-test('narrowed repair context preserves accepted Halcyon hours labels and values', async () => {
-  const halcyon = await loadFamilyPackage(defaultPackageDir('halcyon'), 'halcyon');
-  const sectionIndex = (halcyon.fixture.sections as JsonObject[]).findIndex((section) => section.id === 'visit');
+test('narrowed repair context preserves accepted TestInstitution hours labels and values', async () => {
+  const ownedinstitution = await loadFamilyPackage(TEST_INSTITUTION_DIR, 'ownedinstitution');
+  const sectionIndex = (ownedinstitution.fixture.sections as JsonObject[]).findIndex((section) => section.id === 'visit');
   const model = fakeModel({
     firstAnswer: (template, limits) => {
       const filled = fillTemplate(template, limits) as JsonObject;
@@ -650,7 +651,7 @@ test('narrowed repair context preserves accepted Halcyon hours labels and values
     if (answer.id === 'visit') (answer.content as JsonObject).block1Value1 = '11:00-18:00';
     return { ...response, text: JSON.stringify(answer) };
   };
-  const report = await runFastLane({ pkg: halcyon, lockPaths: lockOutsideSection(halcyon.fixture, sectionIndex), brief: 'Hours: Wednesday-Friday 11:00-18:00; Saturday 10:00-19:00; Monday and Tuesday closed.', mode: 'sections', entry: 'halcyon-r1.html', revision: 1, model: repairModel, modelName: 'fake' });
+  const report = await runFastLane({ pkg: ownedinstitution, lockPaths: lockOutsideSection(ownedinstitution.fixture, sectionIndex), brief: 'Hours: Wednesday-Friday 11:00-18:00; Saturday 10:00-19:00; Monday and Tuesday closed.', mode: 'sections', entry: 'ownedinstitution-r1.html', revision: 1, model: repairModel, modelName: 'fake' });
   assert.equal(report.repairs, 1);
   assert.deepEqual(report.missing, []);
   const repair = model.prompts.find((prompt) => prompt.includes(`missing or empty values: sections[${sectionIndex}].content.block1Value1`));
@@ -670,7 +671,7 @@ test('narrowed repair context preserves accepted Halcyon hours labels and values
 });
 
 test("sections mode: an incomplete repair inside a nullable group (crm-dashboard's secondary KPI cards) may still null the WHOLE group, exactly as the unnarrowed repair always could", async () => {
-  // Round-1 audit regression (Opus 5.5, proof/audits/emmpo-r1-opus55.md): narrowing an
+  // Round-1 audit regression (Opus 5.5, the earlier array-narrowing audit): narrowing an
   // `incomplete` repair to exactly the missing leaf, with every OTHER slot of the unit locked,
   // also locked every ANCESTOR container of that leaf — including a whole group the family
   // schema lets be null as one piece (`atomKindsFor`'s group kind: crm-dashboard's 3rd/4th KPI
@@ -687,7 +688,7 @@ test("sections mode: an incomplete repair inside a nullable group (crm-dashboard
     const text = `New ${key}`;
     return typeof limit === 'number' ? text.slice(0, limit) : text;
   };
-  // Round-2 audit (Opus 5.5, proof/audits/emmpo-r2-opus55.md): the previous version of this test
+  // Round-2 audit (Opus 5.5, the earlier array-narrowing audit): the previous version of this test
   // filled BOTH the first answer and the repair answer with the same `crmFill`, so the 1st/2nd
   // KPI cards' assertion (`label === 'New label'`) would pass even without the lock — the repair
   // model happened to write the identical text either way. Repair now uses a DISTINCT marker for
@@ -707,7 +708,7 @@ test("sections mode: an incomplete repair inside a nullable group (crm-dashboard
     if (filled.id === 'crm-dashboard-kpis' && Array.isArray(filled.items)) {
       const items = filled.items as (JsonObject | null)[];
       // First fill: an honest model finds no brief support for the label, and — same mistake as
-      // emmpo-talents — leaves it empty instead of nulling the whole card. Repair: given the
+      // ownedlearning-talents — leaves it empty instead of nulling the whole card. Repair: given the
       // narrowed TEMPLATE (this group unlocked, everything else locked to its own accepted
       // answer), the model corrects course and nulls the whole card, exactly like the unnarrowed
       // repair path always allowed — and, since it is trying REPAIR-* everywhere else too, would
@@ -732,7 +733,7 @@ test("sections mode: an incomplete repair inside a nullable group (crm-dashboard
 });
 
 test("sections mode: an incomplete repair under a VARIABLE-LENGTH list (practice's services items, minItems 1 maxItems 3) falls back to the full, unnarrowed re-ask so the model may still drop the item, exactly as base allows", async () => {
-  // Round-2 audit regression (Opus 5.5, proof/audits/emmpo-r2-opus55.md): the ARRAY MINIMA
+  // Round-2 audit regression (Opus 5.5, the earlier array-narrowing audit): the ARRAY MINIMA
   // convention tells the model it may drop items it has no brief facts for FROM THE END of a
   // variable-length list. When one slot of the LAST item comes back empty, a narrowed repair
   // locks that item's OTHER slots — and `mergeIntoSpine`'s trim guard (`hasLockedDescendant`)
@@ -766,7 +767,7 @@ test("sections mode: an incomplete repair under a VARIABLE-LENGTH list (practice
       const items = filled.items as JsonObject[];
       if (!repairing) {
         // First fill: the brief supports only 2 services; an honest model should drop the 3rd,
-        // but — same mistake as emmpo-talents — leaves its title empty instead.
+        // but — same mistake as ownedlearning-talents — leaves its title empty instead.
         if (items[2]) items[2].title = '';
       } else {
         // Repair: given the FULL, unnarrowed template (this fix), the model corrects course and
@@ -792,7 +793,7 @@ test('sections mode repairs only the failing unit', async () => {
   const report = await runFastLane({ pkg, brief: BRIEF, mode: 'sections', entry: ENTRY, revision: 1, model, modelName: 'fake' });
   assert.equal(report.calls, 9);
   assert.equal(report.repairs, 1);
-  assert.equal(report.units.filter((unit) => unit.repairs > 0).map((unit) => unit.label).join(), 'maben-hero');
+  assert.equal(report.units.filter((unit) => unit.repairs > 0).map((unit) => unit.label).join(), 'ownedsite-hero');
 });
 
 test('an overrun that survives the repair budget is clipped at a word boundary and reported', async () => {
@@ -821,7 +822,7 @@ test('a refusal that clipping cannot fix stops the run, naming the unit and a fi
     runFastLane({ pkg, brief: BRIEF, mode: 'sections', entry: ENTRY, revision: 1, model, modelName: 'fake', onCall: (call) => calls.push(call) }),
     (error: unknown) => {
       const message = (error as Error).message;
-      assert.equal(message, 'maben-hero: the family compiler refused the filled unit');
+      assert.equal(message, 'ownedsite-hero: the family compiler refused the filled unit');
       assert.ok(!message.includes(rejected), 'the model\'s own text must not ride out on the error');
       assert.ok(!message.includes('markup is not allowed'), 'nor the validator\'s words about it');
       return true;
@@ -842,7 +843,7 @@ test('single mode matches answered sections by id, so a dropped or reordered sec
   });
   const report = await runFastLane({ pkg, brief: BRIEF, mode: 'single', entry: ENTRY, revision: 1, model, modelName: 'fake' });
   assert.equal(report.repairs, 1, 'only the dropped rail is repaired');
-  assert.equal(report.units.find((unit) => unit.label === 'maben-site-rail')?.repairs, 1);
+  assert.equal(report.units.find((unit) => unit.label === 'ownedsite-site-rail')?.repairs, 1);
   assert.ok((getAtPath(report.recipe, ['sections', 6, 'text', 'requestTitle']) as string).startsWith('New requestTitle'));
   assert.ok((getAtPath(report.recipe, ['sections', 2, 'text', 'statement']) as string).startsWith('New statement'));
 });
@@ -853,7 +854,7 @@ test('single mode keeps the sections that streamed cleanly when the page answer 
       if (!isObject(template) || !Array.isArray(template.sections)) return text;
       // Cut the page answer inside the fourth section and append junk: brand and three sections
       // close cleanly in the stream, the rest never arrive, and the whole text does not parse.
-      const cut = text.indexOf('"id": "maben-how-we-work"') > 0 ? text.indexOf('"id": "maben-how-we-work"') : text.indexOf('"id":"maben-how-we-work"');
+      const cut = text.indexOf('"id": "ownedsite-how-we-work"') > 0 ? text.indexOf('"id": "ownedsite-how-we-work"') : text.indexOf('"id":"ownedsite-how-we-work"');
       return `${text.slice(0, cut + 40)} <<garbage`;
     },
   });
@@ -878,8 +879,8 @@ test('verify: jev flags a fabricated slot, repairUnit repairs it, and remaining 
     firstAnswer: (template, limits) => {
       const filled = fillTemplate(template, limits) as JsonObject;
       const hero = Array.isArray(filled.sections)
-        ? (filled.sections as JsonObject[]).find((section) => section.id === 'maben-hero')
-        : filled.id === 'maben-hero' ? filled : undefined;
+        ? (filled.sections as JsonObject[]).find((section) => section.id === 'ownedsite-hero')
+        : filled.id === 'ownedsite-hero' ? filled : undefined;
       if (hero) (hero.text as JsonObject).statement = 'Call FABRICATED-555-0100 for a free consult';
       return filled;
     },
@@ -1176,10 +1177,10 @@ test('a spine from an earlier build is re-targeted with the new revision and unt
   const previous = structuredClone(pkg.fixture);
   previous.revision = 1;
   const model = fakeModel();
-  const report = await runFastLane({ pkg, brief: 'Greenline Landscaping, Denver.', mode: 'single', entry: 'maben-r2.html', revision: 2, model, modelName: 'fake', spine: previous });
+  const report = await runFastLane({ pkg, brief: 'Greenline Landscaping, Denver.', mode: 'single', entry: 'ownedsite-r2.html', revision: 2, model, modelName: 'fake', spine: previous });
   assert.equal(getAtPath(report.recipe, ['revision']), 2);
-  assert.equal(report.manifest.metadata.agencySite.revision, 'maben-r2');
-  assert.ok(report.approvedAssets.every((asset) => asset.destination.startsWith('assets/agency-site/maben-r2/')));
+  assert.equal(report.manifest.metadata.agencySite.revision, 'ownedsite-r2');
+  assert.ok(report.approvedAssets.every((asset) => asset.destination.startsWith('assets/agency-site/ownedsite-r2/')));
 });
 
 type DaemonRequest = { method: string; url: string; body: JsonObject };
@@ -1299,8 +1300,8 @@ test('strict: a clean pass defers everything — one create, assets, one page sa
     assert.equal(daemon.requests[0]!.url, '/api/projects', 'the project is created first, only after the gate passed');
     const fileRequests = daemon.requests.slice(1);
     const nameOf = (request: { body: JsonObject }) => (typeof request.body.name === 'string' ? request.body.name : undefined);
-    const destinationAssetSaves = fileRequests.filter((request) => nameOf(request)?.startsWith('assets/agency-site/maben-r1/'));
-    assert.equal(destinationAssetSaves.length, 17, 'every approved asset is uploaded');
+    const destinationAssetSaves = fileRequests.filter((request) => nameOf(request)?.startsWith('assets/agency-site/ownedsite-r1/'));
+    assert.equal(destinationAssetSaves.length, 2, 'every approved asset is uploaded');
     const pageSaves = fileRequests.filter((request) => nameOf(request) === ENTRY);
     assert.equal(pageSaves.length, 1, 'the final page is saved exactly once, never once per unit');
     const lastAssetIndex = Math.max(...destinationAssetSaves.map((save) => fileRequests.indexOf(save)));
@@ -1309,7 +1310,7 @@ test('strict: a clean pass defers everything — one create, assets, one page sa
     for (const expected of ['agency-site-state/r1/recipe.json', 'agency-site-state/r1/approved-assets.json', 'AGENCY-SITE-STATE.md', 'agency-site-state/r1/assets/hero-frame.png']) {
       assert.ok(fileRequests.some((request) => nameOf(request) === expected), expected);
     }
-    assert.equal(daemon.requests.length, 1 + 17 + 1 + 3 + 17, 'create, destination assets, one page, three state files, state-dir asset copies');
+    assert.equal(daemon.requests.length, 5 + 2 * 2, 'create, destination assets, one page, three state files, state-dir asset copies');
 
     // Strict never counts the fill step's own in-memory renders as paints (unlike a plain
     // dry-run's "single mode paints progressively" test): the report's `paints`, `firstPaintMs`
@@ -1350,7 +1351,7 @@ test('strict + dry-run (no ensurePublisher): the same pass/fail decision, but no
 });
 
 test('strict: every editable path either locked or left null checks 0 slots and still passes, explicitly', async () => {
-  const watsonPkg = await loadFamilyPackage(WATSON_DIR, 'watson');
+  const ownededitorialPkg = await loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
   const NULLABLE_ATOMS = ['location', 'city', 'awardCaption', 'locations', 'campaigns', 'businessEmail', 'jobsEmail', 'addressFirst', 'addressSecond', 'phone'];
   const nullingFill: Filler = (key, _value, _at, limit) => (NULLABLE_ATOMS.includes(key) ? null : `New ${key} for Taproot`.slice(0, limit));
 
@@ -1358,8 +1359,8 @@ test('strict: every editable path either locked or left null checks 0 slots and 
   // model answers every one of them null. What remains for `collectFaithfulnessSlots` to see is
   // nothing: every locked leaf is excluded by `lockPaths`, and a null leaf carries no text to
   // check in the first place.
-  const templateForPaths = editableTemplate(watsonPkg.fixture, undefined, new Set());
-  const atomKinds = atomKindsFor(watsonPkg.schema, templateForPaths as Json);
+  const templateForPaths = editableTemplate(ownededitorialPkg.fixture, undefined, new Set());
+  const atomKinds = atomKindsFor(ownededitorialPkg.schema, templateForPaths as Json);
   const nullablePaths = nullablePathsOf(atomKinds);
   const leaves = (function walk(node: Json, at = ''): string[] {
     if (typeof node === 'string' || node === null) return [at];
@@ -1372,7 +1373,7 @@ test('strict: every editable path either locked or left null checks 0 slots and 
   const model = fakeModel({ fill: nullingFill });
   const verify = fakeJevChecker();
   const report = await runFastLane({
-    pkg: watsonPkg, brief: 'Taproot, a two-person design studio.', mode: 'sections', entry: 'watson-r1.html', revision: 1, model, modelName: 'fake',
+    pkg: ownededitorialPkg, brief: 'Taproot, a two-person design studio.', mode: 'sections', entry: 'ownededitorial-r1.html', revision: 1, model, modelName: 'fake',
     lockPaths, verify, strict: true,
   });
 
@@ -1444,8 +1445,8 @@ test('a repair event carries the unit and a fixed reason, never the text the mod
     firstAnswer: (template, limits) => {
       const filled = fillTemplate(template, limits) as JsonObject;
       const hero = Array.isArray(filled.sections)
-        ? (filled.sections as JsonObject[]).find((section) => section.id === 'maben-hero')
-        : filled.id === 'maben-hero' ? filled : undefined;
+        ? (filled.sections as JsonObject[]).find((section) => section.id === 'ownedsite-hero')
+        : filled.id === 'ownedsite-hero' ? filled : undefined;
       if (hero) (hero.text as JsonObject).statement = `Call ${secret} for a free consult`;
       return filled;
     },
@@ -1458,7 +1459,7 @@ test('a repair event carries the unit and a fixed reason, never the text the mod
 
   const repairs = events.filter((event) => event.type === 'repair');
   assert.equal(repairs.length, 1, 'the flagged unit was repaired once');
-  assert.equal(repairs[0]!.label, 'maben-hero');
+  assert.equal(repairs[0]!.label, 'ownedsite-hero');
   assert.equal(repairs[0]!.reason, 'unfaithful');
   const serialised = JSON.stringify(events);
   assert.ok(!serialised.includes(secret), 'a generated fact leaked into the event stream');

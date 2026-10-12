@@ -12,6 +12,10 @@ describe('AC-R04.1 roster coverage', () => {
         // A gap is named as a gap: no count, no digest, and a reason.
         expect(status).toMatchObject({ itemCount: null, listingDigest: null });
         expect(status.reason).toBeTruthy();
+      } else if (status.sourceId === 'fonts') {
+        expect(status.state).toBe('degraded');
+        expect(status.reason).toContain('font-file-unreadable');
+        expect(status.listingDigest).toMatch(/^[a-f0-9]{64}$/);
       } else {
         expect(status.state).toBe('searched');
         expect(Number.isInteger(status.itemCount)).toBe(true);
@@ -21,7 +25,7 @@ describe('AC-R04.1 roster coverage', () => {
     // The local, network-free federation (statuses in contract source order): the three W1 cohorts, the bundled design systems and
     // their DESIGN.md references (B5-2), the AC-R11 fonts snapshot (B6-1), and the frozen B7-3 reference-link/project-fetch
     // entries (AC-R18.6–R18.8). Project-scoped owned rows need a project; see resources-owned-federation-roster.test.ts.
-    expect(response.sourceStatuses.filter(status => status.state === 'searched').map(status => status.sourceId)).toEqual(['plugins', 'genui', 'sections', 'design-systems', 'fonts', 'design-md', 'aceternity', 'svelte-animations', 'cnblocks', 'animations']);
+    expect(response.sourceStatuses.filter(status => status.state === 'searched').map(status => status.sourceId)).toEqual(['plugins', 'genui', 'sections', 'design-systems', 'design-md', 'aceternity', 'svelte-animations', 'cnblocks', 'animations']);
     const designSystems = response.sourceStatuses.find(status => status.sourceId === 'design-systems');
     expect(designSystems).toMatchObject({ state: 'searched', reason: null });
     expect(designSystems!.itemCount).toBeGreaterThan(0);

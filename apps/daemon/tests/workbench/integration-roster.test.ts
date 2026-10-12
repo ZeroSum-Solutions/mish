@@ -74,14 +74,16 @@ describe('AC-R08.1 published integration roster', () => {
     expect(after.pendingReceipts.join(' ')).not.toMatch(/licence record/i);
     expect(after.readiness).toBe('unverified');
   });
-  it('cites only evidence that exists in the repository', () => {
+  it('keeps private evidence references separate from shipped public evidence', () => {
     const refs = roster().entries.flatMap(entry => [
       ...entry.rights.evidenceRefs, ...entry.operations.flatMap(item => item.evidenceRefs),
       ...(entry.lastVerifiedUse ? [entry.lastVerifiedUse.evidenceRef] : []),
       ...(entry.siteEvaluation ? [...entry.siteEvaluation.existingMcp.evidenceRefs, ...entry.siteEvaluation.toolSchema.evidenceRefs, ...entry.siteEvaluation.terms.evidenceRefs, ...(entry.siteEvaluation.lastProof ? [entry.siteEvaluation.lastProof.evidenceRef] : [])] : []),
     ]);
     expect(refs.length).toBeGreaterThan(20);
-    expect([...new Set(refs)].filter(ref => !existsSync(resolve(repoRoot, ref)))).toEqual([]);
+    for (const ref of new Set(refs)) {
+      expect(existsSync(resolve(repoRoot, ref)), ref).toBe(!ref.startsWith('docs/plans/') && ref !== 'docs/proofs/2026-10-01-21st-source-fidelity.md');
+    }
   });
   it('reports the live daemon MCP binding without exposing server configuration', () => {
     const value = roster([

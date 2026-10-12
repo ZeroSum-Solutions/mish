@@ -11,10 +11,10 @@ import { loadFamilyPackage } from '../src/family.ts';
 import { buildUserPrompt, withFixHint } from '../src/prompt.ts';
 import { runFastLane } from '../src/run.ts';
 import { contactPathsFor, editableTemplate, getAtPath, normalizeContactAtom, type JsonObject } from '../src/spine.ts';
-import { WATSON_DIR, fakeModel, type Filler } from './fixtures.ts';
+import { TEST_EDITORIAL_DIR, fakeModel, type Filler } from './fixtures.ts';
 
-const pkg = await loadFamilyPackage(WATSON_DIR, 'watson');
-const ENTRY = 'watson-r1.html';
+const pkg = await loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
+const ENTRY = 'ownededitorial-r1.html';
 const BRIEF = 'Anchorline Legal, a business law firm in Seattle. Reach the intake team at (828) 555-0135 or intake@x.com.';
 const LOCK_BRAND = ['brand.name'];
 
@@ -38,7 +38,7 @@ test('normalizeContactAtom never strips a leading quote or bracket without its m
   assert.equal(normalizeContactAtom('a@b.co"'), 'a@b.co"', 'a lone straight quote at the end is ambiguous and left for the repair');
 });
 
-test('contactPathsFor finds the email and phone atoms of the watson footer', () => {
+test('contactPathsFor finds the email and phone atoms of the ownededitorial footer', () => {
   const paths = contactPathsFor(pkg.schema, editableTemplate(pkg.fixture)!);
   assert.equal(paths.get('sections[4].content.jobsEmail'), 'email');
   assert.equal(paths.get('sections[4].content.businessEmail'), 'email');
@@ -64,7 +64,7 @@ test('a genuinely invalid email is still refused, and the repair prompt names th
   const model = fakeModel({ fill: fillWith({ jobsEmail: 'intake at x dot com.', businessEmail: 'intake@x.com', phone: '(828) 555-0135' }) });
   await assert.rejects(
     runFastLane({ pkg, brief: BRIEF, mode: 'sections', entry: ENTRY, revision: 1, model, modelName: 'fake', lockPaths: LOCK_BRAND }),
-    /watson-footer: the family compiler refused the filled unit/,
+    /ownededitorial-footer: the family compiler refused the filled unit/,
   );
   assert.ok(model.prompts.some((prompt) => prompt.includes('jobsEmail: invalid email. Fix: remove trailing punctuation')), 'the rejection tells the model what to change');
 });

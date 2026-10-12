@@ -32,8 +32,8 @@ const sanitizedRealSeedPath = join(
   dirname(fileURLToPath(import.meta.url)),
   '..',
   'fixtures',
-  'od-next-runtime-capabilities',
-  'vela-opencode-0.0.1-local-opencode-1.18.18.sanitized-real-seed.json',
+  'daemon-b',
+  'vela-child-seed.json',
 );
 
 function fixture(): RecordValue[] {
@@ -122,14 +122,12 @@ describe('Vela OpenCode child evidence adapter', () => {
     });
   });
 
-  it('replays the local Terra seven-path seed while keeping the unpublished tuple out of production', () => {
+  it('replays synthetic seven-path lifecycles without promoting a production runtime tuple', () => {
     const seed = JSON.parse(readFileSync(sanitizedRealSeedPath, 'utf8')) as {
       fixtureKind: string;
       evidenceReview: string;
       velaVersion: string;
-      velaCommit: string;
       openCodeVersion: string;
-      model: string;
       recordingDigest: string;
       caseCoverage: Array<{ caseId: string; outcome: string; evidence: Record<string, unknown> }>;
       wire: RecordValue[];
@@ -139,12 +137,10 @@ describe('Vela OpenCode child evidence adapter', () => {
       `sha256:${createHash('sha256').update(JSON.stringify(digestInput)).digest('hex')}`,
     );
     expect(seed).toMatchObject({
-      fixtureKind: 'sanitized_real_best_effort',
-      evidenceReview: 'mish_best_effort',
-      velaVersion: '0.0.1-od-next-local',
-      velaCommit: VELA_CHILD_EVIDENCE_CANDIDATE.commit,
-      openCodeVersion: '1.18.18',
-      model: 'gpt-5.6-terra',
+      fixtureKind: 'synthetic_protocol',
+      evidenceReview: 'synthetic',
+      velaVersion: 'synthetic-v1',
+      openCodeVersion: 'synthetic-v1',
     });
     expect(seed.caseCoverage.map(({ caseId }) => caseId)).toEqual([
       'main_run',

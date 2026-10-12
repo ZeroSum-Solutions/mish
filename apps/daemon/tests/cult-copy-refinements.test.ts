@@ -1,17 +1,27 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { cultRefinedSlot, cultRefinedSourceCopy } from '../src/cult-copy-refinements.js';
 
+// Owned literal data exercises the mechanism without importing removed private copy.
+vi.mock('@mish/cult-ui-catalog/catalog-copy-refinements.json', () => ({
+  default: { replacements: [{ item: 'fixture-card', slot: 'body', from: 'Claim not supplied by the brief', to: 'Example projects' }] },
+}));
+
 describe('reviewed catalog copy', () => {
-  it('removes invented social proof in slots and reusable source while leaving other designs intact', () => {
-    const original = 'Trusted by 10,000+ companies worldwide';
-    expect(cultRefinedSlot('marketing-cta-animated', 'body2', original)).toBe('Example projects and people');
-    const code = `<p>${original}</p><KineticText text="Experience"/><KineticText text="the future"/>`;
-    expect(cultRefinedSourceCopy(code, 'marketing-cta-animated')).toBe('<p>Example projects and people</p><KineticText text="Make the idea"/><KineticText text="real."/>');
+  it('replaces a reviewed exact slot and source literal while leaving other designs intact', () => {
+    const original = 'Claim not supplied by the brief';
+    expect(cultRefinedSlot('fixture-card', 'body', original)).toBe('Example projects');
+    const code = `<p>${original}</p>`;
+    expect(cultRefinedSourceCopy(code, 'fixture-card')).toBe('<p>Example projects</p>');
     expect(cultRefinedSourceCopy(code, 'another-component')).toBe(code);
   });
 
-  it('preserves changed upstream copy and unknown slots instead of overwriting new source', () => {
-    expect(cultRefinedSlot('marketing-cta-animated', 'body2', 'New, reviewed upstream text')).toBe('New, reviewed upstream text');
-    expect(cultRefinedSlot('marketing-cta-animated', 'other', 'Trusted by 10,000+ companies worldwide')).toBe('Trusted by 10,000+ companies worldwide');
+  it('preserves changed copy and unknown slots instead of overwriting new source', () => {
+    expect(cultRefinedSlot('fixture-card', 'body', 'New reviewed text')).toBe('New reviewed text');
+    expect(cultRefinedSlot('fixture-card', 'other', 'Claim not supplied by the brief')).toBe('Claim not supplied by the brief');
+  });
+
+  it('retains source-only kinetic text refinements', () => {
+    expect(cultRefinedSourceCopy('<KineticText text="Experience"/><KineticText text="the future"/>', 'marketing-cta-animated'))
+      .toBe('<KineticText text="Make the idea"/><KineticText text="real."/>');
   });
 });

@@ -135,7 +135,7 @@ test('a valid form whose click is obstructed remains unexercised and incomplete'
 });
 
 test('loaded regular text remains available beside unused unloaded bold and italic faces', async () => {
-  const font = await readFile(new URL('../../../plugins/_official/examples/agency-maren/families/maren/assets/archivo-latin.woff2', import.meta.url));
+  const font = await readFile(new URL('../../../apps/web/public/fonts/IBMPlexMono-400-latin.woff2', import.meta.url));
   await fixture(`<style>
     @font-face{font-family:Local;src:url(regular.woff2);font-weight:400;font-style:normal}
     @font-face{font-family:Local;src:url(unused-bold.woff2);font-weight:700;font-style:normal}

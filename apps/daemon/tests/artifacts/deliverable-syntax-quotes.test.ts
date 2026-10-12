@@ -95,9 +95,9 @@ describe('deterministic quote repair acceptance', () => {
   it('repairs all six diagnosed locations in the sanitized historical ORDER artifact', async () => {
     const original = await fs.readFile(path.join(fixtureRoot, 'order-stress-r01.sanitized.html'), 'utf8');
     const reference = await fs.readFile(path.join(fixtureRoot, 'order-stress-r01.sanitized-reference.html'), 'utf8');
-    expect(sha256(original)).toBe('423637b44d6d900f9c0a7a0dd694619fc611fa4dfa5fc480d66dc37935ee8d7e');
-    expect(sha256(reference)).toBe('f442c0b5c6157ec1b09816bffbc3b5924ad422cba0dcd24784ee1f975c4977b2');
-    expect(Buffer.byteLength(original)).toBe(120_711);
+    expect(sha256(original)).toBe('b64e13e00712019876ba5abc5158d67b2207fbda8105dbd2fd152f9f88debd52');
+    expect(sha256(reference)).toBe('524dc92580c8b66563a54070df47da3defd0a4bcfaded3e132af977a6aaebb57');
+    expect(Buffer.byteLength(original)).toBe(120_697);
     const root = await fixture(original);
 
     await expect(checkDeliverableSyntax({ projectRoot: root, entryFile: 'index.html' }))

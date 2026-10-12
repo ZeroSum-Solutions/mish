@@ -252,8 +252,8 @@ async function setupVelaStub(): Promise<void> {
     script,
     `import { appendFileSync } from 'node:fs';
 const args = process.argv.slice(2);
-if (process.env.OD_TEST_VELA_LOG) {
-  appendFileSync(process.env.OD_TEST_VELA_LOG, args.join(' ') + '\\n');
+if (${JSON.stringify(join(root, 'vela-calls.log'))}) {
+  appendFileSync(${JSON.stringify(join(root, 'vela-calls.log'))}, args.join(' ') + '\\n');
 }
 const [group, ...rest] = args;
 const out = (value) => {
@@ -262,7 +262,7 @@ const out = (value) => {
 };
 if (group === 'team-projects') {
   if (rest[0] === '--help') process.exit(0);
-  const catalog = JSON.parse(process.env.OD_TEST_TEAM_PROJECTS_JSON || '{"projects":[]}');
+  const catalog = JSON.parse(${JSON.stringify(process.env.OD_TEST_TEAM_PROJECTS_JSON)} || '{"projects":[]}');
   const projects = Array.isArray(catalog.projects) ? catalog.projects : [];
   if (rest[0] === 'list') out({ projects });
   if (rest[0] === 'get') {
@@ -278,7 +278,7 @@ if (group === 'team-projects') {
 if (group === 'resource' && rest[0] === 'shared') {
   // Older CLI builds expose only the resource index; the catalog adapter
   // probes once per process, so answer both shapes for the same catalog.
-  const catalog = JSON.parse(process.env.OD_TEST_TEAM_PROJECTS_JSON || '{"projects":[]}');
+  const catalog = JSON.parse(${JSON.stringify(process.env.OD_TEST_TEAM_PROJECTS_JSON)} || '{"projects":[]}');
   const projects = Array.isArray(catalog.projects) ? catalog.projects : [];
   out({
     resources: projects.map((project) => ({
@@ -293,7 +293,7 @@ if (group === 'resource' && rest[0] === 'shared') {
   });
 }
 if (group === 'collab' && rest[0] === 'presence') {
-  const viewers = JSON.parse(process.env.OD_TEST_CLOUD_VIEWERS_JSON || '[]');
+  const viewers = JSON.parse(${JSON.stringify(process.env.OD_TEST_CLOUD_VIEWERS_JSON)} || '[]');
   out({ viewers: rest[1] === 'leave' ? [] : viewers });
 }
 out({});

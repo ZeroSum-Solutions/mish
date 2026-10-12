@@ -70,13 +70,7 @@ function cdnViolations(html: string): string[] {
 const GOOGLE_FONTS_STYLESHEET = 'remote stylesheet: fonts.googleapis.com';
 const GOOGLE_FONTS_IMPORT = 'remote @import: fonts.googleapis.com';
 const REMOTE_FONT_ALLOWLIST: ReadonlySet<string> = new Set([
-  // acreage-farming, aerocore, ai-designer-portfolio, cinematic-landing-page, codenest-coding-platform,
-  // dreamcore-landing and innovation were owned rewrites (T8): they now self-host OFL bytes via a
-  // local fonts.css and no longer load Google Fonts, so their entries were removed rather than kept stale.
-  ...['liquid-glass-agency', 'luxury-botanical', 'mindloop-landing',
-    'mockup-device-3d', 'mythic-naturecore', 'nimbus-grid', 'orbis-nft', 'portfolio-cosmic', 'skyelite-private-jets', 'stellar-launch',
-  ].map(name => `plugins/_official/examples/${name}/example.html: ${GOOGLE_FONTS_STYLESHEET}`),
-  `plugins/_official/examples/velar-luxury-real-estate/example.html: ${GOOGLE_FONTS_IMPORT}`,
+  `plugins/_official/examples/mockup-device-3d/example.html: ${GOOGLE_FONTS_STYLESHEET}`,
 ]);
 
 function findFiles(root: string, name: string): string[] {
@@ -141,7 +135,7 @@ describe('no CDN Tailwind, remote script, stylesheet or font in any Enlarge prev
       if (!existsSync(file) || !/\.html?$/i.test(file)) continue;
       documents.push([path.relative(repoRoot, file), readFileSync(file, 'utf8')]);
     }
-    expect(documents.length).toBeGreaterThan(20);
+    expect(documents).toHaveLength(18);
     expect(report(documents, REMOTE_FONT_ALLOWLIST)).toEqual([]);
   });
 
@@ -168,25 +162,13 @@ describe('no CDN Tailwind, remote script, stylesheet or font in any Enlarge prev
       const preview = entry ? renderSectionPreview(entry, catalog, roots) : null;
       return preview?.status === 200 ? [[`section:${entry!.id}`, preview.html]] : [];
     });
-    expect(documents.length).toBeGreaterThan(200);
+    expect(documents.length).toBe(catalog.filter(entry => entry.content.kind === 'vendored-block').length);
     expect(report(documents)).toEqual([]);
   });
 
-  it('compiled Cult section/page layouts and bundled component previews', async () => {
-    const names = readdirSync(path.join(cultKit, 'converted'));
-    const converted = names.flatMap((name): Array<[string, string]> => {
-      const html = convertedPreviewHtml(cultKit, name, 'light', CULT_CONVERTED_DOCUMENT_CSP);
-      return html ? [[`cult-converted:${name}`, html]] : [];
-    });
-    expect(converted.length).toBeGreaterThan(100);
-    const bundled = new BundledCultPreviews(cultKit);
-    const previews = JSON.parse(readFileSync(path.join(cultKit, 'previews', 'manifest.json'), 'utf8')) as { items: Array<{ name: string; live: boolean }> };
-    const harness: Array<[string, string]> = [];
-    for (const item of previews.items.filter(entry => entry.live)) {
-      const page = await bundled.page(item.name, 'light');
-      if ('html' in page) harness.push([`cult-preview:${item.name}`, page.html]);
-    }
-    expect(harness.length).toBeGreaterThan(100);
-    expect(report([...converted, ...harness])).toEqual([]);
+  it('does not expose converted or bundled Cult previews without the private kit', () => {
+    expect(existsSync(cultKit)).toBe(false);
+    expect(BundledCultPreviews.installed(cultKit)).toBe(false);
+    expect(convertedPreviewHtml(cultKit, 'owned-fixture', 'light', CULT_CONVERTED_DOCUMENT_CSP)).toBeNull();
   });
 });

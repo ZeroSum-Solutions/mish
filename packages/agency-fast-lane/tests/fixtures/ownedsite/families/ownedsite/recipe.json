@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 2,
+  "family": "ownedsite",
+  "revision": 1,
+  "brand": {
+    "name": "Fixture Workshop",
+    "descriptor": "A fictional business fixture.",
+    "wordmark": {
+      "id": "wordmark"
+    }
+  },
+  "sections": [
+    {
+      "id": "ownedsite-site-rail",
+      "type": "navigation",
+      "text": {
+        "menuLabel": "Menu",
+        "note": "Local fixture"
+      }
+    },
+    {
+      "id": "ownedsite-overlay-menu",
+      "type": "menu",
+      "text": {
+        "title": "Explore"
+      },
+      "items": {
+        "destinationLinks": [
+          {
+            "text": {
+              "label": "About"
+            },
+            "destinations": {
+              "href": "about"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ownedsite-hero",
+      "type": "statement-hero",
+      "text": {
+        "statement": "Fixture statement",
+        "eyebrow": "Workshop",
+        "mediaNote": "Fixture media"
+      },
+      "assets": {
+        "media": "hero"
+      }
+    },
+    {
+      "id": "ownedsite-how-we-work",
+      "type": "steps",
+      "text": {
+        "eyebrow": "Process"
+      },
+      "items": {
+        "steps": [
+          {
+            "text": {
+              "title": "Step 0",
+              "caption": "Fixture step 0",
+              "imageAlt": "Fixture image"
+            }
+          },
+          {
+            "text": {
+              "title": "Step 1",
+              "caption": "Fixture step 1",
+              "imageAlt": "Fixture image"
+            }
+          },
+          {
+            "text": {
+              "title": "Step 2",
+              "caption": "Fixture step 2",
+              "imageAlt": "Fixture image"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "ownedsite-latest-projects",
+      "type": "portfolio",
+      "text": {
+        "heading": "Projects"
+      }
+    },
+    {
+      "id": "ownedsite-editorial-grid",
+      "type": "editorial",
+      "text": {
+        "heading": "Notes"
+      }
+    },
+    {
+      "id": "ownedsite-site-footer",
+      "type": "footer",
+      "text": {
+        "heading": "Fixture footer",
+        "requestTitle": "Request a fixture"
+      }
+    }
+  ]
+}

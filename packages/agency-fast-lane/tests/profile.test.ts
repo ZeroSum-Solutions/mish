@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
-import { loadAtlasData } from '../src/atlas.ts';
+import { loadAtlasData } from './routing-fixture.ts';
 import {
   createJevProfiler,
   ProfileError,
@@ -115,7 +115,7 @@ test('buildProfileQuestions: a custom minTransfer changes the family question â€
   const defaulted = buildProfileQuestions(atlas, registry, taxonomy).family as { criteria: Record<string, string> };
   const atDefault = buildProfileQuestions(atlas, registry, taxonomy, DEFAULT_MIN_TRANSFER).family as { criteria: Record<string, string> };
   assert.deepEqual(defaulted, atDefault, 'omitting minTransfer must build the same family question as passing DEFAULT_MIN_TRANSFER explicitly');
-  assert.notEqual(permissive.criteria.fervor, strict.criteria.fervor, 'a permissive and a strict minTransfer must produce different legal-spine lists for fervor');
+  assert.notEqual(permissive.criteria.ownedcinematic, strict.criteria.ownedcinematic, 'a permissive and a strict minTransfer must produce different legal-spine lists for ownedcinematic');
 });
 
 test('buildProfileQuestions: label definitions are used verbatim as criteria', () => {
@@ -185,8 +185,8 @@ test('createJevProfiler: the request carries the family question built from the 
     source: { kind: 'prompt', id: 'dentist-01' },
   });
   const sentFamily = (captured[0]!.body.questions as JsonObject).family as { criteria: Record<string, string> };
-  const expected = (buildProfileQuestions(atlas, registry, taxonomy, 1).family as { criteria: Record<string, string> }).criteria.fervor;
-  assert.equal(sentFamily.criteria.fervor, expected, 'createJevProfiler must thread its own minTransfer into buildProfileQuestions, not silently use the default');
+  const expected = (buildProfileQuestions(atlas, registry, taxonomy, 1).family as { criteria: Record<string, string> }).criteria.ownedcinematic;
+  assert.equal(sentFamily.criteria.ownedcinematic, expected, 'createJevProfiler must thread its own minTransfer into buildProfileQuestions, not silently use the default');
 });
 
 test('createJevProfiler: state carries {text, facts} when facts are given (an HTML input)', async () => {
@@ -389,17 +389,17 @@ test('resolveProfile: route.resolved reuses resolveRoute\'s exact-archetype poli
   const answers = buildFullAnswers({
     spine: choiceAnswer('BA', { BA: 1 }),
     archetype_BA: choiceAnswer('BA.03', { 'BA.01': 0, 'BA.02': 0, 'BA.03': 1, none: 0 }),
-    family: choiceAnswer('halcyon', { halcyon: 0.8, watson: 0.1, fervor: 0.02, wrenfield: 0.02, maben: 0.02, maren: 0.02, emmpo: 0.02, none: 0 }),
+    family: choiceAnswer('ownedinstitution', { ownedinstitution: 0.8, ownededitorial: 0.1, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedmaker: 0.02, ownedlearning: 0.02, none: 0 }),
     skin: choiceAnswer('unspecified', { unspecified: 1 }),
   });
   const source = { kind: 'prompt' as const, chars: 10, digest: 'x' };
   const profile = resolveProfile(answers, atlas, registry, taxonomy, source);
-  assert.equal(profile.route.resolved.familyId, 'halcyon');
+  assert.equal(profile.route.resolved.familyId, 'ownedinstitution');
   assert.equal(profile.route.resolved.archetypeId, 'BA.03');
   assert.equal(profile.route.resolved.basis, 'exact');
   assert.equal(profile.route.spine.choice, 'BA');
   assert.equal(profile.route.archetype?.choice, 'BA.03');
-  assert.equal(profile.route.family.choice, 'halcyon');
+  assert.equal(profile.route.family.choice, 'ownedinstitution');
 });
 
 test('resolveProfile: route.archetypes keeps every archetype answer, runner-up spines included', () => {
@@ -407,7 +407,7 @@ test('resolveProfile: route.archetypes keeps every archetype answer, runner-up s
     spine: choiceAnswer('BA', { BA: 0.7, TL: 0.3 }),
     archetype_BA: choiceAnswer('BA.03', { 'BA.01': 0, 'BA.02': 0, 'BA.03': 1, none: 0 }),
     archetype_TL: choiceAnswer('TL.05', { 'TL.01': 0, 'TL.02': 0, 'TL.03': 0, 'TL.04': 0, 'TL.05': 0.9, 'TL.06': 0.1, none: 0 }),
-    family: choiceAnswer('halcyon', { halcyon: 0.8, watson: 0.1, fervor: 0.02, wrenfield: 0.02, maben: 0.02, maren: 0.02, emmpo: 0.02, none: 0 }),
+    family: choiceAnswer('ownedinstitution', { ownedinstitution: 0.8, ownededitorial: 0.1, ownedcinematic: 0.02, ownedcontractor: 0.02, ownedsite: 0.02, ownedmaker: 0.02, ownedlearning: 0.02, none: 0 }),
     skin: choiceAnswer('unspecified', { unspecified: 1 }),
   });
   const profile = resolveProfile(answers, atlas, registry, taxonomy, { kind: 'prompt' as const, chars: 10, digest: 'x' });
@@ -506,8 +506,8 @@ test('resolveProfile: a Choice answer whose choice is not one of the offered opt
 });
 
 test('resolveProfile: a Choice answer with a probability outside [0, 1] throws', () => {
-  const answers = buildFullAnswers({ family: choiceAnswer('maben', { maben: 1.5 }) });
-  rejectsMalformed(answers, /family/, /probabilities\.maben is not a finite number/);
+  const answers = buildFullAnswers({ family: choiceAnswer('ownedsite', { ownedsite: 1.5 }) });
+  rejectsMalformed(answers, /family/, /probabilities\.ownedsite is not a finite number/);
 });
 
 test('resolveProfile: a missing answer (key absent entirely) throws, naming the missing id', () => {
