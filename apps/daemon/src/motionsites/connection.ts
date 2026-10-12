@@ -50,11 +50,11 @@ export async function resolveMotionSitesAccessToken(dataDir: string, fetchImpl: 
   const stored = await getToken(dataDir, MOTIONSITES_MCP_SERVER_ID);
   if (!stored) throw new MotionSitesLoginRequiredError();
   const endpoint = resourceUrl ?? (await configuredMotionSitesServer(dataDir)).url;
-  if (!mcpTokenMatchesEndpoint(stored, endpoint)) {
+  if (!endpoint || !mcpTokenMatchesEndpoint(stored, endpoint)) {
     throw new MotionSitesLoginRequiredError('The configured MotionSites URL changed — reconnect this server before using its saved OAuth token.');
   }
   if (!isTokenExpired(stored)) return stored.accessToken;
-  return refreshStoredToken(dataDir, stored, fetchImpl);
+  return refreshStoredToken(dataDir, endpoint, stored, fetchImpl);
 }
 
 async function configuredMotionSitesServer(dataDir: string): Promise<McpServerConfig> {
@@ -81,7 +81,8 @@ export async function resolveMotionSitesMcpConnection(dataDir: string, fetchImpl
   return { url: server.url, accessToken, ...(server.headers ? { headers: server.headers } : {}) };
 }
 
-async function refreshStoredToken(dataDir: string, stored: StoredMcpToken, fetchImpl: typeof fetch): Promise<string> {
+/** Refreshes the token saved for `endpoint`; a result bound to another endpoint is never returned. */
+async function refreshStoredToken(dataDir: string, endpoint: string, stored: StoredMcpToken, fetchImpl: typeof fetch): Promise<string> {
   if ((stored.resourceUrl && !isPublicMcpResource(stored.resourceUrl)) || !stored.refreshToken || !stored.tokenEndpoint || !stored.clientId) {
     throw new MotionSitesLoginRequiredError(
       'Stored MotionSites token expired and cannot be refreshed — sign in again via POST /api/mcp/oauth/start.',
@@ -89,7 +90,7 @@ async function refreshStoredToken(dataDir: string, stored: StoredMcpToken, fetch
   }
   let next: StoredMcpToken | null;
   try {
-    next = await refreshMcpTokenSingleFlight(dataDir, MOTIONSITES_MCP_SERVER_ID, (current) => refreshAccessToken(
+    next = await refreshMcpTokenSingleFlight(dataDir, MOTIONSITES_MCP_SERVER_ID, endpoint, (current) => refreshAccessToken(
       {
         tokenEndpoint: current.tokenEndpoint!,
         clientId: current.clientId!,
@@ -106,7 +107,7 @@ async function refreshStoredToken(dataDir: string, stored: StoredMcpToken, fetch
       'Stored MotionSites token expired and refresh failed — sign in again.',
     );
   }
-  if (!next) {
+  if (!next || !mcpTokenMatchesEndpoint(next, endpoint)) {
     throw new MotionSitesLoginRequiredError('MotionSites is not connected — sign in again.');
   }
   return next.accessToken;

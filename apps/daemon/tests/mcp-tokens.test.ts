@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { mcpEndpointFingerprint } from '../src/mcp-endpoint.js';
 import {
   clearToken,
   getToken,
@@ -37,9 +38,17 @@ describe('mcp-tokens storage', () => {
   });
 
   describe('refreshMcpTokenSingleFlight', () => {
+    const endpointA = 'https://a.example.test/mcp';
+    const endpointB = 'https://b.example.test/mcp';
     const expired: StoredMcpToken = {
       accessToken: 'old', refreshToken: 'rt-1', tokenType: 'Bearer', savedAt: 1, expiresAt: 1,
       tokenEndpoint: 'https://auth.example/token', clientId: 'cid',
+      endpointFingerprint: mcpEndpointFingerprint(endpointA),
+    };
+    const tokenForB: StoredMcpToken = {
+      accessToken: 'b-access', refreshToken: 'b-refresh', tokenType: 'Bearer', savedAt: 2,
+      expiresAt: Date.now() + 3_600_000, tokenEndpoint: 'https://auth.b.example/token', clientId: 'b-cid',
+      endpointFingerprint: mcpEndpointFingerprint(endpointB),
     };
 
     it('shares one network refresh between concurrent callers', async () => {
@@ -51,21 +60,21 @@ describe('mcp-tokens storage', () => {
         return { access_token: 'new', refresh_token: 'rt-2', expires_in: 3600 };
       };
       const [a, b] = await Promise.all([
-        refreshMcpTokenSingleFlight(dataDir, 's1', refresh),
-        refreshMcpTokenSingleFlight(dataDir, 's1', refresh),
+        refreshMcpTokenSingleFlight(dataDir, 's1', endpointA, refresh),
+        refreshMcpTokenSingleFlight(dataDir, 's1', endpointA, refresh),
       ]);
       expect(calls).toBe(1);
       expect(a?.accessToken).toBe('new');
       expect(b?.accessToken).toBe('new');
       // A later caller sees a fresh token and does not refresh again.
-      await refreshMcpTokenSingleFlight(dataDir, 's1', refresh);
+      await refreshMcpTokenSingleFlight(dataDir, 's1', endpointA, refresh);
       expect(calls).toBe(1);
     });
 
     it('does not overwrite a token replaced while the refresh was in flight', async () => {
       await setToken(dataDir, 's1', expired);
       const replacement: StoredMcpToken = { ...expired, accessToken: 'signed-in', refreshToken: 'rt-new', expiresAt: Date.now() + 3_600_000 };
-      const result = await refreshMcpTokenSingleFlight(dataDir, 's1', async () => {
+      const result = await refreshMcpTokenSingleFlight(dataDir, 's1', endpointA, async () => {
         await setToken(dataDir, 's1', replacement);
         return { access_token: 'stale-refresh' };
       });
@@ -75,12 +84,56 @@ describe('mcp-tokens storage', () => {
 
     it('does not restore a token cleared while the refresh was in flight', async () => {
       await setToken(dataDir, 's1', expired);
-      const result = await refreshMcpTokenSingleFlight(dataDir, 's1', async () => {
+      const result = await refreshMcpTokenSingleFlight(dataDir, 's1', endpointA, async () => {
         await clearToken(dataDir, 's1');
         return { access_token: 'stale-refresh' };
       });
       expect(result).toBeNull();
       expect(await getToken(dataDir, 's1')).toBeNull();
+    });
+
+    it('never returns a token saved for another endpoint during the refresh', async () => {
+      await setToken(dataDir, 's1', expired);
+      const result = await refreshMcpTokenSingleFlight(dataDir, 's1', endpointA, async () => {
+        // The same server id is reconnected to endpoint B while A's refresh is on the wire.
+        await setToken(dataDir, 's1', tokenForB);
+        return { access_token: 'a-refreshed' };
+      });
+      expect(result).toBeNull();
+      // B's sign-in survives untouched; A's stale refresh is discarded.
+      expect(await getToken(dataDir, 's1')).toEqual(tokenForB);
+    });
+
+    it('returns null without network I/O when the stored token belongs to another endpoint', async () => {
+      await setToken(dataDir, 's1', { ...tokenForB, expiresAt: 1 });
+      let calls = 0;
+      const result = await refreshMcpTokenSingleFlight(dataDir, 's1', endpointA, async () => {
+        calls += 1;
+        return { access_token: 'never' };
+      });
+      expect(result).toBeNull();
+      expect(calls).toBe(0);
+    });
+
+    it('does not let a caller expecting endpoint B join endpoint A\'s flight', async () => {
+      await setToken(dataDir, 's1', expired);
+      let releaseA!: () => void;
+      const gate = new Promise<void>((resolve) => { releaseA = resolve; });
+      let reconnectedToB!: () => void;
+      const reconnected = new Promise<void>((resolve) => { reconnectedToB = resolve; });
+      const flightA = refreshMcpTokenSingleFlight(dataDir, 's1', endpointA, async () => {
+        await setToken(dataDir, 's1', tokenForB);
+        reconnectedToB();
+        await gate;
+        return { access_token: 'a-refreshed' };
+      });
+      // A's refresh is on the wire and B has signed in under the same server id.
+      await reconnected;
+      const flightB = refreshMcpTokenSingleFlight(dataDir, 's1', endpointB, async () => ({ access_token: 'never' }));
+      releaseA();
+      const [resultA, resultB] = await Promise.all([flightA, flightB]);
+      expect(resultB?.accessToken).toBe('b-access');
+      expect(resultA).toBeNull();
     });
   });
 

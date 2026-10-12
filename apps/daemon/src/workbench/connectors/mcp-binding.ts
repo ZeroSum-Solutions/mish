@@ -58,16 +58,22 @@ export async function resolveDaemonMcpConnection(dataDir: string, match: DaemonM
   if (hasPinnedAuthorization(server)) return { url, accessToken: '', ...(server.headers ? { headers: server.headers } : {}) };
   const stored = await getToken(dataDir, server.id);
   if (!stored || !mcpTokenMatchesEndpoint(stored, url)) throw new DaemonBindingError('connector-needs-sign-in', 'no-token');
-  const accessToken = isTokenExpired(stored) ? await refreshStored(dataDir, server.id, stored, fetchImpl) : stored.accessToken;
+  const accessToken = isTokenExpired(stored) ? await refreshStored(dataDir, server.id, url, stored, fetchImpl) : stored.accessToken;
   return { url, accessToken, ...(server.headers ? { headers: server.headers } : {}) };
 }
 
-async function refreshStored(dataDir: string, serverId: string, stored: StoredMcpToken, fetchImpl: typeof fetch): Promise<string> {
+/**
+ * Refreshes the token saved for `url` and returns an access token only when the
+ * result is still bound to that exact endpoint. The server id can be reconnected
+ * to another endpoint while a refresh runs; that endpoint's token must never be
+ * paired with this `url`, so a mismatch is `connector-needs-sign-in`.
+ */
+async function refreshStored(dataDir: string, serverId: string, url: string, stored: StoredMcpToken, fetchImpl: typeof fetch): Promise<string> {
   if ((stored.resourceUrl && !isPublicMcpResource(stored.resourceUrl)) || !stored.refreshToken || !stored.tokenEndpoint || !stored.clientId) throw new DaemonBindingError('connector-needs-sign-in', 'expired');
   let next: StoredMcpToken | null;
   try {
     // Refresh credentials belong to the saved endpoint, including image-access calls.
-    next = await refreshMcpTokenSingleFlight(dataDir, serverId, (current) => refreshAccessToken({
+    next = await refreshMcpTokenSingleFlight(dataDir, serverId, url, (current) => refreshAccessToken({
       tokenEndpoint: current.tokenEndpoint!, clientId: current.clientId!, refreshToken: current.refreshToken!,
       ...(current.clientSecret !== undefined ? { clientSecret: current.clientSecret } : {}),
       ...(current.scope !== undefined ? { scope: current.scope } : {}),
@@ -76,6 +82,6 @@ async function refreshStored(dataDir: string, serverId: string, stored: StoredMc
   } catch {
     throw new DaemonBindingError('connector-needs-sign-in', 'refresh-failed');
   }
-  if (!next) throw new DaemonBindingError('connector-needs-sign-in', 'no-token');
+  if (!next || !mcpTokenMatchesEndpoint(next, url)) throw new DaemonBindingError('connector-needs-sign-in', 'no-token');
   return next.accessToken;
 }

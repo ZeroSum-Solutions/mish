@@ -13,6 +13,7 @@
 import { chmod, mkdir, open, rename, rm } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
+import { mcpEndpointFingerprint } from './mcp-endpoint.js';
 import { readPrivateMcpFile, withPrivateMcpFileLock } from './mcp-private-file.js';
 
 /**
@@ -287,29 +288,41 @@ export interface McpRefreshResponse {
 const refreshInflight = new Map<string, Promise<StoredMcpToken | null>>();
 
 /**
- * Refresh the stored token for `serverId` at most once at a time per data dir.
+ * Refresh the stored token for `serverId` at most once at a time per data dir
+ * and expected endpoint.
  *
  * Concurrent callers (agent spawn, connector calls, parallel chats) share one
  * flight. Inside it the stored token is re-read and the network refresh is
  * skipped when it is no longer expired or its refresh token already rotated.
  * The result is written only if the stored entry is still the one that was
- * refreshed (compare-and-set on refresh token + access token), so a refresh
- * that finishes after Disconnect or a fresh sign-in cannot overwrite it.
+ * refreshed (compare-and-set on refresh token + access token + endpoint), so a
+ * refresh that finishes after Disconnect or a fresh sign-in cannot overwrite it.
  *
- * Resolves to the token now stored, or null when the entry was cleared.
- * Rejects with the refresh function's own error; callers map it.
+ * Endpoint binding: the flight is keyed on, and every token it reads or returns
+ * is checked against, the fingerprint of `expectedEndpoint` — the configured
+ * URL the caller already validated. A token saved for another endpoint (the
+ * same server id reconnected elsewhere while this refresh ran) is never
+ * returned; the helper resolves null so the caller asks for a new sign-in.
+ *
+ * Resolves to the token now stored for `expectedEndpoint`, or null when the
+ * entry was cleared or now belongs to another endpoint. Rejects with the
+ * refresh function's own error; callers map it.
  */
 export function refreshMcpTokenSingleFlight(
   dataDir: string,
   serverId: string,
+  expectedEndpoint: string,
   refresh: (current: StoredMcpToken) => Promise<McpRefreshResponse>,
 ): Promise<StoredMcpToken | null> {
-  const key = `${dataDir}\0${serverId}`;
+  const expectedFingerprint = mcpEndpointFingerprint(expectedEndpoint);
+  const boundToExpected = (token: StoredMcpToken | null | undefined): token is StoredMcpToken =>
+    Boolean(token && token.endpointFingerprint === expectedFingerprint);
+  const key = `${dataDir}\0${serverId}\0${expectedFingerprint}`;
   const existing = refreshInflight.get(key);
   if (existing) return existing;
   const task = (async () => {
     const current = await getToken(dataDir, serverId);
-    if (!current) return null;
+    if (!boundToExpected(current)) return null;
     if (!isTokenExpired(current)) return current;
     if (!current.refreshToken || !current.tokenEndpoint || !current.clientId) {
       throw new Error('stored MCP token cannot be refreshed');
@@ -331,7 +344,15 @@ export function refreshMcpTokenSingleFlight(
       const file = await readTokensFile(dataDir);
       const latest = Object.hasOwn(file.servers, serverId) ? file.servers[serverId] : undefined;
       if (!latest) return null;
-      if (latest.refreshToken !== current.refreshToken || latest.accessToken !== current.accessToken) return latest;
+      if (
+        latest.refreshToken !== current.refreshToken
+        || latest.accessToken !== current.accessToken
+        || latest.endpointFingerprint !== current.endpointFingerprint
+      ) {
+        // Replaced while the refresh ran: hand back the newer token only if it is
+        // still bound to the endpoint this caller validated.
+        return boundToExpected(latest) ? latest : null;
+      }
       file.servers[serverId] = next;
       await writeTokensFile(dataDir, file);
       return next;

@@ -1676,13 +1676,14 @@ function mcpOAuthCallbackUrl(req) {
  * for. Tokens persisted before that context was recorded can't be safely
  * refreshed; the caller treats `null` as "needs reconnect".
  */
-async function refreshAndPersistToken(dataDir, serverId, current) {
+async function refreshAndPersistToken(dataDir, serverId, serverUrl, current) {
   if (current.resourceUrl && !isPublicMcpResource(current.resourceUrl)) return null;
   if (!current.refreshToken) return null;
   if (!current.tokenEndpoint || !current.clientId) return null;
   // Single-flight + compare-and-set: concurrent spawns share one refresh and a
-  // stale result never overwrites a newer sign-in or a Disconnect.
-  return refreshMcpTokenSingleFlight(dataDir, serverId, (stored) =>
+  // stale result never overwrites a newer sign-in or a Disconnect. The flight is
+  // bound to `serverUrl`; a token saved for another endpoint is treated as none.
+  const refreshed = await refreshMcpTokenSingleFlight(dataDir, serverId, serverUrl, (stored) =>
     refreshAccessToken({
       tokenEndpoint: stored.tokenEndpoint!,
       clientId: stored.clientId!,
@@ -1692,6 +1693,7 @@ async function refreshAndPersistToken(dataDir, serverId, current) {
       resource: stored.resourceUrl,
     }),
   );
+  return refreshed && mcpTokenMatchesEndpoint(refreshed, serverUrl) ? refreshed : null;
 }
 
 const activeChatAgentEventSinks = new Map();
@@ -12166,6 +12168,7 @@ export async function startServer({
               const refreshed = await refreshAndPersistToken(
                 RUNTIME_DATA_DIR,
                 serverId,
+                server.url,
                 tok,
               );
               if (refreshed) access = refreshed.accessToken;
