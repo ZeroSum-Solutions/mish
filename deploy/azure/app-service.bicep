@@ -15,8 +15,8 @@ param name string = 'mish'
 @description('Azure region. Defaults to the resource group location.')
 param location string = resourceGroup().location
 
-@description('Container image to run. Pin to a digest (image@sha256:...) for production.')
-param image string = 'docker.io/vanjayak/mish:latest'
+@description('Required container image, e.g. one pushed with deploy/scripts/publish-images.sh to a registry Azure can pull. Pin to a digest (image@sha256:...) for production.')
+param image string
 
 @description('App Service plan SKU. B1 is the smallest tier that supports Always On and health checks.')
 param appServicePlanSku string = 'B1'

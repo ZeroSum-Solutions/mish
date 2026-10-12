@@ -41,8 +41,8 @@ machine: keys come from the environment or from Settings.
 ### 1. Clone and install
 
 ```bash
-git clone --filter=blob:none https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git
-cd Mishh-Mashh-2
+git clone --filter=blob:none https://github.com/ZeroSum-Solutions/mish.git
+cd mish
 sh scripts/team-setup.sh     # checks prerequisites, installs, builds, starts the web app
 ```
 

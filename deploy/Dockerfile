@@ -74,7 +74,14 @@ RUN pnpm --filter @mish/daemon build && \
 COPY skills ./skills
 COPY design-systems ./design-systems
 COPY craft ./craft
+# The Templates catalog and the agency-site compiler the daemon imports at
+# runtime both resolve from <PROJECT_ROOT>/design-templates.
+COPY design-templates ./design-templates
 COPY assets ./assets
+# Community pets ship only in a private pack; an empty directory keeps the
+# runtime COPY below valid on a public checkout, where the daemon simply
+# reports no baked pets.
+RUN mkdir -p /app/assets/community-pets
 # `data/plugin-previews/manifest.json` is committed by the bake pipeline and is
 # what `resolvePluginPreviewsDir()` looks for at runtime. Without it in the
 # image, `loadManifest()` returns `{}` and every plugin silently falls back to
@@ -94,6 +101,7 @@ COPY --from=build --chown=mish:mish /app/apps/web/out ./apps/web/out
 COPY --from=build --chown=mish:mish /app/skills ./skills
 COPY --from=build --chown=mish:mish /app/design-systems ./design-systems
 COPY --from=build --chown=mish:mish /app/craft ./craft
+COPY --from=build --chown=mish:mish /app/design-templates ./design-templates
 COPY --from=build --chown=mish:mish /app/data ./data
 COPY --from=build --chown=mish:mish /app/assets/frames ./assets/frames
 COPY --from=build --chown=mish:mish /app/assets/community-pets ./assets/community-pets

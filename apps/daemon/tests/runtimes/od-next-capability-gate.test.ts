@@ -165,6 +165,23 @@ describe('OD Next runtime capability gate', () => {
     }
   });
 
+  it.each([
+    ['codex-0.147.0.sanitized-real-seed.json', CODEX_0_147_0_BEST_EFFORT_MANIFEST],
+    ['opencode-1.18.18.sanitized-real-seed.json', OPENCODE_1_18_18_BEST_EFFORT_MANIFEST],
+    [
+      'vela-opencode-0.0.1-local-opencode-1.18.18.sanitized-real-seed.json',
+      VELA_OPENCODE_LOCAL_BEST_EFFORT_MANIFEST,
+    ],
+  ] as const)('pins %s by the digest its checked-in bytes produce', (file, manifest) => {
+    const seed = JSON.parse(readFileSync(join(fixtureDir, file), 'utf8')) as {
+      recordingDigest: string;
+    };
+    const { recordingDigest, ...digestInput } = seed;
+    const actual = `sha256:${createHash('sha256').update(JSON.stringify(digestInput)).digest('hex')}`;
+    expect(recordingDigest).toBe(actual);
+    expect(manifest.provenance).toMatchObject({ kind: 'sanitized_real', recordingDigest: actual });
+  });
+
   it('uses the Claude 2.1.233 replay as provenance without pinning admission to that version', () => {
     const seed = JSON.parse(readFileSync(
       join(fixtureDir, 'claude-2.1.233.sanitized-real-seed.json'),

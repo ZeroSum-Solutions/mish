@@ -2,6 +2,8 @@
 
 本手册用于把 Workspace Team 从 Vela `feature-test` 推进到 `test`，最终再发布到 production。它同时覆盖 Vela DB/API/Link/Web/CLI 和 Mishh Mashh 桌面包；任何一层没有明确版本和验收证据，都不能把整体标记为已上线。
 
+> 公开仓库说明：本仓库只发布 `.github/workflows/ci.yml`。下文引用的 release、cut-release 等 workflow 属于上游拓扑，未在本仓库发布，`gh workflow run` 对它们会失败。
+>
 > 安全边界：仓库内不得记录 Stripe 密钥、Webhook secret、数据库连接串、内部域名或测试账号密码。环境 URL、Secret 名称和值以 GitHub Environment、GitOps 仓库和内部上线记录为准。本手册中的 `<...>` 必须在受限上线记录中填写，不能直接提交真实 secret。
 
 ## 1. 发布角色与唯一证据单
@@ -48,8 +50,8 @@ git diff --name-status origin/main...origin/feat/workspace-team -- db/schema db/
 
 - `apps/packaged/src/workspace-team.ts` 的 `WORKSPACE_TEAM_AMR_PROFILES` 和 `workspaceTeamTransportEnv`
 - `apps/packaged/tests/sidecars.test.ts` 的 prod + origin 开启、prod 缺 origin 关闭和 local/无 profile 关闭用例
-- [`.github/workflows/release-stable.yml`](../../.github/workflows/release-stable.yml) 固定 `MISH_AMR_PROFILE: prod`，从 `VELA_WEB_URL_PROD` Secret 注入 origin
-- [`.github/workflows/release-beta.yml`](../../.github/workflows/release-beta.yml) 和 [`.github/workflows/release-prerelease.yml`](../../.github/workflows/release-prerelease.yml) 按所选 profile 从对应 Secret 注入 origin；beta 未选择 profile 时使用 `prod` 和 production origin，prerelease 未选择 profile 时不注入 origin
+- upstream `release-stable.yml` 固定 `MISH_AMR_PROFILE: prod`，从 `VELA_WEB_URL_PROD` Secret 注入 origin
+- upstream `release-beta.yml` 和 upstream `release-prerelease.yml` 按所选 profile 从对应 Secret 注入 origin；beta 未选择 profile 时使用 `prod` 和 production origin，prerelease 未选择 profile 时不注入 origin
 
 这些源码和测试说明客户端的启用条件，不证明某次生产部署已通过验收。发布前仍需：
 
@@ -68,8 +70,8 @@ git diff --name-status origin/main...origin/feat/workspace-team -- db/schema db/
 ```bash
 gh api repos/powerformer/vela/git/ref/heads/main --jq .object.sha
 gh api repos/powerformer/vela/git/ref/heads/feat/workspace-team --jq .object.sha
-gh api repos/ZeroSum-Solutions/Mishh-Mashh-2/git/ref/heads/main --jq .object.sha
-gh api repos/ZeroSum-Solutions/Mishh-Mashh-2/git/ref/heads/feat/workspace-team --jq .object.sha
+gh api repos/ZeroSum-Solutions/mish/git/ref/heads/main --jq .object.sha
+gh api repos/ZeroSum-Solutions/mish/git/ref/heads/feat/workspace-team --jq .object.sha
 ```
 
 从此刻开始只允许 release blocker 修复。任何新 commit 都使该环境之前的 CI、目验和签字失效，必须对新 SHA 重跑。
@@ -92,7 +94,7 @@ gh run list -R powerformer/vela --branch feat/workspace-team \
 Mishh Mashh：
 
 ```bash
-gh run list -R ZeroSum-Solutions/Mishh-Mashh-2 --branch feat/workspace-team \
+gh run list -R ZeroSum-Solutions/mish --branch feat/workspace-team \
   --workflow ci.yml --limit 10
 ```
 
@@ -184,7 +186,7 @@ gh workflow run vela-cli-package.yml \
 构建 feature-test beta：
 
 ```bash
-gh workflow run release-beta.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run release-beta.yml -R ZeroSum-Solutions/mish \
   --ref feat/workspace-team \
   -f ref=feat/workspace-team \
   -f amr_profile=feature-test \
@@ -254,16 +256,16 @@ gh workflow run vela-cli-release.yml -R powerformer/vela \
 Workspace Team 必须先存在于 `main`，再走仓库既有 release branch -> prerelease -> stable promotion，不从 beta 直接升 stable：
 
 ```bash
-gh workflow run cut-release.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run cut-release.yml -R ZeroSum-Solutions/mish \
   --ref main -f 'version=<x.y.z>'
 
-gh workflow run release-prerelease.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run release-prerelease.yml -R ZeroSum-Solutions/mish \
   --ref 'release/v<x.y.z>' \
   -f 'ref=release/v<x.y.z>' \
   -f 'release_version=<x.y.z>' \
   -f win_x64_smoke_mode=full
 
-gh workflow run release-stable.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run release-stable.yml -R ZeroSum-Solutions/mish \
   --ref 'release/v<x.y.z>' \
   -f 'ref=release/v<x.y.z>' \
   -f 'prerelease_version=<x.y.z-prerelease.n>' \
@@ -392,10 +394,10 @@ Atlas migration 默认不可逆。服务回滚必须能在新 schema 上运行�
 操作命令和边界来自以下实际实现；修改 workflow 后应同步更新本手册：
 
 - Mishh Mashh [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)
-- Mishh Mashh [`.github/workflows/release-beta.yml`](../../.github/workflows/release-beta.yml)
-- Mishh Mashh [`.github/workflows/cut-release.yml`](../../.github/workflows/cut-release.yml)
-- Mishh Mashh [`.github/workflows/release-prerelease.yml`](../../.github/workflows/release-prerelease.yml)
-- Mishh Mashh [`.github/workflows/release-stable.yml`](../../.github/workflows/release-stable.yml)
+- Mishh Mashh upstream `release-beta.yml`
+- Mishh Mashh upstream `cut-release.yml`
+- Mishh Mashh upstream `release-prerelease.yml`
+- Mishh Mashh upstream `release-stable.yml`
 - Mishh Mashh [`tools/pack/AGENTS.md`](../../tools/pack/AGENTS.md)
 - Vela [`.github/workflows/deploy-*-feature-test.yml`](https://github.com/powerformer/vela/tree/main/.github/workflows)
 - Vela [`.github/workflows/deploy-*-test.yml`](https://github.com/powerformer/vela/tree/main/.github/workflows)

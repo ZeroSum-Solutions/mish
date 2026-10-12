@@ -14,8 +14,11 @@ repository at:
 docs/whats-new.json
 ```
 
-`.github/workflows/whats-new-publish.yml` publishes that file to the object the
-daemon reads:
+In the upstream project, a `whats-new-publish.yml` workflow publishes that file
+to the object the daemon reads. That workflow is **not published in this
+repository** (it ships only `.github/workflows/ci.yml`), so the publication
+steps below describe the upstream process; here, the hosted object is updated
+out of band:
 
 ```
 https://whatsnew.mish.invalid/whats-new.json
@@ -63,7 +66,7 @@ down is an explicit act rather than something a typo can do for you.
   "title": "Design system sync",
   "body": "Import, edit and sync design systems with cleaner release highlights on Home.",
   "imageUrl": "https://whatsnew.mish.invalid/1.0.0.png",
-  "linkUrl": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/releases/tag/v1.0.0",
+  "linkUrl": "https://github.com/ZeroSum-Solutions/mish/releases/tag/v1.0.0",
   "ctaLabel": "View release notes",
   "locales": {
     "zh-CN": {
@@ -108,16 +111,11 @@ parser rather than trusting review:
    cache bypassed. The job fails unless the bytes served match the bytes
    uploaded — an exit code from the upload alone is not treated as proof.
 
-To publish release copy, run **whats-new-publish** manually
-(`workflow_dispatch`) against the corresponding `release/vX.Y.Z` branch:
-
-```bash
-gh workflow run whats-new-publish.yml --repo ZeroSum-Solutions/Mishh-Mashh-2 \
-  --ref release/v0.22.0 -f dry_run=true
-# After reviewing the proposed document and id:
-gh workflow run whats-new-publish.yml --repo ZeroSum-Solutions/Mishh-Mashh-2 \
-  --ref release/v0.22.0 -f dry_run=false
-```
+Upstream, release copy is published by running **whats-new-publish** manually
+(`workflow_dispatch`) against the corresponding `release/vX.Y.Z` branch, first
+with `dry_run=true` and then, after reviewing the proposed document and id,
+with `dry_run=false`. There is no such workflow to dispatch in this
+repository.
 
 The selected branch must contain this workflow, its publisher and validation
 scripts, and `docs/whats-new.json`. Both jobs check out the run's fixed

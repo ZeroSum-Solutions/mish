@@ -28,7 +28,7 @@ import { applyOverrides, parseOverrides } from '../src/overrides.ts';
 import { renderSnapshotBlock, spliceSnapshotBlock } from '../src/rights-doc.ts';
 import { catalogSummary } from '../src/summary.ts';
 import type { CultCatalog } from '../src/types.ts';
-import { catalogIssues } from '../src/validate.ts';
+import { catalogIssues, catalogWithheld } from '../src/validate.ts';
 
 const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const catalogPath = join(pkgDir, 'catalog.json');
@@ -75,19 +75,26 @@ function runCheck(): void {
   const committed = JSON.parse(readFileSync(catalogPath, 'utf8')) as CultCatalog;
   const issues = catalogIssues(committed);
   if (issues.length > 0) fail('catalog.json is invalid', issues);
+  // A public checkout withholds the licensed rows and the rights record (src/validate.ts
+  // `catalogWithheld`): overrides still have to parse, but there are no rows for them to name.
+  const withheld = catalogWithheld(committed);
   try {
+    const overrides = loadOverrides();
     // Overrides must parse and name existing rows (applying them is a no-op check here).
-    applyOverrides(committed.rows, loadOverrides());
+    if (!withheld) applyOverrides(committed.rows, overrides);
   } catch (error) {
     fail('reviewed-overrides.json is invalid', [(error as Error).message]);
   }
-  const doc = readFileSync(docPath, 'utf8');
-  if (!doc.includes(renderSnapshotBlock(committed.snapshot))) {
-    fail('docs/legal/cult-ui-pro-rights.md does not pin the catalog snapshot', ['run the importer to re-pin it']);
+  if (!withheld || existsSync(docPath)) {
+    const doc = existsSync(docPath) ? readFileSync(docPath, 'utf8') : '';
+    if (!doc.includes(renderSnapshotBlock(committed.snapshot))) {
+      fail('docs/legal/cult-ui-pro-rights.md does not pin the catalog snapshot', ['run the importer to re-pin it']);
+    }
   }
   if (!existsSync(join(kitDir, 'registry', 'index.json'))) {
     if (process.env.CULT_REQUIRE_KIT === '1') fail('Source kit missing', [kitDir]);
-    console.log(`catalog.json valid (${committed.rows.length} rows); source kit not found at ${kitDir}, snapshot comparison skipped`);
+    const rows = withheld ? `licensed rows withheld, snapshot ${committed.snapshot.id}` : `${committed.rows.length} rows`;
+    console.log(`catalog.json valid (${rows}); source kit not found at ${kitDir}, snapshot comparison skipped`);
     return;
   }
   const fresh = buildFromKit();

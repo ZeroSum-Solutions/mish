@@ -32,12 +32,21 @@ MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose pull
 MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose up -d --no-build
 ```
 
-Always set `MISH_IMAGE`. The Compose default still names the upstream
-`ghcr.io/zerosum-solutions/mish` image, which is not Mishh Mashh. Use
-`ghcr.io/zerosum-solutions/od:latest` for the latest release, or
-`ghcr.io/zerosum-solutions/od:<version>` to pin one.
-`.github/workflows/docker-image.yml` publishes this image only on a `v*` release
-tag; until a release exists, build the image locally instead of pulling it.
+The Compose default `MISH_IMAGE` is `ghcr.io/zerosum-solutions/od:latest`, the
+image `deploy/scripts/publish-images.sh` publishes. Set
+`MISH_IMAGE=ghcr.io/zerosum-solutions/od:<version>` to pin a release. No image
+is published from this repository's CI; until one has been published with
+`publish-images.sh`, build the image locally instead of pulling it.
+
+Upgrading from a deployment created before the Mish rename: the Compose project,
+container, and data volume are now all named `mish`, and the settings are read
+from `MISH_*` variables. Before the first `docker compose up` on the new files,
+stop and remove the old container (it still holds the host port), rename every
+variable in your `.env` to its `MISH_*` equivalent from `.env.example`, and copy
+your old data volume (find it with `docker volume ls`) into `mish_mish_data`,
+for example with `docker run --rm -v <old volume>:/from -v mish_mish_data:/to
+alpine cp -a /from/. /to/`. Otherwise the daemon starts with an empty data
+directory and the old settings are ignored.
 
 Open `http://127.0.0.1:7456`. When Docker's bridge makes the browser appear as a
 non-loopback peer, the browser displays its native sign-in dialog. Enter
@@ -222,7 +231,7 @@ deploy/scripts/publish-images.sh --image ghcr.io/your-org/od:0.1.0
 
 The script defaults to:
 
-- `ghcr.io/zerosum-solutions/mish:<tag>`
+- `ghcr.io/zerosum-solutions/od:<tag>`
 - `linux/amd64,linux/arm64`
 - `skopeo` push strategy with registry credentials read from `~/.docker/config.json`
 - preloading base images through `skopeo` to reduce Docker Hub pull flakiness

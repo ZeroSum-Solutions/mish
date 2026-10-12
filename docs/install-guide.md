@@ -2,15 +2,15 @@
 
 **Parent:** [`spec.md`](spec.md) · **Related:** [`deployment/docker.md`](deployment/docker.md) · [`deploy/README.md`](../deploy/README.md)
 
-Deploy Mishh Mashh on Linux or macOS with a single command. The installer wraps the existing Docker Compose stack — no build step required.
+Deploy Mishh Mashh on Linux or macOS with a single command. The installer wraps the existing Docker Compose stack. It pulls the image when a registry you can reach carries one; this repository's CI publishes none, so when the pull fails the installer builds the image from your checkout instead (several minutes the first time).
 
 ## Quick reference
 
 Clone the repository and run the installer:
 
 ```bash
-git clone https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git
-cd Mishh-Mashh-2
+git clone https://github.com/ZeroSum-Solutions/mish.git
+cd mish
 bash deploy/scripts/install.sh
 ```
 
@@ -44,12 +44,12 @@ Running the installer without flags launches an interactive wizard:
   ▸ Runtime: docker Docker version 26.1.3, build b72abbb
   ▸ Compose: Docker Compose version v2.27.1
 
-Docker image [ghcr.io/zerosum-solutions/mish:latest]:
+Docker image [ghcr.io/zerosum-solutions/od:latest]:
 Port [7456]:
 Allowed origins (CORS, comma-separated, or empty) []:
 Memory limit [384m]:
 
-  ▸ Pulling image: ghcr.io/zerosum-solutions/mish:latest
+  ▸ Pulling image: ghcr.io/zerosum-solutions/od:latest
   ▸ Starting Mishh Mashh...
   ▸ Waiting for health check (up to 60s)...
   ✓ Daemon is healthy (200 OK)
@@ -59,7 +59,7 @@ Memory limit [384m]:
 
 | Prompt | Default | Notes |
 |--------|---------|-------|
-| **Docker image** | `ghcr.io/zerosum-solutions/mish:latest` | Use `:latest` for the newest stable image, `:<version>` for a pinned release, or `@sha256:<digest>` for reproducibility |
+| **Docker image** | `ghcr.io/zerosum-solutions/od:latest` | Use `:latest` for the newest stable image, `:<version>` for a pinned release, or `@sha256:<digest>` for reproducibility |
 | **Port** | `7456` | The port the daemon listens on. Must not be in use. |
 | **Allowed origins** | _(empty)_ | CORS origins for reverse-proxy setups. See [`deploy/README.md`](../deploy/README.md). Leave empty for localhost-only use. |
 | **Memory limit** | `384m` | Container memory cap. Raise for large concurrent agent runs. |
@@ -68,7 +68,7 @@ After you confirm, the installer:
 
 1. Writes a `deploy/.env` file (backs up any existing one) and generates a fresh `OD_API_TOKEN`.
 2. Runs `docker compose pull` to fetch the image.
-3. Runs `docker compose up -d --no-build` to start the container.
+3. Runs `docker compose up -d --no-build` to start the container. If the pull failed, or you passed `--build`, it runs `docker compose up -d --build` instead, which builds `deploy/Dockerfile` from your checkout.
 4. Polls `/api/health` for up to 60 seconds to confirm the daemon is ready.
 5. On Linux: installs a `systemd --user` unit so the service starts on login.
 
@@ -77,7 +77,7 @@ After you confirm, the installer:
 For CI, headless servers, and automated provisioning:
 
 ```bash
-bash deploy/scripts/install.sh --non-interactive [--port 7456] [--image <ref>] [--no-systemd]
+bash deploy/scripts/install.sh --non-interactive [--port 7456] [--image <ref>] [--build] [--no-systemd]
 ```
 
 All prompts are skipped and defaults are used. If Docker is not installed, the script exits with an error instead of offering to install it.
@@ -143,12 +143,12 @@ bash deploy/scripts/update.sh
 To update to a specific image:
 
 ```bash
-bash deploy/scripts/update.sh --image=ghcr.io/zerosum-solutions/mish@sha256:<digest>
+bash deploy/scripts/update.sh --image=ghcr.io/zerosum-solutions/od@sha256:<digest>
 ```
 
 The update script:
 1. Pulls the new image.
-2. Restarts the container with `docker compose up -d --no-build`.
+2. Restarts the container with `docker compose up -d --no-build`. If the pull fails, or you pass `--build`, it rebuilds the image from your checkout with `docker compose up -d --build`.
 3. Waits for `/api/health` to return 200.
 4. Prunes dangling old images.
 
@@ -175,7 +175,7 @@ All settings live in `deploy/.env`. Edit it directly or re-run the installer to 
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MISH_IMAGE` | `ghcr.io/zerosum-solutions/mish:latest` | Full image reference |
+| `MISH_IMAGE` | `ghcr.io/zerosum-solutions/od:latest` | Full image reference |
 | `MISH_PORT` | `7456` | Host-side port (bound to `127.0.0.1`) |
 | `MISH_ALLOWED_ORIGINS` | _(empty)_ | CORS origins for reverse-proxy setups |
 | `MISH_MEM_LIMIT` | `384m` | Container memory cap |

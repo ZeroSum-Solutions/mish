@@ -23,7 +23,7 @@ same environment.
 ## 1. Install from source in WSL
 
 ```bash
-git clone https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git ~/tools/mishh-mashh
+git clone https://github.com/ZeroSum-Solutions/mish.git ~/tools/mishh-mashh
 cd ~/tools/mishh-mashh
 
 node --version   # should print v24.x.x

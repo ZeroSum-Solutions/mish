@@ -21,7 +21,8 @@
  *   node --experimental-strip-types scripts/twenty-first-thumbnails.ts           rebuilds the
  *     manifest from the images already on disk (no fetch; fails if an eligible row's image is missing).
  *   node --experimental-strip-types scripts/twenty-first-thumbnails.ts --check   validates the
- *     committed manifest and images; exits 1 on drift. No kit, no network.
+ *     committed manifest and whichever of its images are present; exits 1 on drift. No kit, no
+ *     network. The public repository ships the manifest without the fetched images.
  *
  * Every manifest entry records provenance: the row id, the file, its byte size, the exact
  * `sourceUrl` the image came from and the kit registry file that recorded it, so a reviewer can
@@ -197,6 +198,7 @@ function runCheck(): void {
   const errors: string[] = [];
   if (manifest.schema !== TWENTY_FIRST_THUMBNAIL_SCHEMA) errors.push(`schema must be ${TWENTY_FIRST_THUMBNAIL_SCHEMA}`);
   const rowIds = new Set(catalog.rows.map((r) => r.id));
+  let shipped = 0;
   for (const row of catalog.rows) {
     const entry = manifest.items[row.id];
     if (!twenty1stMayShipLocalImage(row.rights)) {
@@ -206,7 +208,11 @@ function runCheck(): void {
     if (!entry) { errors.push(`${row.id}: no thumbnail entry`); continue; }
     if (!/^https:\/\/cdn\.21st\.dev\//.test(entry.sourceUrl)) errors.push(`${row.id}: sourceUrl must be an https://cdn.21st.dev/ URL, got ${entry.sourceUrl}`);
     const file = join(imagesDir, entry.file);
-    if (!existsSync(file)) { errors.push(`${row.id}: ${entry.file} is missing on disk`); continue; }
+    // The fetched screenshots are not redistributed in the public repository: an entry keeps its
+    // provenance, and an absent image is simply not shipped (the daemon's /reference-preview
+    // answers 404 and the card shows its no-preview placeholder). A present image must match.
+    if (!existsSync(file)) continue;
+    shipped += 1;
     const bytes = statSync(file).size;
     if (bytes !== entry.bytes) errors.push(`${row.id}: manifest says ${entry.bytes} B, file is ${bytes} B`);
     if (bytes > THUMBNAIL_BYTE_LIMIT) errors.push(`${row.id}: ${entry.file} is ${bytes} B, over the ${THUMBNAIL_BYTE_LIMIT} B limit`);
@@ -217,7 +223,7 @@ function runCheck(): void {
     for (const file of readdirSync(imagesDir)) if (!known.has(file)) errors.push(`${file}: not referenced by any manifest entry`);
   }
   if (errors.length > 0) fail('generated/21st-thumbnails.json is invalid', errors);
-  console.log(`21st-thumbnails.json: ${Object.keys(manifest.items).length} images, all from cdn.21st.dev, largest limit ${THUMBNAIL_BYTE_LIMIT} B`);
+  console.log(`21st-thumbnails.json: ${Object.keys(manifest.items).length} entries, ${shipped} images shipped, all from cdn.21st.dev, largest limit ${THUMBNAIL_BYTE_LIMIT} B`);
 }
 
 if (process.argv.includes('--check')) runCheck();

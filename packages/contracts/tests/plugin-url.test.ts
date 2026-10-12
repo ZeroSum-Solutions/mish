@@ -53,11 +53,12 @@ describe('pluginDetailPath / pluginPreviewPath', () => {
 });
 
 describe('pluginShareUrl', () => {
-  it('defaults to the public mish.invalid origin, single-segment path', () => {
-    expect(MISH_SITE_ORIGIN).toBe('https://github.com/ZeroSum-Solutions/mish');
-    expect(pluginShareUrl('mish/live-dashboard')).toBe(
-      'https://github.com/ZeroSum-Solutions/mish/plugins/live-dashboard/',
-    );
+  it('returns no link while there is no public plugin-detail site', () => {
+    // A repository root does not serve `/plugins/<slug>/` routes, so a
+    // default origin would hand users a link that 404s.
+    expect(MISH_SITE_ORIGIN).toBeNull();
+    expect(pluginShareUrl('mish/live-dashboard')).toBeNull();
+    expect(pluginShareUrl('mish/live-dashboard', '')).toBeNull();
   });
   it('honours an explicit origin and trims a trailing slash on it', () => {
     expect(pluginShareUrl('x', 'https://self.host')).toBe('https://self.host/plugins/x/');

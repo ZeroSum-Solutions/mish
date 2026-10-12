@@ -11,7 +11,7 @@ import {
   PLUGIN_PREVIEWS_ROUTE,
 } from '../src/plugins/plugin-preview-bakes.js';
 
-const PUBLIC_BASE = 'https://repo-assets.mish.invalid/plugin-previews';
+const PUBLIC_BASE = 'https://cdn.example.test/plugin-previews';
 
 interface ManifestEntry {
   video: string;
@@ -101,8 +101,34 @@ describe('plugin preview bake manifest', () => {
 });
 
 describe('bakedPreviewBlock', () => {
-  it('uses the public preview origin when the manifest points to remote-only nested assets', async () => {
+  it('returns no baked block for remote-only assets when no public preview origin is configured', async () => {
+    // The fork publishes no baked clips, so there is no built-in public origin.
+    // A clip that is neither on disk nor under a configured base would only be
+    // a dead request; the tile keeps its authored od.preview instead.
     tmpDir = await mkdtemp(path.join(os.tmpdir(), 'od-baked-preview-'));
+    previousBaseUrl = process.env.OD_PLUGIN_PREVIEWS_BASE_URL;
+    delete process.env.OD_PLUGIN_PREVIEWS_BASE_URL;
+    await writeManifest(tmpDir, {
+      'html-plugin': {
+        video: 'html-plugin/abc123abc123abcd/preview.mp4',
+        poster: 'html-plugin/abc123abc123abcd/poster.jpg',
+        durationMs: 7500,
+        holdMs: 2500,
+        hash: 'abc123abc123abcd',
+      },
+    });
+
+    expect(bakedPreviewBlock('html-plugin', tmpDir)).toBeNull();
+    const records: PluginRecord[] = [
+      { id: 'html-plugin', manifest: { name: 'html-plugin', od: { preview: { type: 'html' } } } },
+    ];
+    expect(applyBakedPreviews(records, tmpDir)[0]).toBe(records[0]);
+  });
+
+  it('uses the configured public preview origin when the manifest points to remote-only nested assets', async () => {
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), 'od-baked-preview-'));
+    previousBaseUrl = process.env.OD_PLUGIN_PREVIEWS_BASE_URL;
+    process.env.OD_PLUGIN_PREVIEWS_BASE_URL = PUBLIC_BASE;
     await writeManifest(tmpDir, {
       'html-plugin': {
         video: 'html-plugin/abc123abc123abcd/preview.mp4',
@@ -166,6 +192,8 @@ describe('bakedPreviewBlock', () => {
 describe('applyBakedPreviews', () => {
   it('attaches baked previews without overwriting authored preview blocks', async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), 'od-baked-preview-'));
+    previousBaseUrl = process.env.OD_PLUGIN_PREVIEWS_BASE_URL;
+    process.env.OD_PLUGIN_PREVIEWS_BASE_URL = PUBLIC_BASE;
     await writeManifest(tmpDir, {
       'html-plugin': {
         video: 'html-plugin/aaaabbbbccccdddd/preview.mp4',

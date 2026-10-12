@@ -27,6 +27,7 @@ export function catalogFileText(catalog: { rows: readonly unknown[] }): string {
   const fields = Object.keys(sorted).map((key) => {
     if (key === 'rows') {
       const rows = (sorted.rows as unknown[]).map((row) => `    ${JSON.stringify(row)}`);
+      if (rows.length === 0) return '  "rows": []';
       return `  "rows": [\n${rows.join(',\n')}\n  ]`;
     }
     return `  ${JSON.stringify(key)}: ${JSON.stringify(sorted[key])}`;

@@ -11,7 +11,7 @@ set -euo pipefail
 # Configuration
 # ---------------------------------------------------------------------------
 DEFAULT_PORT=7456
-DEFAULT_IMAGE="ghcr.io/zerosum-solutions/mish:latest"
+DEFAULT_IMAGE="ghcr.io/zerosum-solutions/od:latest"
 DEFAULT_MEM_LIMIT="384m"
 HEALTH_TIMEOUT=60
 
@@ -86,6 +86,7 @@ OPT_PORT=""
 OPT_IMAGE=""
 OPT_SKIP_DOCKER=0
 OPT_NO_SYSTEMD=0
+OPT_BUILD=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -96,6 +97,7 @@ while [ $# -gt 0 ]; do
     --image=*) OPT_IMAGE="${1#--image=}" ;;
     --skip-docker-install) OPT_SKIP_DOCKER=1 ;;
     --no-systemd) OPT_NO_SYSTEMD=1 ;;
+    --build) OPT_BUILD=1 ;;
     --help|-h)
       echo "Usage: install.sh [options]"
       echo ""
@@ -105,6 +107,7 @@ while [ $# -gt 0 ]; do
       echo "  --image <ref>           Docker image reference"
       echo "  --skip-docker-install   Do not attempt to install Docker"
       echo "  --no-systemd            Skip systemd unit creation"
+      echo "  --build                 Build the image from this checkout instead of pulling it"
       echo "  --help                  Show this help"
       exit 0
       ;;
@@ -425,11 +428,31 @@ ok "Written ${ENV_FILE}"
 # ---------------------------------------------------------------------------
 # 6. Pull and start
 # ---------------------------------------------------------------------------
-step "Pulling image: ${IMAGE}"
-$COMPOSE_CMD "${COMPOSE_FILES[@]}" pull
+# No registry is guaranteed to carry the image (this repository's CI does not
+# publish one), so a failed pull falls back to building it from this checkout
+# (docker-compose.yml builds deploy/Dockerfile with the repo root as context).
+start_from_local_build() {
+  if [ ! -f "${DEPLOY_DIR}/Dockerfile" ] || [ ! -f "${DEPLOY_DIR}/../package.json" ]; then
+    error "Cannot build locally: ${DEPLOY_DIR} is not inside a Mishh Mashh checkout."
+    step "Publish an image with deploy/scripts/publish-images.sh and pass it with --image."
+    exit 1
+  fi
+  step "Building image ${IMAGE} from this checkout (this takes several minutes)..."
+  $COMPOSE_CMD "${COMPOSE_FILES[@]}" up -d --build
+}
 
-step "Starting Mishh Mashh..."
-$COMPOSE_CMD "${COMPOSE_FILES[@]}" up -d --no-build
+if [ "$OPT_BUILD" = "1" ]; then
+  start_from_local_build
+else
+  step "Pulling image: ${IMAGE}"
+  if $COMPOSE_CMD "${COMPOSE_FILES[@]}" pull; then
+    step "Starting Mishh Mashh..."
+    $COMPOSE_CMD "${COMPOSE_FILES[@]}" up -d --no-build
+  else
+    warn "Could not pull ${IMAGE}; building it locally instead."
+    start_from_local_build
+  fi
+fi
 
 # ---------------------------------------------------------------------------
 # 7. Health check

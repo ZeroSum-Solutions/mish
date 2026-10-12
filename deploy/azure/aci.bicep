@@ -19,8 +19,8 @@ param name string = 'mish'
 @description('Azure region. Defaults to the resource group location.')
 param location string = resourceGroup().location
 
-@description('Container image to run. Pin to a digest (image@sha256:...) for production.')
-param image string = 'docker.io/vanjayak/mish:latest'
+@description('Required container image, e.g. one pushed with deploy/scripts/publish-images.sh to a registry Azure can pull. Pin to a digest (image@sha256:...) for production.')
+param image string
 
 @secure()
 @minLength(32)

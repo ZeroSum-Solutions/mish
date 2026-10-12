@@ -203,6 +203,35 @@ describe("copyBundledResourceTrees", () => {
     }
   });
 
+  it("packages a public checkout without the private component kit or community pets", async () => {
+    // The licensed cult-ui-pro payload and the community pets live in private packs, so a public
+    // clone has neither. The build must still produce an installer; the daemon reports both as
+    // not installed. A kit that IS present is still verified (see component-kits.test.ts).
+    const root = await mkdtemp(join(tmpdir(), "mish-tools-pack-"));
+    const workspaceRoot = join(root, "workspace");
+    const resourceRoot = join(root, "resources");
+    try {
+      for (const resource of [
+        "skills", "design-templates", "design-systems", "craft",
+        "plugins/_official", "plugins/registry", "assets/frames",
+        "data/plugin-previews", "data/component-kits",
+      ]) {
+        await mkdir(join(workspaceRoot, resource), { recursive: true });
+      }
+      await writeFile(join(workspaceRoot, "data", "component-kits", "README.md"), "# kits\n");
+      await copyBundledResourceTrees({ workspaceRoot, resourceRoot });
+      await expect(readdir(join(resourceRoot, "data", "component-kits"))).resolves.toEqual(["README.md"]);
+      await expect(readdir(join(resourceRoot, "community-pets"))).resolves.toEqual([]);
+
+      // A partially present kit (directory without its manifest) is a broken private payload.
+      await mkdir(join(workspaceRoot, "data", "component-kits", "cult-ui-pro"), { recursive: true });
+      await expect(copyBundledResourceTrees({ workspaceRoot, resourceRoot }))
+        .rejects.toMatchObject({ code: "ENOENT" });
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
   it("includes daemon resources and the packaged Website Clone main path", async () => {
     const root = await mkdtemp(join(tmpdir(), "mish-tools-pack-"));
     const workspaceRoot = join(root, "workspace");

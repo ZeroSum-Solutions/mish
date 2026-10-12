@@ -676,7 +676,7 @@ async function runAgent(args) {
     surfaceFetchError(error, base);
     process.exit(3);
   }
-  if (!response.ok) return structuredHttpFailure(response, 'daemon-not-running');
+  if (!response.ok) return structuredHttpFailure(response);
   const result = await response.json();
   if (flags.json) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -701,7 +701,7 @@ async function runAgentStaged(action, flags, runId) {
       surfaceFetchError(error, base);
       process.exit(3);
     }
-    if (!response.ok) return structuredHttpFailure(response, 'daemon-not-running');
+    if (!response.ok) return structuredHttpFailure(response);
     return response.json();
   };
   if (action !== 'status') {
@@ -737,7 +737,7 @@ async function runAgentStagedFinish(runId, flags) {
     surfaceFetchError(error, base);
     process.exit(3);
   }
-  if (!response.ok) return structuredHttpFailure(response, 'daemon-not-running');
+  if (!response.ok) return structuredHttpFailure(response);
   const result = await response.json();
   if (flags.json) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -2985,7 +2985,20 @@ function exitWithStructuredError({ code, message, data }) {
 // structured envelope instead of collapsing to `HTTP <status>: `, which
 // would drop the only diagnostic the daemon actually returned to a
 // headless caller.
-async function structuredHttpFailure(resp, fallbackCode = 'daemon-not-running', exit = true) {
+// A received response proves the daemon is running, so a response without
+// an error code is classified from its HTTP status; `daemon-not-running` is
+// reserved for connection failures (surfaceFetchError) and is never derived
+// from a response, even when a caller passes it as the fallback.
+function httpStatusErrorCode(status) {
+  if (status === 404) return 'not-found';
+  if (status === 401 || status === 403) return 'forbidden';
+  if (status === 409) return 'conflict';
+  if (status >= 500) return 'daemon-error';
+  if (status >= 400) return 'bad-request';
+  return 'http-error';
+}
+
+async function structuredHttpFailure(resp, fallbackCode = null, exit = true) {
   let raw = '';
   let parsed;
   try {
@@ -2996,10 +3009,12 @@ async function structuredHttpFailure(resp, fallbackCode = 'daemon-not-running', 
   }
   const errorObj = typeof parsed?.error === 'string' ? { message: parsed.error } : parsed?.error;
   const errCode = normalizeRecoverableErrorCode(errorObj?.code, errorObj?.message);
+  const data = structuredErrorData(errorObj);
   const failure = {
-    code: errCode ?? fallbackCode,
+    code: errCode
+      ?? (fallbackCode && fallbackCode !== 'daemon-not-running' ? fallbackCode : httpStatusErrorCode(resp.status)),
     message: errorObj?.message ?? `HTTP ${resp.status}${raw ? `: ${raw}` : ''}`,
-    data: structuredErrorData(errorObj),
+    data: errCode ? data : { ...data, httpStatus: resp.status },
   };
   if (exit) exitWithStructuredError(failure);
   return { error: failure, exitCode: RECOVERABLE_EXIT_CODES[failure.code] ?? 1 };
@@ -9128,8 +9143,7 @@ Common options:
       // already running, so default-classifying them as
       // `daemon-not-running` would send agents down the wrong recovery
       // branch. Map 404 → project-not-found and 400 → missing-input,
-      // keep the default for 5xx so genuine daemon trouble still
-      // surfaces as `daemon-not-running`.
+      // anything else is classified from its HTTP status.
       if (!resp.ok) {
         if (resp.status === 404) return structuredHttpFailure(resp, 'project-not-found');
         if (resp.status === 400) return structuredHttpFailure(resp, 'missing-input');

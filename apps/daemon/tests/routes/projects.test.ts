@@ -1196,6 +1196,135 @@ describe('GET /api/projects/:id resolvedDir', () => {
     expect(deleted.ok).toBe(true);
   });
 
+  async function createPlainProject(projectId: string, headers: Record<string, string> = {}) {
+    const resp = await fetch(`${baseUrl}/api/projects`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      body: JSON.stringify({ id: projectId, name: projectId, skillId: null, designSystemId: null }),
+    });
+    expect(resp.status).toBe(200);
+    const dataDir = process.env.OD_DATA_DIR;
+    if (!dataDir) throw new Error('OD_DATA_DIR is required for daemon route tests');
+    const projectDir = path.join(dataDir, 'projects', projectId);
+    await mkdir(projectDir, { recursive: true });
+    return projectDir;
+  }
+
+  // An existing folder name is an identity, not a request to create a new
+  // name: deleting "My Assets" must remove exactly that folder, never its
+  // sanitized twin "My-Assets".
+  it('deletes exactly the named folder when its name contains spaces', async () => {
+    const projectId = `proj-folder-space-delete-${Date.now()}`;
+    const projectDir = await createPlainProject(projectId);
+    await mkdir(path.join(projectDir, 'My Assets'), { recursive: true });
+    await writeFile(path.join(projectDir, 'My Assets', 'gone.txt'), 'gone');
+    await mkdir(path.join(projectDir, 'My-Assets'), { recursive: true });
+    await writeFile(path.join(projectDir, 'My-Assets', 'keep.txt'), 'keep');
+
+    const deleteResp = await fetch(`${baseUrl}/api/projects/${projectId}/folders`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ path: 'My Assets' }),
+    });
+    expect(deleteResp.status).toBe(200);
+    await expect(stat(path.join(projectDir, 'My Assets'))).rejects.toMatchObject({ code: 'ENOENT' });
+    expect(await readFile(path.join(projectDir, 'My-Assets', 'keep.txt'), 'utf8')).toBe('keep');
+  });
+
+  it('uploads into an existing folder whose name contains spaces', async () => {
+    const projectId = `proj-folder-space-upload-${Date.now()}`;
+    const projectDir = await createPlainProject(projectId);
+    await mkdir(path.join(projectDir, 'My Assets'), { recursive: true });
+
+    const form = new FormData();
+    form.append('dir', 'My Assets');
+    form.append('files', new Blob(['hello'], { type: 'text/plain' }), 'up.txt');
+    const resp = await fetch(`${baseUrl}/api/projects/${projectId}/upload`, { method: 'POST', body: form });
+    expect(resp.status).toBe(200);
+    const body = (await resp.json()) as { files: Array<{ name: string }> };
+    expect(body.files.map((f) => f.name)).toEqual(['My Assets/up.txt']);
+    expect(await readFile(path.join(projectDir, 'My Assets', 'up.txt'), 'utf8')).toBe('hello');
+    await expect(stat(path.join(projectDir, 'My-Assets'))).rejects.toMatchObject({ code: 'ENOENT' });
+  });
+
+  it('duplicates a project with every file name and content unchanged', async () => {
+    const projectId = `proj-dup-names-${Date.now()}`;
+    const projectDir = await createPlainProject(projectId);
+    await mkdir(path.join(projectDir, 'My Assets'), { recursive: true });
+    await writeFile(path.join(projectDir, 'My Assets', 'logo.svg'), '<svg/>');
+    await writeFile(path.join(projectDir, 'a b.txt'), 'ONE');
+    await writeFile(path.join(projectDir, 'a-b.txt'), 'TWO');
+
+    const resp = await fetch(`${baseUrl}/api/projects/${projectId}/duplicate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    expect(resp.status).toBe(200);
+    const body = (await resp.json()) as { project: { id: string }; copiedFiles: string[] };
+    expect([...body.copiedFiles].sort()).toEqual(['My Assets/logo.svg', 'a b.txt', 'a-b.txt']);
+    const dataDir = process.env.OD_DATA_DIR!;
+    const copyDir = path.join(dataDir, 'projects', body.project.id);
+    expect(await readFile(path.join(copyDir, 'a b.txt'), 'utf8')).toBe('ONE');
+    expect(await readFile(path.join(copyDir, 'a-b.txt'), 'utf8')).toBe('TWO');
+    expect(await readFile(path.join(copyDir, 'My Assets', 'logo.svg'), 'utf8')).toBe('<svg/>');
+  });
+
+  // Templates snapshot a project's file contents, so saving, listing,
+  // reading and deleting one must honour the source project's read scope.
+  it('refuses to snapshot or expose a template from a project the caller cannot read', async () => {
+    const suffix = Date.now();
+    const workspaceId = `ws-templates-${suffix}`;
+    const memberHeaders = (memberId: string) => ({
+      'x-od-workspace-id': workspaceId,
+      'x-od-workspace-member-id': memberId,
+      'x-od-workspace-role': 'member',
+    });
+    const projectId = `proj-template-secret-${suffix}`;
+    const projectDir = await createPlainProject(projectId, memberHeaders('memA'));
+    await writeFile(path.join(projectDir, 'secret.txt'), 'TOP SECRET');
+
+    const denied = await fetch(`${baseUrl}/api/projects/${projectId}/files/secret.txt`, {
+      headers: memberHeaders('memB'),
+    });
+    expect(denied.status).toBe(403);
+
+    const steal = await fetch(`${baseUrl}/api/templates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...memberHeaders('memB') },
+      body: JSON.stringify({ name: `stolen-${suffix}`, sourceProjectId: projectId }),
+    });
+    expect(steal.status).toBe(403);
+    expect(JSON.stringify(await steal.json())).not.toContain('TOP SECRET');
+
+    const own = await fetch(`${baseUrl}/api/templates`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...memberHeaders('memA') },
+      body: JSON.stringify({ name: `own-${suffix}`, sourceProjectId: projectId }),
+    });
+    expect(own.status).toBe(200);
+    const template = ((await own.json()) as { template: { id: string } }).template;
+
+    const listB = (await (await fetch(`${baseUrl}/api/templates`, { headers: memberHeaders('memB') })).json()) as {
+      templates: Array<{ id: string }>;
+    };
+    expect(listB.templates.some((t) => t.id === template.id)).toBe(false);
+    const listA = (await (await fetch(`${baseUrl}/api/templates`, { headers: memberHeaders('memA') })).json()) as {
+      templates: Array<{ id: string }>;
+    };
+    expect(listA.templates.some((t) => t.id === template.id)).toBe(true);
+
+    const getB = await fetch(`${baseUrl}/api/templates/${template.id}`, { headers: memberHeaders('memB') });
+    expect(getB.status).toBe(404);
+    const delB = await fetch(`${baseUrl}/api/templates/${template.id}`, {
+      method: 'DELETE',
+      headers: memberHeaders('memB'),
+    });
+    expect(delB.status).toBe(404);
+    const getA = await fetch(`${baseUrl}/api/templates/${template.id}`, { headers: memberHeaders('memA') });
+    expect(getA.status).toBe(200);
+  });
+
   it('rejects folder create and delete requests for internal file-version storage', async () => {
     const projectId = `proj-file-version-folder-guard-${Date.now()}`;
     const createResp = await fetch(`${baseUrl}/api/projects`, {

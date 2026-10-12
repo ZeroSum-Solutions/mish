@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { QuestionForm } from '../../src/artifacts/question-form';
@@ -65,5 +65,24 @@ describe('visual-direction preview loading', () => {
     const images = screen.getAllByRole<HTMLImageElement>('img');
     expect(images).toHaveLength(VISUAL_STYLE_BATCH_SIZE);
     expect(images.every((image) => image.getAttribute('loading') === 'lazy')).toBe(true);
+  });
+});
+
+describe('visual-direction preview failure', () => {
+  it('swaps a preview image that fails to load for the placeholder art', () => {
+    const { container } = render(
+      <QuestionFormView
+        form={form}
+        interactive
+        visualStyleContext="deck"
+        onSubmit={vi.fn()}
+      />,
+    );
+
+    const [first] = screen.getAllByRole<HTMLImageElement>('img');
+    fireEvent.error(first!);
+
+    expect(screen.getAllByRole('img')).toHaveLength(VISUAL_STYLE_BATCH_SIZE - 1);
+    expect(container.querySelectorAll('.qf-visual-preview-deck')).toHaveLength(1);
   });
 });

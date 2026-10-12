@@ -67,15 +67,24 @@ test('published adapters: no insertable Cult block carries its internal name onc
       assert.equal(at, -1, `${adapter.id} ${what} still names ${name}: …${published.slice(Math.max(0, at - 40), at + name.length + 20)}…`);
     }
   }
-  assert.ok(renamed > 40, `${renamed} adapters have a public id that differs from their internal one`);
+  // Every published adapter has a reviewed public slug. With the licensed pack not installed the
+  // registry is empty and nothing is published, so there is nothing to rename.
+  const slugs = (await import(pathToFileURL(join(PACKAGE_DIR, 'generated', 'slugs.json')).href, { with: { type: 'json' } })).default as { items: Record<string, string> };
+  for (const id of Object.keys(CULT_ADAPTERS)) assert.ok(Object.hasOwn(slugs.items, id), `${id} has no public slug`);
+  assert.ok(renamed <= Object.keys(CULT_ADAPTERS).length);
 });
 
-test('published adapters: element ids and their references are renamed together', async () => {
-  // marketing-contact-vite, the only row whose ids carried its own name, is not insertable since yield-5
-  // (x86 ink overlap); its converted label/field markup keeps the shape under test.
-  const published = publicIds.publicAdapterText('cult:marketing-contact-vite',
+const adapterNames = await import(pathToFileURL(join(REPO_ROOT, 'packages/agency-fast-lane/src/cult-adapter-names.ts')).href) as {
+  publicAdapterNamesForId: (adapterId: string, text: string, publicId: string) => string;
+};
+
+test('published adapters: element ids and their references are renamed together', () => {
+  // Owned label/field markup whose ids carry the adapter's own name, renamed with an explicit
+  // public id, so the pairing rule is checked without the licensed slug data.
+  const published = adapterNames.publicAdapterNamesForId('cult:marketing-contact-vite',
     '<div class="cult-marketing-contact-vite"><label for="marketing-contact-vite-name">Name</label><input id="marketing-contact-vite-name">'
-    + '<label for="marketing-contact-vite-work-email">Work email</label><input id="marketing-contact-vite-work-email"></div>');
+    + '<label for="marketing-contact-vite-work-email">Work email</label><input id="marketing-contact-vite-work-email"></div>',
+    'cult:contact-series-vt');
   const ids = [...published.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]!);
   const fors = [...published.matchAll(/\sfor="([^"]+)"/g)].map((match) => match[1]!);
   assert.ok(fors.length > 0 && fors.every((target) => ids.includes(target)), 'every label still points at its field');

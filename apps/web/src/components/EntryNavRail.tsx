@@ -38,6 +38,7 @@ import { createPortal } from 'react-dom';
 import { coalescedGet, evictCoalescedGet } from '../lib/coalesced-get';
 import {
   canReachWorkspaceBillingEntrance,
+  MISH_GITHUB_REPO_URL,
   workspaceSeatCapacityState,
   type WorkspaceActiveResponse,
   type WorkspaceBillingSummary,
@@ -104,9 +105,8 @@ import {
 } from '../analytics/workspace';
 import { workspaceChromeAccountActionsHost } from './workspaceChromeActions';
 
-const REPO_URL = 'https://github.com/ZeroSum-Solutions/Mishh-Mashh-2';
-const GITHUB_HELP_URL = `${REPO_URL}/issues/new`;
-const GITHUB_FEATURE_URL = `${REPO_URL}/issues/new?labels=enhancement`;
+const GITHUB_HELP_URL = `${MISH_GITHUB_REPO_URL}/issues/new`;
+const GITHUB_FEATURE_URL = `${MISH_GITHUB_REPO_URL}/issues/new?labels=enhancement`;
 const CONTACT_EMAIL_URL = 'mailto:devin@zerosumsolutions.com';
 const externalLinkProps = { target: '_blank', rel: 'noreferrer noopener' } as const;
 

@@ -238,6 +238,11 @@ export async function ensureProjectSubdir(projectsRoot, projectId, subdir, metad
   const dir = await ensureProject(projectsRoot, projectId, metadata, finalIO);
   const raw = typeof subdir === 'string' ? subdir.trim() : '';
   if (!raw) return { absDir: dir, relDir: '' };
+  assertVisibleForImportedProject(raw, metadata);
+  // A folder that already exists is addressed by its real name (spaces and
+  // all); only a folder this call creates gets the sanitized upload name.
+  const existing = await existingProjectFolder(dir, raw);
+  if (existing) return existing;
   const relDir = sanitizePath(raw);
   const target = await resolveSafeReal(dir, relDir);
   finalIO?.assertCurrent();
@@ -259,13 +264,28 @@ export async function ensureValidatedProjectSubdir(projectsRoot, projectId, subd
   return { absDir: target, relDir };
 }
 
+/** Returns the existing folder named exactly `raw` (validated, never
+ * rewritten) inside the project, or null when no such folder exists. */
+async function existingProjectFolder(dir, raw) {
+  const relDir = validateProjectPath(raw);
+  const target = await resolveSafeReal(dir, relDir);
+  try {
+    if ((await stat(target)).isDirectory()) return { absDir: target, relDir };
+  } catch (err) {
+    if (!err || err.code !== 'ENOENT') throw err;
+  }
+  return null;
+}
+
 // Recursively delete a folder (and everything under it) within the project
 // sandbox. Refuses to delete the project root itself. resolveSafeReal confines
-// the target to the project tree even across descendant symlinks.
-export async function deleteProjectFolder(projectsRoot, projectId, name, metadata?) {
+// the target to the project tree even across descendant symlinks. The name
+// addresses an existing folder, so it is validated, never sanitized: a
+// sanitized name could point at a different folder.
+export async function deleteProjectFolder(projectsRoot, projectId, name, metadata?, finalIO?) {
   assertVisibleForImportedProject(name, metadata);
   const dir = resolveProjectDir(projectsRoot, projectId, metadata);
-  const safeName = sanitizePath(name);
+  const safeName = validateProjectPath(name);
   const target = await resolveSafeReal(dir, safeName);
   const dirReal = await realpath(dir).catch(() => dir);
   if (target === dirReal) {
@@ -279,7 +299,9 @@ export async function deleteProjectFolder(projectsRoot, projectId, name, metadat
     err.code = 'ENOTDIR';
     throw err;
   }
+  finalIO?.assertCurrent();
   await rm(target, { recursive: true, force: true });
+  return safeName;
 }
 
 // Best-effort entry-file detector — looks for index.html at the root,
@@ -904,14 +926,19 @@ export async function writeProjectFile(
   projectId,
   name,
   body,
-  { overwrite = true, artifactManifest = null, finalIO = null, preserveName = false } = {},
+  { overwrite = true, artifactManifest = null, finalIO = null, preserveName = false, existingName = false } = {},
   metadata?,
 ) {
   assertVisibleForImportedProject(name, metadata);
   // `preserveName` is for callers copying a package whose files reference
   // each other by name (design-system kits): renaming one would break those
   // references, so an unportable name is refused instead of rewritten.
-  const safeName = preserveName ? validatePortableProjectPath(name) : sanitizePath(name);
+  // `existingName` is for callers copying a file that already exists in a
+  // project on this machine (duplicate, template seed): the name is only
+  // validated for confinement, so the copy keeps every name and reference.
+  const safeName = existingName
+    ? validateProjectPath(name)
+    : preserveName ? validatePortableProjectPath(name) : sanitizePath(name);
   const dir = await ensureProject(projectsRoot, projectId, metadata, finalIO);
   const target = await resolveSafeReal(dir, safeName);
   body = normalizeArtifactRuntimeImports(safeName, body);

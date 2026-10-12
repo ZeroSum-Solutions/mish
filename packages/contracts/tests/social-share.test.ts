@@ -6,6 +6,10 @@ import {
 } from '../src/api/social-share';
 
 describe('social-share contract', () => {
+  it('points the repository share target at the public repository', () => {
+    expect(MISH_GITHUB_REPO_URL).toBe('https://github.com/ZeroSum-Solutions/mish');
+  });
+
   it('builds Mishh Mashh repository share targets', () => {
     const payload = buildSocialSharePayload({
       kind: 'mish-repo',

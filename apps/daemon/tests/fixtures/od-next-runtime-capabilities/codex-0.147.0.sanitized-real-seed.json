@@ -4,7 +4,7 @@
   "cliVersion": "codex-cli 0.147.0",
   "sourceTag": "rust-v0.147.0",
   "sourceCommit": "be6e8eac029b183056b7e4402879f15d2c85f61b",
-  "recordingDigest": "sha256:729d0e58e80e7b8b81eb90ad286471a26c3df80411f0b0f7092c19d157b50cc6",
+  "recordingDigest": "sha256:e93db4e64f928d3af5f40db47a092e494cfa7c0b34fbb9c34fdfe0f7087f696c",
   "anonymizationVersion": "od-runtime-evidence/v1",
   "evidenceReview": "mish_best_effort",
   "note": "Exact Codex CLI lifecycle facts recorded in isolated repositories. Child failure was produced by an isolated local Responses API that closed the Child stream after response.created; no online trace or user project was touched.",

@@ -2,7 +2,7 @@
   "fixtureKind": "sanitized_real_best_effort",
   "runtime": "native_opencode",
   "cliVersion": "1.18.18",
-  "recordingDigest": "sha256:b1224716a340401879cfb2f366d1252e9f837ce24050d9b0dfa4430f89492fc5",
+  "recordingDigest": "sha256:ecbfe01ffa56f4327b0b332e1fe16604ff43ddac68783d154d8f2c86a3b39b0f",
   "anonymizationVersion": "od-runtime-evidence/v1",
   "evidenceReview": "mish_best_effort",
   "note": "Locally recorded structural evidence reviewed by Mish. It does not imply OpenCode upstream endorsement and is valid only for the exact reviewed tuple.",

@@ -1,5 +1,5 @@
 import { spawn } from "node:child_process";
-import { mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 
@@ -33,13 +33,19 @@ function runPublisher(repoRoot: string, env: NodeJS.ProcessEnv): Promise<string>
   });
 }
 
+// The publisher rewrites the CMD wrapper's landing PS1 URL to the PS1 published beside it, so the
+// fixture is the canonical CMD the release actually ships rather than a stub without that marker.
+const CANONICAL_CMD_PATH = resolve(import.meta.dirname, "../../release/resources/dsh-bootstrap/install-dsh.cmd");
+const LANDING_PS1_URL = "https://github.com/ZeroSum-Solutions/mish/install-dsh.ps1?version=1";
+
 describe("DeepSeek Harness bootstrap publisher", () => {
   it("publishes immutable cross-platform installers and their checksum manifest", async () => {
     const repoRoot = resolve(import.meta.dirname, "../../..");
     const sourceDir = await mkdtemp(join(tmpdir(), "od-dsh-bootstrap-publish-"));
     const server = await startReleaseStorageFixtureServer();
+    const canonicalCmd = await readFile(CANONICAL_CMD_PATH, "utf8");
     const files = {
-      "install-dsh.cmd": "@echo off\r\necho cmd\r\n",
+      "install-dsh.cmd": canonicalCmd,
       "install-dsh.ps1": "Write-Host 'powershell'\n",
       "install-dsh.sh": "#!/usr/bin/env sh\necho posix\n",
     };
@@ -68,11 +74,16 @@ describe("DeepSeek Harness bootstrap publisher", () => {
         "bootstrap/dsh/v1/install-dsh.ps1",
         "bootstrap/dsh/v1/install-dsh.sh",
       ]);
-      for (const [name, body] of Object.entries(files)) {
-        expect(server.getObject(`bootstrap/dsh/v1/${name}`)?.toString("utf8")).toBe(body);
+      for (const name of ["install-dsh.ps1", "install-dsh.sh"] as const) {
+        expect(server.getObject(`bootstrap/dsh/v1/${name}`)?.toString("utf8")).toBe(files[name]);
       }
+      // The immutable CMD fetches the PS1 colocated in its own version, never the landing URL.
+      expect(server.getObject("bootstrap/dsh/v1/install-dsh.cmd")?.toString("utf8")).toBe(
+        canonicalCmd.replace(LANDING_PS1_URL, "https://releases.example.test/bootstrap/dsh/v1/install-dsh.ps1"),
+      );
       expect(server.getObject("bootstrap/dsh/v1/SHA256SUMS")?.toString("utf8")).toMatch(
-        /^[a-f0-9]{64}  install-dsh\.cmd\n[a-f0-9]{64}  install-dsh\.ps1\n[a-f0-9]{64}  install-dsh\.sh\n$/,
+        // Publication order: the PS1 dependency precedes the CMD wrapper that invokes it.
+        /^[a-f0-9]{64}  install-dsh\.ps1\n[a-f0-9]{64}  install-dsh\.sh\n[a-f0-9]{64}  install-dsh\.cmd\n$/,
       );
       expect(JSON.parse(server.getObject("bootstrap/dsh/latest.json")?.toString("utf8") ?? "{}")).toMatchObject({
         version: "v1",
@@ -95,12 +106,17 @@ describe("DeepSeek Harness bootstrap publisher", () => {
         version: "v2",
       });
 
-      // Rolling back to the earlier bytes reuses the version that already holds
-      // them rather than minting a third copy.
+      // Returning to earlier bytes mints a fresh version above latest: latest.json is monotonic,
+      // so reusing v1 would leave the pointer on v2 (see resolveDshBootstrapVersion). v1 keeps its
+      // archive bytes untouched.
       await writeFile(join(sourceDir, "install-dsh.sh"), files["install-dsh.sh"], "utf8");
-      const rolledBack = await runPublisher(repoRoot, env);
-      expect(rolledBack).toContain("https://releases.example.test/bootstrap/dsh/v1/install-dsh.sh");
-      expect(server.listObjectKeys()).not.toContain("bootstrap/dsh/v3/SHA256SUMS");
+      const reverted = await runPublisher(repoRoot, env);
+      expect(reverted).toContain("https://releases.example.test/bootstrap/dsh/v3/install-dsh.sh");
+      expect(server.getObject("bootstrap/dsh/v3/install-dsh.sh")?.toString("utf8")).toBe(files["install-dsh.sh"]);
+      expect(server.getObject("bootstrap/dsh/v1/install-dsh.sh")?.toString("utf8")).toBe(files["install-dsh.sh"]);
+      expect(JSON.parse(server.getObject("bootstrap/dsh/latest.json")?.toString("utf8") ?? "{}")).toMatchObject({
+        version: "v3",
+      });
     } finally {
       await server.close();
       await rm(sourceDir, { force: true, recursive: true });
@@ -111,9 +127,10 @@ describe("DeepSeek Harness bootstrap publisher", () => {
     const repoRoot = resolve(import.meta.dirname, "../../..");
     const sourceDir = await mkdtemp(join(tmpdir(), "od-dsh-bootstrap-pin-"));
     const server = await startReleaseStorageFixtureServer();
+    const canonicalCmd = await readFile(CANONICAL_CMD_PATH, "utf8");
     await Promise.all(
       Object.entries({
-        "install-dsh.cmd": "@echo off\r\necho cmd\r\n",
+        "install-dsh.cmd": canonicalCmd,
         "install-dsh.ps1": "Write-Host 'powershell'\n",
         "install-dsh.sh": "#!/usr/bin/env sh\necho posix\n",
       }).map(([name, body]) => writeFile(join(sourceDir, name), body, "utf8")),

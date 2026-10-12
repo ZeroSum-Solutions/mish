@@ -179,7 +179,8 @@ export function createClaudeStreamHandler(
    *
    *   1. `stream_event` → `message_delta` → `delta.stop_reason`. The ONLY place
    *      Claude Code 2.1.259 carries it: measured across six verbatim
-   *      recordings of that build (`tests/fixtures/claude-cli-recordings/`),
+   *      recordings of that build (not published; the owned synthetic fixtures in
+   *      `tests/fixtures/daemon-b/claude-stream/` reproduce the shape),
    *      every `assistant` wrapper reported `stop_reason: null` while every
    *      `message_delta` carried the real value. Requires
    *      `--include-partial-messages`; without that flag the CLI emits no
@@ -870,7 +871,8 @@ export function createClaudeStreamHandler(
       // A `result` frame ends ONE user turn, not the process: a stream-json
       // session whose stdin is held open emits one `result` per turn and keeps
       // reading (verified against
-      // `tests/fixtures/claude-cli-recordings/claude-2.1.259-*-two-turns.jsonl`,
+      // unpublished 2.1.259 two-turn recordings; owned synthetic equivalents are
+      // `tests/fixtures/daemon-b/claude-stream/*-two-turns.jsonl`,
       // two `result` frames from a single CLI process). So it is a legitimate
       // per-turn reset point — and on a build with no in-stream boundary at all
       // (2.1.259 without `--include-partial-messages`) it is the ONLY one, which
@@ -930,7 +932,8 @@ export function createClaudeStreamHandler(
   function handleStreamEvent(ev: Record<string, unknown>, parentToolUseId: unknown = null) {
     // The turn's real `stop_reason` on Claude Code 2.1.259. It lands after
     // every `content_block_stop` of the message (verified frame-by-frame
-    // against the recordings in `tests/fixtures/claude-cli-recordings/`), so by
+    // against unpublished 2.1.259 recordings; the owned synthetic fixtures in
+    // `tests/fixtures/daemon-b/claude-stream/` reproduce it), so by
     // the time it arrives every tool_use of the turn has already been emitted —
     // the ordering the assistant-wrapper path had to be careful about.
     if (ev.type === 'message_delta' && isRecord(ev.delta)) {

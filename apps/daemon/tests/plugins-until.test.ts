@@ -70,3 +70,59 @@ describe('evaluateUntil', () => {
     expect(result.matched[0]?.signal).toBe('critique.score');
   });
 });
+
+describe('documented boolean shorthand and grouping', () => {
+  it('treats a bare boolean signal as `== true`', () => {
+    const expr = parseUntil('build.passing && tests.passing');
+    expect(expr.any).toEqual([[
+      { signal: 'build.passing', op: '==', value: true },
+      { signal: 'tests.passing', op: '==', value: true },
+    ]]);
+    expect(() => parseUntil('iterations')).toThrow(UntilSyntaxError);
+  });
+
+  it('parses a parenthesized conjunction inside a disjunction', () => {
+    const expr = parseUntil('(build.passing && tests.passing) || iterations>=8');
+    expect(evaluateUntil(expr, { 'build.passing': true, 'tests.passing': false, iterations: 2 }).satisfied).toBe(false);
+    expect(evaluateUntil(expr, { 'build.passing': true, 'tests.passing': true, iterations: 2 }).satisfied).toBe(true);
+    expect(evaluateUntil(expr, { 'build.passing': false, iterations: 8 }).satisfied).toBe(true);
+  });
+
+  it('distributes a parenthesized disjunction over a conjunction', () => {
+    const expr = parseUntil('preview.ok && (critique.score >= 4 || iterations >= 3)');
+    expect(expr.any).toHaveLength(2);
+    expect(evaluateUntil(expr, { 'preview.ok': true, iterations: 3 }).satisfied).toBe(true);
+    expect(evaluateUntil(expr, { 'preview.ok': false, iterations: 3 }).satisfied).toBe(false);
+  });
+
+  it('parses every `until` expression shipped in a bundled plugin manifest', async () => {
+    const { readdir, readFile } = await import('node:fs/promises');
+    const path = await import('node:path');
+    const { fileURLToPath } = await import('node:url');
+    const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../plugins/_official');
+    const manifests: string[] = [];
+    const walk = async (dir: string) => {
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) await walk(full);
+        else if (entry.name === 'mish.json') manifests.push(full);
+      }
+    };
+    await walk(root);
+    const expressions: Array<{ file: string; until: string }> = [];
+    const collect = (file: string, value: unknown) => {
+      if (Array.isArray(value)) value.forEach((item) => collect(file, item));
+      else if (value && typeof value === 'object') {
+        for (const [key, inner] of Object.entries(value)) {
+          if (key === 'until' && typeof inner === 'string') expressions.push({ file, until: inner });
+          else collect(file, inner);
+        }
+      }
+    };
+    for (const file of manifests) collect(file, JSON.parse(await readFile(file, 'utf8')));
+    expect(expressions.length).toBeGreaterThan(0);
+    for (const { file, until } of expressions) {
+      expect({ file, until, ok: isParseableUntil(until) }).toEqual({ file, until, ok: true });
+    }
+  });
+});

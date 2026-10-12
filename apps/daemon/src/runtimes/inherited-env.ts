@@ -43,6 +43,11 @@ export const AGENT_INHERITED_ENV_NAMES: readonly string[] = [
   'OD_CODEX_SANDBOX', 'OD_CODEX_TRANSPORT', 'OD_CODEX_DISABLE_PLUGINS',
   'OD_BROWSER_USE_REQUESTED', 'OD_BROWSER_USE_AVAILABLE',
   'OD_BROWSER_USE_UNAVAILABLE_REASON', 'OD_BROWSER_USE_REGISTRY_PATH',
+  // Dev-only replay selection knobs read by the mock CLIs under mocks/bin
+  // (mocks/lib/recording-picker.mjs). Without them a PATH-overlay mock plays a
+  // random recording instead of the pinned trace.
+  'OD_MOCKS_TRACE', 'OD_MOCKS_POOL', 'OD_MOCKS_BY_PROMPT_HASH', 'OD_MOCKS_SEED',
+  'OD_MOCKS_NO_DELAY', 'OD_MOCKS_RECORDINGS_DIR',
 ];
 
 const inheritedNames = new Set(AGENT_INHERITED_ENV_NAMES);

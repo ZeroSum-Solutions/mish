@@ -11,7 +11,7 @@ variables:
   deploymentName: mish-aci
   location: eastus
   templateFile: deploy/azure/container-instance.bicep
-  mishImage: ghcr.io/zerosum-solutions/mish:latest
+  mishImage: ghcr.io/zerosum-solutions/od:latest
   dnsNameLabel: mish-$(Build.BuildId)
   browserOrigin: https://od.example.com
 

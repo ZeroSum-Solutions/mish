@@ -57,17 +57,20 @@ test('every entry\'s sourceUrl is 21st.dev\'s own published CDN, never a Mishh-s
   }
 });
 
-test('every referenced image file exists, matches its recorded byte size and stays under the shared thumbnail budget', () => {
+// The fetched 21st.dev screenshots are not redistributed in the public repository: the manifest
+// keeps each entry's provenance, and an entry whose image is absent is "not shipped" (the daemon
+// answers 404 and the card shows its no-preview placeholder). An image that IS present must match.
+test('every image present on disk matches its recorded byte size and stays under the shared thumbnail budget', () => {
   for (const [id, entry] of Object.entries(manifest.items)) {
-    const file = join(IMAGES_DIR, entry.file);
-    assert.ok(existsSync(file), `${id}: ${entry.file} missing on disk`);
-    assert.equal(statSync(file).size, entry.bytes, `${id}: recorded size drifted from the file on disk`);
     assert.ok(entry.bytes <= manifest.byteLimit, `${id}: ${entry.bytes} B exceeds the ${manifest.byteLimit} B limit`);
+    const file = join(IMAGES_DIR, entry.file);
+    if (existsSync(file)) assert.equal(statSync(file).size, entry.bytes, `${id}: recorded size drifted from the file on disk`);
   }
 });
 
-test('--check passes offline against the committed manifest', () => {
+test('--check passes offline against the committed manifest and counts the images it ships', () => {
   const { status, output } = runCheck();
   assert.equal(status, 0, output);
-  assert.match(output, /21st-thumbnails\.json: 2 images/);
+  const shipped = Object.values(manifest.items).filter((entry) => existsSync(join(IMAGES_DIR, entry.file))).length;
+  assert.match(output, new RegExp(`21st-thumbnails\\.json: ${Object.keys(manifest.items).length} entries, ${shipped} images shipped`));
 });
