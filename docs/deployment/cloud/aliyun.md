@@ -99,8 +99,8 @@ Get your personal mirror prefix from the Alibaba Cloud console under **Container
 From this point the flow matches [`docs/install-guide.md`](../../install-guide.md):
 
 ```bash
-git clone https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git
-cd Mishh-Mashh-2
+git clone https://github.com/ZeroSum-Solutions/mish.git
+cd mish
 bash deploy/scripts/install.sh --non-interactive --port 7456
 ```
 

@@ -101,8 +101,10 @@ describe('plugin preview bake manifest', () => {
 });
 
 describe('bakedPreviewBlock', () => {
-  it('uses the public preview origin when the manifest points to remote-only nested assets', async () => {
+  it('returns null (live preview) when clips are not on disk and no base URL is set', async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), 'od-baked-preview-'));
+    previousBaseUrl = process.env.OD_PLUGIN_PREVIEWS_BASE_URL;
+    delete process.env.OD_PLUGIN_PREVIEWS_BASE_URL;
     await writeManifest(tmpDir, {
       'html-plugin': {
         video: 'html-plugin/abc123abc123abcd/preview.mp4',
@@ -113,11 +115,7 @@ describe('bakedPreviewBlock', () => {
       },
     });
 
-    expect(bakedPreviewBlock('html-plugin', tmpDir)).toEqual({
-      video: `${PUBLIC_BASE}/html-plugin/abc123abc123abcd/preview.mp4`,
-      poster: `${PUBLIC_BASE}/html-plugin/abc123abc123abcd/poster.jpg`,
-      holdMs: 2500,
-    });
+    expect(bakedPreviewBlock('html-plugin', tmpDir)).toBeNull();
   });
 
   it('uses the daemon static route when nested preview assets exist on disk', async () => {
@@ -166,6 +164,8 @@ describe('bakedPreviewBlock', () => {
 describe('applyBakedPreviews', () => {
   it('attaches baked previews without overwriting authored preview blocks', async () => {
     tmpDir = await mkdtemp(path.join(os.tmpdir(), 'od-baked-preview-'));
+    previousBaseUrl = process.env.OD_PLUGIN_PREVIEWS_BASE_URL;
+    process.env.OD_PLUGIN_PREVIEWS_BASE_URL = PUBLIC_BASE;
     await writeManifest(tmpDir, {
       'html-plugin': {
         video: 'html-plugin/aaaabbbbccccdddd/preview.mp4',

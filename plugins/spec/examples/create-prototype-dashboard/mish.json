@@ -8,9 +8,9 @@
   "license": "MIT",
   "author": {
     "name": "Mishh Mashh Spec Examples",
-    "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+    "url": "https://github.com/ZeroSum-Solutions/mish"
   },
-  "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/spec/examples/create-prototype-dashboard",
+  "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/spec/examples/create-prototype-dashboard",
   "tags": ["create", "prototype", "dashboard", "operations"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

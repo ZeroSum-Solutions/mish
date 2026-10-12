@@ -3,7 +3,7 @@
   "name": "mish",
   "owner": {
     "name": "ZeroSum-Solutions",
-    "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+    "url": "https://github.com/ZeroSum-Solutions/mish"
   },
   "description": "Mishh Mashh — local-first design app exposed to coding agents over MCP. Install once with your agent's plugin command and projects/files/skills are reachable through stdio.",
   "plugins": [

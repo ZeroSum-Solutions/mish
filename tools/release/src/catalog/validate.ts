@@ -34,8 +34,8 @@ function validateRecord(record: CatalogRecord, index: number, errors: string[]):
   if (typeof record.description !== "string") {
     errors.push(`${prefix}.description must be a string`);
   }
-  if (!isNonEmptyString(record.sourceUrl) || !record.sourceUrl.startsWith("https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/")) {
-    errors.push(`${prefix}.sourceUrl must be a ZeroSum-Solutions/Mishh-Mashh-2 GitHub URL`);
+  if (!isNonEmptyString(record.sourceUrl) || !record.sourceUrl.startsWith("https://github.com/ZeroSum-Solutions/mish/")) {
+    errors.push(`${prefix}.sourceUrl must be a ZeroSum-Solutions/mish GitHub URL`);
   }
   if (typeof record.body !== "string") {
     errors.push(`${prefix}.body must be a string`);

@@ -24,20 +24,17 @@ Before starting:
    - default: paste the token into `OD_API_TOKEN=`
    - trusted reverse proxy that already authenticates every request: leave `OD_API_TOKEN=` empty and set `MISH_DISABLE_API_AUTH=1`
 
-Then pull and start the service:
+Then build the image from this checkout and start the service. No registry login is needed:
 
 ```bash
-docker login ghcr.io
-MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose pull
-MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose up -d --no-build
+docker compose build
+docker compose up -d --no-build
 ```
 
-Always set `MISH_IMAGE`. The Compose default still names the upstream
-`ghcr.io/zerosum-solutions/mish` image, which is not Mishh Mashh. Use
-`ghcr.io/zerosum-solutions/od:latest` for the latest release, or
-`ghcr.io/zerosum-solutions/od:<version>` to pin one.
-`.github/workflows/docker-image.yml` publishes this image only on a `v*` release
-tag; until a release exists, build the image locally instead of pulling it.
+The build tags the image `ghcr.io/zerosum-solutions/mish:latest` (the Compose
+default), so `Dockerfile.local` can extend it. A published image is optional. If
+your team publishes one (`deploy/scripts/publish-images.sh`), set `MISH_IMAGE` to
+that image and use `docker compose pull` instead.
 
 Open `http://127.0.0.1:7456`. When Docker's bridge makes the browser appear as a
 non-loopback peer, the browser displays its native sign-in dialog. Enter
@@ -45,10 +42,6 @@ non-loopback peer, the browser displays its native sign-in dialog. Enter
 password. The browser reuses those credentials for same-origin API requests;
 CLI clients and reverse proxies can continue to send
 `Authorization: Bearer <OD_API_TOKEN>`.
-
-The `ghcr.io/zerosum-solutions/od` package is private. Run `docker login ghcr.io`
-with a GitHub token that has `read:packages` before `docker compose pull`. Do not
-make the package public.
 
 Defaults:
 
@@ -88,7 +81,7 @@ Compose variable maps to daemon env `OD_DISABLE_API_AUTH`.
 Pin a specific published image with a digest instead of the mutable `latest` tag:
 
 ```bash
-MISH_IMAGE=ghcr.io/zerosum-solutions/od@sha256:<digest> docker compose up -d --no-build
+MISH_IMAGE=ghcr.io/zerosum-solutions/mish@sha256:<digest> docker compose up -d --no-build
 ```
 The image intentionally does not bundle Claude/Codex/Gemini CLI binaries. Keep
 those outside the image, or build a separate private runtime layer if a server

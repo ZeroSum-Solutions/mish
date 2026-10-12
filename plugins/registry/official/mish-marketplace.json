@@ -5,7 +5,7 @@
   "version": "0.1.0",
   "owner": {
     "name": "Mishh Mashh",
-    "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+    "url": "https://github.com/ZeroSum-Solutions/mish"
   },
   "trust": "official",
   "metadata": {
@@ -20,10 +20,10 @@
       "name": "mish/code-import",
       "title": "Code import",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/code-import",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/atoms/code-import",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -36,7 +36,7 @@
         "code-migration",
         "phase-7"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/code-import",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/atoms/code-import",
       "license": "MIT",
       "mode": "import"
     },
@@ -44,10 +44,10 @@
       "name": "mish/critique-theater",
       "title": "Critique theater",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/critique-theater",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/atoms/critique-theater",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject"
@@ -58,7 +58,7 @@
         "first-party",
         "critique"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/critique-theater",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/atoms/critique-theater",
       "license": "MIT",
       "mode": "critique"
     },
@@ -66,10 +66,10 @@
       "name": "mish/design-extract",
       "title": "Design extract",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/design-extract",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/atoms/design-extract",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -83,7 +83,7 @@
         "figma-migration",
         "phase-7"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/design-extract",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/atoms/design-extract",
       "license": "MIT",
       "mode": "extract"
     },
@@ -91,10 +91,10 @@
       "name": "mish/direction-picker",
       "title": "Direction picker",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/direction-picker",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/atoms/direction-picker",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject"
@@ -105,7 +105,7 @@
         "first-party",
         "planning"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/direction-picker",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/atoms/direction-picker",
       "license": "MIT",
       "mode": "planning"
     },
@@ -113,10 +113,10 @@
       "name": "mish/discovery-question-form",
       "title": "Discovery question form",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/discovery-question-form",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/atoms/discovery-question-form",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject"
@@ -127,7 +127,7 @@
         "first-party",
         "discovery"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/discovery-question-form",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/atoms/discovery-question-form",
       "license": "MIT",
       "mode": "discovery"
     },
@@ -135,10 +135,10 @@
       "name": "mish/example-meeting-notes",
       "title": "Meeting Notes",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/meeting-notes",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/meeting-notes",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -158,7 +158,7 @@
         "all-hands-recap",
         "untitled"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/meeting-notes",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/meeting-notes",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -167,10 +167,10 @@
       "name": "mish/example-mobile-app",
       "title": "Mobile App",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/mobile-app",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/mobile-app",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -193,7 +193,7 @@
         "untitled",
         "app"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/mobile-app",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/mobile-app",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -202,10 +202,10 @@
       "name": "mish/example-mobile-onboarding",
       "title": "Mobile Onboarding",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/mobile-onboarding",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/mobile-onboarding",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -226,7 +226,7 @@
         "app-onboarding",
         "untitled"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/mobile-onboarding",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/mobile-onboarding",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -235,10 +235,10 @@
       "name": "mish/example-mockup-device-3d",
       "title": "Device 3D Showcase",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/mockup-device-3d",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/mockup-device-3d",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -258,7 +258,7 @@
         "macbook",
         "html-in-canvas"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/mockup-device-3d",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/mockup-device-3d",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation",
@@ -275,10 +275,10 @@
       "name": "mish/example-motion-frames",
       "title": "Motion Frames",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/motion-frames",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/motion-frames",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -301,7 +301,7 @@
         "kinetic-typography",
         "untitled"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/motion-frames",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/motion-frames",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -310,10 +310,10 @@
       "name": "mish/example-pm-spec",
       "title": "Pm Spec",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/pm-spec",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/pm-spec",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -334,7 +334,7 @@
         "feature-doc",
         "untitled"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/pm-spec",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/pm-spec",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -343,10 +343,10 @@
       "name": "mish/example-pricing-page",
       "title": "Pricing Page",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/pricing-page",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/pricing-page",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -367,7 +367,7 @@
         "compare-plans",
         "untitled"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/pricing-page",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/pricing-page",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -376,10 +376,10 @@
       "name": "mish/example-saas-landing",
       "title": "Saas Landing",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/saas-landing",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/saas-landing",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -397,7 +397,7 @@
         "marketing-page",
         "product-landing"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/saas-landing",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/saas-landing",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -406,10 +406,10 @@
       "name": "mish/example-web-prototype",
       "title": "Web Prototype",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/web-prototype",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/web-prototype",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -429,7 +429,7 @@
         "marketing-page",
         "homepage"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/web-prototype",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/web-prototype",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -438,10 +438,10 @@
       "name": "mish/example-x-research",
       "title": "X Research",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/x-research",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/examples/x-research",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -465,7 +465,7 @@
         "untitled",
         "x"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/x-research",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/x-research",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -474,10 +474,10 @@
       "name": "mish/od-new-generation",
       "title": "New generation (default scenario)",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/scenarios/od-new-generation",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/scenarios/od-new-generation",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject"
@@ -488,7 +488,7 @@
         "first-party",
         "new-generation"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/scenarios/od-new-generation",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/scenarios/od-new-generation",
       "license": "MIT",
       "mode": "scenario",
       "taskKind": "new-generation"
@@ -497,10 +497,10 @@
       "name": "mish/od-web-effect-extractor",
       "title": "Web effect extractor",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/scenarios/od-web-effect-extractor",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/scenarios/od-web-effect-extractor",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject",
@@ -520,7 +520,7 @@
         "animation",
         "visual-effects"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/scenarios/od-web-effect-extractor",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/scenarios/od-web-effect-extractor",
       "license": "MIT",
       "mode": "prototype",
       "taskKind": "new-generation"
@@ -529,10 +529,10 @@
       "name": "mish/todo-write",
       "title": "Todo write",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/todo-write",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/atoms/todo-write",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject"
@@ -543,7 +543,7 @@
         "first-party",
         "planning"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/todo-write",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/atoms/todo-write",
       "license": "MIT",
       "mode": "planning"
     },
@@ -551,10 +551,10 @@
       "name": "mish/token-map",
       "title": "Token map",
       "version": "0.1.0",
-      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/token-map",
+      "source": "github:ZeroSum-Solutions/mish@main/plugins/_official/atoms/token-map",
       "publisher": {
         "id": "mish",
-        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+        "url": "https://github.com/ZeroSum-Solutions/mish"
       },
       "capabilitiesSummary": [
         "prompt:inject"
@@ -567,7 +567,7 @@
         "code-migration",
         "phase-6"
       ],
-      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/token-map",
+      "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/atoms/token-map",
       "license": "MIT",
       "mode": "token-map"
     }

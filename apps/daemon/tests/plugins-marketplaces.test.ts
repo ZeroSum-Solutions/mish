@@ -160,7 +160,7 @@ describe('marketplaces', () => {
 
   it('normalizes legacy branch raw urls to the canonical raw registry', () => {
     expect(resolveMarketplaceFetchUrl(
-      'https://raw.githubusercontent.com/ZeroSum-Solutions/Mishh-Mashh-2/garnet-hemisphere/plugins/registry/community/mish-marketplace.json',
+      'https://raw.githubusercontent.com/ZeroSum-Solutions/mish/garnet-hemisphere/plugins/registry/community/mish-marketplace.json',
     )).toBe(marketplaceManifestUrlForRegistry('community'));
   });
 
@@ -314,7 +314,7 @@ describe('marketplaces', () => {
     );
     expect(officialManifest.plugins?.some((plugin) => plugin.name === 'mish/code-import')).toBe(true);
     expect(officialManifest.plugins?.every((plugin) =>
-      /^github:ZeroSum-Solutions\/Mishh-Mashh-2(?:@[^/]+)?\/plugins\/_official\//.test(plugin.source ?? ''),
+      /^github:ZeroSum-Solutions\/mish(?:@[^/]+)?\/plugins\/_official\//.test(plugin.source ?? ''),
     )).toBe(true);
 
     const seeded = ensureMarketplaceManifest(db, {
