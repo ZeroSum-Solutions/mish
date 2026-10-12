@@ -231,10 +231,15 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packs --split
 - Keep a map with real private names outside this repository and pass it with
   `--map`. The committed map is a template.
 - The builder leaves out links, `node_modules`, credential-looking files
-  (`.env`, `mcp-tokens.json`, key files) and names the daemon would refuse, and
-  prints what it left out. It validates the manifest with the daemon's schema
-  before it writes anything, never writes inside the checkout or this
-  repository, and builds the same bytes from the same input.
+  (`.env`, `mcp-tokens.json`, `.mcp.json` and other MCP client configs,
+  `settings.local.json`, `auth.json`, key files) and names the daemon would
+  refuse, and prints what it left out. It validates the manifest with the
+  daemon's schema before it writes anything, never writes inside the checkout
+  or this repository, and builds the same bytes from the same input.
+- Text files that contain something shaped like a credential (a bearer token,
+  a JWT, an `sk-` or `ghp_` key) are packed but named in the report. Captured
+  pages carry look-alikes, so the builder does not drop them; check each one
+  before you share the pack.
 - Give the `.zip` to the team over a private channel. Do not commit it.
 
 ### What a Mish pack does not do

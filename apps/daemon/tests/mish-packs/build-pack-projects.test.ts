@@ -42,10 +42,14 @@ function writeCheckout(root: string, projectBytes = 32): Database.Database {
   writeFile(root, '.od/design-systems/atlas-one/DESIGN.md', '# Atlas');
   writeFile(root, '.od/projects/ds-atlas-one/DESIGN.md', '# Atlas preview');
   writeFile(root, '.od/projects/ds-atlas-one/.env', 'SECRET=1');
+  writeFile(root, '.od/projects/ds-atlas-one/.mcp.json', JSON.stringify({ mcpServers: { refero: { type: 'http', headers: { Authorization: 'Bearer not-a-real-token' } } } }));
+  writeFile(root, '.od/projects/ds-atlas-one/.claude/settings.local.json', JSON.stringify({ env: { SOME_KEY: 'not-real' } }));
   writeFile(root, '.od/projects/ds-atlas-one/node_modules/dep/index.js', 'x');
   writeFile(root, '.od/projects/proj-big-a/blob.bin', randomBytes(projectBytes));
   writeFile(root, '.od/projects/proj-big-b/blob.bin', randomBytes(projectBytes));
   writeFile(root, '.od/projects/proj-wal/index.html', '<h1>only in the log</h1>');
+  // A credential-shaped string in an ordinary file: reported, still packed. Invented, not a real token.
+  writeFile(root, '.od/projects/proj-wal/notes.md', `See ${['eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9', 'eyJzdWIiOiJub2JvZHkifQ', 'c2lnbmF0dXJl'].join('.')}`);
   writeFile(root, '.od/projects/proj-outside/.file-versions/x', 'x');
   writeFile(root, '.od/projects/no-row/index.html', 'x');
   mkdirSync(path.join(root, '.od', 'projects', 'proj-empty'), { recursive: true });
@@ -123,9 +127,10 @@ describe('build-pack: saved projects', () => {
     expect(summary.resources.find((entry) => entry.resource === 'designIndex')?.status).toBe('skipped');
     expect(summary.skipped['project whose files live outside the checkout']).toEqual(['.od/projects/proj-outside']);
     expect(summary.skipped['project folder with no row in the app database']).toEqual(['.od/projects/no-row']);
-    expect(summary.skipped['looks like a credential file']).toEqual(['projects/ds-atlas-one/.env']);
+    expect(summary.skipped['looks like a credential file']).toEqual(['projects/ds-atlas-one/.claude/settings.local.json', 'projects/ds-atlas-one/.env', 'projects/ds-atlas-one/.mcp.json']);
     expect(summary.warnings.join(' ')).toMatch(/1 project row\(s\) in the database have no folder/);
     expect(summary.warnings.join(' ')).toMatch(/linked folders on this computer/);
+    expect(summary.warnings.join(' ')).toMatch(/1 packed file\(s\) contain text shaped like a credential; check them before you share the pack: projects\/proj-wal\/notes\.md/);
 
     const staging = tempDir('mish-extract-');
     await extractMishPackZip(out, staging);
@@ -133,7 +138,10 @@ describe('build-pack: saved projects', () => {
     expect(rows.schema).toBe('mish-pack-projects/1');
     expect(rows.projects.map((row) => row.id)).toEqual(['ds-atlas-one', 'proj-big-a', 'proj-big-b', 'proj-empty', 'proj-wal']);
     expect(rows.projects[0]!.metadata).toEqual({ kind: 'other', importedFrom: 'design-system' });
-    expect(existsSync(path.join(staging, 'projects', 'ds-atlas-one', '.env'))).toBe(false);
+    expect(existsSync(path.join(staging, 'projects', 'proj-wal', 'notes.md'))).toBe(true);
+    for (const left of ['.env', '.mcp.json', '.claude/settings.local.json']) {
+      expect(existsSync(path.join(staging, 'projects', 'ds-atlas-one', ...left.split('/'))), left).toBe(false);
+    }
     expect(existsSync(path.join(staging, 'projects', 'ds-atlas-one', 'node_modules'))).toBe(false);
 
     const { db, dataDir, store } = newStore();

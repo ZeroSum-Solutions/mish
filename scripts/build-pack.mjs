@@ -48,10 +48,31 @@ const SECRET_NAME = [
   /^\.npmrc$/i,
   /^\.netrc$/i,
   /^(mcp-tokens|mcp-oauth-clients|credentials?|secrets?)(\..*)?$/i,
+  // MCP client configs. The app writes `.mcp.json` into a project for each agent run, with the
+  // live Authorization headers of the connected servers in it; the next run writes it again.
+  /^\.?mcp(-config)?\.json$/i,
+  // Per-machine agent settings (`.claude/settings.local.json` can hold an `env` block) and auth stores.
+  /^settings\.local\.json$/i,
+  /^auth\.json$/i,
   /\.(pem|key|p12|pfx|keystore)$/i,
   /^id_(rsa|dsa|ecdsa|ed25519)(\.pub)?$/i,
 ];
 const CHILD_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u;
+/**
+ * Credential shapes looked for inside small text files. A match is reported, not left out: captured
+ * pages and docs carry look-alikes, and dropping them would break the content. Names that mark a
+ * credential file are left out above.
+ */
+const CREDENTIAL_SHAPES = [
+  /\bBearer\s+[A-Za-z0-9._~+/=-]{24,}/u,
+  /\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\./u,
+  /\bsk-[A-Za-z0-9_-]{20,}/u,
+  /\bgh[pousr]_[A-Za-z0-9]{20,}/u,
+  /\bxox[abprs]-[A-Za-z0-9-]{10,}/u,
+  /\bAKIA[0-9A-Z]{16}\b/u,
+];
+const SCANNED_TEXT = /\.(json|jsonl|md|txt|html?|m?[jt]sx?|cjs|ya?ml|toml|ini|cfg|conf|sh|env\w*)$/iu;
+const SCAN_MAX_BYTES = 2 * 1024 * 1024;
 /** The daemon refuses an entry path longer than this. */
 const MAX_ENTRY_PATH = 1024;
 const GIB = 1024 * 1024 * 1024;
@@ -146,6 +167,9 @@ class Plan {
     this.warnings.push(message);
   }
 
+  /** Paths of packed files that contain a credential shape (reported, still packed). */
+  flagged = [];
+
   skip(reason, name) {
     const list = this.skipped.get(reason) ?? [];
     if (list.length < 5) list.push(name);
@@ -204,6 +228,10 @@ async function planPath(plan, root, absolute, zipPrefix, resource, unit = resour
     if (zipPrefix.length > MAX_ENTRY_PATH) return plan.skip('path longer than the daemon accepts', zipPrefix.slice(0, 120));
     const problem = await containmentProblem(plan, root, absolute);
     if (problem) return plan.skip(problem, zipPrefix);
+    if (info.size <= SCAN_MAX_BYTES && SCANNED_TEXT.test(name)) {
+      const text = await readFile(absolute, 'latin1');
+      if (CREDENTIAL_SHAPES.some((shape) => shape.test(text))) plan.flagged.push(zipPrefix);
+    }
     return plan.addFile(zipPrefix, absolute, info.size, resource, unit);
   }
   if (!info.isDirectory()) return plan.skip('not a regular file', zipPrefix);
@@ -633,6 +661,13 @@ function printPack(pack, dryRun) {
   console.log(`${dryRun ? 'Would pack' : 'Packed'} ${pack.files} files (${size}) as ${pack.id} ${pack.version}${pack.resources ? `: ${pack.resources.join(', ')}` : ''}`);
 }
 
+/** Adds the credential-shape report to the warnings once planning is done. */
+function noteFlagged(plan) {
+  if (plan.flagged.length === 0) return;
+  const shown = plan.flagged.slice(0, 10).join(', ');
+  plan.warn(`${plan.flagged.length} packed file(s) contain text shaped like a credential; check them before you share the pack: ${shown}${plan.flagged.length > 10 ? ', ...' : ''}`);
+}
+
 function printReport(report, plan) {
   for (const item of report) console.log(`  ${item.status.padEnd(8)} ${item.resource}${item.detail ? ` (${item.detail})` : ''}`);
   for (const [reason, names] of plan.skipped) console.log(`  left out: ${reason}: ${names.join(', ')}${names.length >= 5 ? ', ...' : ''}`);
@@ -691,6 +726,7 @@ async function main() {
       await handler(ctx, resource);
     }
 
+    noteFlagged(plan);
     const today = new Date().toISOString().slice(0, 10).replaceAll('-', '.');
     const version = args.version ?? map.pack?.version ?? today;
     const env = map.env && Object.keys(map.env).length > 0 ? map.env : null;
