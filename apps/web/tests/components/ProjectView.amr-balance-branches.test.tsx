@@ -66,6 +66,10 @@ import type {
   Project,
   SkillSummary,
 } from '../../src/types';
+import { useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const PROJECT_ID = 'balance-branch-project';
 const TEAM_WORKSPACE = 'nt3itfm1b95puq5w33tvzu44';

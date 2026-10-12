@@ -293,6 +293,22 @@ function cohort(id: string, sourceId: ComponentLedgerCohort['sourceId'], scope: 
 }
 const rowListing = (rows: ComponentLedgerRow[]) => rows.map(row => [row.id, row.sourceVersion.digest ?? row.sourceVersion.revision]);
 
+const FAMILY_NAME = /^[a-z0-9-]+$/;
+
+/**
+ * A family-section entry counts only when its family ships an agency example.
+ * The family name is interpolated into a filesystem path, so anything other
+ * than a plain `[a-z0-9-]` slug is treated as absent rather than probed.
+ */
+export function isShippedFamilySection(root: string, entry: { sourceKind?: unknown; content?: unknown }): boolean {
+  if (entry.sourceKind !== 'family-section') return false;
+  const content = entry.content as { kind?: unknown; family?: unknown } | null | undefined;
+  if (content?.kind !== 'family-section') return false;
+  const family = content.family;
+  if (typeof family !== 'string' || !FAMILY_NAME.test(family)) return false;
+  return existsSync(path.join(root, 'plugins/_official/examples', `agency-${family}`, 'README.md'));
+}
+
 export function collectComponentInventory(root: string = defaultRepositoryRoot()): ComponentInventory {
   const sections = (sectionCatalogJson as { entries: SectionCatalogEntry[] }).entries;
   const manifest = JSON.parse(readFileSync(path.join(root, 'plugins/_official/shared/ui-kits/hyperui/manifest.json'), 'utf8')) as HyperuiManifest;
@@ -300,8 +316,7 @@ export function collectComponentInventory(root: string = defaultRepositoryRoot()
   const genui = genuiCatalog.manifest.components.map(entry => genuiRow(root, entry as CatalogEntry)).sort(byId);
   const hyperui = sections.filter(entry => entry.sourceKind === 'hyperui').map(entry => hyperuiRow(root, manifest, entry)).sort(byId);
   // Reference metadata can outlive a removed private study; only shipped families enter the ledger.
-  const families = sections.filter(entry => entry.sourceKind === 'family-section' && entry.content.kind === 'family-section'
-    && existsSync(path.join(root, 'plugins/_official/examples', `agency-${entry.content.family}`, 'README.md')))
+  const families = sections.filter(entry => isShippedFamilySection(root, entry))
     .map(familySectionRow).sort(byId);
   const twentyFirst = (twenty1stJson as { rows: Array<{ id: string; name: string; itemUrl: string; rights: string }> }).rows
     .map(row => twentyFirstRow(row, originals.find(original => original.id === row.id))).sort(byId);

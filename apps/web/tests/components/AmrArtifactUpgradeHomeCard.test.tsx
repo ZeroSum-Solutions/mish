@@ -3,6 +3,11 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AmrArtifactUpgradeHomeCard } from '../../src/components/AmrArtifactUpgradeHomeCard';
+import { setRuntimeAmrConsoleOrigin } from '../../src/runtime/amr-guidance';
+import { useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 afterEach(() => {
   cleanup();
@@ -44,6 +49,22 @@ describe('AmrArtifactUpgradeHomeCard', () => {
       'noopener,noreferrer',
     );
     expect(onDismiss).toHaveBeenCalledTimes(2);
+  });
+
+  it('hides the plans action when no AMR console origin is configured', () => {
+    setRuntimeAmrConsoleOrigin(null);
+    render(
+      <AmrArtifactUpgradeHomeCard
+        profile="prod"
+        metricsConsent={false}
+        installationId={null}
+        onDismiss={vi.fn()}
+        onViewArtifact={vi.fn()}
+      />,
+    );
+    expect(screen.getByTestId('amr-artifact-upgrade-home-card')).toBeTruthy();
+    expect(screen.queryByTestId('amr-artifact-upgrade-home-plans')).toBeNull();
+    expect(screen.getByTestId('amr-artifact-upgrade-home-artifact')).toBeTruthy();
   });
 
   it('allows a Home offer for every newly eligible artifact session', () => {

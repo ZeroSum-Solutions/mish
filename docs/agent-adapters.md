@@ -685,7 +685,7 @@ resolved aliases. Deployment also checks its referenced local assets.
 A private-use-only, reference-only or unknown rights status
 returns HTTP 403 `PUBLICATION_RIGHTS_BLOCKED` before provider transport. Invalid
 provenance returns `PUBLICATION_RIGHTS_UNVERIFIED` with a fixed message. The
-guard follows the [Oct9 private-use decision](plans/2026-10-02-design-workbench/owner-gate-decisions.md#oct9-owner-decisions-r09-r12-r15-r16-r17-r18).
+guard follows the Oct9 private-use decision.
 An unused private insertion elsewhere does not block owned content. This is
 trusted local provenance: removing or copying material out of its marked
 directory is outside this guard's boundary. A missing marker is ordinary

@@ -102,7 +102,11 @@ export interface VisualStyleCard {
   description: string;
   variant: VisualStyleVariant;
   category: VisualStyleCategory;
-  preview: VisualStylePreviewAsset;
+  /**
+   * Absent when no style-catalog asset origin is configured: the picker then
+   * draws its built-in placeholder preview instead of a broken image.
+   */
+  preview?: VisualStylePreviewAsset;
   recommended?: boolean;
 }
 
@@ -115,9 +119,27 @@ interface VisualStyleCatalogEntry {
   recommended?: boolean;
 }
 
-const STYLE_CATALOG_ASSET_ORIGIN = 'https://repo-assets.mish.invalid';
+// The fork ships no hosted style-catalog preview images, so there is no
+// built-in asset origin. Until one is configured (`setStyleCatalogAssetOrigin`)
+// cards carry no `preview` and the picker renders its placeholder surface.
 const STYLE_CATALOG_ASSET_PATH = '/style-catalog/v1';
-const STYLE_CATALOG_ASSET_BASE_URL = `${STYLE_CATALOG_ASSET_ORIGIN}${STYLE_CATALOG_ASSET_PATH}`;
+let styleCatalogAssetOrigin: string | null = null;
+
+/** Configure (or clear, with a blank value) the origin that serves style previews. */
+export function setStyleCatalogAssetOrigin(origin: string | null | undefined): void {
+  const trimmed = origin?.trim().replace(/\/$/, '') ?? '';
+  let normalized: string | null = null;
+  if (trimmed) {
+    try {
+      const url = new URL(trimmed);
+      if (url.protocol === 'https:' || url.protocol === 'http:') normalized = trimmed;
+    } catch {
+      normalized = null;
+    }
+  }
+  styleCatalogAssetOrigin = normalized;
+}
+
 /**
  * The picker never draws a preview wider than a few hundred CSS pixels. Its
  * source catalogue is uniformly 1600x1200, so decoding six originals would
@@ -128,8 +150,8 @@ const STYLE_CATALOG_ASSET_BASE_URL = `${STYLE_CATALOG_ASSET_ORIGIN}${STYLE_CATAL
  */
 const STYLE_CATALOG_THUMBNAIL_TRANSFORM = 'width=640,quality=75,format=auto';
 
-function styleCatalogThumbnailUrl(filename: string): string {
-  return `${STYLE_CATALOG_ASSET_ORIGIN}/cdn-cgi/image/${STYLE_CATALOG_THUMBNAIL_TRANSFORM}${STYLE_CATALOG_ASSET_PATH}/${filename}`;
+function styleCatalogThumbnailUrl(origin: string, filename: string): string {
+  return `${origin}/cdn-cgi/image/${STYLE_CATALOG_THUMBNAIL_TRANSFORM}${STYLE_CATALOG_ASSET_PATH}/${filename}`;
 }
 
 const DECK_STYLE_CATALOG: VisualStyleCatalogEntry[] = [
@@ -834,6 +856,7 @@ const STYLE_CATALOGS: Readonly<Record<VisualStyleContext, VisualStyleCatalogEntr
 
 export function visualStyleCardsForContext(context: VisualStyleContext): VisualStyleCard[] {
   const catalog = STYLE_CATALOGS[context];
+  const origin = styleCatalogAssetOrigin;
   return catalog.map((style) => {
     const filename = `${context}-${style.slug}-v1.webp`;
     return {
@@ -842,11 +865,15 @@ export function visualStyleCardsForContext(context: VisualStyleContext): VisualS
       description: style.description,
       variant: style.variant,
       category: style.category,
-      preview: {
-        src: `${STYLE_CATALOG_ASSET_BASE_URL}/${filename}`,
-        thumbnailSrc: styleCatalogThumbnailUrl(filename),
-        alt: `${style.title} ${context} style preview.`,
-      },
+      ...(origin
+        ? {
+            preview: {
+              src: `${origin}${STYLE_CATALOG_ASSET_PATH}/${filename}`,
+              thumbnailSrc: styleCatalogThumbnailUrl(origin, filename),
+              alt: `${style.title} ${context} style preview.`,
+            },
+          }
+        : {}),
       recommended: style.recommended,
     };
   });

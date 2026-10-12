@@ -26,6 +26,8 @@ import {
   AMR_LOGIN_TIMEOUT_MS,
 } from '../../src/components/amrLoginPolling';
 import { I18nProvider } from '../../src/i18n';
+import { setRuntimeAmrConsoleOrigin } from '../../src/runtime/amr-guidance';
+import { TEST_AMR_CONSOLE_ORIGIN } from '../helpers/amr-console';
 import type { VelaLoginStatus } from '../../src/providers/daemon';
 import {
   TEAM_PROJECTS_CHANGED_EVENT,
@@ -68,6 +70,7 @@ const originalFetch = globalThis.fetch;
 
 afterEach(() => {
   cleanup();
+  setRuntimeAmrConsoleOrigin(null);
   vi.unstubAllGlobals();
   globalThis.fetch = originalFetch;
   vi.useRealTimers();
@@ -267,50 +270,50 @@ describe('AmrLoginPill', () => {
     expect(screen.queryByText('LOCAL')).toBeNull();
   });
 
-  it('uses the test-profile AMR management URL for signed-in users', () => {
-    renderAccountControl({
-      status: 'signed-in',
-      email: 'leaf@example.com',
-      profile: 'test',
-      showProfileBadge: true,
-      showConsoleAction: true,
-    });
-
-    expect(screen.getByText('leaf@example.com')).toBeTruthy();
-    expect(screen.getByText('TEST')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'https://mish.powerformer.net/cloud/dashboard?source=mish',
-    );
+  // AMR is an upstream paid service the fork does not operate: with no console
+  // origin configured the Manage action is unavailable and not rendered.
+  it('hides the AMR management action when no console origin is configured', () => {
+    for (const profile of ['test', 'local', 'prod']) {
+      const { unmount } = renderAccountControl({
+        status: 'signed-in',
+        email: 'leaf@example.com',
+        profile,
+        showProfileBadge: true,
+        showConsoleAction: true,
+      });
+      expect(screen.getByText('leaf@example.com')).toBeTruthy();
+      expect(screen.queryByRole('link', { name: 'Manage' })).toBeNull();
+      unmount();
+    }
   });
 
-  it('uses the local-profile AMR management URL for signed-in users', () => {
-    renderAccountControl({
-      status: 'signed-in',
-      email: 'leaf@example.com',
-      profile: 'local',
-      showProfileBadge: true,
-      showConsoleAction: true,
-    });
-
-    expect(screen.getByText('LOCAL')).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'http://localhost:5173/dashboard?source=mish',
-    );
-  });
-
-  it('uses the production AMR management URL by default', () => {
+  it('hides the management action when the caller passes an explicit null console URL', () => {
+    setRuntimeAmrConsoleOrigin(TEST_AMR_CONSOLE_ORIGIN);
     renderAccountControl({
       status: 'signed-in',
       email: 'leaf@example.com',
       profile: 'prod',
-      showProfileBadge: true,
       showConsoleAction: true,
+      consoleUrl: null,
     });
+    expect(screen.queryByRole('link', { name: 'Manage' })).toBeNull();
+  });
 
-    expect(screen.queryByText('PROD')).toBeNull();
-    expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
-      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?source=mish',
-    );
+  it('uses the configured console origin for management on every profile, prod included', () => {
+    setRuntimeAmrConsoleOrigin(TEST_AMR_CONSOLE_ORIGIN);
+    for (const profile of ['test', 'prod']) {
+      const { unmount } = renderAccountControl({
+        status: 'signed-in',
+        email: 'leaf@example.com',
+        profile,
+        showProfileBadge: true,
+        showConsoleAction: true,
+      });
+      expect(screen.getByRole('link', { name: 'Manage' }).getAttribute('href')).toBe(
+        `${TEST_AMR_CONSOLE_ORIGIN}/dashboard?source=mish`,
+      );
+      unmount();
+    }
   });
 
   it('bridges the attributed management URL even though its click stops propagation', async () => {

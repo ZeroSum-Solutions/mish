@@ -15,17 +15,15 @@ import { byokApiKeyIsEditableInSettings } from '../utils/byokProvider';
 // `source=mish` tags the landing page_view so vela analytics can
 // attribute the visit to Mishh Mashh (per-product revenue/traffic attribution).
 //
+// AMR is a paid upstream service this fork does not operate, so there is NO
+// built-in console host. Every account / recharge / upgrade link resolves to
+// `null` (and its UI entry is hidden) until a console origin is explicitly
+// configured — passed in from the daemon's status snapshot (`consoleOrigin`)
+// or recorded with `setRuntimeAmrConsoleOrigin`.
+//
 // The console's dashboard — not a wallet page — is the account surface every
-// entry here targets. A wallet route still answers on B's side, but it is no
-// longer part of the product's information architecture: balance, manual
-// top-up and the auto-recharge policy were all rehomed onto the dashboard
-// (vela #1055), so sending a user to /wallet would drop them on a surface the
-// product no longer navigates to.
-export const AMR_CONSOLE_URL =
-  'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?source=mish';
-export const DEFAULT_AMR_RECHARGE_URL = AMR_CONSOLE_URL;
-export const AMR_RECHARGE_URL = DEFAULT_AMR_RECHARGE_URL;
-
+// entry here targets: balance, manual top-up and the auto-recharge policy all
+// live on the dashboard (vela #1055).
 // Path + attribution the console is always reached through, so a runtime
 // origin only has to carry the host.
 const AMR_CONSOLE_PATH = '/dashboard?source=mish';
@@ -79,30 +77,6 @@ export const AMR_CONSOLE_UPGRADE_INTENT = 'plan';
  */
 export const AMR_CONSOLE_AUTO_RECHARGE_INTENT = 'auto-recharge';
 
-// The test entry moved off `vela.powerformer.net` onto
-// `mish.powerformer.net/cloud` when vela cut the test Cloud domain over
-// (vela #1922 prepare, #1929 finalize). That host serves the test Landing page
-// at `/` and routes `/cloud*` to the AMR web origin; the legacy hostname is no
-// longer a mapped test route and must not be relied on for a redirect.
-//
-// feature-test has no row on purpose — see the note at the bottom of this file:
-// an internal hostname must not be a literal in a publicly shipped bundle, so
-// it arrives through the daemon's runtime console origin instead.
-const AMR_CONSOLE_URL_BY_PROFILE: Record<string, string> = {
-  prod: DEFAULT_AMR_RECHARGE_URL,
-  test: 'https://mish.powerformer.net/cloud/dashboard?source=mish',
-  local: 'http://localhost:5173/dashboard?source=mish',
-};
-
-// Every AMR profile the packaged runtime can be built with (mirrors the daemon's
-// resolveAmrProfile allowlist). Anything else is treated as prod.
-const KNOWN_AMR_PROFILES: ReadonlySet<string> = new Set([
-  'prod',
-  'test',
-  'feature-test',
-  'local',
-]);
-
 // Console origin the daemon reported for THIS runtime (GET
 // /api/integrations/vela/status -> consoleOrigin, sourced from OD_VELA_WEB_URL).
 //
@@ -124,25 +98,40 @@ export function setRuntimeAmrConsoleOrigin(origin: string | null | undefined): v
   runtimeAmrConsoleOrigin = normalized.length > 0 ? normalized : null;
 }
 
-export function amrConsoleUrlForProfile(
-  profile: string | null | undefined,
-  consoleOrigin?: string | null,
-): string {
-  const normalized = profile?.trim() || 'prod';
-  // prod's console is the public product URL and stays pinned to it: a runtime
-  // origin must never be able to redirect a production user's account, plan, or
-  // upgrade links somewhere else. Unrecognized profiles are treated as prod for
-  // the same reason.
-  if (normalized === 'prod' || !KNOWN_AMR_PROFILES.has(normalized)) {
-    return DEFAULT_AMR_RECHARGE_URL;
+/**
+ * The configured AMR console origin, or `null` when none is configured. An
+ * explicit `consoleOrigin` (the daemon status snapshot) wins over the
+ * module-level runtime origin. Only absolute http(s) origins are accepted.
+ */
+export function configuredAmrConsoleOrigin(consoleOrigin?: string | null): string | null {
+  for (const candidate of [consoleOrigin, runtimeAmrConsoleOrigin]) {
+    const trimmed = candidate?.trim().replace(/\/$/, '') ?? '';
+    if (!trimmed) continue;
+    try {
+      const url = new URL(trimmed);
+      if (url.protocol === 'https:' || url.protocol === 'http:') return trimmed;
+    } catch {
+      // Not an absolute URL: treat as unconfigured.
+    }
   }
-  const statusOrigin = consoleOrigin?.trim().replace(/\/$/, '') ?? '';
-  if (statusOrigin) return `${statusOrigin}${AMR_CONSOLE_PATH}`;
-  if (runtimeAmrConsoleOrigin) return `${runtimeAmrConsoleOrigin}${AMR_CONSOLE_PATH}`;
-  return AMR_CONSOLE_URL_BY_PROFILE[normalized] ?? DEFAULT_AMR_RECHARGE_URL;
+  return null;
 }
 
-export function amrRechargeUrlForProfile(profile: string | null | undefined): string {
+/**
+ * Console dashboard for this runtime, or `null` when no console origin is
+ * configured (the account / recharge / upgrade entries are then unavailable).
+ * `profile` no longer picks a host — there is no built-in console — but stays
+ * in the signature because callers key their profile badge off the same value.
+ */
+export function amrConsoleUrlForProfile(
+  _profile: string | null | undefined,
+  consoleOrigin?: string | null,
+): string | null {
+  const origin = configuredAmrConsoleOrigin(consoleOrigin);
+  return origin ? `${origin}${AMR_CONSOLE_PATH}` : null;
+}
+
+export function amrRechargeUrlForProfile(profile: string | null | undefined): string | null {
   return amrConsoleUrlForProfile(profile);
 }
 
@@ -153,7 +142,9 @@ function amrWorkspaceUrl(
 ): string | null {
   const normalizedWorkspaceId = workspaceId?.trim();
   if (!normalizedWorkspaceId) return null;
-  const url = new URL(amrConsoleUrlForProfile(profile));
+  const base = amrConsoleUrlForProfile(profile);
+  if (!base) return null;
+  const url = new URL(base);
   url.searchParams.set('workspaceId', normalizedWorkspaceId);
   if (intent === 'plans') url.searchParams.set('billing', AMR_CONSOLE_UPGRADE_INTENT);
   return url.toString();
@@ -174,20 +165,10 @@ export function amrPlansUrlForWorkspace(
 }
 
 /**
- * Where every generic Upgrade / View plans entry lands: the console's plan
- * surface **for this runtime's own profile** (spec T54, product 2026-09-06).
- *
- * `profile` is load-bearing, and that is the whole point of the ruling. While
- * this returned a hardcoded public Pricing URL the parameter was prefixed `_`
- * and deliberately unused, so a test / local / feature-test build sent 升级 to
- * PRODUCTION Pricing — and a card selected there carries plan + interval back
- * to production Vela for direct checkout. Routing through
- * {@link amrConsoleUrlForProfile} reuses the one origin decision the runtime
- * already owns (daemon `/api/integrations/vela/status` → consoleOrigin →
- * `setRuntimeAmrConsoleOrigin`), so there is no second source of truth for
- * "which environment am I".
+ * Where every generic Upgrade / View plans entry lands: the configured
+ * console's plan surface (spec T54), or `null` when no console is configured.
  */
-export function amrPlansUrlForProfile(profile: string | null | undefined): string {
+export function amrPlansUrlForProfile(profile: string | null | undefined): string | null {
   return amrConsoleUrlWithBillingIntent(profile, AMR_CONSOLE_UPGRADE_INTENT);
 }
 
@@ -196,15 +177,16 @@ export function amrPlansUrlForProfile(profile: string | null | undefined): strin
  * Max-tier balance card whose owner has no higher plan to buy. See
  * {@link AMR_CONSOLE_AUTO_RECHARGE_INTENT} for the B-side caveat.
  */
-export function amrAutoRechargeUrlForProfile(profile: string | null | undefined): string {
+export function amrAutoRechargeUrlForProfile(profile: string | null | undefined): string | null {
   return amrConsoleUrlWithBillingIntent(profile, AMR_CONSOLE_AUTO_RECHARGE_INTENT);
 }
 
 function amrConsoleUrlWithBillingIntent(
   profile: string | null | undefined,
   intentValue: string,
-): string {
+): string | null {
   const base = amrConsoleUrlForProfile(profile);
+  if (!base) return null;
   const intent = `billing=${intentValue}`;
   return base.includes('?') ? `${base}&${intent}` : `${base}?${intent}`;
 }

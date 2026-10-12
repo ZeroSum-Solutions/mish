@@ -8,6 +8,10 @@ import {
   workspaceContextFixture,
   workspaceDirectoryFixture,
 } from '../helpers/workspace-context';
+import { TEST_AMR_CONSOLE_ORIGIN, useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 function directoryResponse(
   workspaceId: string,
@@ -101,7 +105,7 @@ describe('AmrBalanceDialog', () => {
       expect(open).toHaveBeenCalled();
       const target = new URL(String(open.mock.calls.at(-1)?.[0]));
       expect(`${target.origin}${target.pathname}`).toBe(
-        'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
+        `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
       );
       expect(target.searchParams.get('billing')).toBe('plan');
     });
@@ -153,7 +157,7 @@ describe('AmrBalanceDialog', () => {
       expect(open).toHaveBeenCalled();
       const target = new URL(String(open.mock.calls.at(-1)?.[0]));
       expect(`${target.origin}${target.pathname}`).toBe(
-        'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
+        `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
       );
       expect(target.searchParams.get('billing')).toBe('plan');
     });
@@ -205,7 +209,7 @@ describe('AmrBalanceDialog', () => {
       expect(open).toHaveBeenCalled();
       const target = new URL(String(open.mock.calls.at(-1)?.[0]));
       expect(`${target.origin}${target.pathname}`).toBe(
-        'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
+        `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
       );
       expect(target.searchParams.get('billing')).toBe('plan');
     });
@@ -271,7 +275,7 @@ describe('AmrBalanceDialog', () => {
     expect(open).toHaveBeenCalled();
     const target = new URL(String(open.mock.calls.at(-1)?.[0]));
     expect(`${target.origin}${target.pathname}`).toBe(
-      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
+      `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
     );
     expect(target.searchParams.get('billing')).toBe('plan');
   });
@@ -352,7 +356,7 @@ describe('AmrBalanceDialog', () => {
 
     const target = new URL(String(open.mock.calls.at(-1)?.[0]));
     expect(`${target.origin}${target.pathname}`).toBe(
-      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
+      `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
     );
     expect(target.searchParams.get('billing')).toBe('plan');
   });

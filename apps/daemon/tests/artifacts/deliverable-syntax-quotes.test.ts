@@ -123,6 +123,23 @@ describe('deterministic quote repair acceptance', () => {
     await expect(fs.readFile(path.join(root, 'index.html'), 'utf8')).resolves.toBe(reference);
   });
 
+  it('records the current sanitized fixture hashes and byte counts in provenance.json', async () => {
+    const provenance = JSON.parse(
+      await fs.readFile(path.join(fixtureRoot, 'provenance.json'), 'utf8'),
+    ) as Record<string, unknown>;
+    const sanitized = await fs.readFile(path.join(fixtureRoot, String(provenance.sanitizedFile)), 'utf8');
+    const sanitizedReference = await fs.readFile(
+      path.join(fixtureRoot, String(provenance.sanitizedReferenceFile)),
+      'utf8',
+    );
+    expect(provenance).toMatchObject({
+      sanitizedSha256: sha256(sanitized),
+      sanitizedReferenceSha256: sha256(sanitizedReference),
+      sanitizedBytes: Buffer.byteLength(sanitized),
+      sanitizedReferenceBytes: Buffer.byteLength(sanitizedReference),
+    });
+  });
+
   it.each(controlledMutations)('restores the known-correct oracle: $name', async ({ valid, broken, rule }) => {
     const expected = `<script>${valid}</script>`;
     const root = await fixture(`<script>${broken}</script>`);

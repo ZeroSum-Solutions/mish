@@ -14,6 +14,10 @@ import { CollabProvider } from '../../src/collab/collab-context';
 import * as registry from '../../src/providers/registry';
 import type { ChatMessage, ProjectFile } from '../../src/types';
 import { workspaceContextFixture } from '../helpers/workspace-context';
+import { useConfiguredStyleCatalog } from '../helpers/style-catalog';
+
+// No hosted style previews ship with the fork; these tests configure an origin.
+useConfiguredStyleCatalog();
 
 beforeAll(() => {
   const store = new Map<string, string>();

@@ -5,6 +5,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { GoPlanSunsetDialog } from '../../src/components/GoPlanSunsetDialog';
 import { I18nProvider, type Locale } from '../../src/i18n';
+import { setRuntimeAmrConsoleOrigin } from '../../src/runtime/amr-guidance';
+import { TEST_AMR_CONSOLE_ORIGIN, useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; most tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const track = vi.hoisted(() => vi.fn());
 
@@ -154,5 +159,13 @@ describe('GoPlanSunsetDialog', () => {
       '_blank',
       'noopener,noreferrer',
     );
+    expect(String(open.mock.calls[0]?.[0])).toContain(`${TEST_AMR_CONSOLE_ORIGIN}/dashboard`);
+  });
+
+  it('hides "View other plans" when no AMR console origin is configured', () => {
+    setRuntimeAmrConsoleOrigin(null);
+    renderDialog();
+    expect(screen.queryByRole('button', { name: 'View other plans' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'Got it' })).toBeTruthy();
   });
 });

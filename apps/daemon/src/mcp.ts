@@ -2665,7 +2665,7 @@ async function getRun(
     const enriched: JsonObject = { ...status };
     if (studioUrl) enriched.studioUrl = studioUrl;
     if (status.failureAction === 'recharge') {
-      enriched.rechargeUrl = DEFAULT_AMR_RECHARGE_URL;
+      if (DEFAULT_AMR_RECHARGE_URL) enriched.rechargeUrl = DEFAULT_AMR_RECHARGE_URL;
       enriched.hint =
         'AMR paused this logical run because the account balance is insufficient. Preserve the brief and project, show rechargeUrl to the user, and do not switch modes. After the user confirms the top-up, call start_run once with the exact original payload, the same requestId, and resume:true; AMR will resume the existing run and billing operation. Do not expose internal runtime or tool identifiers.';
     }

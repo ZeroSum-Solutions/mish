@@ -173,16 +173,19 @@ export async function materializeWorkspaceScopedTeamResource(
     input.identity.resourceId,
     input.storageName,
   );
-  const previous = materializationQueues.get(targetDir) ?? Promise.resolve();
+  // Key on the resolved path so two spellings of one directory (relative vs
+  // absolute, `a/../b`, trailing slash) share one queue.
+  const queueKey = path.resolve(targetDir);
+  const previous = materializationQueues.get(queueKey) ?? Promise.resolve();
   const run = previous
     .catch(() => undefined)
     .then(() => materializeWorkspaceScopedTeamResourceNow(input, targetDir));
-  materializationQueues.set(targetDir, run);
+  materializationQueues.set(queueKey, run);
   try {
     return await run;
   } finally {
-    if (materializationQueues.get(targetDir) === run) {
-      materializationQueues.delete(targetDir);
+    if (materializationQueues.get(queueKey) === run) {
+      materializationQueues.delete(queueKey);
     }
   }
 }

@@ -6,6 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { QuestionForm } from '../../src/artifacts/question-form';
 import { QuestionFormView } from '../../src/components/QuestionForm';
 import { VISUAL_STYLE_BATCH_SIZE } from '../../src/runtime/visual-style-deck';
+import { useConfiguredStyleCatalog } from '../helpers/style-catalog';
+
+// No hosted style previews ship with the fork; these tests configure an origin.
+useConfiguredStyleCatalog();
 
 afterEach(cleanup);
 

@@ -4,11 +4,12 @@
 // and later additions enter the same gate. Owner scope (2026-10-08): MIT/permissive
 // public-core items ship preloaded and are rows here; licensed pack items count once installed.
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { RESOURCE_SOURCE_IDS, parseComponentLedger, summarizeComponentLedger, type ComponentLedger } from '@mish/contracts';
-import { checkComponentLedger, collectComponentInventory, refreshComponentLedger, validateComponentLedgerCitations } from '../../src/workbench/component-ledger.js';
+import { checkComponentLedger, collectComponentInventory, isShippedFamilySection, refreshComponentLedger, validateComponentLedgerCitations } from '../../src/workbench/component-ledger.js';
 
 const repo = path.resolve(import.meta.dirname, '../../../..');
 const readJson = <T>(relative: string): T => JSON.parse(readFileSync(path.join(repo, relative), 'utf8')) as T;
@@ -48,9 +49,10 @@ describe('AC-R13.1 frozen component ledger', () => {
 
   it('omits removed private study families from the shipped inventory', () => {
     const inventory = collectComponentInventory();
-    const removed = sections.filter(entry => entry.sourceKind === 'family-section' && REMOVED_FAMILIES.has(entry.id.split(':')[1]!));
-    expect(removed.length).toBeGreaterThan(0);
-    for (const entry of removed) expect(inventory.items.map(item => item.id)).not.toContain(`sections:${entry.id}`);
+    const ids = inventory.items.map(item => item.id);
+    for (const family of REMOVED_FAMILIES) {
+      expect(ids.some(id => id.startsWith(`sections:family-section:${family}:`)), family).toBe(false);
+    }
     expect(inventory.items).toContainEqual(expect.objectContaining({ id: 'sections:hyperui:application/charts/1', built: true }));
   });
 
@@ -201,5 +203,29 @@ describe('R13.1 rights citation gate', () => {
   it('root NOTICE acknowledges shipped React95 code, font terms and GSAP custom terms', () => {
     const notice = readFileSync(path.join(repo, 'NOTICE'), 'utf8');
     for (const claim of ['React95', 'Artur Bień', 'CC-BY-SA-3.0', 'GSAP', 'GreenSock', 'standard-license']) expect(notice).toContain(claim);
+  });
+});
+
+describe('isShippedFamilySection', () => {
+  it('accepts only plain family slugs with a shipped example and tolerates missing content', () => {
+    const root = mkdtempSync(path.join(tmpdir(), 'component-ledger-'));
+    try {
+      mkdirSync(path.join(root, 'plugins/_official/examples/agency-acme-1'), { recursive: true });
+      writeFileSync(path.join(root, 'plugins/_official/examples/agency-acme-1/README.md'), '# Acme\n');
+      // A traversal-shaped family that WOULD resolve to an existing README if probed.
+      mkdirSync(path.join(root, 'plugins/_official/examples/agency-x/README.md'), { recursive: true });
+      const entry = (family: unknown) => ({ sourceKind: 'family-section', content: { kind: 'family-section', family } });
+      expect(isShippedFamilySection(root, entry('acme-1'))).toBe(true);
+      expect(isShippedFamilySection(root, entry('missing'))).toBe(false);
+      expect(isShippedFamilySection(root, entry('x/README.md/..'))).toBe(false);
+      expect(isShippedFamilySection(root, entry('../agency-acme-1'))).toBe(false);
+      expect(isShippedFamilySection(root, entry('Acme'))).toBe(false);
+      expect(isShippedFamilySection(root, entry(42))).toBe(false);
+      expect(isShippedFamilySection(root, { sourceKind: 'family-section' })).toBe(false);
+      expect(isShippedFamilySection(root, { sourceKind: 'family-section', content: null })).toBe(false);
+      expect(isShippedFamilySection(root, { sourceKind: 'hyperui', content: { kind: 'family-section', family: 'acme-1' } })).toBe(false);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

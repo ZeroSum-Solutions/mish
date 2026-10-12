@@ -376,6 +376,11 @@ function MessageItem({
   </article>;
 }
 
+/** `path` is `prefix` itself or a sub-path of it — `/mish-other` is not under `/mish`. */
+function isPathUnder(path: string, prefix: string): boolean {
+  return path === prefix || path.startsWith(`${prefix}/`);
+}
+
 function safeExternalUrl(value: string | null): string | null {
   if (!value) return null;
   try {
@@ -384,8 +389,8 @@ function safeExternalUrl(value: string | null): string | null {
     const host = parsed.hostname.toLowerCase();
     const path = parsed.pathname.toLowerCase();
     if (host === 'mish.invalid' || host.endsWith('.mish.invalid')) return null;
-    if (host === 'github.com' && path.startsWith('/zerosum-solutions/mish')) return null;
-    if ((host === 'x.com' || host === 'twitter.com') && path.startsWith('/mishhq')) return null;
+    if (host === 'github.com' && isPathUnder(path, '/zerosum-solutions/mish')) return null;
+    if ((host === 'x.com' || host === 'twitter.com') && isPathUnder(path, '/mishhq')) return null;
     return parsed.toString();
   } catch {
     return null;

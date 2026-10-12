@@ -88,7 +88,8 @@ export interface AmrAccountControlProps {
   signInLabel?: string;
   signInIcon?: IconName;
   showConsoleAction?: boolean;
-  consoleUrl?: string;
+  /** `null` = no AMR console configured: the console action is not rendered. */
+  consoleUrl?: string | null;
   iconOnlySignOut?: boolean;
   showCancelSignInAction?: boolean;
   // Activation URL surfaced while signing in, so the user can re-open the
@@ -157,7 +158,8 @@ export function AmrAccountControl({
   const hasError = status === 'error';
   const badgeLabel = showProfileBadge ? amrProfileBadgeLabel(profile) : null;
   const visibleBadgeLabel = isSignedIn ? badgeLabel : null;
-  const resolvedConsoleUrl = consoleUrl ?? amrConsoleUrlForProfile(profile);
+  const resolvedConsoleUrl =
+    consoleUrl === undefined ? amrConsoleUrlForProfile(profile) : consoleUrl;
   const loginErrorText = errorMessage || t('settings.amrLoginErrorCompact');
   const statusText = isSignedIn
     ? hideSignedInStatus
@@ -194,7 +196,7 @@ export function AmrAccountControl({
           ) : null}
         </span>
       ) : null}
-      {isSignedIn && showConsoleAction ? (
+      {isSignedIn && showConsoleAction && resolvedConsoleUrl ? (
         <a
           className="amr-account-control__action"
           href={resolvedConsoleUrl}
@@ -759,6 +761,7 @@ export function AmrLoginPill({
     (event: MouseEvent<HTMLAnchorElement>) => {
       event.stopPropagation();
       event.preventDefault();
+      if (!statusConsoleUrl) return;
       const attribution = recordAmrEntry(analytics.track, 'settings_amr_console', new Date(), {
         metricsConsent,
       });

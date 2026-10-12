@@ -14,6 +14,10 @@ import { AvatarMenu } from '../../src/components/AvatarMenu';
 import { providerModelsCacheKey } from '../../src/components/providerModelsCache';
 import type { ProjectWorkspaceScopeState } from '../../src/collab/useProjectWorkspaceScope';
 import type { AgentInfo, AppConfig, ExecMode } from '../../src/types';
+import { TEST_AMR_CONSOLE_ORIGIN, useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const { openExternalUrlMock } = vi.hoisted(() => ({
   openExternalUrlMock: vi.fn<(url: string) => Promise<boolean>>(),
@@ -320,6 +324,7 @@ describe('AvatarMenu', () => {
           JSON.stringify({
             loggedIn: true,
             loginInFlight: false,
+            consoleOrigin: TEST_AMR_CONSOLE_ORIGIN,
             profile: 'test',
             user: { id: 'u1', email: 'a@b.c' },
             account: { plan: 'plus', balanceUsd: '247.5087' },
@@ -425,6 +430,7 @@ describe('AvatarMenu', () => {
         return new Response(JSON.stringify({
           loggedIn: true,
           loginInFlight: false,
+          consoleOrigin: TEST_AMR_CONSOLE_ORIGIN,
           profile: 'feature-test',
           user: { id: 'u1', email: 'a@b.c' },
           account: { plan: 'plus', balanceUsd: '247.5087' },
@@ -511,6 +517,7 @@ describe('AvatarMenu', () => {
         return new Response(JSON.stringify({
           loggedIn: true,
           loginInFlight: false,
+          consoleOrigin: TEST_AMR_CONSOLE_ORIGIN,
           profile: 'feature-test',
           user: { id: 'u1', email: 'a@b.c' },
           account: { plan: 'plus', balanceUsd: '247.5087' },
@@ -653,6 +660,7 @@ describe('AvatarMenu', () => {
         return new Response(JSON.stringify({
           loggedIn: true,
           loginInFlight: false,
+          consoleOrigin: TEST_AMR_CONSOLE_ORIGIN,
           profile: 'feature-test',
           user: { id: 'u1', email: 'a@b.c' },
           account: { plan: 'max', balanceUsd: '9.12' },
@@ -768,7 +776,7 @@ describe('AvatarMenu', () => {
     // so without it the plan dialog would open against whichever workspace
     // vela's account-level "active workspace" happens to be.
     expect(target.origin + target.pathname).toBe(
-      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
+      `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
     );
     expect(target.searchParams.get('workspaceId')).toBe('workspace-a');
     expect(target.searchParams.get('billing')).toBe('plan');
@@ -897,6 +905,7 @@ describe('AvatarMenu', () => {
         return new Response(JSON.stringify({
           loggedIn: true,
           loginInFlight: false,
+          consoleOrigin: TEST_AMR_CONSOLE_ORIGIN,
           profile: 'feature-test',
           user: { id: 'u1', email: 'a@b.c' },
           account: { plan: 'max', balanceUsd: '9.12' },
@@ -1040,7 +1049,7 @@ describe('AvatarMenu', () => {
 
     expect(onAgentModelChange).not.toHaveBeenCalled();
     const target = new URL(openExternalUrlMock.mock.calls[0]![0]);
-    expect(target.origin + target.pathname).toBe('https://github.com/ZeroSum-Solutions/mish/amr/dashboard');
+    expect(target.origin + target.pathname).toBe(`${TEST_AMR_CONSOLE_ORIGIN}/dashboard`);
     expect(target.searchParams.get('workspaceId')).toBe('workspace-a');
     expect(target.searchParams.get('billing')).toBe('plan');
 

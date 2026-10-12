@@ -6,6 +6,10 @@ import { QuestionFormView, parseSubmittedAnswers } from '../../src/components/Qu
 import type { QuestionForm } from '../../src/artifacts/question-form';
 import { visualStyleCardsForContext } from '../../src/runtime/visual-style-catalog';
 import { VISUAL_STYLE_BATCH_SIZE } from '../../src/runtime/visual-style-deck';
+import { useConfiguredStyleCatalog } from '../helpers/style-catalog';
+
+// No hosted style previews ship with the fork; these tests configure an origin.
+useConfiguredStyleCatalog();
 
 const form: QuestionForm = {
   id: 'discovery',
@@ -1106,7 +1110,7 @@ describe('QuestionFormView', () => {
     ).toBe(
       visualStyleCardsForContext('deck').find(
         (style) => style.value === 'deck-editorial-narrative',
-      )?.preview.thumbnailSrc,
+      )?.preview?.thumbnailSrc,
     );
     expect(
       (screen.getByAltText(
@@ -1115,7 +1119,7 @@ describe('QuestionFormView', () => {
     ).toBe(
       visualStyleCardsForContext('deck').find(
         (style) => style.value === 'deck-product-keynote',
-      )?.preview.thumbnailSrc,
+      )?.preview?.thumbnailSrc,
     );
     expect(document.querySelector('[data-artifact-type="deck"]')).toBeTruthy();
 
@@ -1661,20 +1665,20 @@ describe('QuestionFormView', () => {
     expect(documentCards).toHaveLength(11);
     expect(imageCards).toHaveLength(22);
     expect(videoCards).toHaveLength(12);
-    expect(deckCards.find((card) => card.value === 'deck-academic-research')?.preview.src).toBe(
+    expect(deckCards.find((card) => card.value === 'deck-academic-research')?.preview?.src).toBe(
       'https://repo-assets.mish.invalid/style-catalog/v1/deck-academic-research-v1.webp',
     );
     expect(
-      prototypeCards.find((card) => card.value === 'prototype-y2k-chrome')?.preview.src,
+      prototypeCards.find((card) => card.value === 'prototype-y2k-chrome')?.preview?.src,
     ).toBe('https://repo-assets.mish.invalid/style-catalog/v1/prototype-y2k-chrome-v1.webp');
     expect(
-      documentCards.find((card) => card.value === 'document-academic-paper')?.preview.src,
+      documentCards.find((card) => card.value === 'document-academic-paper')?.preview?.src,
     ).toBe('https://repo-assets.mish.invalid/style-catalog/v1/document-academic-paper-v1.webp');
     expect(
-      imageCards.find((card) => card.value === 'image-chrome-3d')?.preview.src,
+      imageCards.find((card) => card.value === 'image-chrome-3d')?.preview?.src,
     ).toBe('https://repo-assets.mish.invalid/style-catalog/v1/image-chrome-3d-v1.webp');
     expect(
-      videoCards.find((card) => card.value === 'video-kinetic-type')?.preview.src,
+      videoCards.find((card) => card.value === 'video-kinetic-type')?.preview?.src,
     ).toBe('https://repo-assets.mish.invalid/style-catalog/v1/video-kinetic-type-v1.webp');
   });
 });
