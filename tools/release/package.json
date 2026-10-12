@@ -16,7 +16,7 @@
     "@mish/launcher-proto": "workspace:*",
     "@mish/release": "workspace:*",
     "cac": "6.7.14",
-    "sharp": "0.35.3",
+    "sharp": "0.35.5",
     "yaml": "2.9.0"
   },
   "devDependencies": {
