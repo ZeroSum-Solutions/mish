@@ -7704,11 +7704,12 @@ button.entry-nav-rail__menu-credits-row:active:not(:disabled) {
   margin-left: -20px;
   border-radius: 50%;
   border: 3px solid #fff;
-  background: #fff;
   overflow: hidden;
   display: grid;
   place-items: center;
   box-shadow: 0 10px 24px rgba(76, 29, 149, 0.16);
+  background: color-mix(in srgb, var(--accent) 8%, #fff);
+  color: color-mix(in srgb, var(--accent) 55%, #fff);
 }
 
 .entry-invite__art-avatar:first-child { margin-left: 0; }

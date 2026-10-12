@@ -63,7 +63,7 @@ down is an explicit act rather than something a typo can do for you.
   "title": "Design system sync",
   "body": "Import, edit and sync design systems with cleaner release highlights on Home.",
   "imageUrl": "https://whatsnew.mish.invalid/1.0.0.png",
-  "linkUrl": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/releases/tag/v1.0.0",
+  "linkUrl": "https://github.com/ZeroSum-Solutions/mish/releases/tag/v1.0.0",
   "ctaLabel": "View release notes",
   "locales": {
     "zh-CN": {
@@ -112,10 +112,10 @@ To publish release copy, run **whats-new-publish** manually
 (`workflow_dispatch`) against the corresponding `release/vX.Y.Z` branch:
 
 ```bash
-gh workflow run whats-new-publish.yml --repo ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run whats-new-publish.yml --repo ZeroSum-Solutions/mish \
   --ref release/v0.22.0 -f dry_run=true
 # After reviewing the proposed document and id:
-gh workflow run whats-new-publish.yml --repo ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run whats-new-publish.yml --repo ZeroSum-Solutions/mish \
   --ref release/v0.22.0 -f dry_run=false
 ```
 

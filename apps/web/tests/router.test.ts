@@ -154,3 +154,10 @@ describe('parseRoute / buildPath (issue #1505)', () => {
     expect(roundTrip({ kind: 'collab-demo', projectId: 'p-9' })).toEqual({ kind: 'collab-demo', projectId: 'p-9' });
   });
 });
+
+describe('parseRoute malformed percent-encoding', () => {
+  it('does not throw on malformed segments', () => {
+    expect(() => parseRoute('/projects/%E0%A4%A')).not.toThrow();
+    expect(parseRoute('/projects/%E0%A4%A')).toMatchObject({ kind: 'project', projectId: '%E0%A4%A' });
+  });
+});

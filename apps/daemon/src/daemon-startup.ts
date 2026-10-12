@@ -52,6 +52,9 @@ export function parseDaemonCliStartupArgs(
   env: NodeJS.ProcessEnv = process.env,
 ): DaemonCliStartupParseResult {
   let port = Number(env.OD_PORT) || 7456;
+  if (port !== 7456 && (!Number.isInteger(port) || port < 1 || port > 65535)) {
+    return { ok: false, kind: 'error', message: `invalid port: ${env.OD_PORT}` };
+  }
   let host = normalizeDaemonBindHost(env.OD_BIND_HOST);
   let open = true;
 

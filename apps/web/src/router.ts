@@ -75,6 +75,14 @@ export type Route =
   // browser tab can join the same project and appear in the presence overlay.
   | { kind: 'collab-demo'; projectId: string | null };
 
+function safeDecode(segment: string): string {
+  try {
+    return decodeURIComponent(segment);
+  } catch {
+    return segment;
+  }
+}
+
 export function parseRoute(pathname: string): Route {
   const parts = pathname.replace(/\/+$/, '').split('/').filter(Boolean);
   if (parts.length === 0) return { kind: 'home', view: 'home' };
@@ -83,16 +91,16 @@ export function parseRoute(pathname: string): Route {
   }
   if (parts[0] === 'projects') {
     if (parts[1]) {
-      const projectId = decodeURIComponent(parts[1]);
+      const projectId = safeDecode(parts[1]);
       // /projects/:id/conversations/:cid[/files/...]
       if (parts[2] === 'conversations' && parts[3]) {
-        const conversationId = decodeURIComponent(parts[3]);
+        const conversationId = safeDecode(parts[3]);
         if (parts[4] === 'files' && parts[5]) {
           return {
             kind: 'project',
             projectId,
             conversationId,
-            fileName: decodeURIComponent(parts.slice(5).join('/')),
+            fileName: safeDecode(parts.slice(5).join('/')),
           };
         }
         return { kind: 'project', projectId, conversationId, fileName: null };
@@ -103,7 +111,7 @@ export function parseRoute(pathname: string): Route {
           kind: 'project',
           projectId,
           conversationId: null,
-          fileName: decodeURIComponent(parts.slice(3).join('/')),
+          fileName: safeDecode(parts.slice(3).join('/')),
         };
       }
       return { kind: 'project', projectId, conversationId: null, fileName: null };
@@ -115,7 +123,7 @@ export function parseRoute(pathname: string): Route {
       return { kind: 'design-system-create' };
     }
     if (parts[1]) {
-      return { kind: 'design-system-detail', designSystemId: decodeURIComponent(parts[1]) };
+      return { kind: 'design-system-detail', designSystemId: safeDecode(parts[1]) };
     }
     return { kind: 'home', view: 'design-systems' };
   }
@@ -148,7 +156,7 @@ export function parseRoute(pathname: string): Route {
     return { kind: 'home', view: 'settings', ...(settingsSection ? { settingsSection } : {}) };
   }
   if (parts[0] === 'collab-demo') {
-    return { kind: 'collab-demo', projectId: parts[1] ? decodeURIComponent(parts[1]) : null };
+    return { kind: 'collab-demo', projectId: parts[1] ? safeDecode(parts[1]) : null };
   }
   if (parts[0] === 'drafts' && !parts[1]) {
     return { kind: 'home', view: 'drafts' };
@@ -172,7 +180,7 @@ export function parseRoute(pathname: string): Route {
   // in-app we keep /marketplace canonical.
   if (parts[0] === 'marketplace' || parts[0] === 'plugins') {
     if (parts[1]) {
-      return { kind: 'marketplace-detail', pluginId: decodeURIComponent(parts[1]) };
+      return { kind: 'marketplace-detail', pluginId: safeDecode(parts[1]) };
     }
     return { kind: 'marketplace' };
   }

@@ -454,6 +454,10 @@ async function renderOneCover(
     // the `od export` route follows.
     deps.finalIO?.assertCurrent();
     await fs.promises.rm(result.path, { force: true }).catch(() => {});
+    const exportDir = path.dirname(result.path);
+    if (path.basename(exportDir).startsWith('od-export-')) {
+      await fs.promises.rm(exportDir, { recursive: true, force: true }).catch(() => {});
+    }
   }
 }
 

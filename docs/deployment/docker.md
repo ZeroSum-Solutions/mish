@@ -10,8 +10,8 @@ This is the easiest self-hosting path for beginners.
 ## Step 1: Open the Deploy Folder
 
 ```bash
-git clone https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git
-cd Mishh-Mashh-2/deploy
+git clone https://github.com/ZeroSum-Solutions/mish.git
+cd mish/deploy
 ```
 
 What this does:
@@ -46,11 +46,11 @@ MISH_ALLOWED_ORIGINS=https://yourdomain.com
 ## Step 3: Start Mishh Mashh
 
 ```bash
-docker compose up -d
+docker compose up -d --build
 ```
 
 What to expect:
-- First run can take 1-2 minutes while Docker pulls the image
+- First run can take 1-2 minutes while Docker builds the image
 - You should see container creation and startup messages
 
 ## Step 4: Confirm Container Health
@@ -96,6 +96,6 @@ networking override is required.
 - `failed to connect to the docker API`: Docker Desktop is not running yet
 - `address already in use`: Port `7456` is occupied by another process
 - `curl: (7) Failed to connect`: container is still starting; wait 10-20 seconds and retry
-- `pull access denied` or `authentication required` for `ghcr.io/zerosum-solutions/od`: the package is private. Run `docker login ghcr.io` with a GitHub token that has `read:packages`. If the image has never been published (no `v*` release tag yet), build it locally instead.
+- `pull access denied` or `authentication required` for `ghcr.io/zerosum-solutions/mish`: no public image is published. Build it locally with `docker compose build` in `deploy/`.
 - reverse proxy + `OD_API_TOKEN`: either inject `Authorization: Bearer <OD_API_TOKEN>` at the proxy, or set `MISH_DISABLE_API_AUTH=1` only when that proxy already authenticates every request and the daemon is not directly exposed.
 - browser sign-in repeats: use username `mish` and the exact `OD_API_TOKEN` value from `deploy/.env`; recreate the container after changing the token.

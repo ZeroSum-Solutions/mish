@@ -10,6 +10,7 @@ import twenty1stJson from '@mish/21st-catalog/generated/21st-items.json' with { 
 import originalsJson from '@mish/21st-catalog/generated/21st-originals.json' with { type: 'json' };
 import twenty1stThumbnailsJson from '@mish/21st-catalog/generated/21st-thumbnails.json' with { type: 'json' };
 import { findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
+import { mishPackGeneration, packTwentyFirstThumbnails } from '../mish-packs/overlay.js';
 import { PREVIEW_CONTENT_SIZE_REPORTER } from '../preview-content-size.js';
 import type { RouteDeps } from '../server-context.js';
 import { twenty1stLiveThumbnailBytes, twenty1stLiveThumbnailIndex } from '../services/twenty1st-thumbnails.js';
@@ -59,7 +60,18 @@ interface Twenty1stThumbnailEntry { file: string }
 interface Twenty1stThumbnailManifest { items: Record<string, Twenty1stThumbnailEntry> }
 
 const inventory = twenty1stJson as unknown as Twenty1stInventory;
-const thumbnails = twenty1stThumbnailsJson as unknown as Twenty1stThumbnailManifest;
+const bundledThumbnails = twenty1stThumbnailsJson as unknown as Twenty1stThumbnailManifest;
+
+/** The bundled manifest plus an installed pack's thumbnails (a pack fills ids the bundle lacks). */
+function thumbnailIndex(): { items: Record<string, Twenty1stThumbnailEntry & { packDir?: string }> } {
+  const pack = packTwentyFirstThumbnails();
+  if (!pack) return bundledThumbnails;
+  const items: Record<string, Twenty1stThumbnailEntry & { packDir?: string }> = { ...bundledThumbnails.items };
+  for (const [id, entry] of Object.entries(pack.manifest.items)) {
+    if (!items[id] && entry && typeof entry.file === 'string') items[id] = { file: entry.file, packDir: pack.dir };
+  }
+  return { items };
+}
 /** A generated file name only ever `<slug>.webp` (scripts/twenty-first-thumbnails.ts), never request text. */
 const TWENTY1ST_PREVIEW_FILE_PATTERN = /^[a-z0-9][a-z0-9-]*\.webp$/;
 
@@ -114,7 +126,7 @@ function toItem(row: Twenty1stInventoryRow): Twenty1stItem {
     licenseNotice: row.licenseNotice,
     copyable: row.copyable,
     ...(findOriginal(row.id) ? { ownedAlternative: descriptor(findOriginal(row.id)!) } : {}),
-    preview: thumbnails.items[row.id] ? { kind: 'image', source: 'twenty-first-dev-cdn' } : { kind: 'none' },
+    preview: thumbnailIndex().items[row.id] ? { kind: 'image', source: 'twenty-first-dev-cdn' } : { kind: 'none' },
   };
 }
 
@@ -127,12 +139,15 @@ function descriptor(item: Twenty1stSourceResponse) {
   return { title: item.title, description: (item as Twenty1stSourceResponse & {description: string}).description, provenance: 'independently-authored' as const, sourceSha256: item.sourceSha256, sourceUrl: `${path}/source`, previewUrl: `${path}/preview` };
 }
 
-let cached: Twenty1stListResponse['catalog'] | null = null;
+let cached: { generation: number; catalog: Twenty1stListResponse['catalog'] } | null = null;
 
-/** The projected 21st list, built on first use and reused (the inventory ships with the package). */
+/** The projected 21st list, built on first use and reused until the set of installed packs changes. */
 export function twenty1stCatalog(): Twenty1stListResponse['catalog'] {
-  cached ??= { profile: inventory.source.profile, items: inventory.rows.map(row => presentItem(toItem(row))) };
-  return cached;
+  const generation = mishPackGeneration();
+  if (cached?.generation !== generation) {
+    cached = { generation, catalog: { profile: inventory.source.profile, items: inventory.rows.map(row => presentItem(toItem(row))) } };
+  }
+  return cached.catalog;
 }
 
 export function findTwenty1stItem(id: string): Twenty1stItem | undefined {
@@ -153,9 +168,9 @@ function twenty1stGeneratedDir(): string {
  * manifest entry; the file name is validated as one `.webp` segment and the joined path must stay
  * inside the fixed `21st-thumbnails/` directory, so no request text ever reaches the filesystem. */
 function twenty1stPreviewPath(rowId: string, generatedDir: string): string | null {
-  const entry = thumbnails.items[rowId];
+  const entry = thumbnailIndex().items[rowId];
   if (!entry || !TWENTY1ST_PREVIEW_FILE_PATTERN.test(entry.file)) return null;
-  const base = path.resolve(generatedDir, '21st-thumbnails');
+  const base = path.resolve(entry.packDir ?? generatedDir, '21st-thumbnails');
   const file = path.resolve(base, entry.file);
   if (path.dirname(file) !== base) return null;
   return existsSync(file) ? file : null;
@@ -185,16 +200,24 @@ export function registerTwenty1stRoutes(app: Express, ctx: RegisterTwenty1stRout
   }
   // `generatedDir` lets a test point the live-thumbnail and reference-image reads at a synthetic copy.
   const generatedDir = options.generatedDir ?? twenty1stGeneratedDir();
-  const projectedItems = twenty1stCatalog().items.map(item => presentItem(privatePreviews.project(item)));
-  const liveThumbnails = twenty1stLiveThumbnailIndex(generatedDir, projectedItems);
-  const catalog = { ...twenty1stCatalog(), items: projectedItems.map(item => {
-    const thumbnail = liveThumbnails.get(item.id);
-    if (!thumbnail) return item;
-    const field = item.privateImplementation ? 'privateImplementation' : 'ownedAlternative';
-    return { ...item, [field]: { ...item[field]!, thumbnail: { revision: thumbnail.revision } } };
-  }) };
+  let builtState: { generation: number; catalog: Twenty1stListResponse['catalog']; liveThumbnails: ReturnType<typeof twenty1stLiveThumbnailIndex> } | null = null;
+  const state = () => {
+    const generation = mishPackGeneration();
+    if (builtState?.generation === generation) return builtState;
+    const projectedItems = twenty1stCatalog().items.map(item => presentItem(privatePreviews.project(item)));
+    const liveThumbnails = twenty1stLiveThumbnailIndex(generatedDir, projectedItems);
+    const catalog = { ...twenty1stCatalog(), items: projectedItems.map(item => {
+      const thumbnail = liveThumbnails.get(item.id);
+      if (!thumbnail) return item;
+      const field = item.privateImplementation ? 'privateImplementation' : 'ownedAlternative';
+      return { ...item, [field]: { ...item[field]!, thumbnail: { revision: thumbnail.revision } } };
+    }) };
+    builtState = { generation, catalog, liveThumbnails };
+    return builtState;
+  };
 
   app.get('/api/21st/:id/implementation-thumbnail', (req, res) => {
+    const { catalog, liveThumbnails } = state();
     const item = catalog.items.find(item => item.id === req.params.id || item.slug === req.params.id);
     const thumbnail = item ? liveThumbnails.get(item.id) : undefined;
     if (!thumbnail || (req.query.revision !== undefined && req.query.revision !== thumbnail.revision)) return sendApiError(res, 404, 'NOT_FOUND', 'no matching local implementation thumbnail');
@@ -209,6 +232,7 @@ export function registerTwenty1stRoutes(app: Express, ctx: RegisterTwenty1stRout
   app.get('/api/21st', (req, res) => {
     try {
       const param = (key: string) => typeof req.query[key] === 'string' ? req.query[key] as string : undefined;
+      const { catalog } = state();
       res.json({ catalog: { ...catalog, items: filterTwenty1stItems(catalog.items, {
         query: param('query'), tag: param('tag'), rights: param('rights'),
       }) } } satisfies Twenty1stListResponse);
@@ -267,7 +291,7 @@ export function registerTwenty1stRoutes(app: Express, ctx: RegisterTwenty1stRout
 
   app.get('/api/21st/:id', (req, res) => {
     try {
-      const item = catalog.items.find(item => item.id === req.params.id || item.slug === req.params.id);
+      const item = state().catalog.items.find(item => item.id === req.params.id || item.slug === req.params.id);
       if (!item) return sendApiError(res, 404, 'NOT_FOUND', 'no 21st.dev item with that id');
       res.json({ item } satisfies Twenty1stItemResponse);
     } catch (err) {

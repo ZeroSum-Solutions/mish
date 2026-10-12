@@ -109,6 +109,32 @@ describe('resolveXAIBearer', () => {
     expect(onDisk.token.expiresAt).toBeGreaterThanOrEqual(expectedMin);
   });
 
+  it('shares one refresh between parallel callers', async () => {
+    await setXAIToken(dataDir, {
+      accessToken: 'old-bearer',
+      tokenType: 'Bearer',
+      savedAt: Date.now(),
+      expiresAt: Date.now() + 30_000,
+      refreshToken: 'rt-1',
+    });
+    let calls = 0;
+    const fetchImpl = async (): Promise<Response> => {
+      calls += 1;
+      await new Promise((r) => setTimeout(r, 20));
+      return new Response(
+        JSON.stringify({ access_token: 'new-bearer', refresh_token: 'rt-2', expires_in: 1800 }),
+        { status: 200, headers: { 'content-type': 'application/json' } },
+      );
+    };
+    const results = await Promise.all([
+      resolveXAIBearer(dataDir, fetchImpl),
+      resolveXAIBearer(dataDir, fetchImpl),
+      resolveXAIBearer(dataDir, fetchImpl),
+    ]);
+    expect(calls).toBe(1);
+    for (const r of results) expect(r?.accessToken).toBe('new-bearer');
+  });
+
   it('returns null when the stored token is expired and has no refresh_token', async () => {
     const stored: StoredXAIToken = {
       accessToken: 'expired-bearer',

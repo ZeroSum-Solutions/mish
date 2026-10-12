@@ -32,7 +32,24 @@ export interface ResolvedXAICredential {
  * call fails. Callers should treat null as "no OAuth available, fall
  * back to API key / re-login UI".
  */
-export async function resolveXAIBearer(
+export function resolveXAIBearer(
+  dataDir: string,
+  fetchImpl?: typeof fetch,
+): Promise<ResolvedXAICredential | null> {
+  // Single-flight per dataDir: parallel callers share one read/refresh so a
+  // rotating refresh token is spent once and waiters reuse the new bearer.
+  const existing = inflight.get(dataDir);
+  if (existing) return existing;
+  const task = resolveXAIBearerOnce(dataDir, fetchImpl).finally(() => {
+    if (inflight.get(dataDir) === task) inflight.delete(dataDir);
+  });
+  inflight.set(dataDir, task);
+  return task;
+}
+
+const inflight = new Map<string, Promise<ResolvedXAICredential | null>>();
+
+async function resolveXAIBearerOnce(
   dataDir: string,
   fetchImpl?: typeof fetch,
 ): Promise<ResolvedXAICredential | null> {

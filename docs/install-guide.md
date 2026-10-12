@@ -9,8 +9,8 @@ Deploy Mishh Mashh on Linux or macOS with a single command. The installer wraps 
 Clone the repository and run the installer:
 
 ```bash
-git clone https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git
-cd Mishh-Mashh-2
+git clone https://github.com/ZeroSum-Solutions/mish.git
+cd mish
 bash deploy/scripts/install.sh
 ```
 

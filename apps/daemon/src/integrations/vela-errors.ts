@@ -30,13 +30,29 @@ export interface AmrAccountFailureSignal {
 export const DEFAULT_AMR_RECHARGE_URL: string | undefined =
   process.env.MISH_AMR_CONSOLE_URL?.trim() || undefined;
 
+/**
+ * The same setting read at call time: an installed Mish pack can set MISH_AMR_CONSOLE_URL after
+ * this module loads, and a person's own value always wins.
+ */
+export function amrRechargeUrl(): string | undefined {
+  return process.env.MISH_AMR_CONSOLE_URL?.trim() || undefined;
+}
+
 const AMR_AUTH_REQUIRED_MESSAGE =
   'AMR sign-in is required. Sign in to AMR Cloud again, then retry this run.';
 
-const AMR_INSUFFICIENT_BALANCE_MESSAGE =
-  DEFAULT_AMR_RECHARGE_URL
-    ? `AMR Cloud reported insufficient balance for this model. Top up your AMR balance at ${DEFAULT_AMR_RECHARGE_URL}, then retry this run.`
+/** `{ actionUrl }` when a console URL is configured, else nothing. */
+function recharge(): { actionUrl?: string } {
+  const url = amrRechargeUrl();
+  return url ? { actionUrl: url } : {};
+}
+
+function insufficientBalanceMessage(): string {
+  const url = amrRechargeUrl();
+  return url
+    ? `AMR Cloud reported insufficient balance for this model. Top up your AMR balance at ${url}, then retry this run.`
     : 'AMR Cloud reported insufficient balance for this model. Top up your AMR balance in your AMR account, then retry this run.';
+}
 
 const AMR_TIER_UPGRADE_REQUIRED_MESSAGE =
   'Your current AMR plan does not include this model or request type. Upgrade your AMR plan, or switch to an available model and retry.';
@@ -191,9 +207,9 @@ export function classifyAmrAccountFailureDetails(details: unknown): AmrAccountFa
   if (code === 'insufficient_balance' || accountAction === 'recharge') {
     return {
       code: 'AMR_INSUFFICIENT_BALANCE',
-      message: AMR_INSUFFICIENT_BALANCE_MESSAGE,
+      message: insufficientBalanceMessage(),
       action: 'recharge',
-      ...(DEFAULT_AMR_RECHARGE_URL ? { actionUrl: DEFAULT_AMR_RECHARGE_URL } : {}),
+      ...recharge(),
     };
   }
 
@@ -255,9 +271,9 @@ export function classifyAmrAccountFailure(text: string): AmrAccountFailure | nul
   if (containsInsufficientBalanceSignal(value)) {
     return {
       code: 'AMR_INSUFFICIENT_BALANCE',
-      message: AMR_INSUFFICIENT_BALANCE_MESSAGE,
+      message: insufficientBalanceMessage(),
       action: 'recharge',
-      ...(DEFAULT_AMR_RECHARGE_URL ? { actionUrl: DEFAULT_AMR_RECHARGE_URL } : {}),
+      ...recharge(),
     };
   }
 

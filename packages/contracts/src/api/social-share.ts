@@ -1,4 +1,4 @@
-export const MISH_GITHUB_REPO_URL = 'https://github.com/ZeroSum-Solutions/Mishh-Mashh-2';
+export const MISH_GITHUB_REPO_URL = 'https://github.com/ZeroSum-Solutions/mish';
 
 export type SocialShareTargetKind = 'mish-repo' | 'project-html';
 

@@ -18,7 +18,7 @@
 // this machine.
 
 import { readFileSync } from 'node:fs';
-import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rename, unlink, writeFile } from 'node:fs/promises';
 import { createHash, randomBytes } from 'node:crypto';
 import path from 'node:path';
 import type { OdNextRolloutMode } from '@mish/contracts';
@@ -983,6 +983,17 @@ function assertWritableControlValues(partial: Record<string, unknown>): void {
   );
 }
 
+// An unparsable config reads as empty, so the next save would replace it and
+// erase every stored setting. Keep a copy so the data stays recoverable.
+async function quarantineUnparsableConfig(file: string): Promise<void> {
+  let raw: string;
+  try { raw = await readFile(file, 'utf8'); } catch { return; }
+  try { JSON.parse(raw); return; } catch { /* unparsable: keep a copy */ }
+  const backup = `${file}.corrupt-${Date.now()}`;
+  try { await writeFile(backup, raw, 'utf8'); }
+  catch (err) { console.error('[app-config] Could not back up unparsable config:', (err as Error).message); }
+}
+
 async function doWrite(
   dataDir: string,
   partial: Record<string, unknown>,
@@ -1007,8 +1018,14 @@ async function doWrite(
   const file = configFile(dataDir);
   await mkdir(path.dirname(file), { recursive: true });
   const tmp = file + '.' + randomBytes(4).toString('hex') + '.tmp';
-  await writeFile(tmp, JSON.stringify(normalizedNextWithoutRetiredAgents, null, 2), 'utf8');
-  await rename(tmp, file);
+  await quarantineUnparsableConfig(file);
+  try {
+    await writeFile(tmp, JSON.stringify(normalizedNextWithoutRetiredAgents, null, 2), 'utf8');
+    await rename(tmp, file);
+  } catch (err) {
+    await unlink(tmp).catch(() => {});
+    throw err;
+  }
   const installationIdWasExplicitlyReset = Object.prototype.hasOwnProperty.call(partial, 'installationId')
     && (partial.installationId == null || (
       typeof existing.installationId === 'string'

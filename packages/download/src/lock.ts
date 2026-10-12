@@ -8,7 +8,7 @@
  * JSON reader, the `NormalizedTarget` shape, and the platform liveness probe.
  */
 
-import { mkdir, rm, writeFile } from "node:fs/promises";
+import { link, mkdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname } from "node:path";
 
 import { isProcessAlive } from "@mish/platform";
@@ -96,7 +96,21 @@ function isLockProcessAlive(lock: DownloadLockFile): boolean {
 async function clearStaleLock(target: NormalizedTarget): Promise<boolean> {
   const lock = await readJson<unknown>(target.lockPath);
   if (!isDownloadLockFile(lock) || isLockProcessAlive(lock)) return false;
-  await rm(target.lockPath, { force: true }).catch(() => undefined);
+  // Claim the stale lock by renaming it to a unique name; only one contender can win the rename.
+  const claimedPath = `${target.lockPath}.stale.${process.pid}.${Date.now().toString(36)}.${Math.random().toString(36).slice(2)}`;
+  try {
+    await rename(target.lockPath, claimedPath);
+  } catch {
+    return true; // someone else reclaimed it; let the caller retry the exclusive create
+  }
+  const claimed = await readJson<unknown>(claimedPath);
+  if (isDownloadLockFile(claimed) && isLockProcessAlive(claimed)) {
+    // We grabbed a live lock created after our check; put it back if nobody took its place.
+    await link(claimedPath, target.lockPath).catch(() => undefined);
+    await rm(claimedPath, { force: true }).catch(() => undefined);
+    return false;
+  }
+  await rm(claimedPath, { force: true }).catch(() => undefined);
   return true;
 }
 

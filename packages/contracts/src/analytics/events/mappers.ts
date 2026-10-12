@@ -342,6 +342,8 @@ export function settingsSectionToTracking(
       return 'labs';
     case 'licensedPacks':
       return 'licensed_packs';
+    case 'packs':
+      return 'packs';
     case 'notifications':
       return 'notifications';
     case 'externalMcp':

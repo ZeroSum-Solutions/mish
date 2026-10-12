@@ -13,6 +13,7 @@
 import { chmod, mkdir, open, rename, rm } from 'node:fs/promises';
 import { randomBytes } from 'node:crypto';
 import path from 'node:path';
+import { mcpEndpointFingerprint } from './mcp-endpoint.js';
 import { readPrivateMcpFile, withPrivateMcpFileLock } from './mcp-private-file.js';
 
 /**
@@ -59,7 +60,14 @@ export interface McpTokensFile {
   servers: Record<string, StoredMcpToken>;
 }
 
-const EMPTY: McpTokensFile = { servers: {} };
+/** Token maps are null-prototype so ids such as `constructor` or `toString` are ordinary keys. */
+function emptyServers(): Record<string, StoredMcpToken> {
+  return Object.create(null) as Record<string, StoredMcpToken>;
+}
+
+function emptyFile(): McpTokensFile {
+  return { servers: emptyServers() };
+}
 
 function tokensFile(dataDir: string): string {
   return path.join(dataDir, 'mcp-tokens.json');
@@ -73,12 +81,12 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
  * doesn't deserialize cleanly. Used both at read time and as a defensive
  * pass when third-party tooling has hand-edited the file. */
 export function sanitizeTokensFile(raw: unknown): McpTokensFile {
-  if (!isPlainObject(raw)) return { servers: {} };
+  if (!isPlainObject(raw)) return emptyFile();
   const servers = raw.servers;
-  if (!isPlainObject(servers)) return { servers: {} };
-  const out: Record<string, StoredMcpToken> = {};
+  if (!isPlainObject(servers)) return emptyFile();
+  const out = emptyServers();
   for (const [id, value] of Object.entries(servers)) {
-    if (id === '__proto__' || id === 'constructor') continue;
+    if (id === '__proto__') continue;
     const tok = sanitizeToken(value);
     if (!tok) continue;
     out[id] = tok;
@@ -155,10 +163,10 @@ export async function readTokensFile(dataDir: string): Promise<McpTokensFile> {
     return sanitizeTokensFile(JSON.parse(raw));
   } catch (err: unknown) {
     const e = err as { code?: string; name?: string; message?: string };
-    if (e.code === 'ENOENT') return { ...EMPTY, servers: { ...EMPTY.servers } };
+    if (e.code === 'ENOENT') return emptyFile();
     if (e.name === 'SyntaxError') {
       console.error('[mcp-tokens] Corrupted JSON, returning empty.');
-      return { ...EMPTY, servers: { ...EMPTY.servers } };
+      return emptyFile();
     }
     throw err;
   }
@@ -218,7 +226,7 @@ export async function getToken(
   serverId: string,
 ): Promise<StoredMcpToken | null> {
   const file = await readTokensFile(dataDir);
-  return file.servers[serverId] ?? null;
+  return Object.hasOwn(file.servers, serverId) ? (file.servers[serverId] ?? null) : null;
 }
 
 /** Atomically merge a new token for `serverId` into the tokens file. */
@@ -241,7 +249,7 @@ export async function clearToken(
 ): Promise<void> {
   await withLock(dataDir, async () => {
     const file = await readTokensFile(dataDir);
-    if (!(serverId in file.servers)) return;
+    if (!Object.hasOwn(file.servers, serverId)) return;
     delete file.servers[serverId];
     await writeTokensFile(dataDir, file);
   });
@@ -266,4 +274,92 @@ export function isTokenExpired(
 ): boolean {
   if (typeof token.expiresAt !== 'number') return false;
   return token.expiresAt - skew <= now;
+}
+
+/** Subset of an OAuth token-endpoint response (RFC 6749 §5.1) the refresh helper consumes. */
+export interface McpRefreshResponse {
+  access_token: string;
+  token_type?: string;
+  expires_in?: number;
+  refresh_token?: string;
+  scope?: string;
+}
+
+const refreshInflight = new Map<string, Promise<StoredMcpToken | null>>();
+
+/**
+ * Refresh the stored token for `serverId` at most once at a time per data dir
+ * and expected endpoint.
+ *
+ * Concurrent callers (agent spawn, connector calls, parallel chats) share one
+ * flight. Inside it the stored token is re-read and the network refresh is
+ * skipped when it is no longer expired or its refresh token already rotated.
+ * The result is written only if the stored entry is still the one that was
+ * refreshed (compare-and-set on refresh token + access token + endpoint), so a
+ * refresh that finishes after Disconnect or a fresh sign-in cannot overwrite it.
+ *
+ * Endpoint binding: the flight is keyed on, and every token it reads or returns
+ * is checked against, the fingerprint of `expectedEndpoint` — the configured
+ * URL the caller already validated. A token saved for another endpoint (the
+ * same server id reconnected elsewhere while this refresh ran) is never
+ * returned; the helper resolves null so the caller asks for a new sign-in.
+ *
+ * Resolves to the token now stored for `expectedEndpoint`, or null when the
+ * entry was cleared or now belongs to another endpoint. Rejects with the
+ * refresh function's own error; callers map it.
+ */
+export function refreshMcpTokenSingleFlight(
+  dataDir: string,
+  serverId: string,
+  expectedEndpoint: string,
+  refresh: (current: StoredMcpToken) => Promise<McpRefreshResponse>,
+): Promise<StoredMcpToken | null> {
+  const expectedFingerprint = mcpEndpointFingerprint(expectedEndpoint);
+  const boundToExpected = (token: StoredMcpToken | null | undefined): token is StoredMcpToken =>
+    Boolean(token && token.endpointFingerprint === expectedFingerprint);
+  const key = `${dataDir}\0${serverId}\0${expectedFingerprint}`;
+  const existing = refreshInflight.get(key);
+  if (existing) return existing;
+  const task = (async () => {
+    const current = await getToken(dataDir, serverId);
+    if (!boundToExpected(current)) return null;
+    if (!isTokenExpired(current)) return current;
+    if (!current.refreshToken || !current.tokenEndpoint || !current.clientId) {
+      throw new Error('stored MCP token cannot be refreshed');
+    }
+    const refreshed = await refresh(current);
+    // RFC 6749 §5.1: an absent expires_in means no defined lifetime; an absent scope means unchanged.
+    const { expiresAt: _staleExpiresAt, scope: staleScope, ...rest } = current;
+    const nextScope = refreshed.scope ?? staleScope;
+    const next: StoredMcpToken = {
+      ...rest,
+      accessToken: refreshed.access_token,
+      refreshToken: refreshed.refresh_token ?? current.refreshToken,
+      tokenType: refreshed.token_type ?? current.tokenType,
+      ...(nextScope !== undefined ? { scope: nextScope } : {}),
+      ...(typeof refreshed.expires_in === 'number' ? { expiresAt: Date.now() + refreshed.expires_in * 1000 } : {}),
+      savedAt: Date.now(),
+    };
+    return withLock(dataDir, async () => {
+      const file = await readTokensFile(dataDir);
+      const latest = Object.hasOwn(file.servers, serverId) ? file.servers[serverId] : undefined;
+      if (!latest) return null;
+      if (
+        latest.refreshToken !== current.refreshToken
+        || latest.accessToken !== current.accessToken
+        || latest.endpointFingerprint !== current.endpointFingerprint
+      ) {
+        // Replaced while the refresh ran: hand back the newer token only if it is
+        // still bound to the endpoint this caller validated.
+        return boundToExpected(latest) ? latest : null;
+      }
+      file.servers[serverId] = next;
+      await writeTokensFile(dataDir, file);
+      return next;
+    });
+  })().finally(() => {
+    if (refreshInflight.get(key) === task) refreshInflight.delete(key);
+  });
+  refreshInflight.set(key, task);
+  return task;
 }

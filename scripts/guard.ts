@@ -100,6 +100,11 @@ const residualAllowedExactPaths = new Set([
   // Docs lint (`pnpm docs:lint`): Node built-ins only, run directly by Node
   // with no build step, like postinstall.
   "scripts/docs-lint.mjs",
+  // Mish pack builder (`docs/packs.md`): run directly by Node from a team lead's shell against a
+  // private checkout, with no build step. It uses Node built-ins and loads `esbuild` and the
+  // built contracts from this workspace only when a map asks for them.
+  "scripts/build-pack.mjs",
+  "scripts/lib/zip-writer.mjs",
   // GenUI build ladder eval: an ad-hoc runner against a live daemon, kept
   // .mjs beside the other evals/genui entries and run directly by Node.
   "evals/genui/ladder-eval.mjs",

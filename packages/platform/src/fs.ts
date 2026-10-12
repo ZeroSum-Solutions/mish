@@ -9,7 +9,7 @@
  * runtime surface.
  */
 import { copyFile, mkdir, readFile, rename, rm, stat } from "node:fs/promises";
-import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 /** @internal Extract a Node `error.code` as a string, or `null` when the value carries no code. */
 function errorCode(error: unknown): string | null {
@@ -53,7 +53,7 @@ export function pathContains(root: string, target: string): boolean {
   const resolvedRoot = resolve(root);
   const resolvedTarget = resolve(target);
   const rel = relative(resolvedRoot, resolvedTarget);
-  return rel === "" || (rel.length > 0 && !rel.startsWith("..") && !isAbsolute(rel));
+  return rel === "" || (rel.length > 0 && rel !== ".." && !rel.startsWith(`..${sep}`) && !isAbsolute(rel));
 }
 
 /** @internal Build an `EEXIST` error for a destination that already exists when overwrite is not allowed. */
@@ -104,9 +104,6 @@ export async function atomicCopyFile(
   );
   try {
     await copyFile(source, tempPath);
-    if (options.overwrite === true) {
-      await rm(destination, { force: true });
-    }
     await rename(tempPath, destination);
     const copied = await stat(destination);
     return { bytesCopied: copied.size, replaced: existing != null };

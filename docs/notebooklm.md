@@ -19,7 +19,7 @@ From the repo root:
 
 ```bash
 pnpm exec tsx scripts/notebooklm-export-github.ts \
-  --repo ZeroSum-Solutions/Mishh-Mashh-2 \
+  --repo ZeroSum-Solutions/mish \
   --issues open \
   --prs open \
   --limit 50
@@ -35,7 +35,7 @@ You can override the output path:
 
 ```bash
 pnpm exec tsx scripts/notebooklm-export-github.ts \
-  --repo ZeroSum-Solutions/Mishh-Mashh-2 \
+  --repo ZeroSum-Solutions/mish \
   --out notebooklm/mishh-mashh-snapshot.md
 ```
 

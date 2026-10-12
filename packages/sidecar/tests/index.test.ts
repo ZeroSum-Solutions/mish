@@ -319,3 +319,20 @@ describe("resolveRuntimeNamespaceRoot", () => {
     ).toBe(join(resolve("/data/ns/alpha/runtime"), "alpha"));
   });
 });
+
+describe("private IPC path length", () => {
+  it("falls back to a short socket path when TMPDIR is too deep", async () => {
+    const { resolvePrivateIpcPath } = await import("../src/stamp.js");
+    const original = process.env.TMPDIR;
+    process.env.TMPDIR = `/tmp/${"d".repeat(120)}`;
+    try {
+      const stamp = { app: "web", channel: "test", mode: "runtime", namespace: "n", source: "tests" } as never;
+      const path = resolvePrivateIpcPath(stamp, "linux");
+      expect(Buffer.byteLength(path)).toBeLessThanOrEqual(100);
+      expect(path.endsWith(".sock")).toBe(true);
+    } finally {
+      if (original == null) delete process.env.TMPDIR;
+      else process.env.TMPDIR = original;
+    }
+  });
+});

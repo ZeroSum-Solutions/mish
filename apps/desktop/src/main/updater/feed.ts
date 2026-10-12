@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { assertSecureUpdateUrl, isSecureUpdateUrl } from "./secure-url.js";
 import { access, lstat, readFile } from "node:fs/promises";
 import { dirname, extname, join } from "node:path";
 
@@ -256,6 +257,15 @@ export function selectUpdateCandidate(
     };
   }
 
+  const sha256UrlField = stringField(artifactRecord, "sha256Url");
+  if (!isSecureUpdateUrl(url) || (sha256UrlField != null && !isSecureUpdateUrl(sha256UrlField))) {
+    return {
+      ok: false,
+      state: DESKTOP_UPDATE_STATES.ERROR,
+      error: createError("insecure-artifact-url", "release metadata artifact and checksum URLs must use https"),
+    };
+  }
+
   const artifact: DesktopUpdateArtifactSnapshot = {
     ...(stringField(artifactRecord, "name") == null ? {} : { name: stringField(artifactRecord, "name") as string }),
     platformKey,
@@ -393,6 +403,7 @@ export function remoteRequiresReinstall(
 }
 
 export async function fetchJson(fetchImpl: typeof globalThis.fetch, url: string): Promise<Record<string, unknown>> {
+  assertSecureUpdateUrl(url, "metadata URL");
   const response = await fetchImpl(url);
   if (!response.ok) throw new Error(`metadata request returned HTTP ${response.status}`);
   const body = await response.json();
@@ -428,6 +439,7 @@ export function parseChecksumText(text: string, algorithm: "sha256" | "sha512"):
 export async function resolveChecksum(fetchImpl: typeof globalThis.fetch, checksum: DesktopUpdateChecksumSnapshot): Promise<DesktopUpdateChecksumSnapshot> {
   if (checksum.value != null) return checksum;
   if (checksum.url == null) throw new Error("artifact checksum is missing");
+  assertSecureUpdateUrl(checksum.url, "checksum URL");
   const response = await fetchImpl(checksum.url);
   if (!response.ok) throw new Error(`checksum request returned HTTP ${response.status}`);
   return {

@@ -734,7 +734,7 @@ import {
   getToken,
   isTokenExpired,
   readAllTokens,
-  setToken,
+  refreshMcpTokenSingleFlight,
 } from './mcp-tokens.js';
 import {
   agentCliEnvForAgent,
@@ -1043,6 +1043,10 @@ import { registerCultRegistryRoutes } from './routes/cult-registry.js';
 import { registerCultLivePreviewRoutes } from './routes/cult-live-preview.js';
 import { createPackRegistry, packsDirForDataDir } from './packs/registry.js';
 import { createPackService } from './packs/service.js';
+import { createMishPackStore } from './mish-packs/store.js';
+import { installFastLanePackOverlay } from './mish-packs/fast-lane-bridge.js';
+import { readMcpConfigForSpawn } from './mish-packs/mcp.js';
+import { registerMishPackRoutes } from './routes/mish-packs.js';
 import { createPluginsPackHandler } from './plugins/pack-plugins.js';
 import { createGithubPackFetcher } from './packs/github-fetcher.js';
 import { createPackGithubAccess } from './integrations/github-auth.js';
@@ -1467,7 +1471,8 @@ const BUNDLED_PLUGINS_DIR = resolveDaemonResourceDir(
 /** AC-R07 compiled-section previews: bundled read-only resources, never daemon data. */
 const SECTION_PREVIEW_ROOTS = {
   hyperuiRoot: path.join(BUNDLED_PLUGINS_DIR, 'shared', 'ui-kits', 'hyperui'),
-  cultKitDir: resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT),
+  // A function: an installed Mish pack can provide the kit after this module loads.
+  cultKitDir: () => resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT),
 };
 const PLUGIN_REGISTRY_DIR = resolveDaemonResourceDir(
   DAEMON_RESOURCE_ROOT,
@@ -1595,6 +1600,25 @@ const packService = createPackService({
   githubFetcher: createGithubPackFetcher({ access: packGithubAccess }),
   handlers: [createPluginsPackHandler({ db: () => packPluginsDb, roots: PLUGIN_REGISTRY_ROOTS })],
 });
+// Mish packs: private packets (a folder or .zip) that restore content and connections the public
+// repository does not carry. Installed under `<RUNTIME_DATA_DIR>/mish-packs/`; MISH_PACKS_DIR may
+// name an extra read-only folder of packs. Loaders ask the overlay (`mish-packs/overlay.ts`) per
+// request, so an install or removal takes effect without a restart. See docs/packs.md.
+installFastLanePackOverlay();
+const MISH_PACKS_EXTERNAL_DIR = (() => {
+  const raw = process.env.MISH_PACKS_DIR?.trim();
+  if (!raw) return null;
+  if (!path.isAbsolute(raw)) {
+    console.warn('[mish-packs] MISH_PACKS_DIR must be an absolute path; it is ignored');
+    return null;
+  }
+  return raw;
+})();
+const mishPackStore = createMishPackStore({
+  dataDir: RUNTIME_DATA_DIR,
+  externalDir: MISH_PACKS_EXTERNAL_DIR,
+  userRoots: { skills: USER_SKILLS_DIR, designSystems: USER_DESIGN_SYSTEMS_DIR },
+});
 fs.mkdirSync(PROJECTS_DIR, { recursive: true });
 for (const dir of [USER_SKILLS_DIR, USER_DESIGN_SYSTEMS_DIR, BRANDS_DIR, USER_DESIGN_TEMPLATES_DIR, PLUGIN_REGISTRY_ROOTS.userPluginsRoot, LIBRARY_DIR, DESIGN_INDEX_DIR, AGENCY_BUILDS_DIR]) {
   fs.mkdirSync(dir, { recursive: true });
@@ -1652,38 +1676,24 @@ function mcpOAuthCallbackUrl(req) {
  * for. Tokens persisted before that context was recorded can't be safely
  * refreshed; the caller treats `null` as "needs reconnect".
  */
-async function refreshAndPersistToken(dataDir, serverId, current) {
+async function refreshAndPersistToken(dataDir, serverId, serverUrl, current) {
   if (current.resourceUrl && !isPublicMcpResource(current.resourceUrl)) return null;
   if (!current.refreshToken) return null;
   if (!current.tokenEndpoint || !current.clientId) return null;
-  const tokenResp = await refreshAccessToken({
-    tokenEndpoint: current.tokenEndpoint,
-    clientId: current.clientId,
-    clientSecret: current.clientSecret,
-    refreshToken: current.refreshToken,
-    scope: current.scope,
-    resource: current.resourceUrl,
-  });
-  const next = {
-    accessToken: tokenResp.access_token,
-    refreshToken: tokenResp.refresh_token ?? current.refreshToken,
-    tokenType: tokenResp.token_type ?? 'Bearer',
-    scope: tokenResp.scope ?? current.scope,
-    expiresAt:
-      typeof tokenResp.expires_in === 'number'
-        ? Date.now() + tokenResp.expires_in * 1000
-        : undefined,
-    savedAt: Date.now(),
-    tokenEndpoint: current.tokenEndpoint,
-    clientId: current.clientId,
-    clientSecret: current.clientSecret,
-    authServerIssuer: current.authServerIssuer,
-    redirectUri: current.redirectUri,
-    resourceUrl: current.resourceUrl,
-    endpointFingerprint: current.endpointFingerprint,
-  };
-  await setToken(dataDir, serverId, next);
-  return next;
+  // Single-flight + compare-and-set: concurrent spawns share one refresh and a
+  // stale result never overwrites a newer sign-in or a Disconnect. The flight is
+  // bound to `serverUrl`; a token saved for another endpoint is treated as none.
+  const refreshed = await refreshMcpTokenSingleFlight(dataDir, serverId, serverUrl, (stored) =>
+    refreshAccessToken({
+      tokenEndpoint: stored.tokenEndpoint!,
+      clientId: stored.clientId!,
+      clientSecret: stored.clientSecret,
+      refreshToken: stored.refreshToken!,
+      scope: stored.scope,
+      resource: stored.resourceUrl,
+    }),
+  );
+  return refreshed && mcpTokenMatchesEndpoint(refreshed, serverUrl) ? refreshed : null;
 }
 
 const activeChatAgentEventSinks = new Map();
@@ -3477,6 +3487,13 @@ export async function startServer({
     await packRegistry.reconcile();
   } catch (error) {
     console.warn('[packs] startup reconciliation failed', String((error as { code?: unknown })?.code ?? 'unknown'));
+  }
+  // Mish packs: scan, copy skill and design-system folders into the user roots, apply the
+  // allow-listed environment. A failure leaves the app running without the pack content.
+  try {
+    await mishPackStore.start();
+  } catch (error) {
+    console.warn('[mish-packs] startup failed', String((error as { code?: unknown })?.code ?? 'unknown'));
   }
 
   const app = express();
@@ -8629,11 +8646,12 @@ export async function startServer({
   }, { previewRoots: SECTION_PREVIEW_ROOTS });
 
   registerCultCatalogRoutes(app, { http: httpDeps });
-  registerCultRegistryRoutes(app, { http: httpDeps }, { kitDir: resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT) });
-  registerCultLivePreviewRoutes(app, { http: httpDeps }, { kitDir: resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT) });
+  registerCultRegistryRoutes(app, { http: httpDeps }, { kitDir: () => resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT) });
+  registerCultLivePreviewRoutes(app, { http: httpDeps }, { kitDir: () => resolveCultKitDir(process.env, DAEMON_RESOURCE_ROOT ?? PROJECT_ROOT) });
   registerTwenty1stRoutes(app, { http: httpDeps }, { resourceRoot: DAEMON_RESOURCE_ROOT });
   // Licensed packs install surface (Settings → Licensed packs and `od pack`).
   registerPackRoutes(app, { http: httpDeps, packs: packService, githubAccess: packGithubAccess });
+  registerMishPackRoutes(app, { http: httpDeps, packs: mishPackStore, uploadDir: path.join(RUNTIME_DATA_DIR, 'mish-packs', '.staging', 'uploads') });
   registerComponentLedgerRoutes(app, { http: httpDeps }, packRegistry);
 
   registerPluginEventRoutes(app, {
@@ -12111,7 +12129,7 @@ export async function startServer({
     let externalMcpConfig = { servers: [] };
     if (!SANDBOX_RUNTIME.enabled) {
       try {
-        externalMcpConfig = await readMcpConfig(RUNTIME_DATA_DIR);
+        externalMcpConfig = await readMcpConfigForSpawn(RUNTIME_DATA_DIR);
       } catch (err) {
         if (err instanceof McpCredentialFileError) throw err;
         console.warn(
@@ -12150,6 +12168,7 @@ export async function startServer({
               const refreshed = await refreshAndPersistToken(
                 RUNTIME_DATA_DIR,
                 serverId,
+                server.url,
                 tok,
               );
               if (refreshed) access = refreshed.accessToken;

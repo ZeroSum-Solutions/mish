@@ -229,6 +229,12 @@ export function isPathLikeChatHref(href: string | null | undefined): boolean {
   // unknown-route catch-all — special-case it before consulting the router.
   if (withoutQuery.replace(/\/+$/, '') === '') return false;
   try {
+    decodeURIComponent(withoutQuery);
+  } catch {
+    // Malformed percent-encoding is not a route; keep the link inert.
+    return true;
+  }
+  try {
     const route = parseRoute(withoutQuery);
     return route.kind === 'home' && route.view === 'home';
   } catch {

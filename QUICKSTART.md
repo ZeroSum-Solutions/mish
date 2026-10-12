@@ -38,11 +38,21 @@ Use this path to put Mishh Mashh and its agency fast lane on a new team machine.
 clean clone to a first published and deployed page. Nothing here depends on one person's
 machine: keys come from the environment or from Settings.
 
+### Fastest path on a Mac: the packaged app
+
+On Apple Silicon you can skip the clone. Download the `.dmg` from the
+[latest release](https://github.com/ZeroSum-Solutions/mish/releases/latest), drag the app to
+Applications, then right-click it and choose **Open** (the build is unsigned). Or clear the
+quarantine flag: `xattr -dr com.apple.quarantine "/Applications/Mishh Mashh.app"`. You still
+need an agent CLI (`claude` or `codex`) on your `PATH`; see
+[Local agent CLI and PATH](#local-agent-cli-and-path). Steps 1 to 7 below are for the
+source checkout.
+
 ### 1. Clone and install
 
 ```bash
-git clone --filter=blob:none https://github.com/ZeroSum-Solutions/Mishh-Mashh-2.git
-cd Mishh-Mashh-2
+git clone --filter=blob:none https://github.com/ZeroSum-Solutions/mish.git
+cd mish
 sh scripts/team-setup.sh     # checks prerequisites, installs, builds, starts the web app
 ```
 
@@ -164,6 +174,24 @@ od pack list
 How to write `pack.json`, install from a private GitHub repository and remove a pack:
 [`docs/packs.md`](docs/packs.md).
 
+### 8. Restore the private content with a team packet
+
+The public repository does not carry licensed kits, catalogues, studies, extra design
+systems, skills or MCP connections. Your team lead gives you one `.zip` (a Mish pack) that does.
+Start the app, then install it once:
+
+```bash
+od packs install ~/Downloads/team-packet.zip
+od packs list
+```
+
+Or open **Settings → Packs** and choose the `.zip`. The list shows what the packet restored
+and which environment variables its MCP servers need; set those in the shell that starts the
+app (for example `CULT_PRO_TOKEN`), then restart it. Sign in to OAuth servers such as Refero
+and Mobbin from the app. To remove everything the packet added, run `od packs remove <id>`.
+Team leads build the packet with `node scripts/build-pack.mjs`; see
+[`docs/packs.md`](docs/packs.md#mish-packs-a-team-packet).
+
 ## Docker Setup
 
 Run Mishh Mashh in a fully containerised environment without installing Node.js or pnpm locally.
@@ -236,10 +264,11 @@ docker compose restart
 docker compose down
 ```
 
-### Pull the latest image
+### Rebuild after pulling new code
 
 ```bash
-docker compose pull
+git pull
+docker compose build
 docker compose up -d
 ```
 
@@ -271,8 +300,8 @@ MISH_MEM_LIMIT=384m
 # Allowed CORS origins
 MISH_ALLOWED_ORIGINS=https://yourdomain.com
 
-# Docker image tag (this fork's private image; run `docker login ghcr.io` first)
-MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest
+# Image name; `docker compose build` produces this tag locally
+MISH_IMAGE=ghcr.io/zerosum-solutions/mish:latest
 
 # Required API token for daemon security
 # Generate one with: openssl rand -hex 32

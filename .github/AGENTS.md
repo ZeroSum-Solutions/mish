@@ -1,7 +1,9 @@
 # GitHub automation guide
 
-Follow the root `AGENTS.md`. This public fork retains only
-`.github/workflows/ci.yml`. Upstream release, bot, trusted-write and convergence
+Follow the root `AGENTS.md`. This public fork keeps `.github/workflows/ci.yml`
+for validation and `.github/workflows/release-mac.yml`, which builds the unsigned
+macOS package on a stable `v*` tag (read-only build job) and publishes it to
+GitHub Releases from a separate write-scoped job. Nothing in CI depends on it. Upstream release, bot, trusted-write and convergence
 workflows were removed deliberately. Do not restore them as a CI dependency.
 
 ## Required reading

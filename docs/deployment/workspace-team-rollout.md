@@ -68,8 +68,8 @@ git diff --name-status origin/main...origin/feat/workspace-team -- db/schema db/
 ```bash
 gh api repos/powerformer/vela/git/ref/heads/main --jq .object.sha
 gh api repos/powerformer/vela/git/ref/heads/feat/workspace-team --jq .object.sha
-gh api repos/ZeroSum-Solutions/Mishh-Mashh-2/git/ref/heads/main --jq .object.sha
-gh api repos/ZeroSum-Solutions/Mishh-Mashh-2/git/ref/heads/feat/workspace-team --jq .object.sha
+gh api repos/ZeroSum-Solutions/mish/git/ref/heads/main --jq .object.sha
+gh api repos/ZeroSum-Solutions/mish/git/ref/heads/feat/workspace-team --jq .object.sha
 ```
 
 从此刻开始只允许 release blocker 修复。任何新 commit 都使该环境之前的 CI、目验和签字失效，必须对新 SHA 重跑。
@@ -92,7 +92,7 @@ gh run list -R powerformer/vela --branch feat/workspace-team \
 Mishh Mashh：
 
 ```bash
-gh run list -R ZeroSum-Solutions/Mishh-Mashh-2 --branch feat/workspace-team \
+gh run list -R ZeroSum-Solutions/mish --branch feat/workspace-team \
   --workflow ci.yml --limit 10
 ```
 
@@ -184,7 +184,7 @@ gh workflow run vela-cli-package.yml \
 构建 feature-test beta：
 
 ```bash
-gh workflow run release-beta.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run release-beta.yml -R ZeroSum-Solutions/mish \
   --ref feat/workspace-team \
   -f ref=feat/workspace-team \
   -f amr_profile=feature-test \
@@ -254,16 +254,16 @@ gh workflow run vela-cli-release.yml -R powerformer/vela \
 Workspace Team 必须先存在于 `main`，再走仓库既有 release branch -> prerelease -> stable promotion，不从 beta 直接升 stable：
 
 ```bash
-gh workflow run cut-release.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run cut-release.yml -R ZeroSum-Solutions/mish \
   --ref main -f 'version=<x.y.z>'
 
-gh workflow run release-prerelease.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run release-prerelease.yml -R ZeroSum-Solutions/mish \
   --ref 'release/v<x.y.z>' \
   -f 'ref=release/v<x.y.z>' \
   -f 'release_version=<x.y.z>' \
   -f win_x64_smoke_mode=full
 
-gh workflow run release-stable.yml -R ZeroSum-Solutions/Mishh-Mashh-2 \
+gh workflow run release-stable.yml -R ZeroSum-Solutions/mish \
   --ref 'release/v<x.y.z>' \
   -f 'ref=release/v<x.y.z>' \
   -f 'prerelease_version=<x.y.z-prerelease.n>' \

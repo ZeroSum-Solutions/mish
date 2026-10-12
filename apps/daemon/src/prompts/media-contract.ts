@@ -345,8 +345,8 @@ COMP="$OD_PROJECT_DIR/$COMP_REL"
 # Edit ONLY $COMP/index.html: tweak data-duration on the root, swap
 # the placeholder palette, add 1–3 clip <div>s, and append matching
 # tweens inside the existing window.__timelines["main"] = gsap.timeline(...)
-# block. Skip the Visual Identity HARD-GATE in skills/hyperframes/SKILL.md
-# — OD projects already have their own design-system layer. Default to
+# block. Skip any Visual Identity gate — OD projects already have their own
+# design-system layer. Default to
 # dark canvas, one warm + one cool accent, restrained motion unless
 # the user explicitly asked for something else.
 

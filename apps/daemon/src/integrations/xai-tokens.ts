@@ -8,12 +8,11 @@
 // without breaking existing files.
 //
 // File: `<dataDir>/xai-tokens.json`
-// Permissions: chmod 0600 best-effort on POSIX.
+// Permissions: created 0600 and exclusively (shared helpers in mcp-private-file.ts).
 // Lock: in-memory promise chain keyed by dataDir.
 
-import { chmod, mkdir, readFile, rename, writeFile } from 'node:fs/promises';
-import { randomBytes } from 'node:crypto';
 import path from 'node:path';
+import { readPrivateMcpFile, writePrivateMcpFile } from '../mcp-private-file.js';
 
 /**
  * Stored xAI OAuth token. Mirrors the relevant subset of an OAuth 2.0
@@ -93,7 +92,7 @@ function sanitizeToken(raw: unknown): StoredXAIToken | null {
 
 export async function readTokensFile(dataDir: string): Promise<XAITokensFile> {
   try {
-    const raw = await readFile(tokensFile(dataDir), 'utf8');
+    const raw = await readPrivateMcpFile(tokensFile(dataDir));
     return sanitizeTokensFile(JSON.parse(raw));
   } catch (err: unknown) {
     const e = err as { code?: string; name?: string; message?: string };
@@ -123,26 +122,8 @@ async function writeTokensFile(
   dataDir: string,
   next: XAITokensFile,
 ): Promise<XAITokensFile> {
-  const file = tokensFile(dataDir);
-  await mkdir(path.dirname(file), { recursive: true });
-  const tmp = file + '.' + randomBytes(4).toString('hex') + '.tmp';
-  await writeFile(tmp, JSON.stringify(next, null, 2), 'utf8');
-  await rename(tmp, file);
-  // Best-effort lockdown of file mode. Bearer tokens grant posting-as-you
-  // against xAI APIs (and the user's X account scope), so we restrict to
-  // owner-only read/write where the OS supports it.
-  try {
-    await chmod(file, 0o600);
-  } catch (err: unknown) {
-    const e = err as { code?: string; message?: string };
-    if (e.code !== 'ENOTSUP' && e.code !== 'EPERM') {
-      console.warn(
-        '[xai-tokens] could not chmod 0600',
-        file,
-        e.message ?? err,
-      );
-    }
-  }
+  // Owner-only exclusive create (0600, no symlink follow) so tokens are never world-readable.
+  await writePrivateMcpFile(tokensFile(dataDir), JSON.stringify(next, null, 2));
   return next;
 }
 

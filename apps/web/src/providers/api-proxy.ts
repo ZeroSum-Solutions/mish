@@ -95,6 +95,7 @@ export async function streamProxyEndpoint(
     const reader = resp.body.getReader();
     const decoder = new TextDecoder();
     let buf = '';
+    let sawEnd = false;
 
     while (true) {
       const { value, done } = await reader.read();
@@ -125,12 +126,17 @@ export async function streamProxyEndpoint(
         }
 
         if (parsed.event === 'end') {
+          sawEnd = true;
           handlers.onDone(acc);
           return;
         }
       }
     }
 
+    if (!sawEnd && !signal?.aborted) {
+      handlers.onError(new Error('proxy stream ended unexpectedly'));
+      return;
+    }
     handlers.onDone(acc);
   } catch (err) {
     if ((err as Error).name === 'AbortError') return;

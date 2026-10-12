@@ -220,6 +220,9 @@ function isAuthorizationServerMetadata(value: unknown): value is AuthorizationSe
       .every((key) => value[key] === undefined || isStringArray(value[key]));
 }
 
+/** Upper bound for every OAuth network call so a stalled auth server cannot hang a start. */
+const OAUTH_FETCH_TIMEOUT_MS = 10_000;
+
 async function fetchJson<T>(
   url: string,
   fetchImpl: typeof fetch,
@@ -227,6 +230,7 @@ async function fetchJson<T>(
   try {
     const res = await fetchImpl(url, {
       headers: { accept: 'application/json' },
+      signal: AbortSignal.timeout(OAUTH_FETCH_TIMEOUT_MS),
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -303,6 +307,7 @@ export async function registerClient(
       accept: 'application/json',
     },
     body: JSON.stringify(body),
+    signal: AbortSignal.timeout(OAUTH_FETCH_TIMEOUT_MS),
   });
   if (!res.ok) {
     throw new McpOAuthError('MCP_OAUTH_REGISTRATION_FAILED', `OAuth client registration failed (HTTP ${res.status}). Reconnect this server.`);
@@ -327,22 +332,31 @@ export async function getOrRegisterClient(
   redirectUri: string,
   fetchImpl: typeof fetch = fetch,
 ): Promise<RegisteredClient> {
-  return withPrivateMcpFileLock(clientsFile(dataDir), async () => {
-    const cache = await readClientCache(dataDir);
-    const cached = cache.clients.find(
+  const findCached = (cache: { clients: RegisteredClient[] }) =>
+    cache.clients.find(
       (c) => c.authServerIssuer === authServer.issuer && c.redirectUri === redirectUri,
     );
-    if (cached) return cached;
-    if (!authServer.registration_endpoint) {
-      throw new Error(
-        `auth server ${authServer.issuer} does not advertise a registration_endpoint and no client is pre-registered`,
-      );
-    }
-    const reg = await registerClient(
-      authServer.registration_endpoint,
-      redirectUri,
-      fetchImpl,
+  // Read under the lock, then release it before the network call so a slow
+  // registration endpoint cannot block every other OAuth start.
+  const cached = await withPrivateMcpFileLock(clientsFile(dataDir), async () =>
+    findCached(await readClientCache(dataDir)),
+  );
+  if (cached) return cached;
+  if (!authServer.registration_endpoint) {
+    throw new Error(
+      `auth server ${authServer.issuer} does not advertise a registration_endpoint and no client is pre-registered`,
     );
+  }
+  const reg = await registerClient(
+    authServer.registration_endpoint,
+    redirectUri,
+    fetchImpl,
+  );
+  return withPrivateMcpFileLock(clientsFile(dataDir), async () => {
+    const cache = await readClientCache(dataDir);
+    // A concurrent start may have registered while we were off the lock.
+    const raced = findCached(cache);
+    if (raced) return raced;
     const next: RegisteredClient = {
       authServerIssuer: authServer.issuer,
       redirectUri,
@@ -458,6 +472,7 @@ async function tokenRequest(
     headers,
     body: form.toString(),
     redirect: 'error',
+    signal: AbortSignal.timeout(OAUTH_FETCH_TIMEOUT_MS),
   });
   if (!res.ok) {
     throw new McpOAuthError('MCP_OAUTH_TOKEN_REJECTED', `OAuth token request failed (HTTP ${res.status}). Reconnect this server.`);
