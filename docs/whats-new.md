@@ -105,7 +105,7 @@ parser rather than trusting review:
    field would be silently dropped, or if a field name is misspelled. This
    matters because the runtime is fail-safe: a malformed document does not
    error, it just makes the card disappear.
-3. On merge to `main`, `whats-new-publish.yml` uploads the file
+3. Upstream, on merge to `main`, `whats-new-publish.yml` uploads the file
    (`application/json`, `cache-control: public, max-age=300`) and then reads it
    back from `https://whatsnew.mish.invalid/whats-new.json` with the edge
    cache bypassed. The job fails unless the bytes served match the bytes
@@ -163,7 +163,9 @@ from any job on any branch, which would let anyone with write access publish
 unreviewed content by dispatching a modified workflow from their own branch.
 
 That shape is pinned by the `what's new publish workflow` check in `pnpm guard`
-(`scripts/check-whats-new-publish-workflow.ts`): the credential-bearing job is
+(`scripts/check-whats-new-publish-workflow.ts`). In this repository the workflow
+file is absent, so the check reports the publisher as retired and passes; when
+the file is present: the credential-bearing job is
 the one that declares the environment, it cannot start without a green
 `validate`, and no other job may hold an environment or read a secret. The
 check runs from CI's unconditional preflight job rather than a path-routed

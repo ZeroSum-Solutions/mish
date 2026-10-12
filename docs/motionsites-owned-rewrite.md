@@ -30,7 +30,9 @@ Every replacement carries a package-local `RIGHTS.md`.
 These limits are stated so the owned claim is not overstated. (1) Each brief reuses the original package's section-role list one for one; roles are generic ideas, but the order mirrors the original. (2) The eight drafts started in an earlier session that was paused; its prompts and intermediate outputs were not recorded, so their exact inputs cannot be shown. They were rechecked and refined from the current checkout, and no original markup, CSS, copy, media or script appears in the result. (3) Bundled fonts are third-party SIL OFL 1.1 files, listed in each package's `RIGHTS.md` and `assets/OFL.txt` and in the root `NOTICE`.
 
 Owned describes the new template work. It does not describe the bundled fonts:
-Archivo and Bodoni Moda come from the already-vendored `agency-emmpo` assets;
+Archivo and Bodoni Moda were copied from the then-vendored `agency-emmpo` assets
+(that package is not part of this public repository; the copies now live in each
+replacement's `assets/`);
 IBM Plex Mono comes from `apps/web/public/fonts`. Copies retain the complete SIL
 OFL notices beside the bytes. It also does not change rights to old Git revisions,
 old installed resources, cached clips or previously distributed builds.

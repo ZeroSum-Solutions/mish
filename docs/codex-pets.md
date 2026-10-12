@@ -27,12 +27,13 @@ panel calls these endpoints from
 
 ## I do not have Codex installed
 
-You do not need Codex to use Mishh Mashh. The pet companion ships with
-built-in pets that work out of the box. The "Recently hatched" section
-will simply stay empty until something appears under
+You do not need Codex to use Mishh Mashh. This repository ships no
+built-in pets (`BUILT_IN_PETS` in `apps/web/src/components/pet/pets.ts` is
+empty), so the companion offers only the custom pet slot until you add one.
+The "Recently hatched" section stays empty until something appears under
 `${CODEX_HOME:-$HOME/.codex}/pets/`.
 
-You have three ways to populate it without running Codex:
+You have two ways to populate it without running Codex:
 
 1. **Sync the public catalogs.** Run
    `node --experimental-strip-types scripts/sync-community-pets.ts`
@@ -43,10 +44,9 @@ You have three ways to populate it without running Codex:
    `~/.codex/pets/<your-pet>/` with a `pet.json` and a
    `spritesheet.webp` (8x9 atlas). The daemon does not require Codex to
    be installed — it only needs the directory.
-3. **Run the vendored skill in any chat agent.** The `hatch-pet` skill
-   is vendored under `skills/hatch-pet/`. Any agent that can execute
-   skills (Codex, or any other) can run it end-to-end and write into the
-   same directory.
+
+The upstream `hatch-pet` skill is not vendored in this repository; run it
+from Codex itself if you have it.
 
 If `~/.codex/pets/` does not exist, the daemon does **not** auto-create
 it — empty list is returned and the UI shows "no recently hatched pets
@@ -89,5 +89,4 @@ Notes:
 - HTTP routes (list + spritesheet): `apps/daemon/src/server.ts`
 - Web list / adopt UI: `apps/web/src/components/pet/PetSettings.tsx`
 - Shared response types: `packages/contracts/src/api/registry.ts`
-- Vendored skill source: `skills/hatch-pet/`
 - Community catalog sync script: `scripts/sync-community-pets.ts`

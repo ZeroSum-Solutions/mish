@@ -33,11 +33,13 @@ full split.
 
 ## Bundled catalogue
 
-The bundled catalogue is intentionally minimal. It includes Website Clone and
-three supplemental agency reference studies: Emmpo, Watson, and Cult Heroes.
-The reference studies apply captured design evidence to an existing workflow;
-they do not install source-site code or replace the project's creation skill.
-They use the daemon's supported `design-system` mode with
+The bundled catalogue is intentionally minimal: this public repository ships
+only Website Clone (`web-clone/`). The supplemental agency reference studies
+(Emmpo, Watson, Cult Heroes) are private content and are not published here;
+do not recreate them, and keep code and tests working when they are absent.
+Where they are installed, they apply captured design evidence to an existing
+workflow without installing source-site code or replacing the project's
+creation skill, and use the daemon's supported `design-system` mode with
 `od.design_system.requires: false` to classify their design-constraint role.
 Users can add their own skills without repopulating the application with
 unrelated example workflows.

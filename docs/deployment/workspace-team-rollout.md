@@ -2,7 +2,7 @@
 
 本手册用于把 Workspace Team 从 Vela `feature-test` 推进到 `test`，最终再发布到 production。它同时覆盖 Vela DB/API/Link/Web/CLI 和 Mishh Mashh 桌面包；任何一层没有明确版本和验收证据，都不能把整体标记为已上线。
 
-> 公开仓库说明：本仓库只发布 `.github/workflows/ci.yml`。下文引用的 release、cut-release 等 workflow 属于上游拓扑，未在本仓库发布，`gh workflow run` 对它们会失败。
+> 公开仓库说明：本仓库只发布 `.github/workflows/ci.yml`。下文引用的 release、cut-release 等 workflow 属于上游拓扑，未在本仓库发布，`gh workflow run` 对它们会失败。Vela 仓库（`powerformer/vela`）不是公开仓库，下文指向它的链接和 `-R powerformer/vela` 命令需要该仓库的访问权限。
 >
 > 安全边界：仓库内不得记录 Stripe 密钥、Webhook secret、数据库连接串、内部域名或测试账号密码。环境 URL、Secret 名称和值以 GitHub Environment、GitOps 仓库和内部上线记录为准。本手册中的 `<...>` 必须在受限上线记录中填写，不能直接提交真实 secret。
 

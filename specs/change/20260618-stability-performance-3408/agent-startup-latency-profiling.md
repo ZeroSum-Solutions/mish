@@ -14,7 +14,7 @@ Status: proposed · Parent: #3408 · Related: #3380, #3535 · Spec format: `spec
 - **Repo**: this repository. This spec is on branch `spec/agent-startup-latency` (PR #4504); the **code to verify is in `origin/main`**.
 - **Checkout**:
   ```
-  gh repo clone ZeroSum-Solutions/Mishh-Mashh-2 && cd Mishh-Mashh-2 && git checkout main
+  gh repo clone ZeroSum-Solutions/mish && cd mish && git checkout main
   # To view this spec: gh pr checkout 4504
   ```
 - **Key code locations** (reviewers can jump directly):

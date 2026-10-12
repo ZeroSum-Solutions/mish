@@ -130,6 +130,19 @@ After one automatic retry, the dialog offers an explicit Retry action. Only one
 preview request is active at a time; closing the dialog aborts it and clears its
 pending retry timer. A busy response does not attach or accept a brief.
 
+Without a project the dialog calls `POST /api/workbench/briefs/preview`. In a
+project it creates a brief with `POST /api/workbench/briefs`, polls it, and
+accepts it with `PATCH` or stops it with `POST /api/workbench/briefs/:id/cancel`.
+Closing the dialog before the create request returns still cancels the pending
+brief, so its model turn does not keep running. The brief writer is GPT Terra
+through OpenRouter when **Settings → Labs → Faster Improve prompt** is on and an
+OpenRouter key is set; otherwise, and whenever Terra fails, a no-tool `claude -p`
+turn writes it, which needs a signed-in Claude Code CLI. With neither lane
+available, Improve prompt cannot run and the error names what is missing. The CLI
+equivalents are `od workbench transform` and `od workbench brief
+show|edit|accept|cancel|attach|transformer`; see
+[`prompt-composition.md`](prompt-composition.md#accepted-design-brief-r15-improve-prompt).
+
 ### 3.2 Daemon (`apps/daemon`)
 
 The Express daemon is the product authority for `/api/*`. It owns:
@@ -396,7 +409,7 @@ brief
   │
   ▼
 route ── one Jev request: spine, archetype, skin, page kind and family
-  │      (16 families over 9 atlas spines; unrouted when no family is likely enough)
+  │      (12 families over 9 atlas spines; unrouted when no family is likely enough)
   ▼
 family package ── recipe schema, slots, renderer, optional sections, x-mock marks
   │
@@ -405,7 +418,7 @@ optional sections ── one Jev keep/drop request; hints from the caller win
   │
   ▼
 fill ── one structured call per page or per section
-  │     DeepSeek deepseek-v4-flash or Cerebras gpt-oss-120b, with failover
+  │     DeepSeek deepseek-flash or Cerebras gpt-oss-120b, with failover
   ▼
 render ── trusted family renderer, inlined CSS and catalog components
   │
@@ -462,32 +475,28 @@ keep the supported distinct records instead of duplicating content to fill a tem
 
 ### 8.2 Families
 
-Sixteen families cover all nine spines. Each has a JSON Schema recipe, named text slots with
+Twelve families cover all nine spines. Each has a JSON Schema recipe, named text slots with
 `data-od-id` targets, a contract and a renderer.
 
 | Family | Spine | Archetype | Page kind |
 |---|---|---|---|
-| watson | TL trust to lead | TL.05 | site |
-| fervor | TL trust to lead | TL.05 | site |
-| wrenfield | TL trust to lead | TL.04 | site |
-| maben | TL trust to lead | TL.04 | site |
-| halcyon | BA booking attendance | BA.03 | site |
+| practice | TL trust to lead | TL.01 | site |
 | restaurant | BA booking attendance | BA.02 | site |
-| maren | CO commerce | CO.01 | site |
-| emmpo | LM learning membership | LM.01 | site |
+| storefront | CO commerce | CO.01 | site |
 | community | LM learning membership | LM.03 | site |
 | marketing-site | PA product adoption | PA.01 | site |
 | app-shell | TU task utility | TU.01 | app |
 | crm-dashboard | TU task utility | TU.01 | dashboard |
 | listings | SM search and match | SM.02 | site |
 | publication | CS content subscription | CS.01 | site |
-| nonprofit | MI mission impact | MI.01 | site |
+| guide | CS content subscription | CS.01 | site |
 | docs-hub | CS content subscription | CS.02 | site |
+| nonprofit | MI mission impact | MI.01 | site |
 
 app-shell and crm-dashboard (page kinds `app` and `dashboard`) are static prototypes: the page and
 `od agency families` label them "Static prototype: navigation and controls are not wired."
-marketing-site, app-shell, crm-dashboard, listings, publication, nonprofit, restaurant, docs-hub
-and community render HyperUI blocks with committed page-kind CSS. The registry test in
+Every family renders HyperUI blocks with committed page-kind CSS
+(`plugins/_official/shared/ui-kits/hyperui/pagekinds.json`). The registry test in
 `packages/agency-fast-lane/tests/atlas.test.ts` fails if a spine has no family.
 
 ### 8.3 Routing
@@ -520,7 +529,7 @@ the 25-item route corpus is profiled in
 
 ### 8.4 Fill, keys and failover
 
-The fill runs on DeepSeek `deepseek-v4-flash` or Cerebras `gpt-oss-120b`. A request can name a
+The fill runs on DeepSeek `deepseek-flash` or Cerebras `gpt-oss-120b`. A request can name a
 provider; otherwise marketing-site, app-shell, crm-dashboard and four of the six HyperUI site
 page kinds added since (listings, publication, nonprofit, docs-hub) default to Cerebras
 `gpt-oss-120b` (lowest preview p50 in
@@ -528,9 +537,9 @@ page kinds added since (listings, publication, nonprofit, docs-hub) default to C
 the three actually measured take the same site-kind winner by category, not individual
 benchmarking). The other two, restaurant and community, were deliberate exceptions and default
 to DeepSeek explicitly (`DEFAULT_MODEL_BY_FAMILY` names them with no model and with
-`deepseek-v4-flash` respectively), same destination as the seven hand-crafted site families that
-fall back to `DEFAULT_PROVIDER` because the table does not mention them at all — nine families on
-DeepSeek `deepseek-v4-flash` in total. `mode: 'sections'` (the default) makes one call per section; `mode: 'single'` fills
+`deepseek-flash` respectively), same destination as practice, storefront and guide, which
+fall back to `DEFAULT_PROVIDER` because the table does not mention them at all — five families on
+DeepSeek (`deepseek-flash`, the provider default in `packages/agency-fast-lane/src/deepseek.ts`) in total. `mode: 'sections'` (the default) makes one call per section; `mode: 'single'` fills
 the page in one call. One build runs at a time on a daemon; a second `POST /api/agency/build` answers 409
 `BUILD_BUSY`.
 
@@ -581,7 +590,11 @@ normal artifact. A cancelled build deletes a project it created. Deploys use
 `access`: `public` only when the provider confirms protection is off and an anonymous request
 reaches the page, `protected` when a probe hits a protection wall, and `unknown` otherwise. The
 "Public link is ready" sentence appears only for `public`; `od deploy --public` turns Vercel
-deployment protection off and exits 1 unless access is `public`.
+deployment protection off and exits 1 unless access is `public`. The daemon polls a Vercel
+deployment until it is `READY`, `ERROR`, `CANCELED` or `BLOCKED`; only `READY` takes the stable
+alias, a failed state returns `VERCEL_DEPLOY_FAILED` (502) and a deployment still building when
+polling stops returns `VERCEL_DEPLOY_TIMEOUT` (504). Setup and the CLI flags are in
+[`deployment/vercel.md`](deployment/vercel.md).
 
 Vercel and Cloudflare Pages share a publication allowlist: the selected HTML entry and its
 transitively referenced local files. Linked HTML pages, stylesheets and CSS imports, scripts,
@@ -618,12 +631,15 @@ watch-only GET endpoint, not an AG-UI agent endpoint. Other build routes:
 
 ### 8.8 GenUI component catalog
 
-`packages/genui-catalog` owns `catalog.json`, validated by `packages/genui-catalog/schema/catalog.schema.json`. Each of
-its 63 entries records its source (`react-bits`, `21st.dev`, `kokonut-ui`, `cult-ui-pro` or
+`packages/genui-catalog` owns `catalog.json`, validated by `packages/genui-catalog/schema/catalog.schema.json`. Each
+entry records its source (the schema allows `react-bits`, `21st.dev`, `kokonut-ui`, `cult-ui-pro` or
 `original`) and URL, licence decision (`clean-room`, `port-with-attribution`, `licensed` or
-`cut`), verdict (`keep`, `maybe` or `cut`), tier, port difficulty and status. `licensed` marks the
-six Cult UI Pro primitive ports, covered by the purchased licence in
-`docs/legal/cult-ui-pro-rights.md` rather than a clean-room rewrite. The `keep` entries are ported as framework-free ESM plus CSS with
+`cut`), verdict (`keep`, `maybe` or `cut`), tier, port difficulty and status. `licensed` marks
+Cult UI Pro primitive ports covered by a purchased licence rather than a clean-room rewrite.
+Those rows and their licence record (`docs/legal/cult-ui-pro-rights.md`) are not part of this
+public repository; licensed components arrive as an installed pack ([packs.md](packs.md)). The
+public `catalog.json` has 71 entries from `react-bits`, `21st.dev` and `kokonut-ui`, all
+`clean-room` except one `cut`. The `keep` entries are ported as framework-free ESM plus CSS with
 `mount(el, opts) => { destroy() }`, a demo fragment and a jsdom test; no React, GSAP or three.js.
 Family pages ship `default-src 'none'`, so catalog JS and CSS are inlined; the HyperUI page kinds
 keep `script-src 'none'` unless a reviewed family interaction or `js` effect is applied, and then
@@ -638,7 +654,8 @@ components each family declares into that family package under `compiler/scripts
 | `GET /api/genui/catalog/:id/preview` / `od catalog preview <id>` | The same offline demo document, or its embeddable URL (`--json`, `--reduced-motion`) |
 
 The same `/catalog` view carries two more segments over the Cult UI Pro inventory
-(`packages/cult-ui-catalog/catalog.json`, §8.9): **Blocks** (section and page rows, grouped by
+(`packages/cult-ui-catalog/catalog.json`, §8.9; it has no rows in this public repository, so both
+segments are empty here): **Blocks** (section and page rows, grouped by
 taxonomy section kind) and **Components** (primitive and app rows, grouped by source category).
 Both read `GET /api/cult/catalog` (`?kind=section|page|primitive|app|blocks|components`,
 `?state=`) and `GET /api/cult/catalog/:id` (`apps/daemon/src/routes/cult-catalog.ts`, DTO
@@ -799,8 +816,8 @@ source `catalog.json` in the fast-lane CLI. `GET /api/agency/families/:family/ef
 `packages/section-catalog/scripts/build-catalog.ts`), a sibling of the GenUI component catalog for a different unit: a
 *section* (placement, content, a family renderer) rather than a mountable effect. Two build-time
 sources feed it — all 80 pinned HyperUI blocks (`plugins/_official/shared/ui-kits/hyperui/manifest.json`)
-and every section of the 13 agency families, read from each family's own
-`reference.fixture.json` (111 family sections) — 191 entries in total — plus a third, federated
+and every section of the 12 agency families in this repository, read from each family's own
+`reference.fixture.json` (107 family sections) — 187 entries in total — plus a third, federated
 source that is never baked into `catalog.json`: MotionSites prompt metadata, normalized by
 `packages/section-catalog/src/motionsites.ts` from a signed-in user's MCP `list_prompts`/`search_prompts` result and merged
 into a catalog response at request time.
@@ -817,7 +834,9 @@ label (`license`, `decision`, `evidence`) that governs `availability`:
 | `cult-pro` | `bundle` (`licensed`, evidence `docs/legal/cult-ui-pro-rights.md` only) | `insertable` exactly when the section row has a checked adapter (`content.adapterId`, equal to the entry id); `adapter-needed` otherwise; `content` is a `cult-item` (Cult description, raw source title, `cult:<name>` + snapshot provenance), never source code |
 
 The `cult-pro` rows are a projection of `packages/cult-ui-catalog/catalog.json`, the canonical
-Cult UI Pro inventory (metadata and hashes only): one entry per `section` row (its taxonomy
+Cult UI Pro inventory (metadata and hashes only). In this public repository that inventory ships
+with no rows (the licensed inventory and `docs/legal/cult-ui-pro-rights.md` are kept out of it), so
+the committed `catalog.json` has no `cult-pro` entries. When present, the projection is one entry per `section` row (its taxonomy
 `sectionKind`) and per `page` row (`page-composition`). A section row the inventory left
 `unclassified` is skipped and reported by the build, not guessed into a kind. Display titles drop
 other companies' names in favour of a series letter ("Marketing Pricing Vercel" → "Pricing (series

@@ -50,9 +50,12 @@ docker compose up -d
 ```
 
 What to expect:
-- First run can take 1-2 minutes while Docker pulls the image. This repository's
-  CI publishes no image, so when the pull fails Compose builds `deploy/Dockerfile`
-  from your checkout instead; that first build takes several minutes
+- First run can take 1-2 minutes while Docker pulls the image named by
+  `MISH_IMAGE` (default `ghcr.io/zerosum-solutions/od:latest`). No GitHub workflow
+  in this repository publishes it; an operator pushes it with
+  [`deploy/scripts/publish-images.sh`](../../deploy/scripts/publish-images.sh).
+  When the pull fails, Compose builds `deploy/Dockerfile` from your checkout
+  instead; that first build takes several minutes
 - You should see container creation and startup messages
 
 ## Step 4: Confirm Container Health
@@ -94,3 +97,8 @@ networking override is required.
 - `pull access denied` or `authentication required` for `ghcr.io/zerosum-solutions/od`: the package is private. Run `docker login ghcr.io` with a GitHub token that has `read:packages`. If the image has never been published, build it locally instead with `docker compose up -d --build`.
 - reverse proxy + `OD_API_TOKEN`: either inject `Authorization: Bearer <OD_API_TOKEN>` at the proxy, or set `MISH_DISABLE_API_AUTH=1` only when that proxy already authenticates every request and the daemon is not directly exposed.
 - browser sign-in repeats: use username `mish` and the exact `OD_API_TOKEN` value from `deploy/.env`; recreate the container after changing the token.
+
+## Other deployment targets
+
+- Cloud guides: [Azure Container Instances](cloud/azure.md) and [Alibaba Cloud](cloud/aliyun.md).
+- Vercel cannot host the daemon. The root `vercel.json` deploys only a static UI shell; see [`vercel.md`](vercel.md).

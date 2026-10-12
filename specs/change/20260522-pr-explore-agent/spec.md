@@ -292,7 +292,7 @@ Before or after merging, the Mac mini can run the same sandbox path
 manually:
 
 ```bash
-git clone git@github.com:ZeroSum-Solutions/Mishh-Mashh-2.git
+git clone git@github.com:ZeroSum-Solutions/mish.git
 cd mish
 git fetch origin pull/2604/head:agent-pr-explore-sandbox
 git checkout agent-pr-explore-sandbox

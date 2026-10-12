@@ -19,7 +19,7 @@ For the current coverage posture, recent hardening work, grouped-run status, and
 - `lib/vitest/suite.ts`: Vitest-only suite assembly. It composes the neutral tools-dev runtime with report creation, scratch preservation, and Vitest assertions for non-UI smoke suites.
 - `lib/playwright/mock-factory.ts`: shared Playwright mock helpers. `applyStandardMocks(page)` seeds localStorage and intercepts `/api/agents`, `/api/app-config` and conversation model transport with standard mock-agent fixtures. `routeAgents` also installs scoped model snapshots for UI-only catalogs. Real-daemon specs skip these helpers and exercise actual model storage and authority. Use in `beforeEach` for tests that do not need a custom agent or protocol setup.
 - `lib/vitest/`: Vitest-specific atomic helpers only. Helpers describe actions such as mock servers, HTTP calls, and reports; tools-dev lifecycle belongs in `lib/tools-dev/` and is only composed through `lib/vitest/suite.ts`.
-- `lib/vitest/report.ts`: the report boundary. Specs save curated output through `report.save(<relpath>, <blob>)` or `report.json(<relpath>, value)`; release workflows should consume only the final report path, not its internal file layout.
+- `lib/vitest/report.ts`: the report boundary. Specs save curated output through `report.save(<relpath>, <blob>)` or `report.json(<relpath>, value)`; CI and release consumers should read only the final report path, not its internal file layout.
 - `createSmokeSuite(...).with.*`: suite-owned lifecycle composition from `@/vitest/suite`. Prefer this shape for namespace-bound resources such as `suite.with.toolsDev(...)` so specs keep business workflow code in the foreground.
 - Temporary e2e Vitest env/PATH mutations, AMR fake endpoint URLs, and packaged smoke default namespaces belong behind `@/vitest/suite` helpers such as `suite.with.env(...)`, `suite.with.pathEntry(...)`, `suite.amr`, and `resolvePackagedSmokeNamespace(...)`. Do not hand-roll save/restore blocks or fixed localhost ports in individual specs.
 - `lib/playwright/`: Playwright-specific fixtures, resource accessors, route helpers, and UI actions.
@@ -46,8 +46,9 @@ These invariants complement the coverage posture in
 this section is the source of truth for how a UI test must be written to stay
 green under the sharded full pool.
 
-The `ui-extended-main` full pool (the prerelease gate at its resolved build
-commit, or `workflow_dispatch` with `suite=full`)
+The `ui-extended-main` full pool (upstream's prerelease test workflow; that
+workflow is not published in this repository and `ci.yml` has no such lane, so
+here the pool is run by hand, e.g. `OD_PLAYWRIGHT_FULLY_PARALLEL=1 pnpm test:ui`)
 executes every non-visual functional shade in one generically sharded matrix
 (`visual-*.test.ts` is excluded by the config's `testIgnore` and runs in its
 own lane): arbitrary P0/P1/P2 interleavings, contiguous shard slices that

@@ -237,6 +237,15 @@ a `certain` decision.
 
 ### Workload identity, products, and publication
 
+> State of this public repository: `.github/workflows/ci.yml` is the only
+> workflow, and it does not invoke `.github/scripts/convergence.py`. No workload
+> reads reusable-result receipts, no convergence handoff is produced, and the
+> trusted `convergence.atom.yml` and `comment.atom.yml` consumers described below
+> are not published here, so every selected workload executes and nothing is
+> published to R2. `ci.yml` still writes `handoff/comment` artifacts, which have
+> no consumer in this repository. The contract below is the design those pieces
+> follow.
+
 Convergence declarations live in `.github/config/convergence.json`. A workload
 composes Git paths or globs, `suite://<name>` reusable path groups, or `"*"` for
 the tracked tree, and declares an execution class, product mode, and explicit

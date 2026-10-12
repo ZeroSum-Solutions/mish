@@ -44,6 +44,13 @@ The script:
    values from both.
 5. Leaves both raw JSONL outputs in `/tmp` for you to `diff`.
 
+The recording corpus is not part of this public repository: `mocks/manifest.json`
+still describes the externally hosted corpus (179 entries), but no recording
+file is committed and `mocks/recordings/` holds only its `.gitignore`. Without a corpus in
+`mocks/recordings/` (or `OD_MOCKS_RECORDINGS_DIR`), step 3 has nothing to replay:
+the mock exits with code 3 and "mock-agent: no recordings on disk yet", which is
+the missing-corpus state, not a contract finding.
+
 ## What to look for
 
 Compare the two `type` distributions. Acceptable differences:

@@ -5,8 +5,11 @@ This page describes what data Mishh Mashh sends off your machine, and when. It c
 ## Summary
 
 - Mishh Mashh is **local-first**. Projects, generated files and your API keys stay on your machine.
-- **Telemetry is off.** The app sends product analytics and crash reports only when a telemetry key (`POSTHOG_KEY`) is set when the daemon starts or the desktop app is packaged. Our launcher (`scripts/mishh-mashh-dev.sh`) does not set one, and this repository has no telemetry secrets. So the app sends no telemetry to ZeroSum Solutions or to anyone else.
+- **Telemetry is off.** The app sends product analytics and crash reports only when a telemetry key (`POSTHOG_KEY`) is set when the daemon starts or the desktop app is packaged. Neither `pnpm tools-dev` nor `scripts/team-setup.sh` sets one (`tools-dev` does load your own `.env` files, so a key in one of them would turn telemetry on), and this repository's workflows have no telemetry secrets. So the app sends no telemetry to ZeroSum Solutions or to anyone else.
 - **Model calls go where you choose.** When you run an agent or a model, the app sends your prompt and context to that agent or provider (for example Claude Code, Codex, DeepSeek or Cerebras). Their privacy terms apply to that data.
+- **Improve prompt** sends the prompt you are improving to one model lane: with **Settings → Labs → Faster Improve prompt** on and an OpenRouter key set, to OpenAI's GPT Terra through OpenRouter; otherwise to Claude through your signed-in Claude Code CLI.
+- **Agency builds** send the brief to Jev (TypeSafe) for routing and fact checks, and to DeepSeek or Cerebras for the fill.
+- **Vercel deploys** run only when you choose **Share → Vercel** or `od deploy`. The daemon uploads the page you deploy, and the files it needs, to Vercel with your Vercel token.
 
 ## Upstream services
 

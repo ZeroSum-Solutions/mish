@@ -8,7 +8,7 @@ ACI is the daemon upstream in this topology. The browser-facing app URL must be 
 
 - Azure CLI installed and signed in
 - Permission to create a resource group, storage account, file share, and container group
-- A public Docker image, or an image in a registry that ACI can pull
+- A Mishh Mashh image in a registry that ACI can pull. The template defaults to `ghcr.io/zerosum-solutions/od:latest`, but no workflow in this repository publishes that image; push one with [`deploy/scripts/publish-images.sh`](../../../deploy/scripts/publish-images.sh) and pass it as `image` (see [Optional Parameters](#optional-parameters))
 
 ## Step 1: Choose Names
 
@@ -146,7 +146,7 @@ View logs:
 ```bash
 az container logs \
   --resource-group "$RESOURCE_GROUP" \
-  --name mishh-mashh
+  --name mish
 ```
 
 Restart the container group:
@@ -154,7 +154,7 @@ Restart the container group:
 ```bash
 az container restart \
   --resource-group "$RESOURCE_GROUP" \
-  --name mishh-mashh
+  --name mish
 ```
 
 Delete all Azure resources created by this guide:
@@ -169,4 +169,4 @@ az group delete \
 - Do not expose the raw ACI endpoint as the browser-facing app URL. Use it as the upstream for a trusted proxy or for token-authenticated operational checks.
 - Keep `OD_API_TOKEN` secret. The proxy may use it upstream, but browser clients must not receive it. Rotate it by redeploying with a new value.
 - Keep `allowedOrigins` aligned with the browser-visible proxy origin; otherwise the daemon origin guard will reject browser API requests.
-- The Azure Files share persists project data after container restarts and image updates.
+- The Azure Files share persists project data after container restarts and image updates. Azure Files is SMB storage, and [`deploy/azure/README.md`](../../../deploy/azure/README.md) warns that SQLite locking is unsupported there and can corrupt the database; that README's `aci.bicep` and `app-service.bicep` lanes keep data on ephemeral local disk for that reason. Treat this template as evaluation only, and use Docker Compose ([`docker.md`](../docker.md)) for durable self-hosting.

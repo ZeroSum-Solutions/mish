@@ -70,8 +70,8 @@ response or the package version alone does not prove that the app is current.
 - Fetch `origin` before comparing with `origin/main`. If fetching fails, report that
   freshness is unverified; do not describe cached refs as the latest GitHub state.
 - Always name `--repo ZeroSum-Solutions/mish` in GitHub CLI commands.
-  This fork also has an upstream remote; implicit GitHub CLI repository selection
-  can resolve to `ZeroSum-Solutions/mish` and return the wrong PR inventory.
+  A checkout can also carry an upstream remote; implicit GitHub CLI repository
+  selection can then resolve to the upstream project and return the wrong PR inventory.
 - Check open PRs with `gh pr list --repo ZeroSum-Solutions/mish --state open`
   and live remote branches with
   `gh api repos/ZeroSum-Solutions/mish/branches --paginate`.
@@ -211,7 +211,7 @@ This public repository ships only `.github/workflows/ci.yml`. The atomic capabil
 
 CI-related GitHub automation uses a two-layer architecture:
 
-- Business layer workflows own product or validation decisions. `ci.yml` is the main low-privilege PR, merge-queue, and manual validation workflow. It detects scope, runs checks, and produces typed handoff artifacts.
+- Business layer workflows own product or validation decisions. `ci.yml` is the only workflow in this repository: the low-privilege PR, merge-queue, and manual validation workflow. It detects scope, runs checks, and produces typed handoff artifacts (the merge-blocking label gate and the merge-queue failure notice write `handoff/comment` artifacts); with no atomic workflow published here, nothing consumes them, so they stay downloadable diagnostics.
 - Atomic capability workflows own reusable trusted operations. `comment.atom.yml` publishes pure text PR comments, `autofix.atom.yml` applies same-repository patches, and `report.atom.yml` materializes advanced comments that need trusted dependencies, secrets, or report generation before upsert.
 
 Do not add a new business-named follow-on workflow such as `foo.comment.atom.yml` or `bar.autofix.atom.yml` without first trying to express the flow as a `ci.yml` producer plus the existing `comment`, `autofix`, or `report` capability. Keep artifact naming, storage layout, and parser behavior centralized in `.github/scripts/handoff.py`; do not let individual workflows invent parallel handoff conventions.
@@ -265,6 +265,11 @@ conservative behavior such as:
 - direct planner tests cover representative in-bound, out-of-bound, mixed, and
   fallback inputs without reimplementing the evaluator in another language.
 
+This repository's `ci.yml` has no reusable-result path: it does not run a
+convergence check, read R2 receipts, or produce convergence handoffs. The
+paragraph below applies only if such a path is reintroduced by an explicit
+owner decision.
+
 Keep scope routing and reusable-result convergence conceptually orthogonal:
 scope answers which test sets are necessary for a change, while convergence
 answers whether an identically declared workload already has a validated,
@@ -281,7 +286,7 @@ confidence methodology in `specs/current/ci.md`.
 
 ## Cost discipline
 
-This repository is public. CI runs only on GitHub-hosted runners; never add self-hosted runners or `pull_request_target` workflows, and keep secrets out of workflows.
+This repository is public. CI runs only on GitHub-hosted runners and needs no repository secrets or variables (only the automatic read-only `github.token`); never add self-hosted runners or `pull_request_target` workflows, and keep secrets out of workflows.
 
 - Batch work into one coherent feature PR, not one PR per fix.
 - Open PRs as drafts and mark them ready once, after review and the targeted local gates.
@@ -344,7 +349,7 @@ Every user-facing capability must be reachable through both the web UI **and** t
 - The CLI form must support `--json` for machine-readable output and accept long-form prompts via `--prompt-file <path|->`, so jobs that pipe through `xargs`, `jq`, and `<heredoc` stay clean.
 - Adding a new capability is a three-step closure: HTTP endpoint in `apps/daemon/src/*-routes.ts` (with a contract type in `packages/contracts/src/api/`), UI surface in `apps/web/src/`, and `od <capability>` subcommand in `apps/daemon/src/cli.ts` registered through `SUBCOMMAND_MAP`. Land all three in the same PR; do not stage them across PRs.
 - The PR template's Surface area checklist must reflect *both* surfaces. If you ticked UI, tick CLI too — and vice-versa — or explain in the PR body why the missing surface is genuinely not applicable (e.g. an internal-only daemon health probe). "I'll do the CLI later" is not a valid reason.
-- Existing reference points: `od automation …` mirrors the Automations tab against `/api/routines`; `od plugin …`, `od ui …`, `od project …`, `od media …`, `od mcp …`, `od research …` follow the same shape. Copy that pattern for new capabilities.
+- Existing reference points: `od automation …` mirrors the Automations tab against `/api/routines`; `od plugin …`, `od ui …`, `od project …`, `od media …`, `od mcp …`, `od research …` follow the same shape. `od workbench transform` and `od workbench brief show|edit|accept|cancel|attach|transformer` mirror the composer's Improve prompt dialog against `/api/workbench/briefs*`, and `od deploy …` mirrors the in-product deploy against `POST /api/projects/:id/deploy`. Copy that pattern for new capabilities.
 
 ## Git commit policy
 
@@ -458,7 +463,7 @@ Before changing any prompt text — in any of those locations — read `docs/pro
   validation.
 - After package, workspace, or command-entry changes, run `pnpm install` so workspace links and generated dist entries stay fresh.
 - For agent-stream / parser changes (`apps/daemon/src/runtimes/claude-stream.ts`, `json-event-stream.ts`, `qoder-stream.ts`, etc.), replay a recorded session through the mock CLIs in `mocks/` to verify event shapes round-trip without burning provider budget. PATH-overlay activation: `export PATH="$PWD/mocks/bin:$PATH" OD_MOCKS_TRACE=<8-char-id> OD_MOCKS_NO_DELAY=1`. See `mocks/README.md` for the trace catalog and selection knobs.
-- No workflow in this repository builds or publishes the Docker image, and it is outside the core `ci.yml` / `Validate workspace` / merge queue gate. Publish it with `deploy/scripts/publish-images.sh`; `deploy/scripts/install.sh` builds it from the checkout when no image can be pulled.
+- No workflow in this repository builds or publishes the Docker image, and it is outside the core `ci.yml` / `Validate workspace` / merge queue gate. The image `deploy/docker-compose.yml` pulls is `ghcr.io/zerosum-solutions/od`; publish it by hand with `deploy/scripts/publish-images.sh --image_namespace zerosum-solutions` (registry names must be lowercase), and `deploy/scripts/install.sh` builds it from the checkout when no image can be pulled.
 - Before marking regular work ready, run at least `pnpm guard` and `pnpm typecheck`, plus the package-scoped tests/builds that match the files changed. Do not use or add root `pnpm test`/`pnpm build` aliases.
 - For local web runtime loops, prefer `pnpm tools-dev run web --daemon-port <port> --web-port <port>`.
 - For e2e tests that need a tools-dev daemon/web runtime, use the shared tools-dev harness under `e2e/lib/tools-dev/` and the framework suite adapters (`e2e/lib/playwright/suite.ts`, `e2e/lib/vitest/suite.ts`). Do not hand-spawn `tools-dev` from test cases or duplicate lifecycle helpers under framework-specific folders.

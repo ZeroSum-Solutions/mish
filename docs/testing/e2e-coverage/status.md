@@ -23,12 +23,12 @@
 
 当前策略是明确的：继续增强 `extended` 的信号，但不把 `critical` 变成一个越来越慢的大杂烩。
 
-合并门禁按 P0 domain 拆分运行；完整 Functional UI 套件在
-`release-prerelease-tests.yml` 中针对 prerelease 解析出的精确构建 commit 独立运行。
-该 validation 由发布流水线 fire-and-forget 调度，不持有 prerelease 的全局 concurrency group，
-也不阻断已发布包体。也可以通过
-`.github/workflows/ui-extended-main.yml` 的 `workflow_dispatch` 手动选择
-`p0`、`p0p1` 或 `full`。
+合并门禁按 P0 domain 拆分运行（`.github/workflows/ci.yml` 的 `playwright_critical`
+等 job）。在上游拓扑中，完整 Functional UI 套件在
+`release-prerelease-tests.yml` 中针对 prerelease 解析出的精确构建 commit 独立运行，
+也可以通过 `ui-extended-main.yml` 的 `workflow_dispatch` 手动选择 `p0`、`p0p1` 或 `full`。
+本公开仓库只发布 `.github/workflows/ci.yml`，这两个 workflow 不在本仓库中；
+本地可用 `pnpm --filter @mish/e2e test:ui:p0`、`test:ui:p0p1` 或 `test:ui` 运行对应范围。
 
 用 `mise exec -- pnpm -C e2e exec playwright test -c playwright.config.ts ui --list`
 从当前 clean-slate 分支实时生成的 Functional Playwright 清单为
@@ -133,6 +133,8 @@ Playwright 资源场景现在支持显式 contract：
   - 确认 mixed artifact / file workspace 在 reload 后仍然完整
 
 ### 7. Prerelease 精确提交与包体信号
+
+以下描述上游发布拓扑；本公开仓库不包含这些 release workflow。
 
 `release-prerelease.yml` 只保留 `metadata → build_* → publish` 与 fire-and-forget dispatcher。
 Functional E2E、E2E Vitest、daemon 单测和 verify 在 `release-prerelease-tests.yml` 中针对

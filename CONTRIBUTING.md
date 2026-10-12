@@ -30,13 +30,12 @@ If CI fails, treat it as a real failure and fix it on a new head. Rerun only wit
 | A capability users reach | Web UI and `od` CLI in the same pull request, through the same `/api/*` endpoint. See "Capability exposure" in `AGENTS.md`. |
 | Design systems | Follow [`docs/design-systems/QUALITY-STANDARD.md`](docs/design-systems/QUALITY-STANDARD.md). Do not copy a real company's brand. `pnpm guard` runs the promotion gate. |
 | Plugins | Follow [`docs/plugins/PLAYBOOK.md`](docs/plugins/PLAYBOOK.md): scaffold, `od plugin validate`, then a pull request to this repository. |
-| Workflows and CI | Read [`.github/AGENTS.md`](.github/AGENTS.md) Use GitHub-hosted runners only; this repository is public. |
+| Workflows and CI | Read [`.github/AGENTS.md`](.github/AGENTS.md). Use GitHub-hosted runners only; this repository is public. |
 | Changes from upstream | Cherry-pick single commits and log each one in [`docs/FORK-PIN.md`](docs/FORK-PIN.md). Never merge from upstream. |
 
 ## Never
 
-- Commit licensed, paid, scraped or other third-party content without a recorded licence that allows public redistribution. Such content belongs in a private pack (`docs/packs.md`).
-
+- Commit licensed, paid, scraped or other third-party content without a recorded licence that allows public redistribution. Such content belongs in a private pack ([`docs/packs.md`](docs/packs.md)).
 - Commit secrets. Credentials come from environment variables or the app's settings, never from files in the repository.
 - Force-push `main`, rewrite shared history, or use a bare `git stash` in a shared checkout.
 - Add upstream names or logos as our identity. See [`docs/legal/LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md).

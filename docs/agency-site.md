@@ -15,7 +15,7 @@ lets the assistant choose a family and edit typed section JSON in a chat.
 
 ## Fast lane: brief to published page
 
-The fast lane routes a brief to one of sixteen families, fills the family's
+The fast lane routes a brief to one of twelve families, fills the family's
 slots, checks every fact against the brief (with the default `strict` verify) and
 publishes the page as a project.
 By default the fill makes one structured model call per section
@@ -201,7 +201,9 @@ brand-free title, its kind, source category, spines, tags and one honest state: 
 converted yet** (nothing blocks it; no reviewed adapter yet), **App only** or **Pending** (not
 fetched yet). No block is insertable until
 its reviewed adapter lands, and previews arrive with the adapters. The CLI reads the same
-endpoint (`GET /api/cult/catalog`):
+endpoint (`GET /api/cult/catalog`). This repository ships `packages/cult-ui-catalog/catalog.json`
+with no rows (the licensed inventory is not part of it), so here both segments are empty and the
+commands below list nothing; `cult:marketing-pricing-vercel` is an example name from that inventory:
 
 ```sh
 od cult list --kind section --state needs-adaptation
@@ -214,11 +216,12 @@ od cult get cult:marketing-pricing-vercel
 One reviewed section can be composed on top of a build's fixed family recipe — a *composition
 overlay*, not a change to the family's own recipe schema. `GET /api/sections` (filter with
 `?spine=`/`?kind=`) and `GET /api/sections/:id` list the selectable catalog: HyperUI blocks, the
-13 families' own sections (informational, selectable only through that family's own section
+12 families' own sections (informational, selectable only through that family's own section
 controls above), owner-authored local-corpus prompts, and federated MotionSites prompts (when
 signed in). The **insertable** entries are three reviewed HyperUI adapters
-(`marketing/sections/1`, `marketing/feature-grids/1` and `marketing/ctas/1`) and the reviewed Cult
-UI Pro adapters (`cult:…`) generated in `packages/cult-ui-catalog/generated/` — everything else in
+(`marketing/sections/1`, `marketing/feature-grids/1` and `marketing/ctas/1`) and, only where the
+licensed pack supplies them, the reviewed Cult UI Pro adapters (`cult:…`); this repository ships an
+empty adapter registry in `packages/cult-ui-catalog/generated/` — everything else in
 the catalog is browsable but `adapter-needed` or `reference-only`.
 
 **Web.** The Build panel's section picker lists the insertable entries with each one's access

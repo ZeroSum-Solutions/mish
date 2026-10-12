@@ -12,11 +12,10 @@ Primary sources:
 - `docs/publishing-a-plugin.md`, `docs/self-hosting-a-registry.md`
 - `plugins/spec/README.md`, `plugins/spec/SPEC.md`, `plugins/spec/AGENT-DEVELOPMENT.md`,
   `plugins/spec/CONTRIBUTING.md`, `plugins/spec/PUBLISHING-REGISTRIES.md`
-- `plugins/_official/examples/agency-fervor/` and sibling agency packages
+- `plugins/_official/examples/agency-practice/` and sibling agency packages
 - `plugins/_official/scenarios/od-plugin-authoring/`
 - `apps/daemon/src/cli.ts`, `apps/daemon/src/plugins/`
-- `.github/workflows/ci.yml`, `.github/workflows/catalog-validate.yml`,
-  `.github/workflows/catalog-publish.yml`, `.github/workflows/bake-plugin-previews-pr.yml`
+- `.github/workflows/ci.yml` (the only workflow in this repository)
 - `scripts/sync-agency-compiler.ts`
 - root `AGENTS.md` (capability exposure, prompt-composition sections)
 
@@ -51,8 +50,8 @@ under `plugins/_official/`:
   standalone plugin.
 
 The best worked examples in this repo are the **agency family packages** under
-`plugins/_official/examples/agency-*/` (`agency-fervor`, `agency-watson`, `agency-emmpo`,
-`agency-wrenfield`, `agency-community`, and others). Each one is `od.kind: "scenario"` and pairs a `SKILL.md`
+`plugins/_official/examples/agency-*/` (`agency-practice`, `agency-restaurant`,
+`agency-storefront`, `agency-community`, `agency-marketing-site`, and seven others). Each one is `od.kind: "scenario"` and pairs a `SKILL.md`
 with a **typed, trusted compiler** instead of freeform generation — see section 2.
 
 ### Anatomy of a plugin folder
@@ -168,13 +167,12 @@ Repo-wide checks, from `plugins/spec/SPEC.md` section 10 and root `package.json`
 ```bash
 pnpm guard
 pnpm --filter @mish/daemon typecheck
+pnpm --filter @mish/plugin-runtime typecheck
 ```
 
-`pnpm --filter @mish/plugin-runtime typecheck`, cited in `plugins/spec/SPEC.md`
-and `plugins/spec/AGENT-DEVELOPMENT.md`, targets a package named
-`@mish/plugin-runtime`. It is not in `package.json`'s current `devDependencies`
-list and no such workspace package was found in this checkout — **(not verified)**. Run
-`pnpm --filter @mish/daemon typecheck` as the real equivalent instead.
+`@mish/plugin-runtime` (`packages/plugin-runtime`), cited in `plugins/spec/SPEC.md`
+and `plugins/spec/AGENT-DEVELOPMENT.md`, is a workspace package with its own
+`typecheck` script.
 
 ### 2.4 Test it locally in the running app
 
@@ -194,30 +192,30 @@ re-verified here — **(not verified)** for the precise flag list).
 For a visual plugin, `apps/daemon/src/plugins/plugin-preview-bakes.ts` plus
 `.github/actions/bake-previews/` render the declared `od.preview.entry` and check it
 loads as `200 text/html`; `plugins/spec/AGENT-DEVELOPMENT.md` calls a preview-baker
-`404` a failure for that plugin even when the overall bake job stays green.
+`404` a failure for that plugin even when the overall bake job stays green. No workflow
+in this repository calls that action today, so the bake does not run on pull requests.
 
 ### 2.5 The quality bar the best official plugins meet
 
-Observed directly in `plugins/_official/examples/agency-fervor/` and its siblings:
+Observed directly in `plugins/_official/examples/agency-practice/` and its siblings:
 
 | Pattern | What it looks like | Where |
 | --- | --- | --- |
-| Typed slots, not freeform markup | A JSON `recipe.json` with fixed `schemaVersion`, fixed section IDs, plain-text/color/asset-id slots only — no HTML/CSS/JS | `families/fervor/recipe.json` |
-| A trusted compiler | A dedicated `compose.ts` that renders the recipe into HTML; the author is told explicitly not to edit the compiler to force acceptance | `compiler/scripts/compose.ts`, `compiler/SKILL.md` |
-| `approved-assets.json` | Every image/font entry carries `id`, `file`, `kind`, `sha256`, `mediaType`, `bytes` — an integrity-checked asset roster, not a loose folder | `families/fervor/approved-assets.json` |
-| Preview media | A real compiled reference build plus a `gallery.html` wrapper for in-app preview routing | `preview/fervor-r1.html`, `preview/gallery.html` |
+| Typed slots, not freeform markup | A JSON `recipe.json` with fixed `schemaVersion`, fixed section IDs, plain-text/color/asset-id slots only — no HTML/CSS/JS | `families/practice/recipe.json` |
+| A trusted compiler | A dedicated `compose.ts` that renders the validated recipe into HTML; the model fills slots and never writes markup | `compiler/scripts/compose.ts`, `SKILL.md` |
+| `approved-assets.json` | An integrity-checked asset roster, not a loose folder (empty for packages that ship no media) | `families/practice/approved-assets.json` |
 | `publishedAt` stamps | ISO 8601 timestamp of first publish, required for bundled first-party plugins and enforced by a test | `mish.json`, `e2e/tests/plugin-published-at.test.ts` (per `docs/plugins-spec.md` §5.1) |
 | i18n in `en` and other locales | `title_i18n` / `description_i18n` maps, e.g. 17 locales on `od-plugin-authoring` | `plugins/_official/scenarios/od-plugin-authoring/mish.json` |
-| Rights and provenance recorded | A `media-provenance.json` plus a README "Rights" section naming source and license per asset | `families/fervor/media-provenance.json`, `plugins/_official/examples/agency-fervor/README.md` |
-| Reproducible build command | The exact CLI invocation to regenerate the reference build, checked into the README | `plugins/_official/examples/agency-fervor/README.md` |
+| Rights and provenance recorded | A README "Rights and provenance" section | `plugins/_official/examples/agency-practice/README.md` |
+| Reproducible test command | The exact command that runs the family's render tests, checked into the README | `plugins/_official/examples/agency-practice/README.md` ("Test") |
 
 Product note: the product's only locale is English (owner decision 2026-10-10) — see the
 root `AGENTS.md` i18n-keys rule — so `title_i18n`/`description_i18n` only strictly need
 `en` for anything ZeroSum ships; upstream examples carry more locales because
 they target a wider install base.
 
-The **compiler-per-family duplication is deliberate but centrally synced**: eleven
-copies of one compiler exist because a packed/installed plugin cannot import a shared
+The **compiler-per-family duplication is deliberate but centrally synced**: thirteen
+copies of one compiler exist (twelve family packages plus the template) because a packed/installed plugin cannot import a shared
 workspace package. `scripts/sync-agency-compiler.ts` fans the canonical copy at
 `plugins/_official/shared/agency-compiler/scripts/` out to every family package and to
 `design-templates/agency-site/scripts/`, and its `--check` mode is the CI gate. If
@@ -254,16 +252,19 @@ Two more real CLI paths matter for the "publish to our own repo" question:
 - `od plugin publish-repo <folder>` creates or updates a public GitHub repo named by the
   plugin's manifest — a standalone-repo publish, independent of any registry.
 - `od plugin mish-pr <folder>` copies the plugin into
-  `plugins/community/<name>/` on a new branch of `ZeroSum-Solutions/Mishh-Mashh-2` and
-  opens a PR there. It does not fork: contributors push the branch directly to the
-  private org repository. `od plugin publish --to mish` and `od plugin yank` open
-  issues on the same repository. All three read `MISHH_MASHH_PLUGIN_REPO` in
+  `plugins/community/<name>/` on a new branch and opens a PR against the public catalog
+  repository, `ZeroSum-Solutions/mish`. Unless the resolved owner is that organization, it
+  forks the catalog under the owner (the author's login, or the `--owner` org) with
+  `gh repo fork` and pushes the branch there; passing `--owner ZeroSum-Solutions`
+  pushes to the catalog repository directly.
+  `od plugin publish --to mish` and `od plugin yank` open issues on the same
+  repository. All three read `MISHH_MASHH_PLUGIN_REPO` in
   `apps/daemon/src/plugins/catalog-repo.ts`.
 
 ### 3.2 What this means for ZeroSum
 
-We publish to one place only: our own private repo,
-`ZeroSum-Solutions/Mishh-Mashh-2`. There is no external registry, no `skills.sh`
+We publish to one place only: our own public repo,
+`ZeroSum-Solutions/mish`. There is no external registry, no `skills.sh`
 listing, no ClawHub submission, unless a future decision changes that.
 
 **Recommended ZeroSum flow**, built from verified primitives above:
@@ -272,34 +273,26 @@ listing, no ClawHub submission, unless a future decision changes that.
    `plugins/community/<plugin-id>/` for anything not yet production-grade — note this
    folder does not exist in the checkout yet; create it on first use).
 2. Author, then validate locally: `od plugin validate <folder>`, `pnpm guard`.
-3. Open a normal PR against our own default branch. CI validation that already covers
-   `plugins/**` on every PR, verified in the workflow files:
-   - `.github/workflows/catalog-validate.yml` — runs on `pull_request` for paths
-     including `plugins/**`, exports and schema-checks the product catalog.
-   - `.github/workflows/bake-plugin-previews-pr.yml` — runs on PRs touching
-     `plugins/_official/**` or `plugins/community/**`, renders the plugin's preview in
-     strict mode, and fails the PR if the preview breaks.
-   - `.github/workflows/ci.yml` runs the agency family compiler render tests directly:
-     `node --experimental-strip-types --test
-     plugins/_official/examples/agency-*/compiler/scripts/families/*/render.test.ts`.
-4. Merge only with all of the above green — this is the "PR with green CI" gate the goal
-   asked for.
-5. `catalog-publish.yml`, which writes the merged catalog to R2, is gated
-   `if: github.repository == '<upstream repository>' && github.ref == 'refs/heads/main'`
-   (verified in `.github/workflows/catalog-publish.yml`). On our private fork this
-   condition is false, so merging a plugin PR today does **not** auto-publish anything —
-   it only lands the plugin in-repo. That is fine for local/desktop use through
-   `od plugin install ./plugins/_official/<id>`, but if we ever want our own catalog
-   snapshot published, someone has to either fork this workflow's `if` to our repo name
-   or replace it with a ZeroSum-owned publish job.
+3. Open a normal PR against our own default branch. `.github/workflows/ci.yml` is the
+   only workflow in this repository; among its jobs, `agency_tests` runs the agency
+   family compiler render tests directly:
+   `node --experimental-strip-types --test
+   plugins/_official/examples/agency-*/compiler/scripts/families/*/render.test.ts`.
+   No workflow here exports or schema-checks the catalog or bakes plugin previews on a
+   PR; run `od plugin validate` locally for those.
+4. Merge only with CI green — this is the "PR with green CI" gate the goal asked for.
+5. No workflow in this repository publishes the merged catalog anywhere, so merging a
+   plugin PR does **not** auto-publish anything — it only lands the plugin in-repo.
+   That is fine for local/desktop use through `od plugin install ./plugins/_official/<id>`;
+   a published catalog snapshot would need a ZeroSum-owned publish job.
 6. The in-app registry (`od marketplace`) and the bundled plugin sources point at our
    repository. `marketplaceRegistryRepo()` in `apps/daemon/src/plugins/marketplaces.ts`
    defaults to `MISHH_MASHH_PLUGIN_REPO`, and `OD_MARKETPLACE_REPO`,
    `OD_MARKETPLACE_REPO_REF` and `OD_MARKETPLACE_REGISTRY_PATH` still override it.
    `OFFICIAL_PLUGIN_SOURCE_REPO` in `marketplace-seed.ts` and the `source` fields in
    `plugins/registry/official/mish-marketplace.json` use
-   `github:ZeroSum-Solutions/Mishh-Mashh-2@main`. The official registry is read from the
-   local `plugins/registry/` folder, so the private repository needs no public access.
+   `github:ZeroSum-Solutions/mish@main`. The official registry is read from the
+   local `plugins/registry/` folder.
 
 ## 4. Checklist for a new Mishh Mashh plugin
 
@@ -319,9 +312,8 @@ listing, no ClawHub submission, unless a future decision changes that.
 7. Validate: `od plugin validate <folder>`, `pnpm guard`.
 8. Install locally and click through it: `od plugin install ./<folder>` against a
    running `pnpm tools-dev` daemon.
-9. Open a PR into our own repo. Confirm `catalog-validate.yml` and
-   `bake-plugin-previews-pr.yml` (if the plugin is visual) both pass before merge.
-10. After merge, remember: nothing auto-publishes off our fork today (see 3.2, point 5).
+9. Open a PR into our own repo and confirm `ci.yml` passes before merge.
+10. After merge, remember: nothing auto-publishes from this repository today (see 3.2, point 5).
     If the plugin needs to be discoverable outside this repo, that is a separate,
     explicit decision.
 
@@ -336,33 +328,26 @@ listing, no ClawHub submission, unless a future decision changes that.
   individually re-verified for this playbook — treat that specific pipeline as
   **(not verified)** and re-check flags with `od <subcommand> --help` before scripting
   against it.
-- **`pnpm --filter @mish/plugin-runtime typecheck`**, listed as a validation step
-  in both `plugins/spec/SPEC.md` and `plugins/spec/AGENT-DEVELOPMENT.md`, targets a
-  package that was not found in this checkout's workspace. **(not verified)** — use
-  `pnpm --filter @mish/daemon typecheck` instead.
 - **One constant owns the publish target.** `MISHH_MASHH_PLUGIN_REPO` in
   `apps/daemon/src/plugins/catalog-repo.ts` feeds the PR flow, the publish and yank issue
   links, and the default marketplace. Change the repository name there, then update the
   `source` fields in `plugins/registry/official/mish-marketplace.json` and the
   URL prefix in `tools/release/src/catalog/{export,validate}.ts`.
-- **`catalog-publish.yml` is repo-gated, not branch-gated.** It checks
-  the upstream repository name before it ever runs, so pushing to our
-  `main` does not silently start publishing to upstream's R2 bucket — but it also means
-  our own merges never populate any catalog snapshot until we add our own publish job.
+- **Nothing publishes the catalog.** This repository has no catalog publish workflow,
+  so our merges never populate any catalog snapshot until we add our own publish job.
 - **`plugins/community/` does not exist in this checkout.** Several docs
   (`docs/publishing-a-plugin.md`, `plugins/spec/PUBLISHING-REGISTRIES.md`) assume it as
   the default scaffold/PR target. `plugins/_official/` is the only populated plugin root
   today; create `plugins/community/` deliberately if we want that separation, don't
   assume it is already there.
-- **The compiler-per-family pattern is intentional duplication, not drift.** Eleven
+- **The compiler-per-family pattern is intentional duplication, not drift.** Thirteen
   identical copies of the agency compiler exist because a packed, installed plugin
   cannot `import` a shared workspace package at runtime. Don't try to deduplicate them
   by hand; `scripts/sync-agency-compiler.ts` is the only supported way to keep them
   synced, and its `--check` mode is what CI runs.
-- **`docs/FORK-PIN.md` names a different owner than the goal's target repo.** The
-  recorded `origin` remote is `<private origin>`, not
-  `ZeroSum-Solutions/Mishh-Mashh-2`. Confirm the live remote before wiring publish
-  automation to either name.
+- **`docs/FORK-PIN.md` records the remotes.** `origin` is the public
+  `ZeroSum-Solutions/mish`, the same repository `MISHH_MASHH_PLUGIN_REPO` names. Confirm
+  the live remote before wiring publish automation.
 - **A preview 404 fails the plugin even when the overall bake job is green.**
   `plugins/spec/AGENT-DEVELOPMENT.md`'s quality bar states this explicitly; it is easy
   to miss in a bake log that otherwise reports success.
