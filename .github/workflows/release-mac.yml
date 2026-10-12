@@ -1,0 +1,66 @@
+name: release-mac
+
+# Builds an unsigned, portable macOS (Apple Silicon) package and attaches it to
+# the GitHub Release for the tag. No Apple signing secrets exist, so the app is
+# ad-hoc signed only; the README documents the first-launch steps.
+# Not a pull_request workflow: it runs only on version tags or by hand.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to build and publish to (for example v0.1.0)
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-mac-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build and publish macOS arm64
+    runs-on: macos-latest
+    timeout-minutes: 90
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup-workspace
+
+      - name: Build portable dmg and zip
+        run: pnpm tools-pack mac build --to all --portable --json | tee "$RUNNER_TEMP/build.json"
+
+      - name: Collect release files
+        run: |
+          set -euo pipefail
+          mkdir -p release-out
+          out=.tmp/tools-pack/out/mac/namespaces/default
+          cp "$out/dmg/Mish-default.dmg" "release-out/Mish-${RELEASE_TAG}-mac-arm64.dmg"
+          cp "$out/zip/Mish-default.zip" "release-out/Mish-${RELEASE_TAG}-mac-arm64.zip"
+          ls -la release-out
+          test -n "$(ls release-out/*.dmg 2>/dev/null)" || { echo "no dmg produced" >&2; exit 1; }
+          (cd release-out && shasum -a 256 * > SHA256SUMS)
+          cat release-out/SHA256SUMS
+
+      - name: Create or update the GitHub Release
+        run: |
+          set -euo pipefail
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" \
+              --title "$RELEASE_TAG" --verify-tag \
+              --notes "Unsigned macOS build (Apple Silicon). Open the dmg, drag Mish to Applications, then right-click and choose Open on first launch. Verify downloads against SHA256SUMS."
+          fi
+          gh release upload "$RELEASE_TAG" release-out/* --repo "$GITHUB_REPOSITORY" --clobber
