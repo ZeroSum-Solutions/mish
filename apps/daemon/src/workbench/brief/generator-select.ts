@@ -40,8 +40,12 @@ export function createSelectableBriefGenerator(options: SelectableBriefGenerator
     billingLane: options.claude.billingLane,
     maxInputChars: Math.min(options.claude.maxInputChars, options.terra.maxInputChars),
     async available(): Promise<BriefGeneratorAvailability> {
-      if (await lane() === 'terra' && (await options.terra.available()).available) return { available: true };
-      return options.claude.available();
+      const terraLane = await lane() === 'terra';
+      if (terraLane && (await options.terra.available()).available) return { available: true };
+      const claude = await options.claude.available();
+      // On the Terra lane an OpenRouter key is the other way to a brief; say so.
+      if (!claude.available && terraLane) return { ...claude, recovery: `${claude.recovery} Or add an OpenRouter key so GPT Terra writes the brief.` };
+      return claude;
     },
     async generate(input, signal, transient) {
       if (!terraTried.has(signal) && await lane() === 'terra') {

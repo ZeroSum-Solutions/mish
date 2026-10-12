@@ -5,7 +5,7 @@ const page = '<!doctype html><h1>Newest bakery page</h1>';
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 const prior = { vercelProjectId: 'prj_ours', vercelProjectName: 'bobs-bakery', vercelAccountId: 'team_ours', vercelTeamId: 'team_ours', vercel: { projectName: 'bobs-bakery', requestedAddress: 'bobs-bakery.vercel.app', assignedAlias: 'bobs-bakery-actual.vercel.app', stableUrl: 'https://bobs-bakery-actual.vercel.app' } };
 
-function provider(options: { taken?: boolean; stale?: boolean; scope?: boolean; mismatch?: boolean; conflict?: boolean; legacy?: boolean; uploadFails?: boolean; assignFails?: boolean; emptyDomains?: boolean; noAlias?: boolean; redirect?: boolean; foreignAlias?: boolean; lostAlias?: boolean; branch?: boolean; paginated?: boolean } = {}) {
+function provider(options: { taken?: boolean; stale?: boolean; scope?: boolean; mismatch?: boolean; conflict?: boolean; legacy?: boolean; uploadFails?: boolean; assignFails?: boolean; emptyDomains?: boolean; noAlias?: boolean; redirect?: boolean; foreignAlias?: boolean; lostAlias?: boolean; branch?: boolean; paginated?: boolean; readyState?: string } = {}) {
   const calls: Array<{ url: string; method: string; body?: Record<string, unknown> }> = [];
   let assigned = false;
   const name = options.legacy ? vercelProjectNameForProject('legacy') : options.mismatch ? 'someone-else' : 'bobs-bakery';
@@ -22,7 +22,7 @@ function provider(options: { taken?: boolean; stale?: boolean; scope?: boolean; 
     }
     if (url.includes('/v11/projects')) return options.conflict ? json({ error: { code: 'project_name_taken' } }, 409) : json({ id: 'prj_ours', name, accountId: 'team_ours' });
     if (url.includes('/v2/files')) return options.uploadFails ? json({ error: { message: 'Upload failed' } }, 503) : json({});
-    if (url.includes('/v13/deployments')) return json({ id: 'dpl_new', projectId: 'prj_ours', url: 'bobs-bakery-hash-team.vercel.app', readyState: 'READY', alias: options.noAlias ? [] : ['bobs-bakery-actual.vercel.app'] });
+    if (url.includes('/v13/deployments')) return json({ id: 'dpl_new', projectId: 'prj_ours', url: 'bobs-bakery-hash-team.vercel.app', readyState: options.readyState ?? 'READY', alias: options.noAlias ? [] : ['bobs-bakery-actual.vercel.app'] });
     if (url.includes('/v2/deployments/') && method === 'POST') { if (!options.assignFails) assigned = true; if (options.lostAlias) throw new TypeError('response lost after alias write'); return options.assignFails ? json({ error: { message: 'Alias failed' } }, 503) : json({ alias: 'bobs-bakery-actual.vercel.app' }); }
     if (url.includes('/v2/deployments/')) return json({ aliases: options.noAlias ? [] : [{ alias: 'bobs-bakery-actual.vercel.app' }] });
     if (url.includes('/v4/aliases/')) return json({ alias: 'bobs-bakery-actual.vercel.app', projectId: options.foreignAlias ? 'prj_other' : 'prj_ours', deploymentId: options.stale || !assigned ? 'dpl_old' : 'dpl_new' });
@@ -117,5 +117,28 @@ describe('Vercel site binding and stable alias', () => {
   it('does not hide alias-assignment failure behind the hash URL', async () => {
     provider({ assignFails: true });
     await expect(deployToVercel({ ...input(), priorMetadata: prior })).rejects.toMatchObject({ status: 503 });
+  });
+  it.each(['CANCELED', 'BLOCKED', 'ERROR'])('stops polling and never aliases a %s deployment', async (readyState) => {
+    vi.useFakeTimers();
+    try {
+      const calls = provider({ readyState });
+      const result = deployToVercel(input());
+      const settled = expect(result).rejects.toMatchObject({ status: 502, code: 'VERCEL_DEPLOY_FAILED' });
+      await vi.advanceTimersByTimeAsync(5_000);
+      await settled;
+      expect(calls.filter(c => c.method === 'GET' && c.url.includes('/v13/deployments/')).length).toBe(1);
+      expect(calls.some(c => c.url.includes('/aliases'))).toBe(false);
+    } finally { vi.useRealTimers(); }
+  });
+  it('fails with a typed timeout instead of aliasing a deployment that never became READY', async () => {
+    vi.useFakeTimers();
+    try {
+      const calls = provider({ readyState: 'BUILDING' });
+      const result = deployToVercel(input());
+      const settled = expect(result).rejects.toMatchObject({ status: 504, code: 'VERCEL_DEPLOY_TIMEOUT' });
+      await vi.advanceTimersByTimeAsync(10 * 60_000);
+      await settled;
+      expect(calls.some(c => c.url.includes('/aliases'))).toBe(false);
+    } finally { vi.useRealTimers(); }
   });
 });
