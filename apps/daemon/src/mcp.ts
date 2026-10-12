@@ -2328,6 +2328,28 @@ async function writeFile(
   return ok(withActiveEcho(json, active, resolved));
 }
 
+/**
+ * Build the nested-path raw-file URL for a project. Rejects `.`/`..` segments
+ * (fetch() normalizes dot-segments, which would let an agent address other
+ * daemon API routes) and backslashes/NULs.
+ */
+export function buildProjectRawUrl(baseUrl: string, projectId: string, relPath: string): string {
+  const segments = String(relPath)
+    .split('/')
+    .filter((s) => s.length > 0);
+  for (const seg of segments) {
+    if (seg === '.' || seg === '..' || seg.includes('\\') || seg.includes('\0')) {
+      throw new Error(`invalid path segment ${JSON.stringify(seg)} in ${JSON.stringify(relPath)}`);
+    }
+  }
+  const prefix = `/api/projects/${encodeURIComponent(projectId)}/raw/`;
+  const url = `${baseUrl}${prefix}${segments.map(encodeURIComponent).join('/')}`;
+  if (!new URL(url).pathname.startsWith(prefix)) {
+    throw new Error(`invalid path ${JSON.stringify(relPath)}`);
+  }
+  return url;
+}
+
 async function deleteFile(
   baseUrl: string,
   args: McpArgs,
@@ -2338,11 +2360,7 @@ async function deleteFile(
   // /api/projects/:id/raw/* accepts nested paths; /api/projects/:id/files/:name
   // does not. Mirror the create_artifact surface, which already lets agents
   // address files like "codex-product/index.html".
-  const segments = args.path
-    .split('/')
-    .filter((s) => s.length > 0)
-    .map(encodeURIComponent);
-  const url = `${baseUrl}/api/projects/${encodeURIComponent(id)}/raw/${segments.join('/')}`;
+  const url = buildProjectRawUrl(baseUrl, id, args.path);
   const resp = await fetch(url, headers ? { method: 'DELETE', headers } : { method: 'DELETE' });
   if (!resp.ok) {
     return errorResult(await formatDaemonError(resp, url));
@@ -3081,11 +3099,7 @@ async function getFile(
   limit = 2000,
   headers?: Record<string, string>,
 ) {
-  const segments = String(relPath)
-    .split('/')
-    .filter((s) => s.length > 0)
-    .map(encodeURIComponent);
-  const url = `${baseUrl}/api/projects/${encodeURIComponent(project)}/raw/${segments.join('/')}`;
+  const url = buildProjectRawUrl(baseUrl, project, relPath);
   const resp = await fetch(url, headers ? { headers } : undefined);
   if (!resp.ok) {
     const body = await safeText(resp);
@@ -3310,11 +3324,7 @@ async function fetchProjectFile(
   remainingBytes = Infinity,
   headers?: Record<string, string>,
 ): Promise<ProjectFileBundleEntry> {
-  const segments = String(relPath)
-    .split('/')
-    .filter((s) => s.length > 0)
-    .map(encodeURIComponent);
-  const url = `${baseUrl}/api/projects/${encodeURIComponent(projectId)}/raw/${segments.join('/')}`;
+  const url = buildProjectRawUrl(baseUrl, projectId, relPath);
   const resp = await fetch(url, headers ? { headers } : undefined);
   if (!resp.ok) {
     const body = await safeText(resp);
