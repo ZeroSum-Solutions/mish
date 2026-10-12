@@ -1,5 +1,6 @@
 import { writeFile } from "node:fs/promises";
 
+import { assertMainWindowSender } from "./main-window-sender.js";
 import { BrowserWindow, dialog, ipcMain, shell } from "electron";
 
 import { DIAGNOSTICS_FILENAME_PREFIX, diagnosticsFileName } from "@mish/diagnostics";
@@ -116,6 +117,7 @@ export async function exportDiagnosticsToFile(
 
 export function registerDesktopDiagnosticsIpc(deps: DesktopDiagnosticsDeps): () => void {
   const handler = async (event: Electron.IpcMainInvokeEvent): Promise<DesktopDiagnosticsExportResult> => {
+    assertMainWindowSender(event);
     const senderWindow = BrowserWindow.fromWebContents(event.sender);
     return await exportDiagnosticsToFile(deps, senderWindow);
   };
