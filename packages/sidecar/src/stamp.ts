@@ -147,6 +147,9 @@ export function sidecarStampKey(stamp: SidecarStamp): string {
   return SIDECAR_STAMP_FIELDS.map((field) => `${field}=${value[field]}`).join("\n");
 }
 
+/** Conservative sun_path budget (macOS allows 103 + NUL, Linux 107). */
+const MAX_UNIX_SOCKET_PATH_BYTES = 100;
+
 export function resolvePrivateIpcPath(stamp: SidecarStamp, platform: NodeJS.Platform = process.platform): string {
   const principal = platform === "win32"
     ? (() => {
@@ -154,7 +157,12 @@ export function resolvePrivateIpcPath(stamp: SidecarStamp, platform: NodeJS.Plat
       })()
     : String(process.getuid?.() ?? process.env.USER ?? "unknown");
   const digest = createHash("sha256").update(`${principal}\n${sidecarStampKey(stamp)}`).digest("hex").slice(0, 32);
-  return platform === "win32"
-    ? `\\\\.\\pipe\\mish-sidecar-${digest}`
-    : join(tmpdir(), `od-sidecar-${principal}`, `${digest}.sock`);
+  if (platform === "win32") return `\\\\.\\pipe\\mish-sidecar-${digest}`;
+  const preferred = join(tmpdir(), `od-sidecar-${principal}`, `${digest}.sock`);
+  if (Buffer.byteLength(preferred) <= MAX_UNIX_SOCKET_PATH_BYTES) return preferred;
+  const fallback = join("/tmp", `od-sidecar-${principal}`, `${digest.slice(0, 16)}.sock`);
+  if (Buffer.byteLength(fallback) > MAX_UNIX_SOCKET_PATH_BYTES) {
+    throw new Error(`sidecar IPC socket path exceeds ${MAX_UNIX_SOCKET_PATH_BYTES} bytes: ${fallback}`);
+  }
+  return fallback;
 }

@@ -11,6 +11,7 @@
  * errors, public types, and the platform atomic copier.
  */
 
+import { rm } from "node:fs/promises";
 import { isAbsolute, resolve } from "node:path";
 
 import { atomicCopyFile } from "@mish/platform";
@@ -121,8 +122,13 @@ export async function downloadCopyAndClear(options: DownloadCopyAndClearOptions)
       }
     } else {
       await atomicCopyFile(downloaded.path, outputPath);
-      const copiedDigest = await hashFile(outputPath, target.checksum.algorithm);
+      // existingOutput was null, so this call created outputPath; remove it if it turns out corrupt.
+      const copiedDigest = await hashFile(outputPath, target.checksum.algorithm).catch(async (error: unknown) => {
+        await rm(outputPath, { force: true }).catch(() => undefined);
+        throw error;
+      });
       if (copiedDigest !== target.checksum.value) {
+        await rm(outputPath, { force: true }).catch(() => undefined);
         throw new ManagedDownloadError(MANAGED_DOWNLOAD_ERROR_CODES.CHECKSUM_MISMATCH, "copied output checksum did not match requested payload");
       }
     }
