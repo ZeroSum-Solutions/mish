@@ -59,6 +59,9 @@ jobs:
         uses: ./.github/actions/setup-workspace
 
       - name: Build portable dmg and zip
+        env:
+          # The hosted macOS runner has 7 GB; next build exceeds Node's default heap.
+          NODE_OPTIONS: --max-old-space-size=6144
         run: pnpm tools-pack mac build --to all --portable --app-version "$APP_VERSION" --json | tee "$RUNNER_TEMP/build.json"
 
       - name: Collect release files
