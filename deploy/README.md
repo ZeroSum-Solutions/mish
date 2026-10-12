@@ -36,6 +36,16 @@ default), so `Dockerfile.local` can extend it. A published image is optional. If
 your team publishes one (`deploy/scripts/publish-images.sh`), set `MISH_IMAGE` to
 that image and use `docker compose pull` instead.
 
+Upgrading from a deployment created before the Mish rename: the Compose project,
+container, and data volume are now all named `mish`, and the settings are read
+from `MISH_*` variables. Before the first `docker compose up` on the new files,
+stop and remove the old container (it still holds the host port), rename every
+variable in your `.env` to its `MISH_*` equivalent from `.env.example`, and copy
+your old data volume (find it with `docker volume ls`) into `mish_mish_data`,
+for example with `docker run --rm -v <old volume>:/from -v mish_mish_data:/to
+alpine cp -a /from/. /to/`. Otherwise the daemon starts with an empty data
+directory and the old settings are ignored.
+
 Open `http://127.0.0.1:7456`. When Docker's bridge makes the browser appear as a
 non-loopback peer, the browser displays its native sign-in dialog. Enter
 `mish` as the username and the `OD_API_TOKEN` value from `.env` as the

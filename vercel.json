@@ -3,5 +3,11 @@
   "buildCommand": "OD_WEB_OUTPUT_MODE= pnpm --filter @mish/web build",
   "installCommand": "pnpm install",
   "outputDirectory": "apps/web/out",
-  "framework": null
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/((?!api/|api$|artifacts/|artifacts$|frames/|frames$|_next/).*)",
+      "destination": "/index.html"
+    }
+  ]
 }

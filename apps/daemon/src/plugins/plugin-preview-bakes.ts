@@ -9,13 +9,17 @@
 // untouched and keep the live-iframe path as the fallback.
 //
 // Files + a `manifest.json` live under `<dir>` (OD_PLUGIN_PREVIEWS_DIR, default
-// `<project>/.od/plugin-previews`). CI bakes them and uploads to R2; the daemon
-// serves whatever is present locally at `/api/plugin-previews/<file>`.
+// `<project>/.od/plugin-previews`). CI bakes them; the daemon serves whatever is
+// present locally at `/api/plugin-previews/<file>`.
 
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import path from 'node:path';
 
 export const PLUGIN_PREVIEWS_ROUTE = '/api/plugin-previews';
+
+// There is no built-in public origin for baked clips: the fork publishes none.
+// A clip is only advertised when it is on disk (served by the daemon) or when
+// OD_PLUGIN_PREVIEWS_BASE_URL names where the clips are published.
 
 interface BakeEntry {
   video: string;
@@ -83,15 +87,14 @@ export function bakedPreviewBlock(id: string, dir: string): BakedPreviewBlock | 
   // Resolve where the clip is fetchable from, in priority order:
   //   1. an explicit OD_PLUGIN_PREVIEWS_BASE_URL override;
   //   2. the daemon's own /api/plugin-previews route when the clips are on disk
-  //      (local dev / a freshly-baked dir);
-  //   3. otherwise null: the card keeps the live preview.
+  //      (local dev / a freshly-baked dir).
+  // With neither, there is nowhere to fetch the clip from, so no block is
+  // returned and the gallery tile keeps its authored od.preview.
   const envBase = process.env.OD_PLUGIN_PREVIEWS_BASE_URL?.replace(/\/+$/, '');
   const onDisk =
     existsSync(path.join(dir, entry.video)) && existsSync(path.join(dir, entry.poster));
-  // No override and no clips on disk: the default public origin is a placeholder
-  // that does not resolve, so fall back to the live preview instead.
-  if (!envBase && !onDisk) return null;
-  const base = envBase || PLUGIN_PREVIEWS_ROUTE;
+  const base = envBase || (onDisk ? PLUGIN_PREVIEWS_ROUTE : null);
+  if (!base) return null;
   return {
     poster: `${base}/${entry.poster}`,
     video: `${base}/${entry.video}`,

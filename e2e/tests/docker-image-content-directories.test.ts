@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 
 import { describe, expect, it } from "vitest";
@@ -29,7 +30,9 @@ describe("deploy/Dockerfile content directories", () => {
 
     // `assets` is copied wholesale in build but selectively in runtime, so it is
     // matched loosely; the rest are whole-directory copies in both stages.
-    for (const dir of ["skills", "design-systems", "craft", "data"]) {
+    // `design-templates` holds the Templates catalog and the agency-site
+    // compiler the daemon imports at runtime (`agency-recipe.ts`).
+    for (const dir of ["skills", "design-systems", "design-templates", "craft", "data"]) {
       expect(build, `build stage should COPY ${dir}`).toMatch(
         new RegExp(`^COPY ${dir} \\./${dir}$`, "m"),
       );
@@ -55,5 +58,26 @@ describe("deploy/Dockerfile content directories", () => {
 
     expect(build).toMatch(/^COPY data \.\/data$/m);
     expect(runtime).toMatch(/^COPY --from=build [^\n]*\/app\/data \.\/data$/m);
+  });
+
+  it("copies only runtime sources that exist in a public checkout or the build stage creates", async () => {
+    // Content shipped only in a private pack (community pets) is absent from a
+    // public checkout; a runtime `COPY --from=build` of it must not make
+    // `docker build` fail with "not found".
+    const content = await readFile(dockerfile, "utf8");
+    const { build, runtime } = stageSections(content);
+    const generated = new Set(["deploy/daemon", "apps/web/out"]);
+    const sources = [...runtime.matchAll(/^COPY --from=build\s+(?:--chown=\S+\s+)?\/app\/(\S+)\s+\S+$/gm)].map(
+      (match) => match[1]!,
+    );
+    expect(sources.length).toBeGreaterThan(0);
+    for (const source of sources) {
+      if (generated.has(source)) continue;
+      const created = build.split("\n").some((line) => /mkdir -p/.test(line) && line.includes(`/app/${source}`));
+      expect(
+        created || existsSync(new URL(`../../${source}`, import.meta.url)),
+        `runtime stage copies /app/${source}, which is neither in the repository nor created by the build stage`,
+      ).toBe(true);
+    }
   });
 });

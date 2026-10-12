@@ -80,7 +80,10 @@ describe('AgentIcon', () => {
     const markup = renderToStaticMarkup(<AgentIcon id="amr" size={24} />);
 
     expect(amrSvg).toMatch(/^<svg\b/);
-    expect(amrSvg).toContain('fill="#202020"');
+    // Color-baked: explicit hex fills, never `currentColor` (which would
+    // need the mono mask path instead of a plain <img>).
+    expect(amrSvg).toMatch(/fill="#[0-9a-fA-F]{6}"/);
+    expect(amrSvg).not.toContain('currentColor');
     expect(markup).toContain('src="/agent-icons/amr.svg"');
     expect(markup).not.toContain('agent-icon-fallback');
   });

@@ -1284,6 +1284,9 @@ export function registerDesignSystemRoutes(
       for (const entry of entries) {
         if (!entry.isFile() || !entry.name.endsWith('.md')) continue;
         const slug = entry.name.replace(/\.md$/, '');
+        // Same id rule as GET /api/craft/:id: list only what can be fetched,
+        // which also keeps repo docs (README.md, FUTURE_SECTIONS.md) out.
+        if (!CRAFT_ID_PATTERN.test(slug)) continue;
         try {
           const fullPath = `${CRAFT_DIR}/${entry.name}`;
           const text = await fsp.readFile(fullPath, 'utf8');
@@ -1306,7 +1309,7 @@ export function registerDesignSystemRoutes(
   app.get('/api/craft/:id', async (req, res) => {
     try {
       const slug = req.params.id;
-      if (!/^[a-z0-9][a-z0-9-]*$/.test(slug)) {
+      if (!CRAFT_ID_PATTERN.test(slug)) {
         return res.status(400).json({ error: 'invalid craft id' });
       }
       try {
@@ -1325,6 +1328,8 @@ export function registerDesignSystemRoutes(
 
   return { authorizeDesignSystemRead, deleteDesignSystemForRequest };
 }
+
+const CRAFT_ID_PATTERN = /^[a-z0-9][a-z0-9-]*$/;
 
 export function rewriteDesignSystemShowcaseAssetUrls(
   html: string,

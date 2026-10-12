@@ -109,7 +109,7 @@ pnpm --filter @mish/e2e exec tsx benchmarks/quality/cli.ts compare --help
 
 **Known limits.** The brief preview does not say which model wrote it, so a writer that fell back to Claude is not visible in the report; the daemon log records it. Judge accuracy is uncalibrated until a person's blind ranking is compared with the judges'.
 
-**Pilot, 2026-10-10.** The first 20-build comparison of Improve prompt writers ran before this tool, with Claude Opus and Gemini Pro (OpenRouter) as judges, so it is not a baseline for this tool's default judges. Results and the blind gallery: `~/Inbox/notes/design-eval-2026-10-10/full/` (`report.md`, `gallery.html`). Terra briefs led (Claude judge 10–2, visual 17–4 across both judges); the original prompt lost on fidelity (2–12). That data set the D28.4 default.
+**Pilot, 2026-10-10.** The first 20-build comparison of Improve prompt writers ran before this tool, with Claude Opus and Gemini Pro (OpenRouter) as judges, so it is not a baseline for this tool's default judges. Its results and blind gallery (`report.md`, `gallery.html`) are kept outside this repository. Terra briefs led (Claude judge 10–2, visual 17–4 across both judges); the original prompt lost on fidelity (2–12). That data set the D28.4 default.
 
 ## Local harness checks
 

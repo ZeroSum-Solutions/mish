@@ -43,6 +43,21 @@ describe('GET /api/craft', () => {
   });
 });
 
+describe('GET /api/craft list/detail agreement', () => {
+  // The list must only offer ids the detail route serves; repo docs such as
+  // README.md and FUTURE_SECTIONS.md are not craft rules.
+  it('lists only craft ids that GET /api/craft/:id can fetch', async () => {
+    const list = (await (await fetch(`${baseUrl}/api/craft`)).json()) as { craft: Array<{ id: string }> };
+    const ids = list.craft.map((entry) => entry.id);
+    expect(ids).not.toContain('README');
+    expect(ids).not.toContain('FUTURE_SECTIONS');
+    for (const id of ids) {
+      const resp = await fetch(`${baseUrl}/api/craft/${encodeURIComponent(id)}`);
+      expect({ id, status: resp.status }).toEqual({ id, status: 200 });
+    }
+  });
+});
+
 describe('GET /api/craft/:id', () => {
   it('rejects malformed slugs with 400', async () => {
     const resp = await fetch(`${baseUrl}/api/craft/Bad%20ID`);

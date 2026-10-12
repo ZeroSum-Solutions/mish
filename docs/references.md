@@ -138,12 +138,12 @@ Every external project this spec leans on. Three questions per entry: what is it
 
 [guizang]: https://github.com/op7418/guizang-ppt-skill
 - **What it is:** A Claude Code skill producing magazine-style, horizontal-swipe web decks. Structure: `SKILL.md` + `assets/template.html` + `references/{components,layouts,themes,checklist}.md`. 6-step workflow. Single-file HTML output with embedded CSS/WebGL. Keyboard/scroll/touch navigation.
-- **Why it matters:** Reference implementation of a high-quality Claude skill and the source of our bundled guizang deck template.
+- **Why it matters:** Reference implementation of a high-quality Claude skill and the source of the guizang deck template we used to bundle.
 - **What we borrow:**
   - The workflow and assets were bundled under `design-templates/guizang-ppt/` with the upstream license preserved. The bundle left the repo when the bundled design catalog was slimmed; git history keeps it.
   - Skill directory convention (`assets/` + `references/` + `SKILL.md`) as the pattern we document for skill authors.
   - The "6-step workflow + quality-checklist rubric" pattern for authoring new skills.
-- **What we don't:** We do not require the retired `od skill add` flow; the rendering template ships in the catalogue and can still be consumed as a portable `SKILL.md` bundle.
+- **What we don't:** We do not require the retired `od skill add` flow; the upstream skill can still be consumed as a portable `SKILL.md` bundle.
 
 ---
 

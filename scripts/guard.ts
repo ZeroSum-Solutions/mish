@@ -29,6 +29,7 @@ import {
 import { checkCraftReferences } from "./lint-craft-references.ts";
 import { checkWhatsNewDocument } from "./check-whats-new-document.ts";
 import { checkWhatsNewPublishWorkflow } from "./check-whats-new-publish-workflow.ts";
+import { checkWebNextEnv } from "./check-web-next-env.ts";
 import { collectCssHardcodedColorMatches, cssWideAndSpecialColorKeywords, realNamedColors } from "./style-policy.ts";
 import { checkScriptsLibraryArchitecture } from "./lib/guard/architecture.ts";
 import { runGuardChecks, type GuardCheck, type GuardContext } from "./lib/guard/core.ts";
@@ -1618,6 +1619,7 @@ const checks: GuardCheck[] = [
   { name: "e2e layout", run: checkE2eLayout },
   { name: "web test layout", run: checkWebTestLayout },
   { name: "web import isolation", run: checkWebImportIsolation },
+  { name: "web next-env.d.ts", run: ({ repoRoot: root }) => checkWebNextEnv(root) },
   { name: "run start choke point", run: checkRunStartChokePoint },
   { name: "internal error responses", run: checkRawInternalErrorResponses },
   { name: "tools layout", run: checkToolsLayout },

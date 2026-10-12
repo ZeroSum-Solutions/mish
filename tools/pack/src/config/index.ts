@@ -110,8 +110,8 @@ export type ToolPackConfig = {
   /**
    * PostHog product-analytics ingest key, sourced from process.env.POSTHOG_KEY
    * at packaging time. Baked into mish-config.json so the packaged
-   * daemon can read it as POSTHOG_KEY env at launch — only official Open
-   * Design builds (CI with the secret set) ship with this; forks compiling
+   * daemon can read it as POSTHOG_KEY env at launch — only official Mish
+   * builds (CI with the secret set) ship with this; forks compiling
    * locally produce binaries that omit the key and the integration
    * short-circuits cleanly. Apache-2.0 keeps the bundle public, but `phc_`
    * keys are write-only event ingest keys (cannot read your project data),

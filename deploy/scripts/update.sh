@@ -2,7 +2,7 @@
 # Mishh Mashh — Updater
 # Pulls the latest image and restarts the service
 #
-# Usage: ./update.sh [--image <ref>] [--non-interactive]
+# Usage: ./update.sh [--image <ref>] [--build] [--non-interactive]
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -72,15 +72,18 @@ fi
 
 OPT_IMAGE=""
 NON_INTERACTIVE=0
+OPT_BUILD=0
 
 while [ $# -gt 0 ]; do
   case "$1" in
     --image) shift; OPT_IMAGE="$1" ;;
     --image=*) OPT_IMAGE="${1#--image=}" ;;
     --non-interactive) NON_INTERACTIVE=1 ;;
+    --build) OPT_BUILD=1 ;;
     --help|-h)
       echo "Usage: update.sh [options]"
       echo "  --image <ref>       Pull a specific image instead of latest"
+      echo "  --build             Rebuild the image from this checkout instead of pulling it"
       echo "  --non-interactive   Skip confirmation prompts"
       exit 0
       ;;
@@ -113,13 +116,29 @@ if [ -n "$OPT_IMAGE" ]; then
   export MISH_IMAGE="$OPT_IMAGE"
 fi
 
-# Pull latest image
-step "Pulling latest image..."
-$COMPOSE_CMD "${COMPOSE_FILES[@]}" pull
+# Same fallback as install.sh: no registry is guaranteed to carry the image,
+# so a failed pull rebuilds it from this checkout.
+rebuild_from_checkout() {
+  if [ ! -f "${DEPLOY_DIR}/Dockerfile" ] || [ ! -f "${DEPLOY_DIR}/../package.json" ]; then
+    error "Cannot build locally: ${DEPLOY_DIR} is not inside a Mishh Mashh checkout."
+    exit 1
+  fi
+  step "Rebuilding the image from this checkout (this takes several minutes)..."
+  $COMPOSE_CMD "${COMPOSE_FILES[@]}" up -d --build
+}
 
-# Restart with new image
-step "Restarting service..."
-$COMPOSE_CMD "${COMPOSE_FILES[@]}" up -d --no-build
+if [ "$OPT_BUILD" = "1" ]; then
+  rebuild_from_checkout
+else
+  step "Pulling latest image..."
+  if $COMPOSE_CMD "${COMPOSE_FILES[@]}" pull; then
+    step "Restarting service..."
+    $COMPOSE_CMD "${COMPOSE_FILES[@]}" up -d --no-build
+  else
+    warn "Could not pull the image; rebuilding it locally instead."
+    rebuild_from_checkout
+  fi
+fi
 
 # Health check
 step "Waiting for health check (up to ${HEALTH_TIMEOUT}s)..."

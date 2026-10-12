@@ -180,6 +180,48 @@ describe("managed download package", () => {
     }
   });
 
+  it("keeps the bytes that arrived before a dropped connection and resumes from them", async () => {
+    // The first response delivers its leading bytes and then fails on the next read, the way a
+    // dropped socket surfaces through fetch. Those bytes must reach the partial file even though
+    // the failure arrives before any other I/O of the attempt has finished.
+    const body = "resumable payload from a connection that drops early";
+    const cut = 11;
+    const ranges: Array<string | undefined> = [];
+    const fetchImpl: typeof globalThis.fetch = async (_input, init) => {
+      const range = new Headers(init?.headers).get("range") ?? undefined;
+      ranges.push(range);
+      if (ranges.length === 1) {
+        let pulls = 0;
+        const stream = new ReadableStream<Uint8Array>({
+          pull(controller) {
+            pulls += 1;
+            if (pulls === 1) controller.enqueue(new TextEncoder().encode(body.slice(0, cut)));
+            else controller.error(new Error("socket hang up"));
+          },
+        });
+        return new Response(stream, { status: 200, headers: { "content-length": String(body.length), etag: '"v1"' } });
+      }
+      const start = Number(/^bytes=(\d+)-$/.exec(range ?? "")?.[1] ?? 0);
+      if (start === 0) return new Response(body, { status: 200, headers: { "content-length": String(body.length), etag: '"v1"' } });
+      return new Response(body.slice(start), {
+        status: 206,
+        headers: { "content-range": `bytes ${start}-${body.length - 1}/${body.length}`, etag: '"v1"' },
+      });
+    };
+    const root = tmpRoot("resume-early-drop");
+    const result = await managedDownload({
+      basePath: join(root, "downloads"),
+      bucket: "updates",
+      fetch: fetchImpl,
+      fileName: "installer.bin",
+      payload: { checksum: { algorithm: "sha256", value: sha256(body) }, url: "https://downloads.mish.invalid/installer.bin" },
+    });
+
+    expect(ranges).toEqual([undefined, `bytes=${cut}-`]);
+    expect(result.resumed).toBe(true);
+    expect(readFileSync(result.path, "utf8")).toBe(body);
+  });
+
   it("falls back to a full download when Range is not honored", async () => {
     const body = "fallback payload from a server without range support";
     const fixture = await startFixture(body, { failFirstBytes: 8, range: false });

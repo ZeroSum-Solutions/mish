@@ -104,3 +104,24 @@ it('aborts an explicit retry on dismiss and schedules no further turns', async (
   await act(async () => { await vi.advanceTimersByTimeAsync(10_000); });
   expect(request).toHaveBeenCalledTimes(3);
 });
+
+it('cancels the project brief on the daemon when the dialog closed before the create answered', async () => {
+  let answerCreate!: (response: Response) => void;
+  const calls: Array<{ url: string; method: string }> = [];
+  vi.stubGlobal('fetch', vi.fn((url: string, init: RequestInit = {}) => {
+    calls.push({ url, method: init.method ?? 'GET' });
+    if (url === '/api/workbench/briefs') return new Promise<Response>(resolve => { answerCreate = resolve; });
+    return Promise.resolve(new Response(JSON.stringify({ id: 'brief_1', projectId: 'p', status: 'cancelled', originalText: 'A bakery site', brief: null, failure: null, revisions: [], createdAt: '2026-10-08T10:00:00.000Z', updatedAt: '2026-10-08T10:00:00.000Z' })));
+  }));
+  const onClose = vi.fn();
+  const view = render(<I18nProvider initial="en"><WorkbenchImprovePrompt projectId="p" draft="A bakery site" onClose={onClose} pollMs={1} /></I18nProvider>);
+  fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+  expect(onClose).toHaveBeenCalledOnce();
+  view.unmount();
+  await act(async () => {
+    answerCreate(new Response(JSON.stringify({ id: 'brief_1', projectId: 'p', status: 'pending', originalText: 'A bakery site', brief: null, failure: null, revisions: [], createdAt: '2026-10-08T10:00:00.000Z', updatedAt: '2026-10-08T10:00:00.000Z' }), { status: 202 }));
+    await new Promise(resolve => setTimeout(resolve, 5));
+  });
+  expect(calls).toContainEqual({ url: '/api/workbench/briefs/brief_1/cancel?projectId=p', method: 'POST' });
+  expect(calls.filter(call => call.url.startsWith('/api/workbench/briefs/brief_1?'))).toHaveLength(0);
+});

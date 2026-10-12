@@ -3,8 +3,8 @@ set -euo pipefail
 
 # Deploy Mishh Mashh to Azure from the Bicep templates in this directory.
 #
-#   deploy/azure/deploy-azure.sh --target app-service --resource-group od-rg --location eastus
-#   deploy/azure/deploy-azure.sh --target aci         --resource-group od-rg --location eastus
+#   deploy/azure/deploy-azure.sh --target app-service --resource-group od-rg --location eastus --image <image-ref>
+#   deploy/azure/deploy-azure.sh --target aci         --resource-group od-rg --location eastus --image <image-ref>
 #
 # Requires the Azure CLI (`az`) and an authenticated session (`az login`).
 # If no --api-token is given, a 32-byte hex token is generated and printed so
@@ -16,7 +16,7 @@ TARGET="${TARGET:-app-service}"
 RESOURCE_GROUP="${RESOURCE_GROUP:-mish-rg}"
 LOCATION="${LOCATION:-eastus}"
 NAME="${NAME:-mish}"
-IMAGE="${IMAGE:-docker.io/vanjayak/mish:latest}"
+IMAGE="${IMAGE:-}"
 API_TOKEN="${API_TOKEN:-}"
 EXTRA_ALLOWED_ORIGINS="${EXTRA_ALLOWED_ORIGINS:-}"
 DEPLOYMENT_NAME="${DEPLOYMENT_NAME:-mish}"
@@ -30,15 +30,15 @@ Options:
   --resource-group <name>         resource group to deploy into (default: mish-rg)
   --location <region>             Azure region, used to create the group (default: eastus)
   --name <name>                   base name for resources (default: mish)
-  --image <image-ref>             container image (default: docker.io/vanjayak/mish:latest)
+  --image <image-ref>             container image (required; no public image is published)
   --api-token <token>             API token; generated with `openssl rand -hex 32` if omitted
   --extra-allowed-origins <list>  extra comma-separated browser origins for /api
   --deployment-name <name>        ARM deployment name (default: mish)
   -h, --help
 
 Examples:
-  deploy/azure/deploy-azure.sh --target app-service --resource-group od-rg --location westeurope
-  deploy/azure/deploy-azure.sh --target aci --resource-group od-rg --image docker.io/vanjayak/mish@sha256:<digest>
+  deploy/azure/deploy-azure.sh --target app-service --resource-group od-rg --location westeurope --image ghcr.io/your-org/od:0.1.0
+  deploy/azure/deploy-azure.sh --target aci --resource-group od-rg --image ghcr.io/your-org/od@sha256:<digest>
 EOF
 }
 
@@ -61,6 +61,8 @@ while [[ $# -gt 0 ]]; do
     *) usage; die "unknown argument: $1" ;;
   esac
 done
+
+[[ -n "$IMAGE" ]] || { usage; die "--image is required: name an image you published (deploy/scripts/publish-images.sh) to a registry Azure can pull"; }
 
 case "$TARGET" in
   app-service) TEMPLATE="$ROOT_DIR/app-service.bicep" ;;

@@ -80,7 +80,7 @@ export const CODEX_0_147_0_BEST_EFFORT_MANIFEST =
     provenance: {
       kind: 'sanitized_real',
       recordingDigest:
-        'sha256:729d0e58e80e7b8b81eb90ad286471a26c3df80411f0b0f7092c19d157b50cc6',
+        'sha256:e93db4e64f928d3af5f40db47a092e494cfa7c0b34fbb9c34fdfe0f7087f696c',
       anonymizationVersion: 'od-runtime-evidence/v1',
       evidenceReview: 'mish_best_effort',
     },
@@ -104,7 +104,7 @@ export const OPENCODE_1_18_18_BEST_EFFORT_MANIFEST =
     provenance: {
       kind: 'sanitized_real',
       recordingDigest:
-        'sha256:b1224716a340401879cfb2f366d1252e9f837ce24050d9b0dfa4430f89492fc5',
+        'sha256:ecbfe01ffa56f4327b0b332e1fe16604ff43ddac68783d154d8f2c86a3b39b0f',
       anonymizationVersion: 'od-runtime-evidence/v1',
       evidenceReview: 'mish_best_effort',
     },
@@ -171,7 +171,7 @@ export const VELA_OPENCODE_LOCAL_BEST_EFFORT_MANIFEST =
     provenance: {
       kind: 'sanitized_real',
       recordingDigest:
-        'sha256:6fe49f1e0946b2220052b2239494786879c03c972b5be12dee30a7973872f6aa',
+        'sha256:0e55ddbc41eee260e710e1168228d6e0ac5843d0874844b8b04018b60986c447',
       anonymizationVersion: 'od-runtime-evidence/v1',
       evidenceReview: 'mish_best_effort',
     },

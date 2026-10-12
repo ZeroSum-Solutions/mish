@@ -1,7 +1,7 @@
 # Mishh Mashh Plugin Registry Strategy Plan
 
 **Date:** 2026-05-13
-**Related:** [docs/plugins-spec.md](../../docs/plugins-spec.md), [docs/plans/plugins-implementation.md](../../docs/plans/plugins-implementation.md), [specs/current/plugin-authoring-flow-plan.md](plugin-authoring-flow-plan.md), [specs/current/plugin-driven-flow-plan.md](plugin-driven-flow-plan.md)
+**Related:** [docs/plugins-spec.md](../../docs/plugins-spec.md), `docs/plans/plugins-implementation.md` (private product plan, not in this repository), [specs/current/plugin-authoring-flow-plan.md](plugin-authoring-flow-plan.md), [specs/current/plugin-driven-flow-plan.md](plugin-driven-flow-plan.md)
 
 ## Purpose
 

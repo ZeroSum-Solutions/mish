@@ -128,6 +128,13 @@ export function createMediaTaskStore(
   }
 
   function persistMediaTask(task: LiveMediaTask): void {
+    // A generation can settle after daemon shutdown has closed the database.
+    // There is nowhere left to record it, and throwing here would surface as
+    // an unhandled rejection from the generation's promise chain.
+    if (!db.open) {
+      console.warn(`[media] task ${task.id} settled after the database closed; not persisted`);
+      return;
+    }
     const patch: MediaTaskPatch = {
       ...(task.runId !== undefined ? { runId: task.runId } : {}),
       status: task.status,

@@ -5,7 +5,7 @@
 // tool or private provider state reaches the replay or the admission record.
 //
 // These run at the SQLite-fixture layer `replay.test.ts` uses. They do not read
-// CLI stream frames, so tests/fixtures/claude-cli-recordings/ does not apply.
+// CLI stream frames, so tests/fixtures/daemon-b/claude-stream/ does not apply.
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';

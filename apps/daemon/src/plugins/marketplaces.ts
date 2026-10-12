@@ -14,7 +14,7 @@
 // unless `--trust` is passed.
 
 import { randomUUID } from 'node:crypto';
-import { MISHH_MASHH_PLUGIN_REPO } from './catalog-repo.js';
+import { LEGACY_PLUGIN_CATALOG_REPOS, MISHH_MASHH_PLUGIN_REPO } from './catalog-repo.js';
 import { safeExternalFetch } from './plugin-asset-cache.js';
 import type Database from 'better-sqlite3';
 import {
@@ -140,7 +140,11 @@ export function marketplaceRegistryIdFromUrl(url: string): string | null {
     const parts = parsed.pathname.split('/').filter(Boolean);
     if (parts.length < 6) return null;
     const [owner, repo] = parts;
-    const allowedRepos = new Set([DEFAULT_MARKETPLACE_REPO, marketplaceRegistryRepo()]);
+    const allowedRepos = new Set([
+      DEFAULT_MARKETPLACE_REPO,
+      marketplaceRegistryRepo(),
+      ...LEGACY_PLUGIN_CATALOG_REPOS,
+    ]);
     if (!allowedRepos.has(`${owner}/${repo}`)) return null;
     const marker = parts.findIndex((part, index) =>
       part === 'plugins' && parts[index + 1] === 'registry',

@@ -275,8 +275,11 @@ describe('od lint CLI entrypoint', () => {
   it('surfaces an HTTP failure as a structured nonzero exit', async () => {
     stub.setResponder(() => ({ status: 500, body: { error: 'boom' } }));
     const run = await runCli(['lint', cleanFile, '--daemon-url', stub.baseUrl]);
-    expect(run.code).toBe(64);
+    // The daemon answered, so this is a daemon error (exit 1), never the
+    // `daemon-not-running` recovery code (64).
+    expect(run.code).toBe(1);
     expect(`${run.stdout}${run.stderr}`).toContain('boom');
+    expect(`${run.stdout}${run.stderr}`).toContain('daemon-error');
   });
 
   it('exits 3 when the daemon is unreachable', async () => {

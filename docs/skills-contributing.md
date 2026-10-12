@@ -25,7 +25,7 @@ corepack enable
 pnpm install
 
 # 3. Copy the closest existing template as a starting point
-cp -r design-templates/dating-web design-templates/<your-template-name>
+cp -r design-templates/saas-landing design-templates/<your-template-name>
 # Edit design-templates/<your-template-name>/SKILL.md — change name, description, triggers,
 # rewrite the workflow body, replace example.html with your own hand-built sample.
 
@@ -119,8 +119,8 @@ od:
 # Your Design Template
 
 Free-form Markdown describing the workflow the agent should follow.
-Numbered steps work well. Lift the format from design-templates/dating-web/SKILL.md
-or design-templates/guizang-ppt/SKILL.md.
+Numbered steps work well. Lift the format from design-templates/saas-landing/SKILL.md
+or design-templates/web-prototype/SKILL.md.
 ```
 
 Full active grammar (`od.mode`, `od.surface`, `od.craft.requires`, `od.critique.policy`, gallery hints, and more) lives in [`skills-protocol.md`](skills-protocol.md). Older portable fields such as `od.inputs`, `od.parameters`, and `od.capabilities_required` may still appear in external bundles but are not consumed by the skill/template registry.
@@ -207,11 +207,11 @@ For a non-featured template, the cheap path is to keep the source metadata compl
 If you set `od.featured: 1`, also:
 
 - [ ] **Add a screenshot** at `docs/screenshots/skills/<template>.png`. PNG, ~1024×640 retina, captured from the real `example.html` at zoomed-out browser scale.
-- [ ] **Optionally add full localized display copy** in `content.ts` (DE), `content.fr.ts` (FR), `content.ru.ts` (RU) — title, summary, scenario tag. The featured row in the picker uses this copy when present; the default fallback path renders English everywhere.
+- The product is English only (see the root `AGENTS.md` i18n rule), so no localized display copy is needed; `apps/web/src/i18n/content.ts` carries no locale bundles.
 
 ### Forking
 
-If you fork an existing template (e.g. start from `dating-web` and remix into `recruiting-web`), keep the original LICENSE and authorship in `references/` and call it out in the PR description.
+If you fork an existing template (e.g. start from `saas-landing` and remix into `recruiting-landing`), keep the original LICENSE and authorship in `references/` and call it out in the PR description.
 
 ---
 

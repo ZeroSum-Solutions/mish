@@ -70,8 +70,8 @@ response or the package version alone does not prove that the app is current.
 - Fetch `origin` before comparing with `origin/main`. If fetching fails, report that
   freshness is unverified; do not describe cached refs as the latest GitHub state.
 - Always name `--repo ZeroSum-Solutions/mish` in GitHub CLI commands.
-  This fork also has an upstream remote; implicit GitHub CLI repository selection
-  can resolve to `ZeroSum-Solutions/mish` and return the wrong PR inventory.
+  A checkout can also carry an upstream remote; implicit GitHub CLI repository
+  selection can then resolve to the upstream project and return the wrong PR inventory.
 - Check open PRs with `gh pr list --repo ZeroSum-Solutions/mish --state open`
   and live remote branches with
   `gh api repos/ZeroSum-Solutions/mish/branches --paginate`.
@@ -207,9 +207,11 @@ obvious, block the PR and request core-maintainer guidance.
 
 Read `.github/AGENTS.md` before editing `.github/workflows/`, `.github/scripts/`, `.github/actions/`, PR follow-on automation, `workflow_run` trusted writes, CI handoff artifacts, or the workflow topology checks that guard those surfaces.
 
+This public repository ships only `.github/workflows/ci.yml`. The atomic capability workflows, release, notification, Docker image and other follow-on workflows named below and in "Release channel model" describe the upstream topology and are not published here; do not wire a handoff, dispatch or doc instruction to them as if they existed.
+
 CI-related GitHub automation uses a two-layer architecture:
 
-- Business layer workflows own product or validation decisions. `ci.yml` is the main low-privilege PR, merge-queue, and manual validation workflow. It detects scope, runs checks, and produces typed handoff artifacts.
+- Business layer workflows own product or validation decisions. `ci.yml` is the only workflow in this repository: the low-privilege PR, merge-queue, and manual validation workflow. It detects scope, runs checks, and produces typed handoff artifacts (the merge-blocking label gate and the merge-queue failure notice write `handoff/comment` artifacts); with no atomic workflow published here, nothing consumes them, so they stay downloadable diagnostics.
 - Atomic capability workflows own reusable trusted operations. `comment.atom.yml` publishes pure text PR comments, `autofix.atom.yml` applies same-repository patches, and `report.atom.yml` materializes advanced comments that need trusted dependencies, secrets, or report generation before upsert.
 
 Do not add a new business-named follow-on workflow such as `foo.comment.atom.yml` or `bar.autofix.atom.yml` without first trying to express the flow as a `ci.yml` producer plus the existing `comment`, `autofix`, or `report` capability. Keep artifact naming, storage layout, and parser behavior centralized in `.github/scripts/handoff.py`; do not let individual workflows invent parallel handoff conventions.
@@ -263,6 +265,11 @@ conservative behavior such as:
 - direct planner tests cover representative in-bound, out-of-bound, mixed, and
   fallback inputs without reimplementing the evaluator in another language.
 
+This repository's `ci.yml` has no reusable-result path: it does not run a
+convergence check, read R2 receipts, or produce convergence handoffs. The
+paragraph below applies only if such a path is reintroduced by an explicit
+owner decision.
+
 Keep scope routing and reusable-result convergence conceptually orthogonal:
 scope answers which test sets are necessary for a change, while convergence
 answers whether an identically declared workload already has a validated,
@@ -279,7 +286,7 @@ confidence methodology in `specs/current/ci.md`.
 
 ## Cost discipline
 
-This repository is public. CI runs only on GitHub-hosted runners; never add self-hosted runners or `pull_request_target` workflows, and keep secrets out of workflows.
+This repository is public. CI runs only on GitHub-hosted runners and needs no repository secrets or variables (only the automatic read-only `github.token`); never add self-hosted runners or `pull_request_target` workflows, and keep secrets out of workflows.
 
 - Batch work into one coherent feature PR, not one PR per fix.
 - Open PRs as drafts and mark them ready once, after review and the targeted local gates.
@@ -292,6 +299,8 @@ This repository is public. CI runs only on GitHub-hosted runners; never add self
 Each checkout carries a local CodeGraph index in `.codegraph/` (git-ignored; `codegraph init .` after `pnpm install` builds it in about twenty seconds, `codegraph sync .` refreshes it after a large merge). A git worktree is its own checkout, so `.codegraph/` is not shared across worktrees — run `codegraph init .` again from the root of each new worktree. Before `grep`, `find` or reading files to locate or understand code, run `codegraph explore "<symbol names or question>"` or call the `codegraph_explore` MCP tool (registered for Claude Code and Codex CLI): it returns the relevant symbols' source and the call paths between them, including dynamic-dispatch hops that text search cannot follow. Name a file or symbol in the query to read its current line-numbered source.
 
 ## Release channel model
+
+The release workflows this section names (`release-*.yml`, `notify-*-feishu.yml`, `cut-release` and the rest) are not published in this repository; the section records the channel policy that `tools/release` and `tools/pack` still encode.
 
 - `beta` is the daily R&D/development validation channel. It is optimized for fast development feedback and is not part of the stable promotion gate.
 - `prerelease` is the internal validation channel for stable delivery. Stable releases remain gated by validated prerelease artifacts.
@@ -340,7 +349,7 @@ Every user-facing capability must be reachable through both the web UI **and** t
 - The CLI form must support `--json` for machine-readable output and accept long-form prompts via `--prompt-file <path|->`, so jobs that pipe through `xargs`, `jq`, and `<heredoc` stay clean.
 - Adding a new capability is a three-step closure: HTTP endpoint in `apps/daemon/src/*-routes.ts` (with a contract type in `packages/contracts/src/api/`), UI surface in `apps/web/src/`, and `od <capability>` subcommand in `apps/daemon/src/cli.ts` registered through `SUBCOMMAND_MAP`. Land all three in the same PR; do not stage them across PRs.
 - The PR template's Surface area checklist must reflect *both* surfaces. If you ticked UI, tick CLI too — and vice-versa — or explain in the PR body why the missing surface is genuinely not applicable (e.g. an internal-only daemon health probe). "I'll do the CLI later" is not a valid reason.
-- Existing reference points: `od automation …` mirrors the Automations tab against `/api/routines`; `od plugin …`, `od ui …`, `od project …`, `od media …`, `od mcp …`, `od research …` follow the same shape. Copy that pattern for new capabilities.
+- Existing reference points: `od automation …` mirrors the Automations tab against `/api/routines`; `od plugin …`, `od ui …`, `od project …`, `od media …`, `od mcp …`, `od research …` follow the same shape. `od workbench transform` and `od workbench brief show|edit|accept|cancel|attach|transformer` mirror the composer's Improve prompt dialog against `/api/workbench/briefs*`, and `od deploy …` mirrors the in-product deploy against `POST /api/projects/:id/deploy`. Copy that pattern for new capabilities.
 
 ## Git commit policy
 
@@ -390,7 +399,7 @@ Before changing any prompt text — in any of those locations — read `docs/pro
 - `claude-stream.ts` reads the turn's `stop_reason` from **three** frames, because Claude Code moved the field and the daemon does not control which build a user has installed. In order of precedence per message: (1) `stream_event` → `message_delta` → `delta.stop_reason`, the only place Claude Code 2.1.259 carries it, available only when `--include-partial-messages` is negotiated; (2) `assistant` → `message.stop_reason`, the legacy shape, which 2.1.259 leaves `null` on every frame but which older CLIs and argv-compatible forks still populate; (3) the terminal `result` frame, surfaced as `usage`, present on every build and flag combination. `emitTurnEndOnce` dedupes them by assistant message id so a build that fills both (1) and (2) announces one turn once. There is deliberately no version gate — nothing tells us which release stopped filling the legacy field, and forks version themselves independently.
 - Whichever source fires, `turn_end` is emitted AFTER every tool_use of the message has been emitted, so the daemon never closes stdin before it has seen the turn's tool calls. Only a main-turn frame may fire it: a forwarded Task sub-agent frame carries a non-null top-level `parent_tool_use_id` and is refused (#5487).
 - A `result` frame ends one **user turn**, not the CLI process: a stream-json session whose stdin stays open emits one `result` per turn and keeps reading. That makes it a valid per-turn reset point for `claude-stream.ts`'s artifact-echo dedup, and on a build with no in-stream boundary at all it is the only one.
-- Verbatim CLI recordings backing all of the above live in `apps/daemon/tests/fixtures/claude-cli-recordings/` (see its `README.md`). Assert new turn-boundary behavior against those, **not** against the older hand-built Claude fixtures elsewhere in `apps/daemon/tests/` — those put `stop_reason` on the `assistant` wrapper and describe a stream the current CLI no longer produces.
+- The verbatim CLI recordings behind all of the above are not published in this repository. The owned synthetic fixtures in `apps/daemon/tests/fixtures/daemon-b/claude-stream/` reproduce the current frame shapes (`message_delta` stop_reason, forwarded sub-agent frames, multi-turn `result` frames, no-partial-messages streams) and back the `w1xx-*` runtime tests. Assert new turn-boundary behavior against those, **not** against the older hand-built Claude fixtures elsewhere in `apps/daemon/tests/` — those put `stop_reason` on the `assistant` wrapper and describe a stream the current CLI no longer produces.
 - The host asks the user clarifying questions through the `<question-form>` artifact (see "Asking the user questions" below), NOT through a stdin-injected `tool_result`. There is no `AskUserQuestion` tool wiring, no `/api/runs/:id/tool-result` endpoint, and no host-answer return path. The stream-json input skeleton is generic infrastructure, and its one product consumer is `POST /api/runs/:id/steer` (「引导对话」, B11): the USER pushes a further message into a turn that is still running, which is the opposite direction from `<question-form>`. Admissibility lives in `apps/daemon/src/runtimes/run-steering.ts` (`classifyRunSteering`) — do not re-derive it at a call site, and do not extend it into a host-question path.
 
 ## Starting a physical Run
@@ -454,7 +463,7 @@ Before changing any prompt text — in any of those locations — read `docs/pro
   validation.
 - After package, workspace, or command-entry changes, run `pnpm install` so workspace links and generated dist entries stay fresh.
 - For agent-stream / parser changes (`apps/daemon/src/runtimes/claude-stream.ts`, `json-event-stream.ts`, `qoder-stream.ts`, etc.), replay a recorded session through the mock CLIs in `mocks/` to verify event shapes round-trip without burning provider budget. PATH-overlay activation: `export PATH="$PWD/mocks/bin:$PATH" OD_MOCKS_TRACE=<8-char-id> OD_MOCKS_NO_DELAY=1`. See `mocks/README.md` for the trace catalog and selection knobs.
-- Docker image smoke/publish lives only in `.github/workflows/docker-image.yml` and is outside the core `ci.yml` / `Validate workspace` / merge queue gate.
+- No workflow in this repository builds or publishes the Docker image, and it is outside the core `ci.yml` / `Validate workspace` / merge queue gate. The image `deploy/docker-compose.yml` pulls is `ghcr.io/zerosum-solutions/mish`; publish it by hand with `deploy/scripts/publish-images.sh --image_namespace zerosum-solutions` (registry names must be lowercase), and `deploy/scripts/install.sh` builds it from the checkout when no image can be pulled.
 - Before marking regular work ready, run at least `pnpm guard` and `pnpm typecheck`, plus the package-scoped tests/builds that match the files changed. Do not use or add root `pnpm test`/`pnpm build` aliases.
 - For local web runtime loops, prefer `pnpm tools-dev run web --daemon-port <port> --web-port <port>`.
 - For e2e tests that need a tools-dev daemon/web runtime, use the shared tools-dev harness under `e2e/lib/tools-dev/` and the framework suite adapters (`e2e/lib/playwright/suite.ts`, `e2e/lib/vitest/suite.ts`). Do not hand-spawn `tools-dev` from test cases or duplicate lifecycle helpers under framework-specific folders.

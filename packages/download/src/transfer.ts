@@ -8,10 +8,7 @@
  * and manifest shapes, and the fs-io write/stat primitives.
  */
 
-import { createWriteStream } from "node:fs";
-import { rm } from "node:fs/promises";
-import { Readable, Transform } from "node:stream";
-import { pipeline } from "node:stream/promises";
+import { open, rm } from "node:fs/promises";
 
 import { MANAGED_DOWNLOAD_ERROR_CODES, ManagedDownloadError } from "./errors.js";
 import { statFileSize, writeJson } from "./fs-io.js";
@@ -86,15 +83,25 @@ function parseContentRange(value: string | null): { end: number; start: number; 
 /**
  * @internal Emit a progress event reflecting bytes already present on disk.
  */
-async function emitExistingProgress(path: string, totalBytes: number | undefined, emit: (progress: ManagedDownloadProgress) => void): Promise<void> {
-  const existing = await statFileSize(path);
-  if (existing == null || existing <= 0) return;
+function emitExistingProgress(existing: number, totalBytes: number | undefined, emit: (progress: ManagedDownloadProgress) => void): void {
+  if (existing <= 0) return;
   emit({ receivedBytes: existing, sessionReceivedBytes: 0, ...(totalBytes == null ? {} : { totalBytes }) });
 }
 
 /**
+ * @internal Bytes read from the network but not yet on disk before reading
+ * pauses for the disk to catch up.
+ */
+const MAX_PENDING_WRITE_BYTES = 8 * 1024 * 1024;
+
+/**
  * @internal Stream a response body into the partial file (append when resuming),
  * emitting progress for every chunk.
+ *
+ * Reading never waits for the file to open or for an earlier chunk to land, so
+ * every byte that arrived before a dropped connection reaches the partial file
+ * and the next attempt can resume from it. Only a backlog above
+ * `MAX_PENDING_WRITE_BYTES` pauses reading.
  */
 async function writeResponseBodyToPartial(
   response: Response,
@@ -106,25 +113,58 @@ async function writeResponseBodyToPartial(
   },
 ): Promise<void> {
   if (response.body == null) throw new Error("download response did not include a body");
+  const reader = (response.body as ReadableStream<Uint8Array>).getReader();
+  const file = open(target.partialPath, options.startBytes > 0 ? "a" : "w");
+  let failure: { error: unknown } | null = null;
+  const fail = (error: unknown) => {
+    failure ??= { error };
+  };
+  let written: Promise<void> = file.then(() => undefined, fail);
+  let pendingBytes = 0;
   let receivedBytes = options.startBytes;
   let sessionReceivedBytes = 0;
-  const meter = new Transform({
-    transform(chunk: Buffer, _encoding, callback) {
-      receivedBytes += chunk.byteLength;
-      sessionReceivedBytes += chunk.byteLength;
+  try {
+    for (;;) {
+      if (pendingBytes > MAX_PENDING_WRITE_BYTES) await written;
+      if (failure != null) break;
+      const { done, value } = await reader.read();
+      if (done) break;
+      receivedBytes += value.byteLength;
+      sessionReceivedBytes += value.byteLength;
       options.emit({
         receivedBytes,
         sessionReceivedBytes,
         ...(options.totalBytes == null ? {} : { totalBytes: options.totalBytes }),
       });
-      callback(null, chunk);
-    },
-  });
-  await pipeline(
-    Readable.fromWeb(response.body as never),
-    meter,
-    createWriteStream(target.partialPath, { flags: options.startBytes > 0 ? "a" : "w" }),
-  );
+      pendingBytes += value.byteLength;
+      written = written.then(async () => {
+        if (failure != null) return;
+        await (await file).write(value);
+        pendingBytes -= value.byteLength;
+      }).catch(fail);
+    }
+  } finally {
+    // Whatever arrived is kept, including when the read itself failed.
+    await written;
+    const handle = await file.catch(() => null);
+    await handle?.close().catch(() => undefined);
+  }
+  if (failure != null) {
+    await reader.cancel().catch(() => undefined);
+    throw (failure as { error: unknown }).error;
+  }
+}
+
+/**
+ * @internal Run a body transfer and a manifest write side by side. The body is
+ * read from the moment the response arrives (see `writeResponseBodyToPartial`),
+ * and the attempt settles only after both have, so a failed manifest write
+ * never leaves a transfer still writing into the next attempt's partial file.
+ */
+async function transferWithManifest(transfer: Promise<void>, manifestWrite: Promise<void>): Promise<void> {
+  const [body, manifest] = await Promise.allSettled([transfer, manifestWrite]);
+  if (body.status === "rejected") throw body.reason;
+  if (manifest.status === "rejected") throw manifest.reason;
 }
 
 /**
@@ -153,15 +193,17 @@ async function tryResumeDownload(
     return "restart";
   }
   const totalBytes = range.totalBytes ?? manifest.totalBytes ?? partialBytes + (contentLength(response) ?? 0);
-  await emitExistingProgress(target.partialPath, totalBytes, emit);
-  await writeJson(target.manifestPath, {
-    ...manifest,
-    state: "partial",
-    totalBytes,
-    updatedAt: new Date().toISOString(),
-    validators: manifest.validators ?? validatorsFromResponse(response),
-  } satisfies DownloadManifest);
-  await writeResponseBodyToPartial(response, target, { emit, startBytes: partialBytes, totalBytes });
+  emitExistingProgress(partialBytes, totalBytes, emit);
+  await transferWithManifest(
+    writeResponseBodyToPartial(response, target, { emit, startBytes: partialBytes, totalBytes }),
+    writeJson(target.manifestPath, {
+      ...manifest,
+      state: "partial",
+      totalBytes,
+      updatedAt: new Date().toISOString(),
+      validators: manifest.validators ?? validatorsFromResponse(response),
+    } satisfies DownloadManifest),
+  );
   return { resumed: true, totalBytes };
 }
 
@@ -180,8 +222,10 @@ async function downloadFromZero(
   if (!response.ok) throw new Error(`download request returned HTTP ${response.status}`);
   const totalBytes = contentLength(response);
   const validators = validatorsFromResponse(response);
-  await writeJson(target.manifestPath, createManifest(target, "partial", { totalBytes, validators }));
-  await writeResponseBodyToPartial(response, target, { emit, startBytes: 0, totalBytes });
+  await transferWithManifest(
+    writeResponseBodyToPartial(response, target, { emit, startBytes: 0, totalBytes }),
+    writeJson(target.manifestPath, createManifest(target, "partial", { totalBytes, validators })),
+  );
   return { resumed: false, totalBytes };
 }
 

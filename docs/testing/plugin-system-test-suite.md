@@ -2,7 +2,7 @@
 
 状态日期：2026-05-14
 
-这份文档覆盖 `docs/plugins-spec.md`、`docs/plans/plugin-registry.md`、`docs/plans/plugins-implementation.md`
+这份文档覆盖 `docs/plugins-spec.md`、`docs/plans/plugin-registry.md`、`docs/plans/plugins-implementation.md`（后两份为私有产品计划，不在本仓库中）
 本期插件系统需求。目标是把需求进度、自动化测试、手工验收和推荐执行顺序放在同一个地方，方便发布前按清单验证。
 
 ## 1. 当前进度摘要

@@ -60,7 +60,7 @@ describe('buildPublishLink', () => {
   });
 
   it('builds a Mishh Mashh registry submission URL', () => {
-    // Submissions land in the private Mishh Mashh repository
+    // Submissions land in the public Mish repository
     // (plugins/community/<plugin-name>/), not in the upstream project.
     const link = buildPublishLink({ catalog: 'mish', meta: META });
     expect(link.catalogLabel).toBe('ZeroSum-Solutions/mish');

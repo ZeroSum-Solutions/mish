@@ -110,7 +110,7 @@ All four scenarios share the same `ApplyResult`, the same run pipeline, and the 
 10. [First-party atoms](#10-first-party-atoms--the-atomic-pipeline-plugins-assemble)
 11. [Architecture — what changes in the existing repo](#11-architecture--what-changes-in-the-existing-repo)
 12. [CLI surface](#12-cli-surface)
-13. [Public web surface](#13-public-web-surface-mishaimarketplace)
+13. [Public web surface](#13-public-web-surface-public-marketplace-site)
 14. [Publishing and catalog distribution](#14-publishing-and-catalog-distribution)
 15. [Deployment and portability — Docker, any cloud](#15-deployment-and-portability--docker-any-cloud)
 16. [Phased implementation plan](#16-phased-implementation-plan)
@@ -1261,7 +1261,7 @@ If the `## Active plugin` block is added only to the daemon composer, web API-fa
 
 1. **v1: plugin-driven runs are supported only in daemon-orchestrated mode** (desktop / web both go through the daemon over HTTP; headless / Docker talk to the daemon directly). Web API-fallback (browser-to-provider, daemon out of the path) does **not** support `pluginId` in v1: when a fallback-mode client tries to create a run with `pluginId`, the web sidecar detects the missing daemon hop and returns `409 plugin-requires-daemon`; the UI prompts the user to start the daemon or switch to desktop / headless. Phase 2A validation explicitly tests this.
 2. **Phase 2A lifts the plugin block renderer into contracts.** The pure function `renderPluginBlock(snapshot: AppliedPluginSnapshot): string` lives in [`packages/contracts/src/prompts/plugin-block.ts`](../packages/contracts/src/prompts/plugin-block.ts) and is imported by both `apps/daemon/src/prompts/system.ts` and `packages/contracts/src/prompts/system.ts`. The daemon composer calls it; the contracts composer holds the import but does not call it under the v1 fallback rejection rule (1). This eliminates the byte-equality drift class entirely — there is one definition of the plugin block, not two — at the cost of half a day of refactor, while preserving the v1 fallback rejection in (1).
-3. **Phase 4 turns on fallback support for plugins.** With the renderer already in contracts, enabling fallback-mode plugin runs is a one-line wiring change inside the contracts composer plus removal of the 409 in the web sidecar. No prompt-shape work; no new CI guards. (Originally the lift was scheduled for Phase 4 itself, with a Phase 1–4 byte-equality CI fixture between the two composers; the plan in `docs/plans/plugins-implementation.md` PB1 pulled the lift into Phase 2A so the fixture is never needed.)
+3. **Phase 4 turns on fallback support for plugins.** With the renderer already in contracts, enabling fallback-mode plugin runs is a one-line wiring change inside the contracts composer plus removal of the 409 in the web sidecar. No prompt-shape work; no new CI guards. (Originally the lift was scheduled for Phase 4 itself, with a Phase 1–4 byte-equality CI fixture between the two composers; the plan in `docs/plans/plugins-implementation.md` (a private product plan, not in this repository) PB1 pulled the lift into Phase 2A so the fixture is never needed.)
 
 The consequence: of the three consumption modes in §14.2 (skill-only / headless OD / full OD), only the latter two ever carry plugin context in v1 — consistent with §1, where a plugin is a wrapper around a long-running task that needs the daemon (or its headless equivalent) to assemble. Phase 4 closes that gap if and when fallback-mode plugin support is wanted.
 
@@ -1614,6 +1614,8 @@ Both products are decoupled the same way: the terminal flow is sufficient; the I
 
 ## 15. Deployment and portability — Docker, any cloud
 
+> **Status:** this section is the original design target, not current behavior. Today the image is built from [`deploy/Dockerfile`](../deploy/Dockerfile), listens on port `7456`, and is named `ghcr.io/zerosum-solutions/mish`; no GitHub workflow in this repository publishes it, and an operator pushes it with [`deploy/scripts/publish-images.sh`](../deploy/scripts/publish-images.sh). For running it, follow [`deployment/docker.md`](deployment/docker.md), [`install-guide.md`](install-guide.md) and the cloud guides under [`deployment/cloud/`](deployment/cloud/azure.md).
+
 OD ships as a single multi-arch Docker image so the full plugin/marketplace system can be brought up with one command and run unchanged on every major cloud. This is the substrate for the ecosystem and commercial story: a partner self-hosts inside their VPC; an enterprise runs a private marketplace; a CI job spins up a per-job OD daemon. The image is the headless mode of §11.7 packaged for ops, optionally serving the web UI from §11.6 when `--serve-web` is set.
 
 ### 15.1 Image shape
@@ -1658,7 +1660,7 @@ TAVILY_API_KEY=...
 > **Current implementation vs. spec (migration note):**
 >
 > - `OD_BIND_HOST` already exists in the daemon ([`apps/daemon/src/server.ts`](../apps/daemon/src/server.ts), [`apps/daemon/src/origin-validation.ts`](../apps/daemon/src/origin-validation.ts)). Earlier draft text referred to the same variable as `OD_HOST`; the correct name is `OD_BIND_HOST`, and this spec uses it everywhere. **No `OD_HOST` alias is introduced** — that would invite double-name drift.
-> - `OD_TRUST_DEFAULT`, `OD_API_TOKEN`, and the corresponding bearer-token middleware are **not yet implemented**; they are part of Phase 5 "Cloud deployment + pluggable storage" (§15.7, §16 Phase 5). Until landed, hosted deployments must rely on a reverse proxy / network ACL for access control; §15.7 explicitly calls out this prerequisite.
+> - `OD_API_TOKEN` and its bearer-token middleware are implemented ([`apps/daemon/src/api-token-auth.ts`](../apps/daemon/src/api-token-auth.ts)); the daemon refuses to bind to a non-loopback interface without the token unless `OD_DISABLE_API_AUTH=1` declares that a trusted reverse proxy authenticates every request. `OD_TRUST_DEFAULT` is **not yet implemented**; it is part of Phase 5 "Cloud deployment + pluggable storage" (§15.7, §16 Phase 5).
 
 Anything settable via the desktop UI is also settable via `docker exec od od config set ...`. This document MUST NOT provide concrete storage paths.
 

@@ -24,8 +24,8 @@
 
 | 工具 | 位置 | 用途 |
 |---|---|---|
-| 状态矩阵 | `docs/design/chat-matrix/` | 84 个状态的清单与覆盖矩阵(文件名仍叫 `matrix-82.html`),自包含 HTML 双击可开;`python3 build-matrix.py ../chat-panel-next.html` 重建 |
-| **场景模拟器** | `docs/design/chat-sim/` | **真实事件逐帧播放**,看流式效果。`sim.js` 的 `build()` 是 `buildTurnBlocks` 的已验证原型(含 T3 四种策略),翻成 TS 即可。`simulator.standalone.html` 单文件可直接发人 |
+| 状态矩阵 | `docs/design/chat-matrix/`(未纳入公开仓库) | 84 个状态的清单与覆盖矩阵(文件名仍叫 `matrix-82.html`),自包含 HTML 双击可开;`python3 build-matrix.py ../chat-panel-next.html` 重建 |
+| **场景模拟器** | `docs/design/chat-sim/`(未纳入公开仓库) | **真实事件逐帧播放**,看流式效果。`sim.js` 的 `build()` 是 `buildTurnBlocks` 的已验证原型(含 T3 四种策略),翻成 TS 即可。`simulator.standalone.html` 单文件可直接发人 |
 | 评审文档 | `chat-panel-next-review.md`(飞书 `WwIsdvv0Aot72PxtpKNclC3jnge`) | 第 2 版,结论清单;第 1 版在飞书历史版本 |
 | **Dev Design** | `chat-panel-dev-design.md` | 按 Plane「Dev Design 模板」(`pages/fc9ec07b`)重梳的架构视角:架构 / 流程 / 情景分析 / 上线 / 稳定性 / 技术债。**决策仍以本文件为准**,那边冲突时回填 |
 
@@ -35,7 +35,7 @@
 
 ### 1.1 唯一基线
 
-**PR #7170 的 head `1bbdce0b06`**(wangchenglong,2026-08-21 03:57):`docs/design/chat-panel-next.html`(组件稿,**24 个组件 / 84 个状态**,md5 `28ea4c65…`)与 `docs/design/chat-panel-scene.html`(场景稿,八屏,已与组件稿同步)。本仓库这两个路径放的就是这两份原文(内容与 PR 一致,合并时不会冲突)。
+**PR #7170 的 head `1bbdce0b06`**(wangchenglong,2026-08-21 03:57):`docs/design/chat-panel-next.html`(组件稿,**24 个组件 / 84 个状态**,md5 `28ea4c65…`)与 `docs/design/chat-panel-scene.html`(场景稿,八屏,已与组件稿同步)。这两份原文与下面的生成源码 `docs/design/chat-panel/src/` 都未纳入公开仓库,本文引用的稿子行号以上述提交为准。
 同一 PR 还提了生成源码 `docs/design/chat-panel/src/`(`components.css` / `body-components.html` / `body-scene.html` / 各交互脚本,`build.mjs` 生成两份 HTML)——**以后对比设计稿改动直接 diff 源文件**。
 
 版本链:`e954620f11`(8/20 16:51,82 态)→ `pv-components.html`(8/20 21:02,83 态)→ `1bbdce0b06`(8/21 03:57,84 态)。每一跳的差异见 §1.5。设计师说 PR head 是最新的,后续更新以 PR 分支为准。

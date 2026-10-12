@@ -68,6 +68,15 @@ describe('media task persistence', () => {
     expect(getMediaTask(db, task.id)).toBeNull();
   });
 
+  it('does not throw when a task settles after shutdown closed the database', () => {
+    const store = createMediaTaskStore(db);
+    const task = store.createMediaTask('late-task', 'p1', {});
+    db.close();
+    task.status = 'failed';
+    task.endedAt = Date.now();
+    expect(() => store.persistMediaTask(task)).not.toThrow();
+  });
+
   let db: Database.Database;
 
   beforeEach(() => {

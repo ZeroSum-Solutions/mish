@@ -6,7 +6,7 @@
 
 A **Skill** is an atomic functional capability in OD. A **design template** is a rendering-catalogue entry. Both use Claude Code's `SKILL.md` convention as their portable instruction format and may add `od:` metadata, but they have different ownership and APIs: functional skills live in `skills/` and `/api/skills`; rendering templates live in `design-templates/` and `/api/design-templates`.
 
-> **Compatibility promise:** A bundle that contains `SKILL.md` remains readable by agents that support the Agent Skills format. Installation and catalogue placement are separate concerns: the bundled guizang integration is maintained under `design-templates/guizang-ppt/`, while external distribution normally uses the plugin system.
+> **Compatibility promise:** A bundle that contains `SKILL.md` remains readable by agents that support the Agent Skills format. Installation and catalogue placement are separate concerns: a bundled template lives under `design-templates/<id>/` (the guizang deck integration used to, see §7), while external distribution normally uses the plugin system.
 
 ---
 
@@ -315,6 +315,10 @@ the root `AGENTS.md` **Daemon data directory contract** before changing or
 documenting artifact storage.
 
 ## 8. Writing a rendering template — minimal example
+
+The layout below is illustrative. The bundled `design-templates/saas-landing/`
+is a fuller version of it that ships `SKILL.md` plus `example.html` and has no
+`assets/` folder.
 
 ```
 design-templates/saas-landing/

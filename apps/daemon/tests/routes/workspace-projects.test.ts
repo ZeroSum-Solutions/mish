@@ -2579,7 +2579,8 @@ function workspaceProjectRouteDeps({
         throw new Error(`unexpected direct SQLite query in workspace route fixture: ${sql}`);
       },
     },
-    design: {},
+    // An idle run registry: batch delete consults it before removing anything.
+    design: { runs: { list: () => [], isTerminal: () => true } },
     http: {
       createSseResponse: noop,
       sendApiError: (res: any, status: number, code: string, message: string, init: Record<string, unknown> = {}) =>

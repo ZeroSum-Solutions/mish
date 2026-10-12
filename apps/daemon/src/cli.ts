@@ -678,7 +678,7 @@ async function runAgent(args) {
     surfaceFetchError(error, base);
     process.exit(3);
   }
-  if (!response.ok) return structuredHttpFailure(response, 'daemon-not-running');
+  if (!response.ok) return structuredHttpFailure(response);
   const result = await response.json();
   if (flags.json) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -703,7 +703,7 @@ async function runAgentStaged(action, flags, runId) {
       surfaceFetchError(error, base);
       process.exit(3);
     }
-    if (!response.ok) return structuredHttpFailure(response, 'daemon-not-running');
+    if (!response.ok) return structuredHttpFailure(response);
     return response.json();
   };
   if (action !== 'status') {
@@ -739,7 +739,7 @@ async function runAgentStagedFinish(runId, flags) {
     surfaceFetchError(error, base);
     process.exit(3);
   }
-  if (!response.ok) return structuredHttpFailure(response, 'daemon-not-running');
+  if (!response.ok) return structuredHttpFailure(response);
   const result = await response.json();
   if (flags.json) {
     process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
@@ -2990,7 +2990,20 @@ function exitWithStructuredError({ code, message, data }) {
 // structured envelope instead of collapsing to `HTTP <status>: `, which
 // would drop the only diagnostic the daemon actually returned to a
 // headless caller.
-async function structuredHttpFailure(resp, fallbackCode = 'daemon-not-running', exit = true) {
+// A received response proves the daemon is running, so a response without
+// an error code is classified from its HTTP status; `daemon-not-running` is
+// reserved for connection failures (surfaceFetchError) and is never derived
+// from a response, even when a caller passes it as the fallback.
+function httpStatusErrorCode(status) {
+  if (status === 404) return 'not-found';
+  if (status === 401 || status === 403) return 'forbidden';
+  if (status === 409) return 'conflict';
+  if (status >= 500) return 'daemon-error';
+  if (status >= 400) return 'bad-request';
+  return 'http-error';
+}
+
+async function structuredHttpFailure(resp, fallbackCode = null, exit = true) {
   let raw = '';
   let parsed;
   try {
@@ -3001,10 +3014,12 @@ async function structuredHttpFailure(resp, fallbackCode = 'daemon-not-running', 
   }
   const errorObj = typeof parsed?.error === 'string' ? { message: parsed.error } : parsed?.error;
   const errCode = normalizeRecoverableErrorCode(errorObj?.code, errorObj?.message);
+  const data = structuredErrorData(errorObj);
   const failure = {
-    code: errCode ?? fallbackCode,
+    code: errCode
+      ?? (fallbackCode && fallbackCode !== 'daemon-not-running' ? fallbackCode : httpStatusErrorCode(resp.status)),
     message: errorObj?.message ?? `HTTP ${resp.status}${raw ? `: ${raw}` : ''}`,
-    data: structuredErrorData(errorObj),
+    data: errCode ? data : { ...data, httpStatus: resp.status },
   };
   if (exit) exitWithStructuredError(failure);
   return { error: failure, exitCode: RECOVERABLE_EXIT_CODES[failure.code] ?? 1 };
@@ -5616,7 +5631,8 @@ async function runPluginMishPr(rest) {
   od plugin mish-pr <folder> [--host github.com] [--owner github-login-or-fork-owner] [--dry-run] [--json]
 
 Copies a local plugin folder into plugins/community/<name>/ on the author's
-fork of the upstream repository, pushes a branch, and opens the PR form with --web.`);
+fork of the public catalog repository, pushes a branch to that fork, and opens
+the PR form with --web.`);
     process.exit(rest.length === 0 ? 2 : 0);
   }
   const folder = rest.find((a) => !a.startsWith('-') && a !== flags.host && a !== flags.owner);
@@ -5671,9 +5687,19 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
     return result;
   };
 
-  // Mishh Mashh is a private org repository: contributors push a branch to it
-  // directly instead of forking.
-  await run('clone fork', 'git', [
+  // The catalog lives in the public repository, where outside contributors
+  // cannot push branches: fork it under the author (or --owner org), push the
+  // branch to that fork, and open the PR from `<owner>:<branch>`.
+  // GitHub logins are case-insensitive. A maintainer passing --owner as the
+  // catalog's own org already has the repository and pushes there directly.
+  const [catalogOwner, catalogRepoName] = MISHH_MASHH_PLUGIN_REPO.split('/');
+  const ownerKey = String(target.owner ?? '').toLowerCase();
+  if (ownerKey !== catalogOwner.toLowerCase()) {
+    const forkArgs = ['repo', 'fork', MISHH_MASHH_PLUGIN_REPO, '--clone=false'];
+    if (target.login && ownerKey !== String(target.login).toLowerCase()) forkArgs.push('--org', target.owner);
+    await run('fork catalog repository', 'gh', forkArgs, { timeout: 120_000 });
+  }
+  await run('clone catalog', 'git', [
     'clone',
     '--depth', '1',
     '--single-branch',
@@ -5684,6 +5710,7 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
     checkout,
   ], { timeout: 240_000 });
   await run('sparse checkout', 'git', ['sparse-checkout', 'set', 'plugins/community'], { cwd: checkout });
+  await run('add fork remote', 'git', ['remote', 'add', 'fork', `https://github.com/${target.owner}/${catalogRepoName}.git`], { cwd: checkout });
   await run('checkout branch', 'git', ['checkout', '-b', branch], { cwd: checkout });
   const dest = join(checkout, 'plugins', 'community', name);
   if (!flags['dry-run']) {
@@ -5693,7 +5720,7 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
   }
   await run('git add', 'git', ['add', `plugins/community/${name}`], { cwd: checkout });
   await run('git commit', 'git', ['commit', '-m', `Add ${title} plugin`], { cwd: checkout });
-  await run('git push branch', 'git', ['push', '-u', 'origin', branch], { cwd: checkout });
+  await run('git push branch', 'git', ['push', '-u', 'fork', branch], { cwd: checkout });
   const body = [
     `Add ${title} (${name}) plugin.`,
     '',
@@ -5703,13 +5730,13 @@ fork of the upstream repository, pushes a branch, and opens the PR form with --w
   const pr = await run('open PR form', 'gh', [
     'pr', 'create',
     '--repo', MISHH_MASHH_PLUGIN_REPO,
-    '--head', branch,
+    '--head', `${target.owner}:${branch}`,
     '--base', 'main',
     '--title', `Add ${title} plugin`,
     '--body', body,
     '--web',
   ], { cwd: checkout });
-  const prUrl = extractFirstUrl(pr.stdout || pr.stderr) ?? `https://github.com/${MISHH_MASHH_PLUGIN_REPO}/pull/new/${branch}`;
+  const prUrl = extractFirstUrl(pr.stdout || pr.stderr) ?? `https://github.com/${MISHH_MASHH_PLUGIN_REPO}/compare/main...${target.owner}:${branch}?expand=1`;
   emitPluginWorkflowResult(flags, {
     ok: true,
     action: 'mish-pr',
@@ -9133,8 +9160,7 @@ Common options:
       // already running, so default-classifying them as
       // `daemon-not-running` would send agents down the wrong recovery
       // branch. Map 404 → project-not-found and 400 → missing-input,
-      // keep the default for 5xx so genuine daemon trouble still
-      // surfaces as `daemon-not-running`.
+      // anything else is classified from its HTTP status.
       if (!resp.ok) {
         if (resp.status === 404) return structuredHttpFailure(resp, 'project-not-found');
         if (resp.status === 400) return structuredHttpFailure(resp, 'missing-input');

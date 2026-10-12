@@ -89,6 +89,11 @@ describe("catalog export", () => {
     const atom = catalog.records.find((record) => record.id === "demo-atom");
     expect(atom).toMatchObject({ type: "plugin", kind: "atom", discoverable: false });
 
+    // Every record links into the public repository, never the private working one.
+    for (const record of catalog.records) {
+      expect(record.sourceUrl).toMatch(/^https:\/\/github\.com\/ZeroSum-Solutions\/mish\/(tree|blob)\/main\//);
+    }
+
     // Snapshot records must not embed raw example.html contents as files —
     // only markdown bodies. The export walk never copies html into catalog.json.
     const serialized = JSON.stringify(catalog);
@@ -129,6 +134,23 @@ describe("catalog validate", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) {
       expect(result.errors.some((e) => e.includes("duplicate identity"))).toBe(true);
+    }
+  });
+
+  it("rejects source urls outside the public repository", () => {
+    const { catalog } = exportCatalog({
+      repoRoot: FIXTURE_ROOT,
+      sourceCommit: SOURCE_COMMIT,
+      generatedAt: "2026-08-29T00:00:00.000Z",
+    });
+    catalog.records[0] = {
+      ...catalog.records[0]!,
+      sourceUrl: "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/skills/alpha",
+    };
+    const result = validateCatalog(catalog);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.errors.join("\n")).toMatch(/records\[0\]\.sourceUrl must be a ZeroSum-Solutions\/mish GitHub URL/);
     }
   });
 

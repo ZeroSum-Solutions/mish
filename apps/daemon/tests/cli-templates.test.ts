@@ -500,4 +500,24 @@ describe('od templates CLI', () => {
     expect(envelope.error.code).toBe('missing-input');
     expect(envelope.error.message).toBe('name required');
   });
+  // A received HTTP response proves the daemon is running, so a failure
+  // without an error code must never be reported as `daemon-not-running`
+  // (exit 64): agents would restart a healthy daemon instead of handling
+  // the actual not-found / server error.
+  it('derives the error code from the HTTP status when the daemon sends no code', async () => {
+    stub.setResponder(() => ({ status: 404, body: { error: 'not found' } }));
+    const notFound = await runCli(['templates', 'list', '--daemon-url', stub.baseUrl]);
+    expect(notFound.code).toBe(1);
+    const notFoundEnvelope = JSON.parse(notFound.stderr.trim());
+    expect(notFoundEnvelope.error.code).toBe('not-found');
+    expect(notFoundEnvelope.error.message).toBe('not found');
+    expect(notFoundEnvelope.error.data).toMatchObject({ httpStatus: 404 });
+
+    stub.setResponder(() => ({ status: 500, body: { error: { message: 'boom' } } }));
+    const serverError = await runCli(['templates', 'list', '--daemon-url', stub.baseUrl]);
+    expect(serverError.code).toBe(1);
+    const serverEnvelope = JSON.parse(serverError.stderr.trim());
+    expect(serverEnvelope.error.code).toBe('daemon-error');
+    expect(serverEnvelope.error.message).toBe('boom');
+  });
 });

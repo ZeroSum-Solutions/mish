@@ -9,7 +9,7 @@ import {
 } from "node:http";
 import { Agent as HttpsAgent, request as createHttpsRequest } from "node:https";
 import { existsSync, readFileSync } from "node:fs";
-import { readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { realpath } from "node:fs/promises";
 import { createRequire } from "node:module";
 import {
   createConnection,
@@ -25,6 +25,8 @@ import {
   SIDECAR_ENV,
   type WebStatusSnapshot,
 } from "@mish/sidecar-proto";
+
+import { prepareNextAppPreservingNextEnv } from "./next-env.js";
 
 const HOST = process.env.OD_HOST || "127.0.0.1";
 if (process.env.OD_HOST != null && !/^[a-zA-Z0-9._\-:[\]@]+$/.test(process.env.OD_HOST)) {
@@ -629,17 +631,6 @@ async function proxyHttpRequest(
   });
 }
 
-async function prepareNextApp(app: { prepare(): Promise<void> }, dir: string): Promise<void> {
-  const nextEnvPath = join(dir, "next-env.d.ts");
-  const previousNextEnv = await readFile(nextEnvPath, "utf8").catch(() => null);
-  await app.prepare();
-  if (previousNextEnv == null) {
-    await rm(nextEnvPath, { force: true }).catch(() => undefined);
-    return;
-  }
-  await writeFile(nextEnvPath, previousNextEnv, "utf8").catch(() => undefined);
-}
-
 async function listen(server: HttpServer | TcpServer, port: number, host = HOST): Promise<number> {
   await new Promise<void>((resolveListen, rejectListen) => {
     server.once("error", rejectListen);
@@ -1106,7 +1097,7 @@ async function startRegularNextSidecar(
 ): Promise<WebSidecarHandle> {
   const dev = process.env.OD_WEB_PROD !== "1" && runtime.mode === "dev";
   const app = createNextApp({ dev, dir: webRoot, ...resolveNextBundlerOptions(dev) });
-  await prepareNextApp(app, webRoot);
+  await prepareNextAppPreservingNextEnv(app, webRoot);
 
   const daemonOrigin = resolveDaemonOrigin();
   const handleRequest = app.getRequestHandler();

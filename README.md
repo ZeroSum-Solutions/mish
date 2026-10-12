@@ -39,7 +39,7 @@ Licensed and third-party content (paid component kits, reference studies, scrape
 | **Agency build** | Turns a client brief into a checked website page. This is the part ZeroSum added. |
 | **Local agents** | Uses the agent CLI you already have (Claude Code, Codex, Gemini and others). When one is installed and signed in, it is the first choice on the welcome screen. |
 
-Home offers prototypes, slide decks, images, documents, website clones, video and audio. Project chat also supports explicit workspace context; see [composer workspace context](docs/architecture.md#composer-workspace-context) for folder access and queued draft behavior.
+Home offers prototypes, slide decks, images, documents, website clones, video and audio. The composer's **Improve prompt** button rewrites a short prompt into a structured brief before you run it; it needs either an OpenRouter key with **Settings → Labs → Faster Improve prompt** on (the default) or a signed-in Claude Code CLI. Project chat also supports explicit workspace context; see [composer workspace context](docs/architecture.md#composer-workspace-context) for folder access and queued draft behavior.
 
 Home remembers the project owner, type, sort order and Archived toggle in this
 browser for each workspace member and project collection. Local mode keeps a
@@ -55,20 +55,21 @@ work for the current visit. Escape closes a slide deck opened in a new tab.
 
 ## Status
 
-Updated 2026-09-23.
+Updated 2026-10-12.
 
 | Area | State |
 |---|---|
 | Languages | English only. |
 | Design systems | One: **Neutral Product**, our own. It is the default. Its status is `candidate`, not `promoted`: the checks in [`QUALITY-STANDARD.md`](docs/design-systems/QUALITY-STANDARD.md) found work left to do. The five brand-copied systems from upstream were removed. |
-| Agency build | Works end to end: route, fill, verify, publish. Seven site families and three page kinds (marketing site, app shell, CRM dashboard). |
+| Agency build | Works end to end: route, fill, verify, publish. Twelve bundled families in three page kinds: ten `site` families, one `app` (app shell) and one `dashboard` (CRM dashboard). `od agency families` lists them. |
 | Desktop app | Not ready to give to anyone. See [Limits](#limits). |
 | CI | GitHub Actions on GitHub-hosted runners validates pull requests. |
 
 ### Limits
 
 - A desktop build must not go to anyone yet. The open items are in [`docs/legal/LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md): license files in the installer, the closed-license `vela` CLI, the installer name, and the upstream cloud sign-in card.
-- Internal package scopes, the `od` command and the `OD_*` variables keep their upstream names. They are internal, and we keep them for compatibility.
+- Workspace packages use the `@mish/*` scope. The `od` command and the `OD_*` variables keep their upstream names for compatibility, and parts of the UI still show the earlier name Mishh Mashh.
+- The web app can be deployed to Vercel from the root `vercel.json`, but that deploy is a static UI shell only: there is no daemon behind it, so every `/api/*` call fails and projects, agents and generation do not work there. See [`QUICKSTART.md` → Deploy the web UI to Vercel](QUICKSTART.md#deploy-the-web-ui-to-vercel).
 
 ## How an agency build works
 
@@ -145,6 +146,7 @@ Open <http://127.0.0.1:3000>. [`QUICKSTART.md`](QUICKSTART.md) covers other setu
 | [`docs/design-systems/QUALITY-STANDARD.md`](docs/design-systems/QUALITY-STANDARD.md) | Before you add or change a design system. |
 | [`docs/FORK-PIN.md`](docs/FORK-PIN.md) | Before you take a change from upstream. |
 | [`docs/legal/LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md) | Before you give a build to anyone. |
+| [`docs/deployment/vercel.md`](docs/deployment/vercel.md) | Before you deploy a project page to Vercel, or this repository's web UI. |
 | [`PRIVACY.md`](PRIVACY.md) | To see what data the app sends and when. |
 | [`docs/testing/diagnostics-environment.md`](docs/testing/diagnostics-environment.md#local-download-policy) | Before saving or sharing a diagnostics bundle; local download, redaction and collection limits. |
 | [`TRANSLATIONS.md`](TRANSLATIONS.md) | Before you add or change UI text. |
@@ -157,6 +159,6 @@ Open <http://127.0.0.1:3000>. [`QUICKSTART.md`](QUICKSTART.md) covers other setu
 
 ## License
 
-Mish! is a modified version of an upstream project licensed under the Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). ZeroSum Solutions changed the product name, removed upstream community links, removed brand-copied design systems, kept two languages, and turned off most upstream network calls (the rest are listed in [`LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md)). This repository starts from a snapshot of ZeroSum's private working repository; see [`NOTICE`](NOTICE).
+Mish! is a modified version of an upstream project licensed under the Apache License 2.0. See [`LICENSE`](LICENSE) and [`NOTICE`](NOTICE). ZeroSum Solutions changed the product name, removed upstream community links, removed brand-copied design systems, ships English only, and turned off most upstream network calls (the rest are listed in [`LICENSE-COMPLIANCE.md`](docs/legal/LICENSE-COMPLIANCE.md)). This repository starts from a snapshot of ZeroSum's private working repository; see [`NOTICE`](NOTICE).
 
 Upstream names and logos belong to their owners. This product is not affiliated with or endorsed by the upstream project or its owners. Bundled components with their own `LICENSE` files keep those licenses, for example [`skills/web-clone/`](skills/web-clone/) (MIT).
