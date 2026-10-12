@@ -86,8 +86,11 @@ const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, '\\
  */
 export function publicAdapterText(adapterId: string, text: string, kind: 'markup' | 'css' = 'markup'): string {
   if (!adapterId.startsWith('cult:')) return text;
-  const named = publicAdapterNames(adapterId, text);
-  const entry = loadPublicNames()[adapterId];
+  return applyPublicNames(loadPublicNames()[adapterId], publicAdapterNames(adapterId, text), kind);
+}
+
+/** Stage 2 of `publicAdapterText`, pure: one adapter's `public-names.json` entry applied to text already through stage 1. */
+export function applyPublicNames(entry: PublicNames | undefined, named: string, kind: 'markup' | 'css' = 'markup'): string {
   if (!entry) return named;
   const tokens = Object.entries(entry.tokens ?? {});
   const renameTokens = (value: string) => tokens.reduce(

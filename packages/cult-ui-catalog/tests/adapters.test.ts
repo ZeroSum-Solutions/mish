@@ -8,14 +8,14 @@ import assert from 'node:assert/strict';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { after, test } from 'node:test';
+import { test } from 'node:test';
 
 import {
   checkAdapters,
   foreignCustomProperties,
   indexSource,
-  PACKAGE_DIR,
   shimSource,
+  PACKAGE_DIR,
   unscopedSelectors,
 } from '../scripts/adapter-check.ts';
 import {
@@ -26,7 +26,10 @@ import {
   productAdapterSource,
   type ConvertedBlock,
 } from '../src/converted.ts';
-import type { CultCatalog, CultCatalogRow } from '../src/types.ts';
+import { buildCatalog } from '../src/build.ts';
+import { readKit } from '../src/kit.ts';
+import type { CultCatalog } from '../src/types.ts';
+import { writeFixtureKit } from './helpers/fixture-kit.ts';
 
 const catalog = JSON.parse(readFileSync(join(PACKAGE_DIR, 'catalog.json'), 'utf8')) as CultCatalog;
 const generatedDir = join(PACKAGE_DIR, 'generated');
@@ -110,85 +113,96 @@ test('CSS scope and custom-property rules', () => {
   assert.deepEqual(foreignCustomProperties('.a{x:var(--brand)}'), ['--brand']);
 });
 
-// The licensed Cult adapters ship in a private pack, so the gate is exercised on owned fixture
-// adapters (KIT_ADAPTER, renamed per row) written to a generated tree three levels below the repo
-// root, where the shim's `../../../` path into the shared compiler resolves as in `generated/`.
-const REPO_ROOT = join(PACKAGE_DIR, '..', '..');
-const FIXTURE_NAMES = ['demo', 'other'] as const;
-
-function fixtureRow(name: string): CultCatalogRow {
-  return {
-    id: `cult:${name}`,
-    name,
-    conversion: { status: 'insertable' },
-    adapter: { id: `cult:${name}`, version: '1.0.0', sourceSha256: 'a'.repeat(64) },
+/** A one-block synthetic generated tree plus its catalog, written beside `generated/` so the shim's relative import resolves. */
+function syntheticTree(): { catalog: CultCatalog; generatedDir: string; cleanup: () => void } {
+  const generatedDir = mkdtempSync(join(PACKAGE_DIR, '.test-generated-'));
+  mkdirSync(join(generatedDir, 'adapters'), { recursive: true });
+  writeFileSync(join(generatedDir, 'section-adapter.ts'), shimSource());
+  writeFileSync(join(generatedDir, 'index.ts'), indexSource(['demo']));
+  writeFileSync(join(generatedDir, 'adapters', 'demo.ts'), productAdapterSource(KIT_ADAPTER, 'demo'));
+  const base = buildCatalog(readKit(writeFixtureKit()), {});
+  const row = base.rows.find((r) => r.name === 'hero-alpha')!;
+  const demo = {
+    ...row,
+    id: 'cult:demo',
+    name: 'demo',
+    conversion: { status: 'insertable' as const },
+    adapter: { id: 'cult:demo', version: '1.0.0', sourceSha256: 'a'.repeat(64) },
     previewId: null,
-  } as unknown as CultCatalogRow;
+  };
+  return { catalog: { ...base, rows: [demo] } as CultCatalog, generatedDir, cleanup: () => rmSync(generatedDir, { recursive: true, force: true }) };
 }
 
-function fixtureCatalog(): CultCatalog {
-  return { ...structuredClone(catalog), rows: FIXTURE_NAMES.map(fixtureRow) };
-}
-
-function writeFixtureGenerated(): string {
-  const parent = join(REPO_ROOT, '.tmp', 'cult-ui-catalog-tests');
-  mkdirSync(parent, { recursive: true });
-  const dir = mkdtempSync(join(parent, 'generated-'));
-  mkdirSync(join(dir, 'adapters'));
-  for (const name of FIXTURE_NAMES) {
-    writeFileSync(join(dir, 'adapters', `${name}.ts`), productAdapterSource(KIT_ADAPTER.replaceAll('demo', name), name));
-  }
-  writeFileSync(join(dir, 'section-adapter.ts'), shimSource());
-  writeFileSync(join(dir, 'index.ts'), indexSource([...FIXTURE_NAMES]));
-  return dir;
-}
-
-after(() => rmSync(join(REPO_ROOT, '.tmp', 'cult-ui-catalog-tests'), { recursive: true, force: true }));
-
-test('the committed generated tree is the empty registry of an uninstalled pack', async () => {
+test('the committed public adapter tree is the empty stub and passes the gate without the kit (CI mode)', async () => {
+  assert.equal(catalog.rows.length, 0, 'licensed Cult rows are not committed');
+  assert.equal(readFileSync(join(generatedDir, 'index.ts'), 'utf8'), indexSource([]));
+  assert.equal(existsSync(join(generatedDir, 'adapters')), false, 'no licensed adapters are committed');
   const result = await checkAdapters({ catalog, generatedDir, kitDir: null });
   assert.deepEqual(result.errors, []);
   assert.equal(result.kitCompared, false);
-  assert.equal(result.measured.length, 0);
-  assert.deepEqual(catalog.rows.filter((row) => row.conversion.status === 'insertable'), []);
+  assert.deepEqual(result.measured, []);
 });
 
-test('adapters pass the gate without the kit (CI mode)', async () => {
-  const result = await checkAdapters({ catalog: fixtureCatalog(), generatedDir: writeFixtureGenerated(), kitDir: null });
-  assert.deepEqual(result.errors, []);
-  assert.equal(result.kitCompared, false);
-  assert.equal(result.measured.length, FIXTURE_NAMES.length);
-  for (const m of result.measured) assert.ok(m.total <= ADAPTER_BYTE_LIMIT, `${m.id} is ${m.total} B`);
+test('a synthetic adapter passes the gate without the kit, within the byte limit', async () => {
+  const tree = syntheticTree();
+  try {
+    const result = await checkAdapters({ catalog: tree.catalog, generatedDir: tree.generatedDir, kitDir: null });
+    assert.deepEqual(result.errors, []);
+    assert.equal(result.kitCompared, false);
+    assert.equal(result.measured.length, 1);
+    for (const m of result.measured) assert.ok(m.total <= ADAPTER_BYTE_LIMIT, `${m.id} is ${m.total} B`);
+  } finally {
+    tree.cleanup();
+  }
 });
 
 test('the gate fails when catalog.json and the committed adapter disagree', async () => {
-  const dir = writeFixtureGenerated();
-  const mutated = fixtureCatalog();
-  const row = mutated.rows.find((r) => r.id === 'cult:demo')!;
-  row.adapter = { ...row.adapter!, version: '9.9.9', sourceSha256: 'b'.repeat(64) };
-  const result = await checkAdapters({ catalog: mutated, generatedDir: dir, kitDir: null });
-  assert.ok(result.errors.some((e) => e.startsWith('cult:demo: version 1.0.0 differs')), result.errors.join('\n'));
-  assert.ok(result.errors.some((e) => e === 'cult:demo: sourceSha256 differs from catalog.json'));
+  const tree = syntheticTree();
+  try {
+    const mutated = structuredClone(tree.catalog);
+    mutated.rows[0]!.adapter = { ...mutated.rows[0]!.adapter!, version: '9.9.9', sourceSha256: 'b'.repeat(64) };
+    const result = await checkAdapters({ catalog: mutated, generatedDir: tree.generatedDir, kitDir: null });
+    assert.ok(result.errors.some((e) => e.startsWith('cult:demo: version 1.0.0 differs')), result.errors.join('\n'));
+    assert.ok(result.errors.some((e) => e === 'cult:demo: sourceSha256 differs from catalog.json'));
 
-  const dropped = fixtureCatalog();
-  Object.assign(dropped.rows.find((r) => r.id === 'cult:demo')!, { conversion: { status: 'adapter-needed', reason: 'test' }, adapter: null, previewId: null });
-  const extra = await checkAdapters({ catalog: dropped, generatedDir: dir, kitDir: null });
-  assert.ok(extra.errors.some((e) => e.includes('extra: demo')));
-  assert.ok(extra.errors.includes('generated/index.ts is out of date with catalog.json'));
+    const dropped = structuredClone(tree.catalog);
+    Object.assign(dropped.rows[0]!, { conversion: { status: 'adapter-needed', reason: 'test' }, adapter: null, previewId: null });
+    const extra = await checkAdapters({ catalog: dropped, generatedDir: tree.generatedDir, kitDir: null });
+    assert.ok(extra.errors.some((e) => e.includes('extra: demo')));
+    assert.ok(extra.errors.includes('generated/index.ts is out of date with catalog.json'));
+  } finally {
+    tree.cleanup();
+  }
 });
 
 test('the gate compares against a kit when one is present, and reports a mismatch', async () => {
-  const fakeKit = mkdtempSync(join(tmpdir(), 'cult-fake-kit-'));
-  mkdirSync(join(fakeKit, 'converted', 'demo'), { recursive: true });
-  mkdirSync(join(fakeKit, 'registry'), { recursive: true });
-  writeFileSync(join(fakeKit, 'converted', 'demo', 'adapter.ts'), KIT_ADAPTER.replace('var(--role-foreground)', 'var(--role-accent)'));
-  writeFileSync(join(fakeKit, 'registry', 'demo.json'), JSON.stringify({ name: 'demo', files: [{ path: 'a.tsx', content: 'changed' }] }));
-  const result = await checkAdapters({ catalog: fixtureCatalog(), generatedDir: writeFixtureGenerated(), kitDir: fakeKit });
-  assert.equal(result.kitCompared, true);
-  const demo = result.errors.filter((e) => e.startsWith('cult:demo:'));
-  assert.ok(demo.some((e) => /kit adapter cannot be copied|differs from the kit/.test(e)), demo.join('\n'));
-  assert.ok(demo.some((e) => e.includes('does not match the pinned registry item')), demo.join('\n'));
-  assert.ok(result.errors.some((e) => e.startsWith('cult:other: the kit has no converted adapter')));
+  const tree = syntheticTree();
+  try {
+    const fakeKit = mkdtempSync(join(tmpdir(), 'cult-fake-kit-'));
+    mkdirSync(join(fakeKit, 'converted', 'demo'), { recursive: true });
+    mkdirSync(join(fakeKit, 'registry'), { recursive: true });
+    writeFileSync(join(fakeKit, 'converted', 'demo', 'adapter.ts'), KIT_ADAPTER.replace('cult-demo{color', 'cult-demo{background'));
+    writeFileSync(join(fakeKit, 'registry', 'demo.json'), JSON.stringify({ name: 'demo', files: [{ path: 'a.tsx', content: 'changed' }] }));
+    const result = await checkAdapters({ catalog: tree.catalog, generatedDir: tree.generatedDir, kitDir: fakeKit });
+    assert.equal(result.kitCompared, true);
+    const demo = result.errors.filter((e) => e.startsWith('cult:demo:'));
+    assert.ok(demo.some((e) => /differs from the kit/.test(e)), demo.join('\n'));
+    assert.ok(demo.some((e) => e.includes('does not match the pinned registry item')), demo.join('\n'));
+  } finally {
+    tree.cleanup();
+  }
+});
+
+test('a kit with no converted adapter for an insertable row is reported', async () => {
+  const tree = syntheticTree();
+  try {
+    const fakeKit = mkdtempSync(join(tmpdir(), 'cult-fake-kit-'));
+    mkdirSync(join(fakeKit, 'converted'), { recursive: true });
+    const result = await checkAdapters({ catalog: tree.catalog, generatedDir: tree.generatedDir, kitDir: fakeKit });
+    assert.ok(result.errors.some((e) => e.startsWith('cult:demo: the kit has no converted adapter')));
+  } finally {
+    tree.cleanup();
+  }
 });
 
 test('with the private kit, every committed adapter equals the kit output and its pinned hash', { skip: hasKit ? false : 'source kit not present' }, async () => {

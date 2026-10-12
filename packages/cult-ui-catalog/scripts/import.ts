@@ -28,7 +28,7 @@ import { applyOverrides, parseOverrides } from '../src/overrides.ts';
 import { renderSnapshotBlock, spliceSnapshotBlock } from '../src/rights-doc.ts';
 import { catalogSummary } from '../src/summary.ts';
 import type { CultCatalog } from '../src/types.ts';
-import { catalogIssues, catalogWithheld } from '../src/validate.ts';
+import { catalogIssues } from '../src/validate.ts';
 
 const pkgDir = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const catalogPath = join(pkgDir, 'catalog.json');
@@ -64,9 +64,12 @@ function runImport(): void {
   if (issues.length > 0) fail('Generated catalog is invalid', issues);
   const text = catalogFileText(catalog);
   if (!existsSync(catalogPath) || readFileSync(catalogPath, 'utf8') !== text) writeFileSync(catalogPath, text);
-  const doc = readFileSync(docPath, 'utf8');
-  const nextDoc = spliceSnapshotBlock(doc, catalog.snapshot);
-  if (nextDoc !== doc) writeFileSync(docPath, nextDoc);
+  // The rights doc ships with the private kit; the public repo has none and pins nothing.
+  if (existsSync(docPath)) {
+    const doc = readFileSync(docPath, 'utf8');
+    const nextDoc = spliceSnapshotBlock(doc, catalog.snapshot);
+    if (nextDoc !== doc) writeFileSync(docPath, nextDoc);
+  }
   console.log(`catalog.json: ${catalog.rows.length} rows, snapshot ${catalog.snapshot.id}`);
   console.log(JSON.stringify({ snapshot: catalog.snapshot, ...catalogSummary(catalog) }, null, 2));
 }
@@ -75,26 +78,20 @@ function runCheck(): void {
   const committed = JSON.parse(readFileSync(catalogPath, 'utf8')) as CultCatalog;
   const issues = catalogIssues(committed);
   if (issues.length > 0) fail('catalog.json is invalid', issues);
-  // A public checkout withholds the licensed rows and the rights record (src/validate.ts
-  // `catalogWithheld`): overrides still have to parse, but there are no rows for them to name.
-  const withheld = catalogWithheld(committed);
   try {
-    const overrides = loadOverrides();
     // Overrides must parse and name existing rows (applying them is a no-op check here).
-    if (!withheld) applyOverrides(committed.rows, overrides);
+    applyOverrides(committed.rows, loadOverrides());
   } catch (error) {
     fail('reviewed-overrides.json is invalid', [(error as Error).message]);
   }
-  if (!withheld || existsSync(docPath)) {
+  // An empty catalog (the public build) pins no snapshot, so the rights doc is not required.
+  if (committed.rows.length > 0 || existsSync(docPath)) {
     const doc = existsSync(docPath) ? readFileSync(docPath, 'utf8') : '';
-    if (!doc.includes(renderSnapshotBlock(committed.snapshot))) {
-      fail('docs/legal/cult-ui-pro-rights.md does not pin the catalog snapshot', ['run the importer to re-pin it']);
-    }
+    if (!doc.includes(renderSnapshotBlock(committed.snapshot))) fail('docs/legal/cult-ui-pro-rights.md does not pin the catalog snapshot', ['run the importer to re-pin it']);
   }
   if (!existsSync(join(kitDir, 'registry', 'index.json'))) {
     if (process.env.CULT_REQUIRE_KIT === '1') fail('Source kit missing', [kitDir]);
-    const rows = withheld ? `licensed rows withheld, snapshot ${committed.snapshot.id}` : `${committed.rows.length} rows`;
-    console.log(`catalog.json valid (${rows}); source kit not found at ${kitDir}, snapshot comparison skipped`);
+    console.log(`catalog.json valid (${committed.rows.length} rows); source kit not found at ${kitDir}, snapshot comparison skipped`);
     return;
   }
   const fresh = buildFromKit();

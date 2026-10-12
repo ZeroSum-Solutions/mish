@@ -13,10 +13,10 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "etag": "W/\"4ad3-PtLLnNTDGro+Igoua8fhxu186fc\""
+        "etag": "W/\"4a8f-C3n+bZt66biuuLjr3JDTuo1xeRA\""
       },
-      "bodyBytes": 19155,
-      "bodySha256": "60d5f794ec72b5d8547d32baa4333be3c0ec6dff67f24506c54fb879afb79321",
+      "bodyBytes": 19087,
+      "bodySha256": "b9388befd0c46c5cc5b8b27ded4d187f2d54548bd9125f42cf1252d11dd0ae08",
       "bodyFile": "bodies/list.json"
     },
     {
@@ -25,10 +25,10 @@
       "status": 200,
       "headers": {
         "content-type": "application/json; charset=utf-8",
-        "etag": "W/\"7ed-94hxi+9e+jHXLVOHSbb87l4EaB4\""
+        "etag": "W/\"7cc-PFhFcOSZ4gAvBtniFqREZRyCouk\""
       },
-      "bodyBytes": 2029,
-      "bodySha256": "220cf0f5263b7f242c29d1202d12cd6bd32c32e2bb53b80e142947f09c30b7b8",
+      "bodyBytes": 1996,
+      "bodySha256": "012fd408d11ce3de0f059d7b79ed5d5d347882ada2394e9ee23532189e3ca712",
       "bodyFile": "bodies/moumensoliman-glassmorphism-listen-app.item.json"
     },
     {

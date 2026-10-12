@@ -124,15 +124,15 @@ describe("fast-lane design data inside a daemon prebundle", () => {
     // again through the daemon's `BUNDLED_PLUGINS_DIR`.
     //
     // So the workspace tree is not what is loaded here. `plugins/_official/examples/agency-
-    // restaurant` is COPIED into a fresh root first — the copy `copyBundledResourceTrees` makes —
+    // practice` is COPIED into a fresh root first — the copy `copyBundledResourceTrees` makes —
     // and the bundle loads it from there, joining the path exactly as the daemon's
     // `familyPackageDir` does. Reading the live workspace path instead would prove only that the
     // repo is on this disk, which a packaged machine's is not.
     const resourceRoot = await mkdtemp(join(tmpdir(), "mish-family-resources-"));
     try {
       await cp(
-        join(BUNDLED_PLUGINS_ROOT, "examples", "agency-restaurant"),
-        join(resourceRoot, "plugins", "_official", "examples", "agency-restaurant"),
+        join(BUNDLED_PLUGINS_ROOT, "examples", "agency-practice"),
+        join(resourceRoot, "plugins", "_official", "examples", "agency-practice"),
         { recursive: true },
       );
       const bundledPluginsDir = join(resourceRoot, "plugins", "_official");
@@ -141,13 +141,13 @@ describe("fast-lane design data inside a daemon prebundle", () => {
         import { loadFamilyPackage } from "@mish/agency-fast-lane/family";
         // familyPackageDir(bundledPluginsRoot, family), inlined: the daemon's own composition is
         // asserted against this same layout in apps/daemon/tests/agency-build-routes.test.ts.
-        const dir = join(${JSON.stringify(bundledPluginsDir)}, "examples", "agency-restaurant");
-        const pkg = await loadFamilyPackage(dir, "restaurant");
+        const dir = join(${JSON.stringify(bundledPluginsDir)}, "examples", "agency-practice");
+        const pkg = await loadFamilyPackage(dir, "practice");
         process.stdout.write(JSON.stringify({ family: pkg.family, render: typeof pkg.render, fromWorkspace: dir.startsWith(${JSON.stringify(BUNDLED_PLUGINS_ROOT)}) }));
       `);
 
       expect(result.ok, result.output).toBe(true);
-      expect(JSON.parse(result.output)).toEqual({ family: "restaurant", render: "function", fromWorkspace: false });
+      expect(JSON.parse(result.output)).toEqual({ family: "practice", render: "function", fromWorkspace: false });
     } finally {
       await rm(resourceRoot, { force: true, recursive: true });
     }
@@ -159,7 +159,7 @@ describe("fast-lane design data inside a daemon prebundle", () => {
     // wired to it answers 202 and then fails the build at `prepare` time, in packaged builds only.
     const result = await bundleAndRun(`
       import { defaultPackageDir, loadFamilyPackage } from "@mish/agency-fast-lane/family";
-      await loadFamilyPackage(defaultPackageDir("restaurant"), "restaurant");
+      await loadFamilyPackage(defaultPackageDir("practice"), "practice");
       process.stdout.write("loaded");
     `);
 
@@ -167,7 +167,7 @@ describe("fast-lane design data inside a daemon prebundle", () => {
     // It looked for the package three directories above the BUNDLE, not above the package: the
     // path it names is somewhere under the temp root, and never the workspace tree that holds the
     // real family. Which file it misses first (the compiler here) is incidental.
-    expect(result.output).toContain("agency-restaurant");
+    expect(result.output).toContain("agency-practice");
     expect(result.output).not.toContain(BUNDLED_PLUGINS_ROOT);
   }, 60_000);
 

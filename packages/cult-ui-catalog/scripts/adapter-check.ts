@@ -82,7 +82,7 @@ export type { AdapterFill, SectionAdapter, SemanticRole } from '../../../${SHARE
 `;
 }
 
-/** The registry a public checkout carries: no private pack installed, so no Cult adapters. */
+/** The public build ships no licensed adapters: with no insertable row the registry is this stub. */
 const EMPTY_INDEX_SOURCE = `// Public stub. The Cult UI Pro adapters are licensed content and ship in a private pack, not in
 // this repository. With no pack installed the registry is empty and Cult sections are unavailable.
 

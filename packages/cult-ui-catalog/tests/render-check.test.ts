@@ -46,47 +46,47 @@ test('frozen package: no synchronized agency compiler copy carries or imports a 
 const publicIds = await import(pathToFileURL(join(REPO_ROOT, 'packages/agency-fast-lane/src/cult-public-ids.ts')).href) as {
   publicSectionEntryId: (id: string) => string;
   publicAdapterText: (adapterId: string, text: string) => string;
+  applyPublicNames: (entry: { tokens?: Record<string, string>; prose?: Record<string, string> } | undefined, named: string, kind?: 'markup' | 'css') => string;
 };
-
-test('published adapters: no insertable Cult block carries its internal name once made public', async () => {
-  let renamed = 0;
-  for (const load of Object.values(CULT_ADAPTERS)) {
-    const adapter = await load();
-    const publicId = publicIds.publicSectionEntryId(adapter.id);
-    if (publicId === adapter.id) continue;
-    renamed += 1;
-    const name = adapter.id.slice('cult:'.length);
-    // Markup (worst-case and layout fills) and CSS, exactly as the fast lane publishes them.
-    for (const [what, text] of [
-      ['markup', adapter.render(worstCaseFill(adapter as never))],
-      ['layout markup', adapter.render(layoutFill(adapter))],
-      ['css', adapter.css],
-    ] as const) {
-      const published = publicIds.publicAdapterText(adapter.id, text);
-      const at = published.indexOf(name);
-      assert.equal(at, -1, `${adapter.id} ${what} still names ${name}: …${published.slice(Math.max(0, at - 40), at + name.length + 20)}…`);
-    }
-  }
-  // Every published adapter has a reviewed public slug. With the licensed pack not installed the
-  // registry is empty and nothing is published, so there is nothing to rename.
-  const slugs = (await import(pathToFileURL(join(PACKAGE_DIR, 'generated', 'slugs.json')).href, { with: { type: 'json' } })).default as { items: Record<string, string> };
-  for (const id of Object.keys(CULT_ADAPTERS)) assert.ok(Object.hasOwn(slugs.items, id), `${id} has no public slug`);
-  assert.ok(renamed <= Object.keys(CULT_ADAPTERS).length);
-});
-
-const adapterNames = await import(pathToFileURL(join(REPO_ROOT, 'packages/agency-fast-lane/src/cult-adapter-names.ts')).href) as {
+const namesModule = await import(pathToFileURL(join(REPO_ROOT, 'packages/agency-fast-lane/src/cult-adapter-names.ts')).href) as {
   publicAdapterNamesForId: (adapterId: string, text: string, publicId: string) => string;
 };
 
+test('published adapters: the public build commits no adapters and renames nothing', async () => {
+  assert.deepEqual(Object.keys(CULT_ADAPTERS), []);
+  assert.equal(publicIds.publicSectionEntryId('cult:anything'), 'cult:anything');
+  assert.equal(publicIds.publicSectionEntryId('hyperui:x'), 'hyperui:x');
+  assert.equal(publicIds.publicAdapterText('cult:anything', '<div class="cult-anything"></div>'), '<div class="cult-anything"></div>');
+});
+
+test('published adapters: an insertable block carries no internal name once made public', () => {
+  // Synthetic adapter: internal name `demo-vite`, public slug `demo-series-vt`.
+  const markup = '<div class="cult-demo-vite"><svg><use href="#sym-demo-vite"></use></svg><a href="https://demo-vite.example.org/">x</a></div>';
+  const css = '.cult-demo-vite .a{color:var(--role-accent)}';
+  const publishedMarkup = namesModule.publicAdapterNamesForId('cult:demo-vite', markup, 'cult:demo-series-vt');
+  assert.ok(!publishedMarkup.replace('https://demo-vite.example.org/', '').includes('demo-vite'), publishedMarkup);
+  assert.ok(publishedMarkup.includes('cult-demo-series-vt'));
+  assert.ok(namesModule.publicAdapterNamesForId('cult:demo-vite', css, 'cult:demo-series-vt').includes('.cult-demo-series-vt .a'));
+  assert.ok(publishedMarkup.includes('https://demo-vite.example.org/'), 'external hrefs stay unchanged');
+  assert.equal(namesModule.publicAdapterNamesForId('cult:demo-vite', markup, 'cult:demo-vite'), markup, 'an unrenamed block is untouched');
+});
+
 test('published adapters: element ids and their references are renamed together', () => {
-  // Owned label/field markup whose ids carry the adapter's own name, renamed with an explicit
-  // public id, so the pairing rule is checked without the licensed slug data.
-  const published = adapterNames.publicAdapterNamesForId('cult:marketing-contact-vite',
-    '<div class="cult-marketing-contact-vite"><label for="marketing-contact-vite-name">Name</label><input id="marketing-contact-vite-name">'
-    + '<label for="marketing-contact-vite-work-email">Work email</label><input id="marketing-contact-vite-work-email"></div>',
-    'cult:contact-series-vt');
+  const entry = {
+    // Keys are the tokens as stage 1 leaves them (the slug already replaced the internal name).
+    tokens: { 'demo-series-vt-name': 'name-series-vt', 'demo-series-vt-work-email': 'work-email-series-vt' },
+    prose: { 'Visit us on DemoVite': 'Visit us' },
+  };
+  const named = namesModule.publicAdapterNamesForId('cult:demo-vite',
+    '<div class="cult-demo-vite"><label for="demo-vite-name">Name</label><input id="demo-vite-name" aria-label="Visit us on DemoVite">'
+    + '<label for="demo-vite-work-email">Work email</label><input id="demo-vite-work-email"></div>', 'cult:demo-series-vt');
+  const published = publicIds.applyPublicNames(entry, named);
   const ids = [...published.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]!);
   const fors = [...published.matchAll(/\sfor="([^"]+)"/g)].map((match) => match[1]!);
   assert.ok(fors.length > 0 && fors.every((target) => ids.includes(target)), 'every label still points at its field');
-  assert.ok(ids.some((id) => id.startsWith('contact-series-vt-')));
+  assert.ok(ids.includes('name-series-vt') && ids.includes('work-email-series-vt'));
+  assert.ok(published.includes('aria-label="Visit us"'));
+  // CSS renames the same tokens everywhere, including custom properties.
+  assert.equal(publicIds.applyPublicNames(entry, '#demo-series-vt-name{} var(--demo-series-vt-name)', 'css'), '#name-series-vt{} var(--name-series-vt)');
+  assert.equal(publicIds.applyPublicNames(undefined, 'same'), 'same');
 });

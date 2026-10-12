@@ -609,6 +609,9 @@ test('[P1] Settings AMR upgrade opens the attributed plans URL for the active pr
       body: JSON.stringify({
         loggedIn: true,
         profile,
+        // The fork ships no AMR console host; configure one so the upgrade
+        // link stays covered.
+        consoleOrigin: 'https://amr-console.example.invalid',
         configPath: '/tmp/.amr/config.json',
         user: { id: 'settings-upgrade-user', email: 'settings-upgrade@example.com', plan: 'free' },
         account: { plan: 'free', balanceUsd: '0.50' },
@@ -641,7 +644,8 @@ test('[P1] Settings AMR upgrade opens the attributed plans URL for the active pr
 
   await expect.poll(() => openedUrl).toBeTruthy();
   const url = new URL(openedUrl);
-  expect(url.pathname).toBe('/cloud/dashboard');
+  expect(url.origin).toBe('https://amr-console.example.invalid');
+  expect(url.pathname).toBe('/dashboard');
   expect(url.searchParams.get('source')).toBe('mish');
   expect(url.searchParams.get('billing')).toBe('plan');
   expect(url.searchParams.get('od_origin')).toBe('mish');
@@ -660,6 +664,9 @@ test('[P0] @critical Settings preserves AMR account, recharge shortcut, and mode
       body: JSON.stringify({
         loggedIn: true,
         profile,
+        // The fork ships no AMR console host; configure one so the account
+        // link stays covered.
+        consoleOrigin: 'https://amr-console.example.invalid',
         configPath: '/tmp/.amr/config.json',
         user: { id: 'settings-amr-user', email: 'settings-amr-switch@example.com', plan: 'free' },
       }),
