@@ -1,0 +1,551 @@
+/* ============================================================
+   Mishh Mashh — neutral product workspace
+   ============================================================ */
+:root {
+  /* 选中记号:盘底 + 挖空的勾,两枚同大的圆叠出来(底圆 r=9,不然边缘透深色)。
+     执行记录的完成勾和意图澄清的选项勾是同一张,所以放全局。 */
+  --tick-img: url("data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxMiIgY3k9IjEyIiByPSI5IiBmaWxsPSIjMjAyMDIwIi8+PHBhdGggZD0iTTEyIDIyQzE3LjUyMjggMjIgMjIgMTcuNTIyOCAyMiAxMkMyMiA2LjQ3NzE1IDE3LjUyMjggMiAxMiAyQzYuNDc3MTUgMiAyIDYuNDc3MTUgMiAxMkMyIDE3LjUyMjggNi40NzcxNSAyMiAxMiAyMlpNMTcuNDU3MSA5LjQ1NzExTDExIDE1LjkxNDJMNi43OTI4OSAxMS43MDcxTDguMjA3MTEgMTAuMjkyOUwxMSAxMy4wODU4TDE2LjA0MjkgOC4wNDI4OUwxNy40NTcxIDkuNDU3MTFaIiBmaWxsPSIjMDBGRjA4Ii8+PC9zdmc+");
+  /* 选中项的字色 —— 比正文重一档,产品指定的色号 */
+  --select-ink: #353535;
+  /* Mishh Mashh system palette. Neutrals carry the interface; brand green is
+     reserved for sparse feedback, selected assists, and brand emphasis. */
+  --bg: #fff;
+  --bg-app: #fff;
+  --bg-panel: #fafafa;
+  --bg-subtle: #ededed;
+  --bg-muted: #dbdbdb;
+  --bg-fill-tertiary: rgba(0, 0, 0, 0.03);
+  --bg-fill-secondary: rgba(0, 0, 0, 0.06);
+  --bg-fill: rgba(0, 0, 0, 0.12);
+  --bg-elevated: #fafafa;
+  /* Liquid Glass — frosted "regular" material for floating functional layers
+     (nav rail, toolbars, popovers) per the material spec. Translucent surface
+     + backdrop blur; falls back to a solid --bg-panel where unsupported. */
+  --glass-regular: rgba(250, 250, 250, 0.66);
+  --glass-regular-blur: 28px;
+  /* Bright top-edge sheen that reads as glass thickness on a frosted pane. */
+  --glass-edge-highlight: color-mix(in srgb, #fff 65%, transparent);
+  /* Entry ground shares the app surface — the nav rail is a solid panel now,
+     so the page behind it no longer needs a tinted ground to float on. */
+  --entry-ground: var(--bg);
+  --border: #dbdbdb;
+  --border-strong: #bdbdbd;
+  --border-selected: #a3a3a3;
+  --border-soft: #ededed;
+
+  --text: #494949;
+  --text-strong: #202020;
+  --text-muted: #5c5c5c;
+  --text-soft: #848484;
+  --text-faint: #bdbdbd;
+
+  --accent: #353535;
+  --accent-contrast: #fafafa;
+  --accent-strong: #202020;
+  --accent-soft: #ededed;
+  --accent-tint: #f7f7f7;
+  --accent-hover: #202020;
+  --brand: #87ea5c;
+  --brand-weak: #d0ffb5;
+  --brand-soft: #ebffde;
+  --brand-text: #0d5400;
+
+  /* Composer send button: saturated green glyph on a near-black disc (the
+     supplied mark, 发送按钮.svg / Group 2147224569.svg). Theme-independent —
+     the pair IS the mark, so it does not swap in dark mode.
+
+     ⚠️ 合并 main 的 revert(#7843)时,main 侧把这一对连同它自己的使用者一起
+     撤掉了,但**聊天面板仍在用**:`chat.css` 的 `.composer-send.stop
+     .admission-pending` 和 `viewer/routines.css` 的 `.app / .chat-skin /
+     .chat-composer-fixed-layer .composer-send` 一共四处。CSS 对未定义变量不
+     报错、只会静默画错(`background: var(--send-ink)` 整条声明作废,按钮退回
+     继承色),所以这一对必须留在这里 —— 它不是首页遗留,是发送键的字面配色。
+     四处引用都跨 `.app` / `.chat-skin` / `.chat-composer-fixed-layer` 三个不
+     同的根,没有共同祖先能挂,所以留在 `:root` 而不是收进面板作用域。 */
+  --send-ground: #00ff08;
+  --send-ink: #202020;
+
+  /* Semantic accent tints used by tool / status pills. */
+  --green: #00AA54;
+  --green-bg: #f5ffee;
+  --green-border: #adf788;
+  --blue: #1A74FF;
+  --blue-bg: color-mix(in srgb, #1A74FF 10%, #fafafa);
+  --blue-border: color-mix(in srgb, #1A74FF 24%, #dbdbdb);
+  --purple: #353535;
+  --purple-bg: #ededed;
+  --purple-border: #dbdbdb;
+  --red: #F04142;
+  --red-bg: color-mix(in srgb, #F04142 10%, #fafafa);
+  --red-border: color-mix(in srgb, #F04142 24%, #dbdbdb);
+  --amber: #FF7528;
+  --amber-bg: color-mix(in srgb, #FFBA12 18%, #fafafa);
+
+  --shadow-xs: 0 1px 0 rgba(28, 27, 26, 0.04);
+  --shadow-sm: 0 1px 2px rgba(28, 27, 26, 0.05), 0 1px 3px rgba(28, 27, 26, 0.04);
+  --shadow-md: 0 6px 24px rgba(28, 27, 26, 0.07), 0 2px 6px rgba(28, 27, 26, 0.04);
+  --shadow-lg: 0 24px 60px rgba(28, 27, 26, 0.16), 0 8px 16px rgba(28, 27, 26, 0.07);
+
+  /* Floating-layer ladder — the two tiers that already exist in
+     `primitives.css`, named so a new floating surface can be placed by
+     MEANING instead of by picking a number that happens to clear whatever it
+     collided with today.
+
+       --z-hint  a transient hint about something else on screen. Nobody
+                 opened it, `pointer-events: none`, it goes away on its own.
+                 `.od-tooltip-layer` is the only member.
+       --z-menu  a surface the user deliberately opened from a trigger and
+                 must be able to read and click. `.od-select-menu` has been
+                 here since it was written, and the artifact card's
+                 publish / export popovers join it.
+
+     menu ABOVE hint is the point, not an accident: a hint that paints over
+     the menu you just opened is never what you wanted — reported 2026-08-27
+     with a tooltip covering the lower half of the export menu.
+
+     These two do NOT describe the whole app. Roughly forty other z-index
+     literals (chrome 150, viewer popovers 220, dialogs 1500…) are still
+     ad-hoc; naming them is a separate job. Do not invent a third token here
+     without deciding what tier it means. */
+  --z-hint: 4000;
+  --z-menu: 9000;
+
+  /* Corner-radius scale — the only radii UI should reach for (Shape
+     Consistency Lock). xs for inline code / micro-chips, sm for controls,
+     base for cards/menus, md for medium containers, lg for large surfaces,
+     pill for fully-rounded interactive. Off-scale values (7px, 9px, 10px
+     literals) are drift; collapse them to the nearest token. */
+  --radius-none: 0px;
+  --radius-small: 2px;
+  --radius-medium: 4px;
+  --radius-large: 8px;
+  --radius-xlarge: 12px;
+  --radius-2xlarge: 16px;
+  /* 上一次合并 main 时,同一个 16px 档两边起了不同的名字(我们
+     `--radius-2xlarge`,main `--radius-xxlarge`),双方都有使用者,所以两个都
+     留着互为别名。这次合并 main 的 revert(#7843)把 main 那一侧的使用者连同
+     `--radius-xxlarge` 一起撤掉了,全仓再没有第二处引用它,别名就此收掉;
+     16px 这一档由 `--radius-2xlarge` 独家承担,聊天面板的接缝层
+     (`--chat-radius-2xl`)和 `chat-seam-radius-tokens.test.ts` 都指着它。 */
+  --radius-circular: 50%;
+  --stroke-thin: 1px;
+  --stroke-thick: 2px;
+  --stroke-thicker: 3px;
+  --stroke-thickest: 4px;
+  --radius-xs: var(--radius-small);
+  --radius-sm: var(--radius-medium);
+  --radius: var(--radius-large);
+  --radius-md: var(--radius-large);
+  --radius-lg: var(--radius-xlarge);
+  --radius-2xl: var(--radius-2xlarge);
+  --radius-xl: var(--radius-2xlarge);
+  --radius-pill: 999px;
+
+  --duration-ultra-fast: 50ms;
+  --duration-faster: 100ms;
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-gentle: 250ms;
+  --duration-slow: 300ms;
+  --duration-slower: 400ms;
+  --duration-ultra-slow: 500ms;
+  --curve-linear: cubic-bezier(0, 0, 1, 1);
+  --curve-accelerate-mid: cubic-bezier(1, 0, 1, 1);
+  --curve-decelerate-mid: cubic-bezier(0, 0, 0, 1);
+  --curve-easy-ease: cubic-bezier(0.33, 0, 0.67, 1);
+  --ease-out: var(--curve-decelerate-mid);
+  --dur-quick: var(--duration-faster);
+  --dur-enter: var(--duration-normal);
+  --dur-exit: var(--duration-fast);
+
+  /* "Active option" indicator color, intentionally separate from --accent
+     (brand orange used by primary CTAs like Create / Save). Use --selected
+     for "this option is the one currently picked" affordances — selected
+     fidelity card, focused input ring, active filter pill — so a primary
+     CTA and a selected state can coexist on the same screen without
+     competing. --selected-soft is the 16% tint for outer rings / fills. */
+  --selected: #353535;
+  --selected-soft: color-mix(in srgb, #353535 12%, transparent);
+
+  --serif: "Albert Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --sans: "Albert Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Chat prose scale: body 13, headings 14, top-level emphasis 16 — the
+     whole message module stays inside the 12–16px band. */
+  --prose-font-size: 13px;
+  --prose-line-height: 1.7;
+  --code-header-bg: #ededed;
+  --code-body-bg: #fafafa;
+  --code-font-size: 13px;
+  --code-line-height: 1.65;
+}
+
+/* Dark theme variables — shared between explicit [data-theme="dark"] and the
+   OS-level prefers-color-scheme media query (system mode = no data-theme attr). */
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #050505;
+  --bg-app: #070707;
+  --bg-panel: #0e0e10;
+  --bg-subtle: #171719;
+  --bg-muted: #222225;
+  --bg-fill-tertiary: rgba(255, 255, 255, 0.045);
+  --bg-fill-secondary: rgba(255, 255, 255, 0.075);
+  --bg-fill: rgba(255, 255, 255, 0.12);
+  --bg-elevated: #121214;
+  --glass-regular: rgba(10, 10, 11, 0.78);
+  --glass-edge-highlight: color-mix(in srgb, #fff 10%, transparent);
+  --border: #29292d;
+  --border-strong: #414147;
+  --border-selected: #696970;
+  --border-soft: #1d1d20;
+
+  --text: #ededed;
+  --text-strong: #fafafa;
+  --text-muted: #bdbdbd;
+  --text-soft: #848484;
+  --text-faint: #5c5c5c;
+
+  --select-ink: var(--text-strong);
+  --selected: var(--text-strong);
+  --selected-soft: color-mix(in srgb, var(--text-strong) 18%, transparent);
+
+  --accent: #ededed;
+  --accent-contrast: #090909;
+  --accent-strong: #fafafa;
+  --accent-soft: #1b1b1e;
+  --accent-tint: #111113;
+  --accent-hover: #fafafa;
+  --brand: #87ea5c;
+  --brand-weak: #2f781d;
+  --brand-soft: #164111;
+  --brand-text: #adf788;
+
+  --green: #3BBF7D;
+  --green-bg: #164111;
+  --green-border: #2f781d;
+  --blue: #3AA5F0;
+  --blue-bg: color-mix(in srgb, #1A74FF 22%, #070707);
+  --blue-border: color-mix(in srgb, #3AA5F0 34%, #29292d);
+  --purple: #ededed;
+  --purple-bg: #171719;
+  --purple-border: #29292d;
+  --red: #FF5E5E;
+  --red-bg: color-mix(in srgb, #F04142 24%, #070707);
+  --red-border: color-mix(in srgb, #FF5E5E 34%, #29292d);
+  --amber: #FFC740;
+  --amber-bg: color-mix(in srgb, #FFBA12 22%, #070707);
+
+  --shadow-xs: 0 1px 0 rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.3);
+
+  --code-header-bg: #101012;
+  --code-body-bg: #09090b;
+}
+
+/* System mode: follow OS preference when no explicit data-theme is set. */
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #050505;
+    --bg-app: #070707;
+    --bg-panel: #0e0e10;
+    --bg-subtle: #171719;
+    --bg-muted: #222225;
+    --bg-fill-tertiary: rgba(255, 255, 255, 0.045);
+    --bg-fill-secondary: rgba(255, 255, 255, 0.075);
+    --bg-fill: rgba(255, 255, 255, 0.12);
+    --bg-elevated: #121214;
+    --glass-regular: rgba(10, 10, 11, 0.78);
+    --glass-edge-highlight: color-mix(in srgb, #fff 10%, transparent);
+    --border: #29292d;
+    --border-strong: #414147;
+    --border-selected: #696970;
+    --border-soft: #1d1d20;
+
+    --text: #ededed;
+    --text-strong: #fafafa;
+    --text-muted: #bdbdbd;
+    --text-soft: #848484;
+    --text-faint: #5c5c5c;
+
+    --select-ink: var(--text-strong);
+    --selected: var(--text-strong);
+    --selected-soft: color-mix(in srgb, var(--text-strong) 18%, transparent);
+
+    --accent: #ededed;
+    --accent-contrast: #090909;
+    --accent-strong: #fafafa;
+    --accent-soft: #1b1b1e;
+    --accent-tint: #111113;
+    --accent-hover: #fafafa;
+    --brand: #87ea5c;
+    --brand-weak: #2f781d;
+    --brand-soft: #164111;
+    --brand-text: #adf788;
+
+    --green: #3BBF7D;
+    --green-bg: #164111;
+    --green-border: #2f781d;
+    --blue: #3AA5F0;
+    --blue-bg: color-mix(in srgb, #1A74FF 22%, #070707);
+    --blue-border: color-mix(in srgb, #3AA5F0 34%, #29292d);
+    --purple: #ededed;
+    --purple-bg: #171719;
+    --purple-border: #29292d;
+    --red: #FF5E5E;
+    --red-bg: color-mix(in srgb, #F04142 24%, #070707);
+    --red-border: color-mix(in srgb, #FF5E5E 34%, #29292d);
+    --amber: #FFC740;
+    --amber-bg: color-mix(in srgb, #FFBA12 22%, #070707);
+
+    --shadow-xs: 0 1px 0 rgba(0, 0, 0, 0.2);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 6px 24px rgba(0, 0, 0, 0.4), 0 2px 6px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.3);
+
+    --code-header-bg: #101012;
+    --code-body-bg: #09090b;
+  }
+}
+
+/* ============================================================
+   UI system — spacing, type roles, motion, elevation, focus.
+   The rules that govern these tokens live in docs/design/ui-system.md;
+   read it before adding a value here. Raw `--spacing-*` / `--font-size-*`
+   steps (base.css) stay as the literal scale; the tokens below are the
+   ROLES new UI should reach for.
+   ============================================================ */
+:root {
+  /* Spacing — 4px grid. Steps are multiples of 4 (plus a 2px hairline step
+     for optical nudges). Pick by relationship, not by eye:
+       --space-1/2  inside a control (icon ↔ label)
+       --space-3/4  between related controls, card insets
+       --space-6/8  between groups
+       --space-12+  between page sections */
+  --space-half: 2px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Insets — padding presets per container tier. */
+  --inset-chip: var(--space-1) var(--space-3);
+  --inset-control: 0 var(--space-4);
+  --inset-card: var(--space-4);
+  --inset-panel: var(--space-5);
+  --inset-dialog: var(--space-6);
+  --inset-menu: var(--space-1);
+  --inset-menu-item: var(--space-2) var(--space-3);
+
+  /* Control heights — every interactive control lands on one of these. */
+  --control-h-xs: 24px;
+  --control-h-sm: 28px;
+  /* Compact square controls (icon buttons, filter chips) between sm and md. */
+  --control-h-compact: 32px;
+  --control-h-md: 36px;
+  --control-h-lg: 44px;
+
+  /* Typography roles — size / line-height / weight / tracking. Use the
+     `--font-*` shorthands with `font:`; reach for the parts only when a
+     component must override one axis. Hierarchy is carried by size AND
+     weight together; never by color alone. */
+  --type-micro-size: 11px;
+  --type-micro-line: 14px;
+  --type-caption-size: 12px;
+  --type-caption-line: 16px;
+  --type-body-sm-size: 13px;
+  --type-body-sm-line: 20px;
+  --type-body-size: 14px;
+  --type-body-line: 22px;
+  --type-label-size: 13px;
+  --type-label-line: 18px;
+  --type-title-sm-size: 14px;
+  --type-title-sm-line: 20px;
+  --type-title-size: 16px;
+  --type-title-line: 24px;
+  --type-heading-size: 20px;
+  --type-heading-line: 28px;
+  --type-headline-size: 28px;
+  --type-headline-line: 34px;
+  --type-display-size: 40px;
+  --type-display-line: 46px;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --tracking-tight: -0.02em;
+  --tracking-snug: -0.01em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  /* Control role: buttons and toggles. line-height normal on purpose —
+     controls size by their own height, not the reading rhythm. */
+  --font-control: var(--weight-medium) var(--type-body-size) / normal var(--sans);
+  --font-micro: var(--weight-medium) var(--type-micro-size) / var(--type-micro-line) var(--sans);
+  --font-caption: var(--weight-regular) var(--type-caption-size) / var(--type-caption-line) var(--sans);
+  --font-body-sm: var(--weight-regular) var(--type-body-sm-size) / var(--type-body-sm-line) var(--sans);
+  --font-body: var(--weight-regular) var(--type-body-size) / var(--type-body-line) var(--sans);
+  --font-label: var(--weight-medium) var(--type-label-size) / var(--type-label-line) var(--sans);
+  --font-title-sm: var(--weight-semibold) var(--type-title-sm-size) / var(--type-title-sm-line) var(--sans);
+  --font-title: var(--weight-semibold) var(--type-title-size) / var(--type-title-line) var(--sans);
+  --font-heading: var(--weight-semibold) var(--type-heading-size) / var(--type-heading-line) var(--sans);
+  --font-headline: var(--weight-semibold) var(--type-headline-size) / var(--type-headline-line) var(--sans);
+  --font-display: var(--weight-semibold) var(--type-display-size) / var(--type-display-line) var(--sans);
+
+  /* Motion — durations and curves. Enter ~200ms, exit ~140ms (exit is
+     decisive: the user already chose). Hover/press feedback is faster
+     still. `ease-in` is never used for UI. */
+  --motion-press: 90ms;
+  --motion-hover: 150ms;
+  --motion-enter: 200ms;
+  --motion-exit: 140ms;
+  --ease-out-quint: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-smooth: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Springs — physically-sampled damped springs as `linear()` curves, with
+     cubic fallbacks for engines without `linear()` (overridden in the
+     @supports block below). Each spring has its own settle duration; always
+     pair the curve with its duration token.
+       snappy  ~2% overshoot  — press release, toggles, chips, small controls
+       smooth  no overshoot   — panels, drawers, layout shifts
+       pop     ~5% overshoot  — menus, popovers, toasts, dialogs appearing */
+  --spring-snappy: cubic-bezier(0.2, 1.1, 0.35, 1);
+  --spring-snappy-duration: 360ms;
+  --spring-smooth: cubic-bezier(0.23, 1, 0.32, 1);
+  --spring-smooth-duration: 560ms;
+  --spring-pop: cubic-bezier(0.25, 1.25, 0.4, 1);
+  --spring-pop-duration: 340ms;
+
+  /* Spring-loaded press — controls compress on :active and spring back. */
+  --press-scale: 0.97;
+  --press-scale-icon: 0.92;
+  /* Large targets (cards, full-width rows, menu items) barely move: a 3%
+     shrink on a 250px card reads as a jolt, not a press. */
+  --press-scale-card: 0.99;
+  --hover-lift: -1px;
+  /* Floating layers enter from slightly below at 96% and settle at 1. */
+  --enter-scale: 0.96;
+  --enter-offset: 4px;
+
+  /* Elevation — a hairline ring plus a soft, layered shadow. One tier per
+     layer meaning:
+       1  resting cards and inputs that sit on the page
+       2  hovered / raised cards, sticky bars
+       3  menus, popovers, select lists, tooltips with content
+       4  dialogs and sheets */
+  --elevation-0: none;
+  --elevation-1: 0 0 0 1px rgba(28, 27, 26, 0.04), 0 1px 2px rgba(28, 27, 26, 0.05);
+  --elevation-2: 0 0 0 1px rgba(28, 27, 26, 0.05), 0 2px 4px -1px rgba(28, 27, 26, 0.06), 0 8px 20px -6px rgba(28, 27, 26, 0.1);
+  --elevation-3: 0 0 0 1px rgba(28, 27, 26, 0.06), 0 4px 10px -2px rgba(28, 27, 26, 0.08), 0 18px 40px -10px rgba(28, 27, 26, 0.16);
+  --elevation-4: 0 0 0 1px rgba(28, 27, 26, 0.06), 0 10px 24px -6px rgba(28, 27, 26, 0.12), 0 36px 72px -16px rgba(28, 27, 26, 0.26);
+
+  /* Focus — one ring for every focusable control: a 2px gap in the surface
+     color, then a 2px blue ring. Used as a box-shadow so it follows radius. */
+  /* Full-strength blue: #1A74FF clears the 3:1 non-text contrast floor on
+     every light surface; a translucent mix did not. */
+  --focus-ring-color: var(--blue);
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--focus-ring-color);
+  /* Outline form of the same ring. Prefer it on controls that already own a
+     box-shadow (it never clobbers their elevation) — outlines follow
+     border-radius in every engine we ship. */
+  --focus-outline: 2px solid var(--focus-ring-color);
+  --focus-offset: 2px;
+
+  /* Glass surface recipe — the functional-layer material (menus, popovers,
+     floating toolbars, dialogs). Pair with `backdrop-filter: var(--glass-backdrop)`
+     from material.css. */
+  /* Menus and popovers open over busy content (previews, cards, photos),
+     so they use the THICK material: enough fill that text never fights
+     what is behind it, enough blur that the glass still reads. The nav
+     rail keeps the lighter --glass-regular. */
+  --glass-surface: var(--material-thick, rgba(250, 250, 250, 0.86));
+  --glass-surface-border: color-mix(in srgb, var(--text-strong) 9%, transparent);
+
+  /* Field focus — a thin shimmer border instead of a halo ring. The base of
+     the sweep is mixed to clear 3:1 against the surface in both themes; the
+     travelling highlight carries a hint of brand green and blue. */
+  --focus-shimmer-base: color-mix(in srgb, var(--text-strong) 55%, var(--bg));
+  --focus-shimmer-hi: var(--text-strong);
+  --focus-shimmer-tint-a: color-mix(in srgb, var(--brand) 70%, var(--text-strong));
+  --focus-shimmer-tint-b: color-mix(in srgb, var(--blue) 60%, var(--text-strong));
+  --focus-shimmer-duration: 3.2s;
+
+  /* Segmented control (one exclusive choice among 2–5): a recessed pill
+     track with a raised thumb that slides to the choice. */
+  --segmented-track: var(--bg-subtle);
+  --segmented-track-border: var(--border-soft);
+  --segmented-thumb: var(--bg-elevated);
+  --segmented-thumb-shadow: 0 0 0 1px color-mix(in srgb, var(--text-strong) 6%, transparent), 0 1px 2px rgba(28, 27, 26, 0.08), 0 2px 6px -2px rgba(28, 27, 26, 0.1);
+
+  /* Filter chips (many optional filters in a row): calm by default — no
+     border, quiet text; only the selected chip gets a fill. */
+  --chip-text: var(--text-muted);
+  --chip-hover-fill: var(--bg-fill-secondary);
+  --chip-selected-fill: var(--bg-fill);
+  --chip-selected-text: var(--text-strong);
+  --glass-surface-sheen: inset 0 1px 0 var(--glass-edge-highlight);
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --spring-snappy: linear(0, 0.0298, 0.1035, 0.2023, 0.3121, 0.4231, 0.5287, 0.6248, 0.7093, 0.7815, 0.8414, 0.8898, 0.9281, 0.9574, 0.9791, 0.9947, 1.0053, 1.012, 1.0158, 1.0174, 1.0175, 1.0166, 1.0151, 1.0132, 1.0113, 1.0093, 1.0075, 1.0059, 1.0045, 1.0034, 1.0024, 1.0016, 1);
+    --spring-smooth: linear(0, 0.0329, 0.1099, 0.2076, 0.3112, 0.4119, 0.505, 0.5881, 0.6604, 0.7222, 0.7744, 0.8178, 0.8536, 0.8829, 0.9067, 0.926, 0.9414, 0.9538, 0.9637, 0.9715, 0.9777, 0.9826, 0.9865, 0.9895, 0.9918, 0.9937, 0.9951, 0.9962, 0.9971, 0.9978, 0.9983, 0.9987, 1);
+    --spring-pop: linear(0, 0.0441, 0.1508, 0.2886, 0.435, 0.5749, 0.6991, 0.803, 0.8856, 0.9477, 0.9916, 1.0204, 1.037, 1.0446, 1.0458, 1.0428, 1.0374, 1.0308, 1.0241, 1.0179, 1.0124, 1.0079, 1.0044, 1.0018, 1, 0.9988, 0.9982, 0.9979, 0.9979, 0.9981, 0.9984, 0.9987, 1);
+  }
+}
+
+/* Reduced motion: keep state changes, drop travel. Springs collapse to a
+   quick ease-out and press/enter transforms become identity. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --spring-snappy: var(--ease-out-quint);
+    --spring-smooth: var(--ease-out-quint);
+    --spring-pop: var(--ease-out-quint);
+    --spring-snappy-duration: 120ms;
+    --spring-smooth-duration: 120ms;
+    --spring-pop-duration: 120ms;
+    --press-scale: 1;
+    --press-scale-icon: 1;
+    --press-scale-card: 1;
+    --hover-lift: 0px;
+    --enter-scale: 1;
+    --enter-offset: 0px;
+  }
+}
+
+/* Dark elevation — deeper shadows, and a light hairline so a raised dark
+   surface still separates from a dark ground. Kept in sync across the
+   explicit and system dark selectors like every other dark token. */
+[data-theme="dark"] {
+  /* Dark segmented: the track recedes below the panel, the thumb rises
+     above it (a dark thumb on a lighter track read as a hole). */
+  --segmented-track: var(--bg-panel);
+  --segmented-thumb: var(--bg-muted);
+  --segmented-thumb-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.5);
+  --elevation-1: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.4);
+  --elevation-2: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.4), 0 8px 20px -6px rgba(0, 0, 0, 0.5);
+  --elevation-3: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 4px 10px -2px rgba(0, 0, 0, 0.45), 0 18px 40px -10px rgba(0, 0, 0, 0.6);
+  --elevation-4: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 10px 24px -6px rgba(0, 0, 0, 0.5), 0 36px 72px -16px rgba(0, 0, 0, 0.7);
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme]) {
+    /* Dark segmented: the track recedes below the panel, the thumb rises
+       above it (a dark thumb on a lighter track read as a hole). */
+    --segmented-track: var(--bg-panel);
+    --segmented-thumb: var(--bg-muted);
+    --segmented-thumb-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 1px 2px rgba(0, 0, 0, 0.5);
+    --elevation-1: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 1px 2px rgba(0, 0, 0, 0.4);
+    --elevation-2: 0 0 0 1px rgba(255, 255, 255, 0.06), 0 2px 4px -1px rgba(0, 0, 0, 0.4), 0 8px 20px -6px rgba(0, 0, 0, 0.5);
+    --elevation-3: 0 0 0 1px rgba(255, 255, 255, 0.07), 0 4px 10px -2px rgba(0, 0, 0, 0.45), 0 18px 40px -10px rgba(0, 0, 0, 0.6);
+    --elevation-4: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 10px 24px -6px rgba(0, 0, 0, 0.5), 0 36px 72px -16px rgba(0, 0, 0, 0.7);
+  }
+}

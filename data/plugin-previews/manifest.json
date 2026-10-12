@@ -1,0 +1,89 @@
+{
+  "generatedAt": null,
+  "previews": {
+    "example-meeting-notes": {
+      "video": "example-meeting-notes/9d28fdacec342047/preview.mp4",
+      "poster": "example-meeting-notes/9d28fdacec342047/poster.jpg",
+      "durationMs": 6000,
+      "holdMs": 2500,
+      "hash": "9d28fdacec342047"
+    },
+    "example-motion-frames": {
+      "video": "example-motion-frames/3ae75e8c9a1a15de/preview.mp4",
+      "poster": "example-motion-frames/3ae75e8c9a1a15de/poster.jpg",
+      "durationMs": 5000,
+      "holdMs": 2500,
+      "hash": "3ae75e8c9a1a15de"
+    },
+    "od-new-generation": {
+      "video": "od-new-generation/7b884ba518d75c52/preview.mp4",
+      "poster": "od-new-generation/7b884ba518d75c52/poster.jpg",
+      "durationMs": 1267,
+      "holdMs": 1267,
+      "hash": "7b884ba518d75c52"
+    },
+    "example-pm-spec": {
+      "video": "example-pm-spec/2fb72345e7eb5a6b/preview.mp4",
+      "poster": "example-pm-spec/2fb72345e7eb5a6b/poster.jpg",
+      "durationMs": 7800,
+      "holdMs": 2500,
+      "hash": "2fb72345e7eb5a6b"
+    },
+    "example-pricing-page": {
+      "video": "example-pricing-page/51d62cdd9b836c60/preview.mp4",
+      "poster": "example-pricing-page/51d62cdd9b836c60/poster.jpg",
+      "durationMs": 4833,
+      "holdMs": 2500,
+      "hash": "51d62cdd9b836c60"
+    },
+    "example-saas-landing": {
+      "video": "example-saas-landing/a45bacd41a7e48d2/preview.mp4",
+      "poster": "example-saas-landing/a45bacd41a7e48d2/poster.jpg",
+      "durationMs": 5200,
+      "holdMs": 2500,
+      "hash": "a45bacd41a7e48d2"
+    },
+    "example-velar-luxury-real-estate": {
+      "video": "example-velar-luxury-real-estate/3033ac6b3976d835/preview.mp4",
+      "poster": "example-velar-luxury-real-estate/3033ac6b3976d835/poster.jpg",
+      "durationMs": 10267,
+      "holdMs": 2500,
+      "hash": "3033ac6b3976d835"
+    },
+    "example-web-prototype": {
+      "video": "example-web-prototype/aeb5731d76378b6b/preview.mp4",
+      "poster": "example-web-prototype/aeb5731d76378b6b/poster.jpg",
+      "durationMs": 3233,
+      "holdMs": 2500,
+      "hash": "aeb5731d76378b6b"
+    },
+    "example-mockup-device-3d": {
+      "video": "example-mockup-device-3d/f18bc197a821f80a/preview.mp4",
+      "poster": "example-mockup-device-3d/f18bc197a821f80a/poster.jpg",
+      "durationMs": 1267,
+      "holdMs": 1267,
+      "hash": "f18bc197a821f80a"
+    },
+    "example-mobile-app": {
+      "video": "example-mobile-app/c933a4813cdd1ea7/preview.mp4",
+      "poster": "example-mobile-app/c933a4813cdd1ea7/poster.jpg",
+      "durationMs": 1267,
+      "holdMs": 1267,
+      "hash": "c933a4813cdd1ea7"
+    },
+    "example-mobile-onboarding": {
+      "video": "example-mobile-onboarding/03ff2c03e294b49e/preview.mp4",
+      "poster": "example-mobile-onboarding/03ff2c03e294b49e/poster.jpg",
+      "durationMs": 1267,
+      "holdMs": 1267,
+      "hash": "03ff2c03e294b49e"
+    },
+    "example-web-clone": {
+      "video": "example-web-clone/d92cf04f7619478c/preview.mp4",
+      "poster": "example-web-clone/d92cf04f7619478c/poster.jpg",
+      "durationMs": 1267,
+      "holdMs": 1267,
+      "hash": "d92cf04f7619478c"
+    }
+  }
+}

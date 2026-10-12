@@ -1,0 +1,43 @@
+/* Warning that a requested design kit was not used this turn. */
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--amber-border);
+  border-radius: var(--radius-md);
+  background: var(--amber-bg);
+  color: var(--chat-text, var(--text));
+  font-size: var(--chat-t-mini);
+  overflow-wrap: anywhere;
+}
+
+.icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-circular);
+  background: var(--amber);
+  color: var(--bg);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.body {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: var(--space-1);
+}
+
+.message,
+.status {
+  margin: 0;
+}
+
+.status {
+  color: var(--chat-text-muted, var(--text-muted));
+}

@@ -1,0 +1,11 @@
+Maple Street Veterinary is a small animal vet clinic. We need a simple one-page site.
+
+We see dogs and cats for wellness exams, vaccinations, and minor sick visits. Dr. Hannah Okafor,
+DVM, sees every patient.
+
+A first visit: check-in, a short history from the owner, then an exam and a plan for any
+vaccines or follow-up care.
+
+Call us at (206) 555-0119 to book. We don't have a website with online booking yet, we don't
+publish our hours or address online, we haven't collected reviews yet, and we don't have anything
+to say about insurance or pricing right now — please don't put any of that on the page.

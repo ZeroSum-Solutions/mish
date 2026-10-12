@@ -1,0 +1,257 @@
+{
+  "note": "Independent implementations from public index names only; original CSV and licensed seeds remain unchanged. No upstream licence assertion.",
+  "components": [
+    {
+      "id": "gradient-text",
+      "source": {
+        "Component": "Gradient Text",
+        "Source": "React Bits",
+        "Category": "Text Animations",
+        "What it does": "Readable heading with a gently shifting gradient.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "text",
+      "portDifficulty": "Easy",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/text-animations/gradient-text",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "count-up",
+      "source": {
+        "Component": "Count Up",
+        "Source": "React Bits",
+        "Category": "Text Animations",
+        "What it does": "A metric counts to its final value on entering the viewport.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "text",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/text-animations/count-up",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "rotating-text",
+      "source": {
+        "Component": "Rotating Text",
+        "Source": "React Bits",
+        "Category": "Text Animations",
+        "What it does": "A heading cycles between complete words with a pause control.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "text",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/text-animations/rotating-text",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "decrypted-text",
+      "source": {
+        "Component": "Decrypted Text",
+        "Source": "React Bits",
+        "Category": "Text Animations",
+        "What it does": "Decorative glyphs settle once into the original readable text.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "text",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/text-animations/decrypted-text",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "animated-content",
+      "source": {
+        "Component": "Animated Content",
+        "Source": "React Bits",
+        "Category": "Animations",
+        "What it does": "Content rises into view with a bounded stagger; distance zero gives a fade.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "scroll",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/animations/animated-content",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "magnet",
+      "source": {
+        "Component": "Magnet",
+        "Source": "React Bits",
+        "Category": "Animations",
+        "What it does": "A CTA shifts subtly toward a hovering pointer.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "hover",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/animations/magnet",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "star-border",
+      "source": {
+        "Component": "Star Border",
+        "Source": "React Bits",
+        "Category": "Animations",
+        "What it does": "A luminous highlight travels briefly around a fine border.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "surface",
+      "portDifficulty": "Easy",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/animations/star-border",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "logo-loop",
+      "source": {
+        "Component": "Logo Loop",
+        "Source": "React Bits",
+        "Category": "Animations",
+        "What it does": "A repeating strip of client marks has pause and keyboard controls.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "gallery",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/animations/logo-loop",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "dot-grid",
+      "source": {
+        "Component": "Dot Grid",
+        "Source": "React Bits",
+        "Category": "Backgrounds",
+        "What it does": "A quiet dot field has a soft pointer-following highlight.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "background",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/backgrounds/dot-grid",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "light-rays",
+      "source": {
+        "Component": "Light Rays",
+        "Source": "React Bits",
+        "Category": "Backgrounds",
+        "What it does": "Soft diagonal shafts of light settle behind hero content.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "background",
+      "portDifficulty": "Easy",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/backgrounds/light-rays",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "waves",
+      "source": {
+        "Component": "Waves",
+        "Source": "React Bits",
+        "Category": "Backgrounds",
+        "What it does": "Layered ornamental curves flow briefly behind content.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "background",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/backgrounds/waves",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "animated-list",
+      "source": {
+        "Component": "Animated List",
+        "Source": "React Bits",
+        "Category": "Components",
+        "What it does": "A semantic list reveals its rows in a short stagger.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "scroll",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/components/animated-list",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "text-type",
+      "source": {
+        "Component": "Text Type",
+        "Source": "React Bits",
+        "Category": "Text Animations",
+        "What it does": "Characters type once while the complete accessible text stays stable.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "text",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/text-animations/text-type",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    },
+    {
+      "id": "pixel-transition",
+      "source": {
+        "Component": "Pixel Transition",
+        "Source": "React Bits",
+        "Category": "Animations",
+        "What it does": "A keyboard-accessible card switches faces through a tiled reveal.",
+        "Dependencies": "none (owned implementation)",
+        "License": "Upstream license not assessed; index names only. Independent clean-room implementation; no upstream implementation source used."
+      },
+      "category": "hover",
+      "portDifficulty": "Medium",
+      "tier": "Tier 1",
+      "licenceDecision": "clean-room",
+      "sourceUrl": "https://reactbits.dev/animations/pixel-transition",
+      "verdict": "keep",
+      "rationale": "Reusable client-site behavior. Authored from the public index name and an independently written behavior brief."
+    }
+  ]
+}

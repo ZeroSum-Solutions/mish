@@ -1,0 +1,183 @@
+/* pill-nav — clean-room, from the effect description only. Every selector is under .genui-pill-nav. */
+
+:where(.genui-pill-nav) {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  color: #f5f5f7;
+}
+
+.genui-pill-nav__logo {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--genui-pill-nav-radius, 999px);
+  background: var(--genui-pill-nav-accent, #f5f5f7);
+  color: var(--genui-pill-nav-accent-text, #0b0d12);
+  text-decoration: none;
+}
+
+.genui-pill-nav__list {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: var(--genui-pill-nav-radius, 999px);
+  background: var(--genui-pill-nav-track, #161a24);
+  border: 1px solid rgba(255, 255, 255, .08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35);
+}
+
+.genui-pill-nav__link {
+  position: relative;
+  z-index: 1;
+  display: block;
+  padding: 8px 14px;
+  border-radius: var(--genui-pill-nav-radius, 999px);
+  color: #b8bfcc;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color calc(var(--genui-pill-nav-duration, 380ms) * .6) ease;
+}
+
+.genui-pill-nav__link:hover { color: #f5f5f7; }
+
+.genui-pill-nav .genui-pill-nav__link--on,
+.genui-pill-nav .genui-pill-nav__link--on:hover {
+  color: var(--genui-pill-nav-accent-text, #0b0d12);
+}
+
+.genui-pill-nav__indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  border-radius: var(--genui-pill-nav-radius, 999px);
+  background: var(--genui-pill-nav-accent, #f5f5f7);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+  pointer-events: none;
+  transition-property: transform, width, height, opacity;
+  transition-duration: var(--genui-pill-nav-duration, 380ms);
+  transition-timing-function: cubic-bezier(.3, 1.35, .5, 1);
+}
+
+.genui-pill-nav :focus-visible {
+  outline: 2px solid #8ab4ff;
+  outline-offset: 2px;
+}
+
+.genui-pill-nav__toggle {
+  position: relative;
+  display: none;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  margin-left: auto;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: var(--genui-pill-nav-radius, 999px);
+  background: var(--genui-pill-nav-track, #161a24);
+  color: inherit;
+  cursor: pointer;
+}
+
+.genui-pill-nav__toggle::before,
+.genui-pill-nav__toggle::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 16px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform var(--genui-pill-nav-duration, 380ms) cubic-bezier(.2, .8, .2, 1);
+}
+
+.genui-pill-nav__toggle::after { top: 22px; }
+.genui-pill-nav__toggle[aria-expanded="true"]::before { transform: translateY(3px) rotate(45deg); }
+.genui-pill-nav__toggle[aria-expanded="true"]::after { transform: translateY(-3px) rotate(-45deg); }
+
+/* Compact: set by script only when a toggle exists, so the list is never unreachable. */
+.genui-pill-nav--compact .genui-pill-nav__toggle { display: block; }
+
+.genui-pill-nav--compact .genui-pill-nav__list {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 5;
+  flex-direction: column;
+  min-width: 180px;
+  padding: 6px;
+  border-radius: 20px;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(-6px) scale(.97);
+  transform-origin: top right;
+  transition:
+    opacity var(--genui-pill-nav-duration, 380ms) ease,
+    transform var(--genui-pill-nav-duration, 380ms) cubic-bezier(.2, .8, .2, 1),
+    visibility 0s linear var(--genui-pill-nav-duration, 380ms);
+}
+
+.genui-pill-nav--compact.genui-pill-nav--open .genui-pill-nav__list {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.genui-pill-nav--compact .genui-pill-nav__indicator { display: none; }
+.genui-pill-nav--compact .genui-pill-nav__link.genui-pill-nav__link--on { color: #f5f5f7; background: rgba(255, 255, 255, .06); }
+
+.genui-pill-nav--compact .genui-pill-nav__link[aria-current]:not([aria-current="false"]) {
+  background: var(--genui-pill-nav-accent, #f5f5f7);
+  color: var(--genui-pill-nav-accent-text, #0b0d12);
+}
+
+.genui-pill-nav.genui-pill-nav--reduced .genui-pill-nav__indicator,
+.genui-pill-nav.genui-pill-nav--reduced .genui-pill-nav__list,
+.genui-pill-nav.genui-pill-nav--reduced .genui-pill-nav__link,
+.genui-pill-nav.genui-pill-nav--reduced .genui-pill-nav__toggle::before,
+.genui-pill-nav.genui-pill-nav--reduced .genui-pill-nav__toggle::after {
+  transition: none;
+}
+
+.genui-pill-nav.genui-pill-nav--reduced .genui-pill-nav__list { transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-pill-nav .genui-pill-nav__indicator,
+  .genui-pill-nav .genui-pill-nav__list,
+  .genui-pill-nav .genui-pill-nav__link,
+  .genui-pill-nav .genui-pill-nav__toggle::before,
+  .genui-pill-nav .genui-pill-nav__toggle::after {
+    transition: none;
+  }
+
+  .genui-pill-nav .genui-pill-nav__list {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-pill-nav .genui-pill-nav__indicator {
+    background: Highlight;
+  }
+
+  .genui-pill-nav .genui-pill-nav__link--on {
+    color: HighlightText;
+  }
+}

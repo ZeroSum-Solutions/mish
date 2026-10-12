@@ -1,0 +1,7 @@
+{
+  "description": "B4-2 security fixture (review BLOCK B1): a broken page whose script replaces the main frame with an external document. The external document must never be fetched into the main frame or reviewed in place of the entry; with or without an allow-list every check is inconclusive and the run cannot pass (default-deny otherwise reviews Chrome's net-error page).",
+  "cases": {
+    "default-deny": { "allowHosts": [], "outcome": "inconclusive" },
+    "allowed": { "allowHosts": ["good.review-egress.com"], "outcome": "inconclusive" }
+  }
+}

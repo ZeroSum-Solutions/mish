@@ -1,0 +1,29 @@
+Ledgerline is bookkeeping software for small service firms that bill by the hour. We want a
+one-page marketing site that sells the product and gets a visitor to start a free trial.
+
+Hero: "Close the books without the spreadsheet marathon." Ledgerline pulls tracked hours, invoices
+and payments into one place, so month end stops being a scramble. Buttons: "Start a free trial"
+and "See how it works".
+
+Three features, built for firms that bill by the hour — three habits that used to live in three
+different tools now live in one: automatic time capture (tracks billable hours as work happens and
+drops them straight into the next invoice), one-click invoicing (turn tracked hours into a client
+invoice without retyping a line), and live cash position (see what is billed, paid and outstanding
+without opening a spreadsheet).
+
+Testimonials: "We moved three clients over in a single afternoon and never looked back." — Renata
+Ibsen, Owner, Ibsen Bookkeeping. "Month end used to eat a full week. Now it is an afternoon." —
+Oren Castellano, Founder, Castellano Ledger Co. "The invoices finally match what our team actually
+billed." — Priya Someshwar, Office Manager, Someshwar & Frost.
+
+Pricing, plans that scale with your client list: Solo $19/month (1 seat included, up to 10
+clients, email support, "Start free"), Studio $49/month (5 seats included, up to 60 clients,
+priority support, "Start free"), Firm $99/month (unlimited seats, unlimited clients, dedicated
+onboarding, "Talk to sales").
+
+Closing call to action: "Bring your books in from the cold." Import your existing client list and
+reconcile your books without a spreadsheet. Button: "Start your free trial".
+
+Footer columns: Product (Time tracking, Invoicing, Reports), Company (About, Careers, Contact),
+Resources (Guides, Support, Status). Tagline: "Bookkeeping software for firms that bill by the
+hour."

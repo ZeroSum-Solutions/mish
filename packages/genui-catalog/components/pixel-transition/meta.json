@@ -1,0 +1,43 @@
+{
+  "id": "pixel-transition",
+  "name": "Pixel Transition",
+  "category": "hover",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/pixel-transition/index.ts",
+  "css": "components/pixel-transition/styles.css",
+  "demo": "components/pixel-transition/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": {
+        "type": "number",
+        "default": 480,
+        "minimum": 0,
+        "maximum": 1200,
+        "description": "Total tile duration in ms. Below 160ms switches instantly. Capped at 1200ms."
+      },
+      "columns": {
+        "type": "integer",
+        "default": 8,
+        "minimum": 2,
+        "maximum": 16
+      },
+      "label": {
+        "type": "string",
+        "default": "Show alternate view"
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes.",
+    "Requires two direct children with data-pixel-face. Inactive faces stay in layout with aria-hidden and inert; no hidden-attribute CSS override."
+  ],
+  "reducedMotion": "static"
+}

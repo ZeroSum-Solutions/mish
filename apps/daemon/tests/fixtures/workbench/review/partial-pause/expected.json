@@ -1,0 +1,8 @@
+{
+  "description": "The same page with a main-world 7.5 s slide interval; Pause stops only the bar, so the check fails.",
+  "parameters": {
+    "requireReducedMotionFallback": false,
+    "requireLivePreferenceChange": false
+  },
+  "motion": "fail"
+}

@@ -1,0 +1,38 @@
+{
+  "id": "staggered-menu",
+  "name": "Staggered Menu",
+  "category": "navigation",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line description \"Multi-layer menu entrance\" only; no upstream source was read and the GSAP timeline is replaced by staggered CSS transitions driven by one open class.",
+  "entry": "components/staggered-menu/index.ts",
+  "css": "components/staggered-menu/styles.css",
+  "demo": "components/staggered-menu/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "position": { "type": "string", "enum": ["right", "left"], "default": "right", "description": "Edge the layers and panel enter from." },
+      "layers": { "type": "number", "default": 2, "minimum": 0, "maximum": 4, "description": "Coloured sheets that sweep in before the panel." },
+      "layerColors": { "type": "string", "default": "#5b4bff,#b7a8ff", "description": "Comma-separated layer colours, cycled when there are more layers than colours." },
+      "panelColor": { "type": "string", "default": "#f5f3ee" },
+      "ink": { "type": "string", "default": "#101217", "description": "Text colour inside the panel." },
+      "accent": { "type": "string", "default": "#5b4bff" },
+      "width": { "type": "string", "default": "280px", "description": "Panel width (any CSS length); it never exceeds the container." },
+      "duration": { "type": "number", "default": 560, "minimum": 0, "description": "Slide time of each layer and of the panel, in ms." },
+      "stagger": { "type": "number", "default": 60, "minimum": 0, "description": "Delay between consecutive layers and between links, in ms." },
+      "numbered": { "type": "boolean", "default": true, "description": "Show a small 01, 02 index after each list link." },
+      "closeOnSelect": { "type": "boolean", "default": true, "description": "Close the menu when a link inside the panel is activated." },
+      "fixed": { "type": "boolean", "default": false, "description": "Cover the viewport (position: fixed) instead of the nearest positioned ancestor." }
+    }
+  },
+  "a11y": [
+    "The toggle is a real <button> whose aria-expanded tracks the open state; it stays above the panel so it doubles as the close control.",
+    "Escape closes the menu from anywhere inside the nav and returns focus to the toggle; a click outside also closes it.",
+    "The closed panel is visibility: hidden, so its links leave the tab order and the accessibility tree; the coloured layers are aria-hidden divs.",
+    "The 01/02 index numbers are CSS generated content with empty alternative text, so link names stay \"Work\", \"Services\" and so on."
+  ],
+  "reducedMotion": "static"
+}

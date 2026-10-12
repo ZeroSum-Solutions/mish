@@ -1,0 +1,1 @@
+.mm-original .coach-avatar{width:45px;height:45px;border-radius:50%;background:#c1b5a4;color:#403830;display:grid;place-items:center;font-weight:600}.mm-original .dates{display:flex;gap:10px}.mm-original .dates button{border-radius:12px;width:66px;display:grid;gap:4px}.mm-original .dates strong{font-size:24px}.mm-original .dates button[aria-pressed=true] small{color:var(--bg)}

@@ -1,0 +1,31 @@
+{
+  "id": "decrypted-text",
+  "name": "Decrypted Text",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/decrypted-text/index.ts",
+  "css": "components/decrypted-text/styles.css",
+  "demo": "components/decrypted-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": {
+        "type": "number",
+        "default": 900,
+        "minimum": 0,
+        "maximum": 4000
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

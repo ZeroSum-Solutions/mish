@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 2,
+  "family": "app-shell",
+  "revision": 1,
+  "brand": {
+    "name": "Fieldbook",
+    "descriptor": "A site-inspection tracker mock for a field services team."
+  },
+  "sections": [
+    {
+      "id": "app-shell-topnav",
+      "type": "top-nav",
+      "items": {
+        "links": ["Inspections", "Sites", "Crew", "Reports"],
+        "user": "Marisol Aguon"
+      }
+    },
+    {
+      "id": "app-shell-sidenav",
+      "type": "side-nav",
+      "items": [
+        { "heading": "Inspections", "links": ["Open", "Scheduled", "Completed"] },
+        { "heading": "Sites", "links": ["Active sites", "Archived", "Map view"] },
+        { "heading": "Crew", "links": ["Roster", "Certifications", "Time off"] },
+        { "heading": "Reports", "links": ["Weekly summary", "Compliance", "Exports"] }
+      ]
+    },
+    {
+      "id": "app-shell-empty",
+      "type": "empty-state",
+      "text": {
+        "heading": "No inspections scheduled",
+        "body": "Add a site visit to start tracking findings for this week.",
+        "cta": "Schedule an inspection"
+      }
+    },
+    {
+      "id": "app-shell-list",
+      "type": "list-view",
+      "text": { "heading": "Open inspections" },
+      "items": [
+        { "name": "Harborview Warehouse", "status": "Overdue", "owner": "Marisol Aguon", "updated": "2 days ago" },
+        { "name": "Cedar Ridge Plant", "status": "In progress", "owner": "Theo Kavanagh", "updated": "Yesterday" },
+        { "name": "Millbrook Depot", "status": "Scheduled", "owner": "Ines Falkenrath", "updated": "Today" },
+        { "name": "Dunmore Substation", "status": "In progress", "owner": "Theo Kavanagh", "updated": "3 hours ago" },
+        { "name": "Alder Street Yard", "status": "Scheduled", "owner": "Marisol Aguon", "updated": "1 hour ago" }
+      ]
+    },
+    {
+      "id": "app-shell-detail",
+      "type": "detail-view",
+      "text": { "heading": "Harborview Warehouse" },
+      "items": [
+        { "label": "Site ID", "value": "HW-014" },
+        { "label": "Inspector", "value": "Marisol Aguon" },
+        { "label": "Last visit", "value": "38 days ago" },
+        { "label": "Open findings", "value": "3" },
+        { "label": "Next due", "value": "Overdue by 2 days" }
+      ]
+    },
+    {
+      "id": "app-shell-settings",
+      "type": "settings",
+      "items": [
+        { "heading": "Profile", "body": "Update your name, role and the sites you are assigned to inspect." },
+        { "heading": "Notifications", "body": "Choose when Fieldbook alerts you about overdue or reassigned inspections." },
+        { "heading": "Team access", "body": "Manage who on your crew can view or edit each site's inspection history." }
+      ]
+    }
+  ]
+}

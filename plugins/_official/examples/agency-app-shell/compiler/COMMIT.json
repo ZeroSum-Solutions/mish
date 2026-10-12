@@ -1,0 +1,97 @@
+{
+  "commit": "37f396f30fabba98c92b39677bf7393a7265ba87",
+  "note": "shared compiler closure only, written by scripts/sync-agency-compiler.ts; the app-shell family module under compiler/scripts/families/app-shell/ is authored in this package.",
+  "runtimeClosureFiles": 14,
+  "files": [
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/assets.ts",
+      "file": "compiler/scripts/assets.ts",
+      "bytes": 7255,
+      "sha256": "b728124e30477badefd0ce800de61fa9b0cf2642653772ee6f862758b2c6663b"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/compose.ts",
+      "file": "compiler/scripts/compose.ts",
+      "bytes": 3092,
+      "sha256": "4df2abbf2e75d7feb39501fbae0ef6ae7309473fe20a47d22ef5c746ec176ad2"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/family.ts",
+      "file": "compiler/scripts/family.ts",
+      "bytes": 3154,
+      "sha256": "c9e6989c6b0fd87af816f86dd24ac3c741917c705ceee1914ca924a3a3b8aeb1"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/render.ts",
+      "file": "compiler/scripts/render.ts",
+      "bytes": 4850,
+      "sha256": "241abc90950f993261359599b0091c9ba2e910b7d2f524f07d650288ee5fbc5e"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/schema.ts",
+      "file": "compiler/scripts/schema.ts",
+      "bytes": 7953,
+      "sha256": "b44f0077abf89edcfbcc7942715c65adb25bb100e0574a6a0259e5e5892eebe6"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/styles.ts",
+      "file": "compiler/scripts/styles.ts",
+      "bytes": 5796,
+      "sha256": "550f6bff5d0d8e7b7e34255ac1212657f4f49a249ad387286d38d9de1b2ef526"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/sections.ts",
+      "file": "compiler/scripts/sections.ts",
+      "bytes": 4685,
+      "sha256": "cf07acffb5d2ef194a954c04fb4d020448a63f5a6267ff52b69147a8839999ef"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/output-scope.ts",
+      "file": "compiler/scripts/output-scope.ts",
+      "bytes": 1861,
+      "sha256": "54dd983d8e2fb7a33f855992b6f81761444650c7951c4f357c527e87b40b002f"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/catalog-block.ts",
+      "file": "compiler/scripts/catalog-block.ts",
+      "bytes": 5081,
+      "sha256": "cff09b77dbd6a842cef8f90aa79ac40fb049928d5562a1f359b495bdbc42fe33"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/direction-tokens.ts",
+      "file": "compiler/scripts/direction-tokens.ts",
+      "bytes": 10394,
+      "sha256": "464c4c888639d725eb1e4ca77d9535400a4fbd105c53cacc1dbcfddbbc22d025"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/section-adapter-ctas-1.ts",
+      "file": "compiler/scripts/section-adapter-ctas-1.ts",
+      "bytes": 2217,
+      "sha256": "8d4e13710ac41f32f36a095730733619e6c2518981a2cbb70ca687d2eecfb033"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/section-adapter-feature-grids-1.ts",
+      "file": "compiler/scripts/section-adapter-feature-grids-1.ts",
+      "bytes": 4543,
+      "sha256": "23860f0acda0d1b20258796920abc162e5c85b176701c44d71309cd1290505c4"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/section-adapter-sections-1.ts",
+      "file": "compiler/scripts/section-adapter-sections-1.ts",
+      "bytes": 1669,
+      "sha256": "89f0975caa825b34624c109bb46a1617e651679e963585149cbcaa61cfdc2cb6"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/section-adapter.ts",
+      "file": "compiler/scripts/section-adapter.ts",
+      "bytes": 12052,
+      "sha256": "ada5fb8a1617963b2e97e5934fd6db81e64ec6732680668d3d272d5d3d08b39d"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/effects.ts",
+      "file": "compiler/scripts/effects.ts",
+      "bytes": 21520,
+      "sha256": "757cea7c9744408647ee13776988b207f7c9a8cb5f76481e880988abd51cd048"
+    }
+  ]
+}

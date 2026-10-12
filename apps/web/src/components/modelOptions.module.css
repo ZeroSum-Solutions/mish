@@ -1,0 +1,176 @@
+/* InlineModelList — the model catalog drawn inside a host card (search
+   field + scrolling listbox). Rows are calm: no outline, quiet hover fill,
+   the model in effect gets the chip selected fill plus a trailing check. */
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-h-compact);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text-soft);
+  flex: 0 0 auto;
+}
+
+.search input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font: var(--font-body-sm);
+}
+
+.search input::placeholder {
+  color: var(--text-faint);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+  min-height: 0;
+  /* About seven rows; longer catalogs scroll inside the card. */
+  max-height: 300px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  /* Keeps the scrolled-in selection clear of the edges. */
+  scroll-padding-block: var(--space-2);
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+}
+
+.group + .group {
+  margin-top: var(--space-2);
+}
+
+.groupLabel {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  background: var(--bg-elevated);
+  color: var(--text-soft);
+  font: var(--font-caption);
+  font-weight: var(--weight-medium);
+}
+
+.groupLabel img {
+  width: 14px;
+  height: 14px;
+  object-fit: contain;
+}
+
+.groupCount {
+  margin-left: auto;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.option {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: auto;
+  min-height: var(--control-h-compact);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text);
+  font: var(--font-body-sm);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+
+.option:hover:not(:disabled):not([aria-disabled='true']) {
+  background: var(--chip-hover-fill);
+  color: var(--text-strong);
+}
+
+.option:active:not(:disabled):not([aria-disabled='true']) {
+  transform: scale(var(--press-scale-card));
+  transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-press);
+}
+
+.option:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+.option[aria-selected='true'] {
+  background: var(--chip-selected-fill);
+  color: var(--chip-selected-text);
+}
+
+.option[aria-selected='true'] :global(.model-select-searchable__option-label) {
+  font-weight: var(--weight-medium);
+}
+
+.optionDisabled {
+  color: var(--text-muted);
+  cursor: not-allowed;
+}
+
+.optionDisabled :global(.model-select-searchable__option-label) {
+  opacity: 0.7;
+}
+
+/* Logo, label and meta sit centred on one row in the card. */
+.option :global(.model-select-searchable__option-content) {
+  flex: 1 1 auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.option :global(.model-select-searchable__option-logo) {
+  display: inline-flex;
+  flex: 0 0 auto;
+}
+
+.option :global(.model-select-searchable__option-logo img) {
+  display: block;
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
+.check {
+  display: inline-flex;
+  flex: 0 0 16px;
+  justify-content: center;
+  color: var(--text-strong);
+}
+
+.empty {
+  padding: var(--space-4) var(--space-2);
+  color: var(--text-muted);
+  font: var(--font-caption);
+  text-align: center;
+}

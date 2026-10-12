@@ -1,0 +1,48 @@
+{
+  "catalogComponents": [
+    "split-text",
+    "masked-heading",
+    "scroll-reveal",
+    "glare-hover"
+  ],
+  "effects": {
+    "scriptPolicy": "hash",
+    "maxEffects": 2,
+    "placements": {
+      "hero-title": {
+        "host": {
+          "odId": "publication-lead--headline"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-title": {
+        "host": {
+          "odId": "publication-latest--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-reveal": {
+        "host": {
+          "odId": "publication-newsletter--body"
+        },
+        "allow": [
+          "scroll-reveal"
+        ]
+      },
+      "cta": {
+        "host": {
+          "id": "publication-newsletter"
+        },
+        "allow": [
+          "glare-hover"
+        ]
+      }
+    }
+  }
+}

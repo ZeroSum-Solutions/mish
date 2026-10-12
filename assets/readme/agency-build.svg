@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="1200" height="320" viewBox="0 0 1200 320"
+     role="img" aria-labelledby="title desc">
+  <title id="title">How an agency build turns a brief into a page</title>
+  <desc id="desc">Five steps. Brief: a client brief, inline or from a file. Route: Jev maps it to the Website Shape Atlas and picks a family. Fill: DeepSeek or Cerebras fills the family's typed slots. Verify: Jev checks every fact, and strict mode publishes nothing on a miss. Publish: a project you preview, edit, and share to Vercel.</desc>
+
+  <rect x="0.5" y="0.5" width="1199" height="319" rx="28" fill="#fafafa" stroke="#dbdbdb"/>
+
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif">
+
+    <!-- 01 Brief -->
+    <g transform="translate(48 32)">
+      <rect width="208" height="256" rx="20" fill="#ffffff" stroke="#dbdbdb"/>
+      <text x="20" y="40" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#848484">01</text>
+      <rect x="20" y="56" width="92" height="40" rx="20" fill="#fafafa" stroke="#dbdbdb"/>
+      <text x="40" y="83" font-size="21" font-weight="600" fill="#202020">Brief</text>
+      <g font-size="20" fill="#494949">
+        <text x="20" y="136">A client brief,</text>
+        <text x="20" y="164">inline or from</text>
+        <text x="20" y="192">a file.</text>
+      </g>
+    </g>
+    <path d="M260 160 h12 M266 154 l6 6 l-6 6" stroke="#bdbdbd" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- 02 Route -->
+    <g transform="translate(272 32)">
+      <rect width="208" height="256" rx="20" fill="#ffffff" stroke="#dbdbdb"/>
+      <text x="20" y="40" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#848484">02</text>
+      <rect x="20" y="56" width="98" height="40" rx="20" fill="#fafafa" stroke="#dbdbdb"/>
+      <text x="40" y="83" font-size="21" font-weight="600" fill="#202020">Route</text>
+      <g font-size="20" fill="#494949">
+        <text x="20" y="136">Jev maps it to</text>
+        <text x="20" y="164">the Website</text>
+        <text x="20" y="192">Shape Atlas and</text>
+        <text x="20" y="220">picks a family.</text>
+      </g>
+    </g>
+    <path d="M484 160 h12 M490 154 l6 6 l-6 6" stroke="#bdbdbd" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- 03 Fill -->
+    <g transform="translate(496 32)">
+      <rect width="208" height="256" rx="20" fill="#ffffff" stroke="#dbdbdb"/>
+      <text x="20" y="40" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#848484">03</text>
+      <rect x="20" y="56" width="74" height="40" rx="20" fill="#fafafa" stroke="#dbdbdb"/>
+      <text x="40" y="83" font-size="21" font-weight="600" fill="#202020">Fill</text>
+      <g font-size="20" fill="#494949">
+        <text x="20" y="136">DeepSeek or</text>
+        <text x="20" y="164">Cerebras fills</text>
+        <text x="20" y="192">the family's</text>
+        <text x="20" y="220">typed slots.</text>
+      </g>
+    </g>
+    <path d="M708 160 h12 M714 154 l6 6 l-6 6" stroke="#bdbdbd" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- 04 Verify: the gate, drawn as the selected chip -->
+    <g transform="translate(720 32)">
+      <rect width="208" height="256" rx="20" fill="#ffffff" stroke="#adf788" stroke-width="2"/>
+      <text x="20" y="40" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#0d5400">04</text>
+      <rect x="20" y="56" width="104" height="40" rx="20" fill="#ebffde" stroke="#adf788"/>
+      <text x="40" y="83" font-size="21" font-weight="600" fill="#0d5400">Verify</text>
+      <g font-size="20" fill="#494949">
+        <text x="20" y="136">Jev checks every</text>
+        <text x="20" y="164">fact. Strict mode</text>
+        <text x="20" y="192">publishes nothing</text>
+        <text x="20" y="220">on a miss.</text>
+      </g>
+    </g>
+    <path d="M932 160 h12 M938 154 l6 6 l-6 6" stroke="#bdbdbd" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- 05 Publish: the send disc -->
+    <g transform="translate(944 32)">
+      <rect width="208" height="256" rx="20" fill="#ffffff" stroke="#dbdbdb"/>
+      <text x="20" y="40" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="18" fill="#848484">05</text>
+      <rect x="20" y="56" width="116" height="40" rx="20" fill="#202020"/>
+      <text x="40" y="83" font-size="21" font-weight="600" fill="#fafafa">Publish</text>
+      <g font-size="20" fill="#494949">
+        <text x="20" y="136">A project you</text>
+        <text x="20" y="164">preview, edit,</text>
+        <text x="20" y="192">and share to</text>
+        <text x="20" y="220">Vercel.</text>
+      </g>
+    </g>
+  </g>
+</svg>

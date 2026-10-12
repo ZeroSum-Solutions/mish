@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 2,
+  "family": "restaurant",
+  "revision": 1,
+  "brand": {
+    "name": "Vela Trattoria",
+    "descriptor": "A wood-fired Italian kitchen in Seattle's Fremont neighborhood: handmade pasta, a short natural wine list and a nightly changing oven special."
+  },
+  "sections": [
+    {
+      "id": "restaurant-header",
+      "type": "header",
+      "text": {
+        "cta": "Reserve a table"
+      }
+    },
+    {
+      "id": "restaurant-hero",
+      "type": "hero",
+      "text": {
+        "eyebrow": "Wood-fired Italian, Fremont",
+        "heading": "Handmade pasta and a wood-fired oven, six nights a week",
+        "body": "We roll pasta every morning and keep the oven running until close. Stop by the bar for a plate or book ahead for a full table.",
+        "reservationCta": "Book a table"
+      }
+    },
+    {
+      "id": "restaurant-menu",
+      "type": "menu",
+      "text": {
+        "heading": "Menu highlights",
+        "intro": "A short seasonal menu built around what the market and the wood oven give us that day."
+      },
+      "items": [
+        {
+          "name": "Cacio e pepe",
+          "description": "Fresh tonnarelli, Pecorino Romano, cracked black pepper.",
+          "price": "$19"
+        },
+        {
+          "name": "Wood-fired margherita",
+          "description": "San Marzano tomato, fior di latte, basil, olive oil.",
+          "price": "$18"
+        },
+        {
+          "name": "Braised short rib pappardelle",
+          "description": "Slow-braised beef, red wine, pappardelle, gremolata.",
+          "price": "$27"
+        },
+        {
+          "name": "Roasted cauliflower",
+          "description": "Chili, garlic, lemon, breadcrumb, mint.",
+          "price": "$14"
+        },
+        {
+          "name": "Affogato",
+          "description": "Vanilla gelato, hot espresso, cocoa nib.",
+          "price": "$9"
+        }
+      ]
+    },
+    {
+      "id": "restaurant-hours-location",
+      "type": "hours-location",
+      "text": {
+        "heading": "Hours and location",
+        "address": "412 Fremont Ave N, Seattle, WA 98103",
+        "phone": "206-555-0148"
+      },
+      "items": [
+        {
+          "label": "Tue-Thu",
+          "value": "5-9:30pm"
+        },
+        {
+          "label": "Fri-Sat",
+          "value": "5-10pm"
+        },
+        {
+          "label": "Sun-Mon",
+          "value": "Closed"
+        }
+      ]
+    },
+    {
+      "id": "restaurant-reservations",
+      "type": "reservations",
+      "text": {
+        "heading": "Book a table",
+        "body": "We hold half the dining room for walk-ins, but a booking guarantees your table on a Friday or Saturday night.",
+        "cta": "Reserve now"
+      }
+    },
+    {
+      "id": "restaurant-story",
+      "type": "story",
+      "text": {
+        "heading": "Our story",
+        "body": "Chef Marco Belline opened Vela Trattoria in 2019 after a decade cooking in Bologna and Seattle kitchens. The menu changes with the season, but the wood oven never goes cold."
+      }
+    },
+    {
+      "id": "restaurant-gallery",
+      "type": "gallery",
+      "text": {
+        "heading": "A look inside"
+      },
+      "items": [
+        {
+          "caption": "The wood-fired oven",
+          "blurb": "Burning apple and oak all night."
+        },
+        {
+          "caption": "The pasta bar",
+          "blurb": "Tonnarelli and pappardelle, rolled fresh each morning."
+        },
+        {
+          "caption": "The dining room",
+          "blurb": "Twelve tables and six seats at the bar."
+        }
+      ]
+    },
+    {
+      "id": "restaurant-reviews",
+      "type": "reviews",
+      "text": {
+        "heading": "What diners say"
+      },
+      "items": [
+        {
+          "title": "Best pasta in Fremont",
+          "quote": "The cacio e pepe alone is worth the wait for a table.",
+          "name": "Dana Okafor"
+        },
+        {
+          "title": "A wonderful date-night spot",
+          "quote": "Warm room, quick service, and the short rib pappardelle was incredible.",
+          "name": "Priya Shah"
+        },
+        {
+          "title": "Neighborhood favorite",
+          "quote": "We have been coming back every month since they opened.",
+          "name": "Tom Whitfield"
+        }
+      ]
+    },
+    {
+      "id": "restaurant-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Wood-fired Italian in Fremont, six nights a week.",
+        "links": [
+          "Terms",
+          "Privacy",
+          "Gift cards"
+        ],
+        "phone": "206-555-0148",
+        "email": "hello@velatrattoria.example",
+        "address": "412 Fremont Ave N, Seattle, WA 98103"
+      }
+    }
+  ]
+}

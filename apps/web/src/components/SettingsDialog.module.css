@@ -1,0 +1,276 @@
+/* Settings surfaces owned by SettingsDialog.tsx (docs/design/ui-system.md).
+   Provider picker: a calm, searchable list that replaces the outlined pill
+   wall. Provider rows: compact disclosure rows in one list container. */
+
+/* ── Provider picker ─────────────────────────────────────────────────── */
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  padding: var(--space-2);
+  border-radius: var(--radius-lg);
+  background: var(--bg-subtle);
+  box-shadow: inset 0 0 0 1px var(--border-soft);
+}
+
+.pickerHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  min-height: var(--control-h-compact);
+}
+
+/* The search field: a shell with the glyph and the input as flex siblings, so
+   the glyph is centered on the field's own center line in every engine. */
+.picker .search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 320px;
+  height: var(--control-h-compact);
+  margin: 0;
+}
+
+.picker .searchIcon {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: var(--space-3);
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 0;
+  transform: translateY(-50%);
+  color: var(--text-soft);
+  pointer-events: none;
+}
+
+.picker .searchInput {
+  width: 100%;
+  height: var(--control-h-compact);
+  min-height: 0;
+  margin: 0;
+  padding-block: 0;
+  padding-inline: calc(var(--space-3) + 14px + var(--space-2)) var(--space-3);
+  font: var(--font-body-sm);
+  border-radius: var(--radius-pill);
+}
+
+/* Counter rides the search field's center line. */
+.pickerMeta {
+  display: inline-flex;
+  align-items: center;
+  align-self: center;
+  height: var(--control-h-compact);
+  margin-inline-start: auto;
+  font: var(--font-caption);
+  color: var(--text-soft);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* A tidy list in equal columns: each entry is left-aligned (dot, then name)
+   on a control-h-sm row. Scrolls past eight rows. */
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  align-content: start;
+  gap: var(--space-half) var(--space-1);
+  max-height: calc(var(--control-h-sm) * 8 + var(--space-half) * 7);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.picker .item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-2);
+  width: 100%;
+  min-width: 0;
+  height: var(--control-h-sm);
+  min-height: 0;
+  margin: 0;
+  padding: 0 var(--space-2);
+  font: var(--font-label);
+  line-height: var(--control-h-sm);
+  color: var(--text-muted);
+  text-align: start;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint),
+    box-shadow var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+
+.picker .item:hover:not([aria-selected='true']) {
+  color: var(--text-strong);
+  background: var(--chip-hover-fill);
+  border: 0;
+  box-shadow: none;
+}
+
+.picker .item:active {
+  transform: scale(var(--press-scale-card));
+  transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-hover), var(--motion-press);
+}
+
+.picker .item:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+.picker .item[aria-selected='true'],
+.picker .item[aria-selected='true']:hover {
+  color: var(--text-strong);
+  background: var(--segmented-thumb);
+  box-shadow: var(--segmented-thumb-shadow);
+}
+
+.itemLabel {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status dot: filled green when the provider is set up, a hollow ring when
+   it is not. Shape differs as well as hue, so state never rides on color. */
+.dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  box-shadow: inset 0 0 0 1.5px var(--text-faint);
+}
+
+.dot[data-configured='true'] {
+  background: var(--green);
+  box-shadow: none;
+}
+
+.empty {
+  margin: 0;
+  padding: var(--space-2) var(--space-3);
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+
+/* ── Provider rows (Media providers) ─────────────────────────────────── */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.groupLabel {
+  margin: 0;
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+}
+
+.rowList {
+  overflow: hidden;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+}
+
+.rowDetails {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 68ch;
+}
+
+.rowDetails p {
+  margin: 0;
+}
+
+.rowField {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.rowFieldLabel {
+  font: var(--font-label);
+  color: var(--text);
+}
+
+.rowField input {
+  width: 100%;
+  height: var(--control-h-md);
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.rowStatus {
+  font: var(--font-caption);
+  color: var(--text-muted);
+}
+
+.rowStatus[data-tone='success'] {
+  color: color-mix(in srgb, var(--green) 55%, var(--text-strong));
+}
+
+.rowStatus[data-tone='error'] {
+  color: color-mix(in srgb, var(--red) 55%, var(--text-strong));
+}
+
+/* ── General: notification settings ─────────────────────────────────── */
+.prefRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  min-width: 0;
+}
+
+.prefLabel {
+  margin: 0;
+  font: var(--font-label);
+  color: var(--text-strong);
+}
+
+.prefSub {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+  margin-top: var(--space-2);
+  padding-inline: var(--space-3);
+}
+
+.prefSubLabel {
+  font: var(--font-label);
+  color: var(--text-muted);
+}
+
+@media (max-width: 560px) {
+  .pickerHead {
+    flex-wrap: wrap;
+  }
+  .picker .search {
+    max-width: none;
+  }
+  .list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+}

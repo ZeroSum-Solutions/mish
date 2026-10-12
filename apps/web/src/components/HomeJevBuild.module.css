@@ -1,0 +1,9 @@
+/* Home "Build with Jev" card: layout only. The card itself is the shared agency build card
+   (`AgencyBuildProgress.module.css` .card); this sizes and centres it like the composer card
+   above it (`.home-hero__composer-card`). */
+.panel {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 820px;
+  margin: 0 auto 24px;
+}

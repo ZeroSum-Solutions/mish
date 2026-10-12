@@ -1,0 +1,4 @@
+{
+  "description": "Evidence redaction (Sol re-review BLOCK 2 and round 3 BLOCKs 2-3): external URLs keep only origin, path depth and a digest of path and query; project URLs keep their path with the query hashed; console text with a URL that cannot be cleanly replaced is redacted whole. No userinfo, path, query or fragment of an external URL is persisted.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "consoleOutcome": "fail", "secretsAbsent": ["bl0ckS3cret", "s3ss10nS3cret", "t0k3nS3cret", "k3yS3cret", "pa55S3cret", "s1gS3cret", "p4thS3cret", "egr3ssS3cret", "egr3ssQu3ry", "w1nd0wP4th", "c0ns0leS3cret", "qu0teS3cret", "frag0", "frag1", "frag2", "frag3", "frag4", "user:"], "evidenceIncludes": "~redacted:d" } }
+}

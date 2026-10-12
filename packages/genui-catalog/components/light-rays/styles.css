@@ -1,0 +1,9 @@
+.genui-light-rays { position: relative; overflow: hidden; isolation: isolate; }
+.genui-light-rays::before { content: ''; position: absolute; inset: -30%; z-index: -1; pointer-events: none; background: repeating-conic-gradient(from 190deg at 50% -10%, transparent 0deg 12deg, var(--genui-light-rays-colour, #b7c9ff) 14deg 17deg, transparent 20deg 36deg); filter: blur(12px); opacity: var(--genui-light-rays-intensity, .18); transform-origin: 50% 0; animation: genui-light-rays-drift var(--genui-light-rays-duration, 2400ms) ease-out both; }
+.genui-light-rays.genui-light-rays--reduced::before { animation: none; }
+@keyframes genui-light-rays-drift {
+ from { transform: rotate(-8deg) scale(1.05); }
+ to { transform: rotate(4deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce) { .genui-light-rays::before { animation: none; } }
+@media (forced-colors: active) { .genui-light-rays::before { display: none; } }

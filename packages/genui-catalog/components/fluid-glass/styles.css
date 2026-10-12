@@ -1,0 +1,83 @@
+/* fluid-glass — clean-room, from the effect description only. Every selector is under .genui-fluid-glass. */
+
+:where(.genui-fluid-glass) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 15% 20%, color-mix(in srgb, var(--genui-fluid-glass-a, #4f7cff) 38%, transparent), transparent 60%),
+    radial-gradient(110% 90% at 90% 85%, color-mix(in srgb, var(--genui-fluid-glass-b, #c26bff) 34%, transparent), transparent 60%),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.03) 0 14px, transparent 14px 34px),
+    #0d1018;
+}
+
+.genui-fluid-glass__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Static stand-in for the WebGL glass: shown when there is no script or no WebGL. */
+.genui-fluid-glass::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 62%;
+  width: calc(var(--genui-fluid-glass-size, 64px) * 2);
+  height: calc(var(--genui-fluid-glass-size, 64px) * 2);
+  margin: calc(var(--genui-fluid-glass-size, 64px) * -1) 0 0 calc(var(--genui-fluid-glass-size, 64px) * -1);
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.08) 42%, rgba(255, 255, 255, 0.02) 70%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.4),
+    inset 0 -10px 24px rgba(255, 255, 255, 0.12),
+    0 14px 30px rgba(0, 0, 0, 0.35);
+  -webkit-backdrop-filter: blur(1.5px) saturate(1.7) brightness(1.25);
+  backdrop-filter: blur(1.5px) saturate(1.7) brightness(1.25);
+  pointer-events: none;
+  animation: genui-fluid-glass-drift 9s ease-in-out infinite alternate;
+}
+
+.genui-fluid-glass.genui-fluid-glass--bar::after {
+  width: calc(var(--genui-fluid-glass-size, 64px) * 3.5);
+  height: var(--genui-fluid-glass-size, 64px);
+  margin: calc(var(--genui-fluid-glass-size, 64px) * -0.5) 0 0 calc(var(--genui-fluid-glass-size, 64px) * -1.75);
+  border-radius: 999px;
+}
+
+.genui-fluid-glass.genui-fluid-glass--cube::after {
+  border-radius: 22%;
+  rotate: 14deg;
+}
+
+.genui-fluid-glass.genui-fluid-glass--gl::after {
+  display: none;
+}
+
+@keyframes genui-fluid-glass-drift {
+  to {
+    translate: -18% 12%;
+  }
+}
+
+.genui-fluid-glass.genui-fluid-glass--reduced::after {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-fluid-glass::after {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-fluid-glass::after,
+  .genui-fluid-glass__canvas {
+    display: none;
+  }
+}

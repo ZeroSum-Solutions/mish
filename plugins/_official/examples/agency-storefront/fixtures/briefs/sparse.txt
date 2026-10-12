@@ -1,0 +1,8 @@
+Sparse fixture — single-product preorder, drops the collection grid and most optional sections.
+
+Halberd Audio is opening preorders for one product: the Halberd One, a single-driver desktop
+speaker, $189. This is our first and only product right now — there's nothing else to browse.
+Preorder here: https://preorder.halberdaudio.example/one. We don't have shipping dates, returns
+terms, reviews or a founding story to share yet — those will come once the first units ship.
+
+Contact: orders@halberdaudio.example.

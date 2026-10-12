@@ -1,0 +1,216 @@
+{
+  "families": [
+    {
+      "family": "watson",
+      "archetype": "TL.05",
+      "spine": "TL",
+      "skin": "Editorial",
+      "skinInferred": true,
+      "summary": "Trust-to-lead studio landing page: five fixed sections, expressive typography, one flowing text-forward brand statement with inline media. Fits a studio, consultancy or creative practice that wants an art-directed, editorial, text-first homepage. Not a clinic, dental, veterinary or other medical practice with hours, providers or booked appointments, and not a law or accounting firm — trust alone does not make a brief watson. Tiebreaker against `fervor`: when a studio or agency brief could fit either, prefer watson when the brief's own language is text-forward prose — a brand statement, case studies, or credentials — with no motion, scroll, or video-background language, even if the underlying vertical or CTA looks similar.",
+      "pageKind": "site"
+    },
+    {
+      "family": "fervor",
+      "archetype": "TL.05",
+      "spine": "TL",
+      "skin": "Cinematic and immersive",
+      "skinInferred": true,
+      "summary": "One-page creative-studio or agency showcase: motion-led, scroll-linked marquee, staged concept-campaign work, manifesto, expertise, testimonial, contact. Fits a creative studio or agency (advertising, design, branding, production) that presents its own work to win client projects and asks the visitor to start a project or get in touch — not a SaaS, e-commerce, course, museum or contractor site, and not any other business whose page merely uses bold motion or cinematic staging: static product photography or 3D renders, with no scroll-linked or video-based motion, do not make a brief fervor. That is watson. Not a clinic, dental, veterinary or other medical practice — cinematic staging on a booking page does not make it fervor. Tiebreaker against `watson`: when a studio or agency brief could fit either, prefer fervor when the brief specifies motion-led, scroll-linked, marquee, parallax, or video-background treatment — that visual-language cue, not vertical or CTA alone, is what separates fervor's motion-led reel from watson's text-forward statement.",
+      "pageKind": "site",
+      "requiresExactArchetype": true,
+      "excludes": [
+        "static product photography or 3D renders, with no scroll-linked or video-based motion, do not make a brief fervor."
+      ]
+    },
+    {
+      "family": "wrenfield",
+      "archetype": "TL.04",
+      "spine": "TL",
+      "skin": "Heritage and craft",
+      "skinInferred": true,
+      "summary": "One-page remodeling or home-services lead-generation page: real-work photography, annotated hero, before/after slider, trust, services, process, featured work, reviews, final call. Fits a residential contractor or local home-service business trading on reviews and workmanship.",
+      "pageKind": "site"
+    },
+    {
+      "family": "maben",
+      "archetype": "TL.04",
+      "spine": "TL",
+      "skin": "Minimal and quiet",
+      "skinInferred": true,
+      "summary": "Commercial design-build homepage: fixed left rail, full-screen menu, statement hero over one media frame, three-step approach, six-card portfolio carousel, editorial grid. Fits a commercial construction, design-build or architecture firm.",
+      "pageKind": "site"
+    },
+    {
+      "family": "halcyon",
+      "archetype": "BA.03",
+      "spine": "BA",
+      "skin": "Corporate and institutional",
+      "skinInferred": true,
+      "summary": "One-page museum or visited-institution site: now showing, five-room collection, events, learn, visit with hours and admission, membership, support. Fits a museum, gallery, archive, science centre, garden or any visited institution with a programme and a membership. Not a clinic, dental, veterinary or other local appointment practice: hours and a visit do not make a booking-driven practice halcyon.",
+      "pageKind": "site"
+    },
+    {
+      "family": "restaurant",
+      "archetype": "BA.02",
+      "spine": "BA",
+      "skin": "Heritage and craft",
+      "skinInferred": true,
+      "summary": "Restaurant or food-business page: hero with a reservation call to action, menu highlights with nullable prices, hours and location with a nullable address and phone, a reservations step, chef or story, a photography gallery placeholder, optional diner reviews and a footer. Fits a restaurant, cafe, bar, bakery or other food-service business that wants a visitor to see the menu, learn the hours and reserve or book a table.",
+      "pageKind": "site"
+    },
+    {
+      "family": "practice",
+      "archetype": "TL.01",
+      "archetypes": [
+        "TL.02"
+      ],
+      "spine": "TL",
+      "skin": "Corporate and institutional",
+      "skinInferred": true,
+      "summary": "Local clinical or appointment practice page: header, hero, services or treatments, provider credentials, what to expect at a visit, a book call, optional patient or client reviews, insurance or pricing, FAQ, and hours and location as text (no map embed), and a footer. Fits a dentist, veterinarian, medical specialist, physiotherapist, dermatology, fertility or aesthetics/med-spa practice whose visitor judges fit and books a real appointment through a supplied URL, phone or email. Not a signed-in patient portal, and not a studio or consultancy (`watson`), an agency reel (`fervor`), a property or remodeling estimate (`wrenfield`, `maben`), a restaurant table reservation (`restaurant`), a visited membership institution (`halcyon`), or a working app or dashboard screen (`app-shell`, `crm-dashboard`); a link to an existing patient portal does not count. Abstain only when the brief asks this site itself to sell admission or passes, such as day passes or entry tickets, as a separate product alongside presenting the practice; a link to, or an embedded widget from, an existing booking, payment, pass, membership or gift-card provider does not count.",
+      "pageKind": "site",
+      "excludes": [
+        "Not a signed-in patient portal, and not a studio or consultancy (`watson`), an agency reel (`fervor`), a property or remodeling estimate (`wrenfield`, `maben`), a restaurant table reservation (`restaurant`), a visited membership institution (`halcyon`), or a working app or dashboard screen (`app-shell`, `crm-dashboard`); a link to an existing patient portal does not count.",
+        "Abstain only when the brief asks this site itself to sell admission or passes, such as day passes or entry tickets, as a separate product alongside presenting the practice; a link to, or an embedded widget from, an existing booking, payment, pass, membership or gift-card provider does not count."
+      ]
+    },
+    {
+      "family": "maren",
+      "archetype": "TL.06",
+      "spine": "TL",
+      "skin": "Heritage and craft",
+      "skinInferred": true,
+      "summary": "One-page commerce-lite maker studio: a short run of made-to-order pieces, craft, materials, an ordering explainer, care, reviews, visit; no cart, orders by call or email. Fits a small maker or atelier selling a short run by order. Not a catalog or product buy: a brief with a product grid, cart or checkout is not maren — that visitor buys off a catalog, not by phone or email.",
+      "pageKind": "site",
+      "sameSpineOnly": true,
+      "excludes": [
+        "Not a catalog or product buy: a brief with a product grid, cart or checkout is not maren — that visitor buys off a catalog, not by phone or email."
+      ]
+    },
+    {
+      "family": "storefront",
+      "archetype": "CO.01",
+      "spine": "CO",
+      "skin": "Catalog and grid-led",
+      "skinInferred": true,
+      "summary": "One-page retail storefront: hero, one featured product, an optional short collection grid, optional product details, a buy-or-preorder step that links out to the seller's own shop, checkout, or payment page (a Shopify, Stripe, marketplace or other supplied URL) or, absent one, to a supplied phone or email — this page itself never renders a cart, line items, or a payment form. Fits a fashion label, single-SKU shop, hardware preorder, digital drop, or any small retailer selling goods online, including one that already has a real cart, checkout, or payment system elsewhere: a brief that describes an existing Shopify checkout, a Stripe payment link, or “add to cart” on the seller's own store still fits storefront, because this page only links out to that existing buy step. Not `maren`: a made-to-order atelier that takes orders only by phone or email, with no shop or checkout to link to, stays `maren`. Not `marketing-site`: a software trial with pricing tiers is not a shop. Not `listings`: a directory of many independent listings from different providers is not one storefront's own catalog. Not storefront (abstain instead): a brief that asks this page itself to build or embed the cart, checkout, or payment form inline, with no separate existing buy step to link to.",
+      "pageKind": "site",
+      "requiresExternalBuyStep": true,
+      "excludes": [
+        "Not `maren`: a made-to-order atelier that takes orders only by phone or email, with no shop or checkout to link to, stays `maren`.",
+        "Not `marketing-site`: a software trial with pricing tiers is not a shop.",
+        "Not `listings`: a directory of many independent listings from different providers is not one storefront's own catalog.",
+        "Not storefront (abstain instead): a brief that asks this page itself to build or embed the cart, checkout, or payment form inline, with no separate existing buy step to link to."
+      ]
+    },
+    {
+      "family": "emmpo",
+      "archetype": "LM.01",
+      "spine": "LM",
+      "skin": "Playful and illustrative",
+      "skinInferred": true,
+      "summary": "Illustrated learning and membership landing page: hero, career quiz callout, explore list, discover, method, instructor spotlight, outcomes, community, social gallery, sign-up footer, course catalog. Fits a school, academy, coach or creator that sells courses, cohorts, memberships or programmes and asks the visitor to enrol, join or sign up — not a portfolio, and not an agency or studio showcase: a page that shows off someone's work is never emmpo.",
+      "pageKind": "site"
+    },
+    {
+      "family": "crm-dashboard",
+      "archetype": "TU.01",
+      "spine": "TU",
+      "skin": "Technical and utilitarian",
+      "skinInferred": true,
+      "summary": "Static CRM dashboard page: four KPIs, a five-row pipeline table, a six-item activity feed, one contact card, filters and one chart. Fits a sales or service team that wants a mock of its working screen.",
+      "pageKind": "dashboard"
+    },
+    {
+      "family": "marketing-site",
+      "archetype": "PA.01",
+      "spine": "PA",
+      "skin": "Minimal and quiet",
+      "skinInferred": true,
+      "summary": "Static marketing site: a hero, three features, three testimonials, three pricing tiers, one call to action and a footer. Fits a software or subscription product that sells itself from one page. Not a shop: a brief selling a physical or merchandise product to buy is not marketing-site — a trial and pricing tiers sell software, not goods.",
+      "pageKind": "site",
+      "excludes": [
+        "Not a shop: a brief selling a physical or merchandise product to buy is not marketing-site — a trial and pricing tiers sell software, not goods."
+      ]
+    },
+    {
+      "family": "app-shell",
+      "archetype": "TU.01",
+      "spine": "TU",
+      "skin": "Technical and utilitarian",
+      "skinInferred": true,
+      "summary": "Static web-app shell: top nav, grouped side nav, an empty state, one five-row list view, one detail view and a settings page. Fits a team that wants the working frame of an internal tool, not a dashboard of numbers. Not a public clinic or practice site: a signed-in patient portal or staff tool is app-shell, but a public page that sells a visit or a booking is not.",
+      "pageKind": "app"
+    },
+    {
+      "family": "listings",
+      "archetype": "SM.02",
+      "spine": "SM",
+      "skin": "Catalog and grid-led",
+      "skinInferred": true,
+      "summary": "Directory or listings page: a search bar, browse categories, filters, a grid of result cards, a comparison table, one featured listing, optional reviews and an inquiry step. Fits real estate (rentals through luxury property sales), holiday stays, marketplaces and local or business directories — any site where the visitor searches many listed properties, places, providers or items and contacts the one they pick. Not a single provider or a single shop: a brief with one clinic, one practice or one product catalog to buy from has no independent entries to search, so it is not listings. Not for a brief that also needs one cart combining items from several different listings into a single transaction; abstain instead, since no bundled family combines a directory with one shared checkout.",
+      "pageKind": "site",
+      "excludes": [
+        "Not a single provider or a single shop: a brief with one clinic, one practice or one product catalog to buy from has no independent entries to search, so it is not listings.",
+        "Not for a brief that also needs one cart combining items from several different listings into a single transaction; abstain instead, since no bundled family combines a directory with one shared checkout."
+      ]
+    },
+    {
+      "family": "publication",
+      "archetype": "CS.01",
+      "spine": "CS",
+      "skin": "Editorial",
+      "skinInferred": true,
+      "summary": "Publication or media page: masthead, lead story, topics, latest stories, running series, archive, optional contributors, a newsletter sign-up and membership tiers. Fits magazines, newsletters, independent media, journals and blogs — any title or content brand whose visitor comes to read, watch or listen and is asked to subscribe, however bold, cinematic or motion-led its look: visual style alone does not make a content site an agency or a product page. Not a destination or place story: a brief that reads one city or region as chapters, with no recurring title and no subscription, is not publication.",
+      "pageKind": "site",
+      "excludes": [
+        "Not a destination or place story: a brief that reads one city or region as chapters, with no recurring title and no subscription, is not publication."
+      ]
+    },
+    {
+      "family": "guide",
+      "archetype": "CS.01",
+      "spine": "CS",
+      "skin": "Editorial",
+      "skinInferred": true,
+      "summary": "One-destination guide page: masthead naming the place, an opening chapter, a chapter list of further chapters, optional practical facts (getting there, best time to visit, currency, language), optional places to see, an optional typographic gallery of place cards (no photographs), an optional plan-a-visit link to a single supplied URL, and a footer. Fits a city, region, trail or island told as chapters for a visitor deciding whether to go — the visitor READS the place. Not `publication`: a recurring title the visitor subscribes to (a magazine, newsletter or journal with an issue archive), not one place. Not `halcyon`: one visited institution with its own programme, hours and membership, not a destination. Not `listings`: many independent, separately searchable entities, not one place's own chapters. A travel-themed hero with no real place content — no chapters, no practical facts, nothing to read about the destination itself — is not a guide and stays unrouted.",
+      "pageKind": "site",
+      "excludes": [
+        "Not `publication`: a recurring title the visitor subscribes to (a magazine, newsletter or journal with an issue archive), not one place.",
+        "Not `halcyon`: one visited institution with its own programme, hours and membership, not a destination.",
+        "Not `listings`: many independent, separately searchable entities, not one place's own chapters.",
+        "A travel-themed hero with no real place content — no chapters, no practical facts, nothing to read about the destination itself — is not a guide and stays unrouted."
+      ]
+    },
+    {
+      "family": "nonprofit",
+      "archetype": "MI.01",
+      "spine": "MI",
+      "skin": "Corporate and institutional",
+      "skinInferred": true,
+      "summary": "Nonprofit page: what is at stake, mission, programmes, optional impact figures, stories, accountability facts, events, ways to give and a volunteer call. Fits charities, foundations, community trusts and causes that ask visitors to donate or volunteer.",
+      "pageKind": "site"
+    },
+    {
+      "family": "docs-hub",
+      "archetype": "CS.02",
+      "spine": "CS",
+      "skin": "Technical and utilitarian",
+      "skinInferred": true,
+      "summary": "Documentation or knowledge base page: a labelled search field, quick-start steps, a guides grid, optional API or reference entry points, one code sample, an optional changelog and optional community or support links. Fits developer documentation hubs, product docs sites, help centers, knowledge bases and internal wikis — any site whose visitor comes to answer a question or complete a technical task by searching and following steps, not to read editorial stories or subscribe to a publication.",
+      "pageKind": "site"
+    },
+    {
+      "family": "community",
+      "archetype": "LM.03",
+      "spine": "LM",
+      "skin": "Conversational",
+      "skinInferred": true,
+      "summary": "Members' studio or shared-workspace community page: hero with a join call, member benefits, membership tiers, how joining works, upcoming studio events, optional member voices, an FAQ and a final join step. Fits a shared studio, maker space, coworking space, club or professional community that gives members standing access to a space and to each other, priced as recurring membership tiers rather than a fee per lesson. Not a course, cohort or curriculum: a page organized around lessons, instructors, a syllabus or enrollment in a learning programme is never community.",
+      "pageKind": "site",
+      "excludes": [
+        "Not a course, cohort or curriculum: a page organized around lessons, instructors, a syllabus or enrollment in a learning programme is never community."
+      ]
+    }
+  ]
+}

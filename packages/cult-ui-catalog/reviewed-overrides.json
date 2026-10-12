@@ -1,0 +1,517 @@
+{
+  "_comment": "Human-reviewed corrections to catalog.json, keyed by row id (cult:<name>) and applied after the deterministic rules. Each entry needs a note. Allowed fields: assetKind, sectionKind, components, spineAffinities, conversion {status, reason}, portQueue (genui-port | css-surface | app-only; primitive and app rows only). conversion.status cannot be insertable or pending-fetch. An id that is not in the catalog fails the import. See src/overrides.ts.",
+  "overrides": {
+    "cult:agent-suggest-card-stack": {
+      "note": "AI agent suggestion stack; the ai category does not enter the static site planner.",
+      "portQueue": "app-only"
+    },
+    "cult:ai-blob-warp": {
+      "note": "Paper Design Warp shader avatar (WebGL); shaders stay out of the GenUI vanilla budget.",
+      "portQueue": "app-only"
+    },
+    "cult:ai-blob-warp-demo": {
+      "note": "Demo of the WebGL shader avatar cult:ai-blob-warp; the converter classes it app-only by its ai- name, which a primitive row ignores, so it would stay unconverted. It needs the same shader fallback as its component.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "demo of a WebGL shader primitive (cult:ai-blob-warp); a static adapter must supply a fallback"
+      }
+    },
+    "cult:analytics-chart": {
+      "note": "Analytics line chart with tooltip cards; needs a data source and chart runtime a static marketing build cannot promise.",
+      "portQueue": "app-only"
+    },
+    "cult:animated-badge": {
+      "note": "Small badge with a gradient rim and a live status dot; the rim and dot pulse are CSS keyframes and the optional layout animation is a class toggle, so a vanilla mount(el, opts) fits the 8 KB JS / 6 KB CSS budget.",
+      "portQueue": "genui-port"
+    },
+    "cult:animated-button": {
+      "note": "Button with animated gradient rim, frosted fill, staggered label and a loading spinner; label stagger is per-glyph spans set by mount(), the rest is CSS, well inside budget.",
+      "portQueue": "genui-port"
+    },
+    "cult:animated-card": {
+      "note": "Card surface with an animated gradient rim, frosted fill and layered shadow; the rim animates in CSS and the Base UI action buttons are ordinary buttons.",
+      "portQueue": "css-surface"
+    },
+    "cult:animated-composer": {
+      "note": "Prompt composer with a shader avatar and send/attach chrome; chat/composer behavior is app-only.",
+      "portQueue": "app-only"
+    },
+    "cult:animated-dropzone": {
+      "note": "File dropzone; uploads need an application backend.",
+      "portQueue": "app-only"
+    },
+    "cult:animated-field": {
+      "note": "Label/description/error layout for animated inputs; pure CSS layout, no behavior.",
+      "portQueue": "css-surface"
+    },
+    "cult:animated-input": {
+      "note": "Frosted input and textarea with a gradient rim; styles native form controls with no script.",
+      "portQueue": "css-surface"
+    },
+    "cult:animated-notification": {
+      "note": "Notification surface with rim variants and a glyph stagger; the enter/exit is a class toggle plus CSS transitions, no AnimatePresence needed.",
+      "portQueue": "genui-port"
+    },
+    "cult:animated-progress": {
+      "note": "Progress bar with a determinate fill and an indeterminate gradient strip; a spring easing is the shared linear() fallback, so a vanilla port is small.",
+      "portQueue": "genui-port"
+    },
+    "cult:animated-search": {
+      "note": "Search input with a Warp shader avatar (WebGL) and live-results behavior; shader plus search backend.",
+      "portQueue": "app-only"
+    },
+    "cult:animated-segmented": {
+      "note": "Segmented control with a sliding thumb over native radio inputs; the thumb position is one custom property updated on change.",
+      "portQueue": "genui-port"
+    },
+    "cult:animated-select": {
+      "note": "Port as a styled native <select> with the gradient rim and staggered label; the custom Base UI popup is dropped and the metadata must say so.",
+      "portQueue": "genui-port"
+    },
+    "cult:animated-switch": {
+      "note": "Toggle switch on a native checkbox with role=switch; the spring thumb is a CSS transition with the shared spring easing.",
+      "portQueue": "genui-port"
+    },
+    "cult:animated-tabs": {
+      "note": "Tabs with an underline or pill indicator; a vanilla roving-tabindex tablist plus one indicator element fits the budget.",
+      "portQueue": "genui-port"
+    },
+    "cult:animated-toast": {
+      "note": "Sonner-backed toasts that need a root toaster and app events; no static trigger to promise.",
+      "portQueue": "app-only"
+    },
+    "cult:animated-toggle-group": {
+      "note": "Single-select toggle group with a sliding thumb; same vanilla shape as animated-segmented.",
+      "portQueue": "genui-port"
+    },
+    "cult:apple-iphone-17-pro": {
+      "note": "Device mockup; the frame is heavy SVG/markup expected to exceed the 8 KB JS budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:apple-keyboard": {
+      "note": "Device mockup (keyboard); heavy SVG/markup expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:apple-pro-display-xdr": {
+      "note": "Device mockup with an interactive dock; heavy SVG plus motion, over budget.",
+      "portQueue": "app-only"
+    },
+    "cult:apple-watch-ultra": {
+      "note": "Device mockup (watch case and complications); heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:border-beam-button": {
+      "note": "Button with a travelling border beam; the border-beam package reduces to a conic-gradient mask animated by a registered custom property, CSS only plus a mount() for options.",
+      "portQueue": "genui-port"
+    },
+    "cult:border-beam-card": {
+      "note": "Card with a travelling border beam; same conic-gradient beam as border-beam-button on a card surface.",
+      "portQueue": "genui-port"
+    },
+    "cult:border-beam-input": {
+      "note": "Input with a line or full border beam; the beam is the shared conic-gradient treatment around a native input.",
+      "portQueue": "genui-port"
+    },
+    "cult:circuit-board": {
+      "note": "Animated SVG circuit illustration; the SVG payload is expected over the GenUI budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:collab-avatar": {
+      "note": "Initials avatar with a colour ring; pure CSS.",
+      "portQueue": "css-surface"
+    },
+    "cult:collab-toolbar": {
+      "note": "Collaborative editing toolbar; needs a live collaboration session.",
+      "portQueue": "app-only"
+    },
+    "cult:copy-button": {
+      "note": "Copy-to-clipboard button with success feedback; navigator.clipboard plus an icon swap is a few hundred bytes of vanilla JS.",
+      "portQueue": "genui-port"
+    },
+    "cult:feature-sticky-section": {
+      "note": "Sticky panels that follow scroll; the existing GenUI scroll helpers (observeReveal/viewProgress) cover it without Radix state.",
+      "portQueue": "genui-port"
+    },
+    "cult:fluid-ai-workloads": {
+      "note": "Fluid AI-workload visualization; heavy illustration expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:fluted-glass": {
+      "note": "Paper Design fluted-glass image shader (WebGL).",
+      "portQueue": "app-only"
+    },
+    "cult:folded-card": {
+      "note": "Card with a folded-corner reveal and timing options; a CSS fold transition plus a mount() for timing fits the budget.",
+      "portQueue": "genui-port"
+    },
+    "cult:gateway-endpoint-illustration": {
+      "note": "Vercel-style gateway illustration; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:gateway-route-illustration": {
+      "note": "Vercel-style gateway illustration; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:gateway-svg-illustration": {
+      "note": "Vercel-style gateway illustration; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:globe": {
+      "note": "COBE WebGL globe.",
+      "portQueue": "app-only"
+    },
+    "cult:icons": {
+      "note": "File-type and language icon set for app UIs (code viewers, file lists), not a GenUI effect.",
+      "portQueue": "app-only"
+    },
+    "cult:illustration-card-grid": {
+      "note": "Grid of gateway illustrations; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:illustration-comment-bubble": {
+      "note": "Code-review comment illustration for collaboration UIs; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:illustration-cursor": {
+      "note": "Multiplayer cursor illustration for collaboration UIs; implies live presence a static page cannot promise.",
+      "portQueue": "app-only"
+    },
+    "cult:illustration-fluid-rendering": {
+      "note": "Fluid rendering illustration; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:illustration-globe-vercel": {
+      "note": "Globe deployment illustration; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:illustration-graph": {
+      "note": "Graph illustration; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:kanban-board": {
+      "note": "Drag-and-drop kanban board; application state.",
+      "portQueue": "app-only"
+    },
+    "cult:mac-screen": {
+      "note": "Classic Mac device mockup with a composited CRT image; heavy SVG plus an image asset, over budget.",
+      "portQueue": "app-only"
+    },
+    "cult:marketing-comparison-texture": {
+      "note": "Plan feature matrix (upstream use cases: plan feature matrices, SKU comparisons); plan tiers are a SaaS/product pattern, so it routes with the product spine like the other pricing rows.",
+      "spineAffinities": [
+        "PA"
+      ]
+    },
+    "cult:marketing-download-minimal": {
+      "note": "App download section: headline, platform download buttons and version line. The taxonomy has no download kind; as a single conversion ask it plays the cta-band role, which is where the planner should find it.",
+      "sectionKind": "cta-band"
+    },
+    "cult:marketing-feature-code": {
+      "note": "Section-shaped code/network-policy showcase; it belongs to the block adapter pipeline, not a GenUI primitive.",
+      "portQueue": "app-only"
+    },
+    "cult:marketing-features-quote-wave": {
+      "note": "An animated brand quote set in large wave-animated type (upstream: 'Animated quote section'); it states a message, not a feature list, so the planner should offer it as a manifesto/statement band.",
+      "sectionKind": "manifesto-statement"
+    },
+    "cult:marketing-hero-analytics": {
+      "note": "Section-shaped analytics hero built on a live chart; block adapter pipeline, not a GenUI primitive.",
+      "portQueue": "app-only"
+    },
+    "cult:merging-bubbles": {
+      "note": "Merging-bubbles visualization; expected heavy SVG animation over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:organic-button": {
+      "note": "Ported to GenUI as `organic-button` (packages/genui-catalog/components/organic-button) from the copy bundled in the fetched `cult:organic` item; re-diff against this row's own registry file once it is fetched.",
+      "portQueue": "genui-port"
+    },
+    "cult:organic-card": {
+      "note": "Ported to GenUI as `organic-card` (packages/genui-catalog/components/organic-card) from the copy bundled in the fetched `cult:organic` item; re-diff against this row's own registry file once it is fetched.",
+      "portQueue": "css-surface"
+    },
+    "cult:organic-card-small": {
+      "note": "Ported to GenUI as `organic-card-small` (packages/genui-catalog/components/organic-card-small) from the copy bundled in the fetched `cult:organic` item; re-diff against this row's own registry file once it is fetched. The motion band morph becomes a CSS clip-path transition, so it needs no script.",
+      "portQueue": "css-surface"
+    },
+    "cult:security-checkpoint": {
+      "note": "Security checkpoint illustration; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:shadow-card": {
+      "note": "Ported to GenUI as `shadow-card` (packages/genui-catalog/components/shadow-card) from the copy bundled in the fetched `cult:sass-colorful` item; re-diff against this row's own registry file once it is fetched.",
+      "portQueue": "css-surface"
+    },
+    "cult:speech-bubble": {
+      "note": "Speech bubble shape; a pseudo-element tail on a rounded box, pure CSS.",
+      "portQueue": "css-surface"
+    },
+    "cult:tabs-illustration-vercel": {
+      "note": "Tabs bound to Vercel-style illustrations; heavy SVG expected over budget. Revisit once fetched and measured.",
+      "portQueue": "app-only"
+    },
+    "cult:wizard-expandable": {
+      "note": "Multi-step wizard with forward validation; form application behavior.",
+      "portQueue": "app-only"
+    },
+    "cult:marketing-features-animated": {
+      "note": "Dashboard mockup text is covered by an opaque layer on Linux.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: macOS clean (the off-screen text at 390px is fixed by overflow-wrap); Linux reports 4 findings at 1280px: a <div> covered by an opaque non-text layer. Held back until both platforms are clean."
+      }
+    },
+    "cult:marketing-hero-vite": {
+      "note": "Terminal-animation panel text runs off a 390px screen and touches a heading.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: macOS 1 off-screen span at 390px (x 414-417) plus 2 ink-overlap findings; Linux 4 ink-overlap findings at 390px (<h5> over a span, up to 48x10px). Stays demoted."
+      }
+    },
+    "cult:marketing-roadmap-0": {
+      "note": "JS-computed mobile/desktop layout switch defaults to desktop under SSR.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 2 text elements off-screen at 390px on both platforms (x -48 and x 419). Contrast and overlap are now clean. Stays demoted."
+      }
+    },
+    "cult:marketing-bento-animated": {
+      "note": "Closing CTA heading painted for a dark card that exists only as a JS animation layer; statically it sits on the page background.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: the closing <h2> (text-white) measures 1.02-1.03:1 against the page background at 390px and 1280px on both platforms. Needs a real backdrop, not a recolour; not fixed."
+      }
+    },
+    "cult:marketing-features-apple-style": {
+      "note": "Card captions are white text designed to sit on product photos; v1 adapters carry no images, so the caption sits on the light card.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 48 contrast findings on both platforms, white/80 caption <p> at 1.03:1. Needs the photo backdrop (image assets), not a recolour; not fixed."
+      }
+    },
+    "cult:marketing-hero-nav-menu": {
+      "note": "Hero chips and captions are painted for photo/gradient panels the static render does not carry.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 56 contrast findings on both platforms (label spans at 1.00:1, a caption <p> at 1.03:1, an em-dash at 1.27:1); their backdrop layers are unresolvable image/gradient panels. Not fixed."
+      }
+    },
+    "cult:sass-colorful--features": {
+      "note": "Decorative art cards: 6-11px captions on multi-stop colour glows.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 32 contrast findings on both platforms (caption spans at 1.26-1.27:1); no role ink reads on every glow stop. Not fixed."
+      }
+    },
+    "cult:marketing-bento-vercel": {
+      "note": "Domain-stack labels overlap at the source-length slot floor.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 24 ink-overlap findings per platform between stacked domain-label spans (up to 112x6px at 390px on macOS, 83x7px on Linux, plus one span covered by an opaque layer at 1280px on Linux). Stays demoted."
+      }
+    },
+    "cult:marketing-feature-minimal": {
+      "note": "Feature labels overlap at 390px at the source-length slot floor.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 16 ink-overlap findings at 390px on both platforms (label spans, up to 72x6px on macOS, 26x6px on Linux). Stays demoted."
+      }
+    },
+    "cult:marketing-features-accordion-collapse": {
+      "note": "A worst-case accordion trigger link wraps into the heading below it at 390px.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 16 ink-overlap findings at 390px on both platforms (<a> over the next <h2>, 172-200x7-8px). Stays demoted."
+      }
+    },
+    "cult:marketing-integrations-2": {
+      "note": "Worst-case heading collides with the integration description column.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 36 ink-overlap findings on macOS and 28 on Linux (<h2> over <p>, up to 161x9px, 390px and 1280px). Stays demoted."
+      }
+    },
+    "cult:marketing-cta-animated": {
+      "note": "Primary CTA contrast is fixed (its pill fill is now declared on the link), but a worst-case subheading still touches the CTA on macOS.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: contrast clean on both platforms; macOS reports 4 ink-overlap findings at 1280px (<p> over the CTA <a>, 124x12px), Linux none. Held back until both platforms are clean."
+      }
+    },
+    "cult:marketing-cta-vite": {
+      "note": "Avatar-stack initials overlap under worst-case fill on macOS.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: contrast clean on both platforms (initials ink and tint fixed by the surface-ink pass); macOS reports 32 ink-overlap findings between neighbouring avatar initials (5-6x7px), Linux none. Held back until both platforms are clean."
+      }
+    },
+    "cult:social-proof-apple": {
+      "note": "Avatar initials sit on a two-stop accent gradient.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: overlap is now clean; 24 contrast findings on both platforms (avatar initial <div>s at 3.25:1): no role ink reads on both the light and full accent stops. Not fixed."
+      }
+    },
+    "cult:marketing-stats-vite": {
+      "note": "Delta chips are translucent tints over a gradient backdrop layer.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 (converter 1.9.0), render-check on macOS and Linux: 32 contrast findings on both platforms (chip <span>s at 1.00:1: the check reads the unblended tint; the ink pass cannot flatten a tint that sits over a backdrop layer). Overlap and hidden are now clean. Not fixed."
+      }
+    },
+    "cult:marketing-hero-hex": {
+      "note": "Static poster conversion (G4 yield-5b) passes every check except one: at 390px the four-logo row (justify-between in a padded card) overflows by ~5px under the worst-case 'W' fill, pushing the last logo label off-screen (hidden), and it still does with every logo label's slot max floored at its source-string length (the calibration floor, tried in yield-5b), so no honest slot-max fits; fixing it needs a layout change (wrap or drop a logo), which is a design decision, not a conversion.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Static poster conversion (G4 yield-5b) passes every check except one: at 390px the four-logo row (justify-between in a padded card) overflows by ~5px under the worst-case 'W' fill, pushing the last logo label off-screen (hidden), and it still does with every logo label's slot max floored at its source-string length (the calibration floor, tried in yield-5b), so no honest slot-max fits; fixing it needs a layout change (wrap or drop a logo), which is a design decision, not a conversion."
+      }
+    },
+    "cult:marketing-comparison-vercel": {
+      "note": "Worst-case comparison labels split mid-word at 390px.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: 2 words broken mid-word at 390px (label <div>s) on both platforms."
+      }
+    },
+    "cult:marketing-hero-dithering-simplex": {
+      "note": "Worst-case nav labels and headline words split mid-word at 390px.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: macOS 4 nav-label <span>s and Linux 4 <h1> words broken mid-word at 390px; each fits its row unbroken, the flex item shrank below it."
+      }
+    },
+    "cult:marketing-hero-moss": {
+      "note": "Worst-case nav labels split mid-word at 390px.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: 3 nav-label <span>s broken mid-word at 390px on both platforms; each fits its row unbroken, the flex item shrank below it."
+      }
+    },
+    "cult:marketing-hero-neuro": {
+      "note": "Worst-case nav labels and headline words split mid-word at 390px.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: macOS 4 nav-label <span>s and Linux 7 <h1> words broken mid-word at 390px."
+      }
+    },
+    "cult:marketing-hero-warp": {
+      "note": "Worst-case nav labels and headline words split mid-word at 390px.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: macOS 5 nav-label <span>s and Linux 3 <h1> words broken mid-word at 390px."
+      }
+    },
+    "cult:organic--hero": {
+      "note": "Worst-case headline words split mid-word at 390px on Linux.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: Linux 3 <h1> words broken mid-word at 390px; macOS clean. Held back until both platforms are clean."
+      }
+    },
+    "cult:marketing-pricing-hex": {
+      "note": "The worst-case price and its unit run together and the unit splits mid-word at 1280px.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: macOS 1 unit <span> broken mid-word at 1280px (the price and unit have no break opportunity between them); Linux clean. Held back until both platforms are clean."
+      }
+    },
+    "cult:marketing-sticky-section": {
+      "note": "Stat-row text runs off a 390px screen once words no longer split anywhere.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: macOS 2 <span>s off-screen at 390px (x 417-431); Linux clean. Its r0 promotion relied on overflow-wrap:anywhere chopping the words (audit y5-r1). Stays demoted."
+      }
+    },
+    "cult:social-proof-vite": {
+      "note": "Fixed third-party logo cloud under a 'Trusted by' heading; worst-case stats also overlap on macOS.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls sit under an endorsement or integrations heading, so a client page would claim those companies trust or integrate with the client (audit y5-r1). Stays out until the marks are slots or neutral placeholders. Also yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), render-check with the wordbreak rule on macOS and Linux: macOS 4 ink-overlap findings at 390px between stat <span>s."
+      }
+    },
+    "cult:social-proof-vercel": {
+      "note": "Fixed third-party logo cloud under a 'Trusted by' heading.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls sit under an endorsement or integrations heading, so a client page would claim those companies trust or integrate with the client (audit y5-r1). Stays out until the marks are slots or neutral placeholders."
+      }
+    },
+    "cult:marketing-integrations-horizontal": {
+      "note": "Twelve fixed vendor logos with vendor-name aria-labels.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls sit under an endorsement or integrations heading, so a client page would claim those companies trust or integrate with the client (audit y5-r1). Stays out until the marks are slots or neutral placeholders."
+      }
+    },
+    "cult:marketing-integrations-hex": {
+      "note": "Fixed vendor logos in the integrations rail.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls sit under an endorsement or integrations heading, so a client page would claim those companies trust or integrate with the client (audit y5-r1). Stays out until the marks are slots or neutral placeholders."
+      }
+    },
+    "cult:marketing-integrations-vertical": {
+      "note": "Fixed vendor logos in the integrations column.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls sit under an endorsement or integrations heading, so a client page would claim those companies trust or integrate with the client (audit y5-r1). Stays out until the marks are slots or neutral placeholders."
+      }
+    },
+    "cult:marketing-integrations-1": {
+      "note": "Fixed vendor logo SVGs (Anthropic, OpenAI, Coinbase and others) beside slot-controlled names.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls sit under an endorsement or integrations heading, so a client page would claim those companies trust or integrate with the client (audit y5-r1). Stays out until the marks are slots or neutral placeholders. A slot rename would also leave the vendor's mark beside the new name."
+      }
+    },
+    "cult:marketing-hero-simple": {
+      "note": "Fixed brand logo SVGs under 'Loved by teams at'.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls sit under an endorsement or integrations heading, so a client page would claim those companies trust or integrate with the client (audit y5-r1). Stays out until the marks are slots or neutral placeholders."
+      }
+    },
+    "cult:sass-colorful--social-proof": {
+      "note": "Fixed brand logo SVGs (aria-label 'Partner and product logos') under 'Trusted by teams shipping weekly'.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls sit under an endorsement or integrations heading, so a client page would claim those companies trust or integrate with the client (audit y5-r1). Stays out until the marks are slots or neutral placeholders."
+      }
+    },
+    "cult:marketing-contact-vite": {
+      "note": "A worst-case contact line overlaps the heading and body beside it at 1280px on Linux x86.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), CI render-check on Linux x86 (run 36356459395): 3 ink-overlap findings at 1280px (a <span> over the <h3> and two <p>s, up to 26x23px); macOS and Linux arm64 clean. Held back until every platform is clean."
+      }
+    },
+    "cult:marketing-blog-vercel": {
+      "note": "Worst-case heading words split mid-word at 1280px on Linux x86.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), CI render-check on Linux x86 (run 36356459395): 2 words broken mid-word at 1280px (<h2>, <span>); macOS and Linux arm64 clean. Held back until every platform is clean."
+      }
+    },
+    "cult:marketing-hero-radial-gradient": {
+      "note": "A worst-case headline word splits mid-word at 1280px on Linux x86.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), CI render-check on Linux x86 (run 36356459395): 1 <h1> word broken mid-word at 1280px; macOS and Linux arm64 clean. Held back until every platform is clean."
+      }
+    },
+    "cult:marketing-teams-vercel": {
+      "note": "A worst-case label word splits mid-word at 1280px on Linux x86.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "yield-5 r1 (converter 1.9.0, overflow-wrap:break-word), CI render-check on Linux x86 (run 36356459395): 1 <span> word broken mid-word at 1280px; macOS and Linux arm64 clean. Held back until every platform is clean."
+      }
+    },
+    "cult:marketing-model-comparison-2-hover": {
+      "note": "54 fixed vendor model marks (OpenAI, Anthropic, Gemini, Grok, DeepSeek, Llama, Mistral and others) that no slot controls sit beside slot-controlled model names.",
+      "conversion": {
+        "status": "adapter-needed",
+        "reason": "Fixed third-party brand marks that no slot controls (audit y5-r2 finding 2): renaming a model slot would leave the vendor's mark beside the new name. Stays out until the marks are slots or neutral placeholders."
+      }
+    }
+  }
+}

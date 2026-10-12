@@ -1,0 +1,42 @@
+/* decay-card — clean-room, component-specs.md §11. Every selector is under .genui-decay-card. */
+
+:where(.genui-decay-card) {
+  position: relative;
+  display: block;
+}
+
+.genui-decay-card__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.genui-decay-card__media {
+  display: block;
+  filter: grayscale(var(--genui-decay-card-g, 1));
+  transform: translate(var(--genui-decay-card-tx, 0px), var(--genui-decay-card-ty, 0px));
+  transition: filter 300ms ease;
+  will-change: filter, transform;
+}
+
+.genui-decay-card:hover,
+.genui-decay-card:focus-within {
+  --genui-decay-card-g: var(--genui-decay-card-hover-g, 0);
+}
+
+.genui-decay-card__caption {
+  display: block;
+}
+
+.genui-decay-card.genui-decay-card--reduced .genui-decay-card__media {
+  transition: none;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-decay-card__media {
+    transition: none;
+    transform: none;
+  }
+}

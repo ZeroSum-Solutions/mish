@@ -1,0 +1,876 @@
+{
+  "version": 1,
+  "labelledAt": "2026-09-23T22:55:01.302800+00:00",
+  "labeller": "claude-sonnet-5 independent",
+  "families": [
+    "watson",
+    "fervor",
+    "wrenfield",
+    "maben",
+    "halcyon",
+    "maren",
+    "emmpo",
+    "crm-dashboard",
+    "marketing-site",
+    "app-shell",
+    "search-match",
+    "content-sub",
+    "mission"
+  ],
+  "newFamilies": [
+    {
+      "family": "search-match",
+      "spine": "SM",
+      "archetype": "SM.01",
+      "archetypeName": "Marketplace",
+      "rationale": "'search-match' names the two-sided discover-then-match pattern (query, filter, compare, inspect, transact). SM.01 Marketplace (freelancer/rental/provider/resale matching) captures that better than the narrower SM.02 Directory, SM.03 Real estate, SM.04 Jobs, or SM.05 Comparison archetypes, all of which are marketplace sub-cases."
+    },
+    {
+      "family": "content-sub",
+      "spine": "CS",
+      "archetype": "CS.01",
+      "archetypeName": "Publication or media",
+      "rationale": "'content-sub' = content subscription. CS.01 Publication or media (magazine/news/editorial, discover-consume-subscribe-return) is a direct, unambiguous match; CS.02/CS.03 are documentation/research-library variants, a narrower fit for the family name."
+    },
+    {
+      "family": "mission",
+      "spine": "MI",
+      "archetype": "MI.01",
+      "archetypeName": "Nonprofit or charity",
+      "rationale": "MI.01 Nonprofit or charity is the broader, more general MI archetype ('turn concern into contribution') matching a family named simply 'mission'; MI.02 Advocacy or campaign is the narrower political/petition sub-case."
+    }
+  ],
+  "labelingNote": "The route-corpus fixture (tests/fixtures/route-corpus-25.json) stores only Jev's own captured route answers (spine/skin/family/archetype choices + probabilities), not prose briefs. The matching design-index profiles at Mishh-Agency-Restored-2026-09-16/.../route/catalog-25-v2/profiles/*.json are themselves design-index profiles (per task point 1's fallback instruction), also with no prose brief field — each profile's 'source' points to a MotionSites prompt id/title only. Raw MotionSites prompt text is gated (3 free full-text reads per account via mcp__motionsites__get_prompt), so labels below were built independently from each profile's structured label fields (title, category, vertical, use_case, niche, catalog_action, motion_level, section/style scores) rather than from Jev's own route/family choice, which was treated as one signal among several, not ground truth. Several items (prisma-landing, mindloop-landing, mostar-guide) were judged to disagree with Jev's own spine or family pick; this is flagged per-item in 'reason'.",
+  "corpusSource": {
+    "fixture": "packages/agency-fast-lane/tests/fixtures/route-corpus-25.json",
+    "test": "packages/agency-fast-lane/tests/route-corpus.test.ts",
+    "profiles": "Mishh-Agency-Restored-2026-09-16/workspace/work/genui-overnight-2026-09-18/route/catalog-25-v2/profiles/*.json",
+    "report": "Mishh-Agency-Restored-2026-09-16/workspace/work/genui-overnight-2026-09-18/route/catalog-25-v2/REPORT.md",
+    "atlas": "packages/agency-fast-lane/src/atlas/shape-atlas.json",
+    "registry": "packages/agency-fast-lane/src/atlas/family-registry.json"
+  },
+  "items": [
+    {
+      "id": "3d-jack-portfolio-hero",
+      "briefExcerpt": "\"3D Jack Portfolio\" — category=Portfolio, vertical=agency, niche=design-studio, use_case=portfolio-showcase, action=contact, motion=micro",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.06",
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "fervor",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "Design-studio portfolio with a contact CTA and cinematic bespoke-3D imagery — trust-to-lead personal-expert/agency archetype; fervor (creative agency, cinematic) and watson (editorial studio fallback) both fit.",
+      "sourceMeta": {
+        "title": "3D Jack Portfolio",
+        "category": "Portfolio",
+        "vertical": "agency",
+        "use_case": "portfolio-showcase",
+        "niche": "design-studio",
+        "catalog_action": "contact",
+        "motion_level": "micro",
+        "jev_spine": "TL",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "3d-story",
+      "briefExcerpt": "\"3D Story\" — category=Landing Page, vertical=saas, niche=devtools, use_case=saas-product, action=signup, motion=motion-led",
+      "acceptableSpines": [
+        "PA"
+      ],
+      "acceptableArchetypes": [
+        "PA.03",
+        "PA.01"
+      ],
+      "acceptableFamilies": [
+        "marketing-site"
+      ],
+      "illegalFamilies": [
+        "emmpo",
+        "halcyon",
+        "mission",
+        "search-match"
+      ],
+      "reason": "Devtools SaaS landing page with a signup CTA — classic product-adoption spine; marketing-site is the only home family and fits a self-serve dev product.",
+      "sourceMeta": {
+        "title": "3D Story",
+        "category": "Landing Page",
+        "vertical": "saas",
+        "use_case": "saas-product",
+        "niche": "devtools",
+        "catalog_action": "signup",
+        "motion_level": "motion-led",
+        "jev_spine": "PA",
+        "jev_family": "watson"
+      }
+    },
+    {
+      "id": "aetheris-voyage-hero",
+      "briefExcerpt": "\"Aetheris Voyage\" — category=Hero Section, vertical=travel, niche=travel, use_case=landing-single, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "BA"
+      ],
+      "acceptableArchetypes": [
+        "BA.01"
+      ],
+      "acceptableFamilies": [],
+      "illegalFamilies": [
+        "content-sub",
+        "marketing-site",
+        "mission"
+      ],
+      "reason": "Travel/voyage brand hero, weak CTA (action=none/signup) — booking-attendance by vertical, but no existing family covers hospitality/travel content (halcyon is same-spine but museum-only); no family is a real content match, so 'unrouted' is plausibly correct.",
+      "sourceMeta": {
+        "title": "Aetheris Voyage",
+        "category": "Hero Section",
+        "vertical": "travel",
+        "use_case": "landing-single",
+        "niche": "travel",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "BA",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "art-landing",
+      "briefExcerpt": "\"Art Landing\" — category=Landing Page, vertical=entertainment, niche=art, use_case=experimental, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "PA",
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "PA.01",
+        "TL.06"
+      ],
+      "acceptableFamilies": [
+        "marketing-site",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "emmpo",
+        "search-match"
+      ],
+      "reason": "'Art' + entertainment vertical + experimental use_case is underdetermined between a digital-art product (PA) and an artist/studio portfolio (TL); marketing-site and watson are the plausible same-spine fallbacks for each reading.",
+      "sourceMeta": {
+        "title": "Art Landing",
+        "category": "Landing Page",
+        "vertical": "entertainment",
+        "use_case": "experimental",
+        "niche": "art",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "PA",
+        "jev_family": "watson"
+      }
+    },
+    {
+      "id": "bl",
+      "briefExcerpt": "\"Bloom\" — category=Landing Page, vertical=other, niche=generic, use_case=experimental, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "CS",
+        "PA"
+      ],
+      "acceptableArchetypes": [
+        "CS.01",
+        "PA.04"
+      ],
+      "acceptableFamilies": [
+        "content-sub",
+        "marketing-site"
+      ],
+      "illegalFamilies": [
+        "halcyon",
+        "search-match"
+      ],
+      "reason": "Generic 'Bloom' brand (vertical=other, niche=generic) with manifesto + newsletter-waitlist sections reads as either an audience/content brand (CS) or a pre-launch product waitlist (PA); content-sub and marketing-site both plausible.",
+      "sourceMeta": {
+        "title": "Bloom",
+        "category": "Landing Page",
+        "vertical": "other",
+        "use_case": "experimental",
+        "niche": "generic",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "CS",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "digital-experiences",
+      "briefExcerpt": "\"Digital Experiences\" — category=Landing Page, vertical=agency, niche=design-studio, use_case=portfolio-showcase, action=contact, motion=motion-led",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "fervor",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "Agency/design-studio portfolio-showcase, contact CTA, motion-led cinematic tone — exact TL.05 agency archetype; fervor is the precise creative-agency fit, watson the editorial alternative.",
+      "sourceMeta": {
+        "title": "Digital Experiences",
+        "category": "Landing Page",
+        "vertical": "agency",
+        "use_case": "portfolio-showcase",
+        "niche": "design-studio",
+        "catalog_action": "contact",
+        "motion_level": "motion-led",
+        "jev_spine": "TL",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "dreamcore-landing",
+      "briefExcerpt": "\"Dreamcore Landing\" — category=Landing Page, vertical=other, niche=generic, use_case=experimental, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "'Dreamcore', generic/other vertical, experimental use_case, very thin section signal (only navigation >0.7) and Jev's own spine confidence is 0.21 — closest legible spine is TL by title/brand connotation, but content is too thin to confirm an agency-selling-services fervor fit, so watson is the conservative same-spine pick.",
+      "sourceMeta": {
+        "title": "Dreamcore Landing",
+        "category": "Landing Page",
+        "vertical": "other",
+        "use_case": "experimental",
+        "niche": "generic",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "TL",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "email-landing-page",
+      "briefExcerpt": "\"Email Landing Page\" — category=Landing page, vertical=saas, niche=productivity, use_case=saas-product, action=signup, motion=micro",
+      "acceptableSpines": [
+        "PA"
+      ],
+      "acceptableArchetypes": [
+        "PA.01"
+      ],
+      "acceptableFamilies": [
+        "marketing-site"
+      ],
+      "illegalFamilies": [
+        "emmpo",
+        "halcyon",
+        "mission",
+        "search-match"
+      ],
+      "reason": "Productivity SaaS (email tool) landing page with signup CTA, pricing/plan-comparison/testimonials — textbook product-adoption marketing-site fit.",
+      "sourceMeta": {
+        "title": "Email Landing Page",
+        "category": "Landing page",
+        "vertical": "saas",
+        "use_case": "saas-product",
+        "niche": "productivity",
+        "catalog_action": "signup",
+        "motion_level": "micro",
+        "jev_spine": "PA",
+        "jev_family": "watson"
+      }
+    },
+    {
+      "id": "halo-usd-landing",
+      "briefExcerpt": "\"USD Halo\" — category=Landing Page, vertical=finance, niche=crypto, use_case=saas-product, action=signup, motion=static",
+      "acceptableSpines": [
+        "PA"
+      ],
+      "acceptableArchetypes": [
+        "PA.04"
+      ],
+      "acceptableFamilies": [
+        "marketing-site"
+      ],
+      "illegalFamilies": [
+        "emmpo",
+        "halcyon",
+        "mission",
+        "search-match"
+      ],
+      "reason": "Crypto/stablecoin ('USD Halo') product landing with signup CTA — single-product-launch archetype under product-adoption; marketing-site is the only home family.",
+      "sourceMeta": {
+        "title": "USD Halo",
+        "category": "Landing Page",
+        "vertical": "finance",
+        "use_case": "saas-product",
+        "niche": "crypto",
+        "catalog_action": "signup",
+        "motion_level": "static",
+        "jev_spine": "PA",
+        "jev_family": "watson"
+      }
+    },
+    {
+      "id": "health-portal",
+      "briefExcerpt": "\"Health Portal\" — category=Landing Page, vertical=health, niche=dental, use_case=trust-booking, action=book, motion=static",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.02"
+      ],
+      "acceptableFamilies": [
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "Dental/health practice with a book CTA — healthcare-or-aesthetic-practice archetype under trust-to-lead; watson is the closest same-spine fallback since no TL.02-specific family exists yet (fervor/wrenfield/maben all content-mismatched).",
+      "sourceMeta": {
+        "title": "Health Portal",
+        "category": "Landing Page",
+        "vertical": "health",
+        "use_case": "trust-booking",
+        "niche": "dental",
+        "catalog_action": "book",
+        "motion_level": "static",
+        "jev_spine": "TL",
+        "jev_family": "watson"
+      }
+    },
+    {
+      "id": "innovation-landing",
+      "briefExcerpt": "\"Innovation\" — category=Landing Page, vertical=other, niche=generic, use_case=landing-single, action=none, motion=micro",
+      "acceptableSpines": [
+        "CS",
+        "PA"
+      ],
+      "acceptableArchetypes": [
+        "CS.01",
+        "PA.01"
+      ],
+      "acceptableFamilies": [
+        "content-sub",
+        "marketing-site"
+      ],
+      "illegalFamilies": [
+        "halcyon",
+        "search-match"
+      ],
+      "reason": "Generic 'Innovation' brand (vertical=other), thin signal across hero/services/newsletter-waitlist/about — plausibly a content/audience brand (CS) or a product landing page (PA); no strong signal to pick one over the other.",
+      "sourceMeta": {
+        "title": "Innovation",
+        "category": "Landing Page",
+        "vertical": "other",
+        "use_case": "landing-single",
+        "niche": "generic",
+        "catalog_action": "none",
+        "motion_level": "micro",
+        "jev_spine": "CS",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "luxury-real-estate",
+      "briefExcerpt": "\"Luxury Real Estate\" — category=Landing Page, vertical=real-estate, niche=real-estate, use_case=marketing-site, action=contact, motion=motion-led",
+      "acceptableSpines": [
+        "SM",
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "SM.03",
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "search-match",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "content-sub",
+        "emmpo"
+      ],
+      "reason": "Luxury real-estate brand: dual-natured between a single agent/brokerage trust site (TL, watson) and a property search/listings archetype (SM.03, matched only by the new search-match family) — both legitimate readings, no prose to disambiguate.",
+      "sourceMeta": {
+        "title": "Luxury Real Estate",
+        "category": "Landing Page",
+        "vertical": "real-estate",
+        "use_case": "marketing-site",
+        "niche": "real-estate",
+        "catalog_action": "contact",
+        "motion_level": "motion-led",
+        "jev_spine": "SM",
+        "jev_family": "none"
+      }
+    },
+    {
+      "id": "mindloop-landing",
+      "briefExcerpt": "\"Mindloop Landing\" — category=Landing Page, vertical=entertainment, niche=newsletter, use_case=editorial-media, action=signup, motion=micro",
+      "acceptableSpines": [
+        "CS"
+      ],
+      "acceptableArchetypes": [
+        "CS.01"
+      ],
+      "acceptableFamilies": [
+        "content-sub"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "crm-dashboard",
+        "fervor",
+        "halcyon",
+        "maben",
+        "maren",
+        "search-match",
+        "watson",
+        "wrenfield"
+      ],
+      "reason": "Newsletter/editorial-media brand ('Mindloop') with a signup CTA — textbook content-subscription archetype (CS.01 Publication/media); emmpo (LM.01 illustrated course/membership, career-quiz + instructor-spotlight sections) is a content mismatch despite being a legal compatible-spine transfer, so content-sub is the only real fit here — an existing-family gap the corpus's original 10-family note did not flag.",
+      "sourceMeta": {
+        "title": "Mindloop Landing",
+        "category": "Landing Page",
+        "vertical": "entertainment",
+        "use_case": "editorial-media",
+        "niche": "newsletter",
+        "catalog_action": "signup",
+        "motion_level": "micro",
+        "jev_spine": "CS",
+        "jev_family": "emmpo"
+      }
+    },
+    {
+      "id": "modern-agency",
+      "briefExcerpt": "\"Modern Agency\" — category=Agency, vertical=agency, niche=design-studio, use_case=portfolio-showcase, action=contact, motion=webgl-3d",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "fervor",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "Design-studio agency portfolio, contact/book CTA, webgl-3d motion — exact TL.05 agency archetype; fervor fits the cinematic creative-agency template precisely.",
+      "sourceMeta": {
+        "title": "Modern Agency",
+        "category": "Agency",
+        "vertical": "agency",
+        "use_case": "portfolio-showcase",
+        "niche": "design-studio",
+        "catalog_action": "contact",
+        "motion_level": "webgl-3d",
+        "jev_spine": "TL",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "mostar-guide",
+      "briefExcerpt": "\"Mostar Guide\" — category=Travel, vertical=travel, niche=travel, use_case=experimental, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "CS"
+      ],
+      "acceptableArchetypes": [
+        "CS.01"
+      ],
+      "acceptableFamilies": [
+        "content-sub"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "crm-dashboard",
+        "fervor",
+        "halcyon",
+        "maben",
+        "maren",
+        "search-match",
+        "watson",
+        "wrenfield"
+      ],
+      "reason": "'Guide' branding with a 'read' CTA is informational/content-led, not transactional — content-subscription spine (travel content/media, not a booking flow); content-sub (CS.01 Publication/media) is the only fitting family — another new-family-only case. (Jev's own spine answer was 'none' at 0.54 confidence, consistent with the old 10-family set having no home for this content.)",
+      "sourceMeta": {
+        "title": "Mostar Guide",
+        "category": "Travel",
+        "vertical": "travel",
+        "use_case": "experimental",
+        "niche": "travel",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "none",
+        "jev_family": "none"
+      }
+    },
+    {
+      "id": "neon-logic",
+      "briefExcerpt": "\"Neon Logic\" — category=Landing Page, vertical=ai, niche=ai-tools, use_case=saas-product, action=signup, motion=motion-led",
+      "acceptableSpines": [
+        "PA"
+      ],
+      "acceptableArchetypes": [
+        "PA.04",
+        "PA.01"
+      ],
+      "acceptableFamilies": [
+        "marketing-site"
+      ],
+      "illegalFamilies": [
+        "emmpo",
+        "halcyon",
+        "mission",
+        "search-match"
+      ],
+      "reason": "AI-tools SaaS landing page — product-adoption spine; marketing-site is the only home family and fits generically.",
+      "sourceMeta": {
+        "title": "Neon Logic",
+        "category": "Landing Page",
+        "vertical": "ai",
+        "use_case": "saas-product",
+        "niche": "ai-tools",
+        "catalog_action": "signup",
+        "motion_level": "motion-led",
+        "jev_spine": "PA",
+        "jev_family": "watson"
+      }
+    },
+    {
+      "id": "orbis-nft-landing",
+      "briefExcerpt": "\"Orbis NFT\" — category=Landing Page, vertical=finance, niche=crypto, use_case=commerce, action=buy, motion=micro",
+      "acceptableSpines": [
+        "CO"
+      ],
+      "acceptableArchetypes": [
+        "CO.01",
+        "SM.01"
+      ],
+      "acceptableFamilies": [
+        "maren",
+        "search-match"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "fervor",
+        "maben",
+        "mission",
+        "watson",
+        "wrenfield"
+      ],
+      "reason": "NFT drop with a buy CTA and product-grid — commerce spine; maren is the only same-spine family (imperfect: it explicitly excludes cart-based buying) and search-match is a legal compatible-spine transfer that fits an NFT-marketplace reading better.",
+      "sourceMeta": {
+        "title": "Orbis NFT",
+        "category": "Landing Page",
+        "vertical": "finance",
+        "use_case": "commerce",
+        "niche": "crypto",
+        "catalog_action": "buy",
+        "motion_level": "micro",
+        "jev_spine": "CO",
+        "jev_family": "none"
+      }
+    },
+    {
+      "id": "portfolio-cosmic-hero",
+      "briefExcerpt": "\"Portfolio Cosmic\" — category=Portfolio, vertical=agency, niche=design-studio, use_case=portfolio-showcase, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.06",
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "fervor",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "Design-studio portfolio, cosmic/space visual motif, contact CTA — personal-expert/agency archetype; fervor's cinematic creative-agency template and watson's editorial fallback both fit.",
+      "sourceMeta": {
+        "title": "Portfolio Cosmic",
+        "category": "Portfolio",
+        "vertical": "agency",
+        "use_case": "portfolio-showcase",
+        "niche": "design-studio",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "TL",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "prisma-landing",
+      "briefExcerpt": "\"Prisma Creative Studio\" — category=Landing Page, vertical=agency, niche=design-studio, use_case=portfolio-showcase, action=contact, motion=micro",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "fervor",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "Metadata says agency/design-studio/portfolio-showcase (apply/contact CTA) despite Jev routing to LM.03 community-or-membership — this reads as a creative-studio site, not a course or membership; trust-to-lead is the independently correct spine (a likely Jev spine misroute on this item).",
+      "sourceMeta": {
+        "title": "Prisma Creative Studio",
+        "category": "Landing Page",
+        "vertical": "agency",
+        "use_case": "portfolio-showcase",
+        "niche": "design-studio",
+        "catalog_action": "contact",
+        "motion_level": "micro",
+        "jev_spine": "LM",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "prompt-hero",
+      "briefExcerpt": "\"PROMPT\" — category=Landing Page, vertical=ecommerce, niche=fashion, use_case=commerce, action=buy, motion=motion-led",
+      "acceptableSpines": [
+        "CO"
+      ],
+      "acceptableArchetypes": [
+        "CO.01"
+      ],
+      "acceptableFamilies": [
+        "maren"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "fervor",
+        "maben",
+        "mission",
+        "watson",
+        "wrenfield"
+      ],
+      "reason": "Fashion ecommerce with a buy CTA, pricing/footer/hero sections — commerce spine; maren is the only home family, closest available template despite its no-cart framing.",
+      "sourceMeta": {
+        "title": "PROMPT",
+        "category": "Landing Page",
+        "vertical": "ecommerce",
+        "use_case": "commerce",
+        "niche": "fashion",
+        "catalog_action": "buy",
+        "motion_level": "motion-led",
+        "jev_spine": "CO",
+        "jev_family": "maren"
+      }
+    },
+    {
+      "id": "pulse-3d",
+      "briefExcerpt": "\"Pulse 3D\" — category=3D Website, vertical=other, niche=generic, use_case=experimental, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.06"
+      ],
+      "acceptableFamilies": [],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "Pure 3D visual/motion demo (category '3D Website') with only logo-wall + hero + navigation above 0.7 — thin business signal; closest guess is a design/agency demo (TL) but no family has enough content match, so this is plausibly correctly unrouted.",
+      "sourceMeta": {
+        "title": "Pulse 3D",
+        "category": "3D Website",
+        "vertical": "other",
+        "use_case": "experimental",
+        "niche": "generic",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "LM",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "scroll-landing",
+      "briefExcerpt": "\"Scroll Landing Page\" — category=Interactive, vertical=entertainment, niche=sports, use_case=marketing-site, action=contact, motion=motion-led",
+      "acceptableSpines": [
+        "BA",
+        "CO"
+      ],
+      "acceptableArchetypes": [
+        "BA.03",
+        "CO.01"
+      ],
+      "acceptableFamilies": [],
+      "illegalFamilies": [
+        "content-sub",
+        "mission"
+      ],
+      "reason": "Sports/entertainment 'Interactive' page with a buy CTA reads as either event/experience booking (BA) or ticket/merch commerce (CO); no existing family template (halcyon=museum-only, maren=no-cart) fits a sports-interactive brief well.",
+      "sourceMeta": {
+        "title": "Scroll Landing Page",
+        "category": "Interactive",
+        "vertical": "entertainment",
+        "use_case": "marketing-site",
+        "niche": "sports",
+        "catalog_action": "contact",
+        "motion_level": "motion-led",
+        "jev_spine": "LM",
+        "jev_family": "watson"
+      }
+    },
+    {
+      "id": "urban-jungle-hero",
+      "briefExcerpt": "\"Urban Jungle\" — category=Landing Page, vertical=travel, niche=travel, use_case=experimental, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "BA"
+      ],
+      "acceptableArchetypes": [
+        "BA.01"
+      ],
+      "acceptableFamilies": [],
+      "illegalFamilies": [
+        "content-sub",
+        "marketing-site",
+        "mission"
+      ],
+      "reason": "Travel-vertical decorative hero, no CTA (action=none), thin content (only navigation >0.7) — booking-attendance by vertical, but no existing family (halcyon is museum-only) fits; likely correctly unrouted, mirroring aetheris-voyage-hero.",
+      "sourceMeta": {
+        "title": "Urban Jungle",
+        "category": "Landing Page",
+        "vertical": "travel",
+        "use_case": "experimental",
+        "niche": "travel",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "TL",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "vision-reveal",
+      "briefExcerpt": "\"Vision Reveal\" — category=Hero, vertical=agency, niche=design-studio, use_case=portfolio-showcase, action=none, motion=motion-led",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "fervor",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "Agency/design-studio portfolio-showcase hero, contact CTA, motion-led reveal — TL.05 agency archetype; fervor/watson both fit.",
+      "sourceMeta": {
+        "title": "Vision Reveal",
+        "category": "Hero",
+        "vertical": "agency",
+        "use_case": "portfolio-showcase",
+        "niche": "design-studio",
+        "catalog_action": "none",
+        "motion_level": "motion-led",
+        "jev_spine": "TL",
+        "jev_family": "fervor"
+      }
+    },
+    {
+      "id": "vortex-studio-hero",
+      "briefExcerpt": "\"AI Designer Portfolio\" — category=Landing Page, vertical=agency, niche=design-studio, use_case=portfolio-showcase, action=contact, motion=micro",
+      "acceptableSpines": [
+        "TL"
+      ],
+      "acceptableArchetypes": [
+        "TL.05"
+      ],
+      "acceptableFamilies": [
+        "fervor",
+        "watson"
+      ],
+      "illegalFamilies": [
+        "app-shell",
+        "content-sub",
+        "crm-dashboard",
+        "emmpo",
+        "maren",
+        "search-match"
+      ],
+      "reason": "AI-designer portfolio/studio site, contact CTA — TL.05 agency archetype; fervor's cinematic creative-agency template and watson's editorial fallback both fit.",
+      "sourceMeta": {
+        "title": "AI Designer Portfolio",
+        "category": "Landing Page",
+        "vertical": "agency",
+        "use_case": "portfolio-showcase",
+        "niche": "design-studio",
+        "catalog_action": "contact",
+        "motion_level": "micro",
+        "jev_spine": "TL",
+        "jev_family": "fervor"
+      }
+    }
+  ]
+}

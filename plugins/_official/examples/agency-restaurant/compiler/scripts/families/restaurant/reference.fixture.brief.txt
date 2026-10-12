@@ -1,0 +1,37 @@
+Vela Trattoria is a wood-fired Italian kitchen in Seattle's Fremont neighborhood: handmade pasta,
+a short natural wine list and a nightly changing oven special. We want a one-page site for
+someone deciding whether to book a table.
+
+Nav: Menu, Reservations, Our story, Visit, with a "Reserve a table" call to action.
+
+Headline: handmade pasta and a wood-fired oven, six nights a week. We roll pasta every morning
+and keep the oven running until close — stop by the bar for a plate or book ahead for a full
+table. Button: "Book a table".
+
+Menu highlights, a short seasonal menu built around what the market and the wood oven give us
+that day: cacio e pepe (fresh tonnarelli, Pecorino Romano, cracked black pepper) $19; wood-fired
+margherita (San Marzano tomato, fior di latte, basil, olive oil) $18; braised short rib
+pappardelle (slow-braised beef, red wine, pappardelle, gremolata) $27; roasted cauliflower
+(chili, garlic, lemon, breadcrumb, mint) $14; affogato (vanilla gelato, hot espresso, cocoa nib)
+$9.
+
+Hours: Tuesday-Thursday 5-9:30pm, Friday-Saturday 5-10pm, closed Sunday and Monday. We're at 412
+Fremont Ave N, Seattle, WA 98103, phone 206-555-0148.
+
+Reservations: we hold half the dining room for walk-ins, but a booking guarantees your table on a
+Friday or Saturday night. Button: "Reserve now".
+
+Our story: Chef Marco Belline opened Vela Trattoria in 2019 after a decade cooking in Bologna and
+Seattle kitchens. The menu changes with the season, but the wood oven never goes cold.
+
+A look inside, for the gallery: the wood-fired oven (burning apple and oak all night), the pasta
+bar (tonnarelli and pappardelle, rolled fresh each morning), and the dining room (twelve tables
+and six seats at the bar).
+
+What diners say: "The cacio e pepe alone is worth the wait for a table." — Dana Okafor, "Best
+pasta in Fremont". "Warm room, quick service, and the short rib pappardelle was incredible." —
+Priya Shah, "A wonderful date-night spot". "We have been coming back every month since they
+opened." — Tom Whitfield, "Neighborhood favorite".
+
+Footer links: Terms, Privacy, Gift cards. Contact: 206-555-0148, hello@velatrattoria.example, 412
+Fremont Ave N, Seattle, WA 98103.

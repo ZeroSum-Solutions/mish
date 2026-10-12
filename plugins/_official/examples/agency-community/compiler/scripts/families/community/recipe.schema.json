@@ -1,0 +1,699 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-design.ai/schemas/agency-site/community/recipe.v2.json",
+  "title": "community recipe",
+  "description": "A members' studio, club, coworking or professional-community page kind (atlas LM.03): header, hero, member benefits, membership tiers, how joining works, upcoming events, optional member voices, FAQ, a join step and footer. Derived from compiler/scripts/families/community/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.",
+  "$comment": "contract.ts additionally enforces markup-free plain text, email and phone formats on the nullable join atoms, and that a null appears only on an x-atom string leaf or in the x-optional voices slot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "family",
+    "revision",
+    "brand",
+    "sections"
+  ],
+  "sectionOrder": [
+    "community-header",
+    "community-hero",
+    "community-benefits",
+    "community-tiers",
+    "community-how-it-works",
+    "community-events",
+    "community-voices",
+    "community-faq",
+    "community-join",
+    "community-footer"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "family": {
+      "const": "community"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9999
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "descriptor"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "descriptor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-header"
+            },
+            "type": {
+              "const": "header"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "cta"
+              ],
+              "properties": {
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-hero"
+            },
+            "type": {
+              "const": "hero"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "eyebrow",
+                "heading",
+                "body",
+                "cta",
+                "memberCount"
+              ],
+              "properties": {
+                "eyebrow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 72
+                },
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 220
+                },
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "memberCount": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "plain",
+                  "minLength": 1,
+                  "maxLength": 48
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-benefits"
+            },
+            "type": {
+              "const": "benefits"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "blurb"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48
+                  },
+                  "blurb": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-tiers"
+            },
+            "type": {
+              "const": "tiers"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "description",
+                  "price",
+                  "cta",
+                  "features"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "description": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  },
+                  "price": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "plain",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "cta": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32
+                  },
+                  "features": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 60
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-how-it-works"
+            },
+            "type": {
+              "const": "how-it-works"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "body"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-events"
+            },
+            "type": {
+              "const": "events"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "date",
+                  "blurb"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  },
+                  "date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "plain",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "blurb": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "member voices",
+            "dropWhen": "The brief quotes no member word for word. A brief that only asks for member voices or testimonials supplies none.",
+            "keepWhen": "The brief itself contains a member's own words in quotation marks, with who said them, to show as social proof.",
+            "requires": "quote",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-voices"
+            },
+            "type": {
+              "const": "voices"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "quote",
+                  "name",
+                  "role"
+                ],
+                "properties": {
+                  "quote": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 240,
+                    "x-verify": "quote"
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "person-name",
+                    "minLength": 1,
+                    "maxLength": 60
+                  },
+                  "role": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-faq"
+            },
+            "type": {
+              "const": "faq"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "question",
+                  "answer"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "answer": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-join"
+            },
+            "type": {
+              "const": "join"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body",
+                "cta",
+                "phone",
+                "email"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "phone": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "phone",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "email",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "community-footer"
+            },
+            "type": {
+              "const": "footer"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tagline",
+                "link1",
+                "link2",
+                "link3",
+                "address"
+              ],
+              "properties": {
+                "tagline": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "link1": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "plain",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "link2": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "plain",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "link3": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "plain",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "address": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "address",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

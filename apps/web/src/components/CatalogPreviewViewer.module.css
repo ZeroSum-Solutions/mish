@@ -1,0 +1,51 @@
+/* Shared catalog preview workspace: Cult Blocks/Components, Effects and 21st.dev hosts. */
+.workspace { display: grid; grid-template-columns: minmax(0, 1fr) 280px; flex: 1; min-width: 0; min-height: 0; }
+.previewPane { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--bg-subtle); }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); flex-shrink: 0; min-width: 0; min-height: 60px; box-sizing: border-box; padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--border-soft); background: var(--bg-panel); }
+.previewContent { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; }
+.details { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; overflow: auto; padding: var(--inset-dialog); border-left: 1px solid var(--border-soft); background: var(--bg-panel); }
+
+/* Width switch: the segmented recipe (recessed track, raised thumb). Higher specificity than
+   host dialog rules such as `.modal button`. */
+.segment { display: flex; flex-shrink: 0; gap: var(--space-half); padding: 3px; border: 1px solid var(--segmented-track-border); border-radius: var(--radius-pill); background: var(--segmented-track); }
+.segment .control { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; height: auto; min-height: 28px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--text-muted); font: var(--font-label); white-space: nowrap; cursor: pointer; transition: color var(--motion-hover) var(--ease-out-quint), background-color var(--motion-hover) var(--ease-out-quint), transform var(--spring-snappy-duration) var(--spring-snappy); }
+.segment .control[aria-pressed='true'] { color: var(--text-strong); background: var(--segmented-thumb); box-shadow: var(--segmented-thumb-shadow); }
+.segment .control:hover:not(:disabled) { color: var(--text-strong); background: transparent; }
+.segment .control[aria-pressed='true']:hover:not(:disabled) { background: var(--segmented-thumb); }
+.segment .control:active:not(:disabled) { transform: scale(var(--press-scale)); transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-press); }
+.segment .control:focus-visible { outline: var(--focus-outline); outline-offset: var(--focus-offset); }
+.widthNumber { margin-left: var(--space-1); font-variant-numeric: tabular-nums; color: var(--text-soft); }
+
+/* Family parts: one labeled row of calm chips (borderless; only the chosen part is filled). */
+.parts { display: flex; align-items: center; gap: var(--space-1); flex-shrink: 0; overflow-x: auto; min-height: 48px; box-sizing: border-box; padding: var(--space-2) var(--space-4); border-bottom: 1px solid var(--border-soft); background: var(--bg-panel); scrollbar-width: thin; }
+.partsLabel { flex-shrink: 0; margin-right: var(--space-2); color: var(--text-soft); font: var(--font-label); }
+.parts .part { flex-shrink: 0; display: inline-flex; align-items: center; gap: var(--space-2); box-sizing: border-box; height: var(--control-h-compact); max-width: 280px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-pill); background: transparent; color: var(--chip-text); font: var(--font-label); white-space: nowrap; cursor: pointer; transition: background-color var(--motion-hover) var(--ease-out-quint), color var(--motion-hover) var(--ease-out-quint), transform var(--spring-snappy-duration) var(--spring-snappy); }
+.parts .part:hover:not(:disabled) { background: var(--chip-hover-fill); color: var(--text-strong); }
+.parts .part[aria-pressed='true'], .parts .part[aria-pressed='true']:hover:not(:disabled) { background: var(--chip-selected-fill); color: var(--chip-selected-text); }
+.parts .part:active:not(:disabled) { transform: scale(var(--press-scale)); transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-press); }
+.parts .part:focus-visible { outline: var(--focus-outline); outline-offset: var(--focus-offset); }
+.partKind { flex-shrink: 0; color: var(--text-soft); font: var(--font-micro); }
+.partTitle { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.part[aria-pressed='true'] .partTitle { font-weight: 600; }
+
+.canvas { display: flex; flex-direction: column; flex: 1; min-width: 0; min-height: 0; padding: var(--space-5) var(--space-5) 0; }
+/* The frame box never exceeds the stage, so centering cannot clip it. */
+.stage { display: flex; justify-content: center; align-items: center; flex: 1; min-width: 0; min-height: 0; width: 100%; overflow: hidden; }
+.frameBox { position: relative; flex-shrink: 0; overflow: hidden; border-radius: var(--radius-md); background: var(--bg-panel); box-shadow: var(--elevation-2); }
+.frame { display: block; max-width: none; border: 0; transform-origin: top left; background: #fff; }
+
+@media (max-width: 960px) {
+  .workspace { display: flex; flex-direction: column; overflow: auto; }
+  .previewPane { flex: 0 0 min(650px, 72dvh); min-height: 300px; }
+  .toolbar { position: sticky; top: 0; z-index: 1; }
+  .details { overflow: visible; border-left: 0; border-top: 1px solid var(--border-soft); }
+  .canvas { padding: var(--space-3) var(--space-3) 0; }
+}
+@media (max-width: 420px) {
+  .toolbar { padding: 8px; gap: 5px; flex-wrap: wrap; }
+  .segment { gap: 0; }
+  .segment .control { padding: 0 5px; font-size: 11px; }
+  .widthNumber { margin-left: 1px; }
+  .parts { padding: 6px 8px; }
+  .details { padding: 18px; }
+}

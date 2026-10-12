@@ -1,0 +1,9 @@
+.notice {
+  color: var(--chat-text-muted);
+  font-size: var(--chat-t-mini);
+  overflow-wrap: anywhere;
+}
+.details {
+  display: grid;
+  gap: 4px;
+}

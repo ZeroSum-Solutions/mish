@@ -1,0 +1,55 @@
+/* Status tones mix their hue 55% with --text-strong so 11px text clears
+   4.5:1 on its tinted fill in both themes (lowest: warning, light, 5.19:1). */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  height: 20px;
+  padding: 0 var(--space-2, 8px);
+  font: var(--font-micro, 500 11px / 14px var(--sans));
+  letter-spacing: var(--tracking-wide, 0.02em);
+  white-space: nowrap;
+  border-radius: var(--radius-pill, 999px);
+  border: 1px solid transparent;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill, 999px);
+  background: currentColor;
+}
+
+.neutral {
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+}
+
+.brand {
+  color: var(--brand-text);
+  background: var(--brand-soft);
+  border-color: var(--brand-weak);
+}
+
+.success {
+  color: color-mix(in srgb, var(--green) 55%, var(--text-strong));
+  background: var(--green-bg);
+  border-color: var(--green-border);
+}
+
+.warning {
+  color: color-mix(in srgb, var(--amber) 55%, var(--text-strong));
+  background: var(--amber-bg);
+}
+
+.danger {
+  color: color-mix(in srgb, var(--red) 55%, var(--text-strong));
+  background: var(--red-bg);
+  border-color: var(--red-border);
+}
+
+.info {
+  color: color-mix(in srgb, var(--blue) 55%, var(--text-strong));
+  background: var(--blue-bg);
+  border-color: var(--blue-border);
+}

@@ -1,0 +1,14 @@
+{
+  "rows": [],
+  "schema": "cult-ui-catalog/1",
+  "snapshot": {
+    "derivedRows": 20,
+    "digest": "98714bf76896dbbe72b08db7660c485882852ac3ea565bd79a632a3bd7043981",
+    "expectedItems": 291,
+    "fetchedItems": 291,
+    "id": "cult-ui-pro@98714bf76896dbbe",
+    "indexSha256": "8dcff0701e30a2d7ba0ec1ab596649577bc59f65d4771182cc0f410be6b30016",
+    "pendingItems": 0,
+    "registryUrlPattern": "https://pro.cult-ui.com/api/registry/<name>"
+  }
+}

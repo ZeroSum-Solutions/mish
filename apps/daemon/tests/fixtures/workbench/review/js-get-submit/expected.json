@@ -1,0 +1,4 @@
+{
+  "description": "B4-2 round 3 (W-A): a form whose submit handler fetch()es an allowed host with the probe test values. While a click probe runs (and until the daemon reloads the entry) no request may reach a real host; the attempt is recorded and never passes.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "noHits": true, "notPassed": true, "blockedReason": "click probe" } }
+}

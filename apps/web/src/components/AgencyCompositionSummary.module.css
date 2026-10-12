@@ -1,0 +1,38 @@
+/* A composed agency build's plan (block ids in page order, direction, spine) or the fixed reason
+   it ran the family route instead. Shared by the Design index Build panel and Home's "Build with
+   Jev" card through `AgencyBuildProgress`. Colours go through the shared theme tokens. */
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.heading {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding-inline-start: 22px;
+  font-size: 13px;
+  color: var(--text);
+}
+
+.blocks code,
+.note code {
+  overflow-wrap: anywhere;
+}

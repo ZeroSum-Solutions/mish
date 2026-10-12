@@ -1,0 +1,74 @@
+/* scroll-locked-video-hero — clean-room, component-specs.md §9. Every selector is under
+   .genui-scroll-locked-video-hero. mount() drives the effect through --genui-scroll-locked-
+   video-hero-p (0..1 scroll progress) and -overlay-out (the fade-in fraction). */
+
+:where(.genui-scroll-locked-video-hero) {
+  position: relative;
+  display: block;
+}
+
+.genui-scroll-locked-video-hero__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: #0b0d12;
+}
+
+.genui-scroll-locked-video-hero--reduced .genui-scroll-locked-video-hero__stage {
+  position: static;
+}
+
+.genui-scroll-locked-video-hero__canvas,
+.genui-scroll-locked-video-hero__stage > video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.genui-scroll-locked-video-hero__overlay {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.75em;
+  place-items: center;
+  max-width: 42rem;
+  padding: 0 1.5rem;
+  text-align: center;
+  color: #f5f5f7;
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.55);
+  opacity: clamp(0, calc(var(--genui-scroll-locked-video-hero-p, 0) / max(0.001, var(--genui-scroll-locked-video-hero-overlay-out, 0.3))), 1);
+  transform: translateY(calc((1 - clamp(0, calc(var(--genui-scroll-locked-video-hero-p, 0) / max(0.001, var(--genui-scroll-locked-video-hero-overlay-out, 0.3))), 1)) * 18px));
+}
+
+.genui-scroll-locked-video-hero__overlay :where(h1, h2) {
+  margin: 0;
+  font-size: clamp(1.75rem, 5vw, 3.5rem);
+  line-height: 1.1;
+}
+
+.genui-scroll-locked-video-hero__overlay p {
+  margin: 0;
+  font-size: 1.1rem;
+  opacity: 0.85;
+}
+
+.genui-scroll-locked-video-hero--reduced .genui-scroll-locked-video-hero__overlay {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-scroll-locked-video-hero__overlay {
+    opacity: 1;
+    transform: none;
+  }
+
+  .genui-scroll-locked-video-hero__stage {
+    position: static;
+  }
+}

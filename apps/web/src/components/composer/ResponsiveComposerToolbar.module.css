@@ -1,0 +1,71 @@
+/* Reusable contract: put container on the composer and toolbar on its row.
+   Compact controls depend on this container, never on the viewport. */
+.container { container: composer / inline-size; }
+.toolbar.toolbar {
+  --composer-palette-collapsed: 0;
+  container-type: normal;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.toolbar > * { flex-shrink: 0; }
+.toolbar :global(.composer-spacer) { flex: 1 1 0; }
+.toolbar :global(.inline-switcher) { flex: 0 0 auto; }
+.toolbar :global(.inline-switcher__chip) { max-width: 240px; }
+.toolbar :global(.composer-send) { flex: 0 0 var(--control-h-compact); }
+.toolbar :global([data-testid='session-model-status']),
+.toolbar :global([data-testid^='session-model-preflight-']) { flex-basis: 100%; order: 1; }
+.toolbar :global(.inline-switcher__chip:focus-visible),
+.toolbar :global(.plus-menu__trigger:focus-visible) {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+.toolbar :global(.inline-switcher__chip),
+.toolbar :global(.plus-menu__trigger) {
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    border-color var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+.toolbar :global(.inline-switcher__chip:active:not(:disabled)),
+.toolbar :global(.plus-menu__trigger:active:not(:disabled)) {
+  transform: scale(var(--press-scale-icon));
+  transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-hover), var(--motion-press);
+}
+.improve.improve { height: var(--control-h-compact); white-space: nowrap; gap: var(--space-1); flex-shrink: 0; }
+.improveGlyph { display: inline-flex; }
+.improveGlyph svg { width: var(--space-4); height: var(--space-4); }
+.regularGlyph { display: inline-flex; }
+.overflowGlyph { display: none; }
+.attached { max-width: 100%; order: 1; }
+@container composer (width < 520px) {
+  .improve.improve {
+    width: var(--control-h-compact);
+    height: var(--control-h-compact);
+    padding: 0;
+    justify-content: center;
+    transform-origin: center;
+  }
+  .improve.improve:active:not(:disabled) { transform: scale(var(--press-scale-icon)); }
+  .improveLabel { display: none; }
+  /* The provider/agent mark already names the model through the tooltip.
+     Keep it instead of a clipped fragment of an arbitrarily long name. */
+  .toolbar :global(.inline-switcher__chip-model-name),
+  .toolbar :global(.inline-switcher__chip-divider) { display: none; }
+  .toolbar :global(.inline-switcher__chip) { flex-shrink: 0; }
+}
+@container composer (width < 360px) {
+  .toolbar.toolbar { --composer-palette-collapsed: 1; }
+  .regularGlyph { display: none; }
+  .overflowGlyph { display: inline-flex; }
+  .secondary { display: none; }
+  /* The menu opens the same picker, with its anchor at the overflow trigger.
+     Only its portal is visible; the hidden palette is never a tab stop. */
+  .secondary:has([aria-expanded='true']) {
+    display: block;
+    position: absolute;
+    inset-inline-start: 0;
+    bottom: 0;
+    visibility: hidden;
+  }
+}

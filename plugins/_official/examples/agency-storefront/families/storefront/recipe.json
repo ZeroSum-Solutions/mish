@@ -1,0 +1,142 @@
+{
+  "schemaVersion": 2,
+  "family": "storefront",
+  "revision": 1,
+  "brand": {
+    "name": "Tallow Row",
+    "descriptor": "A small fashion label making natural-fibre workwear in short seasonal runs."
+  },
+  "sections": [
+    {
+      "id": "storefront-header",
+      "type": "header",
+      "text": {
+        "cta": "Buy now"
+      }
+    },
+    {
+      "id": "storefront-hero",
+      "type": "hero",
+      "text": {
+        "eyebrow": "Autumn run, while stock lasts",
+        "heading": "Workwear cut from undyed cotton canvas",
+        "body": "Tallow Row makes a short seasonal run of jackets, trousers and shirting in natural-fibre cloth, made in Portland, Oregon."
+      }
+    },
+    {
+      "id": "storefront-featured-product",
+      "type": "featured-product",
+      "text": {
+        "heading": "This season's anchor piece",
+        "name": "The Field Jacket, undyed canvas",
+        "description": "A four-pocket, unlined canvas jacket with brass hardware. Made in Portland, Oregon.",
+        "price": "$248"
+      }
+    },
+    {
+      "id": "storefront-collection-grid",
+      "type": "collection-grid",
+      "text": {
+        "heading": "The rest of the autumn run"
+      },
+      "items": [
+        {
+          "name": "Canvas Work Trouser",
+          "blurb": "Straight leg, double-stitched seams.",
+          "price": "$168"
+        },
+        {
+          "name": "Chore Shirt, undyed",
+          "blurb": "Boxy cut, single chest pocket.",
+          "price": "$132"
+        },
+        {
+          "name": "Canvas Tote",
+          "blurb": "One long strap, brass rivets.",
+          "price": "$58"
+        },
+        {
+          "name": "Waxed Cap",
+          "blurb": "Undyed canvas.",
+          "price": "$34"
+        }
+      ]
+    },
+    {
+      "id": "storefront-product-details",
+      "type": "product-details",
+      "text": {
+        "heading": "Materials and care"
+      },
+      "items": [
+        {
+          "label": "Material",
+          "value": "15oz undyed cotton canvas"
+        },
+        {
+          "label": "Made in",
+          "value": "Portland, Oregon"
+        },
+        {
+          "label": "Care",
+          "value": "Machine wash cold, hang dry"
+        }
+      ]
+    },
+    {
+      "id": "storefront-buy-preorder",
+      "type": "buy-preorder",
+      "text": {
+        "heading": "Buy from the autumn run",
+        "body": "Everything is live on our shop while stock lasts. No preorder needed this season.",
+        "ctaLabel": "Shop the autumn run",
+        "url": "https://shop.tallowrow.example/autumn",
+        "phone": null,
+        "email": "hello@tallowrow.example"
+      }
+    },
+    {
+      "id": "storefront-shipping-returns",
+      "type": "shipping-returns",
+      "text": {
+        "heading": "Shipping and returns",
+        "body": "Orders ship within three business days. Unworn pieces with tags attached can be returned within thirty days for a refund."
+      }
+    },
+    {
+      "id": "storefront-reviews",
+      "type": "reviews",
+      "text": {
+        "heading": "From the last run"
+      },
+      "items": [
+        {
+          "quote": "Wore the field jacket through a wet Portland winter and it only got better with age.",
+          "name": null
+        },
+        {
+          "quote": "The canvas is heavier than I expected in a good way, and the stitching is clean.",
+          "name": null
+        }
+      ]
+    },
+    {
+      "id": "storefront-story-about",
+      "type": "story-about",
+      "text": {
+        "heading": "A small workshop, not a factory",
+        "body": "Tallow Row started as two sewists cutting patterns on a kitchen table. We still cut and sew every piece ourselves, in runs small enough to know where each bolt of cloth came from."
+      }
+    },
+    {
+      "id": "storefront-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Natural-fibre workwear, sewn in small seasonal runs.",
+        "phone": null,
+        "email": "hello@tallowrow.example",
+        "address": "1420 SE Division St, Portland, OR 97202"
+      }
+    }
+  ]
+}

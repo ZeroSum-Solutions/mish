@@ -1,0 +1,37 @@
+{
+  "id": "marketing-site-01",
+  "businessName": "Silverpine Veterinary Clinic",
+  "expectedSpine": "TL",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Silverpine Veterinary Clinic"
+    },
+    {
+      "field": "address",
+      "value": "720 Aspen Grove Road, Bozeman, Montana"
+    },
+    {
+      "field": "phone",
+      "value": "(406) 555-0113"
+    },
+    {
+      "field": "email",
+      "value": "care@silverpinevet.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 7:30 a.m. to 6 p.m.; Saturdays 8 a.m. to noon; after-hours emergency triage by phone"
+    },
+    {
+      "field": "legal",
+      "value": "Licensed to practice veterinary medicine in the State of Montana"
+    },
+    {
+      "field": "other",
+      "value": "Three veterinarians on staff with an in-house lab and pharmacy"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

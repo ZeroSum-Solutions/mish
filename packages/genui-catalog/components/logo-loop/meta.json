@@ -1,0 +1,38 @@
+{
+  "id": "logo-loop",
+  "name": "Logo Loop",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/logo-loop/index.ts",
+  "css": "components/logo-loop/styles.css",
+  "demo": "components/logo-loop/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": {
+        "type": "number",
+        "default": 18000,
+        "minimum": 4000,
+        "maximum": 30000
+      },
+      "gap": {
+        "type": "number",
+        "default": 48,
+        "minimum": 8,
+        "maximum": 160
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static",
+  "motion": "continuous"
+}

@@ -1,0 +1,41 @@
+{
+  "id": "light-rays",
+  "name": "Light Rays",
+  "category": "background",
+  "kind": "css-only",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/light-rays/index.ts",
+  "css": "components/light-rays/styles.css",
+  "demo": "components/light-rays/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": {
+        "type": "number",
+        "default": 2400,
+        "minimum": 0,
+        "maximum": 4000
+      },
+      "colour": {
+        "type": "string",
+        "default": "#b7c9ff"
+      },
+      "intensity": {
+        "type": "number",
+        "default": 0.18,
+        "minimum": 0,
+        "maximum": 0.3
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

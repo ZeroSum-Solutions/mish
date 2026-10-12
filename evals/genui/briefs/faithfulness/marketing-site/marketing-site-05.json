@@ -1,0 +1,37 @@
+{
+  "id": "marketing-site-05",
+  "businessName": "Cobalt Fieldnotes",
+  "expectedSpine": "CS",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Cobalt Fieldnotes"
+    },
+    {
+      "field": "address",
+      "value": "501 East Sixth Street, Austin, Texas"
+    },
+    {
+      "field": "phone",
+      "value": "(512) 555-0138"
+    },
+    {
+      "field": "email",
+      "value": "editors@cobaltfieldnotes.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 9 a.m. to 5 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Published by a registered Texas media LLC"
+    },
+    {
+      "field": "other",
+      "value": "Publishes two features a week; ~18,000 newsletter subscribers"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

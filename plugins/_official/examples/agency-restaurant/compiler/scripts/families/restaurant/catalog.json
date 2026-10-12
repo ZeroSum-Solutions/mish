@@ -1,0 +1,48 @@
+{
+  "catalogComponents": [
+    "split-text",
+    "masked-heading",
+    "scroll-reveal",
+    "glare-hover"
+  ],
+  "effects": {
+    "scriptPolicy": "hash",
+    "maxEffects": 2,
+    "placements": {
+      "hero-title": {
+        "host": {
+          "odId": "restaurant-hero--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-title": {
+        "host": {
+          "odId": "restaurant-menu--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-reveal": {
+        "host": {
+          "odId": "restaurant-story--body"
+        },
+        "allow": [
+          "scroll-reveal"
+        ]
+      },
+      "cta": {
+        "host": {
+          "id": "restaurant-reservations"
+        },
+        "allow": [
+          "glare-hover"
+        ]
+      }
+    }
+  }
+}

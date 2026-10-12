@@ -1,0 +1,37 @@
+{
+  "id": "marketing-site-10",
+  "businessName": "Ironvale Structural Engineers",
+  "expectedSpine": "TL",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Ironvale Structural Engineers"
+    },
+    {
+      "field": "address",
+      "value": "3030 LBJ Freeway, Suite 500, Dallas, Texas"
+    },
+    {
+      "field": "phone",
+      "value": "(214) 555-0157"
+    },
+    {
+      "field": "email",
+      "value": "info@ironvalestructural.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8 a.m. to 5:30 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Principals are licensed Professional Engineers in the State of Texas"
+    },
+    {
+      "field": "other",
+      "value": "Twelve-engineer firm; four principal engineers"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

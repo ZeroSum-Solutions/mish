@@ -1,0 +1,112 @@
+/* Shared thumbnail-card contract: one short title, one metadata line, and
+   a full-bleed media frame. Product rails set width and media height only. */
+.card {
+  --preview-card-padding: var(--spacing-12, 12px);
+  --preview-card-caption-gap: var(--spacing-4, 4px);
+  --preview-card-title-line-height: 20px;
+  --preview-card-description-line-height: 18px;
+  --preview-card-caption-height: calc(
+    2 * var(--preview-card-padding) + var(--preview-card-title-line-height)
+    + var(--preview-card-caption-gap) + var(--preview-card-description-line-height)
+  );
+  appearance: none;
+  position: relative;
+  display: grid;
+  grid-template-rows: var(--preview-card-media-height, 150px) minmax(var(--preview-card-caption-height), auto);
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 12px);
+  color: var(--text-strong, var(--text));
+  background: var(--bg-panel);
+  box-shadow: var(--shadow-xs);
+  font: inherit;
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+  transition: border-color 140ms var(--ease-out), background-color 140ms var(--ease-out), box-shadow 140ms var(--ease-out);
+}
+.card:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--bg-subtle);
+  box-shadow: var(--shadow-sm);
+}
+.card:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+.card:active:not(:disabled) { transform: translateY(1px); }
+.card[data-selected],
+.card[data-selected]:disabled,
+.card[data-selected]:hover:not(:disabled) {
+  border-color: var(--border-selected, var(--accent));
+  box-shadow: inset 0 0 0 1px var(--border-selected, var(--accent));
+}
+.card[data-pending] { cursor: progress; }
+.card:disabled {
+  cursor: not-allowed;
+  opacity: 0.68;
+  transform: none;
+  background: var(--bg-panel);
+  border-color: var(--border);
+}
+.media {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: var(--preview-card-media-height, 150px);
+  overflow: hidden;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border);
+}
+.media :where(img, video) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+}
+.caption {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--preview-card-caption-gap);
+  min-width: 0;
+  padding: var(--preview-card-padding);
+}
+.title {
+  display: block;
+  min-width: 0;
+  max-width: min(100%, 24ch);
+  min-height: var(--preview-card-title-line-height);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-strong, var(--text));
+  font-size: var(--font-size-14, 14px);
+  font-weight: 600;
+  line-height: var(--preview-card-title-line-height);
+}
+.description {
+  display: block;
+  min-width: 0;
+  max-width: min(100%, 28ch);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font-size: var(--font-size-12, 12px);
+  font-weight: 400;
+  line-height: var(--preview-card-description-line-height);
+}
+@media (prefers-reduced-motion: reduce) {
+  .card { transition: none; }
+  .card:active:not(:disabled) { transform: none; }
+}

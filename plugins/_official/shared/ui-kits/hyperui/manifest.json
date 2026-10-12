@@ -1,0 +1,574 @@
+{
+  "upstream": {
+    "repo": "markmead/hyperui",
+    "commit": "ae5038979b77320793360a46b85e7c71a73beda6",
+    "fetchedAt": "2026-09-22T16:21:32.755Z"
+  },
+  "tailwindCliVersion": "4.3.3",
+  "blocks": [
+    {
+      "id": "application/charts/1",
+      "file": "blocks/application/charts/1.html",
+      "bytes": 1288,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/2",
+      "file": "blocks/application/charts/2.html",
+      "bytes": 1272,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/3",
+      "file": "blocks/application/charts/3.html",
+      "bytes": 919,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/4",
+      "file": "blocks/application/charts/4.html",
+      "bytes": 1391,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/5",
+      "file": "blocks/application/charts/5.html",
+      "bytes": 1730,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/6",
+      "file": "blocks/application/charts/6.html",
+      "bytes": 1450,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/7",
+      "file": "blocks/application/charts/7.html",
+      "bytes": 1490,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/8",
+      "file": "blocks/application/charts/8.html",
+      "bytes": 1291,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/9",
+      "file": "blocks/application/charts/9.html",
+      "bytes": 1027,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/10",
+      "file": "blocks/application/charts/10.html",
+      "bytes": 1415,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/charts/11",
+      "file": "blocks/application/charts/11.html",
+      "bytes": 1504,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/details-list/1",
+      "file": "blocks/application/details-list/1.html",
+      "bytes": 1454,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/details-list/2",
+      "file": "blocks/application/details-list/2.html",
+      "bytes": 1467,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/details-list/3",
+      "file": "blocks/application/details-list/3.html",
+      "bytes": 1480,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/details-list/4",
+      "file": "blocks/application/details-list/4.html",
+      "bytes": 1513,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/empty-states/1",
+      "file": "blocks/application/empty-states/1.html",
+      "bytes": 1081,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/empty-states/2",
+      "file": "blocks/application/empty-states/2.html",
+      "bytes": 1478,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/empty-states/3",
+      "file": "blocks/application/empty-states/3.html",
+      "bytes": 1157,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/empty-states/4",
+      "file": "blocks/application/empty-states/4.html",
+      "bytes": 1833,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/empty-states/5",
+      "file": "blocks/application/empty-states/5.html",
+      "bytes": 1546,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/filters/1",
+      "file": "blocks/application/filters/1.html",
+      "bytes": 4814,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/filters/2",
+      "file": "blocks/application/filters/2.html",
+      "bytes": 4648,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/side-menu/1",
+      "file": "blocks/application/side-menu/1.html",
+      "bytes": 5186,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/side-menu/2",
+      "file": "blocks/application/side-menu/2.html",
+      "bytes": 7394,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/stats/1",
+      "file": "blocks/application/stats/1.html",
+      "bytes": 1886,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/stats/2",
+      "file": "blocks/application/stats/2.html",
+      "bytes": 2938,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/stats/3",
+      "file": "blocks/application/stats/3.html",
+      "bytes": 1622,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/stats/4",
+      "file": "blocks/application/stats/4.html",
+      "bytes": 1645,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/stats/5",
+      "file": "blocks/application/stats/5.html",
+      "bytes": 1721,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/stats/6",
+      "file": "blocks/application/stats/6.html",
+      "bytes": 3026,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tables/1",
+      "file": "blocks/application/tables/1.html",
+      "bytes": 2341,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tables/2",
+      "file": "blocks/application/tables/2.html",
+      "bytes": 2382,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tables/3",
+      "file": "blocks/application/tables/3.html",
+      "bytes": 2359,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tables/4",
+      "file": "blocks/application/tables/4.html",
+      "bytes": 2372,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tables/5",
+      "file": "blocks/application/tables/5.html",
+      "bytes": 2738,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tabs/1",
+      "file": "blocks/application/tabs/1.html",
+      "bytes": 1266,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tabs/2",
+      "file": "blocks/application/tabs/2.html",
+      "bytes": 3916,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tabs/3",
+      "file": "blocks/application/tabs/3.html",
+      "bytes": 1408,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tabs/4",
+      "file": "blocks/application/tabs/4.html",
+      "bytes": 1156,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/tabs/5",
+      "file": "blocks/application/tabs/5.html",
+      "bytes": 1134,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/timelines/1",
+      "file": "blocks/application/timelines/1.html",
+      "bytes": 1877,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/timelines/2",
+      "file": "blocks/application/timelines/2.html",
+      "bytes": 2602,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/timelines/3",
+      "file": "blocks/application/timelines/3.html",
+      "bytes": 1797,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/vertical-menu/1",
+      "file": "blocks/application/vertical-menu/1.html",
+      "bytes": 1065,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/vertical-menu/2",
+      "file": "blocks/application/vertical-menu/2.html",
+      "bytes": 1748,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/vertical-menu/3",
+      "file": "blocks/application/vertical-menu/3.html",
+      "bytes": 4244,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/vertical-menu/4",
+      "file": "blocks/application/vertical-menu/4.html",
+      "bytes": 4864,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/vertical-menu/5",
+      "file": "blocks/application/vertical-menu/5.html",
+      "bytes": 4450,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/vertical-menu/6",
+      "file": "blocks/application/vertical-menu/6.html",
+      "bytes": 4023,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/vertical-menu/7",
+      "file": "blocks/application/vertical-menu/7.html",
+      "bytes": 7356,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "application/vertical-menu/8",
+      "file": "blocks/application/vertical-menu/8.html",
+      "bytes": 2667,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/ctas/1",
+      "file": "blocks/marketing/ctas/1.html",
+      "bytes": 1063,
+      "images": 0,
+      "scripts": 0,
+      "collapsed": true
+    },
+    {
+      "id": "marketing/ctas/2",
+      "file": "blocks/marketing/ctas/2.html",
+      "bytes": 1983,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/ctas/3",
+      "file": "blocks/marketing/ctas/3.html",
+      "bytes": 1079,
+      "images": 0,
+      "scripts": 0,
+      "collapsed": true
+    },
+    {
+      "id": "marketing/ctas/4",
+      "file": "blocks/marketing/ctas/4.html",
+      "bytes": 1212,
+      "images": 0,
+      "scripts": 0,
+      "collapsed": true
+    },
+    {
+      "id": "marketing/feature-grids/1",
+      "file": "blocks/marketing/feature-grids/1.html",
+      "bytes": 3295,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/feature-grids/2",
+      "file": "blocks/marketing/feature-grids/2.html",
+      "bytes": 4045,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/feature-grids/3",
+      "file": "blocks/marketing/feature-grids/3.html",
+      "bytes": 3555,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/feature-grids/4",
+      "file": "blocks/marketing/feature-grids/4.html",
+      "bytes": 4518,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/footers/1",
+      "file": "blocks/marketing/footers/1.html",
+      "bytes": 15426,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/footers/4",
+      "file": "blocks/marketing/footers/4.html",
+      "bytes": 8102,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/footers/5",
+      "file": "blocks/marketing/footers/5.html",
+      "bytes": 10121,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/footers/7",
+      "file": "blocks/marketing/footers/7.html",
+      "bytes": 11027,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/footers/9",
+      "file": "blocks/marketing/footers/9.html",
+      "bytes": 18730,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/footers/11",
+      "file": "blocks/marketing/footers/11.html",
+      "bytes": 16896,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/logo-clouds/1",
+      "file": "blocks/marketing/logo-clouds/1.html",
+      "bytes": 13660,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/logo-clouds/2",
+      "file": "blocks/marketing/logo-clouds/2.html",
+      "bytes": 14127,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/logo-clouds/3",
+      "file": "blocks/marketing/logo-clouds/3.html",
+      "bytes": 14291,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/pricing/1",
+      "file": "blocks/marketing/pricing/1.html",
+      "bytes": 7014,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/pricing/2",
+      "file": "blocks/marketing/pricing/2.html",
+      "bytes": 13278,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/sections/1",
+      "file": "blocks/marketing/sections/1.html",
+      "bytes": 760,
+      "images": 0,
+      "scripts": 0,
+      "collapsed": true
+    },
+    {
+      "id": "marketing/sections/2",
+      "file": "blocks/marketing/sections/2.html",
+      "bytes": 797,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/sections/3",
+      "file": "blocks/marketing/sections/3.html",
+      "bytes": 797,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/sections/4",
+      "file": "blocks/marketing/sections/4.html",
+      "bytes": 668,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/stats/1",
+      "file": "blocks/marketing/stats/1.html",
+      "bytes": 1692,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/stats/2",
+      "file": "blocks/marketing/stats/2.html",
+      "bytes": 1622,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/stats/3",
+      "file": "blocks/marketing/stats/3.html",
+      "bytes": 1644,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/testimonials/1",
+      "file": "blocks/marketing/testimonials/1.html",
+      "bytes": 1148,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/testimonials/2",
+      "file": "blocks/marketing/testimonials/2.html",
+      "bytes": 1743,
+      "images": 0,
+      "scripts": 0
+    },
+    {
+      "id": "marketing/testimonials/3",
+      "file": "blocks/marketing/testimonials/3.html",
+      "bytes": 5286,
+      "images": 0,
+      "scripts": 0
+    }
+  ]
+}

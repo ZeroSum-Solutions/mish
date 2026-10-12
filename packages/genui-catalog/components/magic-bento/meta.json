@@ -1,0 +1,35 @@
+{
+  "id": "magic-bento",
+  "name": "Magic Bento",
+  "category": "surface",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; no upstream source was read, and the GSAP dependency is replaced by a CSS grid plus one rAF-batched pointer handler that writes custom properties.",
+  "entry": "components/magic-bento/index.ts",
+  "css": "components/magic-bento/styles.css",
+  "demo": "components/magic-bento/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "columns": { "type": "number", "default": 4, "minimum": 1, "description": "Grid column count." },
+      "gap": { "type": "string", "default": "12px" },
+      "rowHeight": { "type": "string", "default": "96px", "description": "Minimum row height." },
+      "glowColour": { "type": "string", "default": "#8b7cf6" },
+      "radius": { "type": "number", "default": 220, "minimum": 0, "description": "Radius of each card's light, in px." },
+      "proximity": { "type": "number", "default": 120, "minimum": 1, "description": "Distance outside a card, in px, at which its glow starts." },
+      "borderGlow": { "type": "boolean", "default": true, "description": "Light up the card rims." },
+      "spotlight": { "type": "boolean", "default": true, "description": "A soft light that follows the pointer across the whole grid." },
+      "touch": { "type": "boolean", "default": false, "description": "Track touch pointers too (touch has no hover)." }
+    }
+  },
+  "a11y": [
+    "The grid never reorders cards (no dense packing), so the visual order follows DOM order, which is the reading and tab order.",
+    "The glow and spotlight are pseudo-elements with no content, so nothing extra is announced and card text keeps its own contrast.",
+    "Keyboard focus on a card (for example a card that is a link) lights it from its centre and shows a :focus-visible outline, matching the pointer state.",
+    "Reduced motion stops pointer tracking, the hover lift and every transition; forced-colors mode drops the glow and draws a CanvasText border."
+  ],
+  "reducedMotion": "static"
+}

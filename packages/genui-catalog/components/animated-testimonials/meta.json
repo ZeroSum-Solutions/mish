@@ -1,0 +1,33 @@
+{
+  "id": "animated-testimonials",
+  "name": "Animated Testimonials",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line behaviour description only; no 21st.dev source was fetched or read, so no MIT attribution is owed, and framer-motion is replaced by CSS keyframes plus a few lines of dependency-free script.",
+  "entry": "components/animated-testimonials/index.ts",
+  "css": "components/animated-testimonials/styles.css",
+  "demo": "components/animated-testimonials/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "autoplay": { "type": "boolean", "default": true, "description": "Step to the next testimonial on a timer." },
+      "interval": { "type": "number", "default": 5000, "minimum": 500, "description": "Time between autoplay steps, in ms." },
+      "duration": { "type": "number", "default": 600, "minimum": 0, "description": "Portrait swing duration, in ms." },
+      "wordStagger": { "type": "number", "default": 40, "minimum": 0, "description": "Delay between each revealed word, in ms." },
+      "mediaSize": { "type": "string", "default": "140px", "description": "Portrait column width (any CSS length)." },
+      "pauseOnHover": { "type": "boolean", "default": true, "description": "Pause autoplay while the pointer is over the component; keyboard focus always pauses it." },
+      "controls": { "type": "boolean", "default": true, "description": "Render Previous and Next buttons." }
+    }
+  },
+  "a11y": [
+    "Each quote is read once: its original nodes move into a visually-hidden span and the animated word spans are aria-hidden.",
+    "Inactive testimonials are visibility:hidden, so screen readers and the tab order only reach the one on show.",
+    "Previous and Next are real buttons with aria-labels; ArrowLeft and ArrowRight also step while focus is inside, and manual steps are announced through a polite live region.",
+    "Autoplay pauses on hover, on keyboard focus, in a hidden tab and off-screen; reduced motion turns autoplay, the portrait swing and the word reveal off entirely."
+  ],
+  "reducedMotion": "static"
+}

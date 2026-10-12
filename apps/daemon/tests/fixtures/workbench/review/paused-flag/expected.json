@@ -1,0 +1,8 @@
+{
+  "description": "A carousel whose working Pause sets a flag; its interval keeps firing but nothing moves afterwards, so the pause requirement passes.",
+  "parameters": {
+    "requireReducedMotionFallback": false,
+    "requireLivePreferenceChange": false
+  },
+  "motion": "pass"
+}

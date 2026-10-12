@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Behavior probe fixture</title>
+  <style>
+    /* A root-level animation: its target is the document element itself. */
+    @keyframes tint { from { background-color: #ffffff; } to { background-color: #fefefe; } }
+    html { animation: tint 4s linear infinite alternate; }
+    body { margin: 0; padding: 16px; font: 16px/1.5 system-ui, sans-serif; color: #111111; background: #ffffff; }
+    [role="tab"] { min-width: 44px; min-height: 44px; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Behavior probe</h1>
+    <div role="tablist" aria-label="Plans">
+      <button role="tab" id="tab-basic" aria-selected="true" aria-controls="panel-basic">Basic</button>
+      <button role="tab" id="tab-pro" aria-selected="false" aria-controls="panel-pro" tabindex="-1">Pro</button>
+    </div>
+    <section id="panel-basic" role="tabpanel" aria-labelledby="tab-basic"><p>Basic plan details.</p></section>
+    <section id="panel-pro" role="tabpanel" aria-labelledby="tab-pro" hidden><p>Pro plan details.</p></section>
+    <img src="data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==" width="48" height="48" alt="A white square">
+    <div role="dialog" aria-modal="true" aria-labelledby="notice-title" id="notice">
+      <h2 id="notice-title">Notice</h2>
+      <p>An open dialog.</p>
+    </div>
+    <dialog id="closed-dialog"><p>A closed dialog the page can open.</p></dialog>
+  </main>
+</body>
+</html>

@@ -1,0 +1,65 @@
+{
+  "results": [
+    {
+      "id": "fixture-hero-01",
+      "title": "Fixture Aurora Hero",
+      "category": "Hero",
+      "kind": "website",
+      "access": "free",
+      "preview_url": "https://example.invalid/preview/fixture-hero-01.webp",
+      "url": "https://motionsites.ai/?prompt=fixture-hero-01"
+    },
+    {
+      "id": "fixture-cta-01",
+      "title": "Fixture Bold CTA Band",
+      "category": "CTA",
+      "kind": "website",
+      "access": "free",
+      "preview_url": "https://motionsites.ai/preview/fixture-cta-01.webp",
+      "url": "https://motionsites.ai/?prompt=fixture-cta-01"
+    },
+    {
+      "id": "fixture-saas-landing-01",
+      "title": "Fixture Nimbus SaaS Landing",
+      "category": "SaaS",
+      "kind": "website",
+      "access": "premium",
+      "preview_url": "https://example.invalid/preview/fixture-saas-landing-01.webp",
+      "url": "https://motionsites.ai/?prompt=fixture-saas-landing-01"
+    },
+    {
+      "id": "fixture-agency-landing-01",
+      "title": "Fixture Formwork Agency Landing",
+      "category": "Agency",
+      "kind": "website",
+      "access": "premium",
+      "preview_url": "https://example.invalid/preview/fixture-agency-landing-01.webp",
+      "url": "https://motionsites.ai/?prompt=fixture-agency-landing-01"
+    },
+    {
+      "id": "fixture-footer-01",
+      "title": "Fixture Quiet Footer",
+      "category": "Footer",
+      "kind": "website",
+      "access": "free",
+      "url": "https://motionsites.ai/?prompt=fixture-footer-01"
+    },
+    {
+      "id": "fixture-unclear-01",
+      "title": "Fixture Drift 3D Concept",
+      "category": "3D",
+      "kind": "website",
+      "access": "premium",
+      "url": "https://motionsites.ai/?prompt=fixture-unclear-01"
+    },
+    {
+      "id": "fixture-mobile-01",
+      "title": "Fixture Pocket Mobile Section",
+      "category": "Mobile",
+      "kind": "app",
+      "access": "free",
+      "url": "https://motionsites.ai/?prompt=fixture-mobile-01"
+    }
+  ],
+  "upgrade_cta": "Access ALL prompts for stunning animated websites in one click: https://motionsites.ai/unlimited"
+}

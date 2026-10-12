@@ -1,0 +1,1239 @@
+{
+  "fetched": "2026-10-08",
+  "reactBitsIndex": "https://reactbits.dev/get-started/index",
+  "twentyFirstIndex": "https://21st.dev/community/components",
+  "scope": "Public index anchor names and URLs only. Behavior summaries are authored independently; no component pages, source downloads or implementation docs.",
+  "reactBits": [
+    {
+      "name": "Tech Text",
+      "href": "/text-animations/tech-text"
+    },
+    {
+      "name": "Text Loop",
+      "href": "/text-animations/text-loop"
+    },
+    {
+      "name": "Masked Heading",
+      "href": "/text-animations/masked-heading"
+    },
+    {
+      "name": "Particle Text",
+      "href": "/text-animations/particle-text"
+    },
+    {
+      "name": "Split Flap Text",
+      "href": "/text-animations/split-flap-text"
+    },
+    {
+      "name": "Warp Text",
+      "href": "/text-animations/warp-text"
+    },
+    {
+      "name": "Stroke Text",
+      "href": "/text-animations/stroke-text"
+    },
+    {
+      "name": "Depth Text",
+      "href": "/text-animations/depth-text"
+    },
+    {
+      "name": "Fold Text",
+      "href": "/text-animations/fold-text"
+    },
+    {
+      "name": "Echo Text",
+      "href": "/text-animations/echo-text"
+    },
+    {
+      "name": "Split Text",
+      "href": "/text-animations/split-text"
+    },
+    {
+      "name": "Blur Text",
+      "href": "/text-animations/blur-text"
+    },
+    {
+      "name": "Circular Text",
+      "href": "/text-animations/circular-text"
+    },
+    {
+      "name": "Text Type",
+      "href": "/text-animations/text-type"
+    },
+    {
+      "name": "Shuffle",
+      "href": "/text-animations/shuffle"
+    },
+    {
+      "name": "Shiny Text",
+      "href": "/text-animations/shiny-text"
+    },
+    {
+      "name": "Text Pressure",
+      "href": "/text-animations/text-pressure"
+    },
+    {
+      "name": "Curved Loop",
+      "href": "/text-animations/curved-loop"
+    },
+    {
+      "name": "Fuzzy Text",
+      "href": "/text-animations/fuzzy-text"
+    },
+    {
+      "name": "Gradient Text",
+      "href": "/text-animations/gradient-text"
+    },
+    {
+      "name": "Falling Text",
+      "href": "/text-animations/falling-text"
+    },
+    {
+      "name": "Text Cursor",
+      "href": "/text-animations/text-cursor"
+    },
+    {
+      "name": "Decrypted Text",
+      "href": "/text-animations/decrypted-text"
+    },
+    {
+      "name": "True Focus",
+      "href": "/text-animations/true-focus"
+    },
+    {
+      "name": "Scroll Float",
+      "href": "/text-animations/scroll-float"
+    },
+    {
+      "name": "Scroll Reveal",
+      "href": "/text-animations/scroll-reveal"
+    },
+    {
+      "name": "ASCII Text",
+      "href": "/text-animations/ascii-text"
+    },
+    {
+      "name": "Scrambled Text",
+      "href": "/text-animations/scrambled-text"
+    },
+    {
+      "name": "Rotating Text",
+      "href": "/text-animations/rotating-text"
+    },
+    {
+      "name": "Glitch Text",
+      "href": "/text-animations/glitch-text"
+    },
+    {
+      "name": "Scroll Velocity",
+      "href": "/text-animations/scroll-velocity"
+    },
+    {
+      "name": "Variable Proximity",
+      "href": "/text-animations/variable-proximity"
+    },
+    {
+      "name": "Count Up",
+      "href": "/text-animations/count-up"
+    },
+    {
+      "name": "Crystalized Ball",
+      "href": "/animations/crystalized-ball"
+    },
+    {
+      "name": "Electric Logo",
+      "href": "/animations/electric-logo"
+    },
+    {
+      "name": "Dither Veil",
+      "href": "/animations/dither-veil"
+    },
+    {
+      "name": "Glow Cursor",
+      "href": "/animations/glow-cursor"
+    },
+    {
+      "name": "Scroll Expand",
+      "href": "/animations/scroll-expand"
+    },
+    {
+      "name": "Ripple Distortion",
+      "href": "/animations/ripple-distortion"
+    },
+    {
+      "name": "Elastic Mesh",
+      "href": "/animations/elastic-mesh"
+    },
+    {
+      "name": "Swarm Cursor",
+      "href": "/animations/swarm-cursor"
+    },
+    {
+      "name": "Halftone Reveal",
+      "href": "/animations/halftone-reveal"
+    },
+    {
+      "name": "Pixel Swap",
+      "href": "/animations/pixel-swap"
+    },
+    {
+      "name": "Cursor Grid",
+      "href": "/animations/cursor-grid"
+    },
+    {
+      "name": "Animated Content",
+      "href": "/animations/animated-content"
+    },
+    {
+      "name": "Fade Content",
+      "href": "/animations/fade-content"
+    },
+    {
+      "name": "Electric Border",
+      "href": "/animations/electric-border"
+    },
+    {
+      "name": "Orbit Images",
+      "href": "/animations/orbit-images"
+    },
+    {
+      "name": "Pixel Transition",
+      "href": "/animations/pixel-transition"
+    },
+    {
+      "name": "Glare Hover",
+      "href": "/animations/glare-hover"
+    },
+    {
+      "name": "Antigravity",
+      "href": "/animations/antigravity"
+    },
+    {
+      "name": "Logo Loop",
+      "href": "/animations/logo-loop"
+    },
+    {
+      "name": "Target Cursor",
+      "href": "/animations/target-cursor"
+    },
+    {
+      "name": "Magic Rings",
+      "href": "/animations/magic-rings"
+    },
+    {
+      "name": "Laser Flow",
+      "href": "/animations/laser-flow"
+    },
+    {
+      "name": "Magnet Lines",
+      "href": "/animations/magnet-lines"
+    },
+    {
+      "name": "Ghost Cursor",
+      "href": "/animations/ghost-cursor"
+    },
+    {
+      "name": "Gradual Blur",
+      "href": "/animations/gradual-blur"
+    },
+    {
+      "name": "Click Spark",
+      "href": "/animations/click-spark"
+    },
+    {
+      "name": "Magnet",
+      "href": "/animations/magnet"
+    },
+    {
+      "name": "Strands",
+      "href": "/animations/strands"
+    },
+    {
+      "name": "Sticker Peel",
+      "href": "/animations/sticker-peel"
+    },
+    {
+      "name": "Pixel Trail",
+      "href": "/animations/pixel-trail"
+    },
+    {
+      "name": "Cubes",
+      "href": "/animations/cubes"
+    },
+    {
+      "name": "Metallic Paint",
+      "href": "/animations/metallic-paint"
+    },
+    {
+      "name": "Noise",
+      "href": "/animations/noise"
+    },
+    {
+      "name": "Shape Blur",
+      "href": "/animations/shape-blur"
+    },
+    {
+      "name": "Crosshair",
+      "href": "/animations/crosshair"
+    },
+    {
+      "name": "Image Trail",
+      "href": "/animations/image-trail"
+    },
+    {
+      "name": "Ribbons",
+      "href": "/animations/ribbons"
+    },
+    {
+      "name": "Splash Cursor",
+      "href": "/animations/splash-cursor"
+    },
+    {
+      "name": "Meta Balls",
+      "href": "/animations/meta-balls"
+    },
+    {
+      "name": "Blob Cursor",
+      "href": "/animations/blob-cursor"
+    },
+    {
+      "name": "Star Border",
+      "href": "/animations/star-border"
+    },
+    {
+      "name": "Holo Card",
+      "href": "/components/holo-card"
+    },
+    {
+      "name": "Circular Carousel",
+      "href": "/components/circular-carousel"
+    },
+    {
+      "name": "Flex Carousel",
+      "href": "/components/flex-carousel"
+    },
+    {
+      "name": "Infinite Spiral",
+      "href": "/components/infinite-spiral"
+    },
+    {
+      "name": "Depth Carousel",
+      "href": "/components/depth-carousel"
+    },
+    {
+      "name": "Morph Slider",
+      "href": "/components/morph-slider"
+    },
+    {
+      "name": "Drift Wall",
+      "href": "/components/drift-wall"
+    },
+    {
+      "name": "Accordion Gallery",
+      "href": "/components/accordion-gallery"
+    },
+    {
+      "name": "Specular Button",
+      "href": "/components/specular-button"
+    },
+    {
+      "name": "Option Wheel",
+      "href": "/components/option-wheel"
+    },
+    {
+      "name": "Curved Input",
+      "href": "/components/curved-input"
+    },
+    {
+      "name": "Line Sidebar",
+      "href": "/components/line-sidebar"
+    },
+    {
+      "name": "Animated List",
+      "href": "/components/animated-list"
+    },
+    {
+      "name": "Scroll Stack",
+      "href": "/components/scroll-stack"
+    },
+    {
+      "name": "Bubble Menu",
+      "href": "/components/bubble-menu"
+    },
+    {
+      "name": "Magic Bento",
+      "href": "/components/magic-bento"
+    },
+    {
+      "name": "Circular Gallery",
+      "href": "/components/circular-gallery"
+    },
+    {
+      "name": "Reflective Card",
+      "href": "/components/reflective-card"
+    },
+    {
+      "name": "Card Nav",
+      "href": "/components/card-nav"
+    },
+    {
+      "name": "Stack",
+      "href": "/components/stack"
+    },
+    {
+      "name": "Fluid Glass",
+      "href": "/components/fluid-glass"
+    },
+    {
+      "name": "Pill Nav",
+      "href": "/components/pill-nav"
+    },
+    {
+      "name": "Tilted Card",
+      "href": "/components/tilted-card"
+    },
+    {
+      "name": "Masonry",
+      "href": "/components/masonry"
+    },
+    {
+      "name": "Glass Surface",
+      "href": "/components/glass-surface"
+    },
+    {
+      "name": "Dome Gallery",
+      "href": "/components/dome-gallery"
+    },
+    {
+      "name": "Chroma Grid",
+      "href": "/components/chroma-grid"
+    },
+    {
+      "name": "Folder",
+      "href": "/components/folder"
+    },
+    {
+      "name": "Staggered Menu",
+      "href": "/components/staggered-menu"
+    },
+    {
+      "name": "Model Viewer",
+      "href": "/components/model-viewer"
+    },
+    {
+      "name": "Lanyard",
+      "href": "/components/lanyard"
+    },
+    {
+      "name": "Profile Card",
+      "href": "/components/profile-card"
+    },
+    {
+      "name": "Dock",
+      "href": "/components/dock"
+    },
+    {
+      "name": "Gooey Nav",
+      "href": "/components/gooey-nav"
+    },
+    {
+      "name": "Pixel Card",
+      "href": "/components/pixel-card"
+    },
+    {
+      "name": "Carousel",
+      "href": "/components/carousel"
+    },
+    {
+      "name": "Spotlight Card",
+      "href": "/components/spotlight-card"
+    },
+    {
+      "name": "Border Glow",
+      "href": "/components/border-glow"
+    },
+    {
+      "name": "Flying Posters",
+      "href": "/components/flying-posters"
+    },
+    {
+      "name": "Card Swap",
+      "href": "/components/card-swap"
+    },
+    {
+      "name": "Glass Icons",
+      "href": "/components/glass-icons"
+    },
+    {
+      "name": "Decay Card",
+      "href": "/components/decay-card"
+    },
+    {
+      "name": "Flowing Menu",
+      "href": "/components/flowing-menu"
+    },
+    {
+      "name": "Elastic Slider",
+      "href": "/components/elastic-slider"
+    },
+    {
+      "name": "Counter",
+      "href": "/components/counter"
+    },
+    {
+      "name": "Infinite Menu",
+      "href": "/components/infinite-menu"
+    },
+    {
+      "name": "Stepper",
+      "href": "/components/stepper"
+    },
+    {
+      "name": "Bounce Cards",
+      "href": "/components/bounce-cards"
+    },
+    {
+      "name": "Pattern Waves",
+      "href": "/backgrounds/pattern-waves"
+    },
+    {
+      "name": "Micro Slats",
+      "href": "/backgrounds/micro-slats"
+    },
+    {
+      "name": "Shape Waves",
+      "href": "/backgrounds/shape-waves"
+    },
+    {
+      "name": "Aero Shards",
+      "href": "/backgrounds/aero-shards"
+    },
+    {
+      "name": "Ghost Fibers",
+      "href": "/backgrounds/ghost-fibers"
+    },
+    {
+      "name": "CRT Warp",
+      "href": "/backgrounds/crt-warp"
+    },
+    {
+      "name": "Molten Metal",
+      "href": "/backgrounds/molten-metal"
+    },
+    {
+      "name": "Gradient Waves",
+      "href": "/backgrounds/gradient-waves"
+    },
+    {
+      "name": "Web Threads",
+      "href": "/backgrounds/web-threads"
+    },
+    {
+      "name": "Topography",
+      "href": "/backgrounds/topography"
+    },
+    {
+      "name": "Light Tunnel",
+      "href": "/backgrounds/light-tunnel"
+    },
+    {
+      "name": "Sliced Waves",
+      "href": "/backgrounds/sliced-waves"
+    },
+    {
+      "name": "Acid Squares",
+      "href": "/backgrounds/acid-squares"
+    },
+    {
+      "name": "Scanner",
+      "href": "/backgrounds/scanner"
+    },
+    {
+      "name": "Ferrofluid",
+      "href": "/backgrounds/ferrofluid"
+    },
+    {
+      "name": "Lightfall",
+      "href": "/backgrounds/lightfall"
+    },
+    {
+      "name": "Liquid Ether",
+      "href": "/backgrounds/liquid-ether"
+    },
+    {
+      "name": "Prism",
+      "href": "/backgrounds/prism"
+    },
+    {
+      "name": "Dark Veil",
+      "href": "/backgrounds/dark-veil"
+    },
+    {
+      "name": "Light Pillar",
+      "href": "/backgrounds/light-pillar"
+    },
+    {
+      "name": "Silk",
+      "href": "/backgrounds/silk"
+    },
+    {
+      "name": "Floating Lines",
+      "href": "/backgrounds/floating-lines"
+    },
+    {
+      "name": "Side Rays",
+      "href": "/backgrounds/side-rays"
+    },
+    {
+      "name": "Light Rays",
+      "href": "/backgrounds/light-rays"
+    },
+    {
+      "name": "Pixel Blast",
+      "href": "/backgrounds/pixel-blast"
+    },
+    {
+      "name": "Color Bends",
+      "href": "/backgrounds/color-bends"
+    },
+    {
+      "name": "Evil Eye",
+      "href": "/backgrounds/evil-eye"
+    },
+    {
+      "name": "Line Waves",
+      "href": "/backgrounds/line-waves"
+    },
+    {
+      "name": "Radar",
+      "href": "/backgrounds/radar"
+    },
+    {
+      "name": "Soft Aurora",
+      "href": "/backgrounds/soft-aurora"
+    },
+    {
+      "name": "Aurora",
+      "href": "/backgrounds/aurora"
+    },
+    {
+      "name": "Plasma",
+      "href": "/backgrounds/plasma"
+    },
+    {
+      "name": "Plasma Wave",
+      "href": "/backgrounds/plasma-wave"
+    },
+    {
+      "name": "Particles",
+      "href": "/backgrounds/particles"
+    },
+    {
+      "name": "Gradient Blinds",
+      "href": "/backgrounds/gradient-blinds"
+    },
+    {
+      "name": "Grainient",
+      "href": "/backgrounds/grainient"
+    },
+    {
+      "name": "Grid Scan",
+      "href": "/backgrounds/grid-scan"
+    },
+    {
+      "name": "Beams",
+      "href": "/backgrounds/beams"
+    },
+    {
+      "name": "Pixel Snow",
+      "href": "/backgrounds/pixel-snow"
+    },
+    {
+      "name": "Lightning",
+      "href": "/backgrounds/lightning"
+    },
+    {
+      "name": "Prismatic Burst",
+      "href": "/backgrounds/prismatic-burst"
+    },
+    {
+      "name": "Galaxy",
+      "href": "/backgrounds/galaxy"
+    },
+    {
+      "name": "Dither",
+      "href": "/backgrounds/dither"
+    },
+    {
+      "name": "Faulty Terminal",
+      "href": "/backgrounds/faulty-terminal"
+    },
+    {
+      "name": "Ripple Grid",
+      "href": "/backgrounds/ripple-grid"
+    },
+    {
+      "name": "Dot Field",
+      "href": "/backgrounds/dot-field"
+    },
+    {
+      "name": "Dot Grid",
+      "href": "/backgrounds/dot-grid"
+    },
+    {
+      "name": "Threads",
+      "href": "/backgrounds/threads"
+    },
+    {
+      "name": "Hyperspeed",
+      "href": "/backgrounds/hyperspeed"
+    },
+    {
+      "name": "Iridescence",
+      "href": "/backgrounds/iridescence"
+    },
+    {
+      "name": "Waves",
+      "href": "/backgrounds/waves"
+    },
+    {
+      "name": "Grid Distortion",
+      "href": "/backgrounds/grid-distortion"
+    },
+    {
+      "name": "Ballpit",
+      "href": "/backgrounds/ballpit"
+    },
+    {
+      "name": "Orb",
+      "href": "/backgrounds/orb"
+    },
+    {
+      "name": "Letter Glitch",
+      "href": "/backgrounds/letter-glitch"
+    },
+    {
+      "name": "Grid Motion",
+      "href": "/backgrounds/grid-motion"
+    },
+    {
+      "name": "Shape Grid",
+      "href": "/backgrounds/shape-grid"
+    },
+    {
+      "name": "Liquid Chrome",
+      "href": "/backgrounds/liquid-chrome"
+    },
+    {
+      "name": "Balatro",
+      "href": "/backgrounds/balatro"
+    }
+  ],
+  "twentyFirst": [
+    {
+      "name": "Scroll media expansion hero",
+      "url": "https://21st.dev/@arunachalam/components/scroll-expansion-hero",
+      "category": "Featured"
+    },
+    {
+      "name": "Container Scroll Animation",
+      "url": "https://21st.dev/@manuarora700/components/container-scroll-animation",
+      "category": "Featured"
+    },
+    {
+      "name": "Spline Scene",
+      "url": "https://21st.dev/@serafimcloud/components/splite",
+      "category": "Featured"
+    },
+    {
+      "name": "Spotlight Card",
+      "url": "https://21st.dev/@jahed/components/spotlight-card",
+      "category": "Featured"
+    },
+    {
+      "name": "Color Filter Image Gallery",
+      "url": "https://21st.dev/@dhxwhy/components/color-filter-gallery",
+      "category": "Newest"
+    },
+    {
+      "name": "Tilted Grid Hero",
+      "url": "https://21st.dev/@ruixen.ui/components/tilted-grid-hero",
+      "category": "Newest"
+    },
+    {
+      "name": "Build Pipeline",
+      "url": "https://21st.dev/@ibrandify/components/build-pipeline",
+      "category": "Newest"
+    },
+    {
+      "name": "Storage District",
+      "url": "https://21st.dev/@ibrandify/components/storage-district",
+      "category": "Newest"
+    },
+    {
+      "name": "Focus City",
+      "url": "https://21st.dev/@ibrandify/components/focus-city",
+      "category": "Newest"
+    },
+    {
+      "name": "Constellation Image Gallery",
+      "url": "https://21st.dev/@dhxwhy/components/constellation-gallery",
+      "category": "Newest"
+    },
+    {
+      "name": "Domino Scroll Image Gallery",
+      "url": "https://21st.dev/@dhxwhy/components/domino-gallery",
+      "category": "Newest"
+    },
+    {
+      "name": "Lighthouse Spotlight Image Gallery",
+      "url": "https://21st.dev/@dhxwhy/components/lighthouse-gallery",
+      "category": "Newest"
+    },
+    {
+      "name": "Isometric Elevator",
+      "url": "https://21st.dev/@lucasmarkes/components/elevator",
+      "category": "Newest"
+    },
+    {
+      "name": "Padlock",
+      "url": "https://21st.dev/@lucasmarkes/components/padlock",
+      "category": "Newest"
+    },
+    {
+      "name": "Radial Orbital Timeline",
+      "url": "https://21st.dev/@jatin-yadav05/components/radial-orbital-timeline",
+      "category": "Popular"
+    },
+    {
+      "name": "Testimonials Columns",
+      "url": "https://21st.dev/@efferd/components/testimonials-columns-1",
+      "category": "Popular"
+    },
+    {
+      "name": "Liquid Glass Button",
+      "url": "https://21st.dev/@designali-in/components/liquid-glass-button",
+      "category": "Popular"
+    },
+    {
+      "name": "Scroll Morph Hero",
+      "url": "https://21st.dev/@prashantsom75/components/scroll-morph-hero",
+      "category": "Popular"
+    },
+    {
+      "name": "Animated hero",
+      "url": "https://21st.dev/@tommyjepsen/components/animated-hero",
+      "category": "Popular"
+    },
+    {
+      "name": "Background Paths",
+      "url": "https://21st.dev/@kokonutd/components/background-paths",
+      "category": "Popular"
+    },
+    {
+      "name": "Velaris",
+      "url": "https://21st.dev/@amanshakya307/components/velaris",
+      "category": "Shaders"
+    },
+    {
+      "name": "Voice Powered Orb",
+      "url": "https://21st.dev/@isaiahbjork/components/voice-powered-orb",
+      "category": "Shaders"
+    },
+    {
+      "name": "WaterRippleImage",
+      "url": "https://21st.dev/@rahil1202/components/water-ripple-image",
+      "category": "Shaders"
+    },
+    {
+      "name": "Feature Shader Cards",
+      "url": "https://21st.dev/@moazamtrade/components/feature-shader-cards",
+      "category": "Shaders"
+    },
+    {
+      "name": "ATC shader",
+      "url": "https://21st.dev/@xordev/components/atc-shader",
+      "category": "Shaders"
+    },
+    {
+      "name": "Siri Wave",
+      "url": "https://21st.dev/@40973894/components/siri-wave",
+      "category": "Shaders"
+    },
+    {
+      "name": "Liquid Effect Animation",
+      "url": "https://21st.dev/@minhxthanh/components/liquid-effect-animation",
+      "category": "Shaders"
+    },
+    {
+      "name": "Shader Svg",
+      "url": "https://21st.dev/@reuno-ui/components/shader-svg",
+      "category": "Shaders"
+    },
+    {
+      "name": "Sphere",
+      "url": "https://21st.dev/@designali-in/components/sphere",
+      "category": "Shaders"
+    },
+    {
+      "name": "Topo Field",
+      "url": "https://21st.dev/@mengto/components/topo-field",
+      "category": "Shaders"
+    },
+    {
+      "name": "Image Stream Hero",
+      "url": "https://21st.dev/@ruixen.ui/components/image-stream-hero",
+      "category": "Heros"
+    },
+    {
+      "name": "Scroll Locked Video Hero",
+      "url": "https://21st.dev/@gughigug/components/scroll-locked-video-hero",
+      "category": "Heros"
+    },
+    {
+      "name": "Black Hole Hero Section",
+      "url": "https://21st.dev/@yura/components/blackhole-hero-section",
+      "category": "Heros"
+    },
+    {
+      "name": "Glyph Portal",
+      "url": "https://21st.dev/@Legacy/components/glyph-portal",
+      "category": "Heros"
+    },
+    {
+      "name": "Gateway Flow",
+      "url": "https://21st.dev/@mengto/components/gateway-flow",
+      "category": "Heros"
+    },
+    {
+      "name": "Constellation Grid",
+      "url": "https://21st.dev/@daiwiikharihar/components/constellation-grid",
+      "category": "Heros"
+    },
+    {
+      "name": "Scroll Choreography",
+      "url": "https://21st.dev/@componentry/components/scroll-choreography",
+      "category": "Heros"
+    },
+    {
+      "name": "Hero Scroll Video Pin Reveal",
+      "url": "https://21st.dev/@ajith66310/components/hero-scroll-video-pin-reveal",
+      "category": "Heros"
+    },
+    {
+      "name": "Squeeze Carousel",
+      "url": "https://21st.dev/@yura/components/carousel-squeeze",
+      "category": "Features"
+    },
+    {
+      "name": "Features 4",
+      "url": "https://21st.dev/@meschacirung/components/features-4",
+      "category": "Features"
+    },
+    {
+      "name": "Features 2",
+      "url": "https://21st.dev/@meschacirung/components/features-2",
+      "category": "Features"
+    },
+    {
+      "name": "Features 1",
+      "url": "https://21st.dev/@meschacirung/components/features-1",
+      "category": "Features"
+    },
+    {
+      "name": "Feature Comparison Table",
+      "url": "https://21st.dev/@olewandowski1/components/comparison-3",
+      "category": "Features"
+    },
+    {
+      "name": "Features With Panel",
+      "url": "https://21st.dev/@scrollxui/components/features-with-panel",
+      "category": "Features"
+    },
+    {
+      "name": "Alternating Rows With Stats",
+      "url": "https://21st.dev/@olewandowski1/components/features-2",
+      "category": "Features"
+    },
+    {
+      "name": "Animated Features Bento with Live Diagrams",
+      "url": "https://21st.dev/@kedhareswer/components/ink-orbit-features",
+      "category": "Features"
+    },
+    {
+      "name": "Comparison Section",
+      "url": "https://21st.dev/@mohammadshehadeh/components/comparison-03",
+      "category": "Features"
+    },
+    {
+      "name": "Tabbed Feature Categories",
+      "url": "https://21st.dev/@olewandowski1/components/features-4",
+      "category": "Features"
+    },
+    {
+      "name": "V0 AI Chat",
+      "url": "https://21st.dev/@kokonutd/components/v0-ai-chat",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "Ai chat input",
+      "url": "https://21st.dev/@jahed/components/ai-chat-input",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "Shining Text",
+      "url": "https://21st.dev/@preetsuthar17/components/shining-text",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "AI Chat Image Generation",
+      "url": "https://21st.dev/@gonzalochale/components/ai-chat-image-generation-1",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "AI Chat Input",
+      "url": "https://21st.dev/@preetsuthar17/components/ai-chat-input",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "Agent Trace",
+      "url": "https://21st.dev/@n1m4mz/components/agent-trace",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "Message loading",
+      "url": "https://21st.dev/@jakobhoeg/components/message-loading",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "Agent Dock",
+      "url": "https://21st.dev/@dqnamo/components/agent-dock",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "Streaming Text",
+      "url": "https://21st.dev/@theshanelevine/components/streaming-text",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "AI Assistant Interface",
+      "url": "https://21st.dev/@rafa-porto/components/ai-assistant-interface",
+      "category": "AI Chat Components"
+    },
+    {
+      "name": "PrismaHero",
+      "url": "https://21st.dev/@rahil1202/components/prisma-hero",
+      "category": "Calls to Action"
+    },
+    {
+      "name": "Hero",
+      "url": "https://21st.dev/@reuno-ui/components/hero",
+      "category": "Calls to Action"
+    },
+    {
+      "name": "Hero",
+      "url": "https://21st.dev/@ravikatiyar162/components/hero-3",
+      "category": "Calls to Action"
+    },
+    {
+      "name": "Rainbow Button",
+      "url": "https://21st.dev/@dillionverma/components/rainbow-button",
+      "category": "Calls to Action"
+    },
+    {
+      "name": "Hero 195",
+      "url": "https://21st.dev/@shadcnblockscom/components/hero-195-1",
+      "category": "Calls to Action"
+    },
+    {
+      "name": "Responsive Hero Banner",
+      "url": "https://21st.dev/@sensewood8/components/responsive-hero-banner",
+      "category": "Calls to Action"
+    },
+    {
+      "name": "Floating Icons Hero Section",
+      "url": "https://21st.dev/@ravikatiyar162/components/floating-icons-hero-section",
+      "category": "Calls to Action"
+    },
+    {
+      "name": "Integration Card",
+      "url": "https://21st.dev/@shadcnspace/components/integration-card",
+      "category": "Calls to Action"
+    },
+    {
+      "name": "Interactive Hover Button",
+      "url": "https://21st.dev/@dillionverma/components/interactive-hover-button",
+      "category": "Buttons"
+    },
+    {
+      "name": "Liquid Metal Button",
+      "url": "https://21st.dev/@johuniq/components/liquid-metal-button",
+      "category": "Buttons"
+    },
+    {
+      "name": "Gradient Menu",
+      "url": "https://21st.dev/@minhxthanh/components/gradient-menu",
+      "category": "Buttons"
+    },
+    {
+      "name": "Shiny Button",
+      "url": "https://21st.dev/@designali-in/components/shiny-button",
+      "category": "Buttons"
+    },
+    {
+      "name": "Gradient Button",
+      "url": "https://21st.dev/@serafimcloud/components/gradient-button",
+      "category": "Buttons"
+    },
+    {
+      "name": "Neon Button",
+      "url": "https://21st.dev/@cybergaz/components/neon-button",
+      "category": "Buttons"
+    },
+    {
+      "name": "Highlighter",
+      "url": "https://21st.dev/@designali-in/components/highlighter",
+      "category": "Buttons"
+    },
+    {
+      "name": "Sign In",
+      "url": "https://21st.dev/@jahed/components/sign-in",
+      "category": "Testimonials"
+    },
+    {
+      "name": "3D Testimonails",
+      "url": "https://21st.dev/@sean0205/components/3d-testimonails",
+      "category": "Testimonials"
+    },
+    {
+      "name": "Circular Testimonials",
+      "url": "https://21st.dev/@maxim.bort.devel/components/circular-testimonials",
+      "category": "Testimonials"
+    },
+    {
+      "name": "Testimonials with Marquee",
+      "url": "https://21st.dev/@serafimcloud/components/testimonials-with-marquee",
+      "category": "Testimonials"
+    },
+    {
+      "name": "Animated Testimonials",
+      "url": "https://21st.dev/@manuarora700/components/animated-testimonials",
+      "category": "Testimonials"
+    },
+    {
+      "name": "Stagger Testimonials",
+      "url": "https://21st.dev/@vaib215/components/stagger-testimonials",
+      "category": "Testimonials"
+    },
+    {
+      "name": "Testimonial V2",
+      "url": "https://21st.dev/@avanishverma4/components/testimonial-v2",
+      "category": "Testimonials"
+    },
+    {
+      "name": "Unique Testimonial",
+      "url": "https://21st.dev/@jatin-yadav05/components/unique-testimonial",
+      "category": "Testimonials"
+    },
+    {
+      "name": "Profile Card Testimonial Carousel",
+      "url": "https://21st.dev/@arunachalam/components/profile-card-testimonial-carousel",
+      "category": "Testimonials"
+    },
+    {
+      "name": "Pricing",
+      "url": "https://21st.dev/@Codehagen/components/pricing",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Pricing Section",
+      "url": "https://21st.dev/@aymanch-03/components/pricing-section",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Single Pricing Card",
+      "url": "https://21st.dev/@efferd/components/single-pricing-card-1",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Pricing Section",
+      "url": "https://21st.dev/@uilayout.contact/components/pricing-section",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Pricing",
+      "url": "https://21st.dev/@ravikatiyar162/components/pricing",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Pricing",
+      "url": "https://21st.dev/@uilayout.contact/components/pricing",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Pricing Section",
+      "url": "https://21st.dev/@uilayout.contact/components/pricing-section-3",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Pricing Module",
+      "url": "https://21st.dev/@ruixen.ui/components/pricing-module",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Pricing Section",
+      "url": "https://21st.dev/@kokonutd/components/pricing-section",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Squishy Pricing",
+      "url": "https://21st.dev/@vaib215/components/squishy-pricing",
+      "category": "Pricing Sections"
+    },
+    {
+      "name": "Link Preview",
+      "url": "https://21st.dev/@manuarora700/components/link-preview",
+      "category": "Text Components"
+    },
+    {
+      "name": "Text Scroll animation ",
+      "url": "https://21st.dev/@reuno-ui/components/text-scroll-animation",
+      "category": "Text Components"
+    },
+    {
+      "name": "Shimmer Text",
+      "url": "https://21st.dev/@tom_ui/components/shimmer-text",
+      "category": "Text Components"
+    },
+    {
+      "name": "Text Rotate",
+      "url": "https://21st.dev/@danielpetho/components/text-rotate/image-scroll",
+      "category": "Text Components"
+    },
+    {
+      "name": "Magic Text",
+      "url": "https://21st.dev/@preetsuthar17/components/magic-text",
+      "category": "Text Components"
+    },
+    {
+      "name": "Gradient Text",
+      "url": "https://21st.dev/@designali-in/components/gradient-text/gradient-text",
+      "category": "Text Components"
+    },
+    {
+      "name": "Marquee",
+      "url": "https://21st.dev/@tom_ui/components/marquee",
+      "category": "Text Components"
+    },
+    {
+      "name": "Hover Preview",
+      "url": "https://21st.dev/@minhxthanh/components/hover-preview",
+      "category": "Text Components"
+    },
+    {
+      "name": "Handwriting SVG",
+      "url": "https://21st.dev/@pulkitxm/components/handwriting-svg",
+      "category": "Text Components"
+    }
+  ]
+}

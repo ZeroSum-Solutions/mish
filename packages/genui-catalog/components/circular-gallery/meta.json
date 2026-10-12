@@ -1,0 +1,32 @@
+{
+  "id": "circular-gallery",
+  "name": "Circular Gallery",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; no React Bits source was read, and the ogl/WebGL dependency is replaced by per-item DOM transforms on a circular arc plus a CSS perspective bend, so it ships dependency-free.",
+  "entry": "components/circular-gallery/index.ts",
+  "css": "components/circular-gallery/styles.css",
+  "demo": "components/circular-gallery/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "bend": { "type": "number", "default": 22, "minimum": -80, "maximum": 80, "description": "Tilt, in degrees, of an item at the host's edge; 0 is flat, negative curves upward." },
+      "speed": { "type": "number", "default": 28, "description": "Auto-scroll speed in px per second; 0 disables the drift, negative reverses it." },
+      "ease": { "type": "number", "default": 0.08, "minimum": 0.01, "maximum": 1, "description": "Smoothing factor per frame for drag, wheel and key moves." },
+      "gap": { "type": "number", "default": 16, "minimum": 0, "description": "Space between items, in px." },
+      "draggable": { "type": "boolean", "default": true, "description": "Let the pointer drag the strip." },
+      "pauseOnHover": { "type": "boolean", "default": true, "description": "Pause the drift while the pointer or focus is inside." }
+    }
+  },
+  "a11y": [
+    "Items stay real list items in DOM order with their own links and captions; nothing is cloned, so screen readers read each item once.",
+    "Keyboard users Tab through the item links; a focused item is brought to the centre, the drift pauses while focus is inside, and ArrowLeft/ArrowRight step one item.",
+    "Only horizontal wheel input (or Shift+wheel) moves the strip, so vertical page scrolling is never hijacked, and a real drag suppresses the trailing link click.",
+    "Reduced motion leaves a plain horizontal scroll-snap strip with no arc, drift, rAF loop or bend."
+  ],
+  "reducedMotion": "static"
+}

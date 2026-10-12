@@ -1,0 +1,4 @@
+{
+  "description": "B4-2 Sol re-review BLOCK 1: a GET form that auto-submits into an iframe while the page loads (no click probe). Form submissions never reach a real host in any frame at any time; the attempt is recorded and the resource check cannot pass.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "noHits": true, "consoleOutcome": "inconclusive", "blockedReason": "Form submissions" } }
+}

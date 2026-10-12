@@ -1,0 +1,32 @@
+{
+  "id": "shader-svg",
+  "name": "Shader SVG",
+  "category": "background",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only (a shader fill inside an SVG logo); no upstream source was fetched or read, and raw WebGL replaces the shader dependency so the port ships with zero imports. Meant for brand marks and wordmarks, not over product photography.",
+  "entry": "components/shader-svg/index.ts",
+  "css": "components/shader-svg/styles.css",
+  "demo": "components/shader-svg/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "colorA": { "type": "string", "default": "#6d5dfc", "description": "First palette colour (hex for the shader; any CSS colour for the fallback gradient)." },
+      "colorB": { "type": "string", "default": "#22d3ee", "description": "Second palette colour." },
+      "colorC": { "type": "string", "default": "#f472b6", "description": "Accent colour that blooms through the flow." },
+      "speed": { "type": "number", "default": 1, "minimum": 0, "description": "Flow speed multiplier; 0 holds a still frame." },
+      "scale": { "type": "number", "default": 1.4, "minimum": 0.1, "description": "Pattern zoom; larger values give tighter swirls." },
+      "angle": { "type": "number", "default": 135, "description": "Main flow direction, in degrees (also the fallback gradient angle)." }
+    }
+  },
+  "a11y": [
+    "The logo SVG keeps its own role and label; the added clip path, canvas and fallback layer are aria-hidden and ignore the pointer.",
+    "The shader layer is clipped to the logo's own shapes, so its footprint and legibility are the same as the plain logo's.",
+    "Reduced motion draws one still frame and runs no animation loop; a live change of the preference stops or resumes the loop.",
+    "Forced-colors mode hides the shader layer so the logo paints in its system colours."
+  ],
+  "reducedMotion": "static"
+}

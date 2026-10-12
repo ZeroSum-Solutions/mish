@@ -1,0 +1,7 @@
+{
+  "description": "An img slideshow (src swap every 8 s) beside a busy bar, on a page that redefines innerWidth and innerHeight to 8; Pause stops only the bar. Tiles are cut from the daemon's own viewport and an img currentSrc change is element movement, so pause and live fail.",
+  "parameters": {
+    "requireReducedMotionFallback": false
+  },
+  "motion": "fail"
+}

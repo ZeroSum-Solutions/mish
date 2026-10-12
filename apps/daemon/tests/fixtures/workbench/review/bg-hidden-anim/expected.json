@@ -1,0 +1,7 @@
+{
+  "description": "The same hero, but its background swaps on each iteration of an invisible 7.5 s animation (no timer at all) next to a busy progress bar; Pause stops only the bar and nothing honours a live switch to reduce, so both pause and live fail.",
+  "parameters": {
+    "requireReducedMotionFallback": false
+  },
+  "motion": "fail"
+}

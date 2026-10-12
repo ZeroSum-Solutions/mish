@@ -1,0 +1,180 @@
+{
+  "schemaVersion": 2,
+  "family": "docs-hub",
+  "revision": 1,
+  "brand": {
+    "name": "Loomwork Docs",
+    "descriptor": "Documentation and knowledge base for Loomwork, a workflow automation CLI and platform."
+  },
+  "sections": [
+    {
+      "id": "docs-hub-header",
+      "type": "header",
+      "text": {
+        "searchLabel": "Search the docs",
+        "searchPlaceholder": "Search the docs\u2026",
+        "cta": "Get started"
+      }
+    },
+    {
+      "id": "docs-hub-hero",
+      "type": "hero",
+      "text": {
+        "heading": "Everything you need to build with Loomwork",
+        "body": "Guides, quick-start steps and reference material for setting up workflows, connecting integrations and running Loomwork in production.",
+        "cta": "Get started"
+      }
+    },
+    {
+      "id": "docs-hub-quickstart",
+      "type": "quickstart",
+      "text": {
+        "heading": "Quick start"
+      },
+      "items": [
+        {
+          "title": "1. Install the CLI",
+          "description": "Install the Loomwork command-line tool for your platform."
+        },
+        {
+          "title": "2. Sign in",
+          "description": "Authenticate the CLI against your Loomwork workspace."
+        },
+        {
+          "title": "3. Create a workflow",
+          "description": "Scaffold a new workflow from a starter template."
+        },
+        {
+          "title": "4. Connect an integration",
+          "description": "Link a data source or service the workflow will use."
+        },
+        {
+          "title": "5. Deploy",
+          "description": "Push the workflow to your Loomwork environment."
+        }
+      ]
+    },
+    {
+      "id": "docs-hub-guides",
+      "type": "guides",
+      "text": {
+        "heading": "Guides",
+        "body": "Task-focused walkthroughs for the most common things builders do with Loomwork."
+      },
+      "items": [
+        {
+          "title": "Authentication",
+          "description": "Set up API keys and workspace-scoped tokens."
+        },
+        {
+          "title": "Workflows",
+          "description": "Design, test and version workflow definitions."
+        },
+        {
+          "title": "Integrations",
+          "description": "Connect Loomwork to the tools your team already uses."
+        },
+        {
+          "title": "Webhooks",
+          "description": "Trigger workflows from external events."
+        },
+        {
+          "title": "Environments",
+          "description": "Separate staging and production configuration."
+        },
+        {
+          "title": "Permissions",
+          "description": "Control who can view, edit and run each workflow."
+        }
+      ]
+    },
+    {
+      "id": "docs-hub-api",
+      "type": "api-reference",
+      "text": {
+        "heading": "API and reference"
+      },
+      "items": [
+        {
+          "name": "REST API",
+          "description": "Endpoints for managing workflows, runs and integrations."
+        },
+        {
+          "name": "CLI reference",
+          "description": "Every command the Loomwork CLI supports, with flags."
+        },
+        {
+          "name": "Webhook payloads",
+          "description": "The event shapes Loomwork sends to your endpoints."
+        },
+        {
+          "name": "SDKs",
+          "description": "Client libraries for calling the API from your own code."
+        }
+      ]
+    },
+    {
+      "id": "docs-hub-code-sample",
+      "type": "code-sample",
+      "text": {
+        "heading": "Try it",
+        "caption": "Install the CLI and run your first build from a fresh workflow project."
+      }
+    },
+    {
+      "id": "docs-hub-changelog",
+      "type": "changelog",
+      "text": {
+        "heading": "What's new"
+      },
+      "items": [
+        {
+          "version": "v1.4.0",
+          "date": "September 2026",
+          "title": "Workflow environments",
+          "summary": "Separate staging and production configuration per workflow."
+        },
+        {
+          "version": "v1.3.0",
+          "date": "July 2026",
+          "title": "Webhook triggers",
+          "summary": "Start a workflow run from any external event."
+        },
+        {
+          "version": "v1.2.0",
+          "date": "May 2026",
+          "title": "Team permissions",
+          "summary": "Role-based access for workflows and integrations."
+        },
+        {
+          "version": "v1.1.0",
+          "date": "March 2026",
+          "title": "CLI rewrite",
+          "summary": "Faster installs and a redesigned command structure."
+        }
+      ]
+    },
+    {
+      "id": "docs-hub-community",
+      "type": "community-support",
+      "text": {
+        "heading": "Get help",
+        "body": "Ask a question, report an issue or see what's currently up.",
+        "supportEmail": "docs-support@loomwork.example",
+        "communityLink": "Community forum",
+        "statusLink": "Status page"
+      }
+    },
+    {
+      "id": "docs-hub-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Documentation for building and running Loomwork workflows.",
+        "link1": "Guides",
+        "link2": "API reference",
+        "link3": "Changelog",
+        "contactEmail": "docs@loomwork.example"
+      }
+    }
+  ]
+}

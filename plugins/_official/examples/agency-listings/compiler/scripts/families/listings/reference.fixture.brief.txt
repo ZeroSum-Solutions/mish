@@ -1,0 +1,44 @@
+Harbourline Homes is a directory of homes to rent and buy along the Cornish coast, listed by local
+agents. We want a one-page site where a visitor searches many listings and books a viewing on the
+one they like.
+
+Headline: "Find a place by the sea, from people who know the street." Every listing comes from a
+local agent who has walked through the door. Search by town, then filter by bedrooms, budget and
+how far you want to be from the water. Search field placeholder: "Search by town or postcode".
+Button: "Search homes".
+
+Nav: Rent, Buy, Holiday lets, Agents, with a "List a property" call to action.
+
+Browse by kind of home: Harbour cottages (stone cottages a short walk from the quay), Family
+houses (three bedrooms and up, with gardens and parking), Flats with a view (upper-floor flats
+that look out over the bay), Holiday lets (furnished homes for a week or a season).
+
+Filters: bedrooms (one, two, three or more), budget (under 1,200 a month, 1,200 to 1,800 a month,
+over 1,800 a month), distance to sea (under 5 minutes, under 15 minutes, any distance). Results
+can sort by newest, lowest price, or nearest the sea.
+
+Homes to rent this week, four listings: a two-bed cottage on Fore Street, St Ives TR26, 1,450 a
+month — whitewashed cottage with a log burner, two minutes from the harbour. A top-floor flat over
+the bay, Falmouth TR11, 1,150 a month — bright one-bed flat with a balcony and views across
+Carrick Roads. A three-bed family house, Penzance TR18, 1,750 a month — semi-detached house with a
+walled garden, near the primary school. A fisherman's loft, Mousehole TR19, 1,300 a month —
+converted net loft with beams, a mezzanine bedroom and a harbour view.
+
+Compare the towns (town, typical rent, walk to the sea): St Ives, 1,400 a month, 3 minutes.
+Falmouth, 1,200 a month, 8 minutes. Penzance, 1,050 a month, 10 minutes.
+
+Featured this week: a restored coastguard cottage above Porthleven, let unfurnished on a
+twelve-month tenancy — three bedrooms (one with an en-suite), 1,650 a month, available from the
+first of next month.
+
+What renters say: "The agent had photos of every room and answered the questions the listing did
+not." — Tamsin Rowe, "Found our cottage in a weekend". "They told us which houses struggle in
+winter before we booked a viewing." — Idris Pengelly, "Honest about the damp". "Rent, deposit and
+council tax band were on the listing, so there were no surprises." — Hannah Lobb, "Clear on the
+costs".
+
+Ask about a home: tell us which listing you like and when you can view it — the listing agent
+replies within one working day. Button: "Book a viewing". Phone 01736 555 0142, email
+hello@harbourline.example.
+
+Footer: Terms, Privacy, Cookies links. Address: 4 Wharf Road, St Ives, TR26 1LF.

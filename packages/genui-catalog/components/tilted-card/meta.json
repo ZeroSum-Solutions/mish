@@ -1,0 +1,32 @@
+{
+  "id": "tilted-card",
+  "name": "Tilted Card",
+  "category": "hover",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/tilted-card/index.ts",
+  "css": "components/tilted-card/styles.css",
+  "demo": "components/tilted-card/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "maxTilt": { "type": "number", "default": 12, "minimum": 0, "description": "Maximum tilt on each axis, in degrees." },
+      "scale": { "type": "number", "default": 1.04, "minimum": 1, "description": "Scale applied while hovered or focused." },
+      "perspective": { "type": "number", "default": 800, "minimum": 0, "description": "3D perspective set on the host, in px." },
+      "damping": { "type": "number", "default": 0.82, "minimum": 0, "maximum": 0.99, "description": "Spring damping: 0 follows instantly, close to 1 is heavy lag." },
+      "glare": { "type": "boolean", "default": true, "description": "Brighten the edge closest to the viewer." },
+      "glareOpacity": { "type": "number", "default": 0.25, "minimum": 0, "maximum": 1 },
+      "caption": { "type": ["string", "null"], "default": null, "description": "Tooltip text that trails the cursor; no tooltip when null." },
+      "resetDuration": { "type": "number", "default": 500, "minimum": 0, "description": "Ease-back-to-flat duration on leave, in ms." }
+    }
+  },
+  "a11y": [
+    "Content order is unchanged; mount only wraps the existing children in .genui-tilted-card__inner.",
+    "If the host is focusable, keyboard focus gives the same static lift (scale) as pointer hover, with no directional tilt.",
+    "The caption is not the only way to get its information: the same text is also given through a visually hidden element linked with aria-describedby.",
+    "The glare and caption bubble are aria-hidden, decorative layers; they never enter the accessibility tree.",
+    "glareOpacity keeps a sane default cap so the glare layer does not wash out host text contrast."
+  ],
+  "reducedMotion": "reduced"
+}

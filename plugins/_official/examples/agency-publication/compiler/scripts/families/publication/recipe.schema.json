@@ -1,0 +1,674 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-design.ai/schemas/agency-site/publication/recipe.v2.json",
+  "title": "publication recipe",
+  "description": "A static publication or media page kind (atlas CS.01): masthead, lead story, topics, latest stories, series, archive, optional authors, newsletter sign-up, membership and footer. Derived from compiler/scripts/families/publication/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.",
+  "$comment": "contract.ts additionally enforces markup-free plain text, an email format on the nullable footer contact atom (the byline, story and archive dates, and membership prices and periods are nullable too), and that a null appears only on an x-atom string leaf or in the x-optional authors slot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "family",
+    "revision",
+    "brand",
+    "sections"
+  ],
+  "sectionOrder": [
+    "publication-masthead",
+    "publication-lead",
+    "publication-topics",
+    "publication-latest",
+    "publication-series",
+    "publication-archive",
+    "publication-authors",
+    "publication-newsletter",
+    "publication-membership",
+    "publication-footer"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "family": {
+      "const": "publication"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9999
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "descriptor"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "descriptor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-masthead"
+            },
+            "type": {
+              "const": "masthead"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "cta"
+              ],
+              "properties": {
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 24
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-lead"
+            },
+            "type": {
+              "const": "lead-story"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "kicker",
+                "headline",
+                "dek",
+                "byline",
+                "readCta"
+              ],
+              "properties": {
+                "kicker": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "headline": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 90
+                },
+                "dek": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 240
+                },
+                "byline": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "person-name",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "readCta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 24
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-topics"
+            },
+            "type": {
+              "const": "topics"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "topics"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "topics": {
+                  "type": "array",
+                  "minItems": 5,
+                  "maxItems": 5,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-latest"
+            },
+            "type": {
+              "const": "latest"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "topic",
+                  "title",
+                  "dek",
+                  "date"
+                ],
+                "properties": {
+                  "topic": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 90
+                  },
+                  "dek": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  },
+                  "date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "date",
+                    "minLength": 1,
+                    "maxLength": 24
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-series"
+            },
+            "type": {
+              "const": "series"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "blurb"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  },
+                  "blurb": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-archive"
+            },
+            "type": {
+              "const": "archive"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "date",
+                  "title",
+                  "summary"
+                ],
+                "properties": {
+                  "date": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "date",
+                    "minLength": 1,
+                    "maxLength": 24
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 90
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 160
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "writers and contributors",
+            "dropWhen": "The brief names no writers, editors or contributors to introduce.",
+            "keepWhen": "The brief names real writers, editors or contributors (a name and what they cover).",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-authors"
+            },
+            "type": {
+              "const": "authors"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "bio",
+                  "name",
+                  "beat"
+                ],
+                "properties": {
+                  "bio": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "person-name",
+                    "minLength": 1,
+                    "maxLength": 60
+                  },
+                  "beat": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-newsletter"
+            },
+            "type": {
+              "const": "newsletter"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body",
+                "emailPlaceholder",
+                "cta",
+                "cadence"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "emailPlaceholder": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 48
+                },
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 24
+                },
+                "cadence": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "plain",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-membership"
+            },
+            "type": {
+              "const": "membership"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "price",
+                  "period",
+                  "features",
+                  "cta"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "price": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "price",
+                    "minLength": 1,
+                    "maxLength": 16
+                  },
+                  "period": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "plain",
+                    "minLength": 1,
+                    "maxLength": 16
+                  },
+                  "features": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 48
+                    }
+                  },
+                  "cta": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "publication-footer"
+            },
+            "type": {
+              "const": "footer"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tagline",
+                "links",
+                "contactEmail"
+              ],
+              "properties": {
+                "tagline": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "links": {
+                  "type": "array",
+                  "x-label": true,
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32
+                  }
+                },
+                "contactEmail": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "email",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

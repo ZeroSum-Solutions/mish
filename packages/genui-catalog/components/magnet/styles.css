@@ -1,0 +1,3 @@
+.genui-magnet { translate: var(--genui-magnet-x, 0px) var(--genui-magnet-y, 0px); transition: translate var(--genui-magnet-duration, 240ms) cubic-bezier(.16,1,.3,1); }
+.genui-magnet.genui-magnet--reduced, .genui-magnet:focus-within { translate: none; transition: none; }
+@media (prefers-reduced-motion: reduce) { .genui-magnet { translate: none; transition: none; } }

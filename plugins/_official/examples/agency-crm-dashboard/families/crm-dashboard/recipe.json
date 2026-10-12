@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 2,
+  "family": "crm-dashboard",
+  "revision": 1,
+  "brand": {
+    "name": "Anchor Pipeline",
+    "descriptor": "A sales pipeline dashboard mock for a mid-market services team."
+  },
+  "sections": [
+    {
+      "id": "crm-dashboard-kpis",
+      "type": "kpi-strip",
+      "items": [
+        { "label": "Open pipeline", "value": "$482,300", "delta": "+12.4%" },
+        { "label": "Deals won this month", "value": "18", "delta": "+3" },
+        { "label": "Avg. deal size", "value": "$26,800", "delta": "-4.1%" },
+        { "label": "Win rate", "value": "31%", "delta": "+2 pts" }
+      ]
+    },
+    {
+      "id": "crm-dashboard-pipeline",
+      "type": "pipeline-table",
+      "text": { "heading": "Open pipeline" },
+      "items": [
+        { "company": "Bramblewood Logistics", "owner": "Dana Ruiz", "stage": "Proposal", "value": "$64,000", "nextStep": "Send the updated MSA" },
+        { "company": "Colter Analytics", "owner": "Marcus Lee", "stage": "Negotiation", "value": "$118,500", "nextStep": "Confirm final pricing on the call" },
+        { "company": "Ferro and Vale", "owner": "Priya Nair", "stage": "Discovery", "value": "$32,000", "nextStep": "Schedule the technical demo" },
+        { "company": "Halstead Grove", "owner": "Dana Ruiz", "stage": "Qualified", "value": "$54,750", "nextStep": "Share two relevant case studies" },
+        { "company": "Ondine Works", "owner": "Marcus Lee", "stage": "Closed won", "value": "$212,000", "nextStep": "Kick off onboarding" }
+      ]
+    },
+    {
+      "id": "crm-dashboard-activity",
+      "type": "activity-feed",
+      "items": [
+        { "when": "Today, 9:12 AM", "who": "Dana Ruiz", "what": "Logged a call with Bramblewood Logistics about contract terms." },
+        { "when": "Yesterday, 4:40 PM", "who": "Marcus Lee", "what": "Sent the revised proposal to Colter Analytics." },
+        { "when": "Yesterday, 11:05 AM", "who": "Priya Nair", "what": "Booked a technical demo with Ferro and Vale for next week." },
+        { "when": "Tue, 2:18 PM", "who": "Dana Ruiz", "what": "Added the Halstead Grove case study links to the deal notes." },
+        { "when": "Tue, 10:00 AM", "who": "Marcus Lee", "what": "Closed the Ondine Works deal and notified onboarding." },
+        { "when": "Mon, 3:30 PM", "who": "Priya Nair", "what": "Updated the Ferro and Vale discovery notes after the intro call." }
+      ]
+    },
+    {
+      "id": "crm-dashboard-contact",
+      "type": "contact-card",
+      "text": {
+        "name": "Dana Ruiz",
+        "role": "Senior Account Executive",
+        "company": "Anchor Pipeline",
+        "email": "dana.ruiz@example.com",
+        "phone": "+1 415-555-0148",
+        "note": "Prefers async updates before Thursday's pipeline review."
+      }
+    },
+    {
+      "id": "crm-dashboard-filters",
+      "type": "filter-bar",
+      "items": {
+        "owner": ["Dana Ruiz", "Marcus Lee", "Priya Nair", "Unassigned"],
+        "stage": ["Discovery", "Qualified", "Proposal", "Negotiation", "Closed won"]
+      }
+    },
+    {
+      "id": "crm-dashboard-chart",
+      "type": "bar-chart",
+      "text": { "title": "Pipeline value by stage", "unit": "$k" },
+      "items": {
+        "values": [
+          { "label": "Discovery", "value": 32 },
+          { "label": "Qualified", "value": 55 },
+          { "label": "Proposal", "value": 64 },
+          { "label": "Negotiation", "value": 119 },
+          { "label": "Closed won", "value": 212 },
+          { "label": "On hold", "value": 18 },
+          { "label": "At risk", "value": 9 },
+          { "label": "Renewal", "value": 41 }
+        ]
+      }
+    }
+  ]
+}

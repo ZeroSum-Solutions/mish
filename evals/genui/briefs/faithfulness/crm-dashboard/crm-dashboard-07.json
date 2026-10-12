@@ -1,0 +1,46 @@
+{
+  "id": "crm-dashboard-07",
+  "businessName": "Saltmarsh Software",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Saltmarsh Software"
+    },
+    {
+      "field": "product_name",
+      "value": "Dockline"
+    },
+    {
+      "field": "address",
+      "value": "421 Water Street, Norfolk, Virginia"
+    },
+    {
+      "field": "phone",
+      "value": "(757) 555-0163"
+    },
+    {
+      "field": "email",
+      "value": "sales@saltmarshsoftware.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Delaware corporation"
+    },
+    {
+      "field": "other",
+      "value": "Six-rep sales team"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Rep C. Whitfield logged a demo with Blackwater Terminal, moved to proposal, 20 minutes ago"
+    }
+  ]
+}

@@ -1,0 +1,141 @@
+{
+  "practice": [
+    "application/tabs/4",
+    "application/tabs/5",
+    "marketing/sections/4",
+    "marketing/ctas/2",
+    "marketing/feature-grids/1",
+    "marketing/feature-grids/2",
+    "application/timelines/1",
+    "marketing/ctas/1",
+    "marketing/testimonials/3",
+    "marketing/pricing/1",
+    "application/details-list/1",
+    "marketing/footers/4"
+  ],
+  "crm-dashboard": [
+    "application/stats/1",
+    "application/tables/1",
+    "application/timelines/1",
+    "application/details-list/1",
+    "application/filters/1",
+    "application/charts/2"
+  ],
+  "marketing-site": [
+    "marketing/sections/1",
+    "marketing/feature-grids/1",
+    "marketing/testimonials/1",
+    "marketing/pricing/1",
+    "marketing/ctas/1",
+    "marketing/footers/1"
+  ],
+  "app-shell": [
+    "application/side-menu/1",
+    "application/vertical-menu/1",
+    "application/empty-states/1",
+    "application/tables/2",
+    "application/details-list/2",
+    "application/tabs/1"
+  ],
+  "listings": [
+    "application/tabs/4",
+    "application/tabs/5",
+    "marketing/sections/4",
+    "marketing/ctas/2",
+    "marketing/feature-grids/3",
+    "application/filters/1",
+    "marketing/feature-grids/2",
+    "application/tables/3",
+    "application/details-list/1",
+    "marketing/testimonials/3",
+    "marketing/ctas/1",
+    "marketing/footers/4"
+  ],
+  "restaurant": [
+    "application/tabs/4",
+    "application/tabs/5",
+    "marketing/sections/4",
+    "marketing/ctas/2",
+    "marketing/pricing/1",
+    "application/details-list/1",
+    "marketing/ctas/1",
+    "marketing/sections/2",
+    "marketing/feature-grids/3",
+    "marketing/testimonials/3",
+    "marketing/footers/4"
+  ],
+  "publication": [
+    "application/tabs/4",
+    "marketing/sections/2",
+    "application/tabs/5",
+    "marketing/feature-grids/4",
+    "marketing/feature-grids/3",
+    "application/timelines/1",
+    "marketing/testimonials/2",
+    "marketing/ctas/2",
+    "marketing/pricing/1",
+    "marketing/footers/1"
+  ],
+  "nonprofit": [
+    "application/tabs/4",
+    "marketing/sections/1",
+    "marketing/sections/3",
+    "marketing/feature-grids/1",
+    "marketing/stats/3",
+    "marketing/testimonials/1",
+    "application/details-list/3",
+    "application/timelines/1",
+    "marketing/pricing/1",
+    "marketing/ctas/1",
+    "marketing/ctas/2",
+    "marketing/footers/1"
+  ],
+  "docs-hub": [
+    "application/tabs/4",
+    "application/empty-states/5",
+    "marketing/ctas/1",
+    "application/details-list/3",
+    "marketing/feature-grids/1",
+    "application/details-list/1",
+    "application/tables/2",
+    "application/timelines/3",
+    "marketing/ctas/4",
+    "marketing/footers/1"
+  ],
+  "community": [
+    "application/tabs/4",
+    "marketing/ctas/1",
+    "marketing/sections/1",
+    "marketing/feature-grids/1",
+    "marketing/pricing/2",
+    "application/timelines/1",
+    "application/tables/3",
+    "marketing/testimonials/2",
+    "application/details-list/3",
+    "marketing/footers/4"
+  ],
+  "storefront": [
+    "application/tabs/4",
+    "application/tabs/5",
+    "marketing/sections/4",
+    "marketing/pricing/1",
+    "marketing/feature-grids/3",
+    "application/details-list/1",
+    "marketing/ctas/1",
+    "marketing/sections/1",
+    "marketing/testimonials/3",
+    "marketing/sections/3",
+    "marketing/footers/4"
+  ],
+  "guide": [
+    "application/tabs/4",
+    "marketing/sections/4",
+    "marketing/sections/1",
+    "marketing/feature-grids/2",
+    "application/details-list/1",
+    "marketing/feature-grids/1",
+    "marketing/testimonials/3",
+    "marketing/ctas/1",
+    "marketing/footers/4"
+  ]
+}

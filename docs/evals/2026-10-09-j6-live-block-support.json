@@ -1,0 +1,3508 @@
+{
+  "mode": "live",
+  "evaluatedAt": "2026-10-09T16:07:08.505Z",
+  "model": "jev-1.13.0",
+  "provenance": {
+    "fixtureSha256": "e62f7461ac3f4cb73ca2cbe47ee0bc119e8185401ece536ebe932129b5516122",
+    "questionsSha256": "6b08e621929dd7ca82c7944fa6f7898da403deb1d73ffc82d947aaacfeb8c2a8",
+    "labellingRule": "spine: the one journey the brief's final action serves (acceptable set listed when two are defensible). direction: acceptable set = directions whose mood does not contradict the business/audience (fixed before calling). role r: TRUE iff the brief itself supplies the content the code's KIND_NEEDS line demands (pricing: states prices/plans; testimonials: quotes customers or names clients; team: names the people; blog: names articles/posts/updates; timeline: gives milestones/roadmap/dated releases; faq: answers visitor questions; logo-wall: names clients or partners; plan-comparison: compares plans). X = ambiguous, excluded. Real pipeline includes a role iff 1-P(none) >= 0.5. Labels written before any Jev call."
+  },
+  "cases": 16,
+  "limitation": "Original J4 judgment battery and labels; support uses production missing-role questions. Excludes ambiguous labels, catalog compatibility, seven-block capacity, rendering, and generation. Eval requests use a separate 60s per-call budget, not the production shared deadline.",
+  "calls": 32,
+  "tables": [
+    {
+      "supportThreshold": 0.8,
+      "pickerThreshold": 0.5,
+      "before": {
+        "tp": 10,
+        "fp": 3,
+        "tn": 106,
+        "fn": 5,
+        "correct": 116,
+        "total": 124,
+        "accuracy": 0.9354838709677419
+      },
+      "after": {
+        "tp": 15,
+        "fp": 4,
+        "tn": 105,
+        "fn": 0,
+        "correct": 120,
+        "total": 124,
+        "accuracy": 0.967741935483871
+      },
+      "errors": [
+        {
+          "id": "B1",
+          "role": "team",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.94
+        },
+        {
+          "id": "B1",
+          "role": "pricing",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.94
+        },
+        {
+          "id": "B2",
+          "role": "faq",
+          "expected": false,
+          "before": true,
+          "after": true
+        },
+        {
+          "id": "B2",
+          "role": "testimonials",
+          "expected": false,
+          "before": false,
+          "after": true,
+          "support": 0.84
+        },
+        {
+          "id": "B9",
+          "role": "logo_wall",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.91
+        },
+        {
+          "id": "B12",
+          "role": "logo_wall",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.84
+        },
+        {
+          "id": "B13",
+          "role": "team",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.94
+        },
+        {
+          "id": "B14",
+          "role": "faq",
+          "expected": false,
+          "before": true,
+          "after": true
+        },
+        {
+          "id": "B16",
+          "role": "faq",
+          "expected": false,
+          "before": true,
+          "after": true
+        }
+      ]
+    },
+    {
+      "supportThreshold": 0.9,
+      "pickerThreshold": 0.5,
+      "before": {
+        "tp": 10,
+        "fp": 3,
+        "tn": 106,
+        "fn": 5,
+        "correct": 116,
+        "total": 124,
+        "accuracy": 0.9354838709677419
+      },
+      "after": {
+        "tp": 14,
+        "fp": 3,
+        "tn": 106,
+        "fn": 1,
+        "correct": 120,
+        "total": 124,
+        "accuracy": 0.967741935483871
+      },
+      "errors": [
+        {
+          "id": "B1",
+          "role": "team",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.94
+        },
+        {
+          "id": "B1",
+          "role": "pricing",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.94
+        },
+        {
+          "id": "B2",
+          "role": "faq",
+          "expected": false,
+          "before": true,
+          "after": true
+        },
+        {
+          "id": "B9",
+          "role": "logo_wall",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.91
+        },
+        {
+          "id": "B12",
+          "role": "logo_wall",
+          "expected": true,
+          "before": false,
+          "after": false,
+          "support": 0.84
+        },
+        {
+          "id": "B13",
+          "role": "team",
+          "expected": true,
+          "before": false,
+          "after": true,
+          "support": 0.94
+        },
+        {
+          "id": "B14",
+          "role": "faq",
+          "expected": false,
+          "before": true,
+          "after": true
+        },
+        {
+          "id": "B16",
+          "role": "faq",
+          "expected": false,
+          "before": true,
+          "after": true
+        }
+      ]
+    }
+  ],
+  "thresholdReplayAt": "2026-10-09T16:08:13.684Z",
+  "results": [
+    {
+      "id": "B1",
+      "picker": {
+        "logo_wall": 0.010000000000000009,
+        "faq": 0.16000000000000003,
+        "team": 0.22999999999999998,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0.08999999999999997,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.02,
+        "plan_comparison": 0.03,
+        "timeline_roadmap": 0.03,
+        "team": 0.94,
+        "testimonials": 0.02,
+        "blog_articles": 0.02,
+        "pricing": 0.94
+      },
+      "calls": [
+        {
+          "requestSha256": "51e94838611d69a8d64426bd499a75de1cfca464c6b78b9d0bbf2e5fb0fe6cff",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "TL",
+                "confidence": 0.89,
+                "probabilities": {
+                  "TL": 0.9,
+                  "PA": 0,
+                  "CO": 0.01,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0.08,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0.01
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 0.47,
+                "probabilities": {
+                  "editorial_monocle": 0.04,
+                  "modern_minimal": 0.38,
+                  "human_approachable": 0.58,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.98,
+                "probabilities": {
+                  "cult_organic_social_proof": 0.01,
+                  "none": 0.99
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.82,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.07,
+                  "cult_marketing_faq_apple": 0.01,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.08,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.84
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.54,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0.23,
+                  "none": 0.77
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.89,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0.02,
+                  "cult_marketing_pricing_texture": 0.05,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0.02,
+                  "none": 0.91
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2361,
+              "output_tokens": 583
+            }
+          },
+          "ms": 408
+        },
+        {
+          "requestSha256": "6c12a039be8caa93043de760784c60cde713faa93dcb03b23cca1531ab7819ff",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.94
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.94
+              }
+            },
+            "usage": {
+              "input_tokens": 920,
+              "output_tokens": 136
+            }
+          },
+          "ms": 96
+        }
+      ]
+    },
+    {
+      "id": "B2",
+      "picker": {
+        "logo_wall": 0.5900000000000001,
+        "faq": 0.51,
+        "team": 0,
+        "testimonials": 0.48,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0.9299999999999999,
+        "plan_comparison": 0.4
+      },
+      "support": {
+        "plan_comparison": 0.77,
+        "timeline_roadmap": 0.02,
+        "team": 0.02,
+        "testimonials": 0.84,
+        "blog_articles": 0.03
+      },
+      "calls": [
+        {
+          "requestSha256": "870897184b7665cc79ab7e43e8dda00ac5e3080cc8ef30fdc4d07d37a103b563",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "PA",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 1,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "modern_minimal",
+                "confidence": 0.75,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0.8,
+                  "human_approachable": 0.19,
+                  "tech_utility": 0.01,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "cult_organic_social_proof",
+                "confidence": 0.18,
+                "probabilities": {
+                  "cult_organic_social_proof": 0.59,
+                  "none": 0.41
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.42,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.01,
+                  "cult_marketing_faq_apple": 0.36,
+                  "cult_marketing_faq_hex": 0.01,
+                  "cult_marketing_faq_modern": 0.01,
+                  "cult_marketing_faq_vite": 0.08,
+                  "cult_sass_colorful_faq": 0.04,
+                  "none": 0.49
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.28,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0.35,
+                  "cult_sass_colorful_testimonials": 0.13,
+                  "none": 0.52
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "cult_marketing_pricing_vite",
+                "confidence": 0.42,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0.21,
+                  "cult_marketing_pricing_texture": 0.18,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0.54,
+                  "none": 0.07
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.2,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0.4,
+                  "none": 0.6
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2356,
+              "output_tokens": 592
+            }
+          },
+          "ms": 315
+        },
+        {
+          "requestSha256": "aaaffae5ed20a6075c3a505d2d03d13aa1b1c89d161536ff54469b8760102aa6",
+          "questions": [
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.77
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.84
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.03
+              }
+            },
+            "usage": {
+              "input_tokens": 730,
+              "output_tokens": 100
+            }
+          },
+          "ms": 97
+        }
+      ]
+    },
+    {
+      "id": "B3",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.27,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.02,
+        "plan_comparison": 0.02,
+        "timeline_roadmap": 0.02,
+        "team": 0.02,
+        "testimonials": 0.02,
+        "blog_articles": 0.03,
+        "pricing": 0.08
+      },
+      "calls": [
+        {
+          "requestSha256": "6857122789adbc86f9143bb07464add415d625cb00137a3609aee48c96d35dd5",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "CO",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 1,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 0.96,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0.02,
+                  "human_approachable": 0.97,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0.01
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.69,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.07,
+                  "cult_marketing_faq_apple": 0.01,
+                  "cult_marketing_faq_hex": 0.01,
+                  "cult_marketing_faq_modern": 0.18,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.73
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2353,
+              "output_tokens": 583
+            }
+          },
+          "ms": 332
+        },
+        {
+          "requestSha256": "63b16f8b11c05f1250a1e311ebac09a235968bcaa96bae46d79faf5ad8b70577",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.08
+              }
+            },
+            "usage": {
+              "input_tokens": 912,
+              "output_tokens": 136
+            }
+          },
+          "ms": 97
+        }
+      ]
+    },
+    {
+      "id": "B4",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.08999999999999997,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.05,
+        "plan_comparison": 0.03,
+        "timeline_roadmap": 0.03,
+        "team": 0.04,
+        "testimonials": 0.05,
+        "blog_articles": 0.03,
+        "pricing": 0.05
+      },
+      "calls": [
+        {
+          "requestSha256": "7c4ec37ea5e33e74ff16b8638946693f8c6d2ed36eaa1288d21899c9eed42053",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "SM",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 1,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 0.97,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0.02,
+                  "human_approachable": 0.98,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.9,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.05,
+                  "cult_marketing_faq_apple": 0,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.04,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.91
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2336,
+              "output_tokens": 583
+            }
+          },
+          "ms": 316
+        },
+        {
+          "requestSha256": "ad587cbefafe107c32a4c963262fc98b2e8bc55cdd3c91b52bfe5b2c7a3fd28f",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.05
+              }
+            },
+            "usage": {
+              "input_tokens": 895,
+              "output_tokens": 136
+            }
+          },
+          "ms": 102
+        }
+      ]
+    },
+    {
+      "id": "B5",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.05999999999999994,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0.54,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.02,
+        "plan_comparison": 0.1,
+        "timeline_roadmap": 0.03,
+        "team": 0.02,
+        "testimonials": 0.02,
+        "pricing": 0.02
+      },
+      "calls": [
+        {
+          "requestSha256": "cafaa7cb9c3399e82823c14fcccee16f5b87996b015663efc79e4a7157cdfb4c",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "CS",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 1,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "editorial_monocle",
+                "confidence": 0.99,
+                "probabilities": {
+                  "editorial_monocle": 0.99,
+                  "modern_minimal": 0.01,
+                  "human_approachable": 0,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.93,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.03,
+                  "cult_marketing_faq_apple": 0,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.03,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.9400000000000001
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "cult_marketing_blog_texture",
+                "confidence": 0.08,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0.54,
+                  "none": 0.46
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2355,
+              "output_tokens": 588
+            }
+          },
+          "ms": 122
+        },
+        {
+          "requestSha256": "726c6b1bbf21301f65c0c6494a553a9a26b1b075eaf259f69d11ba6933c17196",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.1
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.02
+              }
+            },
+            "usage": {
+              "input_tokens": 831,
+              "output_tokens": 118
+            }
+          },
+          "ms": 141
+        }
+      ]
+    },
+    {
+      "id": "B6",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.19999999999999996,
+        "team": 0.050000000000000044,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0.43000000000000005,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.02,
+        "plan_comparison": 0.02,
+        "timeline_roadmap": 0.89,
+        "team": 0.45,
+        "testimonials": 0.02,
+        "blog_articles": 0.02,
+        "pricing": 0.02
+      },
+      "calls": [
+        {
+          "requestSha256": "71208b520d6c361ff976f1d49d65c371c35e1fe679548f37b4440dbd18d64c15",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "LM",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 1,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 1,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0,
+                  "human_approachable": 1,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.77,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.11,
+                  "cult_marketing_faq_apple": 0.01,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.07,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.8
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.9,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0.05,
+                  "none": 0.95
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.14,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0.43,
+                  "none": 0.57
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2363,
+              "output_tokens": 583
+            }
+          },
+          "ms": 130
+        },
+        {
+          "requestSha256": "5508ad47e7b9679ec19c70da5c3331672dd1c3d9d8d9819b11d8fc4c2e795ce9",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.89
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.45
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.02
+              }
+            },
+            "usage": {
+              "input_tokens": 922,
+              "output_tokens": 136
+            }
+          },
+          "ms": 122
+        }
+      ]
+    },
+    {
+      "id": "B7",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.72,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.02,
+        "plan_comparison": 0.02,
+        "timeline_roadmap": 0.02,
+        "team": 0.02,
+        "testimonials": 0.02,
+        "blog_articles": 0.02,
+        "pricing": 0.02
+      },
+      "calls": [
+        {
+          "requestSha256": "8513718b99e59526bb4dd946ea54f822e8c8205b778903f29ada8cda01605338",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "BA",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 1,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 0.97,
+                "probabilities": {
+                  "editorial_monocle": 0.01,
+                  "modern_minimal": 0.01,
+                  "human_approachable": 0.98,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "cult_marketing_faq_accordion",
+                "confidence": 0.36,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.44,
+                  "cult_marketing_faq_apple": 0.02,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.26,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.28
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2364,
+              "output_tokens": 590
+            }
+          },
+          "ms": 112
+        },
+        {
+          "requestSha256": "8800530963ca679a5efefbfbb7acbaaf940467927c7d4c6ea043af68c5025792",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.02
+              }
+            },
+            "usage": {
+              "input_tokens": 923,
+              "output_tokens": 136
+            }
+          },
+          "ms": 98
+        }
+      ]
+    },
+    {
+      "id": "B8",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.06999999999999995,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.02,
+        "plan_comparison": 0.03,
+        "timeline_roadmap": 0.04,
+        "team": 0.02,
+        "testimonials": 0.02,
+        "blog_articles": 0.02,
+        "pricing": 0.02
+      },
+      "calls": [
+        {
+          "requestSha256": "f1ab1ba7a3caa75c14ab1b59e814d9f9084f7fbac26a783620764efe8af2516e",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "TU",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 1,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "modern_minimal",
+                "confidence": 0.94,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0.95,
+                  "human_approachable": 0.03,
+                  "tech_utility": 0.02,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.92,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.02,
+                  "cult_marketing_faq_apple": 0.02,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.02,
+                  "cult_marketing_faq_vite": 0.01,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.93
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2349,
+              "output_tokens": 581
+            }
+          },
+          "ms": 121
+        },
+        {
+          "requestSha256": "39ecfa6683a16a863718d5fad7648b1075f68b35416a6cb615a222e65333e26c",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.02
+              }
+            },
+            "usage": {
+              "input_tokens": 908,
+              "output_tokens": 136
+            }
+          },
+          "ms": 115
+        }
+      ]
+    },
+    {
+      "id": "B9",
+      "picker": {
+        "logo_wall": 0.43000000000000005,
+        "faq": 0.09999999999999998,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0.5,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.91,
+        "plan_comparison": 0.03,
+        "team": 0.03,
+        "testimonials": 0.03,
+        "blog_articles": 0.07,
+        "pricing": 0.02
+      },
+      "calls": [
+        {
+          "requestSha256": "3edf086c0091ea7c6158aef7974dc9ed6ce1aced86b39f506a2eeb9fc776b5a2",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "MI",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 1,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 0.96,
+                "probabilities": {
+                  "editorial_monocle": 0.02,
+                  "modern_minimal": 0.01,
+                  "human_approachable": 0.97,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.14,
+                "probabilities": {
+                  "cult_organic_social_proof": 0.43,
+                  "none": 0.57
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.89,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.05,
+                  "cult_marketing_faq_apple": 0,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.05,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.9
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "cult_marketing_roadmap_vite",
+                "confidence": 0,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0.5,
+                  "none": 0.5
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2368,
+              "output_tokens": 590
+            }
+          },
+          "ms": 194
+        },
+        {
+          "requestSha256": "b5743ad7cf139ed1723fcd7bed5a065492dee4d74418fdf97d86c4e89eaca1c1",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.91
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.02
+              }
+            },
+            "usage": {
+              "input_tokens": 844,
+              "output_tokens": 115
+            }
+          },
+          "ms": 118
+        }
+      ]
+    },
+    {
+      "id": "B10",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.05999999999999994,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.02,
+        "plan_comparison": 0.03,
+        "timeline_roadmap": 0.03,
+        "team": 0.03,
+        "testimonials": 0.02,
+        "blog_articles": 0.04,
+        "pricing": 0.04
+      },
+      "calls": [
+        {
+          "requestSha256": "ffa31ee25f74ada53288322782b68a17193a2053f49a5b80a087f94db1063142",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "TL",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 1,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "editorial_monocle",
+                "confidence": 0.34,
+                "probabilities": {
+                  "editorial_monocle": 0.47000000000000003,
+                  "modern_minimal": 0.08,
+                  "human_approachable": 0.06,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0.39
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.93,
+                "probabilities": {
+                  "cult_organic_faq": 0.06,
+                  "cult_marketing_faq_accordion": 0,
+                  "cult_marketing_faq_apple": 0,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.9400000000000001
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2352,
+              "output_tokens": 584
+            }
+          },
+          "ms": 165
+        },
+        {
+          "requestSha256": "1163f0fe9831e19f41e6203af7ea5fa6f8302bc193639e15a1388f3d5ec89322",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.04
+              }
+            },
+            "usage": {
+              "input_tokens": 911,
+              "output_tokens": 136
+            }
+          },
+          "ms": 115
+        }
+      ]
+    },
+    {
+      "id": "B11",
+      "picker": {
+        "logo_wall": 0.010000000000000009,
+        "faq": 0.87,
+        "team": 0,
+        "testimonials": 0.88,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.04,
+        "plan_comparison": 0.06,
+        "timeline_roadmap": 0.02,
+        "team": 0.03,
+        "blog_articles": 0.02,
+        "pricing": 0.22
+      },
+      "calls": [
+        {
+          "requestSha256": "6a86bb7ab5fbf2ec4bf764a93b3418f2c0bc8c201e6f9bd9edf71474cebfb975",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "PA",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 1,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 0.69,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0.25,
+                  "human_approachable": 0.75,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.98,
+                "probabilities": {
+                  "cult_organic_social_proof": 0.01,
+                  "none": 0.99
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "cult_marketing_faq_modern",
+                "confidence": 0.29,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.11,
+                  "cult_marketing_faq_apple": 0.27,
+                  "cult_marketing_faq_hex": 0.02,
+                  "cult_marketing_faq_modern": 0.38,
+                  "cult_marketing_faq_vite": 0.04,
+                  "cult_sass_colorful_faq": 0.05,
+                  "none": 0.13
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "cult_sass_colorful_testimonials",
+                "confidence": 0.55,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0.18,
+                  "cult_sass_colorful_testimonials": 0.7,
+                  "none": 0.12
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2365,
+              "output_tokens": 598
+            }
+          },
+          "ms": 160
+        },
+        {
+          "requestSha256": "b592e87c85ab90499c4960fe8af854d67c79f69641fa4900ff9208af5e6fa617",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.22
+              }
+            },
+            "usage": {
+              "input_tokens": 837,
+              "output_tokens": 116
+            }
+          },
+          "ms": 114
+        }
+      ]
+    },
+    {
+      "id": "B12",
+      "picker": {
+        "logo_wall": 0.49,
+        "faq": 0.22999999999999998,
+        "team": 0,
+        "testimonials": 0.30999999999999994,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0.030000000000000027,
+        "plan_comparison": 0.21999999999999997
+      },
+      "support": {
+        "logo_wall": 0.84,
+        "plan_comparison": 0.39,
+        "timeline_roadmap": 0.03,
+        "team": 0.41,
+        "testimonials": 0.48,
+        "blog_articles": 0.02,
+        "pricing": 0.21
+      },
+      "calls": [
+        {
+          "requestSha256": "7a0f5fb5ce6518d89145e4c82e604c68597a0f6cae8b776a89cb8cd8a57c9abc",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "BA",
+                "confidence": 0.93,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0.06,
+                  "BA": 0.9400000000000001,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 0.8,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0.11,
+                  "human_approachable": 0.84,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0.05
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.02,
+                "probabilities": {
+                  "cult_organic_social_proof": 0.49,
+                  "none": 0.51
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.74,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.05,
+                  "cult_marketing_faq_apple": 0.08,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.07,
+                  "cult_marketing_faq_vite": 0.01,
+                  "cult_sass_colorful_faq": 0.02,
+                  "none": 0.77
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.54,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0.31,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 0.6900000000000001
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.96,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0.01,
+                  "cult_marketing_pricing_texture": 0.01,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0.01,
+                  "none": 0.97
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.56,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0.22,
+                  "none": 0.78
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2347,
+              "output_tokens": 583
+            }
+          },
+          "ms": 125
+        },
+        {
+          "requestSha256": "3269c61beeaf9b8e562661776d6bba4b52709db4ba0977baffc4fd3bcb7ec870",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.84
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.39
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.41
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.48
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.21
+              }
+            },
+            "usage": {
+              "input_tokens": 906,
+              "output_tokens": 136
+            }
+          },
+          "ms": 127
+        }
+      ]
+    },
+    {
+      "id": "B13",
+      "picker": {
+        "logo_wall": 0.010000000000000009,
+        "faq": 0.040000000000000036,
+        "team": 0.22999999999999998,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.03,
+        "plan_comparison": 0.02,
+        "timeline_roadmap": 0.07,
+        "team": 0.94,
+        "testimonials": 0.03,
+        "blog_articles": 0.05,
+        "pricing": 0.02
+      },
+      "calls": [
+        {
+          "requestSha256": "c210cbb189b499c869ccfe24aa4fae46cd9de5b775e87938fb5dbf08167354eb",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "TL",
+                "confidence": 0.89,
+                "probabilities": {
+                  "TL": 0.9,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 0.05,
+                  "BA": 0.04,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0.01
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "brutalist_experimental",
+                "confidence": 1,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0,
+                  "human_approachable": 0,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 1
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.98,
+                "probabilities": {
+                  "cult_organic_social_proof": 0.01,
+                  "none": 0.99
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.95,
+                "probabilities": {
+                  "cult_organic_faq": 0.04,
+                  "cult_marketing_faq_accordion": 0,
+                  "cult_marketing_faq_apple": 0,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.96
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.54,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0.23,
+                  "none": 0.77
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2352,
+              "output_tokens": 585
+            }
+          },
+          "ms": 117
+        },
+        {
+          "requestSha256": "6f3750856b6d360d712eb199741884ba6731ebb85946efe0c15c5b1de8d4a114",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.94
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.02
+              }
+            },
+            "usage": {
+              "input_tokens": 911,
+              "output_tokens": 136
+            }
+          },
+          "ms": 132
+        }
+      ]
+    },
+    {
+      "id": "B14",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.5800000000000001,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0.39,
+        "timeline_roadmap": 0.7,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.03,
+        "plan_comparison": 0.02,
+        "team": 0.02,
+        "testimonials": 0.02,
+        "blog_articles": 0.15,
+        "pricing": 0.02
+      },
+      "calls": [
+        {
+          "requestSha256": "4c8227db21728344f3e117733bac4b72f46faf3e52feac25bf5aecef25d98dbb",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "PA",
+                "confidence": 0.96,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0.96,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0.02,
+                  "LM": 0,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0.02
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "tech_utility",
+                "confidence": 0.95,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0.04,
+                  "human_approachable": 0,
+                  "tech_utility": 0.96,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "cult_marketing_faq_vite",
+                "confidence": 0.45,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.02,
+                  "cult_marketing_faq_apple": 0,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.04,
+                  "cult_marketing_faq_vite": 0.52,
+                  "cult_sass_colorful_faq": 0,
+                  "none": 0.42
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.22,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0.39,
+                  "none": 0.61
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "cult_marketing_roadmap_vite",
+                "confidence": 0.4,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0.7,
+                  "none": 0.3
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2362,
+              "output_tokens": 594
+            }
+          },
+          "ms": 133
+        },
+        {
+          "requestSha256": "4dda242cdd5145c100625a5da310d60716c46b774e7d6853e45ad9f5e163a2a2",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.15
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.02
+              }
+            },
+            "usage": {
+              "input_tokens": 838,
+              "output_tokens": 115
+            }
+          },
+          "ms": 155
+        }
+      ]
+    },
+    {
+      "id": "B15",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.030000000000000027,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0,
+        "plan_comparison": 0
+      },
+      "support": {
+        "logo_wall": 0.04,
+        "plan_comparison": 0.02,
+        "timeline_roadmap": 0.05,
+        "team": 0.03,
+        "testimonials": 0.02,
+        "blog_articles": 0.03,
+        "pricing": 0.04
+      },
+      "calls": [
+        {
+          "requestSha256": "1f75283fe23f4bc6a3cdf7a5a8435741931c6e97aa12c0a773c78fa8017512b5",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "BA",
+                "confidence": 0.86,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0.06999999999999999,
+                  "SM": 0.03,
+                  "CS": 0,
+                  "LM": 0,
+                  "BA": 0.87,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0.03
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 1,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0,
+                  "human_approachable": 1,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 0.97,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.01,
+                  "cult_marketing_faq_apple": 0,
+                  "cult_marketing_faq_hex": 0,
+                  "cult_marketing_faq_modern": 0.01,
+                  "cult_marketing_faq_vite": 0,
+                  "cult_sass_colorful_faq": 0.01,
+                  "none": 0.97
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0,
+                  "cult_marketing_pricing_texture": 0,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0,
+                  "none": 1
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2337,
+              "output_tokens": 583
+            }
+          },
+          "ms": 106
+        },
+        {
+          "requestSha256": "46b6117d7c4ac05f1402e293735bf4f489876b8eb5785c3d865336474c534a36",
+          "questions": [
+            "support_logo_wall",
+            "support_plan_comparison",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles",
+            "support_pricing"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "support_plan_comparison": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_pricing": {
+                "type": "noul",
+                "noul": 0.04
+              }
+            },
+            "usage": {
+              "input_tokens": 896,
+              "output_tokens": 136
+            }
+          },
+          "ms": 129
+        }
+      ]
+    },
+    {
+      "id": "B16",
+      "picker": {
+        "logo_wall": 0,
+        "faq": 0.75,
+        "team": 0,
+        "testimonials": 0,
+        "blog_articles": 0,
+        "timeline_roadmap": 0,
+        "pricing": 0.87,
+        "plan_comparison": 0.87
+      },
+      "support": {
+        "logo_wall": 0.02,
+        "timeline_roadmap": 0.03,
+        "team": 0.01,
+        "testimonials": 0.02,
+        "blog_articles": 0.02
+      },
+      "calls": [
+        {
+          "requestSha256": "f70c4031325e19a6ae67ac62c3ff33d82d28af43cd9b1666ef155dc5173e1d3e",
+          "questions": [
+            "spine",
+            "direction",
+            "block_logo_wall",
+            "block_faq",
+            "block_team",
+            "block_testimonials",
+            "block_blog_articles",
+            "block_timeline_roadmap",
+            "block_pricing",
+            "block_plan_comparison"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "spine": {
+                "type": "choice",
+                "choice": "LM",
+                "confidence": 1,
+                "probabilities": {
+                  "TL": 0,
+                  "PA": 0,
+                  "CO": 0,
+                  "SM": 0,
+                  "CS": 0,
+                  "LM": 1,
+                  "BA": 0,
+                  "TU": 0,
+                  "MI": 0,
+                  "none": 0
+                }
+              },
+              "direction": {
+                "type": "choice",
+                "choice": "human_approachable",
+                "confidence": 1,
+                "probabilities": {
+                  "editorial_monocle": 0,
+                  "modern_minimal": 0,
+                  "human_approachable": 1,
+                  "tech_utility": 0,
+                  "brutalist_experimental": 0
+                }
+              },
+              "block_logo_wall": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_organic_social_proof": 0,
+                  "none": 1
+                }
+              },
+              "block_faq": {
+                "type": "choice",
+                "choice": "cult_marketing_faq_apple",
+                "confidence": 0.41,
+                "probabilities": {
+                  "cult_organic_faq": 0,
+                  "cult_marketing_faq_accordion": 0.04,
+                  "cult_marketing_faq_apple": 0.48,
+                  "cult_marketing_faq_hex": 0.01,
+                  "cult_marketing_faq_modern": 0.04,
+                  "cult_marketing_faq_vite": 0.17,
+                  "cult_sass_colorful_faq": 0.01,
+                  "none": 0.25
+                }
+              },
+              "block_team": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_team_minimal": 0,
+                  "none": 1
+                }
+              },
+              "block_testimonials": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_testimonials_hex": 0,
+                  "cult_sass_colorful_testimonials": 0,
+                  "none": 1
+                }
+              },
+              "block_blog_articles": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_blog_texture": 0,
+                  "none": 1
+                }
+              },
+              "block_timeline_roadmap": {
+                "type": "choice",
+                "choice": "none",
+                "confidence": 1,
+                "probabilities": {
+                  "cult_marketing_roadmap_vite": 0,
+                  "none": 1
+                }
+              },
+              "block_pricing": {
+                "type": "choice",
+                "choice": "cult_marketing_pricing_vite",
+                "confidence": 0.36,
+                "probabilities": {
+                  "cult_marketing_pricing_apple": 0.21,
+                  "cult_marketing_pricing_texture": 0.17,
+                  "cult_marketing_pricing_vercel": 0,
+                  "cult_marketing_pricing_vite": 0.49,
+                  "none": 0.13
+                }
+              },
+              "block_plan_comparison": {
+                "type": "choice",
+                "choice": "cult_marketing_comparison_texture",
+                "confidence": 0.74,
+                "probabilities": {
+                  "cult_marketing_comparison_texture": 0.87,
+                  "none": 0.13
+                }
+              }
+            },
+            "usage": {
+              "input_tokens": 2357,
+              "output_tokens": 601
+            }
+          },
+          "ms": 115
+        },
+        {
+          "requestSha256": "e5cd37802b134c9707503f5b4723004f5f1dadcf0bd392ff7dc9e6391494f65c",
+          "questions": [
+            "support_logo_wall",
+            "support_timeline_roadmap",
+            "support_team",
+            "support_testimonials",
+            "support_blog_articles"
+          ],
+          "response": {
+            "model": "jev-1.13.0",
+            "answers": {
+              "support_logo_wall": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_timeline_roadmap": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "support_team": {
+                "type": "noul",
+                "noul": 0.01
+              },
+              "support_testimonials": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "support_blog_articles": {
+                "type": "noul",
+                "noul": 0.02
+              }
+            },
+            "usage": {
+              "input_tokens": 745,
+              "output_tokens": 98
+            }
+          },
+          "ms": 96
+        }
+      ]
+    }
+  ]
+}

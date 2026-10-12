@@ -1,0 +1,63 @@
+/* metallic-paint — clean-room, from the effect description only. Every selector is under .genui-metallic-paint. */
+
+:where(.genui-metallic-paint) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 18px;
+  color: #0b0d12;
+  background-color: #6b7380;
+  background-image: linear-gradient(
+    115deg,
+    color-mix(in srgb, var(--genui-metallic-paint-tint, #c9d2de) 38%, #10131a) 0%,
+    color-mix(in srgb, var(--genui-metallic-paint-tint, #c9d2de) 88%, #ffffff) 18%,
+    color-mix(in srgb, var(--genui-metallic-paint-tint, #c9d2de) 55%, #10131a) 34%,
+    color-mix(in srgb, var(--genui-metallic-paint-tint, #c9d2de) 96%, #ffffff) 52%,
+    color-mix(in srgb, var(--genui-metallic-paint-tint, #c9d2de) 48%, #10131a) 70%,
+    color-mix(in srgb, var(--genui-metallic-paint-tint, #c9d2de) 80%, #ffffff) 86%,
+    color-mix(in srgb, var(--genui-metallic-paint-tint, #c9d2de) 40%, #10131a) 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 50%;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), inset 0 -1px 0 rgba(0, 0, 0, 0.35), 0 12px 32px rgba(0, 0, 0, 0.45);
+  animation: genui-metallic-paint-sheen var(--genui-metallic-paint-duration, 24s) ease-in-out infinite alternate;
+}
+
+.genui-metallic-paint__canvas {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.genui-metallic-paint.genui-metallic-paint--gl,
+.genui-metallic-paint.genui-metallic-paint--reduced {
+  animation: none;
+}
+
+@keyframes genui-metallic-paint-sheen {
+  to {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-metallic-paint {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-metallic-paint {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+
+  .genui-metallic-paint__canvas {
+    display: none;
+  }
+}

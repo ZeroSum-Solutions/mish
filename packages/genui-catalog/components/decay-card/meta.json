@@ -1,0 +1,31 @@
+{
+  "id": "decay-card",
+  "name": "Decay Card",
+  "category": "hover",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/decay-card/index.ts",
+  "css": "components/decay-card/styles.css",
+  "demo": "components/decay-card/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "maxScale": { "type": "number", "default": 60, "minimum": 0, "description": "Peak displacement of the feDisplacementMap." },
+      "decay": { "type": "number", "default": 0.9, "minimum": 0, "maximum": 1, "description": "Per-frame multiplier the warp decays by once movement stops." },
+      "sensitivity": { "type": "number", "default": 1.2, "minimum": 0, "description": "Multiplies pointer travel distance into displacement." },
+      "frequency": { "type": "number", "default": 0.015, "minimum": 0 },
+      "octaves": { "type": "number", "default": 2, "minimum": 1 },
+      "grayscale": { "type": "number", "default": 1, "minimum": 0, "maximum": 1, "description": "0 (colour) to 1 (full grayscale) at rest." },
+      "parallax": { "type": "number", "default": 8, "minimum": 0, "description": "Max parallax offset, in px." },
+      "colourOnHover": { "type": "boolean", "default": true }
+    }
+  },
+  "a11y": [
+    "The media is decorative unless the author gives it role=\"img\" and aria-label.",
+    "The caption is real text in the DOM, not injected by mount().",
+    "Keyboard focus gives the colour state through :focus-within without triggering the warp.",
+    "The SVG filter defs are aria-hidden and never in the tab order."
+  ],
+  "reducedMotion": "static"
+}

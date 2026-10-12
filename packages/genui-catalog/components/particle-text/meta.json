@@ -1,0 +1,35 @@
+{
+  "id": "particle-text",
+  "name": "Particle Text",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "verdict": "keep",
+  "licenceDecision": "clean-room",
+  "rationale": "Clean-room implementation from the one-line effect description only; no upstream source was read. A dependency-free 2D canvas samples the host's own laid-out text, so the effect needs no library and the real text stays in the DOM.",
+  "entry": "components/particle-text/index.ts",
+  "css": "components/particle-text/styles.css",
+  "demo": "components/particle-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "gap": { "type": "number", "default": 3, "minimum": 1, "description": "Sampling step in px; smaller is denser (capped at 6000 particles)." },
+      "size": { "type": "number", "default": 1.6, "minimum": 0.5, "description": "Particle size in px." },
+      "color": { "type": "string", "default": "", "description": "Particle colour; empty uses the host's text colour." },
+      "accent": { "type": "string", "default": "", "description": "Second colour blended across the width; empty means a single colour." },
+      "spread": { "type": "number", "default": 48, "minimum": 0, "description": "How far dissolved particles drift, in px." },
+      "duration": { "type": "number", "default": 1400, "minimum": 1, "description": "Length of one dissolve and of one reassembly, in ms." },
+      "hold": { "type": "number", "default": 2400, "minimum": 0, "description": "How long the letters hold before dissolving, in ms." },
+      "loop": { "type": "boolean", "default": true, "description": "Dissolve and reassemble on a loop; off keeps the letters formed." },
+      "repel": { "type": "number", "default": 60, "minimum": 0, "description": "Pointer scatter radius in px; 0 disables it." }
+    }
+  },
+  "a11y": [
+    "The original text is never moved or split: it stays in the DOM once, read normally by screen readers, selectable and findable; only its paint is made transparent.",
+    "The particle canvas is aria-hidden and pointer-events: none, so it adds nothing to the accessibility tree and never blocks clicks or selection.",
+    "The text is painted transparent only after particles exist; with no 2D canvas, no script or a failed sample, the plain text shows.",
+    "Reduced motion and forced-colors mode remove the canvas and show the plain text."
+  ],
+  "reducedMotion": "static"
+}

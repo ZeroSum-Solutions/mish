@@ -1,0 +1,9 @@
+.genui-star-border { position: relative; isolation: isolate; border: 1px solid #69738b; }
+.genui-star-border::after { content: ''; position: absolute; inset: -1px; border-radius: inherit; padding: 1px; pointer-events: none; background: linear-gradient(110deg, transparent 25%, var(--genui-star-border-colour, #c4b5fd) 48%, #ffffff 50%, transparent 75%); background-size: 300% 100%; mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask-composite: exclude; animation: genui-star-border-travel var(--genui-star-border-duration, 1800ms) ease-out both; }
+.genui-star-border.genui-star-border--static::after, .genui-star-border.genui-star-border--reduced::after { animation: none; background-position: 50% 0; }
+@keyframes genui-star-border-travel {
+ from { background-position: 100% 0; }
+ to { background-position: 0% 0; }
+}
+@media (prefers-reduced-motion: reduce) { .genui-star-border::after { animation: none; background-position: 50% 0; } }
+@media (forced-colors: active) { .genui-star-border { border-color: ButtonText; } .genui-star-border::after { display: none; } }

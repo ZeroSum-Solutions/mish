@@ -1,0 +1,48 @@
+{
+  "catalogComponents": [
+    "split-text",
+    "masked-heading",
+    "scroll-reveal",
+    "glare-hover"
+  ],
+  "effects": {
+    "scriptPolicy": "hash",
+    "maxEffects": 2,
+    "placements": {
+      "hero-title": {
+        "host": {
+          "odId": "community-hero--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-title": {
+        "host": {
+          "odId": "community-benefits--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-reveal": {
+        "host": {
+          "odId": "community-tiers--body"
+        },
+        "allow": [
+          "scroll-reveal"
+        ]
+      },
+      "cta": {
+        "host": {
+          "id": "community-join"
+        },
+        "allow": [
+          "glare-hover"
+        ]
+      }
+    }
+  }
+}

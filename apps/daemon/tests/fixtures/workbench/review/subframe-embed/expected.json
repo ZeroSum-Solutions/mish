@@ -1,0 +1,4 @@
+{
+  "description": "B4-2 BLOCK 1 guard: an ordinary iframe from an allowed host (not a form submission) is still fetched.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "hitsInclude": "GET /embed", "notReason": "Form submissions" } }
+}

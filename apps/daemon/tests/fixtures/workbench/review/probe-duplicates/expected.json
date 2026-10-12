@@ -1,0 +1,12 @@
+{
+  "description": "Captain round 10 refinement: a CTA repeated with an identical fingerprint (header and hero Buy) is one group of two. Its size is the same at capture and after every probe reload, each member is probed by its ordinal and each shows an effect, so the declared actions pass.",
+  "outcome": "passed",
+  "criteria": {
+    "core.declared-actions": "pass",
+    "core.text-contrast": "pass",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  }
+}

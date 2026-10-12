@@ -1,0 +1,6 @@
+.genui-dot-grid { position: relative; isolation: isolate; overflow: hidden; }
+.genui-dot-grid::before, .genui-dot-grid::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: -1; background: radial-gradient(circle, var(--genui-dot-grid-colour, #8b93a7) 1px, transparent 1.6px) 0 0 / var(--genui-dot-grid-spacing, 24px) var(--genui-dot-grid-spacing, 24px); opacity: .25; }
+.genui-dot-grid::after { background-image: radial-gradient(circle, var(--genui-dot-grid-accent, #c4b5fd) 1.5px, transparent 2px); mask-image: radial-gradient(circle 140px at var(--genui-dot-grid-x, 50%) var(--genui-dot-grid-y, 50%), #000, transparent); opacity: var(--genui-dot-grid-active, 0); transition: opacity 200ms ease; }
+.genui-dot-grid.genui-dot-grid--reduced::after { display: none; transition: none; }
+@media (prefers-reduced-motion: reduce) { .genui-dot-grid::after { display: none; transition: none; } }
+@media (forced-colors: active) { .genui-dot-grid::before, .genui-dot-grid::after { display: none; } }

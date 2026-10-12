@@ -1,0 +1,66 @@
+/* stroke-text — clean-room, from "Outlined editorial headline" only. Every selector is under .genui-stroke-text. */
+
+:where(.genui-stroke-text) {
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.02;
+}
+
+.genui-stroke-text {
+  color: var(--genui-stroke-text-fill, #f5f5f7);
+  -webkit-text-stroke: var(--genui-stroke-text-width, 1.5px) var(--genui-stroke-text-stroke, #f5f5f7);
+  -webkit-text-fill-color: transparent;
+  paint-order: stroke fill;
+}
+
+.genui-stroke-text .genui-stroke-text__solid {
+  -webkit-text-fill-color: var(--genui-stroke-text-fill, #f5f5f7);
+}
+
+/* Hover fill: a two-tone gradient, clipped to the glyphs, slides up so the fill rises. */
+.genui-stroke-text.genui-stroke-text--fill-hover {
+  background-image: linear-gradient(
+    to top,
+    var(--genui-stroke-text-fill, #f5f5f7) 50%,
+    transparent 50%
+  );
+  background-size: 100% 200%;
+  background-position: 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  transition: background-position var(--genui-stroke-text-duration, 700ms) cubic-bezier(.22, 1, .36, 1);
+}
+
+.genui-stroke-text.genui-stroke-text--fill-hover:hover,
+.genui-stroke-text.genui-stroke-text--fill-hover:focus-within {
+  background-position: 0 100%;
+}
+
+.genui-stroke-text.genui-stroke-text--reduced {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-stroke-text {
+    transition: none;
+  }
+}
+
+@supports not (-webkit-text-stroke: 1px) {
+  .genui-stroke-text,
+  .genui-stroke-text .genui-stroke-text__solid {
+    -webkit-text-fill-color: currentColor;
+    background: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-stroke-text,
+  .genui-stroke-text .genui-stroke-text__solid {
+    -webkit-text-stroke: 0;
+    -webkit-text-fill-color: CanvasText;
+    background: none;
+    color: CanvasText;
+  }
+}

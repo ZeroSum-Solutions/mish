@@ -1,0 +1,39 @@
+{
+  "id": "dot-grid",
+  "name": "Dot Grid",
+  "category": "background",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/dot-grid/index.ts",
+  "css": "components/dot-grid/styles.css",
+  "demo": "components/dot-grid/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "spacing": {
+        "type": "number",
+        "default": 24,
+        "minimum": 8,
+        "maximum": 160
+      },
+      "colour": {
+        "type": "string",
+        "default": "#8b93a7"
+      },
+      "accent": {
+        "type": "string",
+        "default": "#c4b5fd"
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

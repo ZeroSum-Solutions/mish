@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Neutral Product colors</title>
+<link rel="stylesheet" href="../tokens.css" />
+<script>
+/* Review helper: ?theme=dark or ?theme=light sets data-theme on <html>. */
+(function () {
+  var theme = new URLSearchParams(window.location.search).get("theme");
+  if (theme === "dark" || theme === "light") document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<style>
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); line-height: var(--leading-body); }
+main { max-width: var(--container-max); margin: 0 auto; padding: var(--space-12) var(--container-gutter-desktop); }
+h1 { margin: 0; font-family: var(--font-display); font-size: var(--text-2xl); font-weight: 600; line-height: var(--leading-tight); letter-spacing: var(--tracking-display); }
+h2 { margin: var(--space-8) 0 var(--space-4); font-size: var(--text-base); font-weight: 600; }
+.intro { margin: var(--space-2) 0 0; color: var(--muted); max-width: 60ch; }
+code { font-family: var(--font-mono); font-size: var(--text-xs); color: var(--fg-2); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: var(--space-4); }
+.swatch { overflow: hidden; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
+.chip { height: 72px; border-bottom: 1px solid var(--border); }
+.label { display: grid; gap: 2px; padding: var(--space-3); font-size: var(--text-sm); }
+.label span { color: var(--muted); font-size: var(--text-xs); }
+@media (max-width: 599px) { main { padding: var(--space-8) var(--container-gutter-phone); } }
+</style>
+</head>
+<body>
+<main>
+<h1>Color roles</h1>
+<p class="intro">Semantic roles in the current mode. Open with <code>?theme=dark</code> to see dark values.</p>
+<h2>Roles</h2>
+<div class="grid">
+  <div class="swatch"><div class="chip" style="background: var(--bg)"></div><div class="label">Background<code>--bg</code><span>Page canvas</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--surface)"></div><div class="label">Surface<code>--surface</code><span>Cards, tables, inputs</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--surface-warm)"></div><div class="label">Surface sunken<code>--surface-warm</code><span>Headers, sidebars</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--fg)"></div><div class="label">Text<code>--fg</code><span>Headings, primary text</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--fg-2)"></div><div class="label">Text 2<code>--fg-2</code><span>Dense body text</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--muted)"></div><div class="label">Muted<code>--muted</code><span>Help text</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--meta)"></div><div class="label">Meta<code>--meta</code><span>Captions, placeholders</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--border)"></div><div class="label">Border<code>--border</code><span>Dividers, card edges</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--border-soft)"></div><div class="label">Border soft<code>--border-soft</code><span>Row separators</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--border-strong)"></div><div class="label">Border strong<code>--border-strong</code><span>Control boundaries</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--accent)"></div><div class="label">Accent<code>--accent</code><span>Primary action, links, focus</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--accent-hover)"></div><div class="label">Accent hover<code>--accent-hover</code><span>Hover on accent</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--success)"></div><div class="label">Success<code>--success</code><span>Success status</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--warn)"></div><div class="label">Warning<code>--warn</code><span>Warning status</span></div></div>
+  <div class="swatch"><div class="chip" style="background: var(--danger)"></div><div class="label">Danger<code>--danger</code><span>Errors, destructive</span></div></div>
+</div>
+</main>
+</body>
+</html>

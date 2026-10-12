@@ -1,0 +1,41 @@
+{
+  "id": "marketing-site-08",
+  "businessName": "Wovenroot Relief Fund",
+  "expectedSpine": "MI",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Wovenroot Relief Fund"
+    },
+    {
+      "field": "address",
+      "value": "240 Main Street, Berea, Kentucky"
+    },
+    {
+      "field": "phone",
+      "value": "(859) 555-0147"
+    },
+    {
+      "field": "email",
+      "value": "help@wovenrootrelief.org"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 9 a.m. to 4 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Registered 501(c)(3) nonprofit in Kentucky"
+    },
+    {
+      "field": "pricing",
+      "value": "Steady Hands monthly membership starting at $15; one-time gift option"
+    },
+    {
+      "field": "other",
+      "value": "Serves families across four counties; direct payment to landlords/utilities, never cash to recipients"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

@@ -1,0 +1,39 @@
+{
+  "id": "star-border",
+  "name": "Star Border",
+  "category": "surface",
+  "kind": "css-only",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/star-border/index.ts",
+  "css": "components/star-border/styles.css",
+  "demo": "components/star-border/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": {
+        "type": "number",
+        "default": 1800,
+        "minimum": 0,
+        "maximum": 4000
+      },
+      "colour": {
+        "type": "string",
+        "default": "#c4b5fd"
+      },
+      "animate": {
+        "type": "boolean",
+        "default": true
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

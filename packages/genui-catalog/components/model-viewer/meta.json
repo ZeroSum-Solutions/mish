@@ -1,0 +1,36 @@
+{
+  "id": "model-viewer",
+  "name": "Model Viewer",
+  "category": "hero",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room CSS 3D implementation from the effect description only: a procedural faceted product (or author-supplied inline CSS 3D/SVG markup) turns 360 degrees with drag and keyboard control, with no three.js, no model files and no external assets.",
+  "entry": "components/model-viewer/index.ts",
+  "css": "components/model-viewer/styles.css",
+  "demo": "components/model-viewer/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "speed": { "type": "number", "default": 24, "description": "Auto-rotation speed, in degrees per second." },
+      "autoRotate": { "type": "boolean", "default": true, "description": "Turn the model slowly while it is on screen and idle." },
+      "tilt": { "type": "number", "default": -14, "minimum": -40, "maximum": 40, "description": "Camera tilt (rotateX), in degrees; negative looks down on the model." },
+      "sides": { "type": "number", "default": 24, "minimum": 6, "maximum": 48, "description": "Facets of the procedural model." },
+      "size": { "type": "number", "default": 96, "minimum": 8, "description": "Diameter of the procedural model, in px." },
+      "height": { "type": "number", "default": 150, "minimum": 8, "description": "Height of the procedural model, in px." },
+      "colour": { "type": "string", "default": "#3b4a6b", "description": "Body colour of the procedural model." },
+      "accent": { "type": "string", "default": "#d9dfef", "description": "Lid, label band and focus-ring colour." },
+      "interactive": { "type": "boolean", "default": true, "description": "Drag to spin; the host becomes focusable and the arrow keys rotate it (Home resets)." },
+      "resumeDelay": { "type": "number", "default": 1600, "minimum": 0, "description": "Idle time after a drag or key press before auto-rotation resumes, in ms." }
+    }
+  },
+  "a11y": [
+    "The generated model and floor shadow are aria-hidden; the host carries the accessible name (the demo uses role=\"img\" with an aria-label that also says how to rotate it).",
+    "With interactive on, the host is focusable (tabindex 0 unless the author set one) with a visible :focus-visible ring; ArrowLeft/ArrowRight turn it 15 degrees, ArrowUp/ArrowDown tilt it, and Home resets, so keyboard users get the same control as drag.",
+    "touch-action: pan-y keeps vertical page scrolling on touch screens; only horizontal drags spin the model.",
+    "Reduced motion stops the auto-rotation, drag inertia and idle float; the model rests at a three-quarter view and moves only on direct user input."
+  ],
+  "reducedMotion": "reduced"
+}

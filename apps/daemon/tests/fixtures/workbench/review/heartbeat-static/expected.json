@@ -1,0 +1,5 @@
+{
+  "description": "A static page with a 1 s heartbeat interval that changes nothing on screen: the check is not-applicable, not inconclusive.",
+  "parameters": {},
+  "motion": "not-applicable"
+}

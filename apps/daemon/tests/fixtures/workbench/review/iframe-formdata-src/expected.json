@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 3 BLOCK 1: a submit handler that cancels the native submission and points an iframe at an allowed host with the form data as a query. Only static, query-free initial frame loads reach an allowed host; this one is refused and recorded.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "noHits": true, "consoleOutcome": "inconclusive" } }
+}

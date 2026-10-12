@@ -1,0 +1,17 @@
+Tide & Table is a bimonthly independent travel and food magazine covering the whole coast, not
+one town. We want a one-page site for the masthead, not a single destination guide.
+
+Every issue pairs a coastal region with a chef, a writer and a photographer: past issues have
+covered the Amberlee Coast, the Northern Fjords, and the Salt Road islands, each through recipes,
+a long-form essay and a portfolio of images. We publish six issues a year and keep a full
+back-issue archive going back to issue one, available to read online.
+
+The site should show our latest issue, a running list of past issues (our archive), our regular
+columns (Tasting Notes, Field Dispatch, The Long Table), and a way for a reader to subscribe —
+either a free newsletter or a paid membership that unlocks the full archive and an early-access
+digital edition before print.
+
+We are not about one place: we cover a different destination every issue, and the visitor's
+relationship to us is as a subscriber to an ongoing magazine, not someone deciding whether to
+visit a single town. There is no single set of chapters, no single set of practical facts, and no
+single place to plan a visit to — the masthead is our title, not a place name.

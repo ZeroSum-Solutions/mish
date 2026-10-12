@@ -1,0 +1,155 @@
+/* flowing-menu — clean-room, from the description "Flowing menu treatment" only. Every selector is under .genui-flowing-menu. */
+
+:where(.genui-flowing-menu) {
+  display: block;
+  color: var(--genui-flowing-menu-ink, #f5f5f7);
+}
+
+:where(.genui-flowing-menu) :where(.genui-flowing-menu__list) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-bottom: 1px solid var(--genui-flowing-menu-rule, rgba(245, 245, 247, .16));
+}
+
+.genui-flowing-menu--ready:not(.genui-flowing-menu--open) .genui-flowing-menu__list { display: none; }
+
+.genui-flowing-menu__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--genui-flowing-menu-height, 56px);
+  overflow: hidden;
+  border-top: 1px solid var(--genui-flowing-menu-rule, rgba(245, 245, 247, .16));
+  color: inherit;
+  font-size: calc(var(--genui-flowing-menu-height, 56px) * .42);
+  font-weight: 700;
+  letter-spacing: .02em;
+  line-height: 1;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.genui-flowing-menu__link:focus-visible {
+  outline: 2px solid var(--genui-flowing-menu-band, #f5f5f7);
+  outline-offset: -4px;
+}
+
+/* The band: parked below (or above) the row, flowing to rest when shown. */
+.genui-flowing-menu__flow {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--genui-flowing-menu-band, #f5f5f7);
+  color: var(--genui-flowing-menu-band-ink, #0b0d12);
+  pointer-events: none;
+  transform: translateY(101%);
+  transition: transform var(--genui-flowing-menu-duration, 480ms) cubic-bezier(.65, .05, .25, 1);
+}
+
+.genui-flowing-menu__track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  height: 100%;
+  translate: 0 -101%;
+  transition: translate var(--genui-flowing-menu-duration, 480ms) cubic-bezier(.65, .05, .25, 1);
+  animation: genui-flowing-menu-marquee var(--genui-flowing-menu-speed, 10s) linear infinite paused;
+}
+
+.genui-flowing-menu__flow--top { transform: translateY(-101%); }
+.genui-flowing-menu__flow--top .genui-flowing-menu__track { translate: 0 101%; }
+.genui-flowing-menu__flow--on { transform: none; }
+.genui-flowing-menu__flow--on .genui-flowing-menu__track { translate: none; animation-play-state: running; }
+
+.genui-flowing-menu__flow--snap,
+.genui-flowing-menu__flow--snap .genui-flowing-menu__track { transition: none; }
+
+.genui-flowing-menu__word {
+  display: inline-flex;
+  align-items: center;
+  gap: .7em;
+  padding-right: .7em;
+  white-space: nowrap;
+}
+
+.genui-flowing-menu__word::after {
+  content: "";
+  width: .32em;
+  height: .32em;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+@keyframes genui-flowing-menu-marquee {
+  to { transform: translateX(-50%); }
+}
+
+/* Optional collapse toggle. */
+.genui-flowing-menu__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 6px 11px 6px 13px;
+  border: 1px solid var(--genui-flowing-menu-rule, rgba(245, 245, 247, .16));
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  cursor: pointer;
+}
+
+.genui-flowing-menu__toggle:focus-visible {
+  outline: 2px solid var(--genui-flowing-menu-band, #f5f5f7);
+  outline-offset: 3px;
+}
+
+.genui-flowing-menu__icon {
+  position: relative;
+  width: 10px;
+  height: 10px;
+}
+
+.genui-flowing-menu__icon::before,
+.genui-flowing-menu__icon::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 0;
+  width: 10px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform .3s ease;
+}
+
+.genui-flowing-menu__icon::after { transform: rotate(90deg); }
+.genui-flowing-menu--open .genui-flowing-menu__icon::before { transform: rotate(45deg); }
+.genui-flowing-menu--open .genui-flowing-menu__icon::after { transform: rotate(135deg); }
+
+/* Reduced motion: the band appears in place and the marquee holds still. */
+.genui-flowing-menu.genui-flowing-menu--reduced .genui-flowing-menu__flow,
+.genui-flowing-menu.genui-flowing-menu--reduced .genui-flowing-menu__track,
+.genui-flowing-menu.genui-flowing-menu--reduced .genui-flowing-menu__icon::before,
+.genui-flowing-menu.genui-flowing-menu--reduced .genui-flowing-menu__icon::after {
+  transition: none;
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-flowing-menu.genui-flowing-menu .genui-flowing-menu__flow,
+  .genui-flowing-menu.genui-flowing-menu .genui-flowing-menu__track,
+  .genui-flowing-menu.genui-flowing-menu .genui-flowing-menu__icon::before,
+  .genui-flowing-menu.genui-flowing-menu .genui-flowing-menu__icon::after {
+    transition: none;
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-flowing-menu__flow { background: Highlight; color: HighlightText; }
+}

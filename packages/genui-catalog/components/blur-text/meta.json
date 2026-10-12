@@ -1,0 +1,35 @@
+{
+  "id": "blur-text",
+  "name": "Blur Text",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "verdict": "keep",
+  "licenceDecision": "clean-room",
+  "rationale": "Clean-room implementation from the one-line effect description only; no upstream source was read, and the framer-motion dependency is replaced by one CSS keyframe animation staggered through custom properties.",
+  "entry": "components/blur-text/index.ts",
+  "css": "components/blur-text/styles.css",
+  "demo": "components/blur-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "split": { "type": "string", "enum": ["words", "chars"], "default": "words", "description": "The unit that blurs in: whole words or single characters." },
+      "blur": { "type": "number", "default": 12, "minimum": 0, "description": "Starting blur radius, in px." },
+      "rise": { "type": "number", "default": 0.35, "description": "Starting vertical offset, in em; positive rises from below, negative drops from above." },
+      "duration": { "type": "number", "default": 800, "minimum": 0, "description": "Per-piece animation duration, in ms." },
+      "stagger": { "type": "number", "default": 90, "minimum": 0, "description": "Delay between pieces, in ms." },
+      "delay": { "type": "number", "default": 0, "minimum": 0, "description": "Delay before the first piece, in ms." },
+      "easing": { "type": "string", "default": "cubic-bezier(.2,.65,.25,1)" },
+      "threshold": { "type": "number", "default": 0.25, "minimum": 0, "maximum": 1, "description": "Share of the host that must be visible before the reveal starts." },
+      "replay": { "type": "boolean", "default": false, "description": "Blur the text out again when it leaves the viewport and replay on re-entry." }
+    }
+  },
+  "a11y": [
+    "The original text is kept once, in a visually hidden span that screen readers read; the split, animated copy is aria-hidden.",
+    "The host's element, heading level and role are unchanged, and no aria-label is added.",
+    "Text is only hidden while an IntersectionObserver is present to reveal it; without one, or with JS off, the plain text shows at once.",
+    "Reduced motion skips the split entirely, and a preference change mid-reveal settles every piece to sharp, fully opaque text."
+  ],
+  "reducedMotion": "static"
+}

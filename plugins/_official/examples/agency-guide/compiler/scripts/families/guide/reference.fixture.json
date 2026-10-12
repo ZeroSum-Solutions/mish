@@ -1,0 +1,126 @@
+{
+  "schemaVersion": 2,
+  "family": "guide",
+  "revision": 1,
+  "brand": {
+    "name": "Windward Point",
+    "descriptor": "A small fishing town on the Amberlee Coast, told in chapters for a visitor deciding whether to come."
+  },
+  "sections": [
+    {
+      "id": "guide-header",
+      "type": "header",
+      "text": {}
+    },
+    {
+      "id": "guide-masthead",
+      "type": "masthead",
+      "text": {
+        "heading": "Windward Point",
+        "standfirst": "A small fishing town on the Amberlee Coast, where a tidal inlet meets the open water."
+      }
+    },
+    {
+      "id": "guide-opening-chapter",
+      "type": "opening-chapter",
+      "text": {
+        "heading": "Where the inlet meets the sea",
+        "body": "Windward Point sits where a narrow tidal inlet meets the open water, its harbor lined with weathered clapboard houses painted in faded blues and ochres. The town was built around cod fishing in the 1800s and still keeps a small working fleet, though most visitors now come for the quiet: the slap of rigging against masts, gulls circling the fish market at dawn, and a walkable center small enough to see on foot in an afternoon."
+      }
+    },
+    {
+      "id": "guide-chapter-list",
+      "type": "chapter-list",
+      "text": {
+        "heading": "More of Windward Point"
+      },
+      "items": [
+        {
+          "title": "The Harbor",
+          "body": "The working harbor is the heart of the town. Boats unload their catch each morning around 6am at the public dock, and the fish market beside it sells the day's catch straight off the boats until it sells out, usually by mid-morning. A short breakwater walk gives a view back over the whole harbor and the lighthouse beyond it."
+        },
+        {
+          "title": "The Old Lighthouse District",
+          "body": "Above the harbor, a cluster of nineteenth-century keeper's cottages surrounds the Windward Point Light, a still-active lighthouse first lit in 1868. The cottages are private homes now, but the lane between them is open to walkers, and the light itself is open for a short climb on weekend afternoons."
+        },
+        {
+          "title": "Tide Pool Trail",
+          "body": "A mile-long footpath runs along the rocky shore south of the harbor, past tide pools that fill with starfish, anemones and hermit crabs at low tide. The trail is flat and easy, with benches every quarter mile, and it ends at a small headland with a view out over the open water."
+        },
+        {
+          "title": "The Market Quarter",
+          "body": "A few streets back from the harbor, the Market Quarter holds the town's weekly outdoor market, held every Saturday morning, selling local produce, preserves and crafts from the surrounding coast."
+        }
+      ]
+    },
+    {
+      "id": "guide-practical-facts",
+      "type": "practical-facts",
+      "text": {
+        "heading": "Practical facts"
+      },
+      "items": [
+        { "label": "Getting there", "value": "The nearest airport is Amberlee Regional, about 40 minutes away by car; there is no train station in town." },
+        { "label": "Best time to visit", "value": "Late spring through early autumn, when the tide pools are most active and the market runs every week; winter storms close the breakwater walk." },
+        { "label": "Currency", "value": "The same currency as the rest of the coast; cards are accepted almost everywhere." },
+        { "label": "Language", "value": "English is spoken throughout the town." }
+      ]
+    },
+    {
+      "id": "guide-places-to-see",
+      "type": "places-to-see",
+      "text": {
+        "heading": "Places to see",
+        "body": "Places that capture the town, from the harbor to the market quarter."
+      },
+      "items": [
+        {
+          "name": "Windward Point Light",
+          "body": "A still-active lighthouse first lit in 1868, open for a short climb on weekend afternoons."
+        },
+        {
+          "name": "The public fish market",
+          "body": "Beside the harbor dock, selling the day's catch straight off the boats until it sells out."
+        },
+        {
+          "name": "The headland viewpoint",
+          "body": "At the end of the footpath south of the harbor, with a view out over the open water."
+        },
+        {
+          "name": "The Saturday market",
+          "body": "A weekly outdoor market a few streets back from the harbor, selling local produce, preserves and crafts."
+        }
+      ]
+    },
+    {
+      "id": "guide-gallery",
+      "type": "gallery",
+      "text": {
+        "heading": "A closer look"
+      },
+      "items": [
+        { "label": "Windward Point Light" },
+        { "label": "The public fish market" },
+        { "label": "The headland viewpoint" },
+        { "label": "The Saturday market" }
+      ]
+    },
+    {
+      "id": "guide-plan-a-visit",
+      "type": "plan-a-visit",
+      "text": {
+        "heading": "Plan a visit",
+        "body": "Find more on planning a visit, including the lighthouse's current climbing hours.",
+        "cta": "Plan your visit",
+        "url": "https://visit.windwardpoint.example"
+      }
+    },
+    {
+      "id": "guide-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Windward Point, a small fishing town on the Amberlee Coast."
+      }
+    }
+  ]
+}

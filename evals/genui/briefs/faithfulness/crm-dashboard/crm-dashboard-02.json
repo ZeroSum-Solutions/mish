@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-02",
+  "businessName": "Kestrel Wealth Partners",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Kestrel Wealth Partners"
+    },
+    {
+      "field": "address",
+      "value": "100 Federal Street, Suite 1900, Boston, Massachusetts"
+    },
+    {
+      "field": "phone",
+      "value": "(617) 555-0118"
+    },
+    {
+      "field": "email",
+      "value": "info@kestrelwealthpartners.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8:30 a.m. to 5:30 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Registered Investment Advisor with the SEC"
+    },
+    {
+      "field": "other",
+      "value": "Five-advisor prospecting desk"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Advisor J. Marsh logged a discovery call with prospect T. Okafor, moved to proposal, 15 minutes ago"
+    }
+  ]
+}

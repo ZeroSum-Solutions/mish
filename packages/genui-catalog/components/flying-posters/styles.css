@@ -1,0 +1,69 @@
+/* flying-posters — clean-room, from the effect description only. Every selector is under .genui-flying-posters. */
+
+:where(.genui-flying-posters) {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--genui-flying-posters-gap, 18px);
+  margin: 0;
+  padding: 24px 16px;
+  list-style: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  perspective: var(--genui-flying-posters-perspective, 700px);
+  perspective-origin: 50% 50%;
+  -webkit-mask-image: linear-gradient(transparent, #000 16%, #000 84%, transparent);
+  mask-image: linear-gradient(transparent, #000 16%, #000 84%, transparent);
+}
+
+.genui-flying-posters:focus-visible {
+  outline: 2px solid #8ab4ff;
+  outline-offset: -2px;
+}
+
+.genui-flying-posters__poster {
+  flex: none;
+  position: relative;
+  width: var(--genui-flying-posters-width, min(78%, 320px));
+  box-sizing: border-box;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 36px -18px rgba(0, 0, 0, 0.7), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
+
+.genui-flying-posters--live .genui-flying-posters__poster {
+  will-change: transform;
+  opacity: calc(1 - var(--genui-flying-posters-a, 0) * 0.45);
+  transform:
+    translateZ(calc(var(--genui-flying-posters-a, 0) * var(--genui-flying-posters-depth, 140px) * -1))
+    rotateX(calc(var(--genui-flying-posters-d, 0) * var(--genui-flying-posters-tilt, 40deg) + var(--genui-flying-posters-v, 0) * var(--genui-flying-posters-bend, 14deg)))
+    scaleY(calc(1 + var(--genui-flying-posters-va, 0) * 0.12));
+}
+
+.genui-flying-posters--reduced .genui-flying-posters__poster {
+  transform: none;
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-flying-posters .genui-flying-posters__poster {
+    transform: none;
+    opacity: 1;
+    will-change: auto;
+  }
+  .genui-flying-posters .genui-flying-posters__clone {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-flying-posters .genui-flying-posters__poster {
+    border: 1px solid CanvasText;
+  }
+}

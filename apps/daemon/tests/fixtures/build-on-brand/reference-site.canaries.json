@@ -1,0 +1,49 @@
+{
+  "description": "Phrases, names, prices and image hosts from reference-site.html. None of them may appear in a Build on brand composed prompt or plan: recon is structure-only.",
+  "referenceUrl": "https://harbor-and-pine.example/",
+  "copy": [
+    "Harbor & Pine",
+    "Harbor &amp; Pine",
+    "Small-batch coffee since 1987",
+    "Kettle-sung",
+    "roasted on the quay",
+    "Marisol Venn",
+    "Tobiah Crane",
+    "Why the quay tastes different",
+    "Salt-air cooling trays",
+    "Twelve lots, never thirteen",
+    "Lantern Hill",
+    "fog horn",
+    "Odalys Ferreira-Quint",
+    "Bram Holloway",
+    "Wren Achterberg",
+    "sea shanties",
+    "Bean Club",
+    "Deckhand",
+    "First Mate",
+    "Harbourmaster",
+    "$18",
+    "$32",
+    "$54",
+    "Questions from the dock",
+    "ferry reaches",
+    "cedar trays",
+    "before the gulls do",
+    "Pier 7",
+    "last tide bell",
+    "Our Roasts",
+    "The Quay Story",
+    "Visit the Roastery"
+  ],
+  "images": [
+    "cdn.harbor-and-pine.example",
+    "hero-drum-roaster.jpg",
+    "logo-anchor.svg",
+    "quay-dawn.jpg",
+    "copper drum roaster",
+    "Anchor and pine cone mark"
+  ],
+  "source": [
+    "harbor-and-pine.example"
+  ]
+}

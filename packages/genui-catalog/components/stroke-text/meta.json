@@ -1,0 +1,31 @@
+{
+  "id": "stroke-text",
+  "name": "Stroke Text",
+  "category": "text",
+  "kind": "css-only",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; no upstream source was read. An outlined display headline is a staple editorial treatment and costs almost nothing as pure CSS.",
+  "entry": "components/stroke-text/index.ts",
+  "css": "components/stroke-text/styles.css",
+  "demo": "components/stroke-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "strokeWidth": { "type": "number", "default": 1.5, "minimum": 0, "description": "Outline width, in px." },
+      "strokeColor": { "type": "string", "default": "#f5f5f7" },
+      "fillColor": { "type": "string", "default": "#f5f5f7", "description": "Colour of solid words and of the hover fill." },
+      "fillOnHover": { "type": "boolean", "default": true, "description": "Fill the outline from the bottom up on hover or focus." },
+      "duration": { "type": "number", "default": 700, "minimum": 0, "description": "Hover fill duration, in ms." }
+    }
+  },
+  "a11y": [
+    "The text is never split or cloned; screen readers read the headline once, as written.",
+    "Outlined glyphs have little ink, so use it only at display sizes (about 32px and up) with a stroke colour that passes 3:1 against the background.",
+    "The hover fill also runs on :focus-within, so keyboard users get the same state as pointer users.",
+    "Forced-colors mode drops the outline and paints the text solid in CanvasText; reduced motion makes the hover fill instant."
+  ],
+  "reducedMotion": "static"
+}

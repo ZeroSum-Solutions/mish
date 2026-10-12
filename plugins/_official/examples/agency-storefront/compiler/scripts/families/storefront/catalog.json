@@ -1,0 +1,28 @@
+{
+  "catalogComponents": [
+    "masked-heading",
+    "glare-hover"
+  ],
+  "effects": {
+    "scriptPolicy": "hash",
+    "maxEffects": 2,
+    "placements": {
+      "hero-title": {
+        "host": {
+          "odId": "storefront-hero--heading"
+        },
+        "allow": [
+          "masked-heading"
+        ]
+      },
+      "card-surface": {
+        "host": {
+          "id": "storefront-featured-product--card"
+        },
+        "allow": [
+          "glare-hover"
+        ]
+      }
+    }
+  }
+}

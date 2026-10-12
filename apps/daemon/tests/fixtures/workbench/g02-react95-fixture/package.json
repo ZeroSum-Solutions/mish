@@ -1,0 +1,18 @@
+{
+  "name": "g02-react95-fixture",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-is": "18.3.1",
+    "styled-components": "5.3.11"
+  },
+  "devDependencies": {
+    "@types/react": "18.3.28",
+    "@types/react-dom": "18.3.7",
+    "@types/styled-components": "5.1.36",
+    "esbuild": "0.28.0",
+    "typescript": "5.9.3"
+  }
+}

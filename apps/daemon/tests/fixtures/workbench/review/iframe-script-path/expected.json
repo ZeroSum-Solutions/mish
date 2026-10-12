@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 3 BLOCK 1: a script-created iframe that carries data in its path (no query). Its src is not declared in the served markup, so it is refused and recorded.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "noHits": true, "consoleOutcome": "inconclusive" } }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "reflective-card",
+  "name": "Reflective Card",
+  "category": "surface",
+  "kind": "css-only",
+  "status": "ported",
+  "entry": "components/reflective-card/index.ts",
+  "css": "components/reflective-card/styles.css",
+  "demo": "components/reflective-card/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "metalness": { "type": "number", "default": 0.8, "minimum": 0, "maximum": 1, "description": "Raises the contrast between the dark and bright gradient stops." },
+      "roughness": { "type": "number", "default": 0.3, "minimum": 0, "maximum": 1, "description": "Widens the specular band and softens the brushed streaks." },
+      "specular": { "type": "number", "default": 0.9, "minimum": 0, "maximum": 1, "description": "Brightness of the specular band." },
+      "tone": { "type": "string", "default": "#b8bcc4" },
+      "lightAngle": { "type": "number", "default": 115, "description": "Resting direction of the specular band, in degrees." },
+      "shift": { "type": "number", "default": 30, "minimum": 0, "maximum": 100, "description": "Band travel on hover, as a percent of the surface." },
+      "duration": { "type": "number", "default": 700, "minimum": 0, "description": "Hover transition duration in ms." }
+    }
+  },
+  "a11y": [
+    "The metal gradients and specular band are painted with background-image and a decorative ::after; nothing is added to the accessibility tree.",
+    "The CSS forces text colour through --genui-reflective-card-ink (default #111), so an author can flip it to #fff on a dark tone and keep contrast.",
+    "outline-offset: 3px keeps the focus ring clear of the card's own reflective surface.",
+    "Keyboard focus (:focus-visible / :focus-within) plays the same band shift as hover, so the state is not mouse-only."
+  ],
+  "reducedMotion": "static"
+}

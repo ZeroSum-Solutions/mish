@@ -1,0 +1,60 @@
+/* gradual-blur — clean-room, from the description "Progressive blur reveal" only. Every selector is under .genui-gradual-blur. */
+
+.genui-gradual-blur__edge {
+  --genui-gradual-blur-dir: to bottom;
+  position: sticky;
+  z-index: 1;
+  display: block;
+  flex: none;
+  list-style: none;
+  height: var(--genui-gradual-blur-height, 6rem);
+  pointer-events: none;
+  background: linear-gradient(var(--genui-gradual-blur-dir), transparent, var(--genui-gradual-blur-tint, transparent));
+  transition: opacity var(--genui-gradual-blur-duration, 300ms) ease;
+}
+
+.genui-gradual-blur__edge--bottom {
+  bottom: 0;
+  margin-top: calc(-1 * var(--genui-gradual-blur-height, 6rem));
+}
+
+.genui-gradual-blur__edge--top {
+  --genui-gradual-blur-dir: to top;
+  top: 0;
+  margin-bottom: calc(-1 * var(--genui-gradual-blur-height, 6rem));
+}
+
+.genui-gradual-blur__edge--off {
+  opacity: 0;
+}
+
+.genui-gradual-blur__layer {
+  position: absolute;
+  inset: 0;
+  -webkit-backdrop-filter: blur(var(--genui-gradual-blur-b, 0px));
+  backdrop-filter: blur(var(--genui-gradual-blur-b, 0px));
+  -webkit-mask-image: linear-gradient(var(--genui-gradual-blur-dir), transparent var(--genui-gradual-blur-s0, 0%), #000 var(--genui-gradual-blur-s1, 50%), #000 var(--genui-gradual-blur-s2, 100%), transparent var(--genui-gradual-blur-s3, 100%));
+  mask-image: linear-gradient(var(--genui-gradual-blur-dir), transparent var(--genui-gradual-blur-s0, 0%), #000 var(--genui-gradual-blur-s1, 50%), #000 var(--genui-gradual-blur-s2, 100%), transparent var(--genui-gradual-blur-s3, 100%));
+}
+
+.genui-gradual-blur.genui-gradual-blur--reduced .genui-gradual-blur__edge {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-gradual-blur__edge {
+    transition: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .genui-gradual-blur__edge {
+    background: linear-gradient(var(--genui-gradual-blur-dir), transparent, var(--genui-gradual-blur-fallback, rgba(11, 13, 18, 0.85)));
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-gradual-blur__edge {
+    display: none;
+  }
+}

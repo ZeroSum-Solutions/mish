@@ -1,0 +1,55 @@
+/* shader-svg — clean-room, from the one-line effect description only. Every selector is under .genui-shader-svg. */
+
+:where(.genui-shader-svg) {
+  display: inline-block;
+  line-height: 0;
+}
+
+.genui-shader-svg svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.genui-shader-svg__fx {
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.7s ease;
+}
+
+.genui-shader-svg--ready .genui-shader-svg__fx {
+  opacity: 1;
+}
+
+.genui-shader-svg__canvas,
+.genui-shader-svg__fallback {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.genui-shader-svg__fallback {
+  background: linear-gradient(
+    var(--genui-shader-svg-angle, 135deg),
+    var(--genui-shader-svg-a, #6d5dfc),
+    var(--genui-shader-svg-b, #22d3ee) 55%,
+    var(--genui-shader-svg-c, #f472b6)
+  );
+}
+
+.genui-shader-svg.genui-shader-svg--reduced .genui-shader-svg__fx {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-shader-svg__fx {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-shader-svg__fx {
+    display: none;
+  }
+}

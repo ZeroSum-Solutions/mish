@@ -1,0 +1,29 @@
+{
+  "id": "spotlight-card",
+  "name": "Spotlight Card",
+  "category": "hover",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/spotlight-card/index.ts",
+  "css": "components/spotlight-card/styles.css",
+  "demo": "components/spotlight-card/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "colour": { "type": "string", "default": "rgba(255,255,255,0.12)" },
+      "radius": { "type": "number", "default": 320, "minimum": 0, "description": "Spotlight radius, in px." },
+      "borderGlow": { "type": "boolean", "default": true, "description": "Also brighten the border ring under the pointer." },
+      "borderColour": { "type": "string", "default": "rgba(255,255,255,0.35)" },
+      "fade": { "type": "number", "default": 200, "minimum": 0, "description": "Fade in/out duration, in ms." },
+      "touch": { "type": "boolean", "default": false, "description": "Track touch pointers too (off by default; touch has no hover)." }
+    }
+  },
+  "a11y": [
+    "The spotlight and border-ring layers are decorative pseudo-elements, so they are not in the accessibility tree.",
+    ":focus-within shows the same centred glow as pointer hover, so keyboard users get equivalent feedback.",
+    "The host's own focus outline is untouched by the pseudo-element layers.",
+    "The default colour's alpha (0.12) keeps card text contrast; a custom colour should stay at or below roughly 0.2 alpha for the same reason."
+  ],
+  "reducedMotion": "reduced"
+}

@@ -1,0 +1,52 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NBDPxUF53rEwzXRkJdsKS4NEvN2mcJhy0bTccESLakc='; style-src 'sha256-MTG86maC1YmmEI42mIlrFBNBtnbrO/p0+vohCLVJu1U='; style-src-attr 'unsafe-hashes' 'sha256-PWik0quy5AU5rfwwNHpN0UVNk0vPVV1OwJhZsXq0dfs=' 'sha256-rBj/0uH8e0zcfJCalZkMeUVgXk4u1tG5tSBsT3t0eqs=' 'sha256-R6ZMDuwv7TpsbzfrbTGmuyAooz1tUOw8eayrAQBMifc=' 'sha256-LJucdcMpjB8Y8EBHwrJBY9H9iiwE+G+Qn1Q5b+ABK98=' 'sha256-8heOnJyoLFxXK+QsyPpaNawTedks5ojpy5LpJn8Rs7k=' 'sha256-zcMM9wRJ3veCQTnvACJpdYCwq7vHw74KhO66jIIRTN8=' 'sha256-zr6ZaglhdOx9c/pD3qiGjSUaW6lGWosNm/PUkVT0vUA=' 'sha256-zjTsCQgwciWe1W8BXcRXnJxFwudgpNjtEbomAne+6qg=' 'sha256-U/roNsUGyrn86nlZvV+UIL5yAM+M3izUWv9MvvW6E8c=' 'sha256-Kqv2Ff7cLytg6Ng2rfcYVBaFZmbPxqL0psMiPJiTB+g=' 'sha256-kKsu5cRv9tnK/FzQc0qNcI44pE+sedWpfMfOK9la4r4=' 'sha256-xaCvKvKEEYe+6n2UFt/qQRP7rfOc56xiptl7e6tgshU='; img-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none';"><title>Contour field — original ZeroSum alternative</title><style>html,body{margin:0;min-height:100%;background:transparent}#demo{min-height:100vh}.mm-original{--bg:#101214;--surface:#1a1e22;--ink:#f4f6f8;--muted:#a8b2bb;--line:#343d45;--accent:#a5efcf;color-scheme:dark;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,sans-serif;min-height:310px;padding:24px;box-sizing:border-box;overflow:hidden;position:relative;display:grid;grid-template-columns:min(100%,600px);justify-content:center;align-content:center;gap:16px}
+.mm-original[data-theme=light]{--bg:#f3f5f7;--surface:#fff;--ink:#141a20;--muted:#53616e;--line:#d3dbe1;--accent:#087951;color-scheme:light}
+.mm-original *{box-sizing:border-box}.mm-original h1,.mm-original h2,.mm-original h3,.mm-original p{margin:0}.mm-original h2{font-size:28px;line-height:1.1;letter-spacing:-1px;font-weight:550;text-wrap:balance}.mm-original h3{font-weight:550;font-size:19px}.mm-original small,.mm-original .muted{color:var(--muted)}.mm-original button,.mm-original input,.mm-original select{font:inherit;color:inherit}.mm-original button{cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:var(--surface);min-height:40px}.mm-original button:hover{border-color:var(--accent)}.mm-original button[aria-pressed=true],.mm-original .primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}.mm-original :focus-visible{outline:2px solid var(--accent);outline-offset:3px}.mm-original .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.mm-original .between{justify-content:space-between}.mm-original .panel{padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}.mm-original .stack{display:grid;gap:14px}.mm-original .eyebrow{font:11px/1.5 ui-monospace,monospace;text-transform:uppercase;letter-spacing:2px;color:var(--accent)}.mm-original .art{position:relative;min-height:150px;border-radius:14px;background:linear-gradient(135deg,#123d50,#257b75 60%,#debc76);overflow:hidden}.mm-original .art:before{content:'';position:absolute;width:180px;height:180px;background:#fcdec2;border-radius:50%;left:50%;top:40%;box-shadow:0 0 0 30px #fff2;transform:translate(-50%,-50%)}.mm-original .art:after{content:'';position:absolute;width:220px;height:90px;background:#063d46;transform:rotate(-22deg);bottom:-25px;left:20%}.mm-original [role=status]{font-size:12px;color:var(--muted);min-height:18px}.mm-original svg{max-width:100%}.mm-original input:not([type=range]){background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-width:0}.mm-original [hidden]{display:none!important}.mm-original dialog{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;max-width:calc(100% - 32px);padding:24px}.mm-original dialog::backdrop{background:#0009;backdrop-filter:blur(5px)}
+@media(max-width:420px){.mm-original{padding:16px}.mm-original h2{font-size:25px}}@media(prefers-reduced-motion:reduce){.mm-original *,.mm-original *:before,.mm-original *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}.mm-original[data-reduced-motion=true] *,.mm-original[data-reduced-motion=true] *:before,.mm-original[data-reduced-motion=true] *:after{animation:none!important;transition:none!important}
+.mm-original .contour-field{height:235px;position:relative;overflow:hidden}.mm-original .contour-field svg{width:100%;height:100%;position:absolute;inset:0;opacity:.6}.mm-original .contour-field path{fill:none;stroke:var(--accent);stroke-width:.7;stroke-dasharray:15 5;animation:mm-paths 8s linear infinite;animation-delay:var(--delay)}.mm-original .contour-copy{position:relative;z-index:1;display:grid;gap:18px;padding-top:50px;max-width:220px}.mm-original .contour-copy h2{font-size:32px}.mm-original .contour-field.paused path{animation-play-state:paused}@keyframes mm-paths{to{stroke-dashoffset:-100}}
+</style><main id="demo"></main><script type="module">/** Independently authored by ZeroSum. No upstream component source is used. */
+                                                                                      
+                                                   
+function setup(el             , html        , opts                  = {}) {
+  const attributes = [...el.attributes].map(a => [a.name, a.value]         );
+  const children = [...el.childNodes];
+  const abort = new AbortController();
+  el.classList.add('mm-original');
+  el.dataset.theme = opts.theme ?? 'dark';
+  el.dataset.reducedMotion = String(opts.reducedMotion ?? false);
+  el.innerHTML = html;
+  function on(event        , callback                        ) {
+    el.addEventListener(event, callback, { signal: abort.signal });
+  }
+  function query                                 (selector        )    { return el.querySelector   (selector) ; }
+  function status(text        ) { const node = el.querySelector('[role=status]'); if (node) node.textContent = text; }
+  let destroyed = false;
+  return { el, on, query, status, signal: abort.signal, get reducedMotion() { return opts.reducedMotion || el.ownerDocument.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false; }, destroy() {
+    if (destroyed) return;
+    destroyed = true;
+    el.querySelectorAll('dialog[open]').forEach(d => (d                     ).close());
+    abort.abort();
+    el.replaceChildren(...children);
+    for (const a of [...el.attributes]) el.removeAttribute(a.name);
+    for (const [name, value] of attributes) el.setAttribute(name, value);
+  } };
+}
+function action(event       )                     {
+  return (event.target           ).closest             ('[data-action]')?.dataset.action;
+}
+function escapeText(value        )         {
+  return value.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c] );
+}
+
+/** Independently authored ZeroSum alternative. Upstream is a visual reference only. */
+function mount(el             , opts                  = {})                 {
+    const s = setup(el, "<div class=\"contour-field\"><svg viewBox=\"0 0 500 250\" aria-hidden=\"true\"><path d=\"M-40 30 C140 220 200 -80 540 70\" style=\"--delay:0.0s\"/><path d=\"M-40 44 C140 210 200 -63 540 86\" style=\"--delay:0.15s\"/><path d=\"M-40 58 C140 200 200 -46 540 102\" style=\"--delay:0.3s\"/><path d=\"M-40 72 C140 190 200 -29 540 118\" style=\"--delay:0.44999999999999996s\"/><path d=\"M-40 86 C140 180 200 -12 540 134\" style=\"--delay:0.6s\"/><path d=\"M-40 100 C140 170 200 5 540 150\" style=\"--delay:0.75s\"/><path d=\"M-40 114 C140 160 200 22 540 166\" style=\"--delay:0.8999999999999999s\"/><path d=\"M-40 128 C140 150 200 39 540 182\" style=\"--delay:1.05s\"/><path d=\"M-40 142 C140 140 200 56 540 198\" style=\"--delay:1.2s\"/><path d=\"M-40 156 C140 130 200 73 540 214\" style=\"--delay:1.3499999999999999s\"/><path d=\"M-40 170 C140 120 200 90 540 230\" style=\"--delay:1.5s\"/><path d=\"M-40 184 C140 110 200 107 540 246\" style=\"--delay:1.65s\"/></svg><div class=\"contour-copy\"><span class=\"eyebrow\">Beyond the straight line</span><h2>Follow a different path.</h2><button data-action=\"pause\">Pause paths</button></div></div><label class=\"row\">Density <input aria-label=\"Path density\" type=\"range\" min=\"3\" max=\"12\" value=\"12\"></label>", opts);
+    s.on('click', e => { if (action(e) === 'pause') {
+        const p = s.query('.contour-field').classList.toggle('paused');
+        (e.target               ).textContent = p ? 'Resume paths' : 'Pause paths';
+    } });
+    s.on('input', e => el.querySelectorAll            ('path').forEach((p, i) => p.style.display = i < Number((e.target                    ).value) ? '' : 'none'));
+    return { destroy: s.destroy };
+}
+
+mount(document.getElementById("demo"), {theme: new URLSearchParams(location.search).get("theme") === "light" ? "light" : "dark", reducedMotion: new URLSearchParams(location.search).get("motion") === "reduced"});
+document.addEventListener("keydown", function(event) { if (event.key === "Escape" && !event.defaultPrevented && !document.querySelector("dialog[open]") && parent !== window) { event.preventDefault(); parent.postMessage({type: "mishh-original-preview-escape"}, "*"); } });</script></html>

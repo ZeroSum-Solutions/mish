@@ -1,0 +1,35 @@
+{
+  "id": "dome-gallery",
+  "name": "Dome Gallery",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room CSS 3D implementation from the one-line effect description only; no React Bits source was read, no WebGL or gesture library is needed, and touch-action: pan-y keeps vertical page scroll working on mobile.",
+  "entry": "components/dome-gallery/index.ts",
+  "css": "components/dome-gallery/styles.css",
+  "demo": "components/dome-gallery/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "radius": { "type": "number", "default": 420, "minimum": 50, "description": "Sphere radius in px; also the perspective, so a facing tile shows at its natural size." },
+      "tile": { "type": "number", "default": 140, "minimum": 20, "description": "Tile width, in px." },
+      "rows": { "type": "number", "default": 3, "minimum": 1, "description": "Rows of tiles stacked up the dome." },
+      "step": { "type": "number", "default": 22, "minimum": 2, "maximum": 90, "description": "Angle between neighbouring tiles, in degrees." },
+      "sensitivity": { "type": "number", "default": 0.25, "minimum": 0, "description": "Degrees turned per px dragged." },
+      "autoRotate": { "type": "number", "default": 3, "minimum": 0, "description": "Idle drift in degrees per second; pauses on hover, focus and drag. 0 turns it off." },
+      "maxTilt": { "type": "number", "default": 18, "minimum": 0, "maximum": 80, "description": "Largest up/down tilt, in degrees." },
+      "inertia": { "type": "boolean", "default": true, "description": "Keep turning briefly after a fast drag is released." },
+      "label": { "type": "string", "default": "Gallery. Drag or use the arrow keys to look around.", "description": "Accessible name used when the host has no aria-label or aria-labelledby." }
+    }
+  },
+  "a11y": [
+    "The host becomes a focusable role=\"group\" with an accessible name; Arrow keys turn and tilt the dome and Home recentres it, giving keyboard parity with drag.",
+    "Moving focus onto a link or button inside a tile turns the dome to face that tile, so the focused element is always on screen.",
+    "Tiles facing away from the viewer only fade out (opacity and pointer-events), so their content stays in the accessibility tree and in DOM tab order.",
+    "Reduced motion never builds the dome: the tiles stay in a flat, horizontally scrollable strip with no drift, inertia or 3D transforms."
+  ],
+  "reducedMotion": "static"
+}

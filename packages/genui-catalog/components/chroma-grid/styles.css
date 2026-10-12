@@ -1,0 +1,66 @@
+/* chroma-grid — clean-room, component-specs.md §10. Every selector is under .genui-chroma-grid. */
+
+.genui-chroma-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--genui-chroma-grid-cols, 3), minmax(0, 1fr));
+  grid-template-rows: var(--genui-chroma-grid-rows, auto);
+  gap: var(--genui-chroma-grid-gap, 16px);
+}
+
+.genui-chroma-grid__item {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: border-color 200ms ease;
+}
+
+.genui-chroma-grid__item:hover,
+.genui-chroma-grid__item:focus-within {
+  border-color: var(--card-accent, currentColor);
+}
+
+.genui-chroma-grid__item:focus-visible {
+  outline: 2px solid var(--card-accent, currentColor);
+  outline-offset: 2px;
+}
+
+.genui-chroma-grid__desat,
+.genui-chroma-grid__fade {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  backdrop-filter: grayscale(var(--genui-chroma-grid-grayscale, 1));
+  -webkit-backdrop-filter: grayscale(var(--genui-chroma-grid-grayscale, 1));
+}
+
+.genui-chroma-grid__desat {
+  --genui-chroma-grid-hole: radial-gradient(
+    circle var(--genui-chroma-grid-radius, 280px) at var(--genui-chroma-grid-x, 50%) var(--genui-chroma-grid-y, 50%),
+    transparent 0%,
+    transparent 70%,
+    #000 100%
+  );
+  mask-image: var(--genui-chroma-grid-hole);
+  -webkit-mask-image: var(--genui-chroma-grid-hole);
+}
+
+.genui-chroma-grid__fade {
+  z-index: 2;
+  opacity: calc(1 - var(--genui-chroma-grid-active, 0));
+  transition: opacity var(--genui-chroma-grid-fadeout, 500ms) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-chroma-grid__item {
+    transition: none;
+  }
+
+  .genui-chroma-grid__desat,
+  .genui-chroma-grid__fade {
+    display: none;
+  }
+}

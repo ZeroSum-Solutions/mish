@@ -1,0 +1,37 @@
+{
+  "id": "marketing-site-07",
+  "businessName": "The Gilded Oar",
+  "expectedSpine": "BA",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "The Gilded Oar"
+    },
+    {
+      "field": "address",
+      "value": "18 Wharf Street, Portland, Maine"
+    },
+    {
+      "field": "phone",
+      "value": "(207) 555-0184"
+    },
+    {
+      "field": "email",
+      "value": "reservations@thegildedoar.com"
+    },
+    {
+      "field": "hours",
+      "value": "Dinner Wednesday through Monday, 4:30 p.m. to 10 p.m.; closed Tuesdays; oyster happy hour Wed–Fri 4–6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Holds a valid Maine restaurant and liquor license"
+    },
+    {
+      "field": "other",
+      "value": "Seats fifty-five guests"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

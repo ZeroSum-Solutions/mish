@@ -1,0 +1,39 @@
+{
+  "id": "glyph-portal",
+  "name": "Glyph Portal",
+  "category": "scroll",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "rationale": "Clean-room implementation from the component-specs.md behaviour description only; no 21st.dev source was fetched or read, so no MIT attribution is owed (the upstream author is not recorded in the seed). Same treatment as liquid-glass-card.",
+  "entry": "components/glyph-portal/index.ts",
+  "css": "components/glyph-portal/styles.css",
+  "demo": "components/glyph-portal/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "glyph": { "type": "string", "default": "O" },
+      "font": { "type": "string", "default": "system-ui, sans-serif" },
+      "weight": { "type": "number", "default": 900 },
+      "trackHeight": { "type": "string", "default": "250vh" },
+      "maxScale": { "type": "number", "default": 60, "minimum": 1 },
+      "origin": {
+        "type": "array",
+        "items": { "type": "number", "minimum": 0, "maximum": 1 },
+        "minItems": 2,
+        "maxItems": 2,
+        "default": [0.5, 0.5],
+        "description": "Fraction of the glyph box the scale grows from."
+      },
+      "cover": { "type": "string", "default": "#0b0d12" }
+    }
+  },
+  "a11y": [
+    "The cover SVG is aria-hidden and pointer-events:none at all times, so it never intercepts clicks or enters the accessibility tree.",
+    "The 'next' content stays in normal DOM order and reading order behind the cover.",
+    "Nothing traps focus: focus landing in the content while it is still covered scrolls the track to its end so the focused element is visible.",
+    "The glyph is decoration only; it carries no text alternative and none is needed."
+  ],
+  "reducedMotion": "reduced"
+}

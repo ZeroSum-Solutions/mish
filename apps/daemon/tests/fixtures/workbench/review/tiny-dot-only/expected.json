@@ -1,0 +1,5 @@
+{
+  "description": "A 2x2 dot redrawn on a canvas every 150 ms, with no control. Each change is below the pixel threshold, but it recurs in consecutive samples, so it is persistent motion and the check fails.",
+  "parameters": {},
+  "motion": "fail"
+}

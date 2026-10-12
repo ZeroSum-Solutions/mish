@@ -1,0 +1,3 @@
+# Synthetic diagnostics fixture with a private-key label and placeholder value.
+# Ignore only this historical test-table finding; all other findings remain active.
+22d4a0f261ce5e2b2f489229a23cb8e9b6aca1a1:packages/diagnostics/tests/zip.test.ts:generic-api-key:90

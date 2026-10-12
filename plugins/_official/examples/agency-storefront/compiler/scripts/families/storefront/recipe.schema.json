@@ -1,0 +1,641 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-design.ai/schemas/agency-site/storefront/recipe.v2.json",
+  "title": "storefront recipe",
+  "description": "A retail storefront page kind (atlas CO.01): header, hero, one featured product, an optional short collection grid, optional product details, a required buy-or-preorder step whose destination is honest to the brief, optional shipping and returns, optional reviews, optional story or about, and a footer. Derived from compiler/scripts/families/storefront/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.",
+  "$comment": "contract.ts additionally enforces markup-free plain text, email, phone and url formats on the nullable atoms, and that a null appears only on an x-atom string leaf or in an x-optional section slot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "family",
+    "revision",
+    "brand",
+    "sections"
+  ],
+  "sectionOrder": [
+    "storefront-header",
+    "storefront-hero",
+    "storefront-featured-product",
+    "storefront-collection-grid",
+    "storefront-product-details",
+    "storefront-buy-preorder",
+    "storefront-shipping-returns",
+    "storefront-reviews",
+    "storefront-story-about",
+    "storefront-footer"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "family": {
+      "const": "storefront"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9999
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "descriptor"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "descriptor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-header"
+            },
+            "type": {
+              "const": "header"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "cta"
+              ],
+              "properties": {
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-hero"
+            },
+            "type": {
+              "const": "hero"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "eyebrow",
+                "heading",
+                "body"
+              ],
+              "properties": {
+                "eyebrow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 72
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 140
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-featured-product"
+            },
+            "type": {
+              "const": "featured-product"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "name",
+                "description",
+                "price"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "name": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "price": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "plain",
+                  "minLength": 1,
+                  "maxLength": 24,
+                  "x-verify": "traceable"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "collection grid",
+            "dropWhen": "The brief names fewer than four more products beyond the featured one (including one product or SKU only). This section takes exactly four items and never pads with an invented product to reach that count, so a catalog of two or three extra products still drops the grid.",
+            "keepWhen": "The brief names four or more real products beyond the featured one; only the first four are shown, never fewer than four and never a fabricated one to fill the rest.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-collection-grid"
+            },
+            "type": {
+              "const": "collection-grid"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "blurb",
+                  "price"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48
+                  },
+                  "blurb": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 64
+                  },
+                  "price": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "plain",
+                    "minLength": 1,
+                    "maxLength": 24,
+                    "x-verify": "traceable"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "product details",
+            "dropWhen": "The brief gives no material, sizing, care or origin facts about the product.",
+            "keepWhen": "The brief states real material, sizing, care or origin facts.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-product-details"
+            },
+            "type": {
+              "const": "product-details"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 3,
+              "x-drop": "items",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "value"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24
+                  },
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60,
+                    "x-verify": "traceable"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-buy-preorder"
+            },
+            "type": {
+              "const": "buy-preorder"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body",
+                "ctaLabel",
+                "url",
+                "phone",
+                "email"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "ctaLabel": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "url",
+                  "minLength": 1,
+                  "maxLength": 300
+                },
+                "phone": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "phone",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "email",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "shipping and returns",
+            "dropWhen": "The brief states no shipping, delivery, preorder-timing or returns policy.",
+            "keepWhen": "The brief states a real shipping, delivery, preorder-timing or returns policy.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-shipping-returns"
+            },
+            "type": {
+              "const": "shipping-returns"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60,
+                  "x-label": true
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 280,
+                  "x-verify": "traceable"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "customer reviews",
+            "dropWhen": "The brief carries no buyer reviews or quotes to show.",
+            "keepWhen": "The brief supplies real reviews from buyers (at least a quote).",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-reviews"
+            },
+            "type": {
+              "const": "reviews"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 2,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "quote",
+                  "name"
+                ],
+                "properties": {
+                  "quote": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 240,
+                    "x-verify": "quote"
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "person-name",
+                    "minLength": 1,
+                    "maxLength": 60
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "story or about",
+            "dropWhen": "The brief gives no maker, brand or label story to tell.",
+            "keepWhen": "The brief states a real founding, maker or brand story.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-story-about"
+            },
+            "type": {
+              "const": "story-about"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 280
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "storefront-footer"
+            },
+            "type": {
+              "const": "footer"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tagline",
+                "phone",
+                "email",
+                "address"
+              ],
+              "properties": {
+                "tagline": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "phone": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "phone",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "email",
+                  "minLength": 1,
+                  "maxLength": 80
+                },
+                "address": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "address",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

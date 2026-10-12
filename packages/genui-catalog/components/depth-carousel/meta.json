@@ -1,0 +1,35 @@
+{
+  "id": "depth-carousel",
+  "name": "Depth Carousel",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; a dependency-free 3D coverflow driven by CSS custom properties replaces the upstream motion library, and no upstream source was read.",
+  "entry": "components/depth-carousel/index.ts",
+  "css": "components/depth-carousel/styles.css",
+  "demo": "components/depth-carousel/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "spacing": { "type": "number", "default": 120, "description": "Horizontal step between neighbouring items, in px." },
+      "depth": { "type": "number", "default": 160, "minimum": 0, "description": "How far back each step sits, in px." },
+      "rotate": { "type": "number", "default": 35, "description": "Turn of the items beside the active one, in deg." },
+      "visible": { "type": "number", "default": 2, "minimum": 0, "description": "Steps shown on each side of the active item; further items fade out." },
+      "start": { "type": "number", "default": 0, "minimum": 0, "description": "Index of the item shown first." },
+      "loop": { "type": "boolean", "default": true, "description": "Wrap from the last item to the first." },
+      "autoplay": { "type": "number", "default": 0, "minimum": 0, "description": "Advance every n ms; 0 turns autoplay off." },
+      "duration": { "type": "number", "default": 600, "minimum": 0, "description": "Transition duration, in ms." },
+      "controls": { "type": "boolean", "default": true, "description": "Add Previous and Next buttons." }
+    }
+  },
+  "a11y": [
+    "Items stay in DOM order and in the accessibility tree; the front item carries aria-current=\"true\" and a polite live region announces \"Slide n of N\" after each change.",
+    "Keyboard parity: ArrowLeft/ArrowRight/Home/End on the carousel move the front item, focusing an item with Tab brings it to the front, and the Previous/Next buttons are real labelled <button> elements.",
+    "Autoplay is off by default; when set, it pauses on hover, on keyboard focus inside the carousel, in a hidden tab and off-screen (WCAG 2.2.2).",
+    "Reduced motion drops every transition and turns autoplay off; items snap to their new positions and all controls still work."
+  ],
+  "reducedMotion": "reduced"
+}

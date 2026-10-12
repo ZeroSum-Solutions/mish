@@ -1,0 +1,8 @@
+{
+  "description": "An infinite animation whose working Pause button comes after two buttons inside an open shadow root; the Tab walk must follow shadowRoot.activeElement to reach it.",
+  "parameters": {
+    "requireReducedMotionFallback": false,
+    "requireLivePreferenceChange": false
+  },
+  "motion": "pass"
+}

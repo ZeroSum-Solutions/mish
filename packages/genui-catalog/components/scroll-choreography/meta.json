@@ -1,0 +1,29 @@
+{
+  "id": "scroll-choreography",
+  "name": "Scroll Choreography",
+  "category": "scroll",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/scroll-choreography/index.ts",
+  "css": "components/scroll-choreography/styles.css",
+  "demo": "components/scroll-choreography/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "trackHeight": { "type": "string", "default": "300vh" },
+      "heroIndex": { "type": "number", "default": 0, "minimum": 0, "maximum": 3, "description": "Which of the 4 items grows to fill the viewport." },
+      "spread": { "type": "number", "default": 40, "minimum": 0, "description": "Outward drift of the supporting images, in vw." },
+      "startRadius": { "type": "number", "default": 16, "minimum": 0, "description": "Corner radius of the hero at the start of the track, in px; eases to 0." },
+      "captionAt": { "type": "number", "default": 0.8, "minimum": 0, "maximum": 1, "description": "Track progress (0-1) at which the caption starts fading in." },
+      "smoothing": { "type": "number", "default": 0.2, "minimum": 0, "maximum": 1, "description": "rAF lerp factor applied to the scroll progress each frame." }
+    }
+  },
+  "a11y": [
+    "The four images are decorative unless the author labels them; the DOM order never changes, so reading order is unaffected by the visual scale and drift.",
+    "The caption is real text in normal flow, on a gradient scrim over the hero for >=4.5:1 contrast.",
+    "Nothing traps scroll or keyboard focus; the pin releases once the track ends and the page scrolls on normally.",
+    "A host without exactly 4 \".genui-scroll-choreography__item\" children logs a console warning and mount is a no-op, so a malformed demo never leaves the section pinned or hidden."
+  ],
+  "reducedMotion": "static"
+}

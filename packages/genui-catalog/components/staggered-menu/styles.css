@@ -1,0 +1,211 @@
+/* staggered-menu — clean-room, from the description "Multi-layer menu entrance" only. Every selector is under .genui-staggered-menu. */
+
+.genui-staggered-menu__toggle {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 12px 7px 14px;
+  border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: .02em;
+  cursor: pointer;
+  transition: color .3s ease, border-color .3s ease;
+}
+
+.genui-staggered-menu__toggle:focus-visible {
+  outline: 2px solid var(--genui-staggered-menu-accent, #5b4bff);
+  outline-offset: 3px;
+}
+
+.genui-staggered-menu__icon {
+  position: relative;
+  width: 14px;
+  height: 8px;
+}
+
+.genui-staggered-menu__icon::before,
+.genui-staggered-menu__icon::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform .3s ease, top .3s ease;
+}
+
+.genui-staggered-menu__icon::before { top: 0; }
+.genui-staggered-menu__icon::after { top: 6px; }
+
+.genui-staggered-menu--open .genui-staggered-menu__toggle {
+  color: var(--genui-staggered-menu-ink, #101217);
+}
+
+.genui-staggered-menu--open .genui-staggered-menu__icon::before { top: 3px; transform: rotate(45deg); }
+.genui-staggered-menu--open .genui-staggered-menu__icon::after { top: 3px; transform: rotate(-45deg); }
+
+/* Layers and panel: off-canvas until the open class lands. */
+.genui-staggered-menu--ready .genui-staggered-menu__panel,
+.genui-staggered-menu__layer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  box-sizing: border-box;
+  width: min(100%, var(--genui-staggered-menu-width, 280px));
+  transform: translateX(100%);
+  visibility: hidden;
+  transition:
+    transform var(--genui-staggered-menu-duration, 560ms) cubic-bezier(.7, 0, .2, 1),
+    visibility 0s linear;
+}
+
+.genui-staggered-menu--fixed .genui-staggered-menu__panel,
+.genui-staggered-menu--fixed .genui-staggered-menu__layer { position: fixed; }
+
+.genui-staggered-menu--left .genui-staggered-menu__panel,
+.genui-staggered-menu--left .genui-staggered-menu__layer {
+  right: auto;
+  left: 0;
+  transform: translateX(-100%);
+}
+
+.genui-staggered-menu__layer {
+  z-index: 1;
+  pointer-events: none;
+  background: var(--genui-staggered-menu-accent, #5b4bff);
+  /* Closing: the panel leaves first, then the layers peel off top-down. */
+  transition-delay:
+    calc((var(--genui-staggered-menu-n, 2) - var(--genui-staggered-menu-i, 0)) * var(--genui-staggered-menu-stagger, 60ms)),
+    calc((var(--genui-staggered-menu-n, 2) - var(--genui-staggered-menu-i, 0)) * var(--genui-staggered-menu-stagger, 60ms) + var(--genui-staggered-menu-duration, 560ms));
+}
+
+.genui-staggered-menu--ready .genui-staggered-menu__panel {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 56px 24px 18px;
+  overflow: auto;
+  background: var(--genui-staggered-menu-panel, #f5f3ee);
+  color: var(--genui-staggered-menu-ink, #101217);
+  box-shadow: -18px 0 40px -24px rgba(0, 0, 0, .6);
+  transition-delay: 0s, var(--genui-staggered-menu-duration, 560ms);
+}
+
+.genui-staggered-menu--open .genui-staggered-menu__layer,
+.genui-staggered-menu--open.genui-staggered-menu--ready .genui-staggered-menu__panel {
+  transform: none;
+  visibility: visible;
+}
+
+.genui-staggered-menu--open .genui-staggered-menu__layer {
+  transition-delay: calc(var(--genui-staggered-menu-i, 0) * var(--genui-staggered-menu-stagger, 60ms)), 0s;
+}
+
+.genui-staggered-menu--open.genui-staggered-menu--ready .genui-staggered-menu__panel {
+  transition-delay: calc(var(--genui-staggered-menu-n, 2) * var(--genui-staggered-menu-stagger, 60ms)), 0s;
+}
+
+/* Panel content. */
+.genui-staggered-menu__panel ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: genui-staggered-menu;
+}
+
+.genui-staggered-menu__panel li { counter-increment: genui-staggered-menu; }
+
+.genui-staggered-menu__panel a {
+  color: inherit;
+  text-decoration: none;
+  border-radius: 4px;
+}
+
+.genui-staggered-menu__panel li a {
+  display: inline-block;
+  padding: 1px 0;
+  font-size: var(--genui-staggered-menu-size, 24px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -.02em;
+}
+
+.genui-staggered-menu--numbered .genui-staggered-menu__panel li a::after {
+  content: counter(genui-staggered-menu, decimal-leading-zero);
+  content: counter(genui-staggered-menu, decimal-leading-zero) / "";
+  margin-left: .4em;
+  font-size: .42em;
+  font-weight: 600;
+  vertical-align: super;
+  color: var(--genui-staggered-menu-accent, #5b4bff);
+}
+
+.genui-staggered-menu__panel a:hover,
+.genui-staggered-menu__panel a:focus-visible {
+  color: var(--genui-staggered-menu-accent, #5b4bff);
+}
+
+.genui-staggered-menu__panel a:focus-visible {
+  outline: 2px solid var(--genui-staggered-menu-accent, #5b4bff);
+  outline-offset: 3px;
+}
+
+.genui-staggered-menu__meta {
+  margin: auto 0 0;
+  font-size: 12px;
+  opacity: .6;
+}
+
+/* Links rise in once the panel has landed, one after another. */
+.genui-staggered-menu--ready .genui-staggered-menu__panel a {
+  opacity: 0;
+  transform: translateY(.6em);
+  transition:
+    opacity calc(var(--genui-staggered-menu-duration, 560ms) * .6) ease,
+    transform calc(var(--genui-staggered-menu-duration, 560ms) * .6) cubic-bezier(.2, .8, .2, 1),
+    color .2s ease;
+}
+
+.genui-staggered-menu--open .genui-staggered-menu__panel a {
+  opacity: 1;
+  transform: none;
+  transition-delay:
+    calc((var(--genui-staggered-menu-n, 2) + var(--genui-staggered-menu-i, 0)) * var(--genui-staggered-menu-stagger, 60ms) + var(--genui-staggered-menu-duration, 560ms) * .5),
+    calc((var(--genui-staggered-menu-n, 2) + var(--genui-staggered-menu-i, 0)) * var(--genui-staggered-menu-stagger, 60ms) + var(--genui-staggered-menu-duration, 560ms) * .5),
+    0s;
+}
+
+/* Reduced motion: no sheets, no slide, no stagger; the menu still opens and closes. */
+.genui-staggered-menu.genui-staggered-menu--reduced .genui-staggered-menu__layer { display: none; }
+
+.genui-staggered-menu.genui-staggered-menu--reduced .genui-staggered-menu__panel,
+.genui-staggered-menu.genui-staggered-menu--reduced .genui-staggered-menu__panel a,
+.genui-staggered-menu.genui-staggered-menu--reduced .genui-staggered-menu__icon::before,
+.genui-staggered-menu.genui-staggered-menu--reduced .genui-staggered-menu__icon::after {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-staggered-menu.genui-staggered-menu .genui-staggered-menu__layer { display: none; }
+
+  .genui-staggered-menu.genui-staggered-menu .genui-staggered-menu__panel,
+  .genui-staggered-menu.genui-staggered-menu .genui-staggered-menu__panel a,
+  .genui-staggered-menu.genui-staggered-menu .genui-staggered-menu__icon::before,
+  .genui-staggered-menu.genui-staggered-menu .genui-staggered-menu__icon::after {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-staggered-menu--ready .genui-staggered-menu__panel { border-inline: 1px solid CanvasText; }
+}

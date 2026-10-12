@@ -1,0 +1,21 @@
+{
+  "catalogComponents": [
+    "split-text",
+    "masked-heading"
+  ],
+  "effects": {
+    "scriptPolicy": "hash",
+    "maxEffects": 1,
+    "placements": {
+      "hero-title": {
+        "host": {
+          "odId": "practice-hero--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      }
+    }
+  }
+}

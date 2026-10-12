@@ -1,0 +1,1725 @@
+{
+  "_note": "Jev's own route answers (spine, skin, family and the top spine's archetype) for the 25 catalog-25 references, re-captured 2026-09-23 with jev-1.13.0 against the 13-family registry (listings, publication and nonprofit included) by evals/genui/8-route-eval.mjs (live profile-catalog.ts run). Structured choices only; no prompt text. Feeds tests/route-corpus.test.ts: resolveRoute must fail closed and stay deterministic on real answers.",
+  "profiles": {
+    "3d-jack-portfolio-hero": {
+      "spine": {
+        "choice": "TL",
+        "confidence": 0.99,
+        "probabilities": {
+          "none": 0,
+          "TU": 0,
+          "BA": 0,
+          "PA": 0,
+          "SM": 0,
+          "CS": 0,
+          "LM": 0,
+          "TL": 1,
+          "MI": 0,
+          "CO": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.92,
+        "probabilities": {
+          "Catalog and grid-led": 0,
+          "Editorial": 0,
+          "Cinematic and immersive": 0.93,
+          "Experimental": 0.06,
+          "Playful and illustrative": 0,
+          "unspecified": 0,
+          "Heritage and craft": 0,
+          "Corporate and institutional": 0,
+          "Technical and utilitarian": 0,
+          "Minimal and quiet": 0,
+          "Data-dense": 0,
+          "Luxury": 0.01,
+          "Conversational": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.79,
+        "probabilities": {
+          "marketing-site": 0,
+          "none": 0.01,
+          "halcyon": 0,
+          "publication": 0,
+          "wrenfield": 0,
+          "maben": 0,
+          "app-shell": 0,
+          "fervor": 0.81,
+          "maren": 0,
+          "nonprofit": 0,
+          "listings": 0,
+          "emmpo": 0,
+          "watson": 0.17,
+          "crm-dashboard": 0
+        }
+      },
+      "archetype": {
+        "spine": "TL",
+        "choice": "TL.06",
+        "confidence": 0.96,
+        "probabilities": {
+          "TL.01": 0,
+          "TL.06": 0.96,
+          "none": 0,
+          "TL.02": 0,
+          "TL.04": 0,
+          "TL.05": 0.04,
+          "TL.03": 0
+        }
+      }
+    },
+    "3d-story": {
+      "spine": {
+        "choice": "PA",
+        "confidence": 1,
+        "probabilities": {
+          "SM": 0,
+          "TL": 0,
+          "CS": 0,
+          "PA": 1,
+          "MI": 0,
+          "CO": 0,
+          "BA": 0,
+          "TU": 0,
+          "LM": 0,
+          "none": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.98,
+        "probabilities": {
+          "Technical and utilitarian": 0.01,
+          "Playful and illustrative": 0,
+          "Corporate and institutional": 0,
+          "Luxury": 0,
+          "Conversational": 0,
+          "unspecified": 0,
+          "Minimal and quiet": 0,
+          "Data-dense": 0,
+          "Cinematic and immersive": 0.99,
+          "Heritage and craft": 0,
+          "Editorial": 0,
+          "Experimental": 0,
+          "Catalog and grid-led": 0
+        }
+      },
+      "family": {
+        "choice": "marketing-site",
+        "confidence": 0.83,
+        "probabilities": {
+          "halcyon": 0,
+          "marketing-site": 0.85,
+          "watson": 0.03,
+          "emmpo": 0,
+          "wrenfield": 0,
+          "listings": 0,
+          "fervor": 0.08,
+          "publication": 0,
+          "nonprofit": 0,
+          "crm-dashboard": 0,
+          "app-shell": 0,
+          "none": 0.04,
+          "maben": 0,
+          "maren": 0
+        }
+      },
+      "archetype": {
+        "spine": "PA",
+        "choice": "PA.03",
+        "confidence": 1,
+        "probabilities": {
+          "none": 0,
+          "PA.02": 0,
+          "PA.04": 0,
+          "PA.03": 1,
+          "PA.01": 0
+        }
+      }
+    },
+    "aetheris-voyage-hero": {
+      "spine": {
+        "choice": "BA",
+        "confidence": 0.76,
+        "probabilities": {
+          "TL": 0.02,
+          "MI": 0,
+          "TU": 0,
+          "SM": 0,
+          "PA": 0.1,
+          "BA": 0.79,
+          "CS": 0.01,
+          "CO": 0,
+          "LM": 0.07,
+          "none": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 1,
+        "probabilities": {
+          "Heritage and craft": 0,
+          "unspecified": 0,
+          "Data-dense": 0,
+          "Experimental": 0,
+          "Technical and utilitarian": 0,
+          "Catalog and grid-led": 0,
+          "Editorial": 0,
+          "Luxury": 0,
+          "Corporate and institutional": 0,
+          "Minimal and quiet": 0,
+          "Conversational": 0,
+          "Playful and illustrative": 0,
+          "Cinematic and immersive": 1
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.4,
+        "probabilities": {
+          "fervor": 0.45,
+          "app-shell": 0,
+          "maren": 0.01,
+          "emmpo": 0,
+          "wrenfield": 0,
+          "watson": 0.12,
+          "listings": 0,
+          "crm-dashboard": 0,
+          "maben": 0,
+          "publication": 0.03,
+          "none": 0.12,
+          "marketing-site": 0.26,
+          "nonprofit": 0,
+          "halcyon": 0.01
+        }
+      },
+      "archetype": {
+        "spine": "BA",
+        "choice": "none",
+        "confidence": 0.3,
+        "probabilities": {
+          "BA.03": 0.22,
+          "BA.02": 0,
+          "BA.01": 0.31,
+          "none": 0.47
+        }
+      }
+    },
+    "art-landing": {
+      "spine": {
+        "choice": "PA",
+        "confidence": 0.99,
+        "probabilities": {
+          "TU": 0,
+          "PA": 0.99,
+          "CO": 0,
+          "CS": 0,
+          "LM": 0,
+          "none": 0,
+          "MI": 0,
+          "SM": 0,
+          "BA": 0,
+          "TL": 0.01
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.98,
+        "probabilities": {
+          "Minimal and quiet": 0,
+          "Cinematic and immersive": 0.99,
+          "Data-dense": 0,
+          "Experimental": 0,
+          "Playful and illustrative": 0,
+          "Catalog and grid-led": 0,
+          "Heritage and craft": 0,
+          "Technical and utilitarian": 0.01,
+          "unspecified": 0,
+          "Editorial": 0,
+          "Conversational": 0,
+          "Luxury": 0,
+          "Corporate and institutional": 0
+        }
+      },
+      "family": {
+        "choice": "marketing-site",
+        "confidence": 0.76,
+        "probabilities": {
+          "halcyon": 0,
+          "maben": 0,
+          "nonprofit": 0,
+          "marketing-site": 0.79,
+          "fervor": 0.06,
+          "publication": 0,
+          "watson": 0.1,
+          "listings": 0,
+          "maren": 0,
+          "crm-dashboard": 0,
+          "none": 0.05,
+          "app-shell": 0,
+          "emmpo": 0,
+          "wrenfield": 0
+        }
+      },
+      "archetype": {
+        "spine": "PA",
+        "choice": "PA.01",
+        "confidence": 0.92,
+        "probabilities": {
+          "PA.04": 0.04,
+          "PA.03": 0,
+          "none": 0.01,
+          "PA.01": 0.94,
+          "PA.02": 0.01
+        }
+      }
+    },
+    "bl": {
+      "spine": {
+        "choice": "CS",
+        "confidence": 0.91,
+        "probabilities": {
+          "TL": 0,
+          "MI": 0.06,
+          "TU": 0,
+          "LM": 0,
+          "CO": 0,
+          "none": 0,
+          "SM": 0,
+          "BA": 0,
+          "PA": 0.01,
+          "CS": 0.93
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.76,
+        "probabilities": {
+          "Luxury": 0.19,
+          "Technical and utilitarian": 0,
+          "Catalog and grid-led": 0,
+          "Playful and illustrative": 0,
+          "Editorial": 0,
+          "Conversational": 0,
+          "Experimental": 0.03,
+          "Data-dense": 0,
+          "Minimal and quiet": 0,
+          "Heritage and craft": 0,
+          "unspecified": 0,
+          "Cinematic and immersive": 0.78,
+          "Corporate and institutional": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.36,
+        "probabilities": {
+          "maren": 0,
+          "listings": 0,
+          "watson": 0.14,
+          "crm-dashboard": 0,
+          "app-shell": 0,
+          "emmpo": 0.12,
+          "fervor": 0.4,
+          "marketing-site": 0.19,
+          "wrenfield": 0,
+          "publication": 0.05,
+          "halcyon": 0,
+          "none": 0.08,
+          "maben": 0,
+          "nonprofit": 0.02
+        }
+      },
+      "archetype": {
+        "spine": "CS",
+        "choice": "CS.01",
+        "confidence": 0.55,
+        "probabilities": {
+          "none": 0.33,
+          "CS.02": 0,
+          "CS.01": 0.67,
+          "CS.03": 0
+        }
+      }
+    },
+    "digital-experiences": {
+      "spine": {
+        "choice": "TL",
+        "confidence": 0.98,
+        "probabilities": {
+          "TL": 0.98,
+          "none": 0,
+          "SM": 0,
+          "BA": 0.02,
+          "CS": 0,
+          "MI": 0,
+          "TU": 0,
+          "CO": 0,
+          "LM": 0,
+          "PA": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.98,
+        "probabilities": {
+          "Playful and illustrative": 0,
+          "Cinematic and immersive": 0.98,
+          "Editorial": 0,
+          "Data-dense": 0,
+          "Heritage and craft": 0,
+          "Experimental": 0,
+          "Luxury": 0.02,
+          "Technical and utilitarian": 0,
+          "Corporate and institutional": 0,
+          "unspecified": 0,
+          "Catalog and grid-led": 0,
+          "Minimal and quiet": 0,
+          "Conversational": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.94,
+        "probabilities": {
+          "nonprofit": 0,
+          "maben": 0,
+          "halcyon": 0,
+          "watson": 0.05,
+          "app-shell": 0,
+          "listings": 0,
+          "fervor": 0.95,
+          "wrenfield": 0,
+          "emmpo": 0,
+          "none": 0,
+          "publication": 0,
+          "crm-dashboard": 0,
+          "marketing-site": 0,
+          "maren": 0
+        }
+      },
+      "archetype": {
+        "spine": "TL",
+        "choice": "TL.05",
+        "confidence": 1,
+        "probabilities": {
+          "TL.02": 0,
+          "TL.01": 0,
+          "none": 0,
+          "TL.05": 1,
+          "TL.04": 0,
+          "TL.06": 0,
+          "TL.03": 0
+        }
+      }
+    },
+    "dreamcore-landing": {
+      "spine": {
+        "choice": "LM",
+        "confidence": 0.23,
+        "probabilities": {
+          "SM": 0.07,
+          "TU": 0,
+          "CS": 0.04,
+          "PA": 0.02,
+          "MI": 0,
+          "CO": 0.01,
+          "BA": 0.12,
+          "none": 0.21,
+          "LM": 0.32,
+          "TL": 0.21
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 1,
+        "probabilities": {
+          "Catalog and grid-led": 0,
+          "Playful and illustrative": 0,
+          "Corporate and institutional": 0,
+          "Luxury": 0,
+          "Data-dense": 0,
+          "unspecified": 0,
+          "Minimal and quiet": 0,
+          "Conversational": 0,
+          "Cinematic and immersive": 1,
+          "Heritage and craft": 0,
+          "Editorial": 0,
+          "Experimental": 0,
+          "Technical and utilitarian": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.69,
+        "probabilities": {
+          "marketing-site": 0,
+          "halcyon": 0,
+          "watson": 0.1,
+          "emmpo": 0.01,
+          "wrenfield": 0,
+          "listings": 0.01,
+          "app-shell": 0,
+          "publication": 0,
+          "nonprofit": 0,
+          "crm-dashboard": 0,
+          "fervor": 0.72,
+          "none": 0.16,
+          "maben": 0,
+          "maren": 0
+        }
+      },
+      "archetype": {
+        "spine": "LM",
+        "choice": "none",
+        "confidence": 0.44,
+        "probabilities": {
+          "LM.03": 0.33,
+          "LM.01": 0.08,
+          "none": 0.59,
+          "LM.02": 0
+        }
+      }
+    },
+    "email-landing-page": {
+      "spine": {
+        "choice": "PA",
+        "confidence": 1,
+        "probabilities": {
+          "PA": 1,
+          "CO": 0,
+          "MI": 0,
+          "CS": 0,
+          "TU": 0,
+          "TL": 0,
+          "LM": 0,
+          "SM": 0,
+          "BA": 0,
+          "none": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.99,
+        "probabilities": {
+          "Conversational": 0,
+          "Heritage and craft": 0,
+          "Catalog and grid-led": 0,
+          "Corporate and institutional": 0,
+          "Cinematic and immersive": 0.99,
+          "Luxury": 0.01,
+          "unspecified": 0,
+          "Editorial": 0,
+          "Technical and utilitarian": 0,
+          "Playful and illustrative": 0,
+          "Experimental": 0,
+          "Minimal and quiet": 0,
+          "Data-dense": 0
+        }
+      },
+      "family": {
+        "choice": "marketing-site",
+        "confidence": 0.98,
+        "probabilities": {
+          "wrenfield": 0,
+          "listings": 0,
+          "none": 0.01,
+          "crm-dashboard": 0,
+          "emmpo": 0,
+          "publication": 0,
+          "maben": 0,
+          "marketing-site": 0.98,
+          "nonprofit": 0,
+          "halcyon": 0,
+          "app-shell": 0,
+          "watson": 0.01,
+          "maren": 0,
+          "fervor": 0
+        }
+      },
+      "archetype": {
+        "spine": "PA",
+        "choice": "PA.01",
+        "confidence": 0.85,
+        "probabilities": {
+          "PA.02": 0,
+          "PA.04": 0.11,
+          "PA.03": 0,
+          "none": 0,
+          "PA.01": 0.89
+        }
+      }
+    },
+    "halo-usd-landing": {
+      "spine": {
+        "choice": "PA",
+        "confidence": 0.96,
+        "probabilities": {
+          "SM": 0,
+          "PA": 0.96,
+          "none": 0,
+          "CS": 0,
+          "TL": 0.01,
+          "CO": 0,
+          "BA": 0,
+          "TU": 0,
+          "LM": 0.03,
+          "MI": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.44,
+        "probabilities": {
+          "Corporate and institutional": 0.1,
+          "Heritage and craft": 0,
+          "unspecified": 0,
+          "Editorial": 0,
+          "Catalog and grid-led": 0,
+          "Experimental": 0,
+          "Playful and illustrative": 0,
+          "Conversational": 0,
+          "Luxury": 0.31,
+          "Minimal and quiet": 0.1,
+          "Technical and utilitarian": 0,
+          "Data-dense": 0,
+          "Cinematic and immersive": 0.49
+        }
+      },
+      "family": {
+        "choice": "marketing-site",
+        "confidence": 0.76,
+        "probabilities": {
+          "maben": 0,
+          "listings": 0,
+          "nonprofit": 0,
+          "halcyon": 0,
+          "emmpo": 0,
+          "marketing-site": 0.78,
+          "watson": 0.13,
+          "maren": 0,
+          "crm-dashboard": 0,
+          "publication": 0,
+          "wrenfield": 0,
+          "fervor": 0.03,
+          "app-shell": 0,
+          "none": 0.06
+        }
+      },
+      "archetype": {
+        "spine": "PA",
+        "choice": "PA.04",
+        "confidence": 0.73,
+        "probabilities": {
+          "none": 0.03,
+          "PA.01": 0.17,
+          "PA.04": 0.78,
+          "PA.03": 0,
+          "PA.02": 0.02
+        }
+      }
+    },
+    "health-portal": {
+      "spine": {
+        "choice": "TL",
+        "confidence": 0.83,
+        "probabilities": {
+          "CS": 0,
+          "PA": 0,
+          "CO": 0,
+          "SM": 0,
+          "MI": 0,
+          "none": 0,
+          "LM": 0,
+          "TU": 0,
+          "TL": 0.85,
+          "BA": 0.15
+        }
+      },
+      "skin": {
+        "choice": "Minimal and quiet",
+        "confidence": 0.24,
+        "probabilities": {
+          "Data-dense": 0,
+          "Minimal and quiet": 0.31,
+          "Corporate and institutional": 0.16,
+          "Conversational": 0,
+          "unspecified": 0,
+          "Luxury": 0.1,
+          "Technical and utilitarian": 0.1,
+          "Playful and illustrative": 0,
+          "Heritage and craft": 0.01,
+          "Experimental": 0.01,
+          "Cinematic and immersive": 0.23,
+          "Editorial": 0.01,
+          "Catalog and grid-led": 0.07
+        }
+      },
+      "family": {
+        "choice": "watson",
+        "confidence": 0.54,
+        "probabilities": {
+          "publication": 0,
+          "wrenfield": 0.31,
+          "emmpo": 0,
+          "crm-dashboard": 0,
+          "watson": 0.59,
+          "app-shell": 0,
+          "fervor": 0.01,
+          "nonprofit": 0,
+          "maren": 0,
+          "none": 0.05,
+          "marketing-site": 0.03,
+          "halcyon": 0,
+          "maben": 0.01,
+          "listings": 0
+        }
+      },
+      "archetype": {
+        "spine": "TL",
+        "choice": "TL.02",
+        "confidence": 0.64,
+        "probabilities": {
+          "TL.02": 0.69,
+          "TL.05": 0,
+          "TL.03": 0,
+          "TL.06": 0,
+          "TL.04": 0,
+          "TL.01": 0.31,
+          "none": 0
+        }
+      }
+    },
+    "innovation-landing": {
+      "spine": {
+        "choice": "CS",
+        "confidence": 0.72,
+        "probabilities": {
+          "CS": 0.75,
+          "none": 0,
+          "TL": 0.22,
+          "SM": 0,
+          "CO": 0,
+          "LM": 0.02,
+          "TU": 0,
+          "MI": 0,
+          "PA": 0.01,
+          "BA": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.96,
+        "probabilities": {
+          "Technical and utilitarian": 0,
+          "Catalog and grid-led": 0,
+          "Minimal and quiet": 0,
+          "Corporate and institutional": 0,
+          "Playful and illustrative": 0,
+          "unspecified": 0,
+          "Conversational": 0,
+          "Experimental": 0,
+          "Luxury": 0.03,
+          "Editorial": 0,
+          "Heritage and craft": 0,
+          "Cinematic and immersive": 0.97,
+          "Data-dense": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.55,
+        "probabilities": {
+          "fervor": 0.59,
+          "watson": 0.27,
+          "emmpo": 0.03,
+          "none": 0.02,
+          "halcyon": 0,
+          "maren": 0,
+          "nonprofit": 0,
+          "app-shell": 0,
+          "maben": 0,
+          "listings": 0,
+          "publication": 0.02,
+          "marketing-site": 0.07,
+          "crm-dashboard": 0,
+          "wrenfield": 0
+        }
+      },
+      "archetype": {
+        "spine": "CS",
+        "choice": "CS.01",
+        "confidence": 0.63,
+        "probabilities": {
+          "CS.01": 0.73,
+          "none": 0.27,
+          "CS.03": 0,
+          "CS.02": 0
+        }
+      }
+    },
+    "luxury-real-estate": {
+      "spine": {
+        "choice": "SM",
+        "confidence": 0.75,
+        "probabilities": {
+          "PA": 0,
+          "LM": 0,
+          "TU": 0,
+          "none": 0,
+          "CS": 0,
+          "SM": 0.78,
+          "CO": 0.02,
+          "MI": 0,
+          "TL": 0.17,
+          "BA": 0.03
+        }
+      },
+      "skin": {
+        "choice": "Luxury",
+        "confidence": 0.94,
+        "probabilities": {
+          "Conversational": 0,
+          "Experimental": 0,
+          "Data-dense": 0,
+          "Minimal and quiet": 0,
+          "Editorial": 0,
+          "unspecified": 0,
+          "Catalog and grid-led": 0,
+          "Playful and illustrative": 0,
+          "Technical and utilitarian": 0,
+          "Cinematic and immersive": 0.05,
+          "Heritage and craft": 0,
+          "Luxury": 0.95,
+          "Corporate and institutional": 0
+        }
+      },
+      "family": {
+        "choice": "listings",
+        "confidence": 0.44,
+        "probabilities": {
+          "halcyon": 0.01,
+          "nonprofit": 0,
+          "publication": 0,
+          "watson": 0.35,
+          "maben": 0.01,
+          "listings": 0.49,
+          "wrenfield": 0,
+          "app-shell": 0,
+          "emmpo": 0,
+          "none": 0.09,
+          "marketing-site": 0.01,
+          "fervor": 0.03,
+          "crm-dashboard": 0,
+          "maren": 0.01
+        }
+      },
+      "archetype": {
+        "spine": "SM",
+        "choice": "SM.03",
+        "confidence": 0.87,
+        "probabilities": {
+          "SM.03": 0.89,
+          "SM.05": 0,
+          "SM.02": 0.01,
+          "SM.01": 0,
+          "SM.04": 0,
+          "none": 0.1
+        }
+      }
+    },
+    "mindloop-landing": {
+      "spine": {
+        "choice": "CS",
+        "confidence": 0.99,
+        "probabilities": {
+          "none": 0,
+          "TU": 0,
+          "BA": 0,
+          "PA": 0,
+          "SM": 0,
+          "CS": 0.99,
+          "LM": 0.01,
+          "TL": 0,
+          "MI": 0,
+          "CO": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.89,
+        "probabilities": {
+          "Data-dense": 0,
+          "Editorial": 0.04,
+          "Cinematic and immersive": 0.91,
+          "Experimental": 0,
+          "Playful and illustrative": 0,
+          "unspecified": 0,
+          "Heritage and craft": 0,
+          "Corporate and institutional": 0,
+          "Technical and utilitarian": 0,
+          "Minimal and quiet": 0.05,
+          "Catalog and grid-led": 0,
+          "Luxury": 0,
+          "Conversational": 0
+        }
+      },
+      "family": {
+        "choice": "publication",
+        "confidence": 0.76,
+        "probabilities": {
+          "marketing-site": 0.17,
+          "halcyon": 0,
+          "none": 0.01,
+          "publication": 0.78,
+          "wrenfield": 0,
+          "maben": 0,
+          "app-shell": 0,
+          "fervor": 0,
+          "maren": 0,
+          "nonprofit": 0,
+          "listings": 0,
+          "crm-dashboard": 0,
+          "emmpo": 0.04,
+          "watson": 0
+        }
+      },
+      "archetype": {
+        "spine": "CS",
+        "choice": "CS.01",
+        "confidence": 0.99,
+        "probabilities": {
+          "CS.02": 0,
+          "CS.03": 0,
+          "none": 0,
+          "CS.01": 1
+        }
+      }
+    },
+    "modern-agency": {
+      "spine": {
+        "choice": "TL",
+        "confidence": 0.99,
+        "probabilities": {
+          "TL": 0.99,
+          "SM": 0,
+          "none": 0,
+          "MI": 0,
+          "CO": 0,
+          "CS": 0,
+          "TU": 0,
+          "LM": 0,
+          "BA": 0.01,
+          "PA": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.55,
+        "probabilities": {
+          "Technical and utilitarian": 0.01,
+          "Experimental": 0.3,
+          "Cinematic and immersive": 0.59,
+          "Luxury": 0.06,
+          "Editorial": 0,
+          "Conversational": 0,
+          "unspecified": 0,
+          "Heritage and craft": 0,
+          "Catalog and grid-led": 0,
+          "Playful and illustrative": 0,
+          "Data-dense": 0,
+          "Minimal and quiet": 0.04,
+          "Corporate and institutional": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.78,
+        "probabilities": {
+          "crm-dashboard": 0,
+          "nonprofit": 0,
+          "none": 0,
+          "marketing-site": 0,
+          "app-shell": 0,
+          "watson": 0.19,
+          "fervor": 0.81,
+          "maren": 0,
+          "publication": 0,
+          "emmpo": 0,
+          "maben": 0,
+          "wrenfield": 0,
+          "listings": 0,
+          "halcyon": 0
+        }
+      },
+      "archetype": {
+        "spine": "TL",
+        "choice": "TL.05",
+        "confidence": 1,
+        "probabilities": {
+          "TL.06": 0,
+          "TL.01": 0,
+          "none": 0,
+          "TL.03": 0,
+          "TL.04": 0,
+          "TL.02": 0,
+          "TL.05": 1
+        }
+      }
+    },
+    "mostar-guide": {
+      "spine": {
+        "choice": "none",
+        "confidence": 0.58,
+        "probabilities": {
+          "TL": 0,
+          "none": 0.63,
+          "BA": 0.01,
+          "SM": 0,
+          "CS": 0.36,
+          "LM": 0,
+          "TU": 0,
+          "CO": 0,
+          "MI": 0,
+          "PA": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.96,
+        "probabilities": {
+          "Playful and illustrative": 0,
+          "Cinematic and immersive": 0.97,
+          "Editorial": 0,
+          "Data-dense": 0,
+          "Heritage and craft": 0,
+          "Experimental": 0,
+          "Corporate and institutional": 0,
+          "Luxury": 0,
+          "Technical and utilitarian": 0.03,
+          "unspecified": 0,
+          "Catalog and grid-led": 0,
+          "Minimal and quiet": 0,
+          "Conversational": 0
+        }
+      },
+      "family": {
+        "choice": "none",
+        "confidence": 0.56,
+        "probabilities": {
+          "nonprofit": 0,
+          "halcyon": 0.23,
+          "maben": 0,
+          "none": 0.6,
+          "app-shell": 0,
+          "listings": 0,
+          "fervor": 0.13,
+          "wrenfield": 0,
+          "emmpo": 0,
+          "watson": 0.02,
+          "crm-dashboard": 0,
+          "publication": 0.02,
+          "marketing-site": 0,
+          "maren": 0
+        }
+      }
+    },
+    "neon-logic": {
+      "spine": {
+        "choice": "PA",
+        "confidence": 0.98,
+        "probabilities": {
+          "TU": 0,
+          "SM": 0,
+          "CO": 0.01,
+          "CS": 0,
+          "LM": 0,
+          "none": 0,
+          "TL": 0,
+          "PA": 0.99,
+          "BA": 0,
+          "MI": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.99,
+        "probabilities": {
+          "Minimal and quiet": 0,
+          "Cinematic and immersive": 0.99,
+          "Data-dense": 0,
+          "Experimental": 0,
+          "Catalog and grid-led": 0,
+          "Playful and illustrative": 0,
+          "Heritage and craft": 0,
+          "Technical and utilitarian": 0.01,
+          "unspecified": 0,
+          "Editorial": 0,
+          "Conversational": 0,
+          "Luxury": 0,
+          "Corporate and institutional": 0
+        }
+      },
+      "family": {
+        "choice": "marketing-site",
+        "confidence": 0.68,
+        "probabilities": {
+          "halcyon": 0,
+          "maben": 0,
+          "nonprofit": 0,
+          "marketing-site": 0.7,
+          "fervor": 0.12,
+          "watson": 0.12,
+          "publication": 0,
+          "listings": 0,
+          "wrenfield": 0,
+          "crm-dashboard": 0,
+          "app-shell": 0,
+          "none": 0.05,
+          "emmpo": 0,
+          "maren": 0.01
+        }
+      },
+      "archetype": {
+        "spine": "PA",
+        "choice": "PA.04",
+        "confidence": 0.97,
+        "probabilities": {
+          "PA.04": 0.98,
+          "PA.03": 0,
+          "none": 0.01,
+          "PA.01": 0.01,
+          "PA.02": 0
+        }
+      }
+    },
+    "orbis-nft-landing": {
+      "spine": {
+        "choice": "CO",
+        "confidence": 0.84,
+        "probabilities": {
+          "BA": 0,
+          "CO": 0.85,
+          "TU": 0,
+          "TL": 0,
+          "PA": 0,
+          "MI": 0,
+          "CS": 0.05,
+          "SM": 0.01,
+          "none": 0,
+          "LM": 0.09
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.96,
+        "probabilities": {
+          "Heritage and craft": 0,
+          "Cinematic and immersive": 0.98,
+          "Editorial": 0,
+          "Conversational": 0,
+          "Catalog and grid-led": 0,
+          "Data-dense": 0,
+          "unspecified": 0,
+          "Playful and illustrative": 0,
+          "Technical and utilitarian": 0,
+          "Minimal and quiet": 0,
+          "Experimental": 0.02,
+          "Corporate and institutional": 0,
+          "Luxury": 0
+        }
+      },
+      "family": {
+        "choice": "listings",
+        "confidence": 0.45,
+        "probabilities": {
+          "watson": 0.03,
+          "publication": 0,
+          "crm-dashboard": 0,
+          "wrenfield": 0,
+          "halcyon": 0.02,
+          "fervor": 0.04,
+          "marketing-site": 0.08,
+          "listings": 0.5,
+          "maren": 0.17,
+          "nonprofit": 0,
+          "maben": 0,
+          "none": 0.16,
+          "app-shell": 0,
+          "emmpo": 0
+        }
+      },
+      "archetype": {
+        "spine": "CO",
+        "choice": "none",
+        "confidence": 0.54,
+        "probabilities": {
+          "CO.02": 0,
+          "CO.03": 0,
+          "CO.01": 0.34,
+          "none": 0.66
+        }
+      }
+    },
+    "portfolio-cosmic-hero": {
+      "spine": {
+        "choice": "TL",
+        "confidence": 0.96,
+        "probabilities": {
+          "none": 0,
+          "TU": 0,
+          "SM": 0.02,
+          "TL": 0.97,
+          "LM": 0,
+          "CO": 0,
+          "BA": 0,
+          "CS": 0.01,
+          "PA": 0,
+          "MI": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.93,
+        "probabilities": {
+          "Data-dense": 0,
+          "Playful and illustrative": 0,
+          "Conversational": 0,
+          "Minimal and quiet": 0,
+          "Technical and utilitarian": 0.03,
+          "Catalog and grid-led": 0,
+          "Experimental": 0.02,
+          "Cinematic and immersive": 0.93,
+          "Heritage and craft": 0,
+          "Luxury": 0.01,
+          "unspecified": 0,
+          "Editorial": 0,
+          "Corporate and institutional": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.41,
+        "probabilities": {
+          "none": 0.16,
+          "watson": 0.37,
+          "wrenfield": 0,
+          "halcyon": 0,
+          "fervor": 0.46,
+          "listings": 0,
+          "maren": 0,
+          "publication": 0,
+          "emmpo": 0,
+          "crm-dashboard": 0,
+          "maben": 0,
+          "app-shell": 0,
+          "nonprofit": 0,
+          "marketing-site": 0.01
+        }
+      },
+      "archetype": {
+        "spine": "TL",
+        "choice": "TL.06",
+        "confidence": 0.97,
+        "probabilities": {
+          "none": 0,
+          "TL.01": 0,
+          "TL.04": 0,
+          "TL.05": 0.03,
+          "TL.03": 0,
+          "TL.02": 0,
+          "TL.06": 0.97
+        }
+      }
+    },
+    "prisma-landing": {
+      "spine": {
+        "choice": "LM",
+        "confidence": 0.98,
+        "probabilities": {
+          "TL": 0.01,
+          "CS": 0,
+          "SM": 0,
+          "MI": 0,
+          "BA": 0,
+          "none": 0,
+          "LM": 0.98,
+          "TU": 0,
+          "PA": 0.01,
+          "CO": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 1,
+        "probabilities": {
+          "Heritage and craft": 0,
+          "Luxury": 0,
+          "Data-dense": 0,
+          "Catalog and grid-led": 0,
+          "Editorial": 0,
+          "Cinematic and immersive": 1,
+          "unspecified": 0,
+          "Corporate and institutional": 0,
+          "Technical and utilitarian": 0,
+          "Conversational": 0,
+          "Playful and illustrative": 0,
+          "Experimental": 0,
+          "Minimal and quiet": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.49,
+        "probabilities": {
+          "emmpo": 0.23,
+          "publication": 0,
+          "watson": 0.11,
+          "wrenfield": 0,
+          "maben": 0,
+          "nonprofit": 0,
+          "marketing-site": 0.08,
+          "maren": 0,
+          "none": 0.03,
+          "halcyon": 0.01,
+          "fervor": 0.54,
+          "listings": 0,
+          "crm-dashboard": 0,
+          "app-shell": 0
+        }
+      },
+      "archetype": {
+        "spine": "LM",
+        "choice": "LM.03",
+        "confidence": 0.98,
+        "probabilities": {
+          "none": 0,
+          "LM.03": 0.99,
+          "LM.01": 0.01,
+          "LM.02": 0
+        }
+      }
+    },
+    "prompt-hero": {
+      "spine": {
+        "choice": "CO",
+        "confidence": 0.99,
+        "probabilities": {
+          "CS": 0,
+          "BA": 0,
+          "MI": 0,
+          "CO": 1,
+          "none": 0,
+          "TL": 0,
+          "SM": 0,
+          "LM": 0,
+          "TU": 0,
+          "PA": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.9,
+        "probabilities": {
+          "Technical and utilitarian": 0.05,
+          "Luxury": 0.01,
+          "unspecified": 0,
+          "Corporate and institutional": 0,
+          "Experimental": 0.03,
+          "Minimal and quiet": 0,
+          "Cinematic and immersive": 0.91,
+          "Heritage and craft": 0,
+          "Editorial": 0,
+          "Conversational": 0,
+          "Data-dense": 0,
+          "Playful and illustrative": 0,
+          "Catalog and grid-led": 0
+        }
+      },
+      "family": {
+        "choice": "maren",
+        "confidence": 0.76,
+        "probabilities": {
+          "listings": 0.04,
+          "crm-dashboard": 0,
+          "nonprofit": 0,
+          "watson": 0,
+          "marketing-site": 0.02,
+          "fervor": 0.02,
+          "maren": 0.78,
+          "none": 0.04,
+          "wrenfield": 0,
+          "publication": 0,
+          "emmpo": 0,
+          "maben": 0,
+          "halcyon": 0.09999999999999999,
+          "app-shell": 0
+        }
+      },
+      "archetype": {
+        "spine": "CO",
+        "choice": "CO.01",
+        "confidence": 0.72,
+        "probabilities": {
+          "CO.03": 0,
+          "CO.02": 0,
+          "CO.01": 0.79,
+          "none": 0.21
+        }
+      }
+    },
+    "pulse-3d": {
+      "spine": {
+        "choice": "LM",
+        "confidence": 0.99,
+        "probabilities": {
+          "TU": 0,
+          "BA": 0,
+          "MI": 0,
+          "none": 0,
+          "TL": 0,
+          "SM": 0,
+          "CO": 0,
+          "PA": 0,
+          "CS": 0,
+          "LM": 1
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.9,
+        "probabilities": {
+          "Luxury": 0,
+          "Corporate and institutional": 0,
+          "Conversational": 0,
+          "Technical and utilitarian": 0.01,
+          "Heritage and craft": 0,
+          "unspecified": 0,
+          "Cinematic and immersive": 0.91,
+          "Playful and illustrative": 0,
+          "Experimental": 0.08,
+          "Data-dense": 0,
+          "Editorial": 0,
+          "Catalog and grid-led": 0,
+          "Minimal and quiet": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.6,
+        "probabilities": {
+          "wrenfield": 0,
+          "fervor": 0.64,
+          "halcyon": 0,
+          "listings": 0,
+          "emmpo": 0.15,
+          "maren": 0,
+          "watson": 0.05,
+          "none": 0.15,
+          "maben": 0,
+          "crm-dashboard": 0,
+          "app-shell": 0,
+          "nonprofit": 0,
+          "publication": 0,
+          "marketing-site": 0.01
+        }
+      },
+      "archetype": {
+        "spine": "LM",
+        "choice": "LM.03",
+        "confidence": 0.99,
+        "probabilities": {
+          "none": 0.01,
+          "LM.02": 0,
+          "LM.03": 0.99,
+          "LM.01": 0
+        }
+      }
+    },
+    "scroll-landing": {
+      "spine": {
+        "choice": "LM",
+        "confidence": 0.47,
+        "probabilities": {
+          "PA": 0.01,
+          "MI": 0,
+          "TU": 0,
+          "SM": 0.01,
+          "TL": 0.06,
+          "BA": 0.34,
+          "CS": 0,
+          "CO": 0.05,
+          "LM": 0.53,
+          "none": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.99,
+        "probabilities": {
+          "Heritage and craft": 0,
+          "unspecified": 0,
+          "Data-dense": 0,
+          "Experimental": 0,
+          "Technical and utilitarian": 0,
+          "Catalog and grid-led": 0,
+          "Editorial": 0,
+          "Corporate and institutional": 0,
+          "Playful and illustrative": 0,
+          "Minimal and quiet": 0,
+          "Conversational": 0,
+          "Luxury": 0.01,
+          "Cinematic and immersive": 0.99
+        }
+      },
+      "family": {
+        "choice": "watson",
+        "confidence": 0.19,
+        "probabilities": {
+          "wrenfield": 0,
+          "app-shell": 0,
+          "watson": 0.25,
+          "emmpo": 0.12,
+          "halcyon": 0.15,
+          "nonprofit": 0,
+          "none": 0.08,
+          "crm-dashboard": 0,
+          "maben": 0,
+          "publication": 0,
+          "fervor": 0.18,
+          "maren": 0.01,
+          "listings": 0.02,
+          "marketing-site": 0.19
+        }
+      },
+      "archetype": {
+        "spine": "LM",
+        "choice": "LM.02",
+        "confidence": 0.15,
+        "probabilities": {
+          "LM.02": 0.35,
+          "LM.03": 0.25,
+          "LM.01": 0.25,
+          "none": 0.15
+        }
+      }
+    },
+    "urban-jungle-hero": {
+      "spine": {
+        "choice": "TL",
+        "confidence": 0.95,
+        "probabilities": {
+          "PA": 0.01,
+          "LM": 0,
+          "none": 0.03,
+          "TL": 0.96,
+          "BA": 0,
+          "CS": 0,
+          "MI": 0,
+          "SM": 0,
+          "CO": 0,
+          "TU": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.99,
+        "probabilities": {
+          "Data-dense": 0,
+          "Conversational": 0,
+          "Catalog and grid-led": 0,
+          "Luxury": 0,
+          "Technical and utilitarian": 0,
+          "Corporate and institutional": 0,
+          "unspecified": 0,
+          "Minimal and quiet": 0,
+          "Experimental": 0,
+          "Editorial": 0,
+          "Cinematic and immersive": 1,
+          "Playful and illustrative": 0,
+          "Heritage and craft": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.62,
+        "probabilities": {
+          "publication": 0,
+          "none": 0.08,
+          "app-shell": 0,
+          "listings": 0,
+          "fervor": 0.66,
+          "halcyon": 0,
+          "emmpo": 0,
+          "wrenfield": 0,
+          "crm-dashboard": 0,
+          "marketing-site": 0.01,
+          "watson": 0.14,
+          "nonprofit": 0,
+          "maben": 0.11,
+          "maren": 0
+        }
+      },
+      "archetype": {
+        "spine": "TL",
+        "choice": "TL.05",
+        "confidence": 0.94,
+        "probabilities": {
+          "TL.03": 0.02,
+          "TL.04": 0,
+          "TL.01": 0,
+          "none": 0.02,
+          "TL.02": 0,
+          "TL.06": 0,
+          "TL.05": 0.96
+        }
+      }
+    },
+    "vision-reveal": {
+      "spine": {
+        "choice": "TL",
+        "confidence": 0.98,
+        "probabilities": {
+          "none": 0,
+          "TU": 0,
+          "BA": 0,
+          "PA": 0.02,
+          "SM": 0,
+          "CS": 0,
+          "LM": 0,
+          "TL": 0.98,
+          "MI": 0,
+          "CO": 0
+        }
+      },
+      "skin": {
+        "choice": "Cinematic and immersive",
+        "confidence": 0.83,
+        "probabilities": {
+          "Data-dense": 0,
+          "Editorial": 0.01,
+          "Cinematic and immersive": 0.85,
+          "Experimental": 0.04,
+          "unspecified": 0.03,
+          "Playful and illustrative": 0,
+          "Heritage and craft": 0,
+          "Corporate and institutional": 0,
+          "Technical and utilitarian": 0,
+          "Minimal and quiet": 0.03,
+          "Conversational": 0.01,
+          "Luxury": 0.03,
+          "Catalog and grid-led": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.73,
+        "probabilities": {
+          "marketing-site": 0,
+          "halcyon": 0,
+          "none": 0.01,
+          "publication": 0,
+          "wrenfield": 0,
+          "maben": 0,
+          "watson": 0.23,
+          "fervor": 0.76,
+          "maren": 0,
+          "nonprofit": 0,
+          "listings": 0,
+          "emmpo": 0,
+          "crm-dashboard": 0,
+          "app-shell": 0
+        }
+      },
+      "archetype": {
+        "spine": "TL",
+        "choice": "TL.05",
+        "confidence": 0.96,
+        "probabilities": {
+          "TL.01": 0,
+          "TL.02": 0,
+          "none": 0,
+          "TL.06": 0.03,
+          "TL.04": 0,
+          "TL.05": 0.97,
+          "TL.03": 0
+        }
+      }
+    },
+    "vortex-studio-hero": {
+      "spine": {
+        "choice": "TL",
+        "confidence": 1,
+        "probabilities": {
+          "PA": 0,
+          "CO": 0,
+          "none": 0,
+          "MI": 0,
+          "SM": 0,
+          "CS": 0,
+          "BA": 0,
+          "TL": 1,
+          "LM": 0,
+          "TU": 0
+        }
+      },
+      "skin": {
+        "choice": "Luxury",
+        "confidence": 0.49,
+        "probabilities": {
+          "Corporate and institutional": 0.01,
+          "Minimal and quiet": 0.07,
+          "Experimental": 0.05,
+          "Heritage and craft": 0,
+          "unspecified": 0,
+          "Data-dense": 0,
+          "Editorial": 0.01,
+          "Cinematic and immersive": 0.32,
+          "Catalog and grid-led": 0,
+          "Luxury": 0.53,
+          "Conversational": 0.01,
+          "Technical and utilitarian": 0,
+          "Playful and illustrative": 0
+        }
+      },
+      "family": {
+        "choice": "fervor",
+        "confidence": 0.93,
+        "probabilities": {
+          "marketing-site": 0,
+          "publication": 0,
+          "app-shell": 0,
+          "crm-dashboard": 0,
+          "maben": 0,
+          "none": 0,
+          "maren": 0,
+          "nonprofit": 0,
+          "listings": 0,
+          "emmpo": 0,
+          "wrenfield": 0,
+          "watson": 0.06,
+          "fervor": 0.9400000000000001,
+          "halcyon": 0
+        }
+      },
+      "archetype": {
+        "spine": "TL",
+        "choice": "TL.05",
+        "confidence": 0.96,
+        "probabilities": {
+          "TL.05": 0.97,
+          "TL.02": 0,
+          "TL.01": 0,
+          "TL.04": 0,
+          "TL.03": 0,
+          "none": 0,
+          "TL.06": 0.03
+        }
+      }
+    }
+  }
+}

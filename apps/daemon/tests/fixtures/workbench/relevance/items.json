@@ -1,0 +1,26 @@
+{
+  "schema": "workbench-relevance-items/1",
+  "note": "Candidate pool for the AC-R05.3 relevance benchmark harness (U3). Overrides are merged onto the shared tests/workbench/context-ranking-fixture.ts candidate() baseline, so only ranking-relevant fields are listed here.",
+  "items": [
+    { "id": "calendar-widget", "title": "Appointment calendar widget", "category": "component", "sectionKind": "booking-availability", "spineAffinities": ["SM", "BA"], "implementationOrigin": "owned-original" },
+    { "id": "intake-form", "title": "Patient intake form", "category": "component", "sectionKind": "contact-form", "spineAffinities": ["SM"], "implementationOrigin": "owned-original" },
+    { "id": "booking-cta-band", "title": "Book your visit CTA band", "category": "cta-pattern", "sectionKind": "cta-band", "spineAffinities": ["SM", "BA"], "implementationOrigin": "owned-original" },
+    { "id": "react95-window-chrome", "title": "React95 window chrome kit", "category": "ui-kit", "styleClass": "retro", "sectionKind": "booking-availability", "spineAffinities": ["MI"], "implementationOrigin": "provenance-unverified" },
+    { "id": "windows95-form-kit", "title": "Windows95 form control kit", "category": "ui-kit", "styleClass": "retro", "sectionKind": "contact-form", "spineAffinities": ["MI"], "implementationOrigin": "provenance-unverified" },
+    { "id": "retro-arcade-marquee", "title": "Retro arcade marquee hero", "category": "section", "styleClass": "retro", "sectionKind": "hero", "spineAffinities": ["MI"], "implementationOrigin": "provenance-unverified" },
+    { "id": "ambient-glow-booking-banner", "title": "Ambient glow booking banner background", "category": "motion", "styleTags": ["continuous-motion"], "sectionKind": "booking-availability", "spineAffinities": ["SM"] },
+    { "id": "particle-starfield-hero", "title": "Particle starfield hero background", "category": "motion", "styleTags": ["continuous-motion", "particles"], "spineAffinities": ["MI", "TU"] },
+    { "id": "parallax-grain-overlay", "title": "Parallax grain ambient overlay", "category": "motion", "styleTags": ["continuous-motion"], "spineAffinities": "any" },
+    { "id": "owned-ambient-loader", "title": "Owned ambient loading motion", "category": "motion", "styleTags": ["continuous-motion"], "spineAffinities": ["TU"], "implementationOrigin": "owned-original" },
+    { "id": "vendor-particle-kit", "title": "Vendor particle effects kit", "category": "motion", "styleTags": ["continuous-motion", "particles"], "spineAffinities": ["TU"], "implementationOrigin": "provenance-unverified" },
+    { "id": "saas-signup-hero", "title": "SaaS signup hero", "category": "section", "sectionKind": "hero", "spineAffinities": ["PA"], "implementationOrigin": "owned-original" },
+    { "id": "saas-pricing-table", "title": "SaaS pricing table", "category": "section", "sectionKind": "pricing", "spineAffinities": ["PA", "CO"] },
+    { "id": "newsletter-waitlist-block", "title": "Newsletter waitlist signup block", "category": "section", "sectionKind": "newsletter-waitlist", "spineAffinities": ["PA", "LM"] },
+    { "id": "checkout-product-grid", "title": "Commerce checkout product grid", "category": "section", "sectionKind": "product-grid", "spineAffinities": ["CO"] },
+    { "id": "contact-sales-form", "title": "Contact sales inquiry form", "category": "component", "sectionKind": "contact-form", "spineAffinities": ["CS"], "implementationOrigin": "owned-original" },
+    { "id": "task-utility-dashboard", "title": "Task utility dashboard hero", "category": "layout", "sectionKind": "hero", "spineAffinities": ["TU"], "implementationOrigin": "owned-original" },
+    { "id": "class-booking-calendar", "title": "Class booking availability calendar", "category": "component", "sectionKind": "booking-availability", "spineAffinities": ["BA"], "implementationOrigin": "owned-original" },
+    { "id": "hero-variant-a", "title": "Modern dentistry hero, light variant", "category": "section", "sectionKind": "hero", "spineAffinities": ["SM"], "variantGroup": "dentistry-hero" },
+    { "id": "hero-variant-b", "title": "Modern dentistry hero, dark variant", "category": "section", "sectionKind": "hero", "spineAffinities": ["SM"], "variantGroup": "dentistry-hero" }
+  ]
+}

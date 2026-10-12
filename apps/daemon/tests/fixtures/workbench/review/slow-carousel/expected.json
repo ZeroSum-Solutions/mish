@@ -1,0 +1,5 @@
+{
+  "description": "A carousel that advances every 7.5 s, with a Pause button that does nothing and no reduced-motion handling. Its quiet stretches are longer than a short after-action window, so it must fail all three requirements rather than pass the pause and live-switch ones.",
+  "parameters": {},
+  "motion": "fail"
+}

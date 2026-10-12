@@ -1,0 +1,4 @@
+:where(.genui-count-up) { position: relative; }
+.genui-count-up { font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.genui-count-up .genui-count-up__readable { position: absolute; top: 0; left: 0; pointer-events: none; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .genui-count-up { transition: none; } }

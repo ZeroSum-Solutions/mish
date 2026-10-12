@@ -1,0 +1,25 @@
+We're a field services team and we want a mock of an internal tool for tracking site inspections
+— just the working frame (nav, an empty state, a list, a detail view, settings), not a dashboard of
+numbers. Call it Fieldbook.
+
+Top nav: links for Inspections, Sites, Crew, Reports, signed in as Marisol Aguon.
+
+Side nav, grouped: Inspections (Open, Scheduled, Completed), Sites (Active sites, Archived, Map
+view), Crew (Roster, Certifications, Time off), Reports (Weekly summary, Compliance, Exports).
+
+An empty state for when there's nothing scheduled: "No inspections scheduled" — add a site visit
+to start tracking findings for this week. Button: "Schedule an inspection".
+
+A list view, "Open inspections", five rows: Harborview Warehouse, status Overdue, owner Marisol
+Aguon, updated 2 days ago. Cedar Ridge Plant, status In progress, owner Theo Kavanagh, updated
+yesterday. Millbrook Depot, status Scheduled, owner Ines Falkenrath, updated today. Dunmore
+Substation, status In progress, owner Theo Kavanagh, updated 3 hours ago. Alder Street Yard,
+status Scheduled, owner Marisol Aguon, updated 1 hour ago.
+
+A detail view for Harborview Warehouse: Site ID HW-014, Inspector Marisol Aguon, Last visit 38
+days ago, Open findings 3, Next due "Overdue by 2 days".
+
+A settings page with three sections: Profile (update your name, role and the sites you're
+assigned to inspect), Notifications (choose when Fieldbook alerts you about overdue or reassigned
+inspections), Team access (manage who on your crew can view or edit each site's inspection
+history).

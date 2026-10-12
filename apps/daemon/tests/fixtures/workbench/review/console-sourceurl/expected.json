@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 5 BLOCK: a console source location keeps its project path only when that path is a file the review served in this run; a page-chosen //# sourceURL is recorded as origin plus digest. The real served script keeps its path.",
+  "cases": { "default-deny": { "allowHosts": [], "consoleOutcome": "fail", "secretsAbsent": ["s0urceS3cret"], "evidenceIncludes": "http://project.od-review.localhost/app.js:" } }
+}

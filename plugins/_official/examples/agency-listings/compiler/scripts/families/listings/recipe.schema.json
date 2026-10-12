@@ -1,0 +1,684 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-design.ai/schemas/agency-site/listings/recipe.v2.json",
+  "title": "listings recipe",
+  "description": "A static directory or listings page kind (atlas SM.02): header, search, categories, filters, results, comparison, featured listing, optional reviews, inquiry and footer. Derived from compiler/scripts/families/listings/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.",
+  "$comment": "contract.ts additionally enforces markup-free plain text, email and phone formats on the nullable inquiry atoms, and that a null appears only on an x-atom string leaf or in the x-optional reviews slot. x-mock item groups are illustrative sample data: render.ts shows the fixed template caption (SAMPLE_DATA_CAPTION in slots.ts, not a recipe field) before every one of them.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "family",
+    "revision",
+    "brand",
+    "sections"
+  ],
+  "sectionOrder": [
+    "listings-header",
+    "listings-search",
+    "listings-categories",
+    "listings-filters",
+    "listings-results",
+    "listings-compare",
+    "listings-featured",
+    "listings-reviews",
+    "listings-inquiry",
+    "listings-footer"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "family": {
+      "const": "listings"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9999
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "descriptor"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "descriptor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 200
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 10,
+      "maxItems": 10,
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-header"
+            },
+            "type": {
+              "const": "header"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "cta"
+              ],
+              "properties": {
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-search"
+            },
+            "type": {
+              "const": "search-hero"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "eyebrow",
+                "heading",
+                "body",
+                "queryPlaceholder",
+                "searchCta"
+              ],
+              "properties": {
+                "eyebrow": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 72
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "queryPlaceholder": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 48
+                },
+                "searchCta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 24
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-categories"
+            },
+            "type": {
+              "const": "categories"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "blurb"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40
+                  },
+                  "blurb": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-filters"
+            },
+            "type": {
+              "const": "filters"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "options"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24,
+                    "x-label": true
+                  },
+                  "options": {
+                    "type": "array",
+                    "x-label": true,
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 32
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-results"
+            },
+            "type": {
+              "const": "results"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "sorts"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "sorts": {
+                  "type": "array",
+                  "x-label": true,
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24
+                  }
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "x-mock": true,
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "location",
+                  "title",
+                  "price",
+                  "summary"
+                ],
+                "properties": {
+                  "location": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 48
+                  },
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  },
+                  "price": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24
+                  },
+                  "summary": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 120
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-compare"
+            },
+            "type": {
+              "const": "comparison"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "columns"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "columns": {
+                  "type": "array",
+                  "x-label": true,
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 24
+                  }
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "x-mock": true,
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "cells"
+                ],
+                "properties": {
+                  "cells": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 40
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-featured"
+            },
+            "type": {
+              "const": "featured"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "x-mock": true,
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "value"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32
+                  },
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "customer reviews",
+            "dropWhen": "The brief carries no customer reviews, names or quotes to show.",
+            "keepWhen": "The brief supplies real reviews from buyers, renters, guests or members (a quote and a name).",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-reviews"
+            },
+            "type": {
+              "const": "reviews"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "quote",
+                  "name"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  },
+                  "quote": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 240,
+                    "x-verify": "quote"
+                  },
+                  "name": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "x-atom": "person-name",
+                    "minLength": 1,
+                    "maxLength": 60
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-inquiry"
+            },
+            "type": {
+              "const": "inquiry"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body",
+                "cta",
+                "phone",
+                "email"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "phone": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "phone",
+                  "minLength": 1,
+                  "maxLength": 40
+                },
+                "email": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "email",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "listings-footer"
+            },
+            "type": {
+              "const": "footer"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tagline",
+                "links",
+                "address"
+              ],
+              "properties": {
+                "tagline": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 120
+                },
+                "links": {
+                  "type": "array",
+                  "x-label": true,
+                  "minItems": 3,
+                  "maxItems": 3,
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 32
+                  }
+                },
+                "address": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "x-atom": "address",
+                  "minLength": 1,
+                  "maxLength": 120
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

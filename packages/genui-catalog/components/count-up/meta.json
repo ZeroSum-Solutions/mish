@@ -1,0 +1,53 @@
+{
+  "id": "count-up",
+  "name": "Count Up",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/count-up/index.ts",
+  "css": "components/count-up/styles.css",
+  "demo": "components/count-up/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "from": {
+        "type": "number",
+        "default": 0
+      },
+      "to": {
+        "type": "number",
+        "default": 128
+      },
+      "duration": {
+        "type": "number",
+        "default": 1200,
+        "minimum": 0,
+        "maximum": 4000
+      },
+      "decimals": {
+        "type": "integer",
+        "default": 0,
+        "minimum": 0,
+        "maximum": 4
+      },
+      "prefix": {
+        "type": "string",
+        "default": ""
+      },
+      "suffix": {
+        "type": "string",
+        "default": ""
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

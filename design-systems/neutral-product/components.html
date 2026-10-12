@@ -1,0 +1,773 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Neutral Product — reference components</title>
+<meta name="description" content="Reference fixture for design-systems/neutral-product. Every value comes from tokens.css. Shows primitives, components, and composite patterns with hover, focus, active, disabled, error, loading, and empty states in light and dark modes." />
+<script>
+/* Review helper: ?theme=dark or ?theme=light sets data-theme on <html>. */
+(function () {
+  var theme = new URLSearchParams(window.location.search).get("theme");
+  if (theme === "dark" || theme === "light") document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+ * design-systems/neutral-product/tokens.css
+ *
+ * Neutral Product — archetype 1 of the agency design-system core.
+ * An original system: calm neutral surfaces, one restrained steel-blue
+ * accent, system fonts, and an 8px layout rhythm. It is not derived
+ * from any brand.
+ *
+ * How to consume:
+ *   Paste this whole file (all three blocks) into the first <style> of
+ *   an artifact, or link it. Then reference values with var(--*).
+ *
+ * Modes (read by scripts/design-system-promotion-gate.ts):
+ *   1. `:root { ... }`                       light mode, the default.
+ *   2. `:root[data-theme="dark"] { ... }`     dark mode, explicit opt-in.
+ *   3. `@media (prefers-color-scheme: dark)`  dark mode from the OS, with
+ *      `:root:not([data-theme="light"])` so an explicit light choice wins.
+ *   Blocks 2 and 3 must declare the same tokens with the same values.
+ *   Dark blocks override color, elevation, and focus tokens only.
+ *
+ * Reduced motion:
+ *   The `prefers-reduced-motion` block sets both duration tokens to 0ms.
+ *   Components whose transitions use the motion duration tokens stop
+ *   moving without per-component overrides. Keyframe animations still need
+ *   their own reduced-motion rule (see components.html `.spinner`).
+ *
+ * Extension:
+ *   `--border-strong` is the only brand extension (see
+ *   BRAND_EXTENSIONS["neutral-product"] in the token schema). It is the
+ *   boundary color for form controls, which need 3:1 against the
+ *   surface (WCAG 2.2 SC 1.4.11). `--border` stays a quiet divider.
+ * ─────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Surface */
+  --bg: #f8f8f7;
+  --surface: #ffffff;
+  --surface-warm: #f0f0ee;
+  /* Foreground */
+  --fg: #16171a;
+  --fg-2: #3a3c41;
+  --muted: #55585f;
+  --meta: #65686f;
+  /* Border */
+  --border: #dedfdb;
+  --border-soft: #ebebe8;
+  --border-strong: #878a90;
+  /* Accent */
+  --accent: #1e5a78;
+  --accent-on: #ffffff;
+  --accent-hover: #194c66;
+  --accent-active: #153f55;
+  /* Semantic */
+  --success: #1d7348;
+  --warn: #8a5300;
+  --danger: #b3261e;
+  /* Typography: fonts */
+  --font-display: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  /* Typography: scale */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-base: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+  --text-4xl: 48px;
+  /* Typography: leading and tracking */
+  --leading-body: 1.55;
+  --leading-tight: 1.2;
+  --tracking-display: -0.015em;
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  /* Section rhythm */
+  --section-y-desktop: 96px;
+  --section-y-tablet: 72px;
+  --section-y-phone: 48px;
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 9999px;
+  /* Elevation */
+  --elev-flat: none;
+  --elev-ring: 0 0 0 1px var(--border);
+  --elev-raised: 0 1px 2px rgba(22, 23, 26, 0.06), 0 4px 12px rgba(22, 23, 26, 0.06);
+  /* Focus: inner gap in the surface color, outer ring in the accent */
+  --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+  /* Motion */
+  --motion-fast: 140ms;
+  --motion-base: 200ms;
+  --ease-standard: cubic-bezier(0.23, 1, 0.32, 1);
+  /* Layout */
+  --container-max: 1200px;
+  --container-gutter-desktop: 32px;
+  --container-gutter-tablet: 24px;
+  --container-gutter-phone: 16px;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #111214;
+  --surface: #191a1d;
+  --surface-warm: #212226;
+  --fg: #ededeb;
+  --fg-2: #cfd0cd;
+  --muted: #a9abb0;
+  --meta: #979a9f;
+  --border: #2d2f33;
+  --border-soft: #242629;
+  --border-strong: #6f727a;
+  --accent: #6cb4d9;
+  --accent-on: #0b1820;
+  --accent-hover: #86c2e2;
+  --accent-active: #9dcee8;
+  --success: #5cc995;
+  --warn: #e2ab4a;
+  --danger: #f0857a;
+  --elev-ring: 0 0 0 1px var(--border);
+  --elev-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.32);
+  --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #111214;
+    --surface: #191a1d;
+    --surface-warm: #212226;
+    --fg: #ededeb;
+    --fg-2: #cfd0cd;
+    --muted: #a9abb0;
+    --meta: #979a9f;
+    --border: #2d2f33;
+    --border-soft: #242629;
+    --border-strong: #6f727a;
+    --accent: #6cb4d9;
+    --accent-on: #0b1820;
+    --accent-hover: #86c2e2;
+    --accent-active: #9dcee8;
+    --success: #5cc995;
+    --warn: #e2ab4a;
+    --danger: #f0857a;
+    --elev-ring: 0 0 0 1px var(--border);
+    --elev-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.32);
+    --focus-ring: 0 0 0 2px var(--surface), 0 0 0 4px var(--accent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root:not([data-motion="full"]) {
+    --motion-fast: 0ms;
+    --motion-base: 0ms;
+  }
+}
+
+/* ─── Base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); font-weight: 600; line-height: var(--leading-tight); color: var(--fg); }
+h1 { font-size: var(--text-3xl); letter-spacing: var(--tracking-display); }
+h2 { font-size: var(--text-2xl); letter-spacing: var(--tracking-display); }
+h3 { font-size: var(--text-lg); }
+h4 { font-size: var(--text-base); }
+p { margin: 0; }
+img, svg { display: block; max-width: 100%; }
+a { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; border-radius: 2px; }
+a:hover { color: var(--accent-hover); text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.lead { font-size: var(--text-lg); color: var(--fg-2); max-width: 60ch; }
+.eyebrow { font-size: var(--text-sm); font-weight: 500; color: var(--muted); }
+.body-muted { color: var(--muted); }
+.body-sm { font-size: var(--text-sm); }
+.meta { font-size: var(--text-xs); color: var(--meta); }
+.mono { font-family: var(--font-mono); font-size: 0.92em; }
+.num { text-align: right; font-variant-numeric: tabular-nums; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.container { width: 100%; max-width: calc(var(--container-max) + 2 * var(--container-gutter-desktop)); margin: 0 auto; padding: 0 var(--container-gutter-desktop); }
+.stack-2 > * + * { margin-top: var(--space-2); }
+.stack-4 > * + * { margin-top: var(--space-4); }
+.stack-6 > * + * { margin-top: var(--space-6); }
+.row { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; }
+.icon { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.icon-20 { width: 20px; height: 20px; }
+
+/* ─── Buttons ──────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  height: 40px; padding: 0 var(--space-4);
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  font: inherit; font-size: var(--text-sm); font-weight: 500; line-height: 1;
+  text-decoration: none; white-space: nowrap; cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-standard), border-color var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard);
+}
+.btn:hover { text-decoration: none; }
+.btn-primary { background: var(--accent); color: var(--accent-on); }
+.btn-primary:hover, .btn-primary.is-hover { background: var(--accent-hover); color: var(--accent-on); }
+.btn-primary:active, .btn-primary.is-active { background: var(--accent-active); }
+.btn-secondary { background: var(--surface); color: var(--fg); border-color: var(--border-strong); }
+.btn-secondary:hover, .btn-secondary.is-hover { background: var(--surface-warm); color: var(--fg); }
+.btn-ghost { background: transparent; color: var(--fg-2); }
+.btn-ghost:hover, .btn-ghost.is-hover { background: var(--surface-warm); color: var(--fg); }
+.btn-danger { background: var(--danger); color: var(--accent-on); }
+.btn-danger:hover, .btn-danger.is-hover { background: color-mix(in oklab, var(--danger), var(--fg) 14%); color: var(--accent-on); }
+.btn.is-focus { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; }
+.btn[aria-busy="true"] { opacity: 1; cursor: progress; }
+.btn-sm { height: 32px; padding: 0 var(--space-3); }
+.btn-icon { width: 40px; padding: 0; }
+.btn-sm.btn-icon { width: 32px; }
+
+/* ─── Form controls ────────────────────────────────────────────────── */
+.field { display: grid; gap: var(--space-2); align-content: start; }
+.field label, .label { font-size: var(--text-sm); font-weight: 500; color: var(--fg); }
+.input, .select, .textarea {
+  width: 100%; height: 40px; padding: 0 var(--space-3);
+  background: var(--surface); color: var(--fg);
+  border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+  font: inherit; font-size: var(--text-sm);
+  transition: border-color var(--motion-fast) var(--ease-standard);
+}
+.textarea { height: auto; min-height: 96px; padding: var(--space-2) var(--space-3); resize: vertical; line-height: var(--leading-body); }
+.select { appearance: none; padding-right: var(--space-8); background-image: none; }
+.select-wrap { position: relative; }
+.select-wrap .icon { position: absolute; right: var(--space-3); top: 12px; color: var(--muted); pointer-events: none; }
+.input::placeholder, .textarea::placeholder { color: var(--meta); }
+.input:hover, .select:hover, .textarea:hover { border-color: var(--muted); }
+.input:focus-visible, .select:focus-visible, .textarea:focus-visible { border-color: var(--accent); }
+.input[aria-invalid="true"], .select[aria-invalid="true"], .textarea[aria-invalid="true"] { border-color: var(--danger); }
+.input:disabled { background: var(--surface-warm); color: var(--muted); cursor: not-allowed; }
+.field-help { font-size: var(--text-xs); color: var(--muted); }
+.field-error { display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-xs); font-weight: 500; color: var(--danger); }
+.check { display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--text-sm); color: var(--fg); }
+.check input { width: 16px; height: 16px; margin: 3px 0 0; accent-color: var(--accent); }
+.switch {
+  position: relative; width: 36px; height: 20px; flex: none; padding: 0;
+  border: 1px solid var(--border-strong); border-radius: var(--radius-pill);
+  background: var(--surface-warm); cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+.switch::after {
+  content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px;
+  border-radius: var(--radius-pill); background: var(--muted);
+  transition: transform var(--motion-fast) var(--ease-standard);
+}
+.switch[aria-checked="true"] { background: var(--accent); border-color: var(--accent); }
+.switch[aria-checked="true"]::after { transform: translateX(16px); background: var(--accent-on); }
+
+/* ─── Badges, avatars, kbd ─────────────────────────────────────────── */
+.badge {
+  display: inline-flex; align-items: center; gap: var(--space-1);
+  height: 24px; padding: 0 var(--space-2);
+  border: 1px solid var(--border); border-radius: var(--radius-pill);
+  background: var(--surface-warm); color: var(--fg-2);
+  font-size: var(--text-xs); font-weight: 500; white-space: nowrap;
+}
+.badge .icon { width: 12px; height: 12px; }
+.badge-success { color: var(--success); background: color-mix(in oklab, var(--success), transparent 92%); border-color: color-mix(in oklab, var(--success), transparent 72%); }
+.badge-warn { color: var(--warn); background: color-mix(in oklab, var(--warn), transparent 92%); border-color: color-mix(in oklab, var(--warn), transparent 72%); }
+.badge-danger { color: var(--danger); background: color-mix(in oklab, var(--danger), transparent 92%); border-color: color-mix(in oklab, var(--danger), transparent 72%); }
+.badge-accent { color: var(--accent); background: color-mix(in oklab, var(--accent), transparent 92%); border-color: color-mix(in oklab, var(--accent), transparent 72%); }
+.avatar {
+  display: inline-grid; place-items: center; width: 24px; height: 24px; flex: none;
+  border-radius: var(--radius-pill); background: var(--surface-warm); color: var(--fg-2);
+  border: 1px solid var(--border); font-size: var(--text-xs); font-weight: 600;
+}
+.avatar-32 { width: 32px; height: 32px; font-size: var(--text-xs); }
+kbd {
+  display: inline-block; min-width: 20px; padding: 0 var(--space-1);
+  border: 1px solid var(--border-strong); border-bottom-width: 2px; border-radius: var(--radius-sm);
+  background: var(--surface); color: var(--fg-2);
+  font-family: var(--font-mono); font-size: var(--text-xs); line-height: 18px; text-align: center;
+}
+
+/* ─── Cards, tables, tabs ──────────────────────────────────────────── */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-6); }
+.card-flush { padding: 0; overflow: hidden; }
+.card-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border); }
+.card-title { font-size: var(--text-base); font-weight: 600; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+th {
+  padding: var(--space-2) var(--space-4); text-align: left; white-space: nowrap;
+  background: var(--surface-warm); color: var(--muted);
+  font-size: var(--text-xs); font-weight: 500; border-bottom: 1px solid var(--border);
+}
+td { padding: var(--space-3) var(--space-4); color: var(--fg-2); border-bottom: 1px solid var(--border-soft); vertical-align: middle; }
+tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover td { background: color-mix(in oklab, var(--surface-warm), transparent 40%); }
+td strong { color: var(--fg); font-weight: 500; }
+.tabs { display: flex; gap: var(--space-6); border-bottom: 1px solid var(--border); overflow-x: auto; }
+.tab {
+  display: inline-flex; align-items: center; gap: var(--space-2); height: 40px; padding: 0;
+  margin-bottom: -1px; border: 0; border-bottom: 2px solid transparent; background: none;
+  color: var(--muted); font: inherit; font-size: var(--text-sm); font-weight: 500; white-space: nowrap; cursor: pointer;
+}
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+.tab .count { font-size: var(--text-xs); color: var(--meta); font-variant-numeric: tabular-nums; }
+
+/* ─── Feedback ─────────────────────────────────────────────────────── */
+.alert { display: flex; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); font-size: var(--text-sm); color: var(--fg-2); }
+.alert .icon { margin-top: 3px; }
+.alert strong { display: block; color: var(--fg); font-weight: 600; }
+.alert-info .icon { color: var(--accent); }
+.alert-success { border-color: color-mix(in oklab, var(--success), transparent 60%); }
+.alert-success .icon { color: var(--success); }
+.alert-warn { border-color: color-mix(in oklab, var(--warn), transparent 60%); }
+.alert-warn .icon { color: var(--warn); }
+.alert-danger { border-color: color-mix(in oklab, var(--danger), transparent 60%); }
+.alert-danger .icon { color: var(--danger); }
+.toast { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--elev-raised); font-size: var(--text-sm); color: var(--fg); }
+.toast .icon { color: var(--success); }
+.progress { height: 8px; border-radius: var(--radius-pill); background: var(--surface-warm); overflow: hidden; border: 1px solid var(--border); }
+.progress > span { display: block; height: 100%; background: var(--accent); }
+.spinner { width: 16px; height: 16px; flex: none; border: 2px solid color-mix(in oklab, currentColor, transparent 70%); border-top-color: currentColor; border-radius: var(--radius-pill); animation: np-spin 800ms linear infinite; }
+.skeleton { border-radius: var(--radius-sm); background: var(--surface-warm); animation: np-pulse 1600ms ease-in-out infinite; }
+@keyframes np-spin { to { transform: rotate(360deg); } }
+@keyframes np-pulse { 50% { opacity: 0.55; } }
+@media (prefers-reduced-motion: reduce) {
+  .spinner { animation: none; border-top-color: color-mix(in oklab, currentColor, transparent 70%); border-right-color: currentColor; }
+  .skeleton { animation: none; }
+}
+
+/* ─── Empty state ──────────────────────────────────────────────────── */
+.empty-state { display: grid; justify-items: center; gap: var(--space-3); padding: var(--space-12) var(--space-6); text-align: center; }
+.empty-state .empty-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--surface-warm); color: var(--muted); border: 1px solid var(--border); }
+.empty-state p { max-width: 40ch; font-size: var(--text-sm); color: var(--muted); }
+
+/* ─── Fixture layout ───────────────────────────────────────────────── */
+.page-header { padding: var(--space-12) 0 var(--space-8); background: var(--surface); border-bottom: 1px solid var(--border); }
+.page-header .lead { margin-top: var(--space-3); }
+.page-header nav { margin-top: var(--space-6); }
+section.block { padding: var(--space-12) 0; border-bottom: 1px solid var(--border); }
+.block-intro { max-width: 68ch; color: var(--muted); margin-top: var(--space-2); }
+.demo-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6); margin-top: var(--space-8); }
+.demo { min-width: 0; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: var(--space-6); }
+.demo-wide { grid-column: 1 / -1; }
+.demo-label { margin-bottom: var(--space-4); font-size: var(--text-xs); font-weight: 500; color: var(--muted); }
+.state-row { display: grid; grid-template-columns: 96px 1fr; gap: var(--space-3) var(--space-4); align-items: center; }
+.state-row + .state-row { margin-top: var(--space-3); }
+.state-name { font-size: var(--text-xs); color: var(--meta); }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+.type-row { display: grid; grid-template-columns: 120px 1fr; gap: var(--space-4); align-items: baseline; padding: var(--space-3) 0; border-bottom: 1px solid var(--border-soft); }
+.type-row:last-child { border-bottom: 0; }
+.stat { display: grid; gap: var(--space-1); }
+.stat-value { font-size: var(--text-2xl); font-weight: 600; letter-spacing: var(--tracking-display); font-variant-numeric: tabular-nums; }
+.stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+.menu { width: 220px; padding: var(--space-1); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--elev-raised); }
+.menu-item { display: flex; align-items: center; gap: var(--space-2); width: 100%; height: 36px; padding: 0 var(--space-3); border: 0; border-radius: var(--radius-sm); background: none; color: var(--fg); font: inherit; font-size: var(--text-sm); text-align: left; cursor: pointer; }
+.menu-item:hover, .menu-item.is-hover { background: var(--surface-warm); }
+.menu-item .kbd-hint { margin-left: auto; }
+.menu-item.danger { color: var(--danger); }
+.menu-sep { height: 1px; margin: var(--space-1) 0; background: var(--border); }
+.dialog-stage { display: grid; place-items: center; padding: var(--space-8) var(--space-4); border-radius: var(--radius-md); background: color-mix(in oklab, var(--fg), transparent 88%); }
+.dialog { width: 100%; max-width: 440px; padding: var(--space-6); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--elev-raised); }
+.dialog p { margin-top: var(--space-2); font-size: var(--text-sm); color: var(--muted); }
+.dialog .row { justify-content: flex-end; margin-top: var(--space-6); }
+.breadcrumb { display: flex; align-items: center; gap: var(--space-1); font-size: var(--text-sm); color: var(--muted); flex-wrap: wrap; }
+.breadcrumb a { color: var(--muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--fg); text-decoration: underline; }
+.breadcrumb [aria-current="page"] { color: var(--fg); }
+.pagination { display: flex; align-items: center; gap: var(--space-1); }
+.pagination .btn[aria-current="page"] { background: var(--surface-warm); color: var(--fg); border-color: var(--border-strong); }
+.shell { position: relative; display: grid; grid-template-columns: 200px minmax(0, 1fr); min-height: 360px; border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+.sidenav { padding: var(--space-4) var(--space-2); background: var(--surface-warm); border-right: 1px solid var(--border); }
+.sidenav a { display: flex; align-items: center; gap: var(--space-2); height: 36px; padding: 0 var(--space-3); border-radius: var(--radius-sm); color: var(--fg-2); font-size: var(--text-sm); text-decoration: none; }
+.sidenav a:hover { background: var(--surface); color: var(--fg); }
+.sidenav a[aria-current="page"] { background: var(--surface); color: var(--fg); font-weight: 500; box-shadow: inset 2px 0 0 var(--accent); }
+/* Below 1023px the sidenav collapses into the same disclosure pattern the
+   app specimen uses: a toggle button reveals it as a panel over the shell,
+   with a backdrop to dismiss it. One collapse pattern for this nav shape,
+   wherever it appears. */
+.shell-nav-toggle { display: none; }
+.shell-backdrop { display: none; }
+.shell-main { background: var(--surface); }
+.shell-head { padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border); }
+.filter-bar { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-6); border-bottom: 1px solid var(--border); }
+.filter-bar .search { position: relative; flex: 1 1 200px; }
+.filter-bar .search .icon { position: absolute; left: var(--space-3); top: 12px; color: var(--muted); }
+.filter-bar .search .input { padding-left: var(--space-8); }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: var(--space-3); }
+.swatch { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; font-size: var(--text-xs); }
+.swatch span { display: block; height: 48px; border-bottom: 1px solid var(--border); }
+.swatch code { display: block; padding: var(--space-2); font-family: var(--font-mono); color: var(--fg-2); }
+.sw-bg { background: var(--bg); } .sw-surface { background: var(--surface); } .sw-warm { background: var(--surface-warm); }
+.sw-fg { background: var(--fg); } .sw-muted { background: var(--muted); } .sw-accent { background: var(--accent); }
+.sw-success { background: var(--success); } .sw-warn { background: var(--warn); } .sw-danger { background: var(--danger); }
+footer.fixture-footer { padding: var(--space-8) 0 var(--space-12); color: var(--meta); font-size: var(--text-xs); }
+
+@media (max-width: 1023px) {
+  .demo-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .sidenav { display: none; }
+  .shell-nav-toggle { display: inline-flex; }
+  .shell.nav-open .sidenav {
+    display: flex; flex-direction: column; position: absolute; inset: 0 auto 0 0; z-index: 2;
+    width: min(220px, 80%); box-shadow: var(--elev-raised);
+  }
+  .shell.nav-open .shell-backdrop {
+    display: block; position: absolute; inset: 0; z-index: 1;
+    background: color-mix(in oklab, var(--fg), transparent 55%);
+  }
+}
+@media (max-width: 599px) {
+  .container { padding: 0 var(--container-gutter-phone); }
+  .page-header { padding: var(--space-8) 0 var(--space-6); }
+  .page-header h1 { font-size: var(--text-2xl); }
+  section.block { padding: var(--space-8) 0; }
+  .demo { padding: var(--space-4); }
+  .form-grid, .stat-grid { grid-template-columns: 1fr; }
+  .state-row { grid-template-columns: 1fr; gap: var(--space-2); }
+  .type-row { grid-template-columns: 1fr; gap: var(--space-1); }
+  .shell-head, .filter-bar { padding-left: var(--space-4); padding-right: var(--space-4); }
+  .hide-phone { display: none; }
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4.2-4.2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-alert-triangle" viewBox="0 0 24 24"><path d="M10.3 4.6L2.9 17.5A2 2 0 0 0 4.6 20.5h14.8a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0z"/><path d="M12 10v4M12 17h.01"/></symbol>
+  <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 13l2.4-6.4A1 1 0 0 1 7.3 6h9.4a1 1 0 0 1 .9.6L20 13v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M4 13h4.5l1.5 2.5h4l1.5-2.5H20"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 19.5c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5"/><path d="M15.5 4.7a3.5 3.5 0 0 1 0 6.6M17.5 14.3c2 .7 3.5 2.4 3.5 5.2"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3.5 7a1 1 0 0 1 1-1h4.8l2 2h8.2a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-15a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M7 3.5h7l5 5V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1z"/><path d="M14 3.5v5h5M9 13h6M9 16.5h6"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20v-8M11 20V5M17 20v-11M3 20h18"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 15V4M7.5 8.5L12 4l4.5 4.5M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3.5 6.5L12 13l8.5-6.5"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01" stroke-width="3"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="1.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8.5a1 1 0 0 1-1 1h-4.5v-6h-5v6H5a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="10" rx="1.5"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></symbol>
+</svg>
+<header class="page-header">
+  <div class="container">
+    <p class="eyebrow">Design system · Neutral Product 0.1.0</p>
+    <h1>Reference components</h1>
+    <p class="lead">Primitives, components, and composite patterns. Every value on this page comes from <code class="mono">tokens.css</code>. States that need a pointer or keyboard are also shown as static examples.</p>
+    <nav class="row" aria-label="Fixture sections">
+      <a href="#primitives">Primitives</a><span class="meta" aria-hidden="true">/</span>
+      <a href="#components">Components</a><span class="meta" aria-hidden="true">/</span>
+      <a href="#patterns">Patterns</a><span class="meta" aria-hidden="true">/</span>
+      <a href="?theme=light">Light</a><span class="meta" aria-hidden="true">/</span>
+      <a href="?theme=dark">Dark</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="block" id="primitives" aria-labelledby="primitives-title">
+  <div class="container">
+    <h2 id="primitives-title">Primitives</h2>
+    <p class="block-intro">The smallest parts. Buttons, fields, selection controls, badges, and type.</p>
+    <div class="demo-grid">
+      <div class="demo">
+        <p class="demo-label">Buttons — states</p>
+        <div class="state-row"><span class="state-name">Default</span><div class="row"><button class="btn btn-primary" type="button">Create invoice</button><button class="btn btn-secondary" type="button">Export</button><button class="btn btn-ghost" type="button">Cancel</button></div></div>
+        <div class="state-row"><span class="state-name">Hover</span><div class="row"><button class="btn btn-primary is-hover" type="button">Create invoice</button><button class="btn btn-secondary is-hover" type="button">Export</button><button class="btn btn-ghost is-hover" type="button">Cancel</button></div></div>
+        <div class="state-row"><span class="state-name">Focus</span><div class="row"><button class="btn btn-primary is-focus" type="button">Create invoice</button><button class="btn btn-secondary is-focus" type="button">Export</button></div></div>
+        <div class="state-row"><span class="state-name">Active</span><div class="row"><button class="btn btn-primary is-active" type="button">Create invoice</button></div></div>
+        <div class="state-row"><span class="state-name">Disabled</span><div class="row"><button class="btn btn-primary" type="button" disabled>Create invoice</button><button class="btn btn-secondary" type="button" disabled>Export</button></div></div>
+        <div class="state-row"><span class="state-name">Loading</span><div class="row"><button class="btn btn-primary" type="button" aria-busy="true" aria-disabled="true"><span class="spinner" aria-hidden="true"></span>Saving…</button></div></div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Buttons — variants and sizes</p>
+        <div class="stack-4">
+          <div class="row"><button class="btn btn-danger" type="button">Delete contact</button><button class="btn btn-danger is-hover" type="button">Delete contact</button></div>
+          <div class="row"><button class="btn btn-secondary" type="button"><svg class="icon"><use href="#i-upload"/></svg>Import CSV</button><button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-plus"/></svg>Add client</button></div>
+          <div class="row"><button class="btn btn-secondary btn-sm" type="button">Compact</button><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="More actions"><svg class="icon"><use href="#i-more"/></svg></button><button class="btn btn-secondary btn-icon" type="button" aria-label="Filter"><svg class="icon"><use href="#i-filter"/></svg></button></div>
+          <p class="body-sm">Inline link: read the <a href="#components">component notes</a>. Shortcut: <kbd>⌘</kbd> <kbd>K</kbd></p>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Text fields — states</p>
+        <div class="stack-4">
+          <div class="field"><label for="f-name">Company name</label><input class="input" id="f-name" type="text" value="Aurora Dental Group" /></div>
+          <div class="field"><label for="f-email">Billing email</label><input class="input" id="f-email" type="email" placeholder="name@company.com" aria-describedby="f-email-help" /><span class="field-help" id="f-email-help">Invoices go to this address.</span></div>
+          <div class="field"><label for="f-vat">VAT number</label><input class="input" id="f-vat" type="text" value="GB12 345" aria-invalid="true" aria-describedby="f-vat-err" /><span class="field-error" id="f-vat-err"><svg class="icon" aria-hidden="true"><use href="#i-alert-circle"/></svg>Enter 9 digits after the country code.</span></div>
+          <div class="field"><label for="f-id">Account ID</label><input class="input" id="f-id" type="text" value="acct_7Q2M" disabled /></div>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Selection controls</p>
+        <div class="stack-4">
+          <div class="field"><label for="f-owner">Owner</label><div class="select-wrap"><select class="select" id="f-owner"><option>Priya Raman</option><option>Tomás Ortega</option><option>Mei Lin</option></select><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></div></div>
+          <label class="check"><input type="checkbox" checked /> Send a copy of each invoice to the owner</label>
+          <label class="check"><input type="checkbox" /> Mark as a priority client</label>
+          <fieldset class="stack-2" style="border:0;padding:0;margin-inline:0;margin-bottom:0"><legend class="label">Billing cycle</legend>
+            <label class="check"><input type="radio" name="cycle" checked /> Monthly</label>
+            <label class="check"><input type="radio" name="cycle" /> Quarterly</label>
+          </fieldset>
+          <div class="row"><button class="switch" type="button" role="switch" aria-checked="true" aria-labelledby="sw1"></button><span id="sw1" class="body-sm">Automatic reminders</span></div>
+          <div class="row"><button class="switch" type="button" role="switch" aria-checked="false" aria-labelledby="sw2"></button><span id="sw2" class="body-sm">Client portal access</span></div>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Badges and avatars</p>
+        <div class="stack-4">
+          <div class="row"><span class="badge">Draft</span><span class="badge badge-accent">In review</span><span class="badge badge-success"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"/></svg>Paid</span><span class="badge badge-warn"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>Due in 3 days</span><span class="badge badge-danger"><svg class="icon" aria-hidden="true"><use href="#i-alert-circle"/></svg>Overdue</span></div>
+          <div class="row"><span class="avatar" aria-hidden="true">PR</span><span class="avatar" aria-hidden="true">TO</span><span class="avatar avatar-32" aria-hidden="true">ML</span><span class="body-sm body-muted">Priya, Tomás, and Mei follow this client.</span></div>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Color roles</p>
+        <div class="swatches">
+          <div class="swatch"><span class="sw-bg"></span><code>--bg</code></div>
+          <div class="swatch"><span class="sw-surface"></span><code>--surface</code></div>
+          <div class="swatch"><span class="sw-warm"></span><code>--surface-warm</code></div>
+          <div class="swatch"><span class="sw-fg"></span><code>--fg</code></div>
+          <div class="swatch"><span class="sw-muted"></span><code>--muted</code></div>
+          <div class="swatch"><span class="sw-accent"></span><code>--accent</code></div>
+          <div class="swatch"><span class="sw-success"></span><code>--success</code></div>
+          <div class="swatch"><span class="sw-warn"></span><code>--warn</code></div>
+          <div class="swatch"><span class="sw-danger"></span><code>--danger</code></div>
+        </div>
+      </div>
+      <div class="demo demo-wide">
+        <p class="demo-label">Type scale</p>
+        <div class="type-row"><span class="meta">4xl · 48</span><span style="font-size:var(--text-4xl);font-weight:600;letter-spacing:var(--tracking-display);line-height:var(--leading-tight)">Client work, in order</span></div>
+        <div class="type-row"><span class="meta">3xl · 36</span><span style="font-size:var(--text-3xl);font-weight:600;letter-spacing:var(--tracking-display);line-height:var(--leading-tight)">Quarterly account review</span></div>
+        <div class="type-row"><span class="meta">2xl · 28</span><span style="font-size:var(--text-2xl);font-weight:600;letter-spacing:var(--tracking-display);line-height:var(--leading-tight)">Clients</span></div>
+        <div class="type-row"><span class="meta">xl · 22</span><span style="font-size:var(--text-xl);font-weight:600">Billing details</span></div>
+        <div class="type-row"><span class="meta">lg · 18</span><span style="font-size:var(--text-lg)">Requests arrive by email, form, and phone. Each one gets an owner.</span></div>
+        <div class="type-row"><span class="meta">base · 16</span><span>Body text reads at 16px with 1.55 line height and a 68-character measure.</span></div>
+        <div class="type-row"><span class="meta">sm · 14</span><span class="body-sm">Dense UI text for tables, forms, and navigation.</span></div>
+        <div class="type-row"><span class="meta">xs · 12</span><span class="meta">Captions, badges, timestamps · Updated 12 Sep 2026</span></div>
+        <div class="type-row"><span class="meta">mono</span><span class="mono">INV-2026-0418 · 1,284.50</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="components" aria-labelledby="components-title">
+  <div class="container">
+    <h2 id="components-title">Components</h2>
+    <p class="block-intro">Primitives combined into units with one job each.</p>
+    <div class="demo-grid">
+      <div class="demo">
+        <p class="demo-label">Alerts</p>
+        <div class="stack-2">
+          <div class="alert alert-info" role="note"><svg class="icon" aria-hidden="true"><use href="#i-info"/></svg><div><strong>Invoices now include tax IDs</strong>Add a VAT number to each client before the next billing run.</div></div>
+          <div class="alert alert-success" role="status"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"/></svg><div><strong>Import finished</strong>48 clients added. 2 rows were skipped because the email was missing.</div></div>
+          <div class="alert alert-warn" role="note"><svg class="icon" aria-hidden="true"><use href="#i-alert-triangle"/></svg><div><strong>Card expires this month</strong>Update the payment method to keep automatic billing on.</div></div>
+          <div class="alert alert-danger" role="alert"><svg class="icon" aria-hidden="true"><use href="#i-alert-circle"/></svg><div><strong>Payment failed</strong>The bank declined the charge. Try another card or contact the bank.</div></div>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Tabs, breadcrumb, pagination, toast</p>
+        <div class="stack-6">
+          <nav class="breadcrumb" aria-label="Breadcrumb"><a href="#components">Clients</a><svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg><a href="#components">Aurora Dental Group</a><svg class="icon" aria-hidden="true"><use href="#i-chevron-right"/></svg><span aria-current="page">Invoices</span></nav>
+          <div class="tabs" role="tablist" aria-label="Client views"><button class="tab" role="tab" aria-selected="true" type="button">Overview</button><button class="tab" role="tab" aria-selected="false" type="button">Requests <span class="count">12</span></button><button class="tab" role="tab" aria-selected="false" type="button">Invoices <span class="count">4</span></button><button class="tab" role="tab" aria-selected="false" type="button">Files</button></div>
+          <nav class="pagination" aria-label="Pagination"><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Previous page" disabled><svg class="icon"><use href="#i-chevron-left"/></svg></button><button class="btn btn-ghost btn-sm" type="button" aria-current="page">1</button><button class="btn btn-ghost btn-sm" type="button">2</button><button class="btn btn-ghost btn-sm" type="button">3</button><span class="meta">…</span><button class="btn btn-ghost btn-sm" type="button">8</button><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Next page"><svg class="icon"><use href="#i-chevron-right"/></svg></button></nav>
+          <div class="toast" role="status"><svg class="icon" aria-hidden="true"><use href="#i-check-circle"/></svg><span>Invoice INV-2026-0418 sent to billing@auroradental.example</span><button class="btn btn-ghost btn-sm btn-icon" type="button" aria-label="Dismiss"><svg class="icon"><use href="#i-x"/></svg></button></div>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Stat tiles (sample data)</p>
+        <div class="stat-grid">
+          <div class="stat"><span class="eyebrow">Open requests</span><span class="stat-value">23</span><span class="meta">6 need a reply today</span></div>
+          <div class="stat"><span class="eyebrow">Unpaid</span><span class="stat-value">4</span><span class="meta">1 overdue</span></div>
+          <div class="stat"><span class="eyebrow">Avg. first reply</span><span class="stat-value">3h</span><span class="meta">Last 30 days</span></div>
+        </div>
+        <div class="stack-2" style="margin-top:var(--space-6)"><div class="row-between body-sm"><span>Onboarding checklist</span><span class="meta">7 of 10</span></div><div class="progress" role="progressbar" aria-label="Onboarding checklist" aria-valuenow="70" aria-valuemin="0" aria-valuemax="100"><span style="width:70%"></span></div></div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Menu and loading</p>
+        <div class="row" style="align-items:flex-start;gap:var(--space-6)">
+          <div class="menu" role="menu" aria-label="Client actions">
+            <button class="menu-item" role="menuitem" type="button"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>New invoice<span class="kbd-hint"><kbd>I</kbd></span></button>
+            <button class="menu-item is-hover" role="menuitem" type="button"><svg class="icon" aria-hidden="true"><use href="#i-mail"/></svg>Email contact<span class="kbd-hint"><kbd>E</kbd></span></button>
+            <button class="menu-item" role="menuitem" type="button"><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>Copy portal link</button>
+            <div class="menu-sep" role="separator"></div>
+            <button class="menu-item danger" role="menuitem" type="button"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg>Archive client</button>
+          </div>
+          <div class="stack-2" style="flex:1 1 160px;min-width:160px" aria-busy="true" aria-label="Loading activity">
+            <div class="skeleton" style="height:12px;width:60%"></div>
+            <div class="skeleton" style="height:12px;width:90%"></div>
+            <div class="skeleton" style="height:12px;width:75%"></div>
+            <div class="row meta"><span class="spinner" aria-hidden="true"></span>Loading activity</div>
+          </div>
+        </div>
+      </div>
+      <div class="demo demo-wide">
+        <p class="demo-label">Dialog (static rendering)</p>
+        <div class="dialog-stage">
+          <div class="dialog" role="dialog" aria-modal="false" aria-labelledby="dlg-title" aria-describedby="dlg-desc">
+            <h3 id="dlg-title">Archive Aurora Dental Group?</h3>
+            <p id="dlg-desc">The client leaves active lists and portal access stops. Invoices and files stay available in Archive. You can restore the client at any time.</p>
+            <div class="row"><button class="btn btn-secondary" type="button">Keep client</button><button class="btn btn-danger" type="button">Archive client</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="patterns" aria-labelledby="patterns-title">
+  <div class="container">
+    <h2 id="patterns-title">Patterns</h2>
+    <p class="block-intro">Composite layouts that screens and templates reuse.</p>
+    <div class="demo-grid">
+      <div class="demo demo-wide">
+        <p class="demo-label">App shell with filter bar and data table (sample data)</p>
+        <div class="shell" id="pattern-shell">
+          <div class="shell-backdrop" id="pattern-shell-backdrop"></div>
+          <nav class="sidenav" id="pattern-sidenav" aria-label="Workspace">
+            <a href="#patterns"><svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg>Inbox</a>
+            <a href="#patterns" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg>Clients</a>
+            <a href="#patterns"><svg class="icon" aria-hidden="true"><use href="#i-folder"/></svg>Projects</a>
+            <a href="#patterns"><svg class="icon" aria-hidden="true"><use href="#i-file"/></svg>Invoices</a>
+          </nav>
+          <div class="shell-main">
+            <div class="shell-head row-between">
+              <div class="row" style="gap:var(--space-2)">
+                <button class="btn btn-ghost btn-icon shell-nav-toggle" type="button" id="pattern-nav-toggle" aria-label="Open navigation" aria-controls="pattern-sidenav" aria-expanded="false"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button>
+                <h3>Clients</h3>
+              </div>
+              <button class="btn btn-primary btn-sm" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Add client</button>
+            </div>
+            <div class="filter-bar">
+              <div class="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><label class="visually-hidden" for="p-search">Search clients</label><input class="input" id="p-search" type="search" placeholder="Search by name or email" /></div>
+              <button class="btn btn-secondary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-filter"/></svg>Status: Active</button>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th scope="col">Client</th><th scope="col">Status</th><th scope="col" class="hide-phone">Owner</th><th scope="col" class="num">Open</th></tr></thead>
+                <tbody>
+                  <tr><td><strong>Aurora Dental Group</strong></td><td><span class="badge badge-success">Active</span></td><td class="hide-phone">Priya Raman</td><td class="num">5</td></tr>
+                  <tr><td><strong>Bramble &amp; Finch Studio</strong></td><td><span class="badge badge-warn">Follow up</span></td><td class="hide-phone">Tomás Ortega</td><td class="num">2</td></tr>
+                  <tr><td><strong>Coastline Physio</strong></td><td><span class="badge badge-success">Active</span></td><td class="hide-phone">Mei Lin</td><td class="num">0</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Settings form with validation</p>
+        <form class="stack-4" novalidate>
+          <div class="form-grid">
+            <div class="field"><label for="s-first">First name</label><input class="input" id="s-first" value="Mei" autocomplete="given-name" /></div>
+            <div class="field"><label for="s-last">Last name</label><input class="input" id="s-last" value="Lin" autocomplete="family-name" /></div>
+          </div>
+          <div class="field"><label for="s-email">Work email</label><input class="input" id="s-email" type="email" value="mei.lin@" aria-invalid="true" aria-describedby="s-email-err" /><span class="field-error" id="s-email-err"><svg class="icon" aria-hidden="true"><use href="#i-alert-circle"/></svg>Enter an email address with a domain, like mei@studio.example.</span></div>
+          <div class="field"><label for="s-note">Signature</label><textarea class="textarea" id="s-note">Mei Lin · Account lead</textarea></div>
+          <div class="row"><button class="btn btn-primary" type="submit">Save changes</button><button class="btn btn-ghost" type="button">Discard</button></div>
+        </form>
+      </div>
+      <div class="demo">
+        <p class="demo-label">Empty state</p>
+        <div class="empty-state">
+          <span class="empty-icon" aria-hidden="true"><svg class="icon icon-20"><use href="#i-inbox"/></svg></span>
+          <h3>No open requests</h3>
+          <p>New requests from Aurora Dental Group appear here. You can also log a phone request by hand.</p>
+          <button class="btn btn-secondary" type="button"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Log a request</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="fixture-footer">
+  <div class="container">Neutral Product · reference fixture · All names and figures on this page are fictional sample data.</div>
+</footer>
+<script>
+/* Same disclosure mechanism as the app specimen's sidebar toggle, scoped to
+   this one "app shell" pattern demo. */
+(function () {
+  var shell = document.getElementById("pattern-shell");
+  var toggle = document.getElementById("pattern-nav-toggle");
+  var nav = document.getElementById("pattern-sidenav");
+  var backdrop = document.getElementById("pattern-shell-backdrop");
+  if (!shell || !toggle || !nav) return;
+
+  function isOpen() {
+    return shell.classList.contains("nav-open");
+  }
+  function openNav() {
+    shell.classList.add("nav-open");
+    toggle.setAttribute("aria-expanded", "true");
+    var target = nav.querySelector("a");
+    if (target) target.focus();
+  }
+  function closeNav(returnFocus) {
+    shell.classList.remove("nav-open");
+    toggle.setAttribute("aria-expanded", "false");
+    if (returnFocus) toggle.focus();
+  }
+
+  toggle.addEventListener("click", function () {
+    if (isOpen()) closeNav(false);
+    else openNav();
+  });
+  if (backdrop) backdrop.addEventListener("click", function () { closeNav(true); });
+  document.addEventListener("keydown", function (event) {
+    if (event.key === "Escape" && isOpen()) closeNav(true);
+  });
+
+  // (a) Activating a link inside the open nav closes it.
+  nav.addEventListener("click", function (event) {
+    if (isOpen() && event.target.closest("a")) closeNav(false);
+  });
+
+  // (b) Crossing from mobile to desktop width clears the open state.
+  var desktopQuery = window.matchMedia("(min-width: 1024px)");
+  function onDesktopChange(event) {
+    if (event.matches && isOpen()) closeNav(false);
+  }
+  if (desktopQuery.addEventListener) desktopQuery.addEventListener("change", onDesktopChange);
+  else if (desktopQuery.addListener) desktopQuery.addListener(onDesktopChange);
+
+  // (c) Focus leaving both the nav and the toggle closes it.
+  document.addEventListener("focusout", function (event) {
+    if (!isOpen()) return;
+    var next = event.relatedTarget;
+    if (next && (nav.contains(next) || toggle.contains(next))) return;
+    if (next) closeNav(false);
+  });
+})();
+</script>
+</body>
+</html>

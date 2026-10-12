@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-03",
+  "businessName": "Foxhollow Veterinary Group",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Foxhollow Veterinary Group"
+    },
+    {
+      "field": "address",
+      "value": "620 University Avenue, Madison, Wisconsin"
+    },
+    {
+      "field": "phone",
+      "value": "(608) 555-0148"
+    },
+    {
+      "field": "email",
+      "value": "scheduling@foxhollowvet.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Saturday, 7:30 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed to practice veterinary medicine in the State of Wisconsin"
+    },
+    {
+      "field": "other",
+      "value": "Three clinic locations; nine front-desk staff share the tool"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample appointment-list line shown only to illustrate layout",
+      "text": "Bishop (canine), 10:30 a.m., annual wellness, Dr. Alvarez, checked in"
+    }
+  ]
+}

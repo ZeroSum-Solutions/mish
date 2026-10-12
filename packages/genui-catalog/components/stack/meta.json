@@ -1,0 +1,38 @@
+{
+  "id": "stack",
+  "name": "Stack",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/stack/index.ts",
+  "css": "components/stack/styles.css",
+  "demo": "components/stack/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "sendToBackOnClick": { "type": "boolean", "default": true, "description": "Click, Enter or Space on the top card also sends it to the back." },
+      "dragThreshold": { "type": "number", "default": 120, "minimum": 0, "description": "Drag distance in px past which the top card flies to the back." },
+      "rotateRange": { "type": "number", "default": 6, "minimum": 0, "description": "Maximum seeded rotation of a lower card, in degrees." },
+      "offset": { "type": "number", "default": 6, "minimum": 0, "description": "Vertical offset per depth level, in px." },
+      "spring": {
+        "type": "object",
+        "default": { "stiffness": 260, "damping": 20 },
+        "description": "Spring used for the fly-to-back and spring-back animations.",
+        "properties": {
+          "stiffness": { "type": "number", "default": 260, "minimum": 0 },
+          "damping": { "type": "number", "default": 20, "minimum": 0 }
+        }
+      },
+      "seed": { "type": "number", "default": 1, "description": "Seed for each lower card's offset/rotation, so the pile is identical on every load." },
+      "visible": { "type": "number", "default": 4, "minimum": 1, "description": "Cards shown in the pile before they are hidden." }
+    }
+  },
+  "a11y": [
+    "The host is role=\"list\" and each card role=\"listitem\"; only the top card is in the tab order, with role=\"button\" and an aria-label (\"Send card to back\", overridable with data-genui-stack-label).",
+    "After a reorder, focus moves to the new top card and a visually-hidden aria-live=\"polite\" region announces which card it is.",
+    "Reordering moves DOM nodes rather than repainting, so reading order always matches the pile order.",
+    "Card content is real text, not an image or canvas."
+  ],
+  "reducedMotion": "reduced"
+}

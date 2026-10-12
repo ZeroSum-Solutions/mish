@@ -1,0 +1,125 @@
+/* Work profile form (Memory → Add or import → Work profile). A section intro,
+   three labelled groups of fields at one control height, real choice
+   controls for the list-backed fields, and a footer that stays in view while
+   the form scrolls (docs/design/ui-system.md § 3–5). */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+.headIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--control-h-compact);
+  height: var(--control-h-compact);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+}
+
+.title {
+  margin: 0;
+  font: var(--font-title);
+  color: var(--text-strong);
+}
+
+.hint {
+  max-width: 68ch;
+  margin: var(--space-half) 0 0;
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.sectionTitle {
+  padding: 0;
+  margin-bottom: var(--space-3);
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4) var(--space-4);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.fieldLabel {
+  font: var(--font-label);
+  color: var(--text);
+}
+
+.field :is(input, select) {
+  width: 100%;
+  height: var(--control-h-md);
+}
+
+.field textarea {
+  width: 100%;
+  min-height: calc(var(--control-h-md) * 2);
+  resize: vertical;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Always-visible footer: sticks to the bottom of the scrolling modal pane. */
+.actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: auto;
+  padding: var(--space-3) 0;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-soft);
+}
+
+.savedPill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font: var(--font-label);
+  color: color-mix(in srgb, var(--green) 55%, var(--text-strong));
+}
+
+@media (max-width: 560px) {
+  .fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

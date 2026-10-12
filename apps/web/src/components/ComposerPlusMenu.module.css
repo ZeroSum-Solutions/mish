@@ -1,0 +1,173 @@
+/* ComposerPlusMenu — Resources flyout (wave 2).
+   The flyout body is WorkbenchResourceSearch (components/workbench, owned
+   elsewhere). This file adds the title + one-line explanation above it and
+   restyles its parts structurally so the panel reads at a glance: calm rows
+   with the name on the left and a quiet status badge on the right, instead
+   of full-width outlined pill rows. Selectors key on the component's stable
+   `data-testid` and element structure, never on its hashed class names. */
+
+/* Taller than the generic 320px flyout cap: the panel holds a header, a
+   search row and grouped results. The height variable is computed by
+   ComposerPlusMenu (PLUS_MENU_PLUGIN_FLYOUT_MAX_HEIGHT). */
+.resourcesFlyout.resourcesFlyout {
+  max-height: min(500px, var(--plus-menu-flyout-max-height, calc(100vh - 24px)));
+  padding: var(--space-2);
+}
+
+.resources {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.resourcesHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+  padding: var(--space-1) var(--space-2) var(--space-2);
+}
+
+.resourcesTitle {
+  color: var(--text-strong);
+  font: var(--font-title-sm);
+}
+
+.resourcesHint {
+  margin: 0;
+  color: var(--text-muted);
+  font: var(--font-caption);
+}
+
+/* The flyout scrolls as one surface; the inner root does not scroll on its
+   own (two nested scroll areas read as a broken panel). */
+.resources :global([data-testid='workbench-resource-search']) {
+  width: 100%;
+  max-height: none;
+  overflow: visible;
+}
+
+/* Search row */
+.resources :global([data-testid='workbench-resource-search']) > div:first-child {
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 0 var(--space-1);
+}
+
+.resources :global([data-testid='workbench-resource-search']) > div:first-child > input {
+  height: var(--control-h-compact);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text);
+  font: var(--font-body-sm);
+}
+
+.resources :global([data-testid='workbench-resource-search']) > div:first-child > label {
+  color: var(--text-muted);
+  font: var(--font-caption);
+}
+
+/* Status notes ("Choose a project…", loading, no results): quiet helper
+   text aligned with the rows. */
+.resources :global([data-testid='workbench-resource-search']) > p {
+  margin: var(--space-1) var(--space-2);
+  color: var(--text-soft);
+  font: var(--font-caption);
+}
+
+/* Groups (Plugins / GenUI / Sections) */
+.resources :global([data-testid='workbench-resource-search']) > section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+  padding: var(--space-2) 0 0;
+}
+
+.resources :global([data-testid='workbench-resource-search']) > section > h3 {
+  margin: 0;
+  padding: var(--space-1) var(--space-2);
+  color: var(--text-soft);
+  font: var(--font-caption);
+  font-weight: var(--weight-medium);
+}
+
+/* Result rows: name left, status badge right, fit reasons underneath. */
+.resources :global([data-testid='workbench-resource-search']) > section > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-3);
+  row-gap: var(--space-half);
+  width: 100%;
+  height: auto;
+  min-height: var(--control-h-compact);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text);
+  font: var(--font-body-sm);
+  text-align: left;
+  white-space: normal;
+}
+
+.resources :global([data-testid='workbench-resource-search']) > section > button:hover:not(:disabled) {
+  background: var(--chip-hover-fill);
+  color: var(--text-strong);
+}
+
+.resources :global([data-testid='workbench-resource-search']) > section > button[aria-pressed='true'] {
+  background: var(--chip-selected-fill);
+  color: var(--chip-selected-text);
+}
+
+.resources :global([data-testid='workbench-resource-search']) > section > button:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+.resources :global([data-testid='workbench-resource-search']) > section > button > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Readiness reads as a quiet badge (same recipe as the Badge primitive's
+   neutral tone), not as a second label. */
+.resources :global([data-testid='workbench-resource-search']) > section > button > span:nth-child(2) {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font: var(--font-micro);
+  letter-spacing: var(--tracking-wide);
+  white-space: nowrap;
+}
+
+.resources :global([data-testid='workbench-resource-search']) > section > button > span:nth-child(3) {
+  grid-column: 1 / -1;
+  color: var(--text-soft);
+  font: var(--font-caption);
+}
+
+/* "Load more" and the inline action buttons stay compact and quiet. */
+.resources :global([data-testid='workbench-resource-search']) > button {
+  align-self: flex-start;
+  margin: var(--space-2);
+}
+
+.resources :global([data-testid='workbench-resource-search']) > details {
+  margin: var(--space-2);
+  color: var(--text-soft);
+  font: var(--font-caption);
+}
+
+.resources :global([data-testid='workbench-resource-search']) > details > summary {
+  cursor: pointer;
+}

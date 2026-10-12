@@ -1,0 +1,6 @@
+{
+  "description": "B4-2 security fixture (review WARN W1): a GET form whose action is on an allowed host. Click probes must never deliver it to the host; the action stays inconclusive.",
+  "cases": {
+    "allowed": { "allowHosts": ["good.review-egress.com"], "outcome": "inconclusive" }
+  }
+}

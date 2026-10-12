@@ -1,0 +1,43 @@
+/* masonry — clean-room, component-specs.md §13. Every selector is under .genui-masonry. */
+
+:where(.genui-masonry) {
+  display: block;
+  columns: var(--genui-masonry-cols, 3) var(--genui-masonry-min, 240px);
+  column-gap: var(--genui-masonry-gap, 16px);
+}
+
+.genui-masonry__item {
+  break-inside: avoid;
+  margin-bottom: var(--genui-masonry-gap, 16px);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+
+.genui-masonry:not(.genui-masonry--no-lift) .genui-masonry__item:hover,
+.genui-masonry:not(.genui-masonry--no-lift) .genui-masonry__item:focus-within {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* Set only by mount(), and only while reveal is running: the true no-JS state is always visible. */
+.genui-masonry--pending .genui-masonry__item {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-masonry--pending .genui-masonry__item {
+    opacity: 1;
+    transform: none;
+  }
+
+  .genui-masonry__item {
+    transition: none;
+  }
+
+  .genui-masonry:not(.genui-masonry--no-lift) .genui-masonry__item:hover,
+  .genui-masonry:not(.genui-masonry--no-lift) .genui-masonry__item:focus-within {
+    transform: none;
+    box-shadow: none;
+  }
+}

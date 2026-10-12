@@ -1,0 +1,57 @@
+{
+  "id": "ai-chat-input",
+  "name": "AI Chat Input",
+  "category": "input",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/ai-chat-input/index.ts",
+  "css": "components/ai-chat-input/styles.css",
+  "demo": "components/ai-chat-input/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "placeholders": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": ["Ask anything…"],
+        "description": "Placeholder strings the field cycles through while empty and unfocused."
+      },
+      "placeholderInterval": {
+        "type": "number",
+        "default": 3500,
+        "minimum": 0,
+        "description": "Placeholder rotation interval, in ms."
+      },
+      "maxRows": { "type": "number", "default": 8, "minimum": 1, "description": "Maximum visible rows before the field scrolls instead of growing further." },
+      "spring": {
+        "type": "object",
+        "additionalProperties": false,
+        "default": { "stiffness": 320, "damping": 26 },
+        "description": "Spring used for the height grow, ready scale-in and submit press animations.",
+        "properties": {
+          "stiffness": { "type": "number", "default": 320, "minimum": 0 },
+          "damping": { "type": "number", "default": 26, "minimum": 0 }
+        }
+      },
+      "suggestions": {
+        "type": "array",
+        "items": { "type": "string" },
+        "default": [],
+        "description": "Suggestion chips that fill the field with their text when clicked."
+      },
+      "submitOnEnter": { "type": "boolean", "default": true, "description": "Enter submits; Shift+Enter always inserts a newline instead." },
+      "busy": { "type": "boolean", "default": false, "description": "Initial busy state; the send button becomes a pulsing stop button." },
+      "maxLength": { "type": ["number", "null"], "default": null, "description": "Maximum character length, or no limit." }
+    }
+  },
+  "a11y": [
+    "The field requires a real `<label>` from the host, visible or visually hidden; the placeholder is never the field's only label.",
+    "The send button has `aria-label=\"Send\"`, which switches to `\"Stop\"` together with `aria-busy=\"true\"` while busy.",
+    "Suggestion chips are real `<button>`s, reachable and activatable by keyboard.",
+    "A visually-hidden `aria-live=\"polite\"` status region announces \"Sending…\" while busy.",
+    "Focus rings are visible on the field, send button and chips; the default theme keeps at least 4.5:1 contrast.",
+    "Enter submits and Shift+Enter inserts a newline; IME composition (`isComposing`) is respected so composing text never submits early."
+  ],
+  "reducedMotion": "reduced"
+}

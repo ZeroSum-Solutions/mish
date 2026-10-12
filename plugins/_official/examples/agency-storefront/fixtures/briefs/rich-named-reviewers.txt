@@ -1,0 +1,30 @@
+Variant fixture — same brief as rich.txt, but reviewer names are explicitly supplied.
+
+Kept SEPARATE from rich.txt on purpose: rich.txt's reviews are anonymous ("one wore the field
+jacket...; another says...") and must stay that way, so it keeps proving the anonymous case
+(no invented attribution — a null name renders no attribution line at all, not even a neutral
+"Verified buyer" label, since that would itself assert an unverified fact the brief never gave).
+This file is the positive-path counterpart: when a brief DOES name its reviewers, those real
+names are allowed through — deterministicAttributionFlags only flags a name that is NOT a
+substring of the brief, never a name that is.
+
+We're Tallow Row, a small fashion label based in Portland, Oregon. We make natural-fibre workwear
+in short seasonal runs: undyed cotton canvas jackets, trousers, shirting and a couple of
+accessories. Our anchor piece this season is the Field Jacket — a four-pocket, unlined canvas
+jacket with brass hardware, $248. The rest of the autumn run: Canvas Work Trouser ($168), Chore
+Shirt ($132), Canvas Tote ($58), and a Waxed Cap ($34).
+
+Materials: 15oz undyed cotton canvas, made in Portland, Oregon, machine wash cold and hang dry.
+
+Everything is live on our shop right now — https://shop.tallowrow.example/autumn — while stock
+lasts, no preorder needed. Orders ship within three business days, and unworn pieces with tags
+attached can be returned within thirty days for a refund.
+
+We've had a couple of nice notes from repeat customers: R. Achebe wore the field jacket through a
+wet Portland winter and says it only got better with age; M. Solberg says the canvas is heavier
+than expected, in a good way, and the stitching is clean.
+
+We started as two sewists cutting patterns on a kitchen table, and we still cut and sew every
+piece ourselves in runs small enough to know where each bolt of cloth came from.
+
+Contact: hello@tallowrow.example, 1420 SE Division St, Portland, OR 97202.

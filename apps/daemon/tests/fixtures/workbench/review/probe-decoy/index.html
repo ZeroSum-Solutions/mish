@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probe decoy</title>
+</head>
+<body style="margin:0;font:16px system-ui;color:#111;background:#fff">
+<main style="padding:16px">
+<h1>Probe decoy</h1>
+<!-- Sol round 9: on every reload after the first load, the page inserts a working button identical to the inert one (same tag, role, name and form owner) before it. -->
+<script>
+const first = !sessionStorage.getItem('loaded');
+sessionStorage.setItem('loaded', 'yes');
+document.write(first ? '' : '<button style="padding:15px" onclick="document.body.dataset.clicked=1">Buy</button>');
+</script>
+<button style="padding:15px">Buy</button>
+</main>
+</body>
+</html>

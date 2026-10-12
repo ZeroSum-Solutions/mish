@@ -1,0 +1,30 @@
+{
+  "id": "chroma-grid",
+  "name": "Chroma Grid",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/chroma-grid/index.ts",
+  "css": "components/chroma-grid/styles.css",
+  "demo": "components/chroma-grid/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "radius": { "type": "number", "default": 280, "minimum": 0, "description": "Spotlight radius, in px." },
+      "damping": { "type": "number", "default": 0.85, "minimum": 0, "maximum": 0.98, "description": "Lerp retention per frame while the spotlight tracks the pointer." },
+      "columns": { "type": "number", "default": 3, "minimum": 1 },
+      "rows": { "type": "number", "default": null, "description": "Row count; null lets the grid size rows automatically." },
+      "gap": { "type": "string", "default": "16px" },
+      "grayscale": { "type": "number", "default": 1, "minimum": 0, "maximum": 1 },
+      "fadeOut": { "type": "number", "default": 500, "minimum": 0, "description": "Spotlight fade-out (and fade-in) duration on pointer/focus leave, in ms." }
+    }
+  },
+  "a11y": [
+    "Items can be links or buttons; :focus-visible shows the accent border and moves the spotlight to that card's centre, so keyboard users get colour too.",
+    "The desat and fade overlays are aria-hidden and pointer-events: none, so they never intercept clicks or reach the accessibility tree.",
+    "Titles sit on a scrim with contrast of at least 4.5:1 even while the card is grayscale.",
+    "Reduced motion drops the pointer-tracked spotlight entirely; the grid shows in colour and only the CSS hover/focus border remains."
+  ],
+  "reducedMotion": "reduced"
+}

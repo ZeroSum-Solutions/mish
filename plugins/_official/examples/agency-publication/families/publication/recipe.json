@@ -1,0 +1,209 @@
+{
+  "schemaVersion": 2,
+  "family": "publication",
+  "revision": 1,
+  "brand": {
+    "name": "Field Notes Weekly",
+    "descriptor": "An independent weekly magazine and newsletter about small farms, food and the people who grow it."
+  },
+  "sections": [
+    {
+      "id": "publication-masthead",
+      "type": "masthead",
+      "text": {
+        "cta": "Subscribe"
+      }
+    },
+    {
+      "id": "publication-lead",
+      "type": "lead-story",
+      "text": {
+        "kicker": "This week",
+        "headline": "The orchard that kept its old apples and found a new market",
+        "dek": "A family farm in the Welsh borders stopped chasing supermarket varieties. Ten years on, its heritage cider apples sell out before the blossom falls.",
+        "byline": "By Morwenna Hale",
+        "readCta": "Read the story"
+      }
+    },
+    {
+      "id": "publication-topics",
+      "type": "topics",
+      "text": {
+        "heading": "Browse by topic",
+        "topics": [
+          "Growing",
+          "Markets",
+          "Kitchens",
+          "Land",
+          "Weather"
+        ]
+      }
+    },
+    {
+      "id": "publication-latest",
+      "type": "latest",
+      "text": {
+        "heading": "Latest stories"
+      },
+      "items": [
+        {
+          "topic": "Markets",
+          "title": "Why the Saturday market moved to Thursday evenings",
+          "dek": "Traders swapped the weekend crowd for commuters, and takings went up.",
+          "date": "12 September"
+        },
+        {
+          "topic": "Growing",
+          "title": "A no-dig bed, one season later",
+          "dek": "What worked, what rotted, and what a first-year grower would change.",
+          "date": "5 September"
+        },
+        {
+          "topic": "Kitchens",
+          "title": "Cooking the glut: forty ways with courgettes",
+          "dek": "Readers sent their best late-summer recipes. We tested the top ten.",
+          "date": "29 August"
+        },
+        {
+          "topic": "Land",
+          "title": "Hedgerows are back on the balance sheet",
+          "dek": "How new grants are changing the sums for farms that plant field edges.",
+          "date": "22 August"
+        }
+      ]
+    },
+    {
+      "id": "publication-series",
+      "type": "series",
+      "text": {
+        "heading": "Running series"
+      },
+      "items": [
+        {
+          "title": "First Harvest",
+          "blurb": "New growers on their first full season."
+        },
+        {
+          "title": "The Long Table",
+          "blurb": "One recipe from one farm, every fortnight."
+        },
+        {
+          "title": "Ground Truth",
+          "blurb": "Soil, water and the numbers behind them."
+        },
+        {
+          "title": "Market Day",
+          "blurb": "Portraits of the stalls that keep towns fed."
+        }
+      ]
+    },
+    {
+      "id": "publication-archive",
+      "type": "archive",
+      "text": {
+        "heading": "From the archive"
+      },
+      "items": [
+        {
+          "date": "Spring issue",
+          "title": "The seed library under the village hall",
+          "summary": "How a shoebox of saved beans became a lending library for three counties."
+        },
+        {
+          "date": "Winter issue",
+          "title": "Lambing in the dark months",
+          "summary": "A week on a hill farm where the busiest nights fall in January."
+        },
+        {
+          "date": "Autumn issue",
+          "title": "The last miller on the river",
+          "summary": "A water mill that still grinds flour for the bakers down the valley."
+        },
+        {
+          "date": "Summer issue",
+          "title": "Bees, borders and the neighbours",
+          "summary": "A beekeeper and an arable farmer on sharing the same fields."
+        }
+      ]
+    },
+    {
+      "id": "publication-authors",
+      "type": "authors",
+      "text": {
+        "heading": "Who writes Field Notes"
+      },
+      "items": [
+        {
+          "bio": "Grew up on a dairy farm and has covered rural economics for fifteen years.",
+          "name": "Morwenna Hale",
+          "beat": "Editor, farming and markets"
+        },
+        {
+          "bio": "Former restaurant cook who now writes about what small kitchens do with a harvest.",
+          "name": "Tobias Achebe",
+          "beat": "Food and kitchens"
+        },
+        {
+          "bio": "Soil scientist turned reporter, happiest with a spade and a spreadsheet.",
+          "name": "Ilse Varga",
+          "beat": "Land and climate"
+        }
+      ]
+    },
+    {
+      "id": "publication-newsletter",
+      "type": "newsletter",
+      "text": {
+        "heading": "Get Field Notes in your inbox",
+        "body": "One email with the week's stories, a recipe from a working farm and the dates of the markets near you.",
+        "emailPlaceholder": "Your email address",
+        "cta": "Sign up free",
+        "cadence": "Every Friday morning"
+      }
+    },
+    {
+      "id": "publication-membership",
+      "type": "membership",
+      "text": {
+        "heading": "Support independent farm journalism"
+      },
+      "items": [
+        {
+          "name": "Reader",
+          "price": "Free",
+          "period": "always",
+          "features": [
+            "The weekly newsletter",
+            "Three stories a month",
+            "The market calendar"
+          ],
+          "cta": "Sign up"
+        },
+        {
+          "name": "Member",
+          "price": "5",
+          "period": "a month",
+          "features": [
+            "Every story and the archive",
+            "The printed seasonal issue",
+            "Member-only farm visits"
+          ],
+          "cta": "Become a member"
+        }
+      ]
+    },
+    {
+      "id": "publication-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Independent writing about small farms, food and the people who grow it.",
+        "links": [
+          "Contact",
+          "Privacy",
+          "Advertise"
+        ],
+        "contactEmail": "editors@fieldnotes.example"
+      }
+    }
+  ]
+}

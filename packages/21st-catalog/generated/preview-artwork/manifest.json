@@ -1,0 +1,105 @@
+{
+  "schema": "catalog-preview-artwork/1",
+  "note": "Original Higgsfield assets for image slots in illustrative catalog previews. Portraits depict fictional people. Private upstream source is unchanged.",
+  "items": [
+    {
+      "id": "glass",
+      "file": "glass.webp",
+      "sha256": "000aac0e3e4b588876a91db62e962451cd326a0cc8e3b00acfd111102b5fddb1",
+      "bytes": 22286,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "303fd2fa-90f2-409c-b7f7-79257f65659e",
+      "prompt": "Museum-quality still life photograph of two handblown smoked-glass vessels on a honed pale limestone plinth, one deep petrol blue and one amber, raking side light creates crisp reflections and subtle caustics, deep charcoal background, premium contemporary design editorial, physical plausible materials, high contrast yet delicate, composition weighted to right, no text or logos",
+      "kind": "editorial-image"
+    },
+    {
+      "id": "landscape",
+      "file": "landscape.webp",
+      "sha256": "8156c522ed564b7f29487a35797c22a0375c180d3070f723341654d1389da51f",
+      "bytes": 101002,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "03632b05-46a3-4d5b-8734-176be4a8c0b4",
+      "prompt": "Fine art landscape photograph of a remote alpine lake with a pine-covered shore and pale limestone mountain in the Dolomites, calm steel blue water, early autumn morning light, natural colours and subtle film grain, medium-format editorial travel photography, atmospheric depth, no people, no text, no graphics",
+      "kind": "editorial-image"
+    },
+    {
+      "id": "portrait-five",
+      "file": "portrait-five.webp",
+      "sha256": "9ab10a16db69d02fe55f50381e93c6884e94a5be244dacd57136c104ff64c4b4",
+      "bytes": 11978,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "9942b347-7a61-475c-8077-684c96bb4ecb",
+      "prompt": "Editorial portrait photograph of a fictional Korean female product researcher with a straight chin-length bob, wearing a muted terracotta shirt, age late twenties, relaxed candid expression, soft daylight, olive grey studio background, waist-up portrait, honest realistic skin texture, no branding no text",
+      "kind": "fictional-portrait"
+    },
+    {
+      "id": "portrait-four",
+      "file": "portrait-four.webp",
+      "sha256": "e842a43475ad89ed0c62486d8c3ef7df5fe880476e793f5f436a8869f55d777f",
+      "bytes": 10316,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "4ddf6f6a-eef4-4bec-816c-a2526aa3f7d8",
+      "prompt": "Editorial portrait photograph of a fictional Black male software engineer, close cropped hair and subtle beard, simple navy overshirt, age early thirties, relaxed candid expression, soft daylight, pale limestone studio background, waist-up portrait, honest realistic skin texture, no branding no text",
+      "kind": "fictional-portrait"
+    },
+    {
+      "id": "portrait-one",
+      "file": "portrait-one.webp",
+      "sha256": "68d50d352f58ff509ef4b424a309791fe34e17c0a2c8df792a38a9319a16cc22",
+      "bytes": 10138,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "54e36190-47b3-4cb2-adfd-5b9c74e71a8d",
+      "prompt": "Professional editorial portrait photograph of a fictional female creative director with short dark curly hair and medium brown skin, wearing a simple charcoal cotton shirt, age early thirties, candid relaxed expression, soft daylight, warm grey studio background, waist-up composition, realistic skin texture, no glamour retouching, no text or branding",
+      "kind": "fictional-portrait"
+    },
+    {
+      "id": "portrait-six",
+      "file": "portrait-six.webp",
+      "sha256": "230698618358e85c6fb42de2527753f5312e4a60ef104694b4af1158630500d8",
+      "bytes": 11420,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "635b1bf1-3016-4ec4-81f3-e0130f531ec3",
+      "prompt": "Editorial portrait photograph of a fictional white male customer support lead with short salt-and-pepper hair and thin round glasses, wearing a charcoal linen shirt, age early forties, relaxed candid expression, soft daylight, warm ochre grey studio background, waist-up portrait, honest realistic skin texture, no branding no text",
+      "kind": "fictional-portrait"
+    },
+    {
+      "id": "portrait-three",
+      "file": "portrait-three.webp",
+      "sha256": "99e3cc80ec5489e7ab389725ab4797c083dd49adc3ca9a77a0b0a9dc34fd9a49",
+      "bytes": 12964,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "be616b09-1317-4d57-917b-5774fe242714",
+      "prompt": "Professional editorial portrait photograph of a fictional female industrial designer with light freckles and red hair tied loosely back, wearing a dark forest green knit sweater, age early thirties, candid thoughtful expression, soft daylight, warm beige studio background, waist-up composition, realistic skin texture, no glamour retouching, no text or branding",
+      "kind": "fictional-portrait"
+    },
+    {
+      "id": "portrait-two",
+      "file": "portrait-two.webp",
+      "sha256": "bbe61d720a0ca9051fd7a258881f5b3091b859034d69ad89cf1517f6c058c0f1",
+      "bytes": 12244,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "ac7941bc-6a94-4527-8b14-5c495780a342",
+      "prompt": "Professional editorial portrait photograph of a fictional male architect with East Asian features and shoulder length dark hair, wearing a pale ivory linen shirt, age late thirties, candid relaxed expression, cool daylight, muted blue grey studio background, waist-up composition, realistic skin texture, no glamour retouching, no text or branding",
+      "kind": "fictional-portrait"
+    },
+    {
+      "id": "studio",
+      "file": "studio.webp",
+      "sha256": "39d3baa54d0bc8447cd1fdf42bf53553ee8714dce01f59776bde26a0593302ec",
+      "bytes": 36304,
+      "provider": "higgsfield",
+      "model": "gpt_image_2",
+      "jobId": "b124c462-27eb-4cd7-b00d-bc1f0cd42ed4",
+      "prompt": "Editorial architectural photograph of an independent design studio, oak work table with neatly arranged paper prototypes and a single brushed aluminium desk lamp, limewash walls, soft morning light through tall north windows, one dark olive lounge chair, photographed with a 50mm lens, architectural digest quality, rich authentic material textures, restrained warm palette, intentional asymmetric composition, no people, no readable text, no UI, no logos",
+      "kind": "editorial-image"
+    }
+  ]
+}

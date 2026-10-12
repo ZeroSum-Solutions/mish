@@ -1,0 +1,40 @@
+/* scroll-expand — clean-room, from the effect description only. Every selector is under .genui-scroll-expand. */
+
+.genui-scroll-expand {
+  --genui-scroll-expand-q: calc(1 - var(--genui-scroll-expand-p, 1));
+  --genui-scroll-expand-r: calc(
+    var(--genui-scroll-expand-end-radius, 12px) +
+    (var(--genui-scroll-expand-radius, 28px) - var(--genui-scroll-expand-end-radius, 12px)) * var(--genui-scroll-expand-q)
+  );
+  border-radius: var(--genui-scroll-expand-r);
+  will-change: clip-path, transform;
+}
+
+.genui-scroll-expand--clip {
+  clip-path: inset(
+    calc(var(--genui-scroll-expand-q) * (1 - var(--genui-scroll-expand-from, 0.78)) * 50%)
+    round var(--genui-scroll-expand-r)
+  );
+}
+
+.genui-scroll-expand--scale {
+  overflow: hidden;
+  transform: scale(calc(1 - var(--genui-scroll-expand-q) * (1 - var(--genui-scroll-expand-from, 0.78))));
+  transform-origin: 50% 50%;
+}
+
+.genui-scroll-expand.genui-scroll-expand--reduced {
+  clip-path: none;
+  transform: none;
+  border-radius: var(--genui-scroll-expand-end-radius, 12px);
+  will-change: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-scroll-expand {
+    clip-path: none;
+    transform: none;
+    border-radius: var(--genui-scroll-expand-end-radius, 12px);
+    will-change: auto;
+  }
+}

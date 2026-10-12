@@ -1,0 +1,37 @@
+import {
+  resolveLocalizedText,
+  type InstalledPluginRecord,
+  type LocalizedText,
+} from '@open-design/contracts';
+
+export function localizePluginTitle(locale: string, record: InstalledPluginRecord): string {
+  const value = resolveLocalizedText(localizedText(record.manifest?.title_i18n), locale) || record.title;
+  return record.sourceKind === 'bundled' ? brandOfficialPluginText(value) : value;
+}
+
+export function localizePluginDescription(locale: string, record: InstalledPluginRecord): string {
+  const value = resolveLocalizedText(localizedText(record.manifest?.description_i18n), locale)
+    || record.manifest?.description
+    || '';
+  return record.sourceKind === 'bundled' ? brandOfficialPluginText(value) : value;
+}
+
+/** Rebrand copy supplied by the retained upstream official registry at the UI
+ * boundary. Protocol names, manifests and install sources stay unchanged. */
+export function brandOfficialPluginText(value: string): string {
+  return value
+    .replace(/\bnexu-io\/open-design\b/gi, 'Mishh Mashh')
+    .replace(/\b(?:www\.)?open-design\.ai\b/gi, 'Mishh Mashh')
+    .replace(/@?(?:OpenDesignHQ|Open-Design-ai)\b/gi, 'Mishh Mashh')
+    .replace(/\ban\s+Open(?:\s+Claude)?[\s-]*Design\b/gi, 'a Mishh Mashh')
+    .replace(/\bOpen(?:\s+Claude)?[\s-]*Design\b/gi, 'Mishh Mashh');
+}
+
+export function localizedText(value: unknown): LocalizedText | undefined {
+  if (typeof value === 'string') return value;
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined;
+  const entries = Object.entries(value as Record<string, unknown>);
+  if (entries.length === 0) return undefined;
+  if (!entries.every(([, text]) => typeof text === 'string')) return undefined;
+  return Object.fromEntries(entries) as Record<string, string>;
+}

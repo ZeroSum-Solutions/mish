@@ -1,0 +1,32 @@
+{
+  "id": "card-swap",
+  "name": "Card Swap",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/card-swap/index.ts",
+  "css": "components/card-swap/styles.css",
+  "demo": "components/card-swap/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "cardDistance": { "type": "number", "default": 60, "minimum": 0, "description": "Horizontal offset per depth slot, in px." },
+      "verticalDistance": { "type": "number", "default": 70, "minimum": 0, "description": "Vertical offset per depth slot, in px." },
+      "skewAmount": { "type": "number", "default": 6, "description": "Skew per depth slot, in deg." },
+      "delay": { "type": "number", "default": 5000, "minimum": 0, "description": "Time between swaps, in ms." },
+      "easing": { "type": "string", "enum": ["elastic", "smooth"], "default": "elastic" },
+      "duration": { "type": "number", "default": 1200, "minimum": 0, "description": "Swap duration, in ms." },
+      "pauseOnHover": { "type": "boolean", "default": true, "description": "Pause the cycle while the pointer is over the stack (keyboard focus always pauses it)." },
+      "width": { "type": "string", "default": "420px" },
+      "height": { "type": "string", "default": "300px" }
+    }
+  },
+  "a11y": [
+    "Auto-rotation pauses on pointer hover (when pauseOnHover is set) and always on keyboard focus inside the stack, per WCAG 2.2.2.",
+    "A visually hidden 'Next card' button gives manual, non-time-based control and becomes visible on keyboard focus.",
+    "Cards stay in DOM order; only their --genui-card-swap-slot custom property changes, so no focus or reading-order surprises come from a swap.",
+    "Reduced motion turns off the auto-cycle entirely; the Next button still reorders the cards, instantly."
+  ],
+  "reducedMotion": "reduced"
+}

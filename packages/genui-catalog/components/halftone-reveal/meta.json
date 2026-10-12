@@ -1,0 +1,35 @@
+{
+  "id": "halftone-reveal",
+  "name": "Halftone Reveal",
+  "category": "scroll",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line description only; a dependency-free 2D-canvas halftone screen that dissolves as the host scrolls into view, drawn only on scroll while near the viewport.",
+  "entry": "components/halftone-reveal/index.ts",
+  "css": "components/halftone-reveal/styles.css",
+  "demo": "components/halftone-reveal/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "color": { "type": "string", "default": "#0b0d12", "description": "Dot colour; match the surface behind the host." },
+      "edge": { "type": "string", "default": "", "description": "Colour of the dots that are mid-dissolve; empty for none." },
+      "cell": { "type": "number", "default": 14, "minimum": 4, "description": "Halftone cell size, in px." },
+      "direction": { "type": "string", "enum": ["up", "down", "left", "right", "radial"], "default": "up", "description": "Sweep of the dissolve; up reveals the bottom first." },
+      "softness": { "type": "number", "default": 0.35, "minimum": 0, "maximum": 1, "description": "Share of the sweep over which one dot shrinks away." },
+      "jitter": { "type": "number", "default": 0.3, "minimum": 0, "maximum": 1, "description": "Per-dot randomness of the dissolve front." },
+      "start": { "type": "number", "default": 0.95, "minimum": 0, "maximum": 1, "description": "Viewport fraction of the host's top edge where the reveal starts." },
+      "end": { "type": "number", "default": 0.3, "minimum": 0, "maximum": 1, "description": "Viewport fraction where the reveal is complete." },
+      "once": { "type": "boolean", "default": false, "description": "Stay revealed once complete instead of re-covering on scroll back." }
+    }
+  },
+  "a11y": [
+    "The dot screen is a single aria-hidden canvas with pointer-events: none; the content under it stays in the DOM, is read normally by screen readers, and stays clickable and focusable throughout.",
+    "The effect never hides content before JS can finish it: without a 2D canvas context, or before mount, the content shows as authored.",
+    "Reduced motion creates no canvas and attaches no scroll listener, so the content is fully visible from the start; a live switch to reduce removes the screen at once.",
+    "Forced-colors mode and print hide the screen, so the content keeps system colours and prints in full."
+  ],
+  "reducedMotion": "static"
+}

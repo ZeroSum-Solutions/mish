@@ -1,0 +1,5 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Shadow</title>
+<style>body{margin:0;font:16px/1.5 system-ui;color:#1f2937;background:#fff}main{padding:16px}.bar{width:40px;height:40px;background:#1d4ed8;animation:s 2s linear infinite}.bar.off{animation:none}@keyframes s{to{transform:translateX(200px)}}button{min-height:44px;min-width:44px}</style></head>
+<body><site-nav></site-nav><main><h1>Alerts</h1><div class="bar" id="bar"></div>
+<button type="button" id="pause" onclick="document.getElementById('bar').classList.add('off')">Pause animation</button></main>
+<script>customElements.define('site-nav',class extends HTMLElement{constructor(){super();this.attachShadow({mode:'open'}).innerHTML='<nav aria-label="Site"><button type="button">Home</button> <button type="button">About</button></nav>'}});</script></body></html>

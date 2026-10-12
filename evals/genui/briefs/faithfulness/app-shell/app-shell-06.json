@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-06",
+  "businessName": "Stillwater Catering Co",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Stillwater Catering Co"
+    },
+    {
+      "field": "address",
+      "value": "3300 Hiawatha Avenue, Minneapolis, Minnesota"
+    },
+    {
+      "field": "phone",
+      "value": "(612) 555-0127"
+    },
+    {
+      "field": "email",
+      "value": "events@stillwatercatering.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 9 a.m. to 5 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed food-service caterer in the State of Minnesota"
+    },
+    {
+      "field": "other",
+      "value": "Eight event coordinators"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample event-list row shown only to illustrate layout",
+      "text": "Alden-Ferris wedding, June 14, 180 guests, lead K. Sato, tasting complete"
+    }
+  ]
+}

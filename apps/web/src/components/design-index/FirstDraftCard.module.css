@@ -1,0 +1,219 @@
+/* Design Index → Route → First draft (flagship). Tokens only; see docs/design/ui-system.md. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--inset-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.title {
+  flex: 1 1 auto;
+  margin: 0;
+  font: var(--font-title);
+  color: var(--text-strong);
+}
+
+.lead {
+  margin: 0;
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+
+.note {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.field:first-child {
+  flex: 1 1 220px;
+}
+
+.label {
+  font: var(--font-caption);
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+.select:disabled,
+.toggle:has(input:disabled) {
+  color: var(--text-faint);
+}
+
+.toggle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  white-space: nowrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--control-h-compact);
+  font: var(--font-body-sm);
+  color: var(--text);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+
+.error {
+  margin: 0;
+  font: var(--font-body-sm);
+  color: var(--red);
+}
+
+.failure {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-inline-start: 3px solid var(--red);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+}
+
+.failureTitle {
+  margin: 0;
+  font: var(--font-body-sm);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.failureDetail {
+  margin: 0;
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-block-start: var(--space-3);
+  border-block-start: 1px solid var(--border);
+}
+
+.warnings {
+  margin: 0;
+  padding-inline-start: var(--space-4);
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+
+.deployAccess > div {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.deployAccess label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font: var(--font-label);
+  color: var(--text);
+}
+
+.deployAccess p {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+}
+
+.check {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.checkTitle {
+  margin: 0;
+  font: var(--font-body-sm);
+  font-weight: 600;
+  color: var(--text-strong);
+}
+
+.rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rulePass,
+.ruleFail {
+  display: grid;
+  grid-template-columns: auto minmax(120px, auto) minmax(0, 1fr);
+  gap: var(--space-2);
+  align-items: baseline;
+  font: var(--font-body-sm);
+  color: var(--text);
+}
+
+.ruleFail .ruleMark {
+  color: var(--red);
+}
+
+.rulePass .ruleMark {
+  color: var(--green, var(--text-muted));
+}
+
+.ruleId {
+  font: var(--font-caption);
+  color: var(--text-soft);
+}
+
+.ruleDetail {
+  overflow-wrap: anywhere;
+  color: var(--text-muted);
+}
+
+@media (max-width: 480px) {
+  .rulePass,
+  .ruleFail {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .ruleDetail {
+    grid-column: 2;
+  }
+}

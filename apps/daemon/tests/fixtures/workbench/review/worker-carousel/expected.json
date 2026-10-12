@@ -1,0 +1,8 @@
+{
+  "description": "A progress bar and a carousel whose 7.5 s slide timer runs in a Web Worker; Pause stops only the bar. The after-press watch must cover the carousel itself, so the check fails.",
+  "parameters": {
+    "requireReducedMotionFallback": false,
+    "requireLivePreferenceChange": false
+  },
+  "motion": "fail"
+}

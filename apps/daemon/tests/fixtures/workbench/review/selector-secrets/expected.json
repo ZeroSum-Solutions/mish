@@ -1,0 +1,17 @@
+{
+  "description": "Persisted selectors are structural only (Sol round 7): a tag:nth-of-type path from body. No element id or class appears in evidence, however short or plain; the plain id #cta is absent too and the CTA is cited as body > main > a.",
+  "cases": {
+    "default-deny": {
+      "allowHosts": [],
+      "notPassed": true,
+      "secretsAbsent": [
+        "sk_live",
+        "9f8a7b6c5d4e3f2a1b",
+        "tok-ab12",
+        "ab12cd34ef56ab78cd90",
+        "#cta"
+      ],
+      "evidenceIncludes": "body > main > a (href"
+    }
+  }
+}

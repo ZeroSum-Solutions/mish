@@ -1,0 +1,127 @@
+/* magic-bento — clean-room, from the effect description only. Every selector is under .genui-magic-bento. */
+
+:where(.genui-magic-bento) {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(var(--genui-magic-bento-cols, 4), minmax(0, 1fr));
+  grid-auto-rows: minmax(var(--genui-magic-bento-row, 96px), auto);
+  gap: var(--genui-magic-bento-gap, 12px);
+}
+
+/* Grid spotlight: out of flow (absolute), so it never takes a grid cell. Shows in the gaps. */
+.genui-magic-bento::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--genui-magic-bento-gap, 12px) * -1);
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    circle calc(var(--genui-magic-bento-radius, 220px) * 1.4) at var(--genui-magic-bento-hx, 50%) var(--genui-magic-bento-hy, 50%),
+    color-mix(in srgb, var(--genui-magic-bento-colour, #8b7cf6) 28%, transparent),
+    transparent 70%
+  );
+  opacity: var(--genui-magic-bento-on, 0);
+  transition: opacity 300ms ease;
+}
+
+.genui-magic-bento--no-spotlight::before {
+  content: none;
+}
+
+:where(.genui-magic-bento__card) {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 14px;
+  border-radius: 14px;
+  background: #12141b;
+  color: #f5f5f7;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+  transition: transform 200ms ease;
+}
+
+.genui-magic-bento__card--wide { grid-column: span 2; }
+.genui-magic-bento__card--tall { grid-row: span 2; }
+.genui-magic-bento__card--large { grid-column: span 2; grid-row: span 2; }
+
+.genui-magic-bento__card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.genui-magic-bento__card::before,
+.genui-magic-bento__card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: var(--genui-magic-bento-glow, 0);
+  transition: opacity 180ms ease;
+  background: radial-gradient(
+    circle var(--genui-magic-bento-radius, 220px) at var(--genui-magic-bento-x, 50%) var(--genui-magic-bento-y, 50%),
+    var(--genui-magic-bento-tone),
+    transparent 70%
+  );
+}
+
+/* Wash: tints the card surface under (and near) the pointer. */
+.genui-magic-bento__card::before {
+  --genui-magic-bento-tone: color-mix(in srgb, var(--genui-magic-bento-colour, #8b7cf6) 18%, transparent);
+}
+
+/* Rim: the same light masked down to a 1px edge. */
+.genui-magic-bento__card::after {
+  --genui-magic-bento-tone: var(--genui-magic-bento-colour, #8b7cf6);
+  padding: 1px;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+.genui-magic-bento--no-border .genui-magic-bento__card::after {
+  content: none;
+}
+
+.genui-magic-bento__card:hover,
+.genui-magic-bento__card:focus-within {
+  transform: translateY(-2px);
+}
+
+.genui-magic-bento__card:focus-visible {
+  outline: 2px solid var(--genui-magic-bento-colour, #8b7cf6);
+  outline-offset: 2px;
+}
+
+.genui-magic-bento.genui-magic-bento--reduced::before,
+.genui-magic-bento.genui-magic-bento--reduced .genui-magic-bento__card,
+.genui-magic-bento.genui-magic-bento--reduced .genui-magic-bento__card::before,
+.genui-magic-bento.genui-magic-bento--reduced .genui-magic-bento__card::after {
+  transition: none;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-magic-bento::before,
+  .genui-magic-bento__card,
+  .genui-magic-bento__card:hover,
+  .genui-magic-bento__card:focus-within,
+  .genui-magic-bento__card::before,
+  .genui-magic-bento__card::after {
+    transition: none;
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-magic-bento::before,
+  .genui-magic-bento__card::before,
+  .genui-magic-bento__card::after {
+    content: none;
+  }
+  .genui-magic-bento__card {
+    border: 1px solid CanvasText;
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "schema": "21st-live-thumbnails/1",
+  "items": {
+    "21st:moumensoliman-glassmorphism-listen-app": {
+      "file": "moumensoliman-glassmorphism-listen-app.webp",
+      "bytes": 8576,
+      "revision": "2fdd2a3f9209e757b7b5036945c1f445f412312ae2988e6eae32a2a0d82b2adf",
+      "sourceSha256": "037ca6a0e369af5cbc31afb2bc426582006084bb13e09a5a35124155393f2938",
+      "provenance": "upstream-private",
+      "framePath": "/api/21st/21st%3Amoumensoliman-glassmorphism-listen-app/preview?theme=light&motion=reduced"
+    },
+    "21st:moumensoliman-glassmorphism-portfolio": {
+      "file": "moumensoliman-glassmorphism-portfolio.webp",
+      "bytes": 11650,
+      "revision": "c53d763e24aa26d786f8398db2bea985e33133aed2c45b09cbd8b3db41ca1ac1",
+      "sourceSha256": "e13d4e3e61bb135470281aa0a7f8e08dfc8243030cb27f90898fbb8b657ca062",
+      "provenance": "upstream-private",
+      "framePath": "/api/21st/21st%3Amoumensoliman-glassmorphism-portfolio/preview?theme=light&motion=reduced"
+    }
+  }
+}

@@ -1,0 +1,423 @@
+import { mcpTokenMatchesEndpoint } from './mcp-endpoint.js';
+import { sendInternalError } from './http/api-errors.js';
+import type { Express } from 'express';
+import fs from 'node:fs';
+import { SIDECAR_ENV } from '@open-design/sidecar-proto';
+import { buildMcpInstallPayload, type McpInstallPayload } from './mcp-install-info.js';
+import { installCodexMcp, probeCodexInstall, uninstallCodexMcp } from './codex-cli.js';
+import { MCP_TEMPLATES, buildAcpMcpServers, buildClaudeMcpJson, isManagedProjectCwd, readMcpConfig, writeMcpConfig } from './mcp-config.js';
+import { beginAuth, exchangeCodeForToken, McpOAuthError } from './mcp-oauth.js';
+import { clearToken, getToken, isTokenExpired, readAllTokens, setToken } from './mcp-tokens.js';
+import { McpCredentialFileError, McpCredentialResetError, resetUnsafeMcpOAuthStore } from './mcp-private-file.js';
+import { maskMcpServers, McpSecretMaskError, restoreMcpSecrets } from './mcp-secrets.js';
+import type { RouteDeps } from './server-context.js';
+import { renderOAuthResultPage } from './http/oauth-result-page.js';
+
+export interface RegisterMcpRoutesDeps extends RouteDeps<'http' | 'paths' | 'mcp'> {}
+
+export function registerMcpRoutes(app: Express, ctx: RegisterMcpRoutesDeps) {
+  const { isLocalSameOrigin, resolvedPortRef, sendApiError } = ctx.http;
+  const { OD_BIN, RUNTIME_DATA_DIR, PROJECTS_DIR } = ctx.paths;
+  const { pendingAuth, daemonUrlRef, inheritedEnvironment } = ctx.mcp;
+  const getResolvedPort = () => resolvedPortRef.current;
+  const getDaemonUrl = () => daemonUrlRef.current;
+  // Surfaces the absolute paths to the daemon's Node-compatible runtime and
+  // CLI entry so the Settings → MCP server panel can render snippets that work
+  // even when `od` isn't on the user's PATH (the common case for source clones
+  // - and macOS/Linux ship a /usr/bin/od octal-dump tool that shadows ours
+  // anyway). Cached for 5s because the panel pings on every open. The
+  // executable paths remain stable for the daemon lifetime, while the
+  // packaged web port is part of the cache key because it is registered
+  // after the web sidecar binds and may change after a runtime restart.
+  const INSTALL_INFO_TTL_MS = 5000;
+  let installInfoCache: {
+    t: number;
+    payload: object;
+    webPort: string | null;
+  } | null = null;
+
+  // Resolve the install snippet for the current daemon. Shared by the
+  // public GET /api/mcp/install-info endpoint (renders TOML/JSON for
+  // the user to copy) and POST /api/mcp/install/codex (which feeds the
+  // exact same fields into `codex mcp add` so the one-click install
+  // configures Codex with byte-for-byte the same command as the copy
+  // snippet would). Keeping this in one place is the whole point of
+  // the factoring — divergence here would mean Codex behaves
+  // differently depending on which install path the user took.
+  function computeInstallPayload(): McpInstallPayload {
+    const cliPath = OD_BIN;
+    // Forward only the opaque inherited client capability. IPC endpoint
+    // naming and transport stay private to @open-design/sidecar.
+    const sidecarEnv = inheritedEnvironment();
+    const isSidecarMode = Object.keys(sidecarEnv).length > 0;
+    const mcpBootstrapCommand = process.env.OD_MCP_BOOTSTRAP_COMMAND;
+    if (
+      mcpBootstrapCommand != null
+      && mcpBootstrapCommand.length > 0
+    ) {
+      sidecarEnv.OD_MCP_BOOTSTRAP_COMMAND = mcpBootstrapCommand;
+    }
+    const mcpBootstrapArgs = process.env.OD_MCP_BOOTSTRAP_ARGS;
+    if (mcpBootstrapArgs != null && mcpBootstrapArgs.length > 0) {
+      sidecarEnv.OD_MCP_BOOTSTRAP_ARGS = mcpBootstrapArgs;
+    }
+    // tools-dev / packaged launchers export OD_WEB_PORT so the daemon
+    // knows where the browser-facing Mishh Mashh studio is running.
+    // CLI-only / headless launches set neither and webBaseUrl falls
+    // through as null — MCP clients then just omit the studio deep
+    // link from their responses.
+    const webPortRaw = process.env[SIDECAR_ENV.WEB_PORT];
+    const webPortNum = webPortRaw ? Number(webPortRaw) : Number.NaN;
+    const webBaseUrl = Number.isFinite(webPortNum) && webPortNum > 0
+      ? `http://127.0.0.1:${webPortNum}`
+      : null;
+    return buildMcpInstallPayload({
+      cliPath,
+      cliExists: fs.existsSync(cliPath),
+      // process.execPath is the absolute path to the Node-compatible
+      // runtime running the daemon RIGHT NOW. In packaged builds this
+      // may be Electron with ELECTRON_RUN_AS_NODE=1 rather than a
+      // separate bundled Node binary; the helper surfaces that env
+      // requirement on the command so IDE-spawned MCP clients can
+      // reproduce the same mode from a minimal OS launcher env.
+      execPath: process.execPath,
+      nodeExists: fs.existsSync(process.execPath),
+      port: getResolvedPort(),
+      platform: process.platform,
+      dataDir: RUNTIME_DATA_DIR,
+      electronAsNode: process.env.ELECTRON_RUN_AS_NODE === '1',
+      isSidecarMode,
+      sidecarEnv,
+      webBaseUrl,
+    });
+  }
+
+  app.get('/api/mcp/install-info', (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    const now = Date.now();
+    const webPort = process.env[SIDECAR_ENV.WEB_PORT] ?? null;
+    if (
+      installInfoCache
+      && installInfoCache.webPort === webPort
+      && now - installInfoCache.t < INSTALL_INFO_TTL_MS
+    ) {
+      return res.json(installInfoCache.payload);
+    }
+    const payload = computeInstallPayload();
+    installInfoCache = { t: now, payload, webPort };
+    res.json(payload);
+  });
+
+  // Codex one-click install. Codex CLI exposes `codex mcp add/remove/get`,
+  // so we shell out to it rather than rewriting ~/.codex/config.toml
+  // ourselves — that way we inherit Codex's merge / validation rules
+  // and only need to track its argv. See apps/daemon/src/codex-cli.ts.
+  const CODEX_MCP_NAME = 'open-design';
+
+  app.get('/api/mcp/install/codex/status', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    try {
+      const status = await probeCodexInstall(CODEX_MCP_NAME);
+      res.json(status);
+    } catch (err) {
+      sendApiError(res, 500, 'CODEX_PROBE_FAILED', err instanceof Error ? err.message : String(err));
+    }
+  });
+
+  app.post('/api/mcp/install/codex', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    const payload = computeInstallPayload();
+    if (!payload.cliExists || !payload.nodeExists) {
+      return sendApiError(res, 500, 'INSTALL_INFO_INCOMPLETE', payload.buildHint ?? 'install payload not ready');
+    }
+    try {
+      await installCodexMcp({
+        name: CODEX_MCP_NAME,
+        command: payload.command,
+        args: payload.args,
+        env: payload.env,
+      });
+      res.json({ ok: true });
+    } catch (err) {
+      sendApiError(res, 500, 'CODEX_INSTALL_FAILED', err instanceof Error ? err.message : String(err));
+    }
+  });
+
+  app.delete('/api/mcp/install/codex', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    try {
+      await uninstallCodexMcp(CODEX_MCP_NAME);
+      res.json({ ok: true });
+    } catch (err) {
+      sendApiError(res, 500, 'CODEX_UNINSTALL_FAILED', err instanceof Error ? err.message : String(err));
+    }
+  });
+
+  // External MCP server configuration. Mishh Mashh connects to these as a
+  // CLIENT and surfaces their tools to the underlying agent at spawn time.
+  // GET returns user-saved entries plus the built-in template list so the UI
+  // can render the "Add MCP server" picker without a second round-trip.
+  app.get('/api/mcp/servers', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    try {
+      const cfg = await readMcpConfig(RUNTIME_DATA_DIR);
+      // Saved secrets stay in the daemon (B-121): a client sees MCP_SECRET_MASK in their place.
+      res.json({ servers: maskMcpServers(cfg.servers), templates: MCP_TEMPLATES });
+    } catch (err: any) {
+      if (err instanceof McpCredentialFileError) return res.status(409).json({ error: err.message, code: err.code, store: err.store, file: err.file });
+      sendInternalError(res, err);
+    }
+  });
+
+  app.put('/api/mcp/servers', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    try {
+      // A field sent back with the mask keeps the stored secret of the same slot; a mask that
+      // cannot be placed is refused and nothing is written (B-121).
+      const cfg = await writeMcpConfig(RUNTIME_DATA_DIR, req.body, (next, previous) => ({
+        servers: restoreMcpSecrets(next.servers, previous.servers),
+      }));
+      res.json({ servers: maskMcpServers(cfg.servers), templates: MCP_TEMPLATES });
+    } catch (err: any) {
+      if (err instanceof McpCredentialFileError) return res.status(409).json({ error: err.message, code: err.code, store: err.store, file: err.file });
+      if (err instanceof McpSecretMaskError) {
+        return res.status(400).json({ error: err.message, code: 'MCP_SECRET_MASK_UNMATCHED', serverId: err.serverId, field: err.field });
+      }
+      res
+        .status(400)
+        .json({ error: String(err && err.message ? err.message : err) });
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────────
+  // External MCP server OAuth — daemon-owned authorization flow.
+  //
+  // Replaces per-spawn `mcp-remote` subprocesses. The token is stored
+  // server-side in <dataDir>/mcp-tokens.json and injected as a Bearer
+  // header into the `.mcp.json` we write for Claude Code at spawn time.
+  // The redirect URI points at THIS daemon's public origin so the flow
+  // works the same in local dev (loopback) and in cloud deployments
+  // where OD_PUBLIC_BASE_URL pins the externally-routable URL.
+  // ─────────────────────────────────────────────────────────────────
+
+  app.post('/api/mcp/oauth/start', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    const serverId =
+      typeof req.body?.serverId === 'string' ? req.body.serverId.trim() : '';
+    if (!serverId) {
+      return res.status(400).json({ error: 'serverId is required' });
+    }
+    try {
+      const cfg = await readMcpConfig(RUNTIME_DATA_DIR);
+      const server = cfg.servers.find((s) => s.id === serverId);
+      if (!server) {
+        return res.status(404).json({ error: `unknown serverId ${serverId}` });
+      }
+      if (server.transport !== 'http' && server.transport !== 'sse') {
+        return res
+          .status(400)
+          .json({ error: 'OAuth flow only applies to http/sse transports' });
+      }
+      if (!server.url) {
+        return res.status(400).json({ error: 'server has no URL configured' });
+      }
+      if (server.authMode === 'none') {
+        return res
+          .status(400)
+          .json({ error: 'server is configured for no managed OAuth' });
+      }
+      const redirectUri = mcpOAuthCallbackUrl(req);
+      // Endpoint paths can also carry credentials; log only the stable server identity.
+      console.log(`[mcp-oauth] start serverId=${serverId}`);
+      const result = await beginAuth({
+        serverId,
+        serverUrl: server.url,
+        redirectUri,
+        dataDir: RUNTIME_DATA_DIR,
+        fetchImpl: fetch,
+      });
+      pendingAuth.put(result.state, result.pending);
+      console.log(
+        `[mcp-oauth] start ok serverId=${serverId}`,
+      );
+      res.json({
+        authorizeUrl: result.authorizeUrl,
+        state: result.state,
+        redirectUri,
+      });
+    } catch (err: any) {
+      const code = err instanceof McpOAuthError || err instanceof McpCredentialFileError ? err.code : 'MCP_OAUTH_START_FAILED';
+      const message = err instanceof McpOAuthError || err instanceof McpCredentialFileError ? err.message : 'OAuth connection failed. Reconnect this server.';
+      console.error('[mcp-oauth] start failed:', code);
+      res.status(err instanceof McpCredentialFileError ? 409 : 502).json({ error: message, code, ...(err instanceof McpCredentialFileError ? { store: err.store, file: err.file } : {}) });
+    }
+  });
+
+  // Public endpoint — the OAuth provider's user-agent redirect lands here
+  // after the user approves. We deliberately do NOT enforce
+  // isLocalSameOrigin: in cloud the daemon IS the public origin, and even
+  // locally the request comes back from the OAuth provider's redirect
+  // (no Origin header at all on a top-level navigation).
+  app.get('/api/mcp/oauth/callback', async (req, res) => {
+    const code = typeof req.query.code === 'string' ? req.query.code : '';
+    const state = typeof req.query.state === 'string' ? req.query.state : '';
+    const error = typeof req.query.error === 'string' ? req.query.error : '';
+    if (error) {
+      if (state) pendingAuth.consume(state);
+      return res.status(400).type('html').send(renderOAuthResultPage({
+        ok: false,
+        message: 'The authorization provider refused the request. Reconnect this server.',
+      }));
+    }
+    if (!code || !state) {
+      return res.status(400).type('html').send(renderOAuthResultPage({
+        ok: false,
+        message: 'Missing code or state — open Settings → External MCP servers and click Connect again.',
+      }));
+    }
+    const pending = pendingAuth.consume(state);
+    if (!pending) {
+      return res.status(400).type('html').send(renderOAuthResultPage({
+        ok: false,
+        message: 'Auth state expired or already used. Click Connect again.',
+      }));
+    }
+    try {
+      const current = (await readMcpConfig(RUNTIME_DATA_DIR)).servers.find(server => server.id === pending.serverId);
+      if (!current || !current.enabled || current.authMode === 'none' || !mcpTokenMatchesEndpoint({ endpointFingerprint: pending.endpointFingerprint }, current.url)) {
+        throw new McpOAuthError('MCP_OAUTH_ENDPOINT_CHANGED', 'The MCP endpoint changed during sign-in. Reconnect this server.');
+      }
+      const tokenResp = await exchangeCodeForToken({
+        tokenEndpoint: pending.tokenEndpoint,
+        clientId: pending.clientId,
+        clientSecret: pending.clientSecret,
+        redirectUri: pending.redirectUri,
+        code,
+        codeVerifier: pending.codeVerifier,
+        resource: pending.resourceUrl,
+      });
+      const stored: any = {
+        accessToken: tokenResp.access_token,
+        refreshToken: tokenResp.refresh_token,
+        tokenType: tokenResp.token_type ?? 'Bearer',
+        scope: tokenResp.scope ?? pending.scope,
+        expiresAt:
+          typeof tokenResp.expires_in === 'number'
+            ? Date.now() + tokenResp.expires_in * 1000
+            : undefined,
+        savedAt: Date.now(),
+        // Persist the OAuth client context so refresh-token rotation can
+        // hit the same client_id / token endpoint the upstream issued the
+        // refresh_token to. Refresh tokens are client-bound (RFC 6749 §6).
+        tokenEndpoint: pending.tokenEndpoint,
+        clientId: pending.clientId,
+        clientSecret: pending.clientSecret,
+        authServerIssuer: pending.authServerIssuer,
+        redirectUri: pending.redirectUri,
+        resourceUrl: pending.resourceUrl,
+        endpointFingerprint: pending.endpointFingerprint,
+      };
+      await setToken(RUNTIME_DATA_DIR, pending.serverId, stored);
+      res.type('html').send(renderOAuthResultPage({
+        ok: true,
+        serverId: pending.serverId,
+      }));
+    } catch (err: any) {
+      const code = err instanceof McpOAuthError || err instanceof McpCredentialFileError ? err.code : 'MCP_OAUTH_CALLBACK_FAILED';
+      console.error('[mcp-oauth] callback failed:', code);
+      res.status(err instanceof McpCredentialFileError ? 409 : 502).type('html').send(renderOAuthResultPage({
+        ok: false,
+        message: err instanceof McpCredentialFileError
+          ? err.message
+          : err instanceof McpOAuthError ? err.message : 'OAuth sign-in failed. Reconnect this server.',
+      }));
+    }
+  });
+
+  app.get('/api/mcp/oauth/status', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    const serverId =
+      typeof req.query.serverId === 'string' ? req.query.serverId.trim() : '';
+    if (!serverId) return res.status(400).json({ error: 'serverId is required' });
+    try {
+      const tok = await getToken(RUNTIME_DATA_DIR, serverId);
+      const server = (await readMcpConfig(RUNTIME_DATA_DIR)).servers.find(server => server.id === serverId);
+      if (!tok || !server?.enabled || server.authMode !== 'oauth') return res.json({ connected: false });
+      if (!mcpTokenMatchesEndpoint(tok, server.url)) return res.json({ connected: false, code: 'MCP_OAUTH_RECONNECT_REQUIRED' });
+      res.json({
+        connected: true,
+        expiresAt: tok.expiresAt ?? null,
+        scope: tok.scope ?? null,
+        savedAt: tok.savedAt,
+      });
+    } catch (err: any) {
+      if (err instanceof McpCredentialFileError) return res.status(409).json({ error: err.message, code: err.code, store: err.store, file: err.file });
+      sendInternalError(res, err);
+    }
+  });
+
+  app.post('/api/mcp/oauth/disconnect', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) {
+      return res.status(403).json({ error: 'cross-origin request rejected' });
+    }
+    const serverId =
+      typeof req.body?.serverId === 'string' ? req.body.serverId.trim() : '';
+    if (!serverId) return res.status(400).json({ error: 'serverId is required' });
+    try {
+      await clearToken(RUNTIME_DATA_DIR, serverId);
+      res.json({ ok: true });
+    } catch (err: any) {
+      if (err instanceof McpCredentialFileError) return res.status(409).json({ error: err.message, code: err.code, store: err.store, file: err.file });
+      sendInternalError(res, err);
+    }
+  });
+
+  app.post('/api/mcp/oauth/reset-credentials', async (req, res) => {
+    if (!isLocalSameOrigin(req, getResolvedPort())) return res.status(403).json({ error: 'cross-origin request rejected' });
+    const store = req.body?.store;
+    if ((store !== 'tokens' && store !== 'client-cache') || req.body?.confirm !== true) {
+      return res.status(400).json({ error: 'An OAuth store and explicit confirmation are required.' });
+    }
+    try {
+      await resetUnsafeMcpOAuthStore(RUNTIME_DATA_DIR, store);
+      res.json({ ok: true });
+    } catch (error) {
+      if (error instanceof McpCredentialResetError) return res.status(error.code === 'MCP_CREDENTIAL_RESET_NOT_NEEDED' ? 409 : 500).json({ error: error.message, code: error.code });
+      res.status(500).json({ error: 'Could not reset the OAuth store. The original entry is preserved for owner repair.', code: 'MCP_CREDENTIAL_RESET_FAILED' });
+    }
+  });
+
+
+
+}
+
+function getPublicBaseUrl(req: any) {
+  const env = process.env.OD_PUBLIC_BASE_URL;
+  if (env && /^https?:\/\//i.test(env)) {
+    return env.replace(/\/+$/u, '');
+  }
+  const proto = req.protocol || 'http';
+  const host = req.get('host');
+  if (!host) return `http://localhost:${process.env.OD_PORT ?? '7456'}`;
+  return `${proto}://${host}`;
+}
+
+function mcpOAuthCallbackUrl(req: any) {
+  return `${getPublicBaseUrl(req)}/api/mcp/oauth/callback`;
+}

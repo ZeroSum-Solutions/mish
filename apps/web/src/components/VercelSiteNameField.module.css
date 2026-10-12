@@ -1,0 +1,6 @@
+.field { display: grid; gap: var(--space-1); }
+.field label { font: var(--font-label); color: var(--text-strong); }
+.address { display: flex; align-items: center; gap: var(--space-2); }
+.address input { flex: 1; min-width: 0; }
+.address span { color: var(--text-muted); white-space: nowrap; }
+.hint { margin: 0; color: var(--text-muted); font: var(--font-caption); }

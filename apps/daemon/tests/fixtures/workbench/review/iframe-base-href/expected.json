@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 4 WARN: a static iframe whose relative src resolves through <base href> to an allowed host loads, like Chrome resolves it.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "hitsInclude": "GET /embed" } }
+}

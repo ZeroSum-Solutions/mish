@@ -1,0 +1,7 @@
+{
+  "description": "A hero whose background colour swaps every 8 s (a 2 s interval that acts on every fourth firing) next to a busy progress bar; Pause stops only the bar and nothing honours a live switch to reduce. Only pixels and the background change, so the watch must follow the hero itself: both pause and live fail.",
+  "parameters": {
+    "requireReducedMotionFallback": false
+  },
+  "motion": "fail"
+}

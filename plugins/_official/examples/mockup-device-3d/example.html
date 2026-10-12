@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<title>Device 3D Showcase · HTML-in-Canvas</title>
+<!-- Tailwind utilities compiled at authoring time (tailwindcss 3.4.17, the Play CDN's major) from the classes
+     this page uses, so the preview runs with no CDN script. Recompile after changing classes:
+     npx tailwindcss@3.4.17 --content example.html -i <base+utilities input> --minify -->
+<style data-tailwind-compiled="3.4.17">*,:after,:before{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }::backdrop{--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x: ;--tw-pan-y: ;--tw-pinch-zoom: ;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position: ;--tw-gradient-via-position: ;--tw-gradient-to-position: ;--tw-ordinal: ;--tw-slashed-zero: ;--tw-numeric-figure: ;--tw-numeric-spacing: ;--tw-numeric-fraction: ;--tw-ring-inset: ;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgba(59,130,246,.5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur: ;--tw-brightness: ;--tw-contrast: ;--tw-grayscale: ;--tw-hue-rotate: ;--tw-invert: ;--tw-saturate: ;--tw-sepia: ;--tw-drop-shadow: ;--tw-backdrop-blur: ;--tw-backdrop-brightness: ;--tw-backdrop-contrast: ;--tw-backdrop-grayscale: ;--tw-backdrop-hue-rotate: ;--tw-backdrop-invert: ;--tw-backdrop-opacity: ;--tw-backdrop-saturate: ;--tw-backdrop-sepia: ;--tw-contain-size: ;--tw-contain-layout: ;--tw-contain-paint: ;--tw-contain-style: }/*! tailwindcss v3.4.17 | MIT License | https://tailwindcss.com*/*,:after,:before{box-sizing:border-box;border:0 solid #e5e7eb}:after,:before{--tw-content:""}:host,html{line-height:1.5;-webkit-text-size-adjust:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;font-family:ui-sans-serif,system-ui,sans-serif,Apple Color Emoji,Segoe UI Emoji,Segoe UI Symbol,Noto Color Emoji;font-feature-settings:normal;font-variation-settings:normal;-webkit-tap-highlight-color:transparent}body{margin:0;line-height:inherit}hr{height:0;color:inherit;border-top-width:1px}abbr:where([title]){-webkit-text-decoration:underline dotted;text-decoration:underline dotted}h1,h2,h3,h4,h5,h6{font-size:inherit;font-weight:inherit}a{color:inherit;text-decoration:inherit}b,strong{font-weight:bolder}code,kbd,pre,samp{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace;font-feature-settings:normal;font-variation-settings:normal;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}table{text-indent:0;border-color:inherit;border-collapse:collapse}button,input,optgroup,select,textarea{font-family:inherit;font-feature-settings:inherit;font-variation-settings:inherit;font-size:100%;font-weight:inherit;line-height:inherit;letter-spacing:inherit;color:inherit;margin:0;padding:0}button,select{text-transform:none}button,input:where([type=button]),input:where([type=reset]),input:where([type=submit]){-webkit-appearance:button;background-color:transparent;background-image:none}:-moz-focusring{outline:auto}:-moz-ui-invalid{box-shadow:none}progress{vertical-align:baseline}::-webkit-inner-spin-button,::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}summary{display:list-item}blockquote,dd,dl,figure,h1,h2,h3,h4,h5,h6,hr,p,pre{margin:0}fieldset{margin:0}fieldset,legend{padding:0}menu,ol,ul{list-style:none;margin:0;padding:0}dialog{padding:0}textarea{resize:vertical}input::-moz-placeholder,textarea::-moz-placeholder{opacity:1;color:#9ca3af}input::placeholder,textarea::placeholder{opacity:1;color:#9ca3af}[role=button],button{cursor:pointer}:disabled{cursor:default}audio,canvas,embed,iframe,img,object,svg,video{display:block;vertical-align:middle}img,video{max-width:100%;height:auto}[hidden]:where(:not([hidden=until-found])){display:none}.absolute{position:absolute}.relative{position:relative}.inset-0{inset:0}.bottom-0{bottom:0}.bottom-10{bottom:2.5rem}.bottom-2{bottom:.5rem}.left-0{left:0}.left-12{left:3rem}.left-3{left:.75rem}.right-0{right:0}.right-12{right:3rem}.right-3{right:.75rem}.top-10{top:2.5rem}.mx-6{margin-left:1.5rem;margin-right:1.5rem}.mb-1\.5{margin-bottom:.375rem}.ml-3{margin-left:.75rem}.mt-1{margin-top:.25rem}.mt-2{margin-top:.5rem}.mt-3{margin-top:.75rem}.mt-5{margin-top:1.25rem}.flex{display:flex}.grid{display:grid}.h-2{height:.5rem}.h-\[260px\]{height:260px}.min-h-screen{min-height:100vh}.w-2{width:.5rem}.flex-1{flex:1 1 0%}.transform{transform:translate(var(--tw-translate-x),var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))}.grid-cols-\[1fr_1\.4fr_1\.4fr\]{grid-template-columns:1fr 1.4fr 1.4fr}.flex-col{flex-direction:column}.items-end{align-items:flex-end}.items-center{align-items:center}.items-baseline{align-items:baseline}.justify-center{justify-content:center}.justify-between{justify-content:space-between}.justify-around{justify-content:space-around}.gap-0\.5{gap:.125rem}.gap-1{gap:.25rem}.gap-1\.5{gap:.375rem}.gap-2{gap:.5rem}.gap-2\.5{gap:.625rem}.gap-20{gap:5rem}.space-y-1>:not([hidden])~:not([hidden]){--tw-space-y-reverse:0;margin-top:calc(.25rem*(1 - var(--tw-space-y-reverse)));margin-bottom:calc(.25rem*var(--tw-space-y-reverse))}.overflow-hidden,.truncate{overflow:hidden}.truncate{text-overflow:ellipsis;white-space:nowrap}.rounded{border-radius:.25rem}.rounded-full{border-radius:9999px}.rounded-md{border-radius:.375rem}.rounded-xl{border-radius:.75rem}.border{border-width:1px}.bg-amber-400{--tw-bg-opacity:1;background-color:rgb(251 191 36/var(--tw-bg-opacity,1))}.bg-emerald-400{--tw-bg-opacity:1;background-color:rgb(52 211 153/var(--tw-bg-opacity,1))}.bg-red-500{--tw-bg-opacity:1;background-color:rgb(239 68 68/var(--tw-bg-opacity,1))}.p-14{padding:3.5rem}.p-2{padding:.5rem}.p-3{padding:.75rem}.px-1\.5{padding-left:.375rem;padding-right:.375rem}.px-3{padding-left:.75rem;padding-right:.75rem}.px-6{padding-left:1.5rem;padding-right:1.5rem}.px-7{padding-left:1.75rem;padding-right:1.75rem}.py-1{padding-top:.25rem;padding-bottom:.25rem}.py-1\.5{padding-top:.375rem;padding-bottom:.375rem}.py-3{padding-top:.75rem;padding-bottom:.75rem}.pt-10{padding-top:2.5rem}.pt-3{padding-top:.75rem}.text-center{text-align:center}.text-\[10px\]{font-size:10px}.text-\[11px\]{font-size:11px}.text-\[12px\]{font-size:12px}.text-\[13px\]{font-size:13px}.text-\[16px\]{font-size:16px}.text-\[22px\]{font-size:22px}.text-xl{font-size:1.25rem;line-height:1.75rem}.font-black{font-weight:900}.font-bold{font-weight:700}.font-semibold{font-weight:600}.leading-tight{line-height:1.25}.text-white{--tw-text-opacity:1;color:rgb(255 255 255/var(--tw-text-opacity,1))}.opacity-50{opacity:.5}.opacity-60{opacity:.6}.opacity-70{opacity:.7}.opacity-80{opacity:.8}.opacity-90{opacity:.9}.backdrop-blur{--tw-backdrop-blur:blur(8px);-webkit-backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);backdrop-filter:var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)}</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;700;800&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  body {
+    font-family:'Inter','Noto Sans SC',system-ui,sans-serif;
+    background: radial-gradient(ellipse at 50% 40%, #1a1a22 0%, #08080c 70%);
+    color:#f5f5f7;
+    min-height:100vh;
+    margin:0;
+  }
+  .stage { perspective: 1800px; }
+  .iphone {
+    width:280px; height:580px;
+    border-radius:46px;
+    background:linear-gradient(140deg,#3a3a40 0%,#a8a8ad 35%,#1f1f24 60%,#5a5a60 100%);
+    padding:7px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.08), 0 60px 80px -20px rgba(0,0,0,0.7);
+    transform: rotateY(-14deg) rotateX(4deg) translateZ(40px);
+    transform-style: preserve-3d;
+  }
+  .iphone-screen {
+    width:100%; height:100%; border-radius:40px;
+    background:#0a0a0e;
+    overflow:hidden; position:relative;
+    color:#f5f5f7;
+  }
+  .notch { position:absolute; top:6px; left:50%; transform:translateX(-50%); width:108px; height:28px; background:#000; border-radius:18px; z-index:5; }
+  .lens {
+    position:absolute; pointer-events:none;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.3) 0%, transparent 60%);
+    mix-blend-mode: screen;
+  }
+  .mbp {
+    width:520px;
+    transform: rotateY(10deg) rotateX(-2deg) translateZ(-20px);
+    transform-style: preserve-3d;
+  }
+  .mbp-screen {
+    width:100%; height:320px;
+    border-radius:14px 14px 4px 4px;
+    background:linear-gradient(135deg,#222229 0%,#0a0a0e 100%);
+    border: 12px solid #1a1a1f;
+    border-bottom: 16px solid #1a1a1f;
+    box-shadow: 0 30px 60px -10px rgba(0,0,0,0.7);
+    overflow:hidden;
+    position:relative;
+    color:#f5f5f7;
+  }
+  .mbp-base {
+    width:560px;
+    height:14px;
+    margin:-2px auto 0;
+    background:linear-gradient(180deg,#3a3a40 0%,#1a1a1f 80%);
+    border-radius:0 0 14px 14px;
+    box-shadow: 0 30px 40px -20px rgba(0,0,0,0.8);
+  }
+  .mbp-notch {
+    position:absolute; top:0; left:50%; transform:translateX(-50%);
+    width:90px; height:8px; background:#000; border-radius:0 0 8px 8px; z-index:5;
+  }
+  .ground {
+    position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+    width:1100px; height:140px;
+    background: radial-gradient(ellipse at center top, rgba(0,0,0,0.6) 0%, transparent 70%);
+  }
+  .chip { font-size:10px; letter-spacing:0.16em; text-transform:uppercase; }
+</style>
+</head>
+<body class="flex flex-col items-center justify-center p-14 min-h-screen relative overflow-hidden">
+
+  <!-- caption -->
+  <header class="absolute top-10 left-12 right-12 flex items-baseline justify-between chip opacity-60">
+    <span>HTML ANYTHING — CODENAME ATLAS — v0.4</span>
+    <span>2026 SPRING</span>
+    <span>HTML-IN-CANVAS</span>
+  </header>
+
+  <!-- devices -->
+  <div class="stage relative flex items-end gap-20" style="z-index:2">
+
+    <!-- iPhone -->
+    <div class="iphone relative">
+      <div class="iphone-screen">
+        <div class="notch"></div>
+        <!-- status bar -->
+        <div class="flex items-center justify-between px-7 pt-3 text-[10px] font-semibold relative" style="z-index:6">
+          <span>9:41</span>
+          <span class="flex items-center gap-1">▮▮▮▮ 5G</span>
+        </div>
+        <!-- header -->
+        <div class="px-6 pt-10">
+          <div class="chip opacity-60">新建任务</div>
+          <h2 class="text-[22px] font-bold mt-1 leading-tight">杂志风网页<br/>PPT</h2>
+        </div>
+        <!-- template tile -->
+        <div class="mx-6 mt-5 rounded-xl p-3 flex items-center gap-2.5" style="background:linear-gradient(135deg,#1a1a22,#222229);border:1px solid rgba(255,255,255,0.06)">
+          <span class="text-xl">📰</span>
+          <div class="flex-1">
+            <div class="text-[12px] font-semibold">杂志风网页 PPT</div>
+            <div class="text-[10px] opacity-60">16:9 横向翻页 · 9 帧</div>
+          </div>
+          <span class="text-[10px] opacity-50">✓</span>
+        </div>
+        <!-- input -->
+        <div class="mx-6 mt-3 rounded-xl p-3" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);min-height:140px">
+          <div class="text-[12px] opacity-90">// 公司 2026 Q1 路线图</div>
+          <div class="text-[11px] opacity-60 mt-1">- 推出 200 个新模板</div>
+          <div class="text-[11px] opacity-60">- 接入 28 个本地 agent</div>
+          <div class="text-[11px] opacity-60">- 周活 12K → 80K</div>
+        </div>
+        <!-- CTA -->
+        <div class="mx-6 mt-3 rounded-full py-3 text-center text-[13px] font-semibold" style="background:linear-gradient(135deg,#ff7849,#d97757);color:#08080c">⌘ + Enter 转换</div>
+        <!-- tab bar -->
+        <div class="absolute bottom-0 left-0 right-0 flex items-center justify-around py-3 backdrop-blur" style="background:rgba(10,10,14,0.85);border-top:1px solid rgba(255,255,255,0.06)">
+          <span class="text-[10px] flex flex-col items-center gap-0.5" style="color:#ff7849">■<span>任务</span></span>
+          <span class="text-[10px] flex flex-col items-center gap-0.5 opacity-60">▤<span>模板</span></span>
+          <span class="text-[10px] flex flex-col items-center gap-0.5 opacity-60">◌<span>设置</span></span>
+        </div>
+      </div>
+      <!-- lens flares -->
+      <div class="lens" style="top:-30px;left:-20px;width:160px;height:200px;transform:rotate(-20deg)"></div>
+      <div class="lens" style="bottom:50px;right:-30px;width:120px;height:160px"></div>
+    </div>
+
+    <!-- MacBook -->
+    <div class="mbp relative">
+      <div class="mbp-screen">
+        <div class="mbp-notch"></div>
+        <!-- top bar -->
+        <div class="flex items-center gap-1.5 px-3 py-1.5" style="background:#161620;border-bottom:1px solid rgba(255,255,255,0.06)">
+          <span class="w-2 h-2 rounded-full bg-red-500"></span>
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span class="ml-3 chip opacity-50">localhost:3456 — HTML Anything</span>
+        </div>
+        <!-- 3-pane layout mini -->
+        <div class="grid grid-cols-[1fr_1.4fr_1.4fr] gap-2 p-2 h-[260px]">
+          <!-- sidebar -->
+          <div class="rounded-md p-2 text-[10px] opacity-80" style="background:#1a1a25;border:1px solid rgba(255,255,255,0.04)">
+            <div class="opacity-50 mb-1.5">任务 / 11</div>
+            <div class="space-y-1">
+              <div class="rounded px-1.5 py-1 truncate" style="background:rgba(255,120,73,0.18);color:#ff7849">● 杂志风网页 PPT</div>
+              <div class="rounded px-1.5 py-1 truncate opacity-60">小红书图文卡</div>
+              <div class="rounded px-1.5 py-1 truncate opacity-60">Motion video</div>
+              <div class="rounded px-1.5 py-1 truncate opacity-60">Keynote PPT · 产品介绍</div>
+            </div>
+          </div>
+          <!-- editor -->
+          <div class="rounded-md p-2 text-[10px] opacity-90" style="background:#10101a;border:1px solid rgba(255,255,255,0.04);font-family:'JetBrains Mono',monospace">
+            <div class="opacity-50">// 输入</div>
+            <div class="mt-1"># Mishh Mashh — 2026</div>
+            <div class="opacity-70">## Q1-Q4 关键指标</div>
+            <div class="opacity-70">- 模板: 75 → 200</div>
+            <div class="opacity-70">- WAU: 12K → 80K</div>
+            <div class="opacity-70">- Agents: 17 → 28</div>
+            <div class="opacity-70">- Stars: 4.2K → 25K</div>
+            <div class="mt-2 opacity-50">▍</div>
+          </div>
+          <!-- preview -->
+          <div class="rounded-md overflow-hidden relative" style="background:#002FA7">
+            <div class="absolute inset-0 p-3 text-white">
+              <div class="chip opacity-80">№01 / 22</div>
+              <div class="mt-2 font-black text-[16px] leading-tight">Designing<br/>intelligence on<br/>warm paper.</div>
+              <div class="absolute bottom-2 left-3 right-3 flex justify-between chip opacity-70">
+                <span>OPEN-DESIGN</span><span>BERLIN</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="mbp-base"></div>
+      <!-- lens flares -->
+      <div class="lens" style="top:-40px;right:60px;width:200px;height:140px;transform:rotate(10deg)"></div>
+    </div>
+
+  </div>
+
+  <!-- ground reflection -->
+  <div class="ground"></div>
+
+  <!-- bottom slug -->
+  <footer class="absolute bottom-10 left-12 right-12 flex items-baseline justify-between chip opacity-50">
+    <span>HTML-ANYTHING.DEV</span>
+    <span>GLTF · LIVE-HTML SCREENS · TURNTABLE</span>
+    <span>STAGE — 1920 × 1080</span>
+  </footer>
+</body>
+</html>

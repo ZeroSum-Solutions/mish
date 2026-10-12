@@ -1,0 +1,41 @@
+{
+  "id": "waves",
+  "name": "Waves",
+  "category": "background",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/waves/index.ts",
+  "css": "components/waves/styles.css",
+  "demo": "components/waves/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": {
+        "type": "number",
+        "default": 2400,
+        "minimum": 0,
+        "maximum": 4000
+      },
+      "colour": {
+        "type": "string",
+        "default": "#a5b4fc"
+      },
+      "amplitude": {
+        "type": "number",
+        "default": 12,
+        "minimum": 0,
+        "maximum": 48
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

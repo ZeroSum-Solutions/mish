@@ -1,0 +1,19 @@
+{
+  "catalogComponents": [
+    "split-text"
+  ],
+  "effects": {
+    "scriptPolicy": "hash",
+    "maxEffects": 1,
+    "placements": {
+      "hero-title": {
+        "host": {
+          "odId": "guide-masthead--heading"
+        },
+        "allow": [
+          "split-text"
+        ]
+      }
+    }
+  }
+}

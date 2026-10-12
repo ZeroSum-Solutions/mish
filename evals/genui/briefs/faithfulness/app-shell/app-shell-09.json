@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-09",
+  "businessName": "Thornfield Insurance Adjusters",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Thornfield Insurance Adjusters"
+    },
+    {
+      "field": "address",
+      "value": "45 Court Street, Hartford, Connecticut"
+    },
+    {
+      "field": "phone",
+      "value": "(860) 555-0163"
+    },
+    {
+      "field": "email",
+      "value": "claims@thornfieldadjusters.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8 a.m. to 5 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed to adjust claims in the State of Connecticut"
+    },
+    {
+      "field": "other",
+      "value": "Ten field adjusters"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample claim-list row shown only to illustrate layout",
+      "text": "CLM-30841, Ferris, roof damage, inspection scheduled, assigned to T. Novak"
+    }
+  ]
+}

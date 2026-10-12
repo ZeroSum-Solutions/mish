@@ -1,0 +1,44 @@
+{
+  "items": [
+    {
+      "id": "dreamcore-landing",
+      "evidence": {
+        "source_kind": "prompt",
+        "source_ref": "https://motionsites.ai/?prompt=dreamcore-landing",
+        "title": "Dreamcore Landing",
+        "meta.category": "Landing Page",
+        "meta.vertical": "other",
+        "meta.use_case": "experimental",
+        "meta.niche": "generic",
+        "meta.catalog_action": "none",
+        "meta.motion_level": "motion-led"
+      },
+      "spines": ["none"],
+      "archetype": "none",
+      "acceptableFamilies": [],
+      "unroutedAcceptable": true,
+      "confidence": 0.78,
+      "reasoning": "Every business-identifying field is deliberately blank or generic: vertical='other', niche='generic', catalog_action='none' (no buy/book/apply/donate/signup/contact CTA at all), and use_case='experimental'. The title 'Dreamcore' names a visual/aesthetic mood (a surreal, nostalgic internet-core style), not an industry or offering, and the item is sourced as a 'prompt' from a motion-design prompt library (motionsites.ai) rather than a described real business. There is nothing here — no verb, no audience, no vertical — that a careful designer could point to as the page's business purpose. Without a discernible need/problem/transaction being served, none of the 9 spines' intents (lead a visitor to book, adopt a product, buy, search/match, subscribe to content, enroll, reserve, do recurring work, or act on a cause) can be attached with any confidence. Because no spine is defensible, no archetype or family can be either: 'fervor' (TL.05, agency/creative-studio showcase) is the closest stylistic guess (cinematic/motion-led, one-page) but its summary explicitly requires 'an agency that sells its own creative, advertising or production services to clients,' and nothing in vertical/niche/catalog_action supports that this is an agency selling services rather than, e.g., a nightclub, perfume drop, film/game teaser, or pure art piece. Per the strict rule, thin/generic evidence should default to 'unrouted acceptable' with zero families rather than guessing a family off skin/motion cues alone."
+    },
+    {
+      "id": "mostar-guide",
+      "evidence": {
+        "source_kind": "prompt",
+        "source_ref": "https://motionsites.ai/?prompt=mostar-guide",
+        "title": "Mostar Guide",
+        "meta.category": "Travel",
+        "meta.vertical": "travel",
+        "meta.use_case": "experimental",
+        "meta.niche": "travel",
+        "meta.catalog_action": "none",
+        "meta.motion_level": "motion-led"
+      },
+      "spines": ["CS"],
+      "archetype": "none",
+      "acceptableFamilies": ["publication"],
+      "unroutedAcceptable": true,
+      "confidence": 0.48,
+      "reasoning": "Unlike dreamcore-landing, this item has a coherent, consistent content genre: title 'Mostar Guide' (Mostar is a real destination), category/vertical/niche all say 'travel'. That is enough to say the business purpose is 'inform/inspire about a travel destination,' not nothing — so I do not mark spines as fully none. catalog_action='none' rules out a transactional read: there is no buy/book/apply/donate/signup/contact action recorded, so this is not a booking/reservation flow (BA.01 'Hospitality or travel' needs a reserve/book step) nor an SM/CO transaction. A 'guide' with no catalog action is best read as something to consume (CS spine: 'Discover, consume, explore, subscribe, return' — whose own primary CTA is 'Read/subscribe/follow,' i.e. an action that legitimately has no catalog_action value in this taxonomy). That said, the evidence is still thin: I have no confirmation this is an ongoing multi-article publication versus a single destination microsite, so I cannot confidently pick a specific archetype among CS.01/CS.02/CS.03 — archetype is 'none'. Of the 13 families, only 'publication' (CS.01, self-spine compatibility=3) has a summary that could plausibly cover a travel-editorial piece ('magazines, newsletters, independent media, journals and blogs'), but its summary also implies recurring-publication apparatus (masthead, archive, newsletter sign-up, membership tiers) that meta fields alone cannot confirm, and use_case='experimental' plus the motionsites.ai prompt-library sourcing both suggest this may be a standalone aesthetic demo rather than a genuine ongoing media brand. Given that, 'publication' is listed as the sole acceptable family but only weakly so, and 'unrouted' remains an acceptable outcome; confidence is kept near the midpoint to reflect that CS is the best-supported spine without being a confident, unique answer."
+    }
+  ]
+}

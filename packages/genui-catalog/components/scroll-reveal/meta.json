@@ -1,0 +1,32 @@
+{
+  "id": "scroll-reveal",
+  "name": "Scroll Reveal",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/scroll-reveal/index.ts",
+  "css": "components/scroll-reveal/styles.css",
+  "demo": "components/scroll-reveal/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "mode": { "type": "string", "enum": ["scrub", "once"], "default": "scrub", "description": "scrub follows scroll position both ways; once reveals on entry with a word stagger." },
+      "baseOpacity": { "type": "number", "default": 0.15, "minimum": 0, "maximum": 1, "description": "Opacity of an unrevealed word." },
+      "blur": { "type": "number", "default": 4, "minimum": 0, "description": "Blur (px) of an unrevealed word." },
+      "rotate": { "type": "number", "default": 0, "description": "Rotation (deg) of an unrevealed word." },
+      "start": { "type": "number", "default": 0.9, "minimum": 0, "maximum": 1, "description": "Viewport fraction where scrub progress is 0." },
+      "end": { "type": "number", "default": 0.4, "minimum": 0, "maximum": 1, "description": "Viewport fraction where scrub progress is 1." },
+      "stagger": { "type": "number", "default": 25, "minimum": 0, "description": "Per-word delay in ms, once mode." },
+      "duration": { "type": "number", "default": 500, "minimum": 0, "description": "Reveal duration in ms, once mode." },
+      "threshold": { "type": "number", "default": 0.2, "minimum": 0, "maximum": 1, "description": "IntersectionObserver threshold, once mode." }
+    }
+  },
+  "a11y": [
+    "The word-split copy is aria-hidden; a visually hidden __sr span carries the original text once, in full.",
+    "Links and other inline elements inside the block are kept in the visual copy and stay focusable there; the sr copy is plain text, so they are not duplicated in the tab order.",
+    "At baseOpacity the dim pre-state is a deliberate design choice; once a word is fully revealed, contrast is the author's own.",
+    "Reduced motion skips the word split entirely, so the block reads at full opacity with no blur from the start and no scroll listener is attached."
+  ],
+  "reducedMotion": "reduced"
+}

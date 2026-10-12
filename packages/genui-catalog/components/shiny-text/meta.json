@@ -1,0 +1,31 @@
+{
+  "id": "shiny-text",
+  "name": "Shiny Text",
+  "category": "text",
+  "kind": "css-only",
+  "status": "ported",
+  "entry": "components/shiny-text/index.ts",
+  "css": "components/shiny-text/styles.css",
+  "demo": "components/shiny-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "speed": { "type": "number", "default": 3, "minimum": 0, "description": "Seconds per sweep pass." },
+      "pause": { "type": "number", "default": 1.5, "minimum": 0, "description": "Seconds held between passes." },
+      "base": { "type": "string", "default": "#9aa0a6" },
+      "shine": { "type": "string", "default": "#ffffff" },
+      "bandWidth": { "type": "number", "default": 20, "minimum": 0, "maximum": 100, "description": "Width of the bright band, as a percentage of the gradient." },
+      "angle": { "type": "number", "default": 110 },
+      "pauseOnHover": { "type": "boolean", "default": false, "description": "Pause the sweep while the pointer or focus is over the text." },
+      "disabled": { "type": "boolean", "default": false, "description": "Show a plain solid colour with no shimmer." }
+    }
+  },
+  "a11y": [
+    "The text is never split into spans; screen readers read it once, normally.",
+    "The base colour must pass 4.5:1 against the background on its own, since the band only briefly raises local contrast.",
+    "Reduced motion keeps the band fixed at 50%, so the surface still reads as metallic but does not move.",
+    "Forced-colors mode drops the gradient and paints the text in CanvasText."
+  ],
+  "reducedMotion": "static"
+}

@@ -1,0 +1,575 @@
+{
+  "$schema": "https://open-design.ai/schemas/marketplace.v1.json",
+  "specVersion": "1.0.0",
+  "name": "open-design-official",
+  "version": "0.1.0",
+  "owner": {
+    "name": "Mishh Mashh",
+    "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+  },
+  "trust": "official",
+  "metadata": {
+    "description": "Official Mishh Mashh plugin registry seed. The generated public catalog is served from this repository's marketplace.",
+    "version": "0.1.0",
+    "generatedFrom": "plugins/_official",
+    "bundledPreinstallCount": 19,
+    "pluginCount": 19
+  },
+  "plugins": [
+    {
+      "name": "open-design/code-import",
+      "title": "Code import",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/code-import",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:read"
+      ],
+      "description": "Read an existing repository's structure into the project cwd as a normalised snapshot.",
+      "tags": [
+        "atom",
+        "first-party",
+        "code-migration",
+        "phase-7"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/code-import",
+      "license": "MIT",
+      "mode": "import"
+    },
+    {
+      "name": "open-design/critique-theater",
+      "title": "Critique theater",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/critique-theater",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject"
+      ],
+      "description": "5-dimension critique panel; emits the critique.score signal that drives devloop convergence.",
+      "tags": [
+        "atom",
+        "first-party",
+        "critique"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/critique-theater",
+      "license": "MIT",
+      "mode": "critique"
+    },
+    {
+      "name": "open-design/design-extract",
+      "title": "Design extract",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/design-extract",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:read"
+      ],
+      "description": "Extract design tokens from source code / Figma / screenshots into the canonical token bag.",
+      "tags": [
+        "atom",
+        "first-party",
+        "code-migration",
+        "figma-migration",
+        "phase-7"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/design-extract",
+      "license": "MIT",
+      "mode": "extract"
+    },
+    {
+      "name": "open-design/direction-picker",
+      "title": "Direction picker",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/direction-picker",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject"
+      ],
+      "description": "Resolves the visual direction at the plan stage from the brief and design system, without asking the user.",
+      "tags": [
+        "atom",
+        "first-party",
+        "planning"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/direction-picker",
+      "license": "MIT",
+      "mode": "planning"
+    },
+    {
+      "name": "open-design/discovery-question-form",
+      "title": "Discovery question form",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/discovery-question-form",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject"
+      ],
+      "description": "Structured clarification form for unresolved material requirements.",
+      "tags": [
+        "atom",
+        "first-party",
+        "discovery"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/discovery-question-form",
+      "license": "MIT",
+      "mode": "discovery"
+    },
+    {
+      "name": "open-design/example-meeting-notes",
+      "title": "Meeting Notes",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/meeting-notes",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Meeting notes page — title bar with attendees, agenda checklist, decisions block, action items table with owners + dates, and a \"next meeting\" footer. Use when the brief mentions \"meeting notes\", \"minutes\", \"1:1 notes\", \"all-hands recap\", or \"会议纪要\".",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "operations",
+        "web",
+        "desktop",
+        "meeting-notes",
+        "minutes",
+        "1-1-notes",
+        "all-hands-recap",
+        "untitled"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/meeting-notes",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/example-mobile-app",
+      "title": "Mobile App",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/mobile-app",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "A mobile-app screen rendered inside a pixel-accurate iPhone 15 Pro frame on the page. Built by copying the seed `assets/template.html` and pasting one screen archetype from `references/layouts.md`. Use when the brief asks for \"mobile app\", \"iOS app\", \"Android app\", \"phone screen\", or \"app UI\".",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "design",
+        "web",
+        "mobile",
+        "mobile-app",
+        "ios-app",
+        "android-app",
+        "phone-screen",
+        "app-ui",
+        "app-mockup",
+        "untitled",
+        "app"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/mobile-app",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/example-mobile-onboarding",
+      "title": "Mobile Onboarding",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/mobile-onboarding",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "A multi-screen mobile onboarding flow rendered as three phone frames side by side — splash, value-prop, sign-in. Status bar, swipe dots, primary CTA. Use when the brief mentions \"mobile onboarding\", \"iOS onboarding\", \"phone signup\", or \"移动端引导\".",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "design",
+        "web",
+        "mobile",
+        "mobile-onboarding",
+        "ios-onboarding",
+        "android-onboarding",
+        "phone-signup",
+        "app-onboarding",
+        "untitled"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/mobile-onboarding",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/example-mockup-device-3d",
+      "title": "Device 3D Showcase",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/mockup-device-3d",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Static iPhone and MacBook 3D-style showcase with real HTML embedded on screens, glass-lens refraction, and 360-degree turntable composition.",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "product",
+        "web",
+        "desktop",
+        "device",
+        "mockup",
+        "iphone",
+        "macbook",
+        "html-in-canvas"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/mockup-device-3d",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation",
+      "title_i18n": {
+        "en": "Device 3D Showcase",
+        "zh-CN": "iPhone × MacBook 立体展架"
+      },
+      "description_i18n": {
+        "en": "Static iPhone and MacBook 3D-style showcase with real HTML embedded on screens, glass-lens refraction, and 360-degree turntable composition.",
+        "zh-CN": "iPhone + MacBook 仿 GLTF 静态展架, 屏幕内嵌真实 HTML 内容, 玻璃镜头折射, 360° 转盘构图"
+      }
+    },
+    {
+      "name": "open-design/example-motion-frames",
+      "title": "Motion Frames",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/motion-frames",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "A single-frame motion-design composition with looping CSS animations — rotating type ring, animated globe, ticking timer, parallax labels. Renders as a hero video poster you can hand straight to motion tools or any keyframe-based exporter. Use when the brief asks for \"motion design\", \"animated hero\", \"loop\", \"video poster\", \"title card\", or pairs Open Claude Design with motion tools for a kinetic export.",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "marketing",
+        "web",
+        "desktop",
+        "motion-design",
+        "motion-graphic",
+        "animated-hero",
+        "loop-animation",
+        "video-poster",
+        "title-card",
+        "kinetic-typography",
+        "untitled"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/motion-frames",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/example-pm-spec",
+      "title": "Pm Spec",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/pm-spec",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Product spec / PRD as a single page — problem, success metrics, scope, user stories, design notes, rollout plan, open questions. Use when the brief mentions \"PRD\", \"spec\", \"product spec\", \"feature brief\", or \"需求文档\".",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "product",
+        "web",
+        "desktop",
+        "prd",
+        "spec",
+        "product-spec",
+        "feature-brief",
+        "feature-doc",
+        "untitled"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/pm-spec",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/example-pricing-page",
+      "title": "Pricing Page",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/pricing-page",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "A standalone pricing page — header, plan tiers, feature comparison table, and an FAQ. Use when the brief asks for \"pricing\", \"plans\", \"subscription tiers\", or a \"compare plans\" page.",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "sales",
+        "web",
+        "desktop",
+        "pricing",
+        "pricing-page",
+        "plans",
+        "subscription",
+        "compare-plans",
+        "untitled"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/pricing-page",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/example-saas-landing",
+      "title": "Saas Landing",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/saas-landing",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "Single-page SaaS landing with hero, features, social proof, pricing, and CTA. Respects the active DESIGN.md color/typography/layout tokens. Trigger keywords: \"saas landing\", \"marketing page\", \"product landing\".",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "marketing",
+        "web",
+        "desktop",
+        "saas-landing",
+        "marketing-page",
+        "product-landing"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/saas-landing",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/example-web-prototype",
+      "title": "Web Prototype",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/web-prototype",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "General-purpose desktop web prototype. Single self-contained HTML file built by copying the seed `assets/template.html` and pasting section layouts from `references/layouts.md`. Default for any landing / marketing / docs / SaaS page when no more specific skill matches.",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "design",
+        "web",
+        "desktop",
+        "mockup",
+        "landing",
+        "single-page",
+        "marketing-page",
+        "homepage"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/web-prototype",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/example-x-research",
+      "title": "X Research",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/examples/x-research",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "fs:write"
+      ],
+      "description": "X/Twitter public sentiment research for recent market, company, product, or community discourse. Use when the brief asks what people are saying on X, Twitter sentiment, CT sentiment, public opinion, expert posts, or social reaction around a stock, sector, company, product, or market event.",
+      "tags": [
+        "example",
+        "first-party",
+        "prototype",
+        "design",
+        "web",
+        "x-research",
+        "twitter-sentiment",
+        "x-twitter",
+        "what-people-are-saying-on-x",
+        "what-twitter-says",
+        "ct-sentiment",
+        "public-sentiment",
+        "social-sentiment",
+        "untitled",
+        "x"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/examples/x-research",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/od-new-generation",
+      "title": "New generation (default scenario)",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/scenarios/od-new-generation",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject"
+      ],
+      "description": "Default reference pipeline for the new-generation taskKind.",
+      "tags": [
+        "scenario",
+        "first-party",
+        "new-generation"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/scenarios/od-new-generation",
+      "license": "MIT",
+      "mode": "scenario",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/od-web-effect-extractor",
+      "title": "Web effect extractor",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/scenarios/od-web-effect-extractor",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject",
+        "network",
+        "fs:read",
+        "fs:write",
+        "subprocess"
+      ],
+      "description": "Extract visual effects, Canvas/WebGL/Shader behavior, and interaction details from a reference website, then rebuild them as an editable Mishh Mashh artifact.",
+      "tags": [
+        "scenario",
+        "first-party",
+        "website-recreation",
+        "webgl",
+        "canvas",
+        "shader",
+        "animation",
+        "visual-effects"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/scenarios/od-web-effect-extractor",
+      "license": "MIT",
+      "mode": "prototype",
+      "taskKind": "new-generation"
+    },
+    {
+      "name": "open-design/todo-write",
+      "title": "Todo write",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/todo-write",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject"
+      ],
+      "description": "TodoWrite-driven plan that the agent commits to before generation.",
+      "tags": [
+        "atom",
+        "first-party",
+        "planning"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/todo-write",
+      "license": "MIT",
+      "mode": "planning"
+    },
+    {
+      "name": "open-design/token-map",
+      "title": "Token map",
+      "version": "0.1.0",
+      "source": "github:ZeroSum-Solutions/Mishh-Mashh-2@main/plugins/_official/atoms/token-map",
+      "publisher": {
+        "id": "open-design",
+        "url": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2"
+      },
+      "capabilitiesSummary": [
+        "prompt:inject"
+      ],
+      "description": "Map an extracted source-token bag onto the active OD design system, producing a deterministic crosswalk.",
+      "tags": [
+        "atom",
+        "first-party",
+        "figma-migration",
+        "code-migration",
+        "phase-6"
+      ],
+      "homepage": "https://github.com/ZeroSum-Solutions/Mishh-Mashh-2/tree/main/plugins/_official/atoms/token-map",
+      "license": "MIT",
+      "mode": "token-map"
+    }
+  ]
+}

@@ -1,0 +1,490 @@
+/* InlineModelSwitcher — one card (wave 2).
+   The popover is ONE card: a segmented tab header (Model | Agent/Provider)
+   over the panel for that tab. The model catalog renders inside the card
+   (InlineModelList), never as a second floating list.
+
+   Fill: solid --bg-elevated, not the glass material. This card is nested
+   inside the composer card, and a nested backdrop-filter cannot blur what
+   lies behind its ancestor (the ancestor is the backdrop root), so a
+   translucent fill showed page content straight through. --bg-elevated is
+   the same tint as the thick material in both themes, so the card still
+   reads as part of the functional layer.
+
+   The `:global(.inline-switcher__popover)` compound lifts these rules over
+   the legacy base rule in styles/home/entry-layout.css. */
+.card:global(.inline-switcher__popover) {
+  width: 360px;
+  max-width: calc(100vw - var(--space-6));
+  padding: var(--space-2);
+  gap: var(--space-2);
+  border: 1px solid var(--material-separator);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  box-shadow: var(--glass-surface-sheen), var(--elevation-3);
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  transform-origin: top left;
+  animation: cardEnter var(--spring-pop-duration) var(--spring-pop);
+}
+
+.card:global(.inline-switcher__popover--up) {
+  transform-origin: bottom left;
+  animation-name: cardEnterUp;
+}
+
+@keyframes cardEnter {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--enter-offset))) scale(var(--enter-scale));
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes cardEnterUp {
+  from {
+    opacity: 0;
+    transform: translateY(var(--enter-offset)) scale(var(--enter-scale));
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ── Tab header: the shared segmented look (recessed track, raised thumb). */
+.tabs {
+  --ui-selection-surface: var(--segmented-thumb);
+  --ui-selection-shadow: var(--segmented-thumb-shadow);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-half);
+  padding: 3px;
+  border: 1px solid var(--segmented-track-border);
+  border-radius: var(--radius-pill);
+  background: var(--segmented-track);
+  flex: 0 0 auto;
+}
+
+.tab {
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 0;
+  height: auto;
+  min-height: var(--control-h-sm);
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font: var(--font-label);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--motion-hover) var(--ease-out-quint),
+    background-color var(--motion-hover) var(--ease-out-quint),
+    box-shadow var(--motion-hover) var(--ease-out-quint);
+}
+
+.tab:hover:not(:disabled) {
+  color: var(--text-strong);
+  background: transparent;
+  border-color: transparent;
+}
+
+.tab[aria-selected='true'],
+.tab[aria-selected='true']:hover:not(:disabled) {
+  color: var(--text-strong);
+  background: var(--segmented-thumb);
+  box-shadow: var(--segmented-thumb-shadow);
+}
+
+/* The workspace UI system draws a sliding thumb (SelectionIndicator). */
+:global(html[data-ui-system='workspace']) .tab[aria-selected='true'],
+:global(html[data-ui-system='workspace']) .tab[aria-selected='true']:hover:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+}
+
+.tab > :global([data-selection-indicator]) {
+  border-radius: inherit;
+}
+
+.tab:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+
+.tabLabel {
+  flex: 0 0 auto;
+}
+
+.tabValue {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-soft);
+  font: var(--font-caption);
+}
+
+/* ── Panels */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-height: 0;
+}
+
+.panel[hidden] {
+  display: none;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sectionLabel {
+  padding: 0 var(--space-2);
+  color: var(--text-soft);
+  font: var(--font-caption);
+  font-weight: var(--weight-medium);
+}
+
+.hint {
+  margin: 0;
+  padding: var(--space-3) var(--space-2);
+  color: var(--text-muted);
+  font: var(--font-caption);
+}
+
+/* ── Build with Jev: a mode row pinned above the catalog. */
+.jevRow {
+  display: flex;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--material-separator);
+}
+
+.jevButton {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: auto;
+  min-height: var(--control-h-md);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text);
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+
+.jevButton:hover:not(:disabled) {
+  background: var(--chip-hover-fill);
+  border-color: transparent;
+  color: var(--text-strong);
+}
+
+.jevButton:active:not(:disabled) {
+  transform: scale(var(--press-scale-card));
+  transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-press);
+}
+
+.jevButton[aria-pressed='true'] {
+  background: var(--chip-selected-fill);
+  color: var(--chip-selected-text);
+}
+
+.jevIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--control-h-xs);
+  height: var(--control-h-xs);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  color: var(--brand, var(--text-strong));
+}
+
+.jevText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.jevTitle {
+  font: var(--font-label);
+  color: var(--text-strong);
+}
+
+.jevHint {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font: var(--font-caption);
+}
+
+.agentCheck {
+  flex: 0 0 auto;
+  margin-left: auto;
+  color: var(--text-strong);
+}
+
+/* ── Reasoning / service tier: quiet label + select rows under the list. */
+.tuning {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--material-separator);
+}
+
+.tuningRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: 0 var(--space-1) 0 var(--space-2);
+}
+
+.tuningLabel {
+  color: var(--text-muted);
+  font: var(--font-label);
+}
+
+.tuningSelect {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 60%;
+  height: var(--control-h-sm);
+  padding: 0 var(--space-6) 0 var(--space-2);
+  border-radius: var(--radius-md);
+  font: var(--font-body-sm);
+}
+
+/* ── Execution mode: the shared segmented look, full width. */
+.modeSeg {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-half);
+  padding: 3px;
+  border: 1px solid var(--segmented-track-border);
+  border-radius: var(--radius-pill);
+  background: var(--segmented-track);
+}
+
+.modeSegBtn {
+  appearance: none;
+  height: auto;
+  min-height: var(--control-h-sm);
+  padding: var(--space-1) var(--space-3);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font: var(--font-label);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint),
+    box-shadow var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+
+.modeSegBtn:hover:not(:disabled) {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text-strong);
+}
+
+.modeSegBtn:active:not(:disabled) {
+  transform: scale(var(--press-scale));
+  transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-hover), var(--motion-press);
+}
+
+.modeSegBtn[aria-pressed='true'],
+.modeSegBtn[aria-pressed='true']:hover:not(:disabled) {
+  background: var(--segmented-thumb);
+  box-shadow: var(--segmented-thumb-shadow);
+  color: var(--text-strong);
+}
+
+.modeSegBtn:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+
+.modeSegBtn:disabled {
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+
+/* ── Providers (BYOK): calm chips that wrap. */
+.providerChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* ── Agents (Local CLI): one calm list instead of outlined 2-up cards.
+   Scoped under the card so it outranks the legacy grid rules in
+   entry-layout.css and home-hero.css. */
+.card .agentSection :global(.inline-switcher__agent-grid) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+  max-height: none;
+  overflow: visible;
+}
+
+.card .agentSection :global(.inline-switcher__agent) {
+  height: auto;
+  min-height: var(--control-h-compact);
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text);
+  font: var(--font-body-sm);
+  justify-content: flex-start;
+}
+
+.card .agentSection :global(.inline-switcher__agent:hover:not(:disabled)) {
+  background: var(--chip-hover-fill);
+  color: var(--text-strong);
+}
+
+.card .agentSection :global(.inline-switcher__agent.is-active) {
+  background: var(--chip-selected-fill);
+  color: var(--chip-selected-text);
+  font-weight: var(--weight-medium);
+}
+
+.card .agentSection :global(.inline-switcher__agent:focus-visible) {
+  outline: var(--focus-outline);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+/* The Mishh Mashh account row joins the same calm family: no accent ring,
+   the chip fill marks it when it is the agent in use. */
+.card .agentSection :global(.inline-switcher__account) {
+  margin-top: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--material-separator);
+  border-radius: var(--radius-md);
+  background: transparent;
+}
+
+.card .agentSection :global(.inline-switcher__account.is-active) {
+  border-color: transparent;
+  background: var(--chip-selected-fill);
+}
+
+.card .agentSection :global(.inline-switcher__account:has(.inline-switcher__account-select:hover):not(.is-active)) {
+  background: var(--chip-hover-fill);
+  border-color: var(--material-separator);
+}
+
+/* Compact no-options list: neutral selection plus the trailing check. */
+.card .compactList:global(.inline-switcher__agent-grid) {
+  max-height: 300px;
+}
+
+.card .compactList :global(.inline-switcher__agent.is-active) {
+  background: var(--chip-selected-fill);
+}
+
+/* ── Notices and footer */
+.warn {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+  color: var(--text);
+  font: var(--font-caption);
+}
+
+.warn svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  color: color-mix(in srgb, var(--amber) 70%, var(--text-strong));
+}
+
+.footer {
+  /* Pinned to the bottom of the card's scroll port so the way out to full
+     settings never scrolls away under a long tuning section. */
+  position: sticky;
+  bottom: calc(-1 * var(--space-2));
+  z-index: 2;
+  display: flex;
+  margin: 0 calc(-1 * var(--space-2)) calc(-1 * var(--space-2));
+  padding: var(--space-1) var(--space-2) var(--space-2);
+  border-top: 1px solid var(--material-separator);
+  background: var(--bg-elevated);
+}
+
+.footerButton:global(.inline-switcher__more) {
+  appearance: none;
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  height: var(--control-h-sm);
+  margin: 0;
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-muted);
+  font: var(--font-label);
+  justify-content: flex-start;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint);
+}
+
+.footerButton:global(.inline-switcher__more):hover:not(:disabled) {
+  background: var(--chip-hover-fill);
+  border-color: transparent;
+  color: var(--text-strong);
+}
+
+.footerButton:global(.inline-switcher__more):focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card:global(.inline-switcher__popover) {
+    animation-duration: var(--motion-enter);
+  }
+}

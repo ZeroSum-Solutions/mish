@@ -1,0 +1,35 @@
+{
+  "id": "gradient-text",
+  "name": "Gradient Text",
+  "category": "text",
+  "kind": "css-only",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/gradient-text/index.ts",
+  "css": "components/gradient-text/styles.css",
+  "demo": "components/gradient-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": {
+        "type": "number",
+        "default": 1200,
+        "minimum": 0,
+        "maximum": 4000
+      },
+      "animate": {
+        "type": "boolean",
+        "default": true
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

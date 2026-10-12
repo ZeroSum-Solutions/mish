@@ -1,0 +1,34 @@
+{
+  "id": "gradual-blur",
+  "name": "Gradual Blur",
+  "category": "scroll",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line description \"Progressive blur reveal\" only; no React Bits source or docs were read. A stacked, masked backdrop-filter band that sharpens content as it scrolls out of the panel edge is a common, reusable scroll affordance.",
+  "entry": "components/gradual-blur/index.ts",
+  "css": "components/gradual-blur/styles.css",
+  "demo": "components/gradual-blur/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "position": { "type": "string", "enum": ["bottom", "top", "both"], "default": "bottom", "description": "Which edge(s) of the host get the blur band." },
+      "height": { "type": "string", "default": "6rem", "description": "Depth of the band, any CSS length." },
+      "strength": { "type": "number", "default": 8, "minimum": 0, "description": "Blur at the very edge, in px." },
+      "layers": { "type": "number", "default": 6, "minimum": 1, "maximum": 12, "description": "Stacked blur layers; more is smoother and costs more paint." },
+      "curve": { "type": "string", "enum": ["exponential", "linear"], "default": "exponential", "description": "How the blur rises across the band." },
+      "tint": { "type": "string", "default": "transparent", "description": "Colour the band deepens towards at the edge." },
+      "fadeAtEnds": { "type": "boolean", "default": true, "description": "Fade a band out once the host is scrolled all the way to that end." },
+      "duration": { "type": "number", "default": 300, "minimum": 0, "description": "Fade duration, in ms." }
+    }
+  },
+  "a11y": [
+    "The blur band is an aria-hidden overlay; the host's content, reading order and accessibility tree are not changed or duplicated.",
+    "The band has pointer-events: none, so links and buttons under it stay clickable and text stays selectable.",
+    "With fadeAtEnds the band fades out at the end of the scroll, so the last item is always shown sharp and at full contrast at rest.",
+    "Forced-colors mode removes the band entirely so focus rings and system colours are never obscured; reduced motion keeps the blur but makes the fade instant."
+  ],
+  "reducedMotion": "static"
+}

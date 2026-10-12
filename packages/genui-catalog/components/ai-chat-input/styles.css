@@ -1,0 +1,95 @@
+/* ai-chat-input — clean-room, component-specs.md §22. Every selector is under .genui-ai-chat-input. */
+
+:where(.genui-ai-chat-input) {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.genui-ai-chat-input__chips {
+  order: -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: 100%;
+}
+
+.genui-ai-chat-input__chip {
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  background: rgba(127, 127, 127, 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 0.85em;
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+}
+
+.genui-ai-chat-input__chip:hover,
+.genui-ai-chat-input__chip:focus-visible {
+  background: rgba(127, 127, 127, 0.18);
+}
+
+.genui-ai-chat-input__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 2.75em;
+  height: var(--genui-ai-chat-input-h, auto);
+  resize: none;
+  overflow-y: auto;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  background: rgba(127, 127, 127, 0.06);
+  color: inherit;
+  font: inherit;
+  line-height: 1.4;
+  transition: height 220ms var(--genui-ai-chat-input-ease, cubic-bezier(0.34, 1.56, 0.64, 1));
+}
+
+.genui-ai-chat-input__send {
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 999px;
+  background: var(--genui-ai-chat-input-accent, #5865f2);
+  color: #fff;
+  cursor: pointer;
+}
+
+.genui-ai-chat-input__send:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.genui-ai-chat-input__field:focus-visible,
+.genui-ai-chat-input__send:focus-visible,
+.genui-ai-chat-input__chip:focus-visible {
+  outline: 2px solid Highlight;
+  outline-offset: 2px;
+}
+
+.genui-ai-chat-input.is-busy .genui-ai-chat-input__send {
+  animation: genui-ai-chat-input-pulse 1500ms ease-in-out infinite;
+}
+
+@keyframes genui-ai-chat-input-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--genui-ai-chat-input-accent, #5865f2) 55%, transparent); }
+  50% { box-shadow: 0 0 0 9px transparent; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-ai-chat-input__field {
+    transition: none;
+  }
+
+  .genui-ai-chat-input.is-busy .genui-ai-chat-input__send {
+    animation: none;
+  }
+}

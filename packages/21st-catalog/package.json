@@ -1,0 +1,34 @@
+{
+  "name": "@open-design/21st-catalog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Saved 21st.dev reference metadata and the independently authored alternatives paired with them. Upstream 21st.dev source stays in private source kits and is never copied here.",
+  "files": [
+    "generated"
+  ],
+  "exports": {
+    "./generated/21st-items.json": "./generated/21st-items.json",
+    "./generated/21st-originals.json": "./generated/21st-originals.json",
+    "./generated/21st-thumbnails.json": "./generated/21st-thumbnails.json",
+    "./generated/21st-live-thumbnails.json": "./generated/21st-live-thumbnails.json",
+    "./generated/preview-artwork/manifest.json": "./generated/preview-artwork/manifest.json"
+  },
+  "scripts": {
+    "check": "node --experimental-strip-types scripts/twenty-first.ts --check && node --experimental-strip-types scripts/originals.ts --check && node --experimental-strip-types scripts/twenty-first-thumbnails.ts --check",
+    "test": "node --experimental-strip-types --test \"tests/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.originals.json --noEmit",
+    "21st": "node --experimental-strip-types scripts/twenty-first.ts",
+    "originals": "node --experimental-strip-types scripts/originals.ts",
+    "21st-thumbnails": "node --experimental-strip-types scripts/twenty-first-thumbnails.ts --fetch"
+  },
+  "devDependencies": {
+    "@open-design/contracts": "workspace:*",
+    "@types/node": "24.12.2",
+    "sharp": "0.35.3",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": "~24"
+  }
+}

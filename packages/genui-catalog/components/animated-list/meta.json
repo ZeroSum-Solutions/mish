@@ -1,0 +1,43 @@
+{
+  "id": "animated-list",
+  "name": "Animated List",
+  "category": "scroll",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/animated-list/index.ts",
+  "css": "components/animated-list/styles.css",
+  "demo": "components/animated-list/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": {
+        "type": "number",
+        "default": 500,
+        "minimum": 0,
+        "maximum": 2000
+      },
+      "distance": {
+        "type": "number",
+        "default": 14,
+        "minimum": 0,
+        "maximum": 48
+      },
+      "stagger": {
+        "type": "number",
+        "default": 90,
+        "minimum": 0,
+        "maximum": 200
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

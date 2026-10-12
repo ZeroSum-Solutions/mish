@@ -1,0 +1,113 @@
+/**
+ * Post-build step: emit dist/data.js and dist/data.d.ts, the catalog and every ported component's
+ * built assets as plain JavaScript literals (the pattern of
+ * packages/agency-fast-lane/scripts/copy-dist-data.ts). The daemon and web import
+ * `@open-design/genui-catalog/data`; data that travels as code survives any bundler, where a file
+ * read through `import.meta.dirname` would break inside the daemon's esbuild prebundle.
+ *
+ * The catalog goes through `validateCatalog`, so a malformed catalog.json fails the build rather
+ * than a daemon boot. Must run after scripts/build.ts, which writes dist/components/.
+ */
+
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
+import { validateCatalog } from '../src/validate.ts';
+import { FORCED_REDUCED_MOTION_CLASS, forcedReducedMotionCss } from './reduced-motion-css.ts';
+
+const packageRoot = path.resolve(import.meta.dirname, '..');
+const distDir = path.join(packageRoot, 'dist');
+
+const manifest = validateCatalog(JSON.parse(readFileSync(path.join(packageRoot, 'catalog.json'), 'utf8')));
+const assets: Record<string, { js: string; css: string; reducedCss: string; demo: string }> = {};
+for (const entry of manifest.components) {
+  if (entry.status !== 'ported' || !entry.demo) continue;
+  const built = path.join(distDir, 'components', entry.id);
+  for (const file of ['auto.js', 'styles.css']) {
+    if (!existsSync(path.join(built, file))) throw new Error(`copy-dist-data: dist/components/${entry.id}/${file} is missing; run scripts/build.ts first`);
+  }
+  const css = readFileSync(path.join(built, 'styles.css'), 'utf8');
+  assets[entry.id] = {
+    js: readFileSync(path.join(built, 'auto.js'), 'utf8'),
+    css,
+    reducedCss: forcedReducedMotionCss(css),
+    demo: readFileSync(path.join(packageRoot, entry.demo), 'utf8'),
+  };
+}
+
+/** The demo is a body fragment inlined into demoDocument()'s own <body>: no document, no code. */
+const DEMO_FORBIDDEN = /<!doctype|<\/?(html|head|body|script|style|iframe|object|embed|link|meta|base)\b/i;
+
+for (const [id, asset] of Object.entries(assets)) {
+  if (/<\/(script|style)|<!--/i.test(asset.js) || /<\/(style|script)/i.test(asset.css + asset.reducedCss)) {
+    throw new Error(`copy-dist-data: ${id}'s built JS or CSS contains a closing </script> or </style> tag and cannot be inlined`);
+  }
+  const forbidden = DEMO_FORBIDDEN.exec(asset.demo);
+  if (forbidden) throw new Error(`copy-dist-data: ${id}'s demo.html contains "${forbidden[0]}"; a demo is a body fragment with no script, style or document markup`);
+}
+
+/**
+ * Installed before the component script when a demo previews reduced motion: `matchMedia` answers
+ * `(prefers-reduced-motion: reduce)` as matching, and <html> gets the class the derived CSS keys on.
+ * Emitted through JSON.stringify so the regex's backslash survives into the generated module.
+ */
+const REDUCED_MOTION_SHIM = "(function(){var m=window.matchMedia&&window.matchMedia.bind(window);"
+  + "window.matchMedia=function(q){var r=m?m(q):{matches:false,media:q};if(!/prefers-reduced-motion\\s*:\\s*reduce/.test(q))return r;"
+  + "return{matches:true,media:q,onchange:null,addEventListener:function(){},removeEventListener:function(){},addListener:function(){},removeListener:function(){},dispatchEvent:function(){return false}}};"
+  + `document.documentElement.classList.add('${FORCED_REDUCED_MOTION_CLASS}')})();`;
+
+/**
+ * `demoDocument(id, { reducedMotion })`: a complete, self-contained HTML document for an iframe
+ * `srcdoc` (catalog-design.md §E). The CSP allows only the inlined style and script, so the demo
+ * can load nothing. `reducedMotion: true` answers `(prefers-reduced-motion: reduce)` with
+ * `matches: true` before the component script runs, and applies the component's reduced-motion
+ * CSS under `html.genui-reduced-motion` (see reduced-motion-css.ts), so a viewer can preview the
+ * static state even though the browser's own media state does not change.
+ */
+const DEMO_DOCUMENT_SOURCE = `export const DEMO_CSP = "default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'";
+const REDUCED_MOTION_SHIM = ${JSON.stringify(REDUCED_MOTION_SHIM)};
+export function demoDocument(id, options = {}) {
+  const asset = genuiCatalog.assets[id];
+  if (!asset) return null;
+  const reduced = options.reducedMotion
+    ? (asset.reducedCss ? '<style data-genui-forced-reduced-motion>' + asset.reducedCss + '</style>' : '') + '<script>' + REDUCED_MOTION_SHIM + '</script>'
+    : '';
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8">'
+    + '<meta http-equiv="Content-Security-Policy" content="' + DEMO_CSP + '">'
+    + '<meta name="viewport" content="width=device-width,initial-scale=1">'
+    + '<style>html,body{margin:0}body{background:#0b0d12;color:#f5f5f7;font-family:system-ui,sans-serif}' + asset.css + '</style>'
+    + reduced + '</head><body>' + asset.demo + '<script>' + asset.js + '</script></body></html>';
+}
+`;
+
+const banner = '// Generated by scripts/copy-dist-data.ts from catalog.json and dist/components. Do not edit.\n';
+
+writeFileSync(
+  path.join(distDir, 'data.js'),
+  `${banner}export const genuiCatalog = ${JSON.stringify({ manifest, assets })};\n${DEMO_DOCUMENT_SOURCE}`,
+);
+
+writeFileSync(
+  path.join(distDir, 'data.d.ts'),
+  `${banner}import type { Catalog } from './index.js';\n`
+  + 'export interface GenuiComponentAssets {\n'
+  + '  /** Classic script (IIFE) that mounts every [data-genui="<id>"]; safe to inline in <script>. */\n'
+  + '  js: string;\n'
+  + '  /** Minified stylesheet; every selector is under .genui-<id>. */\n'
+  + '  css: string;\n'
+  + '  /** The stylesheet\'s reduced-motion rules re-keyed under html.genui-reduced-motion (forced preview). */\n'
+  + '  reducedCss: string;\n'
+  + '  /** Demo body fragment (no script, style or URL). */\n'
+  + '  demo: string;\n'
+  + '}\n'
+  + 'export declare const genuiCatalog: {\n'
+  + '  manifest: Catalog;\n'
+  + '  /** Built assets of every ported component, by id. */\n'
+  + '  assets: Record<string, GenuiComponentAssets>;\n'
+  + '};\n'
+  + '/** Content-Security-Policy every demo document carries. */\n'
+  + 'export declare const DEMO_CSP: string;\n'
+  + '/** A full HTML document for an iframe srcdoc, or null when `id` is not a ported component. */\n'
+  + 'export declare function demoDocument(id: string, options?: { reducedMotion?: boolean }): string | null;\n',
+);
+
+console.log(`copy-dist-data: wrote dist/data.js (${manifest.components.length} entries, ${Object.keys(assets).length} ported).`);

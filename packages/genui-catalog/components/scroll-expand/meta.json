@@ -1,0 +1,32 @@
+{
+  "id": "scroll-expand",
+  "name": "Scroll Expand",
+  "category": "scroll",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; no React Bits source was read. A dependency-free scroll-linked clip or scale that replaces framer-motion with one custom property driven by an IntersectionObserver-gated scroll listener.",
+  "entry": "components/scroll-expand/index.ts",
+  "css": "components/scroll-expand/styles.css",
+  "demo": "components/scroll-expand/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "mode": { "type": "string", "enum": ["clip", "scale"], "default": "clip", "description": "clip opens a window over the content without rescaling it; scale grows the whole element." },
+      "from": { "type": "number", "default": 0.78, "minimum": 0.3, "maximum": 1, "description": "Collapsed size as a fraction of the full box." },
+      "radius": { "type": "number", "default": 28, "minimum": 0, "description": "Corner radius (px) while collapsed." },
+      "endRadius": { "type": "number", "default": 12, "minimum": 0, "description": "Corner radius (px) once fully open." },
+      "start": { "type": "number", "default": 0.95, "minimum": 0, "maximum": 1, "description": "Viewport fraction of the element's top edge where expansion starts." },
+      "end": { "type": "number", "default": 0.3, "minimum": 0, "maximum": 1, "description": "Viewport fraction of the element's top edge where the element is fully open." }
+    }
+  },
+  "a11y": [
+    "No nodes are added, split or duplicated; the element's content, headings and links are read once, in DOM order.",
+    "The effect never intercepts, locks or hijacks scrolling; it only reads scroll position.",
+    "In clip mode the clipped margin is decorative and the text never rescales, so zoomed text keeps its size; keep essential copy away from the outer 11% of the box, which is clipped while collapsed.",
+    "Reduced motion removes the clip and scale entirely, shows the element fully open, and attaches no scroll listener."
+  ],
+  "reducedMotion": "static"
+}

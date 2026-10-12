@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-01",
+  "businessName": "Marrowgate Property Group",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Marrowgate Property Group"
+    },
+    {
+      "field": "address",
+      "value": "2100 Bayshore Boulevard, Tampa, Florida"
+    },
+    {
+      "field": "phone",
+      "value": "(813) 555-0162"
+    },
+    {
+      "field": "email",
+      "value": "ops@marrowgatepm.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8 a.m. to 6 p.m., plus an after-hours line"
+    },
+    {
+      "field": "legal",
+      "value": "Licensed property manager in the State of Florida"
+    },
+    {
+      "field": "other",
+      "value": "Manages 410 rental units; five coordinators share the tool"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample job-list row shown only to illustrate layout",
+      "text": "118 Palm Court, leaking faucet, assigned to Ruiz Plumbing, in progress, updated 2 hours ago"
+    }
+  ]
+}

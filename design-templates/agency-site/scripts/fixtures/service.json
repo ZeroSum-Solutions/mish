@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "revision": "r1",
+  "name": "FIELDWORK",
+  "description": "A fictional landscape studio concept. Original generated courtyard imagery.",
+  "direction": "landscape",
+  "brand": {
+    "background": "#f5f4ee",
+    "ink": "#23382c",
+    "muted": "#4d5c50",
+    "accent": "#36533d",
+    "surface": "#e4e8dc",
+    "display": "sans"
+  },
+  "sections": [
+    {
+      "id": "introduction",
+      "type": "hero",
+      "eyebrow": "Landscape design / Outdoor living",
+      "title": "A little closer to outside.",
+      "body": "A garden should feel like part of your home. This studio concept brings practical spaces, generous planting and a calmer pace to everyday life.",
+      "image": {
+        "file": "service-garden-hero.png",
+        "alt": "Generated concept courtyard with olive tree, limestone steps, sage planting and a timber bench.",
+        "focal": "center"
+      },
+      "action": {
+        "label": "Plan your outdoor space",
+        "href": "#contact"
+      }
+    },
+    {
+      "id": "services",
+      "type": "collection",
+      "eyebrow": "From first sketch to final planting",
+      "title": "Room for the way you live.",
+      "items": [
+        {
+          "label": "01 / Imagine",
+          "title": "Garden design",
+          "body": "A clear layout, planting direction and material palette shaped around how you want to use your space."
+        },
+        {
+          "label": "02 / Shape",
+          "title": "Outdoor spaces",
+          "body": "Courtyards, paths and places to gather. Establish the useful structure before choosing the finishing touches."
+        },
+        {
+          "label": "03 / Grow",
+          "title": "Planting plans",
+          "body": "Plant choices considered against light, soil, water and the care your garden will need over time."
+        }
+      ]
+    },
+    {
+      "id": "approach",
+      "type": "proof",
+      "eyebrow": "A considered process",
+      "title": "Good gardens start with good questions.",
+      "body": "The courtyard shown is a generated design concept, not a completed client project. A live site would replace this block with verified work, credentials and service-area details.",
+      "facts": [
+        {
+          "label": "First conversation",
+          "value": "How will you use the space?"
+        },
+        {
+          "label": "Site assessment",
+          "value": "Light, access, water and soil"
+        },
+        {
+          "label": "Clear next step",
+          "value": "Agree the brief and scope"
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "type": "contact",
+      "eyebrow": "Start with your space",
+      "title": "What would you like to grow?",
+      "body": "Tell the studio about your location, the space and your priorities. This demonstration uses an example email address; connect the client’s real booking or inquiry destination before launch.",
+      "action": {
+        "label": "Discuss your garden",
+        "href": "mailto:hello@example.com"
+      }
+    }
+  ]
+}

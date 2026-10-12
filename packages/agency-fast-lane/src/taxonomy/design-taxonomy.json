@@ -1,0 +1,235 @@
+{
+  "version": "1.0",
+  "sections": [
+    { "id": "navigation", "definition": "A persistent navigation bar or menu linking to the page's major sections or destinations." },
+    { "id": "hero", "definition": "The first-viewport statement: a headline, a primary call to action, and a dominant visual or object." },
+    { "id": "features", "definition": "A set of named product or service capabilities, each with a short description." },
+    { "id": "services", "definition": "A list of distinct services the business offers, each named and described." },
+    { "id": "benefits", "definition": "Outcomes or value the customer gets, phrased from the customer's side rather than as feature specs." },
+    { "id": "process-steps", "definition": "A numbered or ordered sequence of steps describing how the work or engagement proceeds." },
+    { "id": "proof-gallery", "definition": "A portfolio, past-work, or case-study gallery showing finished pieces or projects." },
+    { "id": "product-grid", "definition": "A grid or list of individual products or items, each with an image and a name." },
+    { "id": "pricing", "definition": "One or more prices or plans stated as actual figures, not just a \"contact for pricing\" link." },
+    { "id": "plan-comparison", "definition": "Two or more plans or tiers compared side by side by feature or limit." },
+    { "id": "testimonials", "definition": "Quoted statements attributed to named or described customers or clients." },
+    { "id": "reviews-ratings", "definition": "A star rating, review score, or aggregated rating figure." },
+    { "id": "stats-metrics", "definition": "Standalone numeric statistics or metrics presented as a claim, such as \"500+ projects\"." },
+    { "id": "logo-wall", "definition": "A row or grid of client, partner, or press logos." },
+    { "id": "team", "definition": "Named people with roles, presented as the team or staff." },
+    { "id": "about-story", "definition": "A narrative section about the business's history, mission, or founding." },
+    { "id": "manifesto-statement", "definition": "A first-person or declarative statement of belief or philosophy, set apart as its own section." },
+    { "id": "faq", "definition": "A list of questions and answers." },
+    { "id": "blog-articles", "definition": "A list of article, post, or news entries with titles." },
+    { "id": "newsletter-waitlist", "definition": "A form to join a mailing list or a waitlist, distinct from a purchase or contact form." },
+    { "id": "contact-form", "definition": "A form to send a message or inquiry, with fields such as name, email, and message." },
+    { "id": "booking-availability", "definition": "A scheduler, calendar, or availability picker to book a specific time or slot." },
+    { "id": "location-map-hours", "definition": "A physical address, embedded map, or stated hours of operation." },
+    { "id": "cta-band", "definition": "A standalone band or strip whose only content is a call to action." },
+    { "id": "footer", "definition": "The page's closing band: links, legal text, or contact details below the main content." },
+    { "id": "timeline-roadmap", "definition": "A chronological sequence of dated or staged milestones." },
+    { "id": "integrations", "definition": "A list of third-party tools, platforms, or services the product connects to." },
+    { "id": "specifications", "definition": "A technical spec sheet or data table of exact figures, such as dimensions, materials, or capacity." }
+  ],
+  "components": [
+    { "id": "sticky-nav", "definition": "A navigation bar that stays fixed to the viewport while the page scrolls." },
+    { "id": "mega-menu", "definition": "A navigation dropdown that expands into a large multi-column panel." },
+    { "id": "marquee-ticker", "definition": "Text or logos scrolling continuously in one direction like a ticker tape." },
+    { "id": "carousel-slider", "definition": "A set of items the visitor pages through one at a time, forward and back." },
+    { "id": "before-after-slider", "definition": "A draggable divider revealing a before state on one side and an after state on the other." },
+    { "id": "tabs", "definition": "Content organized into labeled panels where selecting one label swaps the visible panel." },
+    { "id": "accordion", "definition": "A list of headers that expand and collapse to reveal or hide their content." },
+    { "id": "card-grid", "definition": "Uniform cards, each with an image and short text, arranged in a regular grid." },
+    { "id": "bento-grid", "definition": "A grid of mismatched cell sizes arranged like a bento box, not a uniform grid." },
+    { "id": "masonry", "definition": "A grid where items of varying height pack into columns without fixed row alignment." },
+    { "id": "modal-dialog", "definition": "A popup panel that overlays the page and must be dismissed to continue." },
+    { "id": "custom-cursor", "definition": "A replacement for the default pointer, styled or animated to follow the cursor." },
+    { "id": "video-background", "definition": "A video playing behind foreground content, filling its section." },
+    { "id": "3d-canvas-webgl", "definition": "A real-time 3D scene rendered in the browser (WebGL, Three.js, or Canvas), not a static 3D-rendered image." },
+    { "id": "particle-shader-field", "definition": "A field of many small animated particles or a GPU shader effect covering an area." },
+    { "id": "number-counter", "definition": "A number that animates upward from zero, or a start value, to its final figure." },
+    { "id": "filter-search", "definition": "Controls that narrow a list of items by category, tag, or a search box." },
+    { "id": "form", "definition": "A structured input form of two or more fields, beyond a single email capture." },
+    { "id": "toggle-switch", "definition": "A binary on/off switch control, distinct from a checkbox." },
+    { "id": "scroll-progress", "definition": "A bar or indicator showing how far the visitor has scrolled through the page." },
+    { "id": "hotspots-tooltips", "definition": "Small markers on an image or diagram that reveal a tooltip or label on interaction." },
+    { "id": "floating-glass-panel", "definition": "A translucent, blurred panel that appears to float over the content behind it." },
+    { "id": "split-screen", "definition": "The viewport divided into two independent halves, often scrolling or acting separately." },
+    { "id": "hud-dock", "definition": "A fixed cluster of small UI controls or readouts styled like a heads-up display." }
+  ],
+  "mechanics": [
+    { "id": "entrance-stagger", "definition": "Elements animate in one after another in a staggered sequence, not all at once." },
+    { "id": "reveal-on-scroll", "definition": "Elements fade, slide, or otherwise appear as the visitor scrolls them into view." },
+    { "id": "scroll-scrubbed", "definition": "An animation's progress is tied directly to scroll position rather than to time." },
+    { "id": "pinned-section", "definition": "A section locks in place (position sticky or fixed) while its content changes underneath." },
+    { "id": "parallax", "definition": "Background and foreground layers move at different rates as the page scrolls." },
+    { "id": "marquee-drift", "definition": "Content drifts continuously sideways or diagonally, independent of scroll or interaction." },
+    { "id": "velocity-linked", "definition": "An element's motion speed or intensity responds to how fast the visitor scrolls." },
+    { "id": "cursor-following", "definition": "An element moves to track the pointer's position." },
+    { "id": "magnetic-hover", "definition": "An element pulls toward the cursor as it nears, snapping into alignment." },
+    { "id": "kinetic-type", "definition": "Typography itself is animated — morphing, sliding, or scaling letters or words — not just static text that fades in." },
+    { "id": "morphing-shapes", "definition": "A shape smoothly deforms from one form into another." },
+    { "id": "page-transitions", "definition": "A custom animated transition plays when navigating between pages or major views." },
+    { "id": "horizontal-scroll", "definition": "The main scroll direction for a section runs sideways instead of down." },
+    { "id": "looping-video", "definition": "A video plays on a continuous, seamless loop." },
+    { "id": "ambient-3d", "definition": "A 3D scene or object animates gently and continuously in the background, not as the main interaction." },
+    { "id": "physics-lerp", "definition": "Motion is described with physics terms — lerp, spring, damping, easing constants — rather than a fixed CSS transition." },
+    { "id": "auto-cycle", "definition": "Content such as slides, testimonials, or images advances automatically on a timer without visitor input." },
+    { "id": "hover-signature", "definition": "A distinctive, named hover effect applied consistently as a signature interaction." },
+    { "id": "reduced-motion-branch", "definition": "The spec explicitly states a prefers-reduced-motion handling that removes or reduces motion." },
+    { "id": "static-only", "definition": "The design specifies no motion beyond ordinary CSS hover states." }
+  ],
+  "depth": [
+    { "id": "layered-shadow", "definition": "Multiple shadow layers stack to build a sense of elevation." },
+    { "id": "glass-blur", "definition": "A backdrop-blur or frosted-glass treatment over content behind an element." },
+    { "id": "z-occlusion", "definition": "One element is deliberately placed behind another, such as type set behind the hero object." },
+    { "id": "grain-texture", "definition": "A visible grain, noise, or texture overlay applied to a surface or image." },
+    { "id": "masked-contrast", "definition": "A gradient mask creates a blurred or darkened zone exactly where text sits, while the rest of the image stays sharp." }
+  ],
+  "style": {
+    "ground": [
+      { "id": "near-black", "definition": "The dominant background is near-black or very dark." },
+      { "id": "deep-saturated", "definition": "The dominant background is one deep, saturated color that is not black and not white." },
+      { "id": "light-paper", "definition": "The dominant background is a warm off-white or paper-like light tone." },
+      { "id": "white-grey-template", "definition": "The dominant background is plain white or light grey with no committed color choice." },
+      { "id": "alternating-bands", "definition": "The page alternates background color band by band, section to section." }
+    ],
+    "accent": [
+      { "id": "one-held", "definition": "A single accent color is used consistently everywhere it recurs." },
+      { "id": "two", "definition": "Exactly two accent colors are used across the design." },
+      { "id": "scattered", "definition": "Three or more accent colors appear without one holding priority." },
+      { "id": "none", "definition": "No accent color beyond the ground and ink colors." }
+    ],
+    "typography": [
+      { "id": "display-serif-plus-grotesk", "definition": "A display serif is paired with a grotesk or sans family for body and UI text." },
+      { "id": "grotesk-only", "definition": "A single grotesk or sans family is used throughout, with no serif." },
+      { "id": "mono-technical", "definition": "A monospace family is used for prominent text, giving a technical register." },
+      { "id": "expressive-display", "definition": "An unconventional or expressive display face is used for headlines." },
+      { "id": "serif-editorial", "definition": "A serif family carries body and headline text in an editorial register." }
+    ],
+    "imagery": [
+      { "id": "bespoke-3d-render", "definition": "Custom-generated 3D renders carry the imagery." },
+      { "id": "photography", "definition": "Photographic images carry the imagery." },
+      { "id": "illustration", "definition": "Hand or vector illustration carries the imagery." },
+      { "id": "abstract-gradient", "definition": "Abstract gradients or generative shapes stand in for imagery, with no figurative subject." },
+      { "id": "product-screens", "definition": "Screenshots of a product or app UI carry the imagery." },
+      { "id": "typographic-only", "definition": "The design has no meaningful imagery; type and color carry the page." },
+      { "id": "video-led", "definition": "Video is the primary imagery, not a static image." }
+    ],
+    "topology": [
+      { "id": "full-bleed-anchored-type", "definition": "A full-bleed media ground with type anchored to a corner or edge." },
+      { "id": "centered-object-on-void", "definition": "A single object is centered against an empty or near-empty ground." },
+      { "id": "portrait-diagonal-thrust", "definition": "A portrait-cropped subject is angled to thrust diagonally across the frame." },
+      { "id": "edge-bleed-panel", "definition": "A panel or image bleeds off one edge of the frame while floating free of the others." },
+      { "id": "fan-array", "definition": "Several items are arranged fanned out or splayed from a shared point." },
+      { "id": "macro-proof-crop", "definition": "A tight macro crop on a product or material stands in as proof of quality." },
+      { "id": "framed-scene", "definition": "The composition sits inside a visible frame-within-the-frame, such as a device, window, or border." },
+      { "id": "hud-docked-centerpiece", "definition": "A centerpiece object is surrounded by HUD-style docked readouts or controls." },
+      { "id": "bento-grid", "definition": "The layout is built from a bento grid of mismatched cells." },
+      { "id": "diagonal-duotone-split", "definition": "The frame is split diagonally into two color-toned halves." },
+      { "id": "text-left-image-right", "definition": "A plain two-column split, text on one side and image on the other, with no interlock." },
+      { "id": "centered-content-stack", "definition": "A plain, vertically centered stack of headline, subtext, and button with no distinct topology." },
+      { "id": "editorial-columns", "definition": "Multi-column, magazine-style text layout carries the composition." }
+    ],
+    "density": [
+      { "id": "airy", "definition": "Generous negative space; content occupies a minority of the frame." },
+      { "id": "balanced", "definition": "A moderate, even ratio of content to whitespace." },
+      { "id": "dense", "definition": "Content fills most of the frame with little negative space." }
+    ]
+  },
+  "quality": [
+    {
+      "id": "focal-discipline",
+      "rubric": "D1",
+      "levels": [
+        "Two or more elements compete for the same weight in the first viewport; no single idea owns it.",
+        "A dominant element is present, but a second element — a badge, a secondary headline, dense UI — pulls comparable attention.",
+        "One element leads, but supporting elements are still busy enough to divide focus.",
+        "One idea clearly owns the first viewport, with only minor competing detail.",
+        "One idea owns the first viewport outright; everything else is clearly subordinate."
+      ]
+    },
+    {
+      "id": "scale-drama",
+      "rubric": "D2",
+      "levels": [
+        "The headline is merely \"bigger than body text\", not a viewport-relative display statement.",
+        "The headline is large but capped conservatively, not dominant.",
+        "The headline is sizeable but shares visual weight with other large elements.",
+        "Display type is close to the largest object on the screen, sized relative to the viewport.",
+        "Display type is the largest object on the screen, sized relative to the viewport."
+      ]
+    },
+    {
+      "id": "topology-commitment",
+      "rubric": "D3",
+      "levels": [
+        "A generic centered content stack, a plain text-left/image-right split, or un-interlocked bands.",
+        "A named topology is attempted, but type and media do not interlock.",
+        "A named topology is present with partial type-media interlock.",
+        "A named topology is committed, with type-media interlock present.",
+        "A named topology is committed, type-media interlock is present, and it reads clearly even from a thumbnail."
+      ]
+    },
+    {
+      "id": "ground-palette",
+      "rubric": "D4",
+      "levels": [
+        "The ground is template white or grey, with scattered accent hues.",
+        "A ground color is chosen, but it is timid or inconsistent, with more than 3 hues in play.",
+        "The ground is committed, but the accent is not held consistently.",
+        "A committed ground, one held accent, and 3 or fewer hues overall.",
+        "A fully committed ground, exactly one accent held everywhere, 3 or fewer hues."
+      ]
+    },
+    {
+      "id": "imagery-direction",
+      "rubric": "D6",
+      "levels": [
+        "Imagery is stock-generic, a borrowed metaphor, or text fights the image for legibility.",
+        "Imagery is on-topic but generic, with no stated art direction.",
+        "Imagery is thematically tied to the business but lacks a stated grade, crop, or content direction.",
+        "Imagery is bespoke-grade and thematically tied to the business, with most legibility handled.",
+        "Imagery is bespoke-grade, thematically tied to the business, and text-over-media stays legible via a stated masked-contrast treatment."
+      ]
+    },
+    {
+      "id": "motion-choreography",
+      "rubric": "D7",
+      "levels": [
+        "The page is static, or motion is stacked gimmicks with no reduced-motion handling.",
+        "One mechanic is named but lacks authored numbers — trigger, duration, easing, stagger.",
+        "One mechanic is named with some authored numbers, but reduced-motion is not addressed.",
+        "One signature mechanic is named with authored numbers and a stated reduced-motion branch.",
+        "One legible signature mechanic is named with authored numbers, a sequenced entrance, hover states, and reduced-motion parks the page at rest."
+      ]
+    },
+    {
+      "id": "micro-craft",
+      "rubric": "D8",
+      "levels": [
+        "Uniform padding everywhere, mixed corner radii, default type metrics throughout.",
+        "Some spacing rhythm exists, but radii and type metrics are still inconsistent.",
+        "Spacing rhythm is present, but tracking or leading intent is not stated.",
+        "Tracking and leading intent is stated, and spacing rhythm has some density contrast.",
+        "Tracking and leading intent is visible, spacing rhythm has density contrast, and hairlines or radii are consistent."
+      ]
+    }
+  ],
+  "truthRisk": {
+    "id": "truth-risk",
+    "instructions": "Does `text` carry plausible-specific filler — a named person, a non-round number, or a populated calendar or date — that would be a fabrication hazard if reused verbatim for client work?",
+    "criteriaTrue": "The text states a specific, plausible-sounding fact (a named person, a non-round number, a populated date) that reads as invented detail rather than a verified claim about the actual business.",
+    "criteriaFalse": "The text carries no such plausible-specific filler, or every specific fact it states reads as a real, verifiable claim."
+  },
+  "action": [
+    { "id": "contact", "definition": "The primary call to action is to contact the business directly, by call, email, or message." },
+    { "id": "book", "definition": "The primary call to action is to book or schedule a specific appointment or session." },
+    { "id": "buy", "definition": "The primary call to action is to purchase a product or service now." },
+    { "id": "signup", "definition": "The primary call to action is to create an account or start a signup flow." },
+    { "id": "apply", "definition": "The primary call to action is to submit an application, such as for a job, program, or membership." },
+    { "id": "read", "definition": "The primary call to action is to read or continue to content, with no transaction implied." },
+    { "id": "donate", "definition": "The primary call to action is to give a donation or contribution." },
+    { "id": "login", "definition": "The primary call to action is to sign in to an existing account." },
+    { "id": "none", "definition": "No clear primary call to action is stated." }
+  ]
+}

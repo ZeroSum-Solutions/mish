@@ -1,0 +1,39 @@
+{
+  "id": "masked-heading",
+  "name": "Masked Heading",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/masked-heading/index.ts",
+  "css": "components/masked-heading/styles.css",
+  "demo": "components/masked-heading/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "style": {
+        "type": "string",
+        "enum": ["rise", "wipe"],
+        "default": "rise",
+        "description": "Slide each line up from below the mask, or wipe it open left-to-right."
+      },
+      "duration": { "type": "number", "default": 900, "minimum": 0, "description": "Reveal duration per line, in ms." },
+      "stagger": { "type": "number", "default": 120, "minimum": 0, "description": "Delay between each line's reveal, in ms." },
+      "easing": { "type": "string", "default": "cubic-bezier(.19,1,.22,1)" },
+      "threshold": { "type": "number", "default": 0.4, "minimum": 0, "maximum": 1, "description": "Fraction of the heading visible before the reveal fires." },
+      "lines": {
+        "type": "string",
+        "enum": ["auto", "br"],
+        "default": "auto",
+        "description": "Group lines by measured layout, or split only on <br>."
+      }
+    }
+  },
+  "a11y": [
+    "The original text stays in a visually hidden .__sr span, read once by assistive tech.",
+    "The animated .__visual copy is aria-hidden and duplicates nothing in the reading order.",
+    "Each .__line keeps a small padding-bottom so its clipping box never cuts a descender.",
+    "The reveal plays once on entry; nothing changes on hover or keyboard focus."
+  ],
+  "reducedMotion": "reduced"
+}

@@ -1,0 +1,983 @@
+{
+  "schema": "workbench-verification-bundle/1",
+  "id": "rv_pre_motion",
+  "projectId": "p",
+  "entry": "index.html",
+  "sourceHashes": [
+    {
+      "path": "book.html",
+      "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "path": "index.html",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "contextRevision": 0,
+  "rubricRevision": 3,
+  "previewOrigin": "http://project.od-review.localhost",
+  "environment": {
+    "worker": "cdp-chromium",
+    "browserVersion": "HeadlessChrome/140.0.0.0",
+    "runnerVersion": "mechanical/1"
+  },
+  "viewports": [
+    320,
+    375,
+    768,
+    1440,
+    1920
+  ],
+  "startedAt": "2026-10-07T08:00:00.000Z",
+  "endedAt": "2026-10-07T08:00:01.000Z",
+  "results": [
+    {
+      "checkId": "core.declared-actions",
+      "criterionId": "core.declared-actions",
+      "parameterType": "cta",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": {
+        "template": "result.passed",
+        "params": [
+          {
+            "kind": "list",
+            "items": [
+              {
+                "kind": "number",
+                "value": 320
+              },
+              {
+                "kind": "number",
+                "value": 375
+              },
+              {
+                "kind": "number",
+                "value": 768
+              },
+              {
+                "kind": "number",
+                "value": 1440
+              }
+            ]
+          }
+        ]
+      },
+      "evidenceIds": [
+        "core.declared-actions@320",
+        "core.declared-actions@375",
+        "core.declared-actions@768",
+        "core.declared-actions@1440"
+      ]
+    },
+    {
+      "checkId": "contrast-strict",
+      "criterionId": "core.text-contrast",
+      "parameterType": "contrast",
+      "synthesized": false,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": {
+        "template": "result.passed",
+        "params": [
+          {
+            "kind": "list",
+            "items": [
+              {
+                "kind": "number",
+                "value": 320
+              },
+              {
+                "kind": "number",
+                "value": 375
+              },
+              {
+                "kind": "number",
+                "value": 768
+              },
+              {
+                "kind": "number",
+                "value": 1440
+              },
+              {
+                "kind": "number",
+                "value": 1920
+              }
+            ]
+          }
+        ]
+      },
+      "evidenceIds": [
+        "contrast-strict@320",
+        "contrast-strict@375",
+        "contrast-strict@768",
+        "contrast-strict@1440",
+        "contrast-strict@1920"
+      ]
+    },
+    {
+      "checkId": "core.console-resources",
+      "criterionId": "core.console-resources",
+      "parameterType": "console-resources",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": {
+        "template": "result.passed",
+        "params": [
+          {
+            "kind": "list",
+            "items": [
+              {
+                "kind": "number",
+                "value": 320
+              },
+              {
+                "kind": "number",
+                "value": 375
+              },
+              {
+                "kind": "number",
+                "value": 768
+              },
+              {
+                "kind": "number",
+                "value": 1440
+              }
+            ]
+          }
+        ]
+      },
+      "evidenceIds": [
+        "core.console-resources@320",
+        "core.console-resources@375",
+        "core.console-resources@768",
+        "core.console-resources@1440"
+      ]
+    },
+    {
+      "checkId": "core.responsive-overflow",
+      "criterionId": "core.responsive-overflow",
+      "parameterType": "overflow",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": {
+        "template": "result.passed",
+        "params": [
+          {
+            "kind": "list",
+            "items": [
+              {
+                "kind": "number",
+                "value": 320
+              },
+              {
+                "kind": "number",
+                "value": 375
+              },
+              {
+                "kind": "number",
+                "value": 768
+              },
+              {
+                "kind": "number",
+                "value": 1440
+              }
+            ]
+          }
+        ]
+      },
+      "evidenceIds": [
+        "core.responsive-overflow@320",
+        "core.responsive-overflow@375",
+        "core.responsive-overflow@768",
+        "core.responsive-overflow@1440"
+      ]
+    },
+    {
+      "checkId": "core.keyboard-focus",
+      "criterionId": "core.keyboard-focus",
+      "parameterType": "keyboard-focus",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": {
+        "template": "result.passed",
+        "params": [
+          {
+            "kind": "list",
+            "items": [
+              {
+                "kind": "number",
+                "value": 320
+              },
+              {
+                "kind": "number",
+                "value": 375
+              },
+              {
+                "kind": "number",
+                "value": 768
+              },
+              {
+                "kind": "number",
+                "value": 1440
+              }
+            ]
+          }
+        ]
+      },
+      "evidenceIds": [
+        "core.keyboard-focus@320",
+        "core.keyboard-focus@375",
+        "core.keyboard-focus@768",
+        "core.keyboard-focus@1440"
+      ]
+    },
+    {
+      "checkId": "core.document-semantics",
+      "criterionId": "core.document-semantics",
+      "parameterType": "document-semantics",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": {
+        "template": "result.passed",
+        "params": [
+          {
+            "kind": "list",
+            "items": [
+              {
+                "kind": "number",
+                "value": 320
+              },
+              {
+                "kind": "number",
+                "value": 375
+              },
+              {
+                "kind": "number",
+                "value": 768
+              },
+              {
+                "kind": "number",
+                "value": 1440
+              }
+            ]
+          }
+        ]
+      },
+      "evidenceIds": [
+        "core.document-semantics@320",
+        "core.document-semantics@375",
+        "core.document-semantics@768",
+        "core.document-semantics@1440"
+      ]
+    },
+    {
+      "checkId": "focus-optional",
+      "criterionId": null,
+      "parameterType": "keyboard-focus",
+      "synthesized": false,
+      "required": false,
+      "severity": "medium",
+      "outcome": "pass",
+      "reason": {
+        "template": "result.passed",
+        "params": [
+          {
+            "kind": "list",
+            "items": [
+              {
+                "kind": "number",
+                "value": 320
+              },
+              {
+                "kind": "number",
+                "value": 375
+              },
+              {
+                "kind": "number",
+                "value": 768
+              },
+              {
+                "kind": "number",
+                "value": 1440
+              }
+            ]
+          }
+        ]
+      },
+      "evidenceIds": [
+        "focus-optional@320",
+        "focus-optional@375",
+        "focus-optional@768",
+        "focus-optional@1440"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "core.declared-actions@320",
+      "viewport": 320,
+      "type": "probe",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 320
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.declared-actions@375",
+      "viewport": 375,
+      "type": "probe",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 375
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.declared-actions@768",
+      "viewport": 768,
+      "type": "probe",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 768
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.declared-actions@1440",
+      "viewport": 1440,
+      "type": "probe",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 1440
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "contrast-strict@320",
+      "viewport": 320,
+      "type": "computed-style",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 320
+          }
+        ]
+      },
+      "observations": [
+        {
+          "template": "contrast.samples",
+          "params": [
+            {
+              "kind": "number",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contrast-strict@375",
+      "viewport": 375,
+      "type": "computed-style",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 375
+          }
+        ]
+      },
+      "observations": [
+        {
+          "template": "contrast.samples",
+          "params": [
+            {
+              "kind": "number",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contrast-strict@768",
+      "viewport": 768,
+      "type": "computed-style",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 768
+          }
+        ]
+      },
+      "observations": [
+        {
+          "template": "contrast.samples",
+          "params": [
+            {
+              "kind": "number",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contrast-strict@1440",
+      "viewport": 1440,
+      "type": "computed-style",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 1440
+          }
+        ]
+      },
+      "observations": [
+        {
+          "template": "contrast.samples",
+          "params": [
+            {
+              "kind": "number",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "contrast-strict@1920",
+      "viewport": 1920,
+      "type": "computed-style",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 1920
+          }
+        ]
+      },
+      "observations": [
+        {
+          "template": "contrast.samples",
+          "params": [
+            {
+              "kind": "number",
+              "value": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "core.console-resources@320",
+      "viewport": 320,
+      "type": "console",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 320
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.console-resources@375",
+      "viewport": 375,
+      "type": "console",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 375
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.console-resources@768",
+      "viewport": 768,
+      "type": "console",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 768
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.console-resources@1440",
+      "viewport": 1440,
+      "type": "console",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 1440
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.responsive-overflow@320",
+      "viewport": 320,
+      "type": "probe",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 320
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.responsive-overflow@375",
+      "viewport": 375,
+      "type": "probe",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 375
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.responsive-overflow@768",
+      "viewport": 768,
+      "type": "probe",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 768
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.responsive-overflow@1440",
+      "viewport": 1440,
+      "type": "probe",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 1440
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.keyboard-focus@320",
+      "viewport": 320,
+      "type": "keyboard-trace",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 320
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.keyboard-focus@375",
+      "viewport": 375,
+      "type": "keyboard-trace",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 375
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.keyboard-focus@768",
+      "viewport": 768,
+      "type": "keyboard-trace",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 768
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.keyboard-focus@1440",
+      "viewport": 1440,
+      "type": "keyboard-trace",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 1440
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.document-semantics@320",
+      "viewport": 320,
+      "type": "accessibility-tree",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 320
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.document-semantics@375",
+      "viewport": 375,
+      "type": "accessibility-tree",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 375
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.document-semantics@768",
+      "viewport": 768,
+      "type": "accessibility-tree",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 768
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "core.document-semantics@1440",
+      "viewport": 1440,
+      "type": "accessibility-tree",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 1440
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "focus-optional@320",
+      "viewport": 320,
+      "type": "keyboard-trace",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 320
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "focus-optional@375",
+      "viewport": 375,
+      "type": "keyboard-trace",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 375
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "focus-optional@768",
+      "viewport": 768,
+      "type": "keyboard-trace",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 768
+          }
+        ]
+      },
+      "observations": []
+    },
+    {
+      "id": "focus-optional@1440",
+      "viewport": 1440,
+      "type": "keyboard-trace",
+      "summary": {
+        "template": "summary.atWidth",
+        "params": [
+          {
+            "kind": "vocab",
+            "vocabulary": "outcome",
+            "value": "pass"
+          },
+          {
+            "kind": "number",
+            "value": 1440
+          }
+        ]
+      },
+      "observations": []
+    }
+  ],
+  "unresolvedRequiredChecks": [],
+  "outcome": "passed",
+  "conformanceNote": "Automated checks target WCAG 2.2 AA but cannot claim full conformance; manual accessibility and target-device checks stay separate gates.",
+  "egress": {
+    "schema": "workbench-review-egress/4",
+    "allowHosts": [],
+    "limits": {
+      "maxRequests": 200,
+      "maxBytes": 20971520,
+      "maxResponseBytes": 5242880,
+      "requestTimeoutMs": 10000,
+      "maxRedirects": 5
+    },
+    "fetches": [],
+    "requests": 0,
+    "bytes": 0,
+    "exhausted": null,
+    "digest": "bdecbb5d9fa8b9f31568ae388a469ae51d4c74e2a4d8d8dec47a282a0bb92be3"
+  },
+  "console": {
+    "schema": "workbench-review-console/3",
+    "entries": []
+  },
+  "evidenceVersion": "workbench-review-evidence/2"
+}

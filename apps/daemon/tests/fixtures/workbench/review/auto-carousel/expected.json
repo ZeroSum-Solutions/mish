@@ -1,0 +1,13 @@
+{
+  "description": "An auto-advancing carousel with an infinite progress animation that never stops, offers no pause, stop or hide control and ignores prefers-reduced-motion on load and when it changes live; every mandatory check passes, so the opt-in motion check is the only failure.",
+  "outcome": "failed",
+  "criteria": {
+    "core.declared-actions": "pass",
+    "core.text-contrast": "pass",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  },
+  "motion": "fail"
+}

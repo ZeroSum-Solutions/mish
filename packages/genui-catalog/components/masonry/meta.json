@@ -1,0 +1,29 @@
+{
+  "id": "masonry",
+  "name": "Masonry",
+  "category": "gallery",
+  "kind": "css-only",
+  "status": "ported",
+  "entry": "components/masonry/index.ts",
+  "css": "components/masonry/styles.css",
+  "demo": "components/masonry/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "columns": { "type": "number", "default": 3, "minimum": 1, "description": "Column count at the widest breakpoint." },
+      "minColumn": { "type": "string", "default": "240px", "description": "Minimum column width; the browser narrows the column count to fit it." },
+      "gap": { "type": "string", "default": "16px" },
+      "reveal": { "type": "boolean", "default": true, "description": "Fade-and-rise each item once as it scrolls into view." },
+      "stagger": { "type": "number", "default": 60, "minimum": 0, "description": "Delay between each revealed item, in ms — by intersection order, not DOM index." },
+      "duration": { "type": "number", "default": 500, "minimum": 0 },
+      "hoverLift": { "type": "boolean", "default": true, "description": "Lift the hovered or focused item slightly." }
+    }
+  },
+  "a11y": [
+    "Reading order is DOM order, which matches the visual column order.",
+    "Items that are links keep a visible :focus-visible ring; the hover/focus lift transform does not clip it.",
+    "Captions are real text and stay in the DOM at every breakpoint."
+  ],
+  "reducedMotion": "static"
+}

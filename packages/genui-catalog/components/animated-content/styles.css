@@ -1,0 +1,8 @@
+.genui-animated-content { min-width: 0; }
+.genui-animated-content.genui-animated-content--play > .genui-animated-content__item { animation: genui-animated-content-enter var(--genui-animated-content-duration, 600ms) cubic-bezier(.16,1,.3,1) var(--genui-animated-content-delay, 0ms) both; }
+.genui-animated-content.genui-animated-content--reduced > .genui-animated-content__item, .genui-animated-content > .genui-animated-content__item:focus-within { animation: none; }
+@keyframes genui-animated-content-enter {
+ from { opacity: 0; transform: translateY(var(--genui-animated-content-distance, 24px)); }
+ to { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) { .genui-animated-content.genui-animated-content--play > .genui-animated-content__item { animation: none; } }

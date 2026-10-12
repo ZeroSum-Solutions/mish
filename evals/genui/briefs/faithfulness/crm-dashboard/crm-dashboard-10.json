@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-10",
+  "businessName": "Amaranth Development Office",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Amaranth Development Office"
+    },
+    {
+      "field": "address",
+      "value": "900 Fine Arts Way, St. Louis, Missouri"
+    },
+    {
+      "field": "phone",
+      "value": "(314) 555-0149"
+    },
+    {
+      "field": "email",
+      "value": "development@amaranthmuseum.org"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 9 a.m. to 5 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Part of a registered 501(c)(3) nonprofit in Missouri"
+    },
+    {
+      "field": "other",
+      "value": "Four gift officers"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Officer H. Grantham logged a stewardship visit with donor R. Feldstein, moved to solicited, 30 minutes ago"
+    }
+  ]
+}

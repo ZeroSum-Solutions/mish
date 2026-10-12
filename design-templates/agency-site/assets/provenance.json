@@ -1,0 +1,15 @@
+{
+  "method": "Built-in image_gen",
+  "date": "2026-09-14",
+  "purpose": "Original concept imagery for fictional agency starter fixtures. Not photographs of real client products or completed projects.",
+  "assets": [
+    {
+      "file": "jewelry-cuff-hero.png",
+      "prompt": "Use case: product-mockup. Asset type: original hero photograph for a fictional luxury-jewelry agency starter website. Create one landscape 1536x1024 editorial product image, not a website screenshot. Subject: one original sculptural open gold cuff with a softly folded organic surface, unbranded and not referencing any existing jewelry design. It rests on a low irregular pale limestone block against warm ivory studio surroundings. Frame the cuff as the large focal object on the right two-thirds; leave quiet warm space on the left for separately rendered website text. Lighting: directional late-afternoon studio light, precise soft-edged shadows, rich but believable gold reflections and fine material detail. Restrained, tactile, premium still-life photography. No flowers, logos, words, watermarks, extra jewelry, people or collage. This is fictional concept imagery and will be labeled as such outside the image."
+    },
+    {
+      "file": "service-garden-hero.png",
+      "prompt": "Use case: photorealistic-natural. Asset type: original landscape hero photograph for a fictional landscaping/design-build agency starter website. Create one landscape 1536x1024 editorial architecture photograph, not a website screenshot. A beautifully built small drought-tolerant residential garden courtyard: precise warm limestone stepping slabs, soft drifts of sage and ornamental grasses, a restrained low timber bench and one sculptural small olive tree beside a modest modern pale-stucco home. Human-scaled and plausible, quietly cultivated rather than extravagant. Late afternoon side light with long natural shadows, fine real material texture, expert architectural photography. Use the scene itself across the full frame; main garden path and tree in the central-right portion so the image can crop vertically. No people, logos, words, signs, watermark, swimming pools, impossible stairs or collage. This is fictional project visualization and will be labeled as such outside the image."
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+Marrow & Field is a small brand and product design studio. We want a one-page site that shows
+prospective clients our point of view and gets them to start a project with us.
+
+We work across brand identity, packaging and digital product design for consumer and hospitality
+brands. Our process: a discovery workshop, a concepting sprint, then two rounds of refinement
+before final delivery. We've partnered with independent hospitality groups, a specialty coffee
+roaster, and two direct-to-consumer skincare brands on their full brand systems.
+
+The site should show a handful of our best case studies, our capabilities, our process and a way
+to start a project — an inquiry form or a "let's talk" email. There are no providers, no
+appointment hours, no insurance, and nothing to book: a client email us and we schedule an intro
+call from there. We are not a medical or clinical practice and this is not a booking site — we
+want visitors to judge our taste and past work, not to see credentials or a service menu.

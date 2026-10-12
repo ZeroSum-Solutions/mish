@@ -1,0 +1,74 @@
+/* blur-text — clean-room, from the effect description only. Every selector is under .genui-blur-text. */
+
+@keyframes genui-blur-text-focus {
+  0% {
+    opacity: 0;
+    filter: blur(var(--genui-blur-text-blur, 12px));
+    transform: translate3d(0, var(--genui-blur-text-rise, 0.35em), 0);
+  }
+  55% {
+    opacity: 0.6;
+    filter: blur(calc(var(--genui-blur-text-blur, 12px) * 0.3));
+    transform: translate3d(0, calc(var(--genui-blur-text-rise, 0.35em) * 0.2), 0);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+.genui-blur-text__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.genui-blur-text__word {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.genui-blur-text__piece {
+  display: inline-block;
+}
+
+.genui-blur-text.genui-blur-text--pending .genui-blur-text__piece {
+  opacity: 0;
+  filter: blur(var(--genui-blur-text-blur, 12px));
+  transform: translate3d(0, var(--genui-blur-text-rise, 0.35em), 0);
+}
+
+.genui-blur-text.genui-blur-text--play .genui-blur-text__piece {
+  will-change: filter, opacity, transform;
+  animation: genui-blur-text-focus var(--genui-blur-text-duration, 800ms) var(--genui-blur-text-easing, ease-out) both;
+  animation-delay: calc(var(--genui-blur-text-delay, 0ms) + var(--genui-blur-text-i, 0) * var(--genui-blur-text-stagger, 90ms));
+}
+
+.genui-blur-text.genui-blur-text--reduced .genui-blur-text__piece {
+  animation: none;
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-blur-text .genui-blur-text__piece {
+    animation: none;
+    opacity: 1;
+    filter: none;
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-blur-text .genui-blur-text__piece {
+    filter: none;
+  }
+}

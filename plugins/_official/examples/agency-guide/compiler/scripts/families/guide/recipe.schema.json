@@ -1,0 +1,523 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-design.ai/schemas/agency-site/guide/recipe.v2.json",
+  "title": "guide recipe",
+  "description": "A one-destination guide page kind (atlas CS.01): header/nav, masthead, an opening chapter, a chapter list, optional practical facts, optional places to see, an optional typographic gallery of place cards, an optional plan-a-visit link, and a footer. Derived from compiler/scripts/families/guide/slots.ts by contract.ts recipeSchema(); render.test.ts checks the two are equal.",
+  "$comment": "contract.ts additionally enforces markup-free plain text and a well-formed URL on the plan-a-visit destination, and that a null appears only on an x-atom string leaf, an x-atom item (a whole practical-facts row), or in an x-optional section slot.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "family",
+    "revision",
+    "brand",
+    "sections"
+  ],
+  "sectionOrder": [
+    "guide-header",
+    "guide-masthead",
+    "guide-opening-chapter",
+    "guide-chapter-list",
+    "guide-practical-facts",
+    "guide-places-to-see",
+    "guide-gallery",
+    "guide-plan-a-visit",
+    "guide-footer"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 2
+    },
+    "family": {
+      "const": "guide"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9999
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "descriptor"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 60
+        },
+        "descriptor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "x-atom": "the destination's one-sentence descriptor — use ONLY the brief's own words and phrasing to state its plain facts (place type, region, what it is known for); never paraphrase, summarize, or add a connecting detail the brief does not literally give; if no single sentence can be built from the brief's own words alone, return null rather than invent or loosely restate one",
+          "minLength": 1,
+          "maxLength": 200,
+          "x-verify": "traceable"
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 9,
+      "maxItems": 9,
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-header"
+            },
+            "type": {
+              "const": "header"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [],
+              "properties": {}
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-masthead"
+            },
+            "type": {
+              "const": "masthead"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "standfirst"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 72
+                },
+                "standfirst": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 220
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-opening-chapter"
+            },
+            "type": {
+              "const": "opening-chapter"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 1800
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-chapter-list"
+            },
+            "type": {
+              "const": "chapter-list"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 6,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "title",
+                  "body"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 600
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "practical facts",
+            "dropWhen": "The brief states no real practical fact (getting there, best time to visit, currency or language) for this destination. Getting there, best time, currency and language are four independent facts — the section is kept, but any one of them the brief does not state is its own row to OMIT ENTIRELY (return null for that whole row, not just its value), never guessed and never a row filled with a plausible-sounding guess (a season, a currency name, a language, a road or parking note the brief never gave). Omit the row; never guess.",
+            "keepWhen": "The brief states at least one real practical fact for this destination.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-practical-facts"
+            },
+            "type": {
+              "const": "practical-facts"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": {
+                "type": [
+                  "object",
+                  "null"
+                ],
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "value"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 40,
+                    "x-label": true
+                  },
+                  "value": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200,
+                    "x-verify": "traceable"
+                  }
+                },
+                "x-atom": "this whole row (its fixed label AND its value together) — return null for the WHOLE item, not just its value, when the brief does not support this exact category; a present item's \"label\" must be copied VERBATIM from this same position in TEMPLATE, never invented or reworded"
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "places to see",
+            "dropWhen": "The brief names no real place within this destination worth a visitor seeing, or names a place but gives nothing to say about it. Each place card is its own row, and both parts of it are optional together: a card whose name or body claims something the brief never said (a proximity to another place, a distance, a walking time, a count of places, a superlative such as \"best\" or \"most\") is inventing, not describing, and that card should be OMITTED entirely rather than written with an invented or padded description. Describe a kept place using the brief's OWN words and facts — never a distance, a walking or driving time, or a count the brief does not give.",
+            "keepWhen": "The brief names at least one real place within this destination AND gives something real to say about it.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-places-to-see"
+            },
+            "type": {
+              "const": "places-to-see"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 5,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "name",
+                  "body"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60,
+                    "x-verify": "traceable"
+                  },
+                  "body": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "gallery-style typographic place cards",
+            "dropWhen": "The brief names fewer than two real places within this destination to show as a typographic card grid. Each label reuses a place name (and, if needed, at most a short honest descriptor of it) the brief already gave elsewhere — never a new claim about that place — and a label with no brief-given place behind it is its own row to omit.",
+            "keepWhen": "The brief names at least two real places within this destination for a typographic card grid.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text",
+            "items"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-gallery"
+            },
+            "type": {
+              "const": "gallery"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                }
+              }
+            },
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "maxItems": 6,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 60,
+                    "x-verify": "traceable"
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "x-optional": {
+            "label": "plan a visit",
+            "dropWhen": "The brief gives no real URL for planning a visit to this destination.",
+            "keepWhen": "The brief gives one real URL for planning a visit to this destination.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-plan-a-visit"
+            },
+            "type": {
+              "const": "plan-a-visit"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "heading",
+                "body",
+                "cta",
+                "url"
+              ],
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 60
+                },
+                "body": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200
+                },
+                "cta": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 32
+                },
+                "url": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 200,
+                  "x-atom": "url"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "type",
+            "text"
+          ],
+          "properties": {
+            "id": {
+              "const": "guide-footer"
+            },
+            "type": {
+              "const": "footer"
+            },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "tagline"
+              ],
+              "properties": {
+                "tagline": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 160
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

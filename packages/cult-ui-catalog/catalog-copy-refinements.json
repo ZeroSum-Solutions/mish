@@ -1,0 +1,5 @@
+{
+  "schema": "catalog-copy-refinements/1",
+  "note": "Reviewed literal copy edits remove generic promotion and unsupported example claims. Applied after pinned source verification; no component behaviour or private kit bytes change.",
+  "replacements": []
+}

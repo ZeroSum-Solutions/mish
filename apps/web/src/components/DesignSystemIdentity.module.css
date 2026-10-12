@@ -1,0 +1,13 @@
+.option {
+  height: auto;
+  flex-shrink: 0;
+}
+
+.identity {
+  display: block;
+  min-width: 0;
+  color: var(--text-soft);
+  font: var(--font-caption);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}

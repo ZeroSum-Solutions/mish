@@ -1,0 +1,71 @@
+/* card-swap — clean-room, component-specs.md §18. Every selector is under .genui-card-swap. */
+
+:where(.genui-card-swap) {
+  position: relative;
+  display: block;
+  width: var(--genui-card-swap-width, 420px);
+  height: var(--genui-card-swap-height, 300px);
+  perspective: 1400px;
+}
+
+.genui-card-swap__card {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  transform-style: preserve-3d;
+  transform:
+    translate3d(
+      calc(var(--genui-card-swap-slot, 0) * var(--genui-card-swap-card-distance, 60px)),
+      calc(var(--genui-card-swap-slot, 0) * -1 * var(--genui-card-swap-vertical-distance, 70px)),
+      calc(var(--genui-card-swap-slot, 0) * -40px)
+    )
+    skewY(calc(var(--genui-card-swap-slot, 0) * var(--genui-card-swap-skew, 6deg)));
+  z-index: calc(var(--genui-card-swap-total, 1) - var(--genui-card-swap-slot, 0));
+  transition: transform var(--genui-card-swap-duration, 1200ms) ease;
+  cursor: pointer;
+}
+
+.genui-card-swap__card:focus-visible {
+  outline-offset: 4px;
+}
+
+.genui-card-swap--reduced .genui-card-swap__card,
+.genui-card-swap__card:where(.genui-card-swap--no-motion) {
+  transition: none;
+}
+
+/* The stack's own manual control: hidden until it is the keyboard focus target. */
+.genui-card-swap__next {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+  background: #111;
+  color: #fff;
+  font: inherit;
+}
+
+.genui-card-swap__next:focus-visible {
+  position: absolute;
+  inset: auto auto -40px 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 8px 14px;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+  border-radius: 8px;
+  z-index: 999;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-card-swap__card {
+    transition: none;
+  }
+}

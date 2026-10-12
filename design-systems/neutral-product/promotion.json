@@ -1,0 +1,438 @@
+{
+  "schemaVersion": "od-design-system-promotion/v1",
+  "id": "neutral-product",
+  "version": "0.1.0",
+  "status": "candidate",
+  "owner": "Mishh Mashh design-system maintainers",
+  "authors": [
+    "Claude Code (Wave 0 build agent)"
+  ],
+  "specimens": {
+    "website": "preview/specimen-website.html",
+    "app": "preview/specimen-app.html",
+    "document": "preview/specimen-document.html",
+    "campaign": "preview/specimen-campaign.html"
+  },
+  "contrast": {
+    "pairs": [
+      {
+        "fg": "--border-strong",
+        "bg": "--surface",
+        "kind": "ui"
+      },
+      {
+        "fg": "--border-strong",
+        "bg": "--bg",
+        "kind": "ui"
+      },
+      {
+        "fg": "--accent-on",
+        "bg": "--danger",
+        "kind": "text"
+      },
+      {
+        "fg": "--fg-2",
+        "bg": "--surface-warm",
+        "kind": "text"
+      },
+      {
+        "fg": "--meta",
+        "bg": "--surface-warm",
+        "kind": "text"
+      },
+      {
+        "fg": "--accent",
+        "bg": "--surface-warm",
+        "kind": "text"
+      },
+      {
+        "fg": "--success",
+        "bg": "--bg",
+        "kind": "text"
+      },
+      {
+        "fg": "--warn",
+        "bg": "--bg",
+        "kind": "text"
+      },
+      {
+        "fg": "--danger",
+        "bg": "--bg",
+        "kind": "text"
+      }
+    ]
+  },
+  "visualRegression": {
+    "fixtures": [
+      {
+        "path": "promotion/evidence/components-1280-light.webp",
+        "page": "components.html",
+        "width": 1280,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/components-1280-dark.webp",
+        "page": "components.html",
+        "width": 1280,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/components-360-light.webp",
+        "page": "components.html",
+        "width": 360,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/components-360-dark.webp",
+        "page": "components.html",
+        "width": 360,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/website-1280-light.webp",
+        "page": "preview/specimen-website.html",
+        "width": 1280,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/website-1280-dark.webp",
+        "page": "preview/specimen-website.html",
+        "width": 1280,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/website-360-light.webp",
+        "page": "preview/specimen-website.html",
+        "width": 360,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/website-360-dark.webp",
+        "page": "preview/specimen-website.html",
+        "width": 360,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/app-1280-light.webp",
+        "page": "preview/specimen-app.html",
+        "width": 1280,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/app-1280-dark.webp",
+        "page": "preview/specimen-app.html",
+        "width": 1280,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/app-360-light.webp",
+        "page": "preview/specimen-app.html",
+        "width": 360,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/app-360-dark.webp",
+        "page": "preview/specimen-app.html",
+        "width": 360,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/document-1280-light.webp",
+        "page": "preview/specimen-document.html",
+        "width": 1280,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/document-1280-dark.webp",
+        "page": "preview/specimen-document.html",
+        "width": 1280,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/document-360-light.webp",
+        "page": "preview/specimen-document.html",
+        "width": 360,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/document-360-dark.webp",
+        "page": "preview/specimen-document.html",
+        "width": 360,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/campaign-1280-light.webp",
+        "page": "preview/specimen-campaign.html",
+        "width": 1280,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/campaign-1280-dark.webp",
+        "page": "preview/specimen-campaign.html",
+        "width": 1280,
+        "theme": "dark"
+      },
+      {
+        "path": "promotion/evidence/campaign-360-light.webp",
+        "page": "preview/specimen-campaign.html",
+        "width": 360,
+        "theme": "light"
+      },
+      {
+        "path": "promotion/evidence/campaign-360-dark.webp",
+        "page": "preview/specimen-campaign.html",
+        "width": 360,
+        "theme": "dark"
+      }
+    ]
+  },
+  "criteria": {
+    "DSP-01": {
+      "result": "fail",
+      "checkedBy": "GPT-6 Sol (delegated by Devin)",
+      "date": "2026-09-23",
+      "evidence": [
+        "promotion/attestations/DSP-01.md",
+        "DESIGN.md",
+        "source/evidence.md"
+      ],
+      "note": "Named references lack a rights status; the 8px grid has no stated reason."
+    },
+    "DSP-02": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "tokens.css",
+        "source/token-contract.report.json",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-03": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "tokens.css",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-04": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "DESIGN.md",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-05": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "components.html",
+        "components.manifest.json",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-06": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "preview/specimen-website.html",
+        "preview/specimen-app.html",
+        "preview/specimen-document.html",
+        "preview/specimen-campaign.html",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-07": {
+      "result": "fail",
+      "checkedBy": "GPT-6 Sol (delegated by Devin)",
+      "date": "2026-09-23",
+      "evidence": [
+        "promotion/attestations/DSP-07.md",
+        "promotion/attestations/evidence/specimen-app-covered-focus-768.webp",
+        "promotion/attestations/evidence/components-covered-focus-360.webp"
+      ],
+      "note": "Open nav covers its focused toggle at 768/360px; tabs and menu do not respond to arrow keys; switch hit box is 36x20px."
+    },
+    "DSP-08": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "tokens.css",
+        "components.html",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-09": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "preview/specimen-website.html",
+        "preview/specimen-app.html",
+        "preview/specimen-document.html",
+        "preview/specimen-campaign.html",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-10": {
+      "result": "fail",
+      "checkedBy": "GPT-6 Sol (delegated by Devin)",
+      "date": "2026-09-23",
+      "evidence": [
+        "promotion/attestations/DSP-10.md",
+        "promotion/attestations/evidence/specimen-website-de-360.webp",
+        "promotion/attestations/evidence/specimen-website-ja-360.webp",
+        "promotion/attestations/evidence/specimen-app-de-360.webp",
+        "promotion/attestations/evidence/specimen-app-rtl-360.webp",
+        "promotion/attestations/evidence/specimen-document-de-360.webp",
+        "promotion/attestations/evidence/specimen-campaign-de-360.webp",
+        "promotion/attestations/evidence/components-de-360.webp",
+        "promotion/attestations/evidence/components-de-tabs-360.webp",
+        "promotion/attestations/evidence/components-rtl-360.webp"
+      ],
+      "note": "German at 360px widens the website specimen to 378px and clips the hero heading and actions. RTL is not claimed."
+    },
+    "DSP-11": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "tokens.css",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-12": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "tokens.css",
+        "components.html",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-13": {
+      "result": "fail",
+      "checkedBy": "GPT-6 Sol (delegated by Devin)",
+      "date": "2026-09-23",
+      "evidence": [
+        "promotion/attestations/DSP-13.md"
+      ],
+      "note": "Tabs lack aria-controls, tabpanel and roving tabindex; the menu lacks arrow-key focus. Accessibility-tree audit in Chromium, not a live VoiceOver pass."
+    },
+    "DSP-14": {
+      "result": "na",
+      "checkedBy": "GPT-6 Sol (delegated by Devin)",
+      "date": "2026-09-23",
+      "evidence": [
+        "promotion/attestations/DSP-14.md",
+        "manifest.json",
+        "source/evidence.md"
+      ],
+      "justification": "Code-first system; no design-tool library exists (see promotion/attestations/DSP-14.md)."
+    },
+    "DSP-15": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "manifest.json",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-16": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "promotion/evidence",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-17": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "manifest.json",
+        "design-tokens.json",
+        "tailwind-v4.css",
+        "components.manifest.json",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-18": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "DESIGN.md",
+        "USAGE.md",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-19": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "promotion.json",
+        "promotion/gate-report.json"
+      ]
+    },
+    "DSP-20": {
+      "result": "fail",
+      "checkedBy": "Grok 4.7 (independent critique)",
+      "date": "2026-09-22",
+      "evidence": [
+        "promotion/critiques/2026-09-22-grok-4.7.md"
+      ]
+    },
+    "DSP-21": {
+      "result": "pass",
+      "checkedBy": "promotion-gate",
+      "date": "2026-09-22",
+      "evidence": [
+        "preview/specimen-website.html",
+        "preview/specimen-app.html",
+        "preview/specimen-document.html",
+        "preview/specimen-campaign.html",
+        "promotion/gate-report.json"
+      ]
+    }
+  },
+  "critiques": [
+    {
+      "id": "2026-09-22-grok-4.7",
+      "reviewer": "Grok 4.7 via SuperGrok subscription, document-only, not an author or owner",
+      "relationship": "independent",
+      "date": "2026-09-22",
+      "versionReviewed": "0.1.0",
+      "verdict": "fail",
+      "scope": [
+        "responsive layouts",
+        "focus behavior",
+        "contrast",
+        "documentation coherence"
+      ],
+      "findings": "promotion/critiques/2026-09-22-grok-4.7.md"
+    }
+  ],
+  "changelog": [
+    {
+      "version": "0.1.0",
+      "date": "2026-09-22",
+      "summary": "First version: tokens with light and dark modes, components fixture, four specimens, and promotion record."
+    }
+  ],
+  "deprecation": {
+    "policy": "A deprecated version stays in the catalog for one minor release with status deprecated and a replacedBy id. Downstream assets pinned to it keep working; new assets must use the replacement. Breaking token renames require a major version and a migration note in the changelog."
+  }
+}

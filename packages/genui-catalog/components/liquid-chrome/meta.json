@@ -1,0 +1,31 @@
+{
+  "id": "liquid-chrome",
+  "name": "Liquid Chrome",
+  "category": "background",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room WebGL port written from the one-line effect description only (no upstream source read): a dependency-free fragment shader turns hero panels and cards into flowing mirror-polished metal that can react to the pointer, with a banded CSS chrome gradient when WebGL is unavailable.",
+  "entry": "components/liquid-chrome/index.ts",
+  "css": "components/liquid-chrome/styles.css",
+  "demo": "components/liquid-chrome/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "tint": { "type": "string", "default": "#c9d2e0", "description": "Metal tint, as #rgb or #rrggbb; also tints the CSS fallback gradient." },
+      "speed": { "type": "number", "default": 0.5, "minimum": 0, "description": "Flow speed; 0 holds a still frame." },
+      "amplitude": { "type": "number", "default": 0.7, "minimum": 0, "maximum": 2, "description": "Warp strength: how far the surface folds." },
+      "frequency": { "type": "number", "default": 1.5, "minimum": 0.2, "maximum": 6, "description": "Ripple density; larger gives more, smaller ripples." },
+      "interactive": { "type": "boolean", "default": true, "description": "Let the pointer press a soft dent into the flow; it never intercepts clicks or focus." }
+    }
+  },
+  "a11y": [
+    "The injected canvas is aria-hidden and pointer-events: none; the host's content, reading order and focus behaviour are unchanged, and pointer tracking is passive and never captures clicks.",
+    "Chrome swings between near-white highlights and near-black bands, so text must sit on its own scrim to keep 4.5:1 contrast (the demo uses a dark panel).",
+    "Reduced motion stops the shader loop, the pointer easing and the fallback drift, and shows one still frame of the metal.",
+    "Forced-colors mode hides the canvas and paints the host in Canvas/CanvasText with a visible border."
+  ],
+  "reducedMotion": "static"
+}

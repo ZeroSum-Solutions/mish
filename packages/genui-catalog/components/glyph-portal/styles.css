@@ -1,0 +1,58 @@
+/* glyph-portal — clean-room, component-specs.md §20. Every selector is under .genui-glyph-portal. */
+
+.genui-glyph-portal {
+  position: relative;
+}
+
+.genui-glyph-portal__stage {
+  position: sticky;
+  top: 0;
+  display: grid;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.genui-glyph-portal__content {
+  position: relative;
+  z-index: 1;
+  grid-area: 1 / 1;
+}
+
+.genui-glyph-portal__cover {
+  position: relative;
+  z-index: 2;
+  grid-area: 1 / 1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.genui-glyph-portal__cover--open {
+  visibility: hidden;
+}
+
+.genui-glyph-portal__glyph {
+  transform: scale(var(--genui-glyph-portal-s, 1));
+  transform-box: fill-box;
+  will-change: transform;
+}
+
+.genui-glyph-portal--reduced .genui-glyph-portal__stage {
+  position: static;
+  height: auto;
+}
+
+.genui-glyph-portal--reduced .genui-glyph-portal__cover {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-glyph-portal__stage {
+    position: static;
+    height: auto;
+  }
+
+  .genui-glyph-portal__cover {
+    display: none;
+  }
+}

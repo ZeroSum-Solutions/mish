@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-04",
+  "businessName": "Graymoor Insurance Brokers",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Graymoor Insurance Brokers"
+    },
+    {
+      "field": "address",
+      "value": "700 Louisiana Street, Suite 2200, Houston, Texas"
+    },
+    {
+      "field": "phone",
+      "value": "(713) 555-0137"
+    },
+    {
+      "field": "email",
+      "value": "desk@graymoorinsurance.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8 a.m. to 5:30 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed as an insurance agency in the State of Texas"
+    },
+    {
+      "field": "other",
+      "value": "Five-broker commercial lines desk"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Broker L. Park logged a carrier quote for Fenmore Trucking, moved to quoted, 10 minutes ago"
+    }
+  ]
+}

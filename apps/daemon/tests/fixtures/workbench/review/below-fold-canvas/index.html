@@ -1,0 +1,4 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Canvas</title>
+<style>body{margin:0;font:16px/1.5 system-ui;color:#1f2937;background:#fff}main{padding:16px}.spacer{height:3000px}</style></head>
+<body><main><h1>Studio</h1><p>Rooms.</p><div class="spacer"></div><canvas id="c" width="200" height="100" aria-label="Animated"></canvas></main>
+<script>const c=document.getElementById('c').getContext('2d');let x=0;(function f(){c.fillStyle='#fff';c.fillRect(0,0,200,100);c.fillStyle='#1d4ed8';c.fillRect(x,30,40,40);x=(x+2)%160;requestAnimationFrame(f)})();</script></body></html>

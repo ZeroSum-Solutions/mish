@@ -1,0 +1,31 @@
+{
+  "id": "soft-aurora",
+  "name": "Soft Aurora",
+  "category": "background",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room WebGL port written from the one-line effect description only (no upstream source read): a dependency-free fragment shader lays two faint, slowly swaying aurora curtains behind hero panels and cards as a quiet base layer, with a static two-colour CSS wash when WebGL is unavailable.",
+  "entry": "components/soft-aurora/index.ts",
+  "css": "components/soft-aurora/styles.css",
+  "demo": "components/soft-aurora/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "colorA": { "type": "string", "default": "#3fd8b0", "description": "First curtain colour, as #rgb or #rrggbb; also tints the CSS fallback wash." },
+      "colorB": { "type": "string", "default": "#7c6cf2", "description": "Second curtain colour, as #rgb or #rrggbb; also tints the CSS fallback wash." },
+      "speed": { "type": "number", "default": 0.5, "minimum": 0, "description": "Sway speed; 0 holds a still frame." },
+      "intensity": { "type": "number", "default": 0.6, "minimum": 0, "maximum": 1, "description": "Brightness of the wash; keep it low under text." },
+      "height": { "type": "number", "default": 0.55, "minimum": 0, "maximum": 1, "description": "Height of the band line, 0 (bottom) to 1 (top)." }
+    }
+  },
+  "a11y": [
+    "The injected canvas is aria-hidden and pointer-events: none; the host's content, reading order and focus behaviour are unchanged.",
+    "The wash stays dark at default intensity, but its brightest band can sit behind text, so text on it should carry a shadow or scrim to keep 4.5:1 contrast (the demo does this).",
+    "Reduced motion stops the shader loop and the fallback sway and shows one still frame of the aurora.",
+    "Forced-colors mode hides the canvas and paints the host in Canvas/CanvasText with a visible border."
+  ],
+  "reducedMotion": "static"
+}

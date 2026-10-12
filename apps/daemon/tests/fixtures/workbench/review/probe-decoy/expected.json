@@ -1,0 +1,15 @@
+{
+  "description": "Sol round 9 BLOCK: a working decoy identical to the inert Buy button (tag, role, name, form owner) is inserted before it on reload. Its fingerprint group is 1 at capture and 2 after the reload, so nothing is clicked and the declared-actions check is inconclusive, never passed.",
+  "outcome": "inconclusive",
+  "criteria": {
+    "core.declared-actions": "inconclusive",
+    "core.text-contrast": "pass",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  },
+  "evidenceIncludes": [
+    "changed when the probe reloaded the page"
+  ]
+}

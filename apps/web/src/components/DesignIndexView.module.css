@@ -1,0 +1,502 @@
+/* Design index view on the UI system (docs/design/ui-system.md): type roles,
+   the 4px space scale, one segmented track for the panel switch, one toolbar
+   row (search, floor, primary action, live count) and the facets in one
+   filter card. Every colour goes through the shared theme tokens, which
+   already carry the dark-mode values. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-1) 96px;
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-1) 0;
+}
+.title {
+  margin: 0;
+  font: var(--font-headline);
+  letter-spacing: var(--tracking-tight);
+  color: var(--text-strong);
+}
+.lede {
+  margin: 0;
+  max-width: 68ch;
+  font: var(--font-body);
+  color: var(--text-muted);
+}
+
+/* Segmented track picking the panel; the shared SelectionIndicator draws and
+   glides the thumb in the workspace system. */
+.panels {
+  --ui-selection-surface: var(--segmented-thumb);
+  --ui-selection-shadow: var(--segmented-thumb-shadow);
+  display: inline-flex;
+  align-self: flex-start;
+  gap: var(--space-half);
+  padding: 3px;
+  border: 1px solid var(--segmented-track-border);
+  border-radius: var(--radius-pill);
+  background: var(--segmented-track);
+}
+.panelTab {
+  appearance: none;
+  position: relative;
+  isolation: isolate;
+  min-height: 30px;
+  padding: var(--space-1) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font: var(--font-label);
+  cursor: pointer;
+  transition:
+    color var(--motion-hover) var(--ease-out-quint),
+    transform var(--motion-hover) var(--ease-out-quint);
+}
+.panelTab:hover,
+.panelTabActive {
+  color: var(--text-strong);
+}
+.panelTabActive {
+  background: var(--segmented-thumb);
+  box-shadow: var(--segmented-thumb-shadow);
+}
+:global(html[data-ui-system='workspace']) .panelTabActive {
+  background: transparent;
+  box-shadow: none;
+}
+.panelTab > :global([data-selection-indicator]) {
+  border-radius: inherit;
+}
+.panelTab:active {
+  transform: scale(var(--press-scale));
+  transition-duration: var(--motion-hover), var(--motion-press);
+}
+.panelTab:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* ── Toolbar row ─────────────────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  min-width: 0;
+}
+.toolbar > .count {
+  margin-inline-start: auto;
+}
+
+/* Search field: the shimmer focus comes from `data-ui-field-shell`
+   (workspace-ui.css). */
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1 1 280px;
+  min-width: 200px;
+  max-width: 420px;
+  height: var(--control-h-compact);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-panel);
+  color: var(--text-soft);
+  cursor: text;
+}
+.searchIcon {
+  flex: 0 0 auto;
+}
+.searchInput {
+  appearance: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+  font: var(--font-body-sm);
+}
+.searchInput::placeholder {
+  color: var(--text-soft);
+}
+.searchInput:focus,
+.searchInput:focus-visible {
+  outline: none;
+  border: 0;
+  box-shadow: none;
+}
+
+/* Probability floor: label and number inside one compact field. */
+.minField {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-h-compact);
+  padding: 0 var(--space-1) 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-panel);
+}
+.minLabel {
+  font: var(--font-label);
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.minInput {
+  width: 64px;
+  height: calc(var(--control-h-compact) - 8px);
+  padding: 0 var(--space-2);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  color: var(--text-strong);
+  font: var(--font-label);
+  font-variant-numeric: tabular-nums;
+}
+.minInput:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+
+/* One card holds every facet, with the low-signal ones folded below. */
+.filterCard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--inset-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+}
+
+/* Facet grid: one column per facet, wrapping on narrow shells. */
+.facets {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: var(--space-3);
+}
+.facet,
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.facetLabel {
+  font: var(--font-caption);
+  font-weight: 500;
+  color: var(--text-soft);
+}
+
+/* background-color, not the shorthand: the shorthand would wipe the global
+   select chevron (primitives.css draws it as a background-image). */
+.select,
+.input {
+  height: var(--control-h-compact);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-panel);
+  color: var(--text);
+  font: var(--font-body-sm);
+}
+/* Room for the chevron the global select rule draws at the right. */
+.select {
+  padding-inline-end: var(--space-8);
+}
+.textarea {
+  min-height: 180px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  color: var(--text);
+  font: var(--font-body-sm);
+  font-family: var(--mono, ui-monospace, monospace);
+  resize: vertical;
+}
+.select:focus-visible,
+.input:focus-visible,
+.textarea:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+
+/* Chosen values of a repeatable facet; clicking one drops it. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.chip {
+  appearance: none;
+  padding: var(--space-half) var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--text);
+  font: var(--font-caption);
+  cursor: pointer;
+}
+.chip:hover {
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}
+
+/* Facets that dominate the loaded profiles too much to discriminate anything; collapsed here
+   rather than left in the main grid. */
+.moreFilters {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-3);
+}
+.moreFiltersSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  list-style: none;
+  font: var(--font-label);
+  color: var(--text-soft);
+  cursor: pointer;
+}
+.moreFiltersSummary::-webkit-details-marker {
+  display: none;
+}
+.moreFiltersSummary:hover {
+  color: var(--text);
+}
+.moreFiltersChevron {
+  transform: rotate(-90deg);
+  transition: transform var(--motion-hover) var(--ease-out-quint);
+}
+.moreFilters[open] .moreFiltersChevron {
+  transform: rotate(0deg);
+}
+.moreFilters .facets {
+  padding-top: var(--space-3);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  flex-wrap: wrap;
+}
+.count {
+  font: var(--font-body-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+/* The shared EmptyState owns its type and layout; this only places it. */
+.empty {
+  margin: var(--space-2) 0;
+}
+.note {
+  margin: 0;
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+.error {
+  margin: 0;
+  font: var(--font-body-sm);
+  color: var(--red);
+}
+
+/* C16: the "Static prototype" label on app and dashboard builds. */
+.scopeNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+.scopeBadge {
+  display: inline-block;
+  margin-inline-start: var(--space-1);
+  padding: 1px var(--space-2);
+  border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--border));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+  color: var(--text);
+  font: var(--font-micro);
+}
+.scopeNote .scopeBadge {
+  margin-inline-start: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-3);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--inset-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+}
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.cardTitle {
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+  font: var(--font-title);
+  color: var(--text-strong);
+  overflow-wrap: anywhere;
+}
+.badge {
+  padding: var(--space-half) var(--space-2);
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font: var(--font-micro);
+  white-space: nowrap;
+}
+.remove {
+  appearance: none;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  font: var(--font-caption);
+  cursor: pointer;
+  transition:
+    border-color var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint);
+}
+.remove:hover {
+  border-color: color-mix(in srgb, var(--red) 45%, var(--border));
+  color: var(--red);
+}
+.remove:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+.cardRef {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+.cardRef a {
+  color: var(--accent);
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+}
+.row,
+.rowHead {
+  display: grid;
+  grid-template-columns: minmax(96px, 34%) minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: baseline;
+}
+.rowHead {
+  padding-bottom: var(--space-half);
+  border-bottom: 1px solid var(--border);
+  font-weight: 600;
+}
+.rowKey {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-soft);
+  overflow-wrap: anywhere;
+}
+
+.startingPointRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.startingPointTitle {
+  flex: 1 1 0;
+  min-width: 0;
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+  overflow-wrap: anywhere;
+}
+
+.startingPointAccess {
+  font: var(--font-caption);
+  color: var(--text-soft);
+}
+
+.startingPointAction {
+  flex: 0 0 auto;
+  margin-inline-start: auto;
+  min-height: var(--control-h-sm);
+}
+.rowValue {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.tables {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-3);
+}
+/* Nested in a card: one radius step below the card (ui-system § 4). */
+.table {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+}
+.tableTitle {
+  margin: 0;
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+}
+.warnings {
+  margin: 0;
+  padding-left: var(--space-5);
+  font: var(--font-caption);
+  color: var(--text-muted);
+}

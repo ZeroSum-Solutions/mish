@@ -1,0 +1,55 @@
+{
+  "name": "@open-design/cult-ui-catalog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Canonical Cult UI inventory metadata. Upstream source remains in private source kits. The 21st.dev references and their independently authored alternatives live in @open-design/21st-catalog.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "catalog.json",
+    "reviewed-overrides.json",
+    "catalog-curation.json",
+    "schema",
+    "generated",
+    "catalog-copy-refinements.json"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./catalog.json": "./catalog.json",
+    "./schema/cult-ui-catalog.schema.json": "./schema/cult-ui-catalog.schema.json",
+    "./generated": "./generated/index.ts",
+    "./generated/thumbnails.json": "./generated/thumbnails.json",
+    "./generated/slugs.json": "./generated/slugs.json",
+    "./generated/public-names.json": "./generated/public-names.json",
+    "./catalog-curation.json": "./catalog-curation.json",
+    "./catalog-copy-refinements.json": "./catalog-copy-refinements.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "import": "node --experimental-strip-types scripts/import.ts && node --experimental-strip-types scripts/slugs.ts",
+    "adapters": "node --experimental-strip-types scripts/adapters.ts && node --experimental-strip-types scripts/public-names.ts",
+    "check": "node --experimental-strip-types scripts/import.ts --check && node --experimental-strip-types scripts/adapters.ts --check && node --experimental-strip-types scripts/thumbnails.ts --check && node --experimental-strip-types scripts/slugs.ts --check && node --experimental-strip-types scripts/public-names.ts --check",
+    "render-check": "node --experimental-strip-types scripts/render-check.ts",
+    "thumbnails": "node --experimental-strip-types scripts/thumbnails.ts",
+    "test": "node --experimental-strip-types --test \"tests/**/*.test.ts\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tests.json --noEmit",
+    "slugs": "node --experimental-strip-types scripts/slugs.ts",
+    "public-names": "node --experimental-strip-types scripts/public-names.ts"
+  },
+  "devDependencies": {
+    "@open-design/contracts": "workspace:*",
+    "@types/node": "24.12.2",
+    "cobe": "2.0.1",
+    "sharp": "0.35.3",
+    "typescript": "5.9.3",
+    "zod": "3.25.76"
+  },
+  "engines": {
+    "node": "~24"
+  }
+}

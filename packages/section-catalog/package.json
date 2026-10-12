@@ -1,0 +1,47 @@
+{
+  "name": "@open-design/section-catalog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The selectable section catalog: HyperUI blocks, the 13 agency families' own sections, the Cult UI Pro section/page projection, and federated MotionSites prompt metadata, normalized to one rights-labeled DTO (see @open-design/contracts's section-catalog.ts) behind catalog.json.",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "catalog.json",
+    "data",
+    "schema"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./motionsites": {
+      "types": "./dist/motionsites.d.ts",
+      "default": "./dist/motionsites.js"
+    },
+    "./local-corpus": {
+      "types": "./dist/local-corpus.d.ts",
+      "default": "./dist/local-corpus.js"
+    },
+    "./catalog.json": "./catalog.json",
+    "./data/zerosum-local-corpus.json": "./data/zerosum-local-corpus.json",
+    "./schema/section-catalog.schema.json": "./schema/section-catalog.schema.json"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "catalog": "node --experimental-strip-types scripts/build-catalog.ts",
+    "check": "node --experimental-strip-types scripts/build-catalog.ts --check",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tests.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "24.12.2",
+    "typescript": "5.9.3",
+    "vitest": "4.1.6"
+  },
+  "engines": {
+    "node": "~24"
+  }
+}

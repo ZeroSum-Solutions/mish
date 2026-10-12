@@ -1,0 +1,133 @@
+{
+  "schemaVersion": 2,
+  "family": "practice",
+  "revision": 1,
+  "brand": {
+    "name": "Willow Creek Family Dental",
+    "descriptor": "A family and cosmetic dental practice in Northeast Portland offering preventive, restorative and cosmetic care for the whole family."
+  },
+  "sections": [
+    {
+      "id": "practice-header",
+      "type": "header",
+      "text": {
+        "bookCta": "Book a visit"
+      }
+    },
+    {
+      "id": "practice-hero",
+      "type": "hero",
+      "text": {
+        "eyebrow": "Family and cosmetic dentistry, NE Portland",
+        "heading": "Gentle dental care for every stage of your family's smile",
+        "body": "Willow Creek Family Dental: preventive care, restorative dentistry and cosmetic dentistry for NE Portland families since 2009, with same-week appointments for new patients.",
+        "bookCta": "Book your visit"
+      }
+    },
+    {
+      "id": "practice-services",
+      "type": "services",
+      "text": {
+        "heading": "Services and treatments",
+        "body": "From a first cleaning to a full smile plan, our team walks you through every option before we start."
+      },
+      "items": [
+        { "title": "Preventive care", "body": "Cleanings, exams and digital X-rays for every age, twice a year." },
+        { "title": "Restorative dentistry", "body": "Fillings, crowns and bridges using tooth-colored materials." },
+        { "title": "Cosmetic dentistry", "body": "Whitening, bonding and porcelain veneers, planned around your smile." }
+      ]
+    },
+    {
+      "id": "practice-providers",
+      "type": "providers",
+      "text": {
+        "heading": "Meet your providers",
+        "body": "Our team brings preventive, restorative and cosmetic dentistry experience to every family that visits Willow Creek."
+      },
+      "items": [
+        { "name": "Dr. Elena Marsh, DDS", "credential": "General and cosmetic dentistry, University of Washington School of Dentistry, practicing since 2008" },
+        { "name": "Dr. Priya Anand, DMD", "credential": "Restorative dentistry, Oregon Health & Science University, practicing since 2015" },
+        { "name": "Sofia Reyes, RDH", "credential": "Registered dental hygienist, Pacific University, on staff since 2019" }
+      ]
+    },
+    {
+      "id": "practice-expect",
+      "type": "expect",
+      "text": {
+        "heading": "What to expect at your visit",
+        "body": "Check-in and a short health history, then an exam, a cleaning and a clear plan before any work starts."
+      },
+      "items": [
+        { "step": "Step 1", "title": "Check-in and history", "body": "A short health history at check-in." },
+        { "step": "Step 2", "title": "Exam and X-rays", "body": "An exam with digital X-rays." },
+        { "step": "Step 3", "title": "Cleaning and plan", "body": "A cleaning, then a clear plan, with costs explained up front." }
+      ]
+    },
+    {
+      "id": "practice-book",
+      "type": "book",
+      "text": {
+        "heading": "Ready to book?",
+        "body": "New patients can book online or call our front desk.",
+        "cta": "Book a visit",
+        "destination": "https://booking.willowcreekdental.example/appointments"
+      }
+    },
+    {
+      "id": "practice-reviews",
+      "type": "reviews",
+      "text": { "heading": "What our patients say" },
+      "items": [
+        { "quote": "Dr. Marsh explained every step before she started. First dentist visit in years that didn't feel rushed.", "name": "Katie R." },
+        { "quote": "Sofia is fantastic with my kids. They actually look forward to their cleanings now.", "name": "Marcus D." },
+        { "quote": "Got a same-week appointment for a cracked filling and the front desk made it painless.", "name": "Anh T." }
+      ]
+    },
+    {
+      "id": "practice-insurance",
+      "type": "insurance",
+      "text": {
+        "heading": "Insurance and costs",
+        "body": "We work with most major PPO plans and offer a straightforward cash-pay option for routine care."
+      },
+      "items": [
+        { "name": "Most major PPO plans", "detail": "Delta Dental, Cigna and MetLife; our front desk verifies benefits before billing.", "price": null },
+        { "name": "New patient cleaning & exam", "detail": "Cleaning, exam and digital X-rays for patients without insurance.", "price": "$149" }
+      ]
+    },
+    {
+      "id": "practice-faq",
+      "type": "faq",
+      "text": { "heading": "Frequently asked questions" },
+      "items": [
+        { "question": "Do you see new patients?", "answer": "Yes, we're accepting new patients of every age and usually offer a same-week first appointment." },
+        { "question": "Do you offer emergency appointments?", "answer": "We hold same-day slots for urgent issues like a cracked tooth or a lost filling; call our front desk first thing." },
+        { "question": "Is parking available?", "answer": "Yes, free patient parking is available directly behind the building." }
+      ]
+    },
+    {
+      "id": "practice-hours-location",
+      "type": "hours-location",
+      "text": {
+        "heading": "Hours",
+        "address": "4820 NE Sandy Blvd, Portland, OR 97213",
+        "phone": "(503) 555-0142"
+      },
+      "items": [
+        { "label": "Mon-Thu", "value": "8:00am - 5:00pm" },
+        { "label": "Fri", "value": "8:00am - 2:00pm" },
+        { "label": "Sat-Sun", "value": "Closed" }
+      ]
+    },
+    {
+      "id": "practice-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Family dental care for NE Portland since 2009.",
+        "phone": "(503) 555-0142",
+        "email": "frontdesk@willowcreekdental.example",
+        "address": "4820 NE Sandy Blvd, Portland, OR 97213"
+      }
+    }
+  ]
+}

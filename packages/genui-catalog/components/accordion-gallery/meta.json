@@ -1,0 +1,30 @@
+{
+  "id": "accordion-gallery",
+  "name": "Accordion Gallery",
+  "category": "gallery",
+  "kind": "css-only",
+  "status": "ported",
+  "entry": "components/accordion-gallery/index.ts",
+  "css": "components/accordion-gallery/styles.css",
+  "demo": "components/accordion-gallery/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "expand": { "type": "number", "default": 4, "minimum": 1, "description": "flex-grow ratio of the expanded panel." },
+      "grayscale": { "type": "number", "default": 1, "minimum": 0, "maximum": 1, "description": "Grayscale amount of a collapsed panel." },
+      "duration": { "type": "number", "default": 500, "minimum": 0, "description": "Expand/collapse transition duration in ms." },
+      "easing": { "type": "string", "default": "cubic-bezier(.2,.8,.2,1)" },
+      "activeIndex": { "type": "number", "default": -1, "description": "Panel expanded when nothing is hovered or focused; -1 for none." },
+      "height": { "type": "string", "default": "420px" },
+      "stackBelow": { "type": "number", "default": 640, "minimum": 0, "maximum": 640, "description": "Viewport width, in px, below which the layout stacks vertically. Can only lower the baked-in 640px default, never raise it." }
+    }
+  },
+  "a11y": [
+    "Panels are list items and the links are the focus targets, so :focus-within expands the panel under keyboard focus.",
+    "Labels are real text and stay in the DOM, so screen readers read them even when the panel is collapsed.",
+    "The label sits on a gradient scrim with >= 4.5:1 contrast against white text.",
+    "The host's own focus outline is untouched."
+  ],
+  "reducedMotion": "reduced"
+}

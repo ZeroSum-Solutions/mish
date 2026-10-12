@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-05",
+  "businessName": "Havenwell Legal Aid",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Havenwell Legal Aid"
+    },
+    {
+      "field": "address",
+      "value": "77 State Street, Albany, New York"
+    },
+    {
+      "field": "phone",
+      "value": "(518) 555-0136"
+    },
+    {
+      "field": "email",
+      "value": "intake@havenwelllegalaid.org"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 9 a.m. to 4 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Registered 501(c)(3) nonprofit in New York"
+    },
+    {
+      "field": "other",
+      "value": "Serves three counties; four intake coordinators"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample intake-list row shown only to illustrate layout",
+      "text": "R. Nguyen, housing eviction defense, eligible, assigned to Atty. Park, awaiting documents"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-08",
+  "businessName": "Thistlewood Realty Team",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Thistlewood Realty Team"
+    },
+    {
+      "field": "address",
+      "value": "3400 Peachtree Road NE, Suite 500, Atlanta, Georgia"
+    },
+    {
+      "field": "phone",
+      "value": "(404) 555-0173"
+    },
+    {
+      "field": "email",
+      "value": "team@thistlewoodrealty.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Saturday, 9 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Operates under a broker licensed in the State of Georgia"
+    },
+    {
+      "field": "other",
+      "value": "Nine-agent team"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Agent P. Salazar logged a signed contract for the Ainsworth listing, moved to under contract, 8 minutes ago"
+    }
+  ]
+}

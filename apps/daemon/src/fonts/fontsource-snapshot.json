@@ -1,0 +1,2414 @@
+{
+ "schema": "od-font-catalogue/1",
+ "source": {
+  "repository": "fontsource/font-files",
+  "commit": "c3f4e3e5a664d2c3002e800050ce809a790d7281",
+  "retrievedAt": "2026-10-08",
+  "retrieval": "metadata.json, unicode.json, package.json and LICENSE per family from raw.githubusercontent.com at the pinned commit; no font binaries were downloaded",
+  "licence": "Fontsource packaging code is MIT; each family carries its own font licence below"
+ },
+ "classification": "Spine fit, counter-fit, the small-size legibility trait and brand tones are Mishh Mashh curated judgments, not source claims. No family is exclusive to one spine.",
+ "localBytes": {
+  "root": "bundled-plugins",
+  "measuredWith": "fontTools 4.66.1",
+  "method": "Local files are upstream Google Fonts-served subsets already bundled with the official example plugins; cmap coverage, weight and axes were measured once at snapshot time. The daemon only checks size, magic and sha256 at runtime."
+ },
+ "families": [
+  {
+   "id": "archivo",
+   "family": "Archivo",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wdth",
+     "min": 62,
+     "max": 125,
+     "default": 100,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo) Archivo-Italic[wdth,wght].ttf: Copyright 2020 The Archivo Project Authors (https://github.com/Omnibus-Type/Archivo)",
+    "upstreamLicenceSha256": "c3c8402eec0e31dc9a76851235b1c02a0bb821488b2db8e35bcc2ab60ca8fc2b",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/archivo",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v25",
+    "lastModified": "2025-09-08",
+    "metadataSha256": "cfc3330ae68e374132dd652c39440d8978bd0c19800c71b5cd42008129dddfb7",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "PA",
+     "fit": "Width and weight axes let one family carry product headlines and dense interface labels.",
+     "counterFit": "Its neutral grotesque voice needs a distinct accent before it reads as a brand."
+    },
+    {
+     "spine": "CO",
+     "fit": "Condensed widths fit price, size and product-grid labels without truncation.",
+     "counterFit": "Long product stories read more comfortably in a text serif."
+    },
+    {
+     "spine": "TU",
+     "fit": "Tabular figures and a 100–900 weight range suit dense tool screens.",
+     "counterFit": "Wide widths waste space in narrow side panels; keep the default width."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "technical",
+    "expressive"
+   ],
+   "localFiles": [
+    {
+     "path": "examples/agency-halcyon/families/halcyon/assets/archivo-latin.woff2",
+     "sha256": "7150c0ec5ad356453013d11affec1fbab95de0dd2dcecb043b4f1cb7f87c4ba4",
+     "bytes": 34940,
+     "format": "woff2",
+     "subset": "latin",
+     "style": "normal",
+     "weight": {
+      "min": 100,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 100,
+       "max": 900,
+       "default": 600
+      }
+     ],
+     "cmap": "U+000D,U+0020-007E,U+00A0-00FF,U+0102,U+0131,U+0152-0153,U+02BC,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+2009,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2032-2033,U+2039-203A,U+2044,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF",
+     "notice": {
+      "path": "examples/agency-halcyon/families/halcyon/assets/OFL.txt",
+      "sha256": "9dd12956b803c015ae84bddcf0c36fc88ef783ee603b534473c934d2b65c8bfb"
+     },
+     "provenance": "examples/agency-halcyon/families/halcyon/media-provenance.json#halcyon-archivo-latin"
+    },
+    {
+     "path": "examples/agency-halcyon/families/halcyon/assets/archivo-latinext.woff2",
+     "sha256": "a999e009fdcd0f939c138e04043b3b2ad083b26252b644e8f94c083d48b77af0",
+     "bytes": 32672,
+     "format": "woff2",
+     "subset": "latin-ext",
+     "style": "normal",
+     "weight": {
+      "min": 100,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 100,
+       "max": 900,
+       "default": 600
+      }
+     ],
+     "cmap": "U+000D,U+0020,U+0041,U+00A0,U+00C1,U+0100-0130,U+0132-0151,U+0154-017F,U+018F,U+0192,U+019D,U+01A0-01A1,U+01AF-01B0,U+01C4-01DC,U+01E6-01E7,U+01EA-01EB,U+01FA-021B,U+022A-022D,U+0230-0233,U+0237,U+0259,U+0272,U+02B9-02BA,U+02BC,U+02C7,U+02C9,U+02DD,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+1E24-1E25,U+1E62-1E63,U+1E6C-1E6D,U+1E80-1E85,U+1E9E,U+1EF2-1EF9,U+2020,U+20A1,U+20A3-20A4,U+20A6-20A7,U+20A9,U+20AB,U+20AD,U+20B1-20B2,U+20B5,U+20B9-20BA,U+20BC-20BD,U+2113",
+     "notice": {
+      "path": "examples/agency-halcyon/families/halcyon/assets/OFL.txt",
+      "sha256": "9dd12956b803c015ae84bddcf0c36fc88ef783ee603b534473c934d2b65c8bfb"
+     },
+     "provenance": "examples/agency-halcyon/families/halcyon/media-provenance.json#halcyon-archivo-latinext"
+    }
+   ]
+  },
+  {
+   "id": "atkinson-hyperlegible",
+   "family": "Atkinson Hyperlegible",
+   "category": "sans-serif",
+   "weights": [
+    400,
+    700
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext"
+   ],
+   "defaultSubset": "latin",
+   "axes": [],
+   "unicodeRanges": {
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2020 Braille Institute of America, Inc. AtkinsonHyperlegible-Italic.ttf: Copyright 2020 Braille Institute of America, Inc. AtkinsonHyperlegible-Bold.ttf: Copyright 2020 Braille Institute of America, Inc. AtkinsonHyperlegible-BoldItalic.ttf: Copyright 2020 Braille Institute of America, Inc.",
+    "upstreamLicenceSha256": "e137caeef2ff7c04fbf87078ad09cf3dcba8a3a58a4aa4e2f399d42c50bc4b18",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/atkinson-hyperlegible",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v12",
+    "lastModified": "2025-09-05",
+    "metadataSha256": "b4ec00a78161d294d5da274b5cd00457576682fac4712eeca232d38f3973b6ac",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "TL",
+     "fit": "Letterforms designed to separate confusable characters support clinical and legal forms.",
+     "counterFit": "Only 400 and 700 exist, so fine typographic hierarchy needs size, not weight."
+    },
+    {
+     "spine": "LM",
+     "fit": "High character distinction helps learners and low-vision readers in lessons and quizzes.",
+     "counterFit": "Its utilitarian voice can feel institutional for a premium course brand."
+    },
+    {
+     "spine": "MI",
+     "fit": "Accessible defaults match public-interest audiences with mixed reading ability.",
+     "counterFit": "It does not cover non-Latin scripts; pair a Noto family for those languages."
+    }
+   ],
+   "traits": [
+    {
+     "trait": "small-size-legibility",
+     "reason": "Designed by the Braille Institute so confusable letters and numerals stay distinct for low-vision readers."
+    }
+   ],
+   "tones": [
+    "civic",
+    "formal"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "bodoni-moda",
+   "family": "Bodoni Moda",
+   "category": "serif",
+   "weights": [
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext",
+    "math",
+    "symbols"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "opsz",
+     "min": 6,
+     "max": 96,
+     "default": 11,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 400,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "math": "U+0302-0303,U+0305,U+0307-0308,U+0310,U+0312,U+0315,U+031A,U+0326-0327,U+032C,U+032F-0330,U+0332-0333,U+0338,U+033A,U+0346,U+034D,U+0391-03A1,U+03A3-03A9,U+03B1-03C9,U+03D1,U+03D5-03D6,U+03F0-03F1,U+03F4-03F5,U+2016-2017,U+2034-2038,U+203C,U+2040,U+2043,U+2047,U+2050,U+2057,U+205F,U+2070-2071,U+2074-208E,U+2090-209C,U+20D0-20DC,U+20E1,U+20E5-20EF,U+2100-2112,U+2114-2115,U+2117-2121,U+2123-214F,U+2190,U+2192,U+2194-21AE,U+21B0-21E5,U+21F1-21F2,U+21F4-2211,U+2213-2214,U+2216-22FF,U+2308-230B,U+2310,U+2319,U+231C-2321,U+2336-237A,U+237C,U+2395,U+239B-23B7,U+23D0,U+23DC-23E1,U+2474-2475,U+25AF,U+25B3,U+25B7,U+25BD,U+25C1,U+25CA,U+25CC,U+25FB,U+266D-266F,U+27C0-27FF,U+2900-2AFF,U+2B0E-2B11,U+2B30-2B4C,U+2BFE,U+3030,U+FF5B,U+FF5D,U+1D400-1D7FF,U+1EE00-1EEFF",
+    "symbols": "U+0001-000C,U+000E-001F,U+007F-009F,U+20DD-20E0,U+20E2-20E4,U+2150-218F,U+2190,U+2192,U+2194-2199,U+21AF,U+21E6-21F0,U+21F3,U+2218-2219,U+2299,U+22C4-22C6,U+2300-243F,U+2440-244A,U+2460-24FF,U+25A0-27BF,U+2800-28FF,U+2921-2922,U+2981,U+29BF,U+29EB,U+2B00-2BFF,U+4DC0-4DFF,U+FFF9-FFFB,U+10140-1018E,U+10190-1019C,U+101A0,U+101D0-101FD,U+102E0-102FB,U+10E60-10E7E,U+1D2C0-1D2D3,U+1D2E0-1D37F,U+1F000-1F0FF,U+1F100-1F1AD,U+1F1E6-1F1FF,U+1F30D-1F30F,U+1F315,U+1F31C,U+1F31E,U+1F320-1F32C,U+1F336,U+1F378,U+1F37D,U+1F382,U+1F393-1F39F,U+1F3A7-1F3A8,U+1F3AC-1F3AF,U+1F3C2,U+1F3C4-1F3C6,U+1F3CA-1F3CE,U+1F3D4-1F3E0,U+1F3ED,U+1F3F1-1F3F3,U+1F3F5-1F3F7,U+1F408,U+1F415,U+1F41F,U+1F426,U+1F43F,U+1F441-1F442,U+1F444,U+1F446-1F449,U+1F44C-1F44E,U+1F453,U+1F46A,U+1F47D,U+1F4A3,U+1F4B0,U+1F4B3,U+1F4B9,U+1F4BB,U+1F4BF,U+1F4C8-1F4CB,U+1F4D6,U+1F4DA,U+1F4DF,U+1F4E3-1F4E6,U+1F4EA-1F4ED,U+1F4F7,U+1F4F9-1F4FB,U+1F4FD-1F4FE,U+1F503,U+1F507-1F50B,U+1F50D,U+1F512-1F513,U+1F53E-1F54A,U+1F54F-1F5FA,U+1F610,U+1F650-1F67F,U+1F687,U+1F68D,U+1F691,U+1F694,U+1F698,U+1F6AD,U+1F6B2,U+1F6B9-1F6BA,U+1F6BC,U+1F6C6-1F6CF,U+1F6D3-1F6D7,U+1F6E0-1F6EA,U+1F6F0-1F6F3,U+1F6F7-1F6FC,U+1F700-1F7FF,U+1F800-1F80B,U+1F810-1F847,U+1F850-1F859,U+1F860-1F887,U+1F890-1F8AD,U+1F8B0-1F8BB,U+1F8C0-1F8C1,U+1F900-1F90B,U+1F93B,U+1F946,U+1F984,U+1F996,U+1F9E9,U+1FA00-1FA6F,U+1FA70-1FA7C,U+1FA80-1FA89,U+1FA8F-1FAC6,U+1FACE-1FADC,U+1FADF-1FAE9,U+1FAF0-1FAF8,U+1FB00-1FBFF",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni) BodoniModa-Italic[opsz,wght].ttf: Copyright 2020 The Bodoni Moda Project Authors (https://github.com/indestructible-type/Bodoni)",
+    "upstreamLicenceSha256": "6c64f717433eadd29b058d6254fe25c1ee2d249ce3772f843bb21f73285779c2",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/bodoni-moda",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v28",
+    "lastModified": "2025-09-16",
+    "metadataSha256": "1b4ec4e53cd0725334316cb5ae0bcd989e2a24771e7de99ba0a6bef616c241a6",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "CO",
+     "fit": "High-contrast didone display suits fashion, beauty and luxury product pages.",
+     "counterFit": "Hairlines break down at small sizes; keep it out of prices and checkout text."
+    },
+    {
+     "spine": "BA",
+     "fit": "Event and venue headlines gain occasion and formality.",
+     "counterFit": "Booking forms and times need a sturdier text face beside it."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "editorial"
+   ],
+   "localFiles": [
+    {
+     "path": "examples/agency-emmpo/families/emmpo/assets/bodoni-moda-latin.woff2",
+     "sha256": "fe710b15e2acd1f30159cec96b10c3455a32d27104c29d4027c5465d81fc11fe",
+     "bytes": 46248,
+     "format": "woff2",
+     "subset": "latin",
+     "style": "normal",
+     "weight": {
+      "min": 400,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 400,
+       "max": 900,
+       "default": 400
+      },
+      {
+       "tag": "opsz",
+       "min": 6,
+       "max": 96,
+       "default": 11
+      }
+     ],
+     "cmap": "U+000D,U+0020-007E,U+00A0-00AC,U+00AE-00FF,U+0102,U+0131,U+0152-0153,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308,U+0323,U+2002,U+2009,U+200B,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2039-203A,U+2044,U+20AC,U+2122,U+2212,U+2215",
+     "notice": {
+      "path": "examples/agency-emmpo/families/emmpo/assets/OFL.txt",
+      "sha256": "16b1f768ca5449adf3a7c03d4ecff6739db0d1f4d1a4eb87a5f2dd6128fa7382"
+     },
+     "provenance": "examples/agency-emmpo/families/emmpo/media-provenance.json#ofl-bodoni-moda-latin"
+    },
+    {
+     "path": "examples/agency-maren/families/maren/assets/bodoni-latinext.woff2",
+     "sha256": "e00904cd96a4b289e3e56f9f12c59d2f49b33f56baf384336534e61024c088d0",
+     "bytes": 24952,
+     "format": "woff2",
+     "subset": "latin-ext",
+     "style": "normal",
+     "weight": {
+      "min": 400,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 400,
+       "max": 900,
+       "default": 400
+      },
+      {
+       "tag": "opsz",
+       "min": 6,
+       "max": 96,
+       "default": 11
+      }
+     ],
+     "cmap": "U+000D,U+0020,U+0041,U+00A0,U+00C1,U+0100-0130,U+0132-0151,U+0154-017F,U+0192,U+0212-0213,U+0218-021B,U+0237,U+02C7,U+02DD,U+0300-0301,U+0303-0304,U+0308,U+0323,U+1E80-1E89,U+1E9E,U+1EF2-1EF3,U+2020",
+     "notice": {
+      "path": "examples/agency-maren/families/maren/assets/OFL.txt",
+      "sha256": "16b1f768ca5449adf3a7c03d4ecff6739db0d1f4d1a4eb87a5f2dd6128fa7382"
+     },
+     "provenance": "examples/agency-maren/families/maren/media-provenance.json#maren-bodoni-latinext"
+    }
+   ]
+  },
+  {
+   "id": "dm-sans",
+   "family": "DM Sans",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "opsz",
+     "min": 9,
+     "max": 40,
+     "default": 14,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 1000,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts) DMSans-Italic[opsz,wght].ttf: Copyright 2014 The DM Sans Project Authors (https://github.com/googlefonts/dm-fonts)",
+    "upstreamLicenceSha256": "6fbd040a29c2037a765dfb9f2561e9965b5c95c6dcb5dce516089d63d5f17af7",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/dm-sans",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v17",
+    "lastModified": "2025-09-11",
+    "metadataSha256": "7d4178ebfc70335634d594d30ba9bead575b3578b373f6b6c4e8a355b2ca4acb",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "PA",
+     "fit": "Low-contrast geometric shapes and an optical-size axis read cleanly from hero to UI.",
+     "counterFit": "Geometric round forms can feel generic in a crowded SaaS category."
+    },
+    {
+     "spine": "SM",
+     "fit": "Compact, even texture keeps listing cards and filters scannable.",
+     "counterFit": "Latin-script subsets only; marketplaces with Cyrillic or Greek listings need another family."
+    }
+   ],
+   "traits": [
+    {
+     "trait": "small-size-legibility",
+     "reason": "Low-contrast strokes and an optical-size axis that opens spacing at small text sizes."
+    }
+   ],
+   "tones": [
+    "friendly",
+    "technical"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "fraunces",
+   "family": "Fraunces",
+   "category": "serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "opsz",
+     "min": 9,
+     "max": 144,
+     "default": 14,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    },
+    {
+     "tag": "SOFT",
+     "min": 0,
+     "max": 100,
+     "default": 0,
+     "step": 0.1
+    },
+    {
+     "tag": "WONK",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2020 The Fraunces Project Authors (github.com/undercasetype/Fraunces) Fraunces-Italic[SOFT,WONK,opsz,wght].ttf: Copyright 2020 The Fraunces Project Authors (github.com/undercasetype/Fraunces)",
+    "upstreamLicenceSha256": "cd3384cafac6f2bddc3955273958a2e029f97027c8037ac539ef5744a77b579e",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/fraunces",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v38",
+    "lastModified": "2025-09-10",
+    "metadataSha256": "f2d1eec366e0b3e2db67c5a6f29f1f6df37790c89d3d0c4bc1783eda06f28436",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "CS",
+     "fit": "Soft, wonky old-style display gives newsletters and essays a recognisable masthead.",
+     "counterFit": "Its quirks distract at body sizes; pair a calmer text face for articles."
+    },
+    {
+     "spine": "BA",
+     "fit": "Warm display character suits restaurants, studios and local bookings.",
+     "counterFit": "Heavy weights crowd small calendar and time-slot labels."
+    },
+    {
+     "spine": "MI",
+     "fit": "Expressive headlines help a cause or campaign feel human.",
+     "counterFit": "The playful SOFT and WONK axes can undercut serious reports; keep them at defaults."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "editorial",
+    "friendly",
+    "expressive"
+   ],
+   "localFiles": [
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/fraunces-900-latin.woff2",
+     "sha256": "628051c1bd196ee82e88cb02015e46b8fc30f505215b424d29627ec613395a0d",
+     "bytes": 34632,
+     "format": "woff2",
+     "subset": "latin",
+     "style": "normal",
+     "weight": {
+      "min": 900,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "opsz",
+       "min": 9,
+       "max": 144,
+       "default": 9
+      }
+     ],
+     "cmap": "U+0020-007E,U+00A0-00FF,U+0131,U+0152-0153,U+02BC,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2032-2033,U+2039-203A,U+2044,U+20AC,U+2122,U+2212,U+2215",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-fraunces-900-latin"
+    },
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/fraunces-900-latinext.woff2",
+     "sha256": "dadf4bb1a5ac7e433e2b85654ecbc9df68f672a08c7c77b2994db904e7176cc7",
+     "bytes": 31824,
+     "format": "woff2",
+     "subset": "latin-ext",
+     "style": "normal",
+     "weight": {
+      "min": 900,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "opsz",
+       "min": 9,
+       "max": 144,
+       "default": 9
+      }
+     ],
+     "cmap": "U+0020,U+0041,U+00A0,U+0100-0130,U+0132-0148,U+014A-0151,U+0154-017E,U+018F,U+0192,U+01A0-01A1,U+01AF-01B0,U+01C4-01CC,U+01D9-01DA,U+01E6-01E7,U+01EA-01EB,U+01FA-021B,U+022A-022D,U+0230-0233,U+0237,U+0259,U+02B9-02BA,U+02BC,U+02C7,U+02DD,U+0300-0301,U+0303-0304,U+0308,U+1E08-1E09,U+1E0C-1E0F,U+1E14-1E17,U+1E1C-1E1D,U+1E20-1E21,U+1E24-1E25,U+1E2A-1E2B,U+1E2E-1E2F,U+1E36-1E37,U+1E3A-1E3B,U+1E42-1E43,U+1E46-1E49,U+1E4C-1E53,U+1E5A-1E5B,U+1E5E-1E5F,U+1E62-1E65,U+1E6C-1E6F,U+1E78-1E7B,U+1E80-1E85,U+1E92-1E93,U+1E97,U+1E9E,U+1EF2-1EF9,U+2020,U+20A1,U+20A3-20A4,U+20A6-20A7,U+20A9,U+20AB,U+20AD,U+20B1-20B2,U+20B5,U+20B9-20BA,U+20BC-20BD",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-fraunces-900-latinext"
+    },
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/fraunces-900-vietnamese.woff2",
+     "sha256": "bc62e56ede8f6ef682ba373dd4cfe85546b9fb1cd6643787280abcaa3ff5b52b",
+     "bytes": 11004,
+     "format": "woff2",
+     "subset": "vietnamese",
+     "style": "normal",
+     "weight": {
+      "min": 900,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "opsz",
+       "min": 9,
+       "max": 144,
+       "default": 9
+      }
+     ],
+     "cmap": "U+0020,U+0041,U+00A0,U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308,U+1EA0-1EF9,U+20AB",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-fraunces-900-vietnamese"
+    },
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/fraunces-i900-latin.woff2",
+     "sha256": "252d6ef9df2207b41b7415057df65557ed550ad8c3b7787f3dd1d9c89da100b1",
+     "bytes": 42064,
+     "format": "woff2",
+     "subset": "latin",
+     "style": "italic",
+     "weight": {
+      "min": 900,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "opsz",
+       "min": 9,
+       "max": 144,
+       "default": 9
+      }
+     ],
+     "cmap": "U+0020-007E,U+00A0-00FF,U+0131,U+0152-0153,U+02BC,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308,U+0323,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2032-2033,U+2039-203A,U+2044,U+20AC,U+2122,U+2212,U+2215",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-fraunces-i900-latin"
+    },
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/fraunces-i900-latinext.woff2",
+     "sha256": "dc548517ba35b07261354894a6280169a0fae71aa94f8d5cd51f97e0ad13fbe9",
+     "bytes": 37588,
+     "format": "woff2",
+     "subset": "latin-ext",
+     "style": "italic",
+     "weight": {
+      "min": 900,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "opsz",
+       "min": 9,
+       "max": 144,
+       "default": 9
+      }
+     ],
+     "cmap": "U+0020,U+0041,U+00A0,U+0100-0130,U+0132-0148,U+014A-0151,U+0154-017E,U+018F,U+0192,U+01A0-01A1,U+01AF-01B0,U+01C4-01CC,U+01D9-01DA,U+01E6-01E7,U+01EA-01EB,U+01FA-021B,U+022A-022D,U+0230-0233,U+0237,U+0259,U+02B9-02BA,U+02BC,U+02C7,U+02DD,U+0300-0301,U+0303-0304,U+0308,U+0323,U+1E08-1E09,U+1E0C-1E0F,U+1E14-1E17,U+1E1C-1E1D,U+1E20-1E21,U+1E24-1E25,U+1E2A-1E2B,U+1E2E-1E2F,U+1E36-1E37,U+1E3A-1E3B,U+1E42-1E43,U+1E46-1E49,U+1E4C-1E53,U+1E5A-1E5B,U+1E5E-1E5F,U+1E62-1E65,U+1E6C-1E6F,U+1E78-1E7B,U+1E80-1E85,U+1E92-1E93,U+1E97,U+1E9E,U+1EF2-1EF9,U+2020,U+20A1,U+20A3-20A4,U+20A6-20A7,U+20A9,U+20AB,U+20AD,U+20B1-20B2,U+20B5,U+20B9-20BA,U+20BC-20BD",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-fraunces-i900-latinext"
+    },
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/fraunces-i900-vietnamese.woff2",
+     "sha256": "9707e17a79325013dca75ee3c78c1023a8eae1f24b570c627ed9d2aefb8325b6",
+     "bytes": 12124,
+     "format": "woff2",
+     "subset": "vietnamese",
+     "style": "italic",
+     "weight": {
+      "min": 900,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "opsz",
+       "min": 9,
+       "max": 144,
+       "default": 9
+      }
+     ],
+     "cmap": "U+0020,U+0041,U+00A0,U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308,U+0323,U+1EA0-1EF9,U+20AB",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-fraunces-i900-vietnamese"
+    }
+   ]
+  },
+  {
+   "id": "ibm-plex-mono",
+   "family": "IBM Plex Mono",
+   "category": "monospace",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "cyrillic-ext",
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [],
+   "unicodeRanges": {
+    "cyrillic-ext": "U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F",
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-ThinItalic.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-ExtraLight.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-ExtraLightItalic.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-Light.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-LightItalic.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-Regular.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-Italic.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-Medium.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-MediumItalic.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-SemiBold.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-SemiBoldItalic.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-Bold.ttf: Copyright 2017 IBM Corp. All rights reserved. IBMPlexMono-BoldItalic.ttf: Copyright 2017 IBM Corp. All rights reserved.",
+    "upstreamLicenceSha256": "23b0a9d0c6d3f140a0b77e483c5cfa6bba574325ef5cb189ed9f2fec4884533f",
+    "reservedFontNames": [
+     "Plex"
+    ]
+   },
+   "source": {
+    "packageName": "@fontsource/ibm-plex-mono",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v20",
+    "lastModified": "2025-09-16",
+    "metadataSha256": "ae2e02195f982cfca6ababa48282f46b1e84b1c9162037229b72c943c2c2b873",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "TU",
+     "fit": "A monospace with clear zero and one serves code, IDs, logs and counters.",
+     "counterFit": "Monospace body text slows reading of prose instructions."
+    },
+    {
+     "spine": "PA",
+     "fit": "Developer-product docs and API references gain technical credibility.",
+     "counterFit": "Reserved Font Name 'Plex': any local modification or subsetting needs a rename review."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "technical"
+   ],
+   "localFiles": [
+    {
+     "path": "examples/agency-halcyon/families/halcyon/assets/plexmono-400-latin.woff2",
+     "sha256": "c36f509c0a8f9f85f29cb44bc8701d8a9e0b14c499e77a884f789ead7093a7ac",
+     "bytes": 10052,
+     "format": "woff2",
+     "subset": "latin",
+     "style": "normal",
+     "weight": {
+      "min": 400,
+      "max": 400
+     },
+     "axes": [],
+     "cmap": "U+0000,U+000D,U+0020-007E,U+00A0-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2032-2033,U+2039-203A,U+2044,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215",
+     "notice": {
+      "path": "examples/agency-halcyon/families/halcyon/assets/OFL.txt",
+      "sha256": "9dd12956b803c015ae84bddcf0c36fc88ef783ee603b534473c934d2b65c8bfb"
+     },
+     "provenance": "examples/agency-halcyon/families/halcyon/media-provenance.json#halcyon-plexmono-400-latin"
+    },
+    {
+     "path": "examples/agency-halcyon/families/halcyon/assets/plexmono-400-latinext.woff2",
+     "sha256": "f1050dc5317b43434c0aeda599d4624c774ffc162e87a8cf204b949b6a85816d",
+     "bytes": 8860,
+     "format": "woff2",
+     "subset": "latin-ext",
+     "style": "normal",
+     "weight": {
+      "min": 400,
+      "max": 400
+     },
+     "axes": [],
+     "cmap": "U+0000,U+000D,U+0020,U+0061-0062,U+00A0,U+0100-0130,U+0132-0151,U+0154-017F,U+018F,U+0192,U+01A0-01A1,U+01AF-01B0,U+01CD-01DC,U+01FA-01FF,U+0218-021B,U+0237,U+0259,U+02BC,U+02C7,U+02DD,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+1E80-1E85,U+1E9E,U+1EF2-1EF9,U+2020,U+20A1,U+20A4,U+20A6,U+20A8-20AB,U+20AD-20AE,U+20B1-20B2,U+20B4-20B5,U+20B8-20BA,U+20BD,U+20BF,U+2113",
+     "notice": {
+      "path": "examples/agency-halcyon/families/halcyon/assets/OFL.txt",
+      "sha256": "9dd12956b803c015ae84bddcf0c36fc88ef783ee603b534473c934d2b65c8bfb"
+     },
+     "provenance": "examples/agency-halcyon/families/halcyon/media-provenance.json#halcyon-plexmono-400-latinext"
+    },
+    {
+     "path": "examples/agency-halcyon/families/halcyon/assets/plexmono-500-latin.woff2",
+     "sha256": "a76f53ca6612e7b3828eec2311098675b7f9849ae4169a8bcef6302aec02a6c0",
+     "bytes": 10060,
+     "format": "woff2",
+     "subset": "latin",
+     "style": "normal",
+     "weight": {
+      "min": 500,
+      "max": 500
+     },
+     "axes": [],
+     "cmap": "U+0000,U+000D,U+0020-007E,U+00A0-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2032-2033,U+2039-203A,U+2044,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215",
+     "notice": {
+      "path": "examples/agency-halcyon/families/halcyon/assets/OFL.txt",
+      "sha256": "9dd12956b803c015ae84bddcf0c36fc88ef783ee603b534473c934d2b65c8bfb"
+     },
+     "provenance": "examples/agency-halcyon/families/halcyon/media-provenance.json#halcyon-plexmono-500-latin"
+    },
+    {
+     "path": "examples/agency-halcyon/families/halcyon/assets/plexmono-500-latinext.woff2",
+     "sha256": "77f03e26f981c582bdba3a7abed4baa2d3149211c01366bb3ab3ba7622ec4ae5",
+     "bytes": 8848,
+     "format": "woff2",
+     "subset": "latin-ext",
+     "style": "normal",
+     "weight": {
+      "min": 500,
+      "max": 500
+     },
+     "axes": [],
+     "cmap": "U+0000,U+000D,U+0020,U+0061-0062,U+00A0,U+0100-0130,U+0132-0151,U+0154-017F,U+018F,U+0192,U+01A0-01A1,U+01AF-01B0,U+01CD-01DC,U+01FA-01FF,U+0218-021B,U+0237,U+0259,U+02BC,U+02C7,U+02DD,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+1E80-1E85,U+1E9E,U+1EF2-1EF9,U+2020,U+20A1,U+20A4,U+20A6,U+20A8-20AB,U+20AD-20AE,U+20B1-20B2,U+20B4-20B5,U+20B8-20BA,U+20BD,U+20BF,U+2113",
+     "notice": {
+      "path": "examples/agency-halcyon/families/halcyon/assets/OFL.txt",
+      "sha256": "9dd12956b803c015ae84bddcf0c36fc88ef783ee603b534473c934d2b65c8bfb"
+     },
+     "provenance": "examples/agency-halcyon/families/halcyon/media-provenance.json#halcyon-plexmono-500-latinext"
+    }
+   ]
+  },
+  {
+   "id": "instrument-sans",
+   "family": "Instrument Sans",
+   "category": "sans-serif",
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wdth",
+     "min": 75,
+     "max": 100,
+     "default": 100,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 400,
+     "max": 700,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans) InstrumentSans-Italic[wdth,wght].ttf: Copyright 2022 The Instrument Sans Project Authors (https://github.com/Instrument/instrument-sans)",
+    "upstreamLicenceSha256": "c27a3c53c3beed7f5c26853afa15991478ff7145d3754a36b0382f84e10c0d03",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/instrument-sans",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v4",
+    "lastModified": "2025-09-05",
+    "metadataSha256": "7213db89b7a3f344929f6262f4a044bb77369659a5a68410d0a5d63f46d52696",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "TL",
+     "fit": "Restrained modern sans with a width axis reads as calm and professional.",
+     "counterFit": "Few weights (400–700) limit dramatic display hierarchy."
+    },
+    {
+     "spine": "PA",
+     "fit": "Neutral product UI and marketing copy share one voice.",
+     "counterFit": "Similar in feel to many startup defaults; add brand colour or imagery to differentiate."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "formal"
+   ],
+   "localFiles": [
+    {
+     "path": "examples/agency-fervor/families/fervor/assets/instrument-latin.woff2",
+     "sha256": "6219bc4bfdfc5d9b2201dcdf046218b122a758f932e25ed5f168f929b7ca2311",
+     "bytes": 29904,
+     "format": "woff2",
+     "subset": "latin",
+     "style": "normal",
+     "weight": {
+      "min": 400,
+      "max": 700
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 400,
+       "max": 700,
+       "default": 400
+      }
+     ],
+     "cmap": "U+0020-007E,U+00A0-00A3,U+00A5,U+00A7-00AB,U+00AE-00B0,U+00B4,U+00B6-00B8,U+00BA-00BB,U+00BF-00FF,U+0102,U+0131,U+0152-0153,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2039-203A,U+20AC,U+2122,U+2191,U+2193,U+2212",
+     "notice": {
+      "path": "examples/agency-fervor/families/fervor/assets/OFL.txt",
+      "sha256": "67a91a3d8f6a9d122f010d4630d7025a19040301bba7784131099aa1e644a32e"
+     },
+     "provenance": "examples/agency-fervor/families/fervor/media-provenance.json#fervor-instrument-latin"
+    },
+    {
+     "path": "examples/agency-fervor/families/fervor/assets/instrument-latinext.woff2",
+     "sha256": "21fac8da552a915e7a9fb84c5afaeb85d35507b2616346d592e78128c1cfe3e0",
+     "bytes": 11092,
+     "format": "woff2",
+     "subset": "latin-ext",
+     "style": "normal",
+     "weight": {
+      "min": 400,
+      "max": 700
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 400,
+       "max": 700,
+       "default": 400
+      }
+     ],
+     "cmap": "U+0020,U+0041,U+00A0,U+00C1,U+0100-0107,U+010A-0113,U+0116-011B,U+011E-0123,U+0126-0127,U+012A-012B,U+012E-0130,U+0132-0133,U+0136-0137,U+0139-013E,U+0141-0148,U+014A-014D,U+0150-0151,U+0154-015B,U+015E-0161,U+0164-0165,U+016A-017E,U+01CD-01CE,U+0218-021B,U+0237,U+02C7,U+02DD,U+0300-0301,U+0303-0304,U+0308,U+1E80-1E85,U+1E9E,U+1EF2-1EF3",
+     "notice": {
+      "path": "examples/agency-fervor/families/fervor/assets/OFL.txt",
+      "sha256": "67a91a3d8f6a9d122f010d4630d7025a19040301bba7784131099aa1e644a32e"
+     },
+     "provenance": "examples/agency-fervor/families/fervor/media-provenance.json#fervor-instrument-latinext"
+    }
+   ]
+  },
+  {
+   "id": "inter",
+   "family": "Inter",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "cyrillic-ext",
+    "greek",
+    "greek-ext",
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "opsz",
+     "min": 14,
+     "max": 32,
+     "default": 14,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "cyrillic-ext": "U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F",
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "greek-ext": "U+1F00-1FFF",
+    "greek": "U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter) Inter-Italic[opsz,wght].ttf: Copyright 2016 The Inter Project Authors (https://github.com/rsms/inter)",
+    "upstreamLicenceSha256": "3b0a5fca3d17942cde889069889dedbbbd075e9b599968c82a95f4d944e9b345",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/inter",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v20",
+    "lastModified": "2025-09-10",
+    "metadataSha256": "c2c4b99241edcf1bc2653e9b1d3713d5074f38e819239c550c0159cb534457d9",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "PA",
+     "fit": "Tuned for screens, with an optical-size axis and wide weight range for product UI.",
+     "counterFit": "Ubiquity makes it read as a default unless a display face adds character."
+    },
+    {
+     "spine": "SM",
+     "fit": "Many scripts (Cyrillic, Greek, Vietnamese) cover international listings and search results.",
+     "counterFit": "Large x-height can feel crowded in long descriptive copy without extra leading."
+    },
+    {
+     "spine": "TU",
+     "fit": "Tabular figures and clear small sizes suit dashboards and settings.",
+     "counterFit": "Very light weights lose contrast on low-quality displays."
+    }
+   ],
+   "traits": [
+    {
+     "trait": "small-size-legibility",
+     "reason": "Drawn for screens with a tall x-height and an optical-size axis tuned for small UI text."
+    }
+   ],
+   "tones": [
+    "technical",
+    "formal"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "jetbrains-mono",
+   "family": "JetBrains Mono",
+   "category": "monospace",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "cyrillic-ext",
+    "greek",
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 800,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "cyrillic-ext": "U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F",
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "greek": "U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono) JetBrainsMono-Italic[wght].ttf: Copyright 2020 The JetBrains Mono Project Authors (https://github.com/JetBrains/JetBrainsMono)",
+    "upstreamLicenceSha256": "403581b69dac5cff4079205e01c6b467e56af449ecbd7247693ddb1baafa005b",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/jetbrains-mono",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v24",
+    "lastModified": "2025-09-11",
+    "metadataSha256": "4fed386ac446aebf3b94233a5b36bf46def4cd417f99e136eb6ea27efee70c01",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "TU",
+     "fit": "Increased letter height and distinct glyphs suit code editors, terminals and data tables.",
+     "counterFit": "Too technical in voice for consumer-facing headings."
+    },
+    {
+     "spine": "PA",
+     "fit": "Code samples in developer onboarding stay legible at small sizes.",
+     "counterFit": "Use it for code only; product marketing copy needs a proportional face."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "technical"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "kumbh-sans",
+   "family": "Kumbh Sans",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext",
+    "math",
+    "symbols"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    },
+    {
+     "tag": "YOPQ",
+     "min": 40,
+     "max": 300,
+     "default": 300,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "math": "U+0302-0303,U+0305,U+0307-0308,U+0310,U+0312,U+0315,U+031A,U+0326-0327,U+032C,U+032F-0330,U+0332-0333,U+0338,U+033A,U+0346,U+034D,U+0391-03A1,U+03A3-03A9,U+03B1-03C9,U+03D1,U+03D5-03D6,U+03F0-03F1,U+03F4-03F5,U+2016-2017,U+2034-2038,U+203C,U+2040,U+2043,U+2047,U+2050,U+2057,U+205F,U+2070-2071,U+2074-208E,U+2090-209C,U+20D0-20DC,U+20E1,U+20E5-20EF,U+2100-2112,U+2114-2115,U+2117-2121,U+2123-214F,U+2190,U+2192,U+2194-21AE,U+21B0-21E5,U+21F1-21F2,U+21F4-2211,U+2213-2214,U+2216-22FF,U+2308-230B,U+2310,U+2319,U+231C-2321,U+2336-237A,U+237C,U+2395,U+239B-23B7,U+23D0,U+23DC-23E1,U+2474-2475,U+25AF,U+25B3,U+25B7,U+25BD,U+25C1,U+25CA,U+25CC,U+25FB,U+266D-266F,U+27C0-27FF,U+2900-2AFF,U+2B0E-2B11,U+2B30-2B4C,U+2BFE,U+3030,U+FF5B,U+FF5D,U+1D400-1D7FF,U+1EE00-1EEFF",
+    "symbols": "U+0001-000C,U+000E-001F,U+007F-009F,U+20DD-20E0,U+20E2-20E4,U+2150-218F,U+2190,U+2192,U+2194-2199,U+21AF,U+21E6-21F0,U+21F3,U+2218-2219,U+2299,U+22C4-22C6,U+2300-243F,U+2440-244A,U+2460-24FF,U+25A0-27BF,U+2800-28FF,U+2921-2922,U+2981,U+29BF,U+29EB,U+2B00-2BFF,U+4DC0-4DFF,U+FFF9-FFFB,U+10140-1018E,U+10190-1019C,U+101A0,U+101D0-101FD,U+102E0-102FB,U+10E60-10E7E,U+1D2C0-1D2D3,U+1D2E0-1D37F,U+1F000-1F0FF,U+1F100-1F1AD,U+1F1E6-1F1FF,U+1F30D-1F30F,U+1F315,U+1F31C,U+1F31E,U+1F320-1F32C,U+1F336,U+1F378,U+1F37D,U+1F382,U+1F393-1F39F,U+1F3A7-1F3A8,U+1F3AC-1F3AF,U+1F3C2,U+1F3C4-1F3C6,U+1F3CA-1F3CE,U+1F3D4-1F3E0,U+1F3ED,U+1F3F1-1F3F3,U+1F3F5-1F3F7,U+1F408,U+1F415,U+1F41F,U+1F426,U+1F43F,U+1F441-1F442,U+1F444,U+1F446-1F449,U+1F44C-1F44E,U+1F453,U+1F46A,U+1F47D,U+1F4A3,U+1F4B0,U+1F4B3,U+1F4B9,U+1F4BB,U+1F4BF,U+1F4C8-1F4CB,U+1F4D6,U+1F4DA,U+1F4DF,U+1F4E3-1F4E6,U+1F4EA-1F4ED,U+1F4F7,U+1F4F9-1F4FB,U+1F4FD-1F4FE,U+1F503,U+1F507-1F50B,U+1F50D,U+1F512-1F513,U+1F53E-1F54A,U+1F54F-1F5FA,U+1F610,U+1F650-1F67F,U+1F687,U+1F68D,U+1F691,U+1F694,U+1F698,U+1F6AD,U+1F6B2,U+1F6B9-1F6BA,U+1F6BC,U+1F6C6-1F6CF,U+1F6D3-1F6D7,U+1F6E0-1F6EA,U+1F6F0-1F6F3,U+1F6F7-1F6FC,U+1F700-1F7FF,U+1F800-1F80B,U+1F810-1F847,U+1F850-1F859,U+1F860-1F887,U+1F890-1F8AD,U+1F8B0-1F8BB,U+1F8C0-1F8C1,U+1F900-1F90B,U+1F93B,U+1F946,U+1F984,U+1F996,U+1F9E9,U+1FA00-1FA6F,U+1FA70-1FA7C,U+1FA80-1FA89,U+1FA8F-1FAC6,U+1FACE-1FADC,U+1FADF-1FAE9,U+1FAF0-1FAF8,U+1FB00-1FBFF",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2020 The KumbhSans Project Authors (https://github.com/xconsau/KumbhSans)",
+    "upstreamLicenceSha256": "95aea2685548bcc62cdc7c8326bdfa5b42d5ff5d762511464ad31bc27148a8d3",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/kumbh-sans",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v27",
+    "lastModified": "2025-09-16",
+    "metadataSha256": "ee72a472d5606c7a88b60db717314569b914511aada2658c43d3432b45624f59",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "CO",
+     "fit": "Geometric, friendly shapes and a 100–900 axis fit approachable retail brands.",
+     "counterFit": "Latin-script coverage only; check product names in other scripts."
+    },
+    {
+     "spine": "BA",
+     "fit": "Clean numerals help dates, times and prices in booking flows.",
+     "counterFit": "Its neutral voice needs photography or colour for venue personality."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "friendly"
+   ],
+   "localFiles": [
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/kumbh-latin.woff2",
+     "sha256": "adedef4c0363483afc02b377227742e244c2af986461614164fed0ebf893cfb8",
+     "bytes": 29556,
+     "format": "woff2",
+     "subset": "latin",
+     "style": "normal",
+     "weight": {
+      "min": 100,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 100,
+       "max": 900,
+       "default": 400
+      }
+     ],
+     "cmap": "U+0020-007E,U+00A0-00FF,U+0102,U+0131,U+0152-0153,U+02C6,U+02DA,U+02DC,U+0300-0301,U+0303-0304,U+0308,U+2002,U+2009,U+200B,U+2013-2014,U+2018-201A,U+201C-201E,U+2022,U+2026,U+2032-2033,U+2039-203A,U+2044,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-kumbh-latin"
+    },
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/kumbh-latinext.woff2",
+     "sha256": "78a44cae9a83ac2f5cfc35acf4d2d4974d5f36babdca55d709189fa0a94404a6",
+     "bytes": 15908,
+     "format": "woff2",
+     "subset": "latin-ext",
+     "style": "normal",
+     "weight": {
+      "min": 100,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 100,
+       "max": 900,
+       "default": 400
+      }
+     ],
+     "cmap": "U+0020,U+0041,U+00A0,U+00C1,U+0100-012B,U+012E-0130,U+0132-0151,U+0154-017F,U+0192,U+01CD-01CE,U+0218-021B,U+0237,U+02C7,U+02C9,U+02DD,U+0300-0301,U+0303-0304,U+0308,U+1E80-1E85,U+1E9E,U+1EF2-1EF3,U+2020,U+20A3,U+20A8,U+2113",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-kumbh-latinext"
+    },
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/kumbh-math.woff2",
+     "sha256": "54c23ea733a230c5badfe9c263c6f4f4a8f7f428c69a5ec496fa60b68704c768",
+     "bytes": 23144,
+     "format": "woff2",
+     "subset": "math",
+     "style": "normal",
+     "weight": {
+      "min": 100,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 100,
+       "max": 900,
+       "default": 400
+      }
+     ],
+     "cmap": "U+0020-007E,U+00A0,U+00A7,U+00AC,U+00B1,U+00C1,U+00D7,U+00F7,U+0102,U+0302-0303,U+0307-0308,U+0312,U+0326-0327,U+0394,U+03A9,U+03C0,U+2032-2033,U+2074,U+212E,U+2191,U+2193,U+2202,U+2206,U+220F,U+2211-2212,U+2215,U+2219-221A,U+221E,U+222B,U+2248,U+2260,U+2264-2265,U+25CA",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-kumbh-math"
+    },
+    {
+     "path": "examples/agency-wrenfield/families/wrenfield/assets/kumbh-symbols.woff2",
+     "sha256": "f9b8aebd5c3ea2da4549c6d715bb190be8b783506bc0a26cdf914cf73c75e294",
+     "bytes": 13336,
+     "format": "woff2",
+     "subset": "symbols",
+     "style": "normal",
+     "weight": {
+      "min": 100,
+      "max": 900
+     },
+     "axes": [
+      {
+       "tag": "wght",
+       "min": 100,
+       "max": 900,
+       "default": 400
+      }
+     ],
+     "cmap": "U+0020,U+0023,U+002A,U+0030-0039,U+0041-005A,U+0061-007A,U+00A0,U+00C1,U+0102,U+2022,U+2191,U+2193,U+2219,U+25CA",
+     "notice": {
+      "path": "examples/agency-wrenfield/families/wrenfield/assets/OFL.txt",
+      "sha256": "d56806947d90a97686550cd3a3acf105642ab3ee08a06f4704426c51e10f6fa0"
+     },
+     "provenance": "examples/agency-wrenfield/families/wrenfield/media-provenance.json#wrenfield-kumbh-symbols"
+    }
+   ]
+  },
+  {
+   "id": "lexend",
+   "family": "Lexend",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2019 The Lexend Project Authors (https://github.com/googlefonts/lexend)",
+    "upstreamLicenceSha256": "cdfed8f91b0660b004befb744757918b7c7d40dc2201b6c6d0a86b2fab9408f8",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/lexend",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v26",
+    "lastModified": "2025-09-08",
+    "metadataSha256": "c644fa0febe89ee3261c468cb861ee147678631cc27c3176d9a419741257f125",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "LM",
+     "fit": "Designed around reading-proficiency research; wide spacing helps early and struggling readers.",
+     "counterFit": "Expanded spacing costs line length in dense course tables."
+    },
+    {
+     "spine": "BA",
+     "fit": "Generous, open forms keep appointment instructions easy to follow.",
+     "counterFit": "Only normal style; no italics for emphasis or citations."
+    }
+   ],
+   "traits": [
+    {
+     "trait": "small-size-legibility",
+     "reason": "Designed from reading-proficiency research with widened spacing to reduce crowding."
+    }
+   ],
+   "tones": [
+    "friendly",
+    "civic"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "literata",
+   "family": "Literata",
+   "category": "serif",
+   "weights": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "cyrillic-ext",
+    "greek",
+    "greek-ext",
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "opsz",
+     "min": 7,
+     "max": 72,
+     "default": 14,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 200,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "cyrillic-ext": "U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F",
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "greek-ext": "U+1F00-1FFF",
+    "greek": "U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2017 The Literata Project Authors (https://github.com/googlefonts/literata) Literata-Italic[opsz,wght].ttf: Copyright 2017 The Literata Project Authors (https://github.com/googlefonts/literata)",
+    "upstreamLicenceSha256": "9895ebc015226accf416b758ac1ca02a2fb4f83a89d316791ef697c3dc0852aa",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/literata",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v40",
+    "lastModified": "2025-09-11",
+    "metadataSha256": "234c16340d8f6c7c1c9073523f40b6ebadd0ca6b105bf9c57e9b74cc278b8baa",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "CS",
+     "fit": "Built for long-form e-reading, with optical sizes across text and display.",
+     "counterFit": "Its bookish tone can feel slow for news or fast product updates."
+    },
+    {
+     "spine": "LM",
+     "fit": "Comfortable long reading for lessons, transcripts and course notes.",
+     "counterFit": "Pair a sans for navigation and controls in learning apps."
+    }
+   ],
+   "traits": [
+    {
+     "trait": "small-size-legibility",
+     "reason": "An optical-size axis built for long reading on screens, including small caption sizes."
+    }
+   ],
+   "tones": [
+    "editorial",
+    "formal"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "lora",
+   "family": "Lora",
+   "category": "serif",
+   "weights": [
+    400,
+    500,
+    600,
+    700
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "cyrillic-ext",
+    "latin",
+    "latin-ext",
+    "math",
+    "symbols",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wght",
+     "min": 400,
+     "max": 700,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "cyrillic-ext": "U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F",
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "math": "U+0302-0303,U+0305,U+0307-0308,U+0310,U+0312,U+0315,U+031A,U+0326-0327,U+032C,U+032F-0330,U+0332-0333,U+0338,U+033A,U+0346,U+034D,U+0391-03A1,U+03A3-03A9,U+03B1-03C9,U+03D1,U+03D5-03D6,U+03F0-03F1,U+03F4-03F5,U+2016-2017,U+2034-2038,U+203C,U+2040,U+2043,U+2047,U+2050,U+2057,U+205F,U+2070-2071,U+2074-208E,U+2090-209C,U+20D0-20DC,U+20E1,U+20E5-20EF,U+2100-2112,U+2114-2115,U+2117-2121,U+2123-214F,U+2190,U+2192,U+2194-21AE,U+21B0-21E5,U+21F1-21F2,U+21F4-2211,U+2213-2214,U+2216-22FF,U+2308-230B,U+2310,U+2319,U+231C-2321,U+2336-237A,U+237C,U+2395,U+239B-23B7,U+23D0,U+23DC-23E1,U+2474-2475,U+25AF,U+25B3,U+25B7,U+25BD,U+25C1,U+25CA,U+25CC,U+25FB,U+266D-266F,U+27C0-27FF,U+2900-2AFF,U+2B0E-2B11,U+2B30-2B4C,U+2BFE,U+3030,U+FF5B,U+FF5D,U+1D400-1D7FF,U+1EE00-1EEFF",
+    "symbols": "U+0001-000C,U+000E-001F,U+007F-009F,U+20DD-20E0,U+20E2-20E4,U+2150-218F,U+2190,U+2192,U+2194-2199,U+21AF,U+21E6-21F0,U+21F3,U+2218-2219,U+2299,U+22C4-22C6,U+2300-243F,U+2440-244A,U+2460-24FF,U+25A0-27BF,U+2800-28FF,U+2921-2922,U+2981,U+29BF,U+29EB,U+2B00-2BFF,U+4DC0-4DFF,U+FFF9-FFFB,U+10140-1018E,U+10190-1019C,U+101A0,U+101D0-101FD,U+102E0-102FB,U+10E60-10E7E,U+1D2C0-1D2D3,U+1D2E0-1D37F,U+1F000-1F0FF,U+1F100-1F1AD,U+1F1E6-1F1FF,U+1F30D-1F30F,U+1F315,U+1F31C,U+1F31E,U+1F320-1F32C,U+1F336,U+1F378,U+1F37D,U+1F382,U+1F393-1F39F,U+1F3A7-1F3A8,U+1F3AC-1F3AF,U+1F3C2,U+1F3C4-1F3C6,U+1F3CA-1F3CE,U+1F3D4-1F3E0,U+1F3ED,U+1F3F1-1F3F3,U+1F3F5-1F3F7,U+1F408,U+1F415,U+1F41F,U+1F426,U+1F43F,U+1F441-1F442,U+1F444,U+1F446-1F449,U+1F44C-1F44E,U+1F453,U+1F46A,U+1F47D,U+1F4A3,U+1F4B0,U+1F4B3,U+1F4B9,U+1F4BB,U+1F4BF,U+1F4C8-1F4CB,U+1F4D6,U+1F4DA,U+1F4DF,U+1F4E3-1F4E6,U+1F4EA-1F4ED,U+1F4F7,U+1F4F9-1F4FB,U+1F4FD-1F4FE,U+1F503,U+1F507-1F50B,U+1F50D,U+1F512-1F513,U+1F53E-1F54A,U+1F54F-1F5FA,U+1F610,U+1F650-1F67F,U+1F687,U+1F68D,U+1F691,U+1F694,U+1F698,U+1F6AD,U+1F6B2,U+1F6B9-1F6BA,U+1F6BC,U+1F6C6-1F6CF,U+1F6D3-1F6D7,U+1F6E0-1F6EA,U+1F6F0-1F6F3,U+1F6F7-1F6FC,U+1F700-1F7FF,U+1F800-1F80B,U+1F810-1F847,U+1F850-1F859,U+1F860-1F887,U+1F890-1F8AD,U+1F8B0-1F8BB,U+1F8C0-1F8C1,U+1F900-1F90B,U+1F93B,U+1F946,U+1F984,U+1F996,U+1F9E9,U+1FA00-1FA6F,U+1FA70-1FA7C,U+1FA80-1FA89,U+1FA8F-1FAC6,U+1FACE-1FADC,U+1FADF-1FAE9,U+1FAF0-1FAF8,U+1FB00-1FBFF",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2011 The Lora Project Authors (https://github.com/cyrealtype/Lora-Cyrillic), with Reserved Font Name \"Lora\". Lora-Italic[wght].ttf: Copyright 2011 The Lora Project Authors (https://github.com/cyrealtype/Lora-Cyrillic), with Reserved Font Name \"Lora\".",
+    "upstreamLicenceSha256": "948aed765160f7b974105606c21994715a171f89fca48e57bf1e0a23aca0bef1",
+    "reservedFontNames": [
+     "Lora"
+    ]
+   },
+   "source": {
+    "packageName": "@fontsource/lora",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v37",
+    "lastModified": "2025-09-11",
+    "metadataSha256": "1f5cffc81116f09d14c98fb2a23d6cf9ca0a91b24770f3668f44b2bcf64266cd",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "TL",
+     "fit": "Moderate contrast and calligraphic roots signal care for professional services.",
+     "counterFit": "Reserved Font Name 'Lora': local modification or subsetting needs a rename review."
+    },
+    {
+     "spine": "CS",
+     "fit": "Well suited to article body text and pull quotes.",
+     "counterFit": "Display sizes above 48px look soft; use a dedicated display face for mastheads."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "formal",
+    "editorial"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "noto-sans",
+   "family": "Noto Sans",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "cyrillic-ext",
+    "devanagari",
+    "greek",
+    "greek-ext",
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wdth",
+     "min": 62.5,
+     "max": 100,
+     "default": 100,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "cyrillic-ext": "U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F",
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "devanagari": "U+0900-097F,U+1CD0-1CF9,U+200C-200D,U+20A8,U+20B9,U+20F0,U+25CC,U+A830-A839,U+A8E0-A8FF,U+11B00-11B09",
+    "greek-ext": "U+1F00-1FFF",
+    "greek": "U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic) NotoSans-Italic[wdth,wght].ttf: Copyright 2022 The Noto Project Authors (https://github.com/notofonts/latin-greek-cyrillic)",
+    "upstreamLicenceSha256": "54ec7b5a35310ad66f9f3091426f7028484cbf9ae1ab5da30122ee412a3009e1",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/noto-sans",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v42",
+    "lastModified": "2025-09-11",
+    "metadataSha256": "fcc4544c547a6d7361a199d43a5562fff21485322f3ddf3d7452fb44c22677f7",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "SM",
+     "fit": "Very broad script coverage (Latin, Cyrillic, Greek, Devanagari, Vietnamese) suits multilingual search results.",
+     "counterFit": "Its deliberate neutrality gives little brand character on its own."
+    },
+    {
+     "spine": "MI",
+     "fit": "Global campaigns can render many languages consistently.",
+     "counterFit": "Large total size; load only the subsets the project actually needs."
+    }
+   ],
+   "traits": [
+    {
+     "trait": "small-size-legibility",
+     "reason": "Large x-height and open apertures designed for legible UI text across many scripts."
+    }
+   ],
+   "tones": [
+    "civic",
+    "formal"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "noto-sans-arabic",
+   "family": "Noto Sans Arabic",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "normal"
+   ],
+   "subsets": [
+    "arabic",
+    "latin",
+    "latin-ext",
+    "math",
+    "symbols"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "wdth",
+     "min": 62.5,
+     "max": 100,
+     "default": 100,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "arabic": "U+0600-06FF,U+0750-077F,U+0870-088E,U+0890-0891,U+0897-08E1,U+08E3-08FF,U+200C-200E,U+2010-2011,U+204F,U+2E41,U+FB50-FDFF,U+FE70-FE74,U+FE76-FEFC,U+102E0-102FB,U+10E60-10E7E,U+10EC2-10EC4,U+10EFC-10EFF,U+1EE00-1EE03,U+1EE05-1EE1F,U+1EE21-1EE22,U+1EE24,U+1EE27,U+1EE29-1EE32,U+1EE34-1EE37,U+1EE39,U+1EE3B,U+1EE42,U+1EE47,U+1EE49,U+1EE4B,U+1EE4D-1EE4F,U+1EE51-1EE52,U+1EE54,U+1EE57,U+1EE59,U+1EE5B,U+1EE5D,U+1EE5F,U+1EE61-1EE62,U+1EE64,U+1EE67-1EE6A,U+1EE6C-1EE72,U+1EE74-1EE77,U+1EE79-1EE7C,U+1EE7E,U+1EE80-1EE89,U+1EE8B-1EE9B,U+1EEA1-1EEA3,U+1EEA5-1EEA9,U+1EEAB-1EEBB,U+1EEF0-1EEF1",
+    "math": "U+0302-0303,U+0305,U+0307-0308,U+0310,U+0312,U+0315,U+031A,U+0326-0327,U+032C,U+032F-0330,U+0332-0333,U+0338,U+033A,U+0346,U+034D,U+0391-03A1,U+03A3-03A9,U+03B1-03C9,U+03D1,U+03D5-03D6,U+03F0-03F1,U+03F4-03F5,U+2016-2017,U+2034-2038,U+203C,U+2040,U+2043,U+2047,U+2050,U+2057,U+205F,U+2070-2071,U+2074-208E,U+2090-209C,U+20D0-20DC,U+20E1,U+20E5-20EF,U+2100-2112,U+2114-2115,U+2117-2121,U+2123-214F,U+2190,U+2192,U+2194-21AE,U+21B0-21E5,U+21F1-21F2,U+21F4-2211,U+2213-2214,U+2216-22FF,U+2308-230B,U+2310,U+2319,U+231C-2321,U+2336-237A,U+237C,U+2395,U+239B-23B7,U+23D0,U+23DC-23E1,U+2474-2475,U+25AF,U+25B3,U+25B7,U+25BD,U+25C1,U+25CA,U+25CC,U+25FB,U+266D-266F,U+27C0-27FF,U+2900-2AFF,U+2B0E-2B11,U+2B30-2B4C,U+2BFE,U+3030,U+FF5B,U+FF5D,U+1D400-1D7FF,U+1EE00-1EEFF",
+    "symbols": "U+0001-000C,U+000E-001F,U+007F-009F,U+20DD-20E0,U+20E2-20E4,U+2150-218F,U+2190,U+2192,U+2194-2199,U+21AF,U+21E6-21F0,U+21F3,U+2218-2219,U+2299,U+22C4-22C6,U+2300-243F,U+2440-244A,U+2460-24FF,U+25A0-27BF,U+2800-28FF,U+2921-2922,U+2981,U+29BF,U+29EB,U+2B00-2BFF,U+4DC0-4DFF,U+FFF9-FFFB,U+10140-1018E,U+10190-1019C,U+101A0,U+101D0-101FD,U+102E0-102FB,U+10E60-10E7E,U+1D2C0-1D2D3,U+1D2E0-1D37F,U+1F000-1F0FF,U+1F100-1F1AD,U+1F1E6-1F1FF,U+1F30D-1F30F,U+1F315,U+1F31C,U+1F31E,U+1F320-1F32C,U+1F336,U+1F378,U+1F37D,U+1F382,U+1F393-1F39F,U+1F3A7-1F3A8,U+1F3AC-1F3AF,U+1F3C2,U+1F3C4-1F3C6,U+1F3CA-1F3CE,U+1F3D4-1F3E0,U+1F3ED,U+1F3F1-1F3F3,U+1F3F5-1F3F7,U+1F408,U+1F415,U+1F41F,U+1F426,U+1F43F,U+1F441-1F442,U+1F444,U+1F446-1F449,U+1F44C-1F44E,U+1F453,U+1F46A,U+1F47D,U+1F4A3,U+1F4B0,U+1F4B3,U+1F4B9,U+1F4BB,U+1F4BF,U+1F4C8-1F4CB,U+1F4D6,U+1F4DA,U+1F4DF,U+1F4E3-1F4E6,U+1F4EA-1F4ED,U+1F4F7,U+1F4F9-1F4FB,U+1F4FD-1F4FE,U+1F503,U+1F507-1F50B,U+1F50D,U+1F512-1F513,U+1F53E-1F54A,U+1F54F-1F5FA,U+1F610,U+1F650-1F67F,U+1F687,U+1F68D,U+1F691,U+1F694,U+1F698,U+1F6AD,U+1F6B2,U+1F6B9-1F6BA,U+1F6BC,U+1F6C6-1F6CF,U+1F6D3-1F6D7,U+1F6E0-1F6EA,U+1F6F0-1F6F3,U+1F6F7-1F6FC,U+1F700-1F7FF,U+1F800-1F80B,U+1F810-1F847,U+1F850-1F859,U+1F860-1F887,U+1F890-1F8AD,U+1F8B0-1F8BB,U+1F8C0-1F8C1,U+1F900-1F90B,U+1F93B,U+1F946,U+1F984,U+1F996,U+1F9E9,U+1FA00-1FA6F,U+1FA70-1FA7C,U+1FA80-1FA89,U+1FA8F-1FAC6,U+1FACE-1FADC,U+1FADF-1FAE9,U+1FAF0-1FAF8,U+1FB00-1FBFF",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2022 The Noto Project Authors (https://github.com/notofonts/arabic)",
+    "upstreamLicenceSha256": "91053c23e8a0fe5fc9b5fdbe5ff74ceffd66f6f996c123f1a6ca4c23487c1fff",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/noto-sans-arabic",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v33",
+    "lastModified": "2025-09-17",
+    "metadataSha256": "9613711ed8797bb40f16f1af135cab8ffe7fc21880236fc01d6f4f5b6b4df400",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "MI",
+     "fit": "Arabic script support for regional or diaspora audiences of a cause.",
+     "counterFit": "Its Latin subset is secondary; test mixed-direction layouts with real copy."
+    },
+    {
+     "spine": "SM",
+     "fit": "Arabic listings and filters render with a consistent Noto texture.",
+     "counterFit": "Check right-to-left alignment of cards and search inputs before adoption."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "civic"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "noto-sans-devanagari",
+   "family": "Noto Sans Devanagari",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "normal"
+   ],
+   "subsets": [
+    "devanagari",
+    "latin",
+    "latin-ext"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "wdth",
+     "min": 62.5,
+     "max": 100,
+     "default": 100,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "devanagari": "U+0900-097F,U+1CD0-1CF9,U+200C-200D,U+20A8,U+20B9,U+20F0,U+25CC,U+A830-A839,U+A8E0-A8FF,U+11B00-11B09",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2022 The Noto Project Authors (https://github.com/notofonts/devanagari)",
+    "upstreamLicenceSha256": "79c44862256af9a67fc23df7c45ae289e730c7f6d4f8fb8ef593bd3c314b6d6d",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/noto-sans-devanagari",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v30",
+    "lastModified": "2025-09-05",
+    "metadataSha256": "e1a28555f0fb0f71a71c9e2bb1f1799d21c051d6aa18c0ef791f4bed90bee89b",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "LM",
+     "fit": "Devanagari coverage serves Hindi, Marathi and Nepali learning content.",
+     "counterFit": "Conjunct rendering needs testing with real lesson text in the target browser."
+    },
+    {
+     "spine": "MI",
+     "fit": "Reaches South Asian audiences in their own script.",
+     "counterFit": "Pair a matching Latin family for mixed-language pages."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "civic"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "nunito",
+   "family": "Nunito",
+   "category": "sans-serif",
+   "weights": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "cyrillic-ext",
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wght",
+     "min": 200,
+     "max": 1000,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "cyrillic-ext": "U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F",
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito) Nunito-Italic[wght].ttf: Copyright 2014 The Nunito Project Authors (https://github.com/googlefonts/nunito)",
+    "upstreamLicenceSha256": "40991bfa02ac620aae16dc527f3c47765a25e43f270d4c301ee6ab663a8d9015",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/nunito",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v32",
+    "lastModified": "2025-09-16",
+    "metadataSha256": "c293b612f0efbac8356c71704793f3d42ce77bd499a6806a753036f8d5c695b1",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "LM",
+     "fit": "Rounded terminals feel friendly for young learners and community courses.",
+     "counterFit": "Rounded forms can look informal for professional certification."
+    },
+    {
+     "spine": "BA",
+     "fit": "Approachable tone suits family activities, classes and clinics booking.",
+     "counterFit": "Weak contrast between 400 and 500; use 400 and 700 for hierarchy."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "friendly"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "playfair-display",
+   "family": "Playfair Display",
+   "category": "serif",
+   "weights": [
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wght",
+     "min": 400,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2017 The Playfair Display Project Authors (https://github.com/clauseggers/Playfair-Display), with Reserved Font Name \"Playfair Display\". PlayfairDisplay-Italic[wght].ttf: Copyright 2017 The Playfair Display Project Authors (https://github.com/clauseggers/Playfair-Display), with Reserved Font Name \"Playfair Display\".",
+    "upstreamLicenceSha256": "c052aafd2a71e90bcee6e69f475029d430a10d548c08ffcae350171f0e9668b1",
+    "reservedFontNames": [
+     "Playfair Display"
+    ]
+   },
+   "source": {
+    "packageName": "@fontsource/playfair-display",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v40",
+    "lastModified": "2025-09-11",
+    "metadataSha256": "5215d6cf86f78fde6e47aaf8566eab20e1ac74efa2d4888bae41b07e87ca5fc7",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "CO",
+     "fit": "High-contrast transitional display suits editorial product launches and premium goods.",
+     "counterFit": "Reserved Font Name 'Playfair Display': local modification or subsetting needs a rename review."
+    },
+    {
+     "spine": "CS",
+     "fit": "Magazine-style headings for subscription publications.",
+     "counterFit": "Not a body face; thin hairlines fail at paragraph sizes."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "editorial"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "public-sans",
+   "family": "Public Sans",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2015 The Public Sans Project Authors (https://github.com/uswds/public-sans) PublicSans-Italic[wght].ttf: Copyright 2015 The Public Sans Project Authors (https://github.com/uswds/public-sans)",
+    "upstreamLicenceSha256": "705a497c781f6463ff819abb513bb495f3fb05256f1d20321e3275813c0bafa5",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/public-sans",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v21",
+    "lastModified": "2025-09-16",
+    "metadataSha256": "54e0a8f715234f8bf1273ece5274044f7d4eb46558016c82f1e545d240e683d1",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "TL",
+     "fit": "Neutral, government-origin sans communicates plain, accountable service.",
+     "counterFit": "Its civic neutrality can feel cold for hospitality brands."
+    },
+    {
+     "spine": "BA",
+     "fit": "Clear forms and numerals for appointment and registration flows.",
+     "counterFit": "Pair with a warmer display face if the venue needs personality."
+    },
+    {
+     "spine": "TU",
+     "fit": "Strong, legible UI text across a full weight range.",
+     "counterFit": "Few distinctive features; branding must come from elsewhere."
+    },
+    {
+     "spine": "MI",
+     "fit": "Public-interest heritage fits nonprofits and civic programmes.",
+     "counterFit": "Latin-script subsets only; multilingual programmes need a Noto family."
+    }
+   ],
+   "traits": [
+    {
+     "trait": "small-size-legibility",
+     "reason": "Built for government services with plain, open letterforms that stay clear at small sizes."
+    }
+   ],
+   "tones": [
+    "civic",
+    "formal"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "source-serif-4",
+   "family": "Source Serif 4",
+   "category": "serif",
+   "weights": [
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "cyrillic",
+    "cyrillic-ext",
+    "greek",
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "opsz",
+     "min": 8,
+     "max": 60,
+     "default": 14,
+     "step": 0.1
+    },
+    {
+     "tag": "wght",
+     "min": 200,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "cyrillic-ext": "U+0460-052F,U+1C80-1C8A,U+20B4,U+2DE0-2DFF,U+A640-A69F,U+FE2E-FE2F",
+    "cyrillic": "U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116",
+    "greek": "U+0370-0377,U+037A-037F,U+0384-038A,U+038C,U+038E-03A1,U+03A3-03FF",
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "http://scripts.sil.org/OFL",
+    "attribution": "Google Inc.",
+    "upstreamLicenceSha256": "18aabf190848725e2576eefb5c29ba06aac1029d02132252a7f312eac2e50cf3",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/source-serif-4",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v14",
+    "lastModified": "2025-09-11",
+    "metadataSha256": "e8d8104d50e7a530e780edc30c9578eeee4d2f64033897374aa329ac78c83ad7",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "TL",
+     "fit": "Sturdy text serif with optical sizes conveys authority for advisory and legal content.",
+     "counterFit": "Formal tone may feel distant for casual consumer services."
+    },
+    {
+     "spine": "CS",
+     "fit": "Optical sizes keep body text and headlines consistent in long articles.",
+     "counterFit": "Needs generous line length and leading to show its quality."
+    }
+   ],
+   "traits": [
+    {
+     "trait": "small-size-legibility",
+     "reason": "Optical sizes include a caption design with sturdier serifs and wider spacing for small text."
+    }
+   ],
+   "tones": [
+    "formal",
+    "editorial"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "space-grotesk",
+   "family": "Space Grotesk",
+   "category": "sans-serif",
+   "weights": [
+    300,
+    400,
+    500,
+    600,
+    700
+   ],
+   "styles": [
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "wght",
+     "min": 300,
+     "max": 700,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2020 The Space Grotesk Project Authors (https://github.com/floriankarsten/space-grotesk)",
+    "upstreamLicenceSha256": "18a4de52385f6b988782639d5d0cc1326e5a8c2de9a7f01d7b20d9aedcc60943",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/space-grotesk",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v22",
+    "lastModified": "2025-09-05",
+    "metadataSha256": "dbe18757008ad3d0b4502002e3f0907ad59cab8002305fd29f63fdefbdbd22ba",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "PA",
+     "fit": "Distinctive grotesque details give tech products a memorable headline voice.",
+     "counterFit": "Quirky glyphs (e.g. 'a', 'G') hurt long body text."
+    },
+    {
+     "spine": "CO",
+     "fit": "Works for streetwear or tech-gadget storefront headings.",
+     "counterFit": "Only normal style and 300–700; limited range for rich editorial hierarchy."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "expressive",
+    "technical"
+   ],
+   "localFiles": []
+  },
+  {
+   "id": "work-sans",
+   "family": "Work Sans",
+   "category": "sans-serif",
+   "weights": [
+    100,
+    200,
+    300,
+    400,
+    500,
+    600,
+    700,
+    800,
+    900
+   ],
+   "styles": [
+    "italic",
+    "normal"
+   ],
+   "subsets": [
+    "latin",
+    "latin-ext",
+    "vietnamese"
+   ],
+   "defaultSubset": "latin",
+   "axes": [
+    {
+     "tag": "ital",
+     "min": 0,
+     "max": 1,
+     "default": 0,
+     "step": 1
+    },
+    {
+     "tag": "wght",
+     "min": 100,
+     "max": 900,
+     "default": 400,
+     "step": 1
+    }
+   ],
+   "unicodeRanges": {
+    "vietnamese": "U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB",
+    "latin-ext": "U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF",
+    "latin": "U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD"
+   },
+   "licence": {
+    "type": "OFL-1.1",
+    "url": "https://openfontlicense.org",
+    "attribution": "Copyright 2019 The Work Sans Project Authors (https://github.com/weiweihuanghuang/Work-Sans) WorkSans-Italic[wght].ttf: Copyright 2019 The Work Sans Project Authors (https://github.com/weiweihuanghuang/Work-Sans)",
+    "upstreamLicenceSha256": "e7c426573d51f3d2e5e92254878c862344ffa0b9272f79a880f9f99010f002c7",
+    "reservedFontNames": []
+   },
+   "source": {
+    "packageName": "@fontsource/work-sans",
+    "packageVersion": "5.3.0",
+    "upstreamVersion": "v24",
+    "lastModified": "2025-09-11",
+    "metadataSha256": "c54364847afe7f9774d58b028b1ea52a79ba570a11917c27b32ee33cf5d7e7b6",
+    "upstream": "https://github.com/google/fonts"
+   },
+   "spineFit": [
+    {
+     "spine": "CO",
+     "fit": "Slightly wide grotesque with a full weight range fits product and price labels.",
+     "counterFit": "Its widest display styles need tight tracking to avoid looking loose."
+    },
+    {
+     "spine": "SM",
+     "fit": "Even texture keeps directory and search listings readable.",
+     "counterFit": "Latin-script subsets only, which limits international directories."
+    },
+    {
+     "spine": "MI",
+     "fit": "Plain, open forms suit transparent nonprofit communication.",
+     "counterFit": "Light weights lose contrast on busy imagery."
+    }
+   ],
+   "traits": [],
+   "tones": [
+    "friendly",
+    "civic"
+   ],
+   "localFiles": []
+  }
+ ]
+}

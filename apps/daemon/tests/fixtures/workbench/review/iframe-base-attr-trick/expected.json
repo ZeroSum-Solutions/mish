@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 5 WARN: the base URL comes from the real <base> element's href attribute (parsed, entities decoded), not from text inside another attribute; the iframe loads from the allowed host like Chrome resolves it.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "hitsInclude": "GET /embed" } }
+}

@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "od-design-system-project/v1",
+  "id": "neutral-product",
+  "name": "Neutral Product",
+  "category": "Productivity & SaaS",
+  "description": "Original agency archetype for calm, neutral product UI: one steel-blue accent, system fonts, an 8px rhythm, and light and dark modes.",
+  "source": {
+    "type": "bundled",
+    "origin": "Mishh Mashh original agency archetype (authored, not brand-derived)"
+  },
+  "files": {
+    "design": "DESIGN.md",
+    "tokens": "tokens.css",
+    "designTokens": "design-tokens.json",
+    "tailwind": "tailwind-v4.css",
+    "components": "components.html"
+  },
+  "usage": "USAGE.md",
+  "componentsManifest": "components.manifest.json",
+  "importMode": "normalized",
+  "craft": {
+    "applies": [],
+    "suggested": [
+      "color",
+      "accessibility-baseline",
+      "state-coverage",
+      "form-validation"
+    ],
+    "exemptions": []
+  },
+  "preview": {
+    "dir": "preview",
+    "pages": [
+      {
+        "path": "preview/colors.html",
+        "role": "colors",
+        "title": "Colors"
+      },
+      {
+        "path": "preview/typography.html",
+        "role": "typography",
+        "title": "Typography"
+      },
+      {
+        "path": "preview/spacing.html",
+        "role": "spacing",
+        "title": "Spacing"
+      },
+      {
+        "path": "preview/specimen-website.html",
+        "role": "specimen-website",
+        "title": "Website specimen"
+      },
+      {
+        "path": "preview/specimen-app.html",
+        "role": "specimen-app",
+        "title": "App and CRM specimen"
+      },
+      {
+        "path": "preview/specimen-document.html",
+        "role": "specimen-document",
+        "title": "Document and deck specimen"
+      },
+      {
+        "path": "preview/specimen-campaign.html",
+        "role": "specimen-campaign",
+        "title": "Campaign specimen"
+      }
+    ]
+  },
+  "sourceFiles": {
+    "evidence": "source/evidence.md",
+    "report": "source/token-contract.report.json"
+  }
+}

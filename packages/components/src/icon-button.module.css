@@ -1,0 +1,116 @@
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  padding: 0;
+  font: inherit;
+  color: var(--text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-md, 8px);
+  cursor: pointer;
+  transition:
+    background-color var(--motion-hover, 150ms) var(--ease-out-quint, ease-out),
+    color var(--motion-hover, 150ms) var(--ease-out-quint, ease-out),
+    box-shadow var(--motion-hover, 150ms) var(--ease-out-quint, ease-out),
+    transform var(--spring-snappy-duration, 360ms) var(--spring-snappy, ease-out);
+}
+
+.iconButton svg {
+  flex: none;
+}
+
+.iconButton:hover:not(:disabled) {
+  color: var(--text-strong);
+  background: var(--bg-fill-secondary);
+}
+
+.iconButton:active:not(:disabled) {
+  transform: scale(var(--press-scale-icon, 0.92));
+  transition-duration: var(--motion-hover, 150ms), var(--motion-hover, 150ms), var(--motion-hover, 150ms), var(--motion-press, 90ms);
+}
+
+.iconButton:focus-visible {
+  outline: var(--focus-outline, 2px solid var(--blue));
+  outline-offset: var(--focus-offset, 2px);
+}
+
+.iconButton:disabled {
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+
+.iconButton[aria-pressed='true'] {
+  color: var(--text-strong);
+  background: var(--bg-fill);
+}
+
+.sm {
+  width: var(--control-h-sm, 28px);
+  height: var(--control-h-sm, 28px);
+  border-radius: var(--radius-sm, 4px);
+}
+
+.sm svg {
+  width: 16px;
+  height: 16px;
+}
+
+.md {
+  width: var(--control-h-compact, 32px);
+  height: var(--control-h-compact, 32px);
+}
+
+.md svg {
+  width: 16px;
+  height: 16px;
+}
+
+.lg {
+  width: var(--control-h-md, 36px);
+  height: var(--control-h-md, 36px);
+}
+
+.lg svg {
+  width: 18px;
+  height: 18px;
+}
+
+.ghost {
+  background: transparent;
+}
+
+.subtle {
+  color: var(--text-strong);
+  background: var(--bg-subtle);
+}
+
+.subtle:hover:not(:disabled) {
+  background: var(--bg-muted);
+}
+
+.solid {
+  color: var(--bg);
+  background: var(--text-strong);
+  border-radius: var(--radius-pill, 999px);
+}
+
+.solid:hover:not(:disabled) {
+  color: var(--bg);
+  background: var(--ui-button-primary-hover, var(--text));
+}
+
+.glass {
+  color: var(--text-strong);
+  background: var(--glass-surface, var(--glass-regular));
+  -webkit-backdrop-filter: var(--glass-backdrop, blur(24px));
+  backdrop-filter: var(--glass-backdrop, blur(24px));
+  box-shadow: var(--glass-surface-sheen, none), var(--elevation-2, var(--shadow-md));
+  border-radius: var(--radius-pill, 999px);
+}
+
+.glass:hover:not(:disabled) {
+  background: var(--glass-surface, var(--glass-regular));
+  box-shadow: var(--glass-surface-sheen, none), var(--elevation-3, var(--shadow-lg));
+}

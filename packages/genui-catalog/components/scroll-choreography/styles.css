@@ -1,0 +1,121 @@
+/* scroll-choreography — clean-room, component-specs.md §19. Every selector sits under .genui-scroll-choreography. */
+
+:where(.genui-scroll-choreography) {
+  position: relative;
+  overflow: clip;
+}
+
+.genui-scroll-choreography__stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.genui-scroll-choreography__item {
+  position: absolute;
+  top: calc(50% - 23% + var(--genui-scroll-choreography-dir-y, 0) * 25%);
+  left: calc(50% - 23% + var(--genui-scroll-choreography-dir-x, 0) * 25%);
+  width: 46%;
+  height: 46%;
+  z-index: 1;
+  overflow: hidden;
+  border-radius: var(--genui-scroll-choreography-radius, 16px);
+  opacity: calc(1 - var(--genui-scroll-choreography-p, 0) * 0.9);
+  transform: translate(
+      calc(var(--genui-scroll-choreography-dir-x, 0) * var(--genui-scroll-choreography-spread, 40) * var(--genui-scroll-choreography-p, 0) * 1vw),
+      calc(var(--genui-scroll-choreography-dir-y, 0) * var(--genui-scroll-choreography-spread, 40) * var(--genui-scroll-choreography-p, 0) * 1vw)
+    )
+    scale(calc(1 - var(--genui-scroll-choreography-p, 0) * 0.3));
+}
+
+.genui-scroll-choreography__item.is-hero {
+  z-index: 2;
+  opacity: 1;
+  border-radius: calc(var(--genui-scroll-choreography-radius, 16px) * (1 - var(--genui-scroll-choreography-p, 0)));
+  transform-origin: calc((var(--genui-scroll-choreography-dir-x, 0) + 1) * 50%) calc((var(--genui-scroll-choreography-dir-y, 0) + 1) * 50%);
+  transform: scale(
+    calc(1 + (var(--genui-scroll-choreography-hero-sx, 1) - 1) * var(--genui-scroll-choreography-p, 0)),
+    calc(1 + (var(--genui-scroll-choreography-hero-sy, 1) - 1) * var(--genui-scroll-choreography-p, 0))
+  );
+}
+
+.genui-scroll-choreography__caption {
+  position: absolute;
+  inset: auto 0 0 0;
+  z-index: 3;
+  padding: 16px 24px 28px;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+  opacity: clamp(
+    0,
+    calc((var(--genui-scroll-choreography-p, 0) - var(--genui-scroll-choreography-cap-at, 0.8)) / (1 - var(--genui-scroll-choreography-cap-at, 0.8) + 0.001)),
+    1
+  );
+}
+
+/* Reduced motion: a static grid, hero full-width on top. Progress defaults to 0 with no JS (the
+   var() fallbacks above), and to exactly 0 when JS is running (disablePinned), so the per-item
+   transform/opacity/border-radius formulas already land on the same rest state here — only
+   layout (position, grid) needs an explicit override. Both blocks below must agree. */
+.genui-scroll-choreography--reduced :is(.genui-scroll-choreography__stage, .genui-scroll-choreography__item, .genui-scroll-choreography__caption) {
+  position: static;
+  width: auto;
+  height: auto;
+  transform: none;
+  opacity: 1;
+}
+
+.genui-scroll-choreography--reduced .genui-scroll-choreography__stage {
+  height: auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.genui-scroll-choreography--reduced .genui-scroll-choreography__item {
+  aspect-ratio: 1;
+}
+
+.genui-scroll-choreography--reduced .is-hero {
+  grid-column: 1 / -1;
+  aspect-ratio: 16 / 9;
+}
+
+.genui-scroll-choreography--reduced .genui-scroll-choreography__caption {
+  padding: 12px 0 0;
+  color: inherit;
+  background: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-scroll-choreography :is(.genui-scroll-choreography__stage, .genui-scroll-choreography__item, .genui-scroll-choreography__caption) {
+    position: static;
+    width: auto;
+    height: auto;
+    transform: none;
+    opacity: 1;
+  }
+
+  .genui-scroll-choreography .genui-scroll-choreography__stage {
+    height: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+  }
+
+  .genui-scroll-choreography .genui-scroll-choreography__item {
+    aspect-ratio: 1;
+  }
+
+  .genui-scroll-choreography .is-hero {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+  }
+
+  .genui-scroll-choreography .genui-scroll-choreography__caption {
+    padding: 12px 0 0;
+    color: inherit;
+    background: none;
+  }
+}

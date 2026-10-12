@@ -1,0 +1,31 @@
+{
+  "id": "molten-metal",
+  "name": "Molten Metal",
+  "category": "background",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room WebGL port written from the one-line effect description only (no upstream source read): a dependency-free fragment shader shades a churning noise height field as polished metal with glowing heat pools, giving hero panels a dramatic industrial backdrop, with a static CSS gradient when WebGL is unavailable.",
+  "entry": "components/molten-metal/index.ts",
+  "css": "components/molten-metal/styles.css",
+  "demo": "components/molten-metal/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "metal": { "type": "string", "default": "#9aa3b5", "description": "Surface metal tint, as #rgb or #rrggbb; also tints the CSS fallback." },
+      "glow": { "type": "string", "default": "#ff6a1f", "description": "Heat glow colour, as #rgb or #rrggbb; white-hot cores are mixed in automatically." },
+      "speed": { "type": "number", "default": 0.5, "minimum": 0, "description": "Churn speed; 0 holds a still frame." },
+      "scale": { "type": "number", "default": 1, "minimum": 0.2, "maximum": 6, "description": "Ripple density; larger gives more, smaller ripples." },
+      "heat": { "type": "number", "default": 0.5, "minimum": 0, "maximum": 1, "description": "How much of the surface glows; 0 is cold polished metal." }
+    }
+  },
+  "a11y": [
+    "The injected canvas is aria-hidden and pointer-events: none; the host's content, reading order and focus behaviour are unchanged.",
+    "The surface has bright specular glints and hot spots, so text on it needs a scrim or panel to keep 4.5:1 contrast (the demo sets its copy on a dark translucent panel).",
+    "Reduced motion stops the shader loop and the fallback drift and shows one still frame of the surface.",
+    "Forced-colors mode hides the canvas and paints the host in Canvas/CanvasText with a visible border."
+  ],
+  "reducedMotion": "static"
+}

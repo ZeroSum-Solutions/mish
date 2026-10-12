@@ -1,0 +1,11 @@
+{
+  "id": "0.22.1",
+  "title": "Welcome to Mishh Mashh",
+  "body": "Create, edit, and share polished design work from one focused canvas.\nSwitch between silky dark, light, and system themes without changing your project.",
+  "locales": {
+    "zh-CN": {
+      "title": "欢迎使用 Mishh Mashh",
+      "body": "在专注的画布中创建、编辑和分享精美的设计作品。\n在丝滑深色、浅色和跟随系统主题之间切换，不会更改项目内容。"
+    }
+  }
+}

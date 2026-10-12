@@ -1,0 +1,4190 @@
+import { homeBriefPreview } from '../helpers/home-brief-preview';
+// @vitest-environment jsdom
+
+import * as workbenchProvider from '../../src/providers/workbench';
+import { workbenchIntakeStore } from '../../src/runtime/intake/intake-store';
+import { advanceWorkspaceAccountGeneration, workspaceAccountScopedCacheKey } from '../../src/collab/workspace-identity';
+import { readHomeModelHandoff } from '../../src/runtime/workbench/home-model-handoff';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  buildWorkspacePermissions,
+  parseAttachIntakeResponse,
+  type ProjectWorkspaceScope,
+  type WorkspaceCollabContext,
+} from '@open-design/contracts';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { App } from '../../src/App';
+import { notifyAmrLoginStatusChanged } from '../../src/components/amrLoginPolling';
+import type {
+  ProjectNameAuthorityResolution,
+  ProjectRenameFenceToken,
+} from '../../src/components/ProjectView';
+import type { AgentInfo, AppConfig, Project } from '../../src/types';
+import {
+  fetchComposioConfigFromDaemon,
+  fetchDaemonConfig,
+  loadConfig,
+  mergeDaemonConfig,
+  saveConfig,
+  syncComposioConfigToDaemon,
+  syncConfigToDaemon,
+} from '../../src/state/config';
+import {
+  daemonIsLive,
+  fetchAgentsStream,
+  fetchAppVersionInfo,
+  fetchDesignSystems,
+  fetchDesignTemplates,
+  fetchPromptTemplates,
+  fetchSkills,
+  replaceProjectWorkingDir,
+  uploadProjectFiles,
+} from '../../src/providers/registry';
+import {
+  createDesignSystemProjectFromProject,
+  createProject,
+  deleteProject,
+  duplicateProject,
+  getProject,
+  invalidatePluginCatalogCache,
+  listProjects,
+  listTemplates,
+  patchProject,
+  ProjectCreateError,
+} from '../../src/state/projects';
+import {
+  WORKSPACE_CONTEXT_REFRESH_EVENT,
+  notifyWorkspaceContextRefresh,
+  resetTeamProjectsCache,
+  resetWorkspaceContextCache,
+  currentWorkspaceAccountGeneration,
+  workspaceIdentityCacheKey,
+} from '../../src/collab/useWorkspaceContext';
+import { runWorkspaceIdentity } from '../../src/collab/useProjectWorkspaceScope';
+import { resetCoalescedGet } from '../../src/lib/coalesced-get';
+import {
+  projectDisplaySnapshotKey,
+  readProjectDisplaySnapshot,
+  resetProjectDisplaySnapshots,
+  writeProjectDisplaySnapshot,
+} from '../../src/state/project-display-cache';
+import type { AmrAuthRetryContinuation } from '../../src/runtime/amr-auth-retry-continuation';
+import type { VelaLoginStatus } from '../../src/providers/daemon';
+import { workspaceDirectoryFixture } from '../helpers/workspace-context';
+
+const workspaceInvalidationHarness = vi.hoisted(() => ({
+  handlers: [] as Array<Record<string, (payload: any) => void>>,
+  onActive: [] as Array<() => void>,
+}));
+
+const iframePoolHarness = vi.hoisted(() => ({
+  evictMatching: vi.fn(),
+  evictProject: vi.fn(),
+}));
+
+const projectViewRenameFenceHarness = vi.hoisted(() => ({
+  token: null as ProjectRenameFenceToken | null,
+}));
+
+const projectViewRetryScopeHarness = vi.hoisted(() => ({
+  scope: null as ProjectWorkspaceScope | null,
+  armedWorkspaceKey: null as string | null,
+  latest: null as {
+    context: WorkspaceCollabContext | null;
+    continuation: AmrAuthRetryContinuation | null;
+    consume: ((continuation: AmrAuthRetryContinuation) => boolean) | undefined;
+  } | null,
+}));
+
+
+const archiveCompletion = vi.hoisted(() => vi.fn());
+
+const workspaceTabsHarness = vi.hoisted(() => ({
+  projectIds: new Set<string>(),
+}));
+
+vi.mock('../../src/collab/workspace-events', () => ({
+  useWorkspaceInvalidation: vi.fn((
+    handlers: Record<string, (payload: any) => void>,
+    options?: { onActive?: () => void },
+  ) => {
+    workspaceInvalidationHarness.handlers.push(handlers);
+    if (options?.onActive) workspaceInvalidationHarness.onActive.push(options.onActive);
+    return { connected: false };
+  }),
+}));
+
+vi.mock('../../src/components/IframeKeepAlivePool', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../src/components/IframeKeepAlivePool')>()),
+  useIframeKeepAlivePool: () => ({
+    attach: vi.fn(),
+    release: vi.fn(),
+    evict: vi.fn(),
+    evictProject: iframePoolHarness.evictProject,
+    evictMatching: iframePoolHarness.evictMatching,
+    subscribe: vi.fn(() => () => {}),
+    revision: vi.fn(() => 0),
+  }),
+}));
+
+vi.mock('../../src/components/EntryView', () => ({
+  EntryView: ({
+    onCreateProject,
+    onProjectsRefresh,
+    onDeleteProject,
+    onArchiveProject,
+    onImportFolderResponse,
+    onOpenProject,
+    onRenameProject,
+    onOpenSettings,
+    onRefreshAgents,
+    agents,
+    amrLoggedIn,
+    projects,
+    projectsLoading,
+  }: {
+    onProjectsRefresh: () => Promise<void>;
+    onCreateProject: (input: unknown) => boolean | Promise<boolean>;
+    onDeleteProject: (id: string) => void;
+    onArchiveProject?: (id: string, archived: boolean, options?: { bulk?: boolean }) => Promise<boolean>;
+    onImportFolderResponse?: (response: {
+      conversationId: string;
+      entryFile: string | null;
+      ok: true;
+      projectId: string;
+    }) => Promise<void> | void;
+    onOpenProject: (
+      id: string,
+      fileName?: string,
+      projectTitleHint?: {
+        authoritative: boolean;
+        name: string;
+        workspaceId: string | null;
+        workspaceMemberId: string | null;
+      },
+    ) => Promise<boolean> | boolean | void;
+    onRenameProject?: (id: string, name: string) => Promise<void> | void;
+    onOpenSettings: () => void;
+    onRefreshAgents: () => void | Promise<void>;
+    agents: AgentInfo[];
+    amrLoggedIn?: boolean | null;
+    projects: Project[];
+    projectsLoading?: boolean;
+  }) => (
+    <main>
+      <div data-testid="entry-home-surface" />
+      <button onClick={() => { void onArchiveProject?.(projects[0]!.id, true, { bulk: true }).catch(archiveCompletion); }}>Bulk archive</button>
+      <button onClick={() => { void onArchiveProject?.(projects[0]!.id, true).catch(archiveCompletion); }}>Single archive</button>
+      <div data-testid="amr-login-status">{String(amrLoggedIn)}</div>
+      <div data-testid="entry-project-count">{projects.length}</div>
+      <div data-testid="entry-projects-loading">{String(Boolean(projectsLoading))}</div>
+      <button
+        type="button"
+        onClick={() => {
+          void Promise.resolve(onCreateProject({
+            name: 'Fresh project',
+            skillId: null,
+            designSystemId: null,
+            metadata: { kind: 'prototype' },
+          })).catch(() => {});
+        }}
+      >
+        Create project
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          void Promise.resolve(onCreateProject({
+            name: 'Prompted project',
+            skillId: null,
+            designSystemId: null,
+            pendingPrompt: 'Build the retained artifact prompt',
+            pendingFiles: [new File(['brief'], 'brief.txt', { type: 'text/plain' })],
+            autoSendFirstMessage: true,
+            metadata: { kind: 'prototype' },
+          })).catch(() => {});
+        }}
+      >
+        Create prompted project
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const out = document.querySelector('[data-testid="entry-create-error"]');
+          void Promise.resolve(onCreateProject({
+            name: 'Website Clone',
+            skillId: null,
+            designSystemId: null,
+            pendingPrompt: 'Website URL to clone: http://127.0.0.1:8080',
+            autoSendFirstMessage: true,
+            metadata: { kind: 'prototype', intent: 'web-clone' },
+          })).catch((error: unknown) => {
+            if (out) out.textContent = error instanceof Error ? error.message : String(error);
+          });
+        }}
+      >
+        Create web clone project
+      </button>
+      <button type="button" onClick={() => {
+        void Promise.resolve(onCreateProject({
+          name: 'Home reviewed project', skillId: null, designSystemId: null,
+          pendingPrompt: 'A bakery site', autoSendFirstMessage: true,
+          acceptedBrief: homeBriefPreview,
+        })).catch(error => {
+          const out = document.querySelector('[data-testid="entry-create-error"]');
+          if (out) out.textContent = error instanceof Error ? error.message : String(error);
+        });
+      }}>Send Home brief</button>
+      <button onClick={() => void onProjectsRefresh()}>Refresh Home projects</button>
+      <div data-testid="entry-create-error" />
+      <button
+        type="button"
+        onClick={() =>
+          onCreateProject({
+            name: 'Dir project',
+            skillId: null,
+            designSystemId: null,
+            metadata: { kind: 'prototype', userWorkingDir: '/Users/me/external' },
+            userWorkingDirToken: 'wd-token',
+            pendingFiles: [new File(['hi'], 'note.txt', { type: 'text/plain' })],
+          })
+        }
+      >
+        Create project with working dir
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          onCreateProject({
+            name: 'Many attachment project',
+            skillId: null,
+            designSystemId: null,
+            metadata: { kind: 'prototype', userWorkingDir: '/Users/me/external' },
+            userWorkingDirToken: 'wd-token',
+            pendingPrompt: 'Make a deck from these',
+            autoSendFirstMessage: true,
+            pendingFiles: Array.from(
+              { length: 6 },
+              (_unused, index) =>
+                new File([`shot-${index}`], `shot-${index}.png`, { type: 'image/png' }),
+            ),
+          })
+        }
+      >
+        Create project with many attachments
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          onCreateProject({
+            name: 'Context dir project',
+            skillId: null,
+            designSystemId: null,
+            metadata: { kind: 'prototype', linkedDirs: ['/Users/me/existing'] },
+            linkedDirs: ['/Users/me/reference', ' /Users/me/reference ', '/Users/me/local-code'],
+          })
+        }
+      >
+        Create project with context dirs
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          void onImportFolderResponse?.({
+            conversationId: 'conv-import',
+            entryFile: null,
+            ok: true,
+            projectId: 'project-new',
+          })
+        }
+      >
+        Host import folder
+      </button>
+      <button type="button" onClick={() => void onRefreshAgents()}>
+        Refresh agents
+      </button>
+      <button type="button" onClick={onOpenSettings}>
+        Open settings from home
+      </button>
+      <button type="button" onClick={() => void onOpenProject('project-missing')}>
+        Open missing project
+      </button>
+      <button
+        type="button"
+        onClick={() => projects[0] && void onRenameProject?.(projects[0].id, 'Rename A')}
+      >
+        Rename first project A
+      </button>
+      <button
+        type="button"
+        onClick={() => projects[0] && void onRenameProject?.(projects[0].id, 'Rename B')}
+      >
+        Rename first project B
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          void onOpenProject('project-shared', undefined, {
+            authoritative: true,
+            name: 'Catalog authority',
+            workspaceId: 'ws-1',
+            workspaceMemberId: 'wm-1',
+          })
+        }
+      >
+        Open catalog project
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          void onOpenProject('project-shared', undefined, {
+            authoritative: true,
+            name: 'New card authority',
+            workspaceId: 'ws-1',
+            workspaceMemberId: 'wm-1',
+          })
+        }
+      >
+        Open updated catalog project
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          void onOpenProject('project-own', undefined, {
+            authoritative: false,
+            name: 'Own local project',
+            workspaceId: 'ws-1',
+            workspaceMemberId: 'wm-1',
+          })
+        }
+      >
+        Open own unbound project
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          void onOpenProject('project-same', undefined, {
+            authoritative: true,
+            name: 'Workspace A catalog',
+            workspaceId: 'ws-a',
+            workspaceMemberId: 'member-ws-a',
+          })
+        }
+      >
+        Open workspace A project
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          void onOpenProject('project-same', undefined, {
+            authoritative: false,
+            name: 'Workspace A stale own title',
+            workspaceId: 'ws-a',
+            workspaceMemberId: 'member-ws-a',
+          })
+        }
+      >
+        Open stale own workspace A project
+      </button>
+      <div data-testid="entry-agent-list">
+        {agents.map((agent) => (
+          <span key={agent.id} data-testid={`entry-agent-${agent.id}`}>
+            {agent.name}
+          </span>
+        ))}
+      </div>
+      {projects.map((project) => (
+        <div key={project.id} data-testid={`entry-project-${project.id}`}>
+          <span>{project.name}</span>
+          <button type="button" onClick={() => onOpenProject(project.id)}>
+            Open {project.name}
+          </button>
+          <button type="button" onClick={() => void onDeleteProject(project.id)}>
+            Delete {project.name}
+          </button>
+        </div>
+      ))}
+    </main>
+  ),
+}));
+
+vi.mock('../../src/components/ProjectView', () => ({
+  ProjectView: ({
+    onBack,
+    onCreateProjectFromDesignSystem,
+    onCreateDesignSystemFromProject,
+    onDuplicateProject,
+    onProjectsRefresh,
+    onProjectChange,
+    onProjectRenameStarted,
+    onProjectRenameSettled,
+    project,
+    routeConversationId,
+    authoritativeProjectName,
+    projectAuthorizationKey,
+    resolveAuthoritativeProjectName,
+    amrAuthRetryContinuation,
+    onArmAmrAuthRetryContinuation,
+    onConsumeAmrAuthRetryContinuation,
+    onOpenAmrSettings,
+    onOpenSettings,
+    workspaceContextOverride,
+  }: {
+    onBack: () => void;
+    onCreateProjectFromDesignSystem?: (designSystemId: string, title: string) => Promise<void> | void;
+    onCreateDesignSystemFromProject?: (
+      sourceProjectId: string,
+      input: { name?: string; pendingPrompt?: string },
+    ) => Promise<void> | void;
+    onDuplicateProject?: (
+      sourceProjectId: string,
+      input?: { name?: string },
+    ) => Promise<void> | void;
+    onProjectsRefresh: () => Promise<void>;
+    onProjectChange: (project: Project) => void;
+    onProjectRenameStarted?: (project: Project) => ProjectRenameFenceToken | null;
+    onProjectRenameSettled?: (
+      token: ProjectRenameFenceToken | null,
+      project: Project,
+    ) => void;
+    project: Project;
+    routeConversationId?: string | null;
+    authoritativeProjectName?: string;
+    projectAuthorizationKey?: string;
+    resolveAuthoritativeProjectName?: (
+      projectId: string,
+      expectedAuthorizationKey: string,
+    ) => Promise<ProjectNameAuthorityResolution>;
+    amrAuthRetryContinuation?: AmrAuthRetryContinuation | null;
+    onArmAmrAuthRetryContinuation?: (
+      continuation: Omit<AmrAuthRetryContinuation, 'accountIdAtArm' | 'createdAtMs'>,
+    ) => void;
+    onConsumeAmrAuthRetryContinuation?: (
+      continuation: AmrAuthRetryContinuation,
+    ) => boolean;
+    onOpenAmrSettings?: () => void;
+    onOpenSettings?: () => void;
+    workspaceContextOverride?: WorkspaceCollabContext | null;
+  }) => {
+    projectViewRetryScopeHarness.latest = {
+      context: workspaceContextOverride ?? null,
+      continuation: amrAuthRetryContinuation ?? null,
+      consume: onConsumeAmrAuthRetryContinuation,
+    };
+    return (
+    <main data-testid="project-view">
+      <span data-testid="project-title">{project.name}</span>
+      <span data-testid="project-authoritative-title">{authoritativeProjectName ?? 'none'}</span>
+      <span data-testid="project-workspace-id">{project.workspaceId ?? 'unbound'}</span>
+      <span data-testid="project-route-workspace-context">
+        {workspaceContextOverride
+          ? `${workspaceContextOverride.workspaceId}:${workspaceContextOverride.workspaceMemberId}`
+          : 'none'}
+      </span>
+      <span data-testid="project-route-conversation">{routeConversationId ?? 'none'}</span>
+      <span data-testid="project-auth-continuation">
+        {amrAuthRetryContinuation?.assistantId ?? 'none'}
+      </span>
+      <button type="button" onClick={onBack}>
+        Back to projects
+      </button>
+      <button
+        type="button"
+        onClick={() => { void Promise.resolve(onCreateDesignSystemFromProject?.(project.id, {
+          name: 'Derived design system',
+          pendingPrompt: 'Extract the retained design system prompt',
+        })).catch(() => {}); }}
+      >
+        Extract design system project
+      </button>
+      <button
+        type="button"
+        onClick={() => void onDuplicateProject?.(project.id, {
+          name: 'Scoped duplicate',
+        })}
+      >
+        Duplicate project
+      </button>
+      <button type="button" onClick={onOpenSettings}>
+        Open settings from project
+      </button>
+      <button type="button" onClick={() => void onProjectsRefresh()}>
+        Refresh projects
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const optimistic = {
+            ...project,
+            name: 'After local rename',
+            updatedAt: project.updatedAt + 1,
+          };
+          projectViewRenameFenceHarness.token = onProjectRenameStarted?.(optimistic) ?? null;
+          onProjectChange(optimistic);
+        }}
+      >
+        Rename current project
+      </button>
+      <button
+        type="button"
+        onClick={() => onProjectChange({
+          ...project,
+          name: 'Remote rename',
+          updatedAt: project.updatedAt + 1,
+        })}
+      >
+        Apply remote project rename
+      </button>
+      <button
+        type="button"
+        onClick={() => onProjectRenameSettled?.(projectViewRenameFenceHarness.token, project)}
+      >
+        Settle current project rename
+      </button>
+      <button
+        type="button"
+        onClick={() => void onCreateProjectFromDesignSystem?.('slack', 'Slack')}
+      >
+        Create design from design system
+      </button>
+      <button
+        type="button"
+        onClick={() =>
+          void resolveAuthoritativeProjectName?.(
+            project.id,
+            projectAuthorizationKey ?? project.id,
+          )
+        }
+      >
+        Refresh catalog title
+      </button>
+      <button
+        type="button"
+        onClick={() => onArmAmrAuthRetryContinuation?.({
+          projectId: project.id,
+          conversationId: routeConversationId ?? 'conv-auth',
+          assistantId: 'assistant-auth-failure',
+          originMountId: 'origin-mount',
+          workspaceIdentityKey: workspaceIdentityCacheKey(workspaceContextOverride),
+        })}
+      >
+        Arm auth continuation
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const runContext = projectViewRetryScopeHarness.scope
+            ? runWorkspaceIdentity(
+                { loading: false, scope: projectViewRetryScopeHarness.scope },
+                workspaceContextOverride ?? null,
+                project.workspaceId,
+              )
+            : workspaceContextOverride;
+          const continuation = {
+            projectId: project.id,
+            conversationId: routeConversationId ?? 'conv-auth',
+            assistantId: 'assistant-auth-failure',
+            originMountId: 'origin-mount',
+            // ProjectView arms from its resolved project scope, which has a
+            // least-privilege role. App's directory context is a different
+            // projection of the same principal; don't silently substitute it.
+            workspaceIdentityKey: workspaceIdentityCacheKey(runContext),
+            workspacePrincipal: runContext ? {
+              workspaceId: runContext.workspaceId,
+              workspaceType: runContext.workspaceType,
+              workspaceMemberId: runContext.workspaceMemberId,
+            } : null,
+          };
+          projectViewRetryScopeHarness.armedWorkspaceKey = continuation.workspaceIdentityKey;
+          onArmAmrAuthRetryContinuation?.(continuation);
+          onOpenAmrSettings?.();
+        }}
+      >
+        Authorize in settings
+      </button>
+      <button
+        type="button"
+        disabled={!amrAuthRetryContinuation}
+        onClick={() => {
+          if (amrAuthRetryContinuation) {
+            onConsumeAmrAuthRetryContinuation?.(amrAuthRetryContinuation);
+          }
+        }}
+      >
+        Consume auth continuation
+      </button>
+    </main>
+    );
+  },
+}));
+
+vi.mock('../../src/components/WorkspaceTabsBar', () => ({
+  WorkspaceTabsBar: ({
+    activeProjectWorkspaceId,
+    projects,
+  }: {
+    activeProjectWorkspaceId?: string | null;
+    projects: Project[];
+  }) => (
+    <>
+      <span data-testid="workspace-tabs-active-project-workspace">
+        {activeProjectWorkspaceId === undefined
+          ? 'unresolved'
+          : activeProjectWorkspaceId ?? 'personal'}
+      </span>
+      {projects.map((project) => (
+        <span key={project.id} data-testid={`workspace-tab-name-${project.id}`}>
+          {project.name}
+        </span>
+      ))}
+    </>
+  ),
+  openWorkspaceTab: (route: { kind: string; projectId?: string }) => {
+    if (route.kind === 'project' && route.projectId) {
+      workspaceTabsHarness.projectIds.add(route.projectId);
+    }
+  },
+  removeWorkspaceProjectTabs: (projectId: string) => {
+    workspaceTabsHarness.projectIds.delete(projectId);
+  },
+}));
+
+vi.mock('../../src/components/pet/PetOverlay', () => ({
+  PetOverlay: () => null,
+}));
+
+vi.mock('../../src/components/pet/pets', () => ({
+  migrateCustomPetAtlas: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock('../../src/components/SettingsDialog', () => ({
+  SettingsDialog: ({ onClose }: { onClose: () => void }) => (
+    <div data-testid="settings-surface">
+      <button type="button" onClick={onClose}>
+        Close settings
+      </button>
+    </div>
+  ),
+  switchApiProtocolConfig: (config: AppConfig) => config,
+  updateCurrentApiProtocolConfig: (config: AppConfig) => config,
+}));
+
+vi.mock('../../src/providers/registry', async () => {
+  const actual = await vi.importActual<typeof import('../../src/providers/registry')>(
+    '../../src/providers/registry',
+  );
+  return {
+    ...actual,
+    daemonIsLive: vi.fn(),
+    fetchAgentsStream: vi.fn(),
+    fetchAppVersionInfo: vi.fn(),
+    fetchDesignSystems: vi.fn(),
+    fetchDesignTemplates: vi.fn(),
+    fetchPromptTemplates: vi.fn(),
+    fetchSkills: vi.fn(),
+    replaceProjectWorkingDir: vi.fn(),
+    uploadProjectFiles: vi.fn(),
+  };
+});
+
+vi.mock('../../src/state/projects', async () => {
+  const actual = await vi.importActual<typeof import('../../src/state/projects')>(
+    '../../src/state/projects',
+  );
+  return {
+    ...actual,
+    createDesignSystemProjectFromProject: vi.fn(),
+    createProject: vi.fn(),
+    deleteProject: vi.fn(),
+    duplicateProject: vi.fn(),
+    getProject: vi.fn(),
+    invalidatePluginCatalogCache: vi.fn(actual.invalidatePluginCatalogCache),
+    listProjects: vi.fn(),
+    listTemplates: vi.fn(),
+    patchProject: vi.fn(),
+  };
+});
+
+vi.mock('../../src/state/config', async () => {
+  const actual = await vi.importActual<typeof import('../../src/state/config')>(
+    '../../src/state/config',
+  );
+  return {
+    ...actual,
+    fetchDaemonConfig: vi.fn().mockResolvedValue({}),
+    fetchComposioConfigFromDaemon: vi.fn().mockResolvedValue(null),
+    loadConfig: vi.fn(),
+    mergeDaemonConfig: vi.fn(),
+    saveConfig: vi.fn(),
+    syncComposioConfigToDaemon: vi.fn().mockResolvedValue(true),
+    syncConfigToDaemon: vi.fn().mockResolvedValue(undefined),
+  };
+});
+
+const mockedDaemonIsLive = vi.mocked(daemonIsLive);
+const mockedFetchAgentsStream = vi.mocked(fetchAgentsStream);
+const mockedFetchAppVersionInfo = vi.mocked(fetchAppVersionInfo);
+const mockedFetchDesignSystems = vi.mocked(fetchDesignSystems);
+const mockedFetchDesignTemplates = vi.mocked(fetchDesignTemplates);
+const mockedFetchPromptTemplates = vi.mocked(fetchPromptTemplates);
+const mockedFetchSkills = vi.mocked(fetchSkills);
+const mockedUploadProjectFiles = vi.mocked(uploadProjectFiles);
+const mockedReplaceProjectWorkingDir = vi.mocked(replaceProjectWorkingDir);
+const mockedCreateDesignSystemProjectFromProject = vi.mocked(createDesignSystemProjectFromProject);
+const mockedCreateProject = vi.mocked(createProject);
+const mockedDeleteProject = vi.mocked(deleteProject);
+const mockedDuplicateProject = vi.mocked(duplicateProject);
+const mockedGetProject = vi.mocked(getProject);
+const mockedInvalidatePluginCatalogCache = vi.mocked(invalidatePluginCatalogCache);
+const mockedListProjects = vi.mocked(listProjects);
+const mockedListTemplates = vi.mocked(listTemplates);
+const mockedPatchProject = vi.mocked(patchProject);
+const mockedFetchDaemonConfig = vi.mocked(fetchDaemonConfig);
+const mockedFetchComposioConfigFromDaemon = vi.mocked(fetchComposioConfigFromDaemon);
+const mockedLoadConfig = vi.mocked(loadConfig);
+const mockedMergeDaemonConfig = vi.mocked(mergeDaemonConfig);
+const mockedSaveConfig = vi.mocked(saveConfig);
+const mockedSyncComposioConfigToDaemon = vi.mocked(syncComposioConfigToDaemon);
+const mockedSyncConfigToDaemon = vi.mocked(syncConfigToDaemon);
+
+const baseConfig: AppConfig = {
+  mode: 'daemon',
+  apiKey: '',
+  apiProtocol: 'anthropic',
+  apiVersion: '',
+  baseUrl: 'https://api.anthropic.com',
+  model: 'claude-sonnet-4-5',
+  apiProviderBaseUrl: 'https://api.anthropic.com',
+  apiProtocolConfigs: {},
+  agentId: 'codex',
+  skillId: null,
+  designSystemId: null,
+  onboardingCompleted: true,
+  privacyDecisionAt: 1778244000000,
+  mediaProviders: {},
+  composio: {},
+  agentModels: {},
+  agentCliEnv: {},
+};
+
+const freshProject: Project = {
+  id: 'project-new',
+  name: 'Fresh project',
+  skillId: null,
+  designSystemId: null,
+  createdAt: 1778244000000,
+  updatedAt: 1778244000000,
+  metadata: { kind: 'prototype' },
+};
+
+const existingProject: Project = {
+  id: 'project-existing',
+  name: 'Existing project',
+  skillId: null,
+  designSystemId: null,
+  createdAt: 1778243000000,
+  updatedAt: 1778243000000,
+  metadata: { kind: 'prototype' },
+};
+
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+  return { promise, resolve, reject };
+}
+
+function workspaceContextPayload(
+  workspaceId: string,
+  workspaceMemberId: string,
+) {
+  return { context: workspaceContext(workspaceId, workspaceMemberId) };
+}
+
+function workspaceContext(
+  workspaceId: string,
+  workspaceMemberId: string,
+) {
+  return {
+    workspaceId,
+    workspaceName: workspaceId,
+    workspaceType: 'team' as const,
+    workspaceMemberId,
+    role: 'member' as const,
+    memberStatus: 'active' as const,
+    lifecycleState: 'active' as const,
+    billingState: 'active' as const,
+    planId: null,
+    providerMode: 'platform_credits' as const,
+    seatSummary: {
+      seatLimit: 5,
+      usedSeats: 1,
+      availableSeats: 4,
+      isSeatFull: false,
+    },
+    permissions: buildWorkspacePermissions({
+      role: 'member',
+      lifecycleState: 'active',
+    }),
+    displayName: workspaceId,
+  };
+}
+
+function stubWorkspaceContext(
+  workspaceId: string,
+  workspaceMemberId: string,
+) {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn(async (input: RequestInfo | URL) => {
+      const pathname = new URL(String(input), 'http://d.local').pathname;
+      return {
+        ok: true,
+        json: async () =>
+          pathname.endsWith('/workspace/directory')
+            ? workspaceDirectoryFixture([workspaceContext(workspaceId, workspaceMemberId)])
+            : pathname.endsWith('/workspace/context')
+              ? workspaceContextPayload(workspaceId, workspaceMemberId)
+              : {},
+      } as Response;
+    }),
+  );
+}
+
+function mockSavedHomeIntake(names: string[], options: { attachGate?: Promise<void>; failedName?: string; attachError?: Error } = {}) {
+  const batchId = '00000000-0000-4000-8000-000000019999';
+  const fileIds = names.map((_, index) => `00000000-0000-4000-8000-${String(index + 1).padStart(12, '0')}`);
+  const accept = vi.spyOn(workbenchIntakeStore, 'accept').mockReturnValue({ id: batchId, remaining: [], settled: Promise.resolve() });
+  vi.spyOn(workbenchIntakeStore, 'pendingFileIds').mockReturnValue(fileIds);
+  // Home's raw File drops auto-select every descriptor for the message
+  // (stagePending + messageFileIds), not just the explicit intake-tray
+  // "Attach to message" path. accept() is mocked above, so the real store
+  // never gains this batch; mock the selection read directly instead.
+  vi.spyOn(workbenchIntakeStore, 'messageFileIds').mockReturnValue(fileIds);
+  vi.spyOn(workbenchIntakeStore, 'beginHomeHandoff').mockImplementation(() => {});
+  const attach = vi.spyOn(workbenchIntakeStore, 'attach').mockImplementation(async (_batchId, request) => {
+    await options.attachGate;
+    if (options.attachError) throw options.attachError;
+    return parseAttachIntakeResponse({ intakeBatchId: batchId, revision: 2,
+      files: names.map((filename, order) => ({ clientFileId: fileIds[order], order, descriptor: { clientFileId: fileIds[order], order, filename, size: 1 },
+        state: filename === options.failedName ? 'failed' : 'stored', retryable: filename === options.failedName, hasSuccessfulAttachment: filename !== options.failedName,
+        ...(filename === options.failedName ? {} : { stored: { assetId: fileIds[order], contentHash: 'a'.repeat(64), filename, size: 1, detectedMime: filename.endsWith('.png') ? 'image/png' : 'text/plain', kind: filename.endsWith('.png') ? 'image' : 'text', downloadUrl: '/fixture-download' } }),
+      })),
+      attachments: names.flatMap((filename, order) => filename === options.failedName ? [] : [{ clientFileId: fileIds[order], assetId: fileIds[order], contentHash: 'a'.repeat(64), projectId: request.projectId, conversationId: request.conversationId, filename, relPath: `references/${filename}`, size: 1 }]),
+    });
+  });
+  return { accept, attach, batchId, fileIds };
+}
+
+describe('App project creation routing', () => {
+  it('lets the bulk strip own archive errors while keeping the single archive toast', async () => {
+    archiveCompletion.mockClear();
+    mockedListProjects.mockResolvedValue([existingProject]);
+    mockedPatchProject.mockRejectedValue(new Error('Archive rejected by daemon'));
+    render(<App />);
+    await waitFor(() => expect(screen.getByTestId('entry-project-count').textContent).toBe('1'));
+    fireEvent.click(screen.getByRole('button', { name: 'Bulk archive' }));
+    await waitFor(() => expect(archiveCompletion).toHaveBeenCalledTimes(1));
+    expect(screen.queryByText('Archive rejected by daemon')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Single archive' }));
+    expect(await screen.findByText('Archive rejected by daemon')).toBeTruthy();
+    expect(screen.getAllByText('Archive rejected by daemon')).toHaveLength(1);
+  });
+
+  beforeEach(() => {
+    // This suite isolates shell routing. Model transport has a dedicated
+    // provider/HTTP suite; {} is no longer a valid model-save response.
+    vi.spyOn(workbenchProvider, 'putSessionModel').mockImplementation(async (sessionId, projectId, input) => ({
+      sessionId, projectId, revision: input.expectedRevision + 1, updatedAt: 1,
+      choice: { agentId: input.agentId, modelId: input.modelId, ...(input.byokBinding ? { byokBinding: input.byokBinding } : {}) },
+    }));
+    resetCoalescedGet();
+    resetWorkspaceContextCache();
+    resetTeamProjectsCache();
+    resetProjectDisplaySnapshots();
+    workspaceInvalidationHarness.handlers.length = 0;
+    workspaceInvalidationHarness.onActive.length = 0;
+    projectViewRenameFenceHarness.token = null;
+    projectViewRetryScopeHarness.scope = null;
+    projectViewRetryScopeHarness.armedWorkspaceKey = null;
+    projectViewRetryScopeHarness.latest = null;
+    workspaceTabsHarness.projectIds.clear();
+    window.history.replaceState(null, '', '/');
+    mockedDaemonIsLive.mockResolvedValue(true);
+    mockedFetchAgentsStream.mockResolvedValue([]);
+    mockedFetchSkills.mockResolvedValue([]);
+    mockedFetchDesignTemplates.mockResolvedValue([]);
+    mockedFetchDesignSystems.mockResolvedValue([]);
+    mockedFetchPromptTemplates.mockResolvedValue([]);
+    mockedFetchAppVersionInfo.mockResolvedValue(null);
+    mockedListTemplates.mockResolvedValue([]);
+    mockedFetchDaemonConfig.mockResolvedValue({});
+    mockedFetchComposioConfigFromDaemon.mockResolvedValue(null);
+    mockedMergeDaemonConfig.mockImplementation((local) => local);
+    mockedLoadConfig.mockReturnValue({ ...baseConfig });
+    mockedUploadProjectFiles.mockResolvedValue({ uploaded: [], failed: [] });
+    mockedCreateProject.mockResolvedValue({
+      project: freshProject,
+      conversationId: 'conv-new',
+    });
+    mockedCreateDesignSystemProjectFromProject.mockResolvedValue({
+      project: {
+        ...freshProject,
+        id: 'project-design-system',
+        name: 'Derived design system',
+      },
+      conversationId: 'conv-design-system',
+      designSystemId: 'derived-design-system',
+      copiedFiles: [],
+    });
+    mockedDeleteProject.mockResolvedValue(true);
+    mockedDuplicateProject.mockResolvedValue({
+      project: {
+        ...freshProject,
+        id: 'project-duplicate',
+        name: 'Scoped duplicate',
+      },
+      conversationId: 'conv-duplicate',
+      copiedFiles: [],
+    });
+    mockedGetProject.mockResolvedValue(null);
+    mockedPatchProject.mockResolvedValue(freshProject);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({}),
+      }),
+    );
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    vi.clearAllMocks();
+    resetWorkspaceContextCache();
+    resetTeamProjectsCache();
+    resetProjectDisplaySnapshots();
+    resetCoalescedGet();
+    workspaceInvalidationHarness.handlers.length = 0;
+    workspaceInvalidationHarness.onActive.length = 0;
+  });
+
+  it.each(['create', 'model-put'] as const)('fences derived design-system setup after account boundary during %s', async phase => {
+    window.history.replaceState(null, '', `/projects/${existingProject.id}`);
+    mockedListProjects.mockResolvedValue([existingProject]); mockedGetProject.mockResolvedValue(existingProject);
+    const gate = deferred<void>();
+    const created = { project: { ...freshProject, id: 'derived-scoped', name: 'Derived scoped' }, conversationId: 'derived-seed', designSystemId: 'derived', copiedFiles: [] };
+    mockedCreateDesignSystemProjectFromProject.mockImplementation(async () => { if (phase === 'create') await gate.promise; return created; });
+    const put = vi.spyOn(workbenchProvider, 'putSessionModel').mockImplementation(async (sessionId, projectId, input) => {
+      if (phase === 'model-put') await gate.promise;
+      return { sessionId, projectId, revision: 1, choice: { agentId: input.agentId, modelId: input.modelId }, updatedAt: 0 };
+    });
+    try {
+      render(<App />);
+      fireEvent.click(await screen.findByRole('button', { name: 'Extract design system project' }));
+      await waitFor(() => expect(phase === 'create' ? mockedCreateDesignSystemProjectFromProject : put).toHaveBeenCalled());
+      const before = { ...sessionStorage };
+      advanceWorkspaceAccountGeneration('derived-account-sign-out'); advanceWorkspaceAccountGeneration('derived-account-sign-in');
+      await act(async () => { gate.resolve(); await gate.promise; });
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+      expect({ ...sessionStorage }).toEqual(before);
+      expect(window.location.pathname).toBe(`/projects/${existingProject.id}`);
+      expect(screen.queryByText('Derived scoped')).toBeNull();
+      if (phase === 'create') expect(put).not.toHaveBeenCalled();
+    } finally { put.mockRestore(); }
+  });
+
+  it.each(['working-dir', 'model-put', 'final-attach'] as const)('fences Home setup after account boundary during %s', async phase => {
+    mockedListProjects.mockResolvedValue([]);
+    const gate = deferred<void>();
+    mockedReplaceProjectWorkingDir.mockImplementation(async () => { if (phase === 'working-dir') await gate.promise; return undefined as never; });
+    const put = vi.spyOn(workbenchProvider, 'putSessionModel').mockImplementation(async (sessionId, projectId, input) => {
+      if (phase === 'model-put') await gate.promise;
+      return { sessionId, projectId, revision: 1, choice: { agentId: input.agentId, modelId: input.modelId }, updatedAt: 0 };
+    });
+    const accept = vi.spyOn(workbenchIntakeStore, 'accept').mockReturnValue({ id: 'original-batch', remaining: [], settled: Promise.resolve() });
+    const pending = vi.spyOn(workbenchIntakeStore, 'pendingFileIds').mockReturnValue(['original-file']);
+    // See mockSavedHomeIntake: the Home raw-drop path reads the frozen
+    // selection through messageFileIds, not pendingFileIds.
+    const messageFiles = vi.spyOn(workbenchIntakeStore, 'messageFileIds').mockReturnValue(['original-file']);
+    const begin = vi.spyOn(workbenchIntakeStore, 'beginHomeHandoff').mockImplementation(() => {});
+    const attach = vi.spyOn(workbenchIntakeStore, 'attach').mockImplementation(async (batchId, request) => {
+      if (phase === 'final-attach') await gate.promise;
+      return { intakeBatchId: batchId, revision: 2, files: [], attachments: [{ clientFileId: 'original-file', assetId: 'asset', contentHash: 'a'.repeat(64), projectId: request.projectId, conversationId: request.conversationId, relPath: 'note.txt', filename: 'note.txt', size: 2 }] };
+    });
+    try {
+      render(<App />);
+      fireEvent.click(await screen.findByRole('button', { name: phase === 'model-put' ? 'Create project' : 'Create project with working dir' }));
+      await waitFor(() => expect(phase === 'working-dir' ? mockedReplaceProjectWorkingDir : phase === 'model-put' ? put : attach).toHaveBeenCalled());
+      const before = { ...sessionStorage }; const accepts = accept.mock.calls.length;
+      advanceWorkspaceAccountGeneration('same-account-sign-out');
+      advanceWorkspaceAccountGeneration('same-account-sign-in');
+      await act(async () => { gate.resolve(); await gate.promise; });
+      await act(async () => { await new Promise(resolve => setTimeout(resolve, 10)); });
+      expect({ ...sessionStorage }).toEqual(before);
+      expect(accept).toHaveBeenCalledTimes(accepts);
+      expect(screen.queryByTestId('project-view')).toBeNull();
+      expect(screen.queryByText('home-handoff-scope-changed')).toBeNull();
+      expect(window.location.pathname).toBe('/');
+    } finally { put.mockRestore(); accept.mockRestore(); pending.mockRestore(); messageFiles.mockRestore(); begin.mockRestore(); attach.mockRestore(); }
+  });
+
+  it('routes mutations and limits global focus catch-up to Skills and Design Systems', async () => {
+    const context = workspaceContext('ws-resources', 'wm-resources');
+    stubWorkspaceContext(context.workspaceId, context.workspaceMemberId);
+    mockedListProjects.mockResolvedValue([]);
+    const pluginChanged = vi.fn();
+    window.addEventListener('open-design:plugins-changed', pluginChanged);
+
+    render(<App />);
+    await waitFor(() => {
+      expect(mockedFetchSkills).toHaveBeenCalled();
+      expect(mockedFetchDesignSystems).toHaveBeenCalled();
+    });
+    mockedFetchSkills.mockClear();
+    mockedFetchDesignTemplates.mockClear();
+    mockedFetchDesignSystems.mockClear();
+    mockedInvalidatePluginCatalogCache.mockClear();
+
+    const currentHandlers = () => [...workspaceInvalidationHarness.handlers]
+      .reverse()
+      .find((handlers) => handlers['team-resources-changed'])!;
+
+    act(() => currentHandlers()['team-resources-changed']?.({
+      type: 'team-resources-changed',
+      resourceKind: 'skill',
+      resourceId: 'skill-1',
+    }));
+    await waitFor(() => expect(mockedFetchSkills).toHaveBeenCalledTimes(1));
+    expect(mockedFetchDesignTemplates).toHaveBeenCalledTimes(1);
+    expect(mockedFetchDesignSystems).not.toHaveBeenCalled();
+    expect(mockedInvalidatePluginCatalogCache).not.toHaveBeenCalled();
+
+    act(() => currentHandlers()['team-resources-changed']?.({
+      type: 'team-resources-changed',
+      resourceKind: 'design_system',
+      resourceId: 'system-1',
+    }));
+    await waitFor(() => expect(mockedFetchDesignSystems).toHaveBeenCalledTimes(1));
+    expect(mockedFetchDesignSystems).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        workspaceId: context.workspaceId,
+        workspaceMemberId: context.workspaceMemberId,
+      }),
+      { forceTeamMaterialization: true },
+    );
+    expect(mockedFetchSkills).toHaveBeenCalledTimes(1);
+
+    act(() => currentHandlers()['team-resources-changed']?.({
+      type: 'team-resources-changed',
+      resourceKind: 'plugin',
+      resourceId: 'plugin-1',
+    }));
+    expect(mockedInvalidatePluginCatalogCache).toHaveBeenCalledWith({
+      workspaceContext: expect.objectContaining({
+        workspaceId: context.workspaceId,
+        workspaceMemberId: context.workspaceMemberId,
+      }),
+      accountGeneration: currentWorkspaceAccountGeneration(),
+    });
+    expect(pluginChanged).toHaveBeenCalledTimes(1);
+
+    // The shell closes missed-event gaps for its two global registries. It must
+    // not broadcast a fake plugin mutation or evict project previews.
+    const onActive = workspaceInvalidationHarness.onActive.at(-1);
+    expect(onActive).toBeTypeOf('function');
+    mockedFetchSkills.mockClear();
+    mockedFetchDesignSystems.mockClear();
+    mockedInvalidatePluginCatalogCache.mockClear();
+    pluginChanged.mockClear();
+    iframePoolHarness.evictMatching.mockClear();
+    act(() => onActive?.());
+    await waitFor(() => {
+      expect(mockedFetchSkills).toHaveBeenCalledTimes(1);
+      expect(mockedFetchDesignSystems).toHaveBeenCalledTimes(1);
+    });
+    expect(mockedInvalidatePluginCatalogCache).not.toHaveBeenCalled();
+    expect(pluginChanged).not.toHaveBeenCalled();
+    expect(iframePoolHarness.evictMatching).not.toHaveBeenCalled();
+    window.removeEventListener('open-design:plugins-changed', pluginChanged);
+  });
+
+  it('supersedes the Team fallback snapshot when SSE opens, then refreshes once on later focus', async () => {
+    const context = workspaceContext('ws-initial-catch-up', 'wm-initial-catch-up');
+    stubWorkspaceContext(context.workspaceId, context.workspaceMemberId);
+    mockedListProjects.mockResolvedValue([]);
+    const skillsFirst = deferred<Awaited<ReturnType<typeof fetchSkills>>>();
+    const systemsFirst = deferred<Awaited<ReturnType<typeof fetchDesignSystems>>>();
+    mockedFetchSkills.mockImplementationOnce(() => skillsFirst.promise);
+    mockedFetchDesignSystems.mockImplementation((issuedContext) => {
+      if (issuedContext?.workspaceId === context.workspaceId) return systemsFirst.promise;
+      return Promise.resolve([]);
+    });
+
+    render(<App />);
+    await waitFor(() => {
+      expect(mockedFetchSkills).toHaveBeenCalledTimes(1);
+      expect(mockedFetchDesignSystems.mock.calls.filter(
+        ([issued]) => issued?.workspaceId === context.workspaceId,
+      )).toHaveLength(1);
+    });
+
+    const onActive = workspaceInvalidationHarness.onActive.at(-1);
+    act(() => onActive?.());
+    await waitFor(() => expect(mockedFetchSkills).toHaveBeenCalledTimes(2));
+    expect(mockedFetchDesignSystems.mock.calls.filter(
+      ([issued]) => issued?.workspaceId === context.workspaceId,
+    )).toHaveLength(2);
+
+    skillsFirst.resolve([]);
+    systemsFirst.resolve([]);
+    await act(async () => Promise.all([skillsFirst.promise, systemsFirst.promise]));
+    mockedFetchSkills.mockResolvedValue([]);
+    mockedFetchDesignSystems.mockResolvedValue([]);
+    act(() => onActive?.());
+    await waitFor(() => expect(mockedFetchSkills).toHaveBeenCalledTimes(3));
+    expect(mockedFetchDesignSystems.mock.calls.filter(
+      ([issued]) => issued?.workspaceId === context.workspaceId,
+    )).toHaveLength(3);
+  });
+
+  it('auto-picks the first available agent in registry order after streamed probes settle', async () => {
+    const codexAgent: AgentInfo = {
+      id: 'codex',
+      name: 'Codex CLI',
+      bin: 'codex',
+      available: true,
+      version: '0.80.0',
+      models: [{ id: 'default', label: 'Default' }],
+    };
+    const claudeAgent: AgentInfo = {
+      id: 'claude',
+      name: 'Claude Code',
+      bin: 'claude',
+      available: true,
+      version: '1.0.0',
+      models: [{ id: 'default', label: 'Default' }],
+    };
+    mockedLoadConfig.mockReturnValue({ ...baseConfig, agentId: null });
+    mockedListProjects.mockResolvedValue([]);
+    mockedFetchAgentsStream.mockImplementation(async ({ onAgent }) => {
+      onAgent(codexAgent);
+      onAgent(claudeAgent);
+      return [codexAgent, claudeAgent];
+    });
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(mockedSaveConfig).toHaveBeenCalledWith(
+        expect.objectContaining({ agentId: 'claude' }),
+      );
+    });
+    expect(
+      mockedSaveConfig.mock.calls.some(([saved]) => saved.agentId === 'codex'),
+    ).toBe(false);
+    expect(mockedSyncConfigToDaemon).toHaveBeenCalledWith(
+      expect.objectContaining({ agentId: 'claude' }),
+    );
+  });
+
+  it('ignores stale streamed writes from an older bootstrap after a newer rescan', async () => {
+    const staleCodexAgent: AgentInfo = {
+      id: 'codex',
+      name: 'Stale Codex CLI',
+      bin: 'codex',
+      available: false,
+      version: null,
+      models: [],
+    };
+    const refreshedCodexAgent: AgentInfo = {
+      id: 'codex',
+      name: 'Fresh Codex CLI',
+      bin: 'codex',
+      available: true,
+      version: '0.80.0',
+      models: [{ id: 'default', label: 'Default' }],
+    };
+    const staleBootstrap = deferred<AgentInfo[]>();
+    let emitStaleAgent: ((agent: AgentInfo) => void) | null = null;
+    mockedFetchAgentsStream
+      .mockImplementationOnce(({ onAgent }) => {
+        emitStaleAgent = onAgent;
+        return staleBootstrap.promise;
+      })
+      .mockImplementationOnce(async ({ onAgent }) => {
+        onAgent(refreshedCodexAgent);
+        return [refreshedCodexAgent];
+      });
+    mockedListProjects.mockResolvedValue([]);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Refresh agents' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-agent-codex').textContent).toBe(
+        'Fresh Codex CLI',
+      );
+    });
+
+    await act(async () => {
+      emitStaleAgent?.(staleCodexAgent);
+      staleBootstrap.resolve([staleCodexAgent]);
+      await staleBootstrap.promise;
+    });
+
+    expect(screen.getByTestId('entry-agent-codex').textContent).toBe(
+      'Fresh Codex CLI',
+    );
+  });
+
+  it('does not auto-pick from a partial rescan when an older bootstrap settles', async () => {
+    const codexAgent: AgentInfo = {
+      id: 'codex',
+      name: 'Codex CLI',
+      bin: 'codex',
+      available: true,
+      version: '0.80.0',
+      models: [{ id: 'default', label: 'Default' }],
+    };
+    const claudeAgent: AgentInfo = {
+      id: 'claude',
+      name: 'Claude Code',
+      bin: 'claude',
+      available: true,
+      version: '1.0.0',
+      models: [{ id: 'default', label: 'Default' }],
+    };
+    const staleBootstrap = deferred<AgentInfo[]>();
+    const rescan = deferred<AgentInfo[]>();
+    mockedLoadConfig.mockReturnValue({ ...baseConfig, agentId: null });
+    mockedListProjects.mockResolvedValue([]);
+    mockedFetchAgentsStream
+      .mockReturnValueOnce(staleBootstrap.promise)
+      .mockImplementationOnce(({ onAgent }) => {
+        onAgent(codexAgent);
+        return rescan.promise;
+      });
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Refresh agents' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-agent-codex').textContent).toBe(
+        'Codex CLI',
+      );
+    });
+
+    await act(async () => {
+      staleBootstrap.resolve([]);
+      await staleBootstrap.promise;
+    });
+    await act(async () => {
+      rescan.resolve([codexAgent, claudeAgent]);
+      await rescan.promise;
+    });
+
+    await waitFor(() => {
+      expect(mockedSaveConfig).toHaveBeenCalledWith(
+        expect.objectContaining({ agentId: 'claude' }),
+      );
+    });
+    expect(
+      mockedSaveConfig.mock.calls.some(([saved]) => saved.agentId === 'codex'),
+    ).toBe(false);
+  });
+
+  it('keeps auto-pick gated while rescanning from an empty agent state', async () => {
+    const codexAgent: AgentInfo = {
+      id: 'codex',
+      name: 'Codex CLI',
+      bin: 'codex',
+      available: true,
+      version: '0.80.0',
+      models: [{ id: 'default', label: 'Default' }],
+    };
+    const claudeAgent: AgentInfo = {
+      id: 'claude',
+      name: 'Claude Code',
+      bin: 'claude',
+      available: true,
+      version: '1.0.0',
+      models: [{ id: 'default', label: 'Default' }],
+    };
+    const initialProbe = deferred<AgentInfo[]>();
+    const rescan = deferred<AgentInfo[]>();
+    mockedLoadConfig.mockReturnValue({ ...baseConfig, agentId: null });
+    mockedListProjects.mockResolvedValue([]);
+    mockedFetchAgentsStream
+      .mockReturnValueOnce(initialProbe.promise)
+      .mockImplementationOnce(({ onAgent }) => {
+        onAgent(codexAgent);
+        return rescan.promise;
+      });
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(mockedFetchAgentsStream).toHaveBeenCalledTimes(1);
+    });
+    await act(async () => {
+      initialProbe.resolve([]);
+      await initialProbe.promise;
+    });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Refresh agents' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-agent-codex').textContent).toBe(
+        'Codex CLI',
+      );
+    });
+
+    await act(async () => {
+      rescan.resolve([codexAgent, claudeAgent]);
+      await rescan.promise;
+    });
+
+    await waitFor(() => {
+      expect(mockedSaveConfig).toHaveBeenCalledWith(
+        expect.objectContaining({ agentId: 'claude' }),
+      );
+    });
+    expect(
+      mockedSaveConfig.mock.calls.some(([saved]) => saved.agentId === 'codex'),
+    ).toBe(false);
+  });
+
+  it('keeps a newly created project open when the initial project list resolves stale', async () => {
+    const bootstrapProjects = deferred<Project[]>();
+    mockedListProjects
+      .mockReturnValueOnce(bootstrapProjects.promise)
+      .mockResolvedValue([]);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Create project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    });
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    await act(async () => {
+      bootstrapProjects.resolve([]);
+      await bootstrapProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    expect(window.location.pathname).toBe('/projects/project-new');
+  });
+
+  it('creates the accepted Home project before attaching its exact brief revision and handing it off', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    mockedCreateProject.mockResolvedValue({ project: freshProject, conversationId: 'conv-new' });
+    const attach = vi.spyOn(workbenchProvider, 'attachDesignBrief').mockImplementation(async request => {
+      expect(mockedCreateProject).toHaveBeenCalledTimes(1);
+      expect(request).toEqual({ projectId: 'project-new', preview: homeBriefPreview });
+      return { brief: { id: 'brief_home', revision: 2, hash: 'b'.repeat(64), state: 'accepted' } } as any;
+    });
+    try {
+      render(<App />);
+      fireEvent.click(await screen.findByRole('button', { name: 'Send Home brief' }));
+      await screen.findByTestId('project-view');
+      expect(mockedCreateProject).toHaveBeenCalledTimes(1);
+      expect(attach).toHaveBeenCalledTimes(1);
+      const keys = Object.keys(sessionStorage).filter(key => key.startsWith('od:home-model-handoff:') && key.endsWith(':project-new'));
+      expect(keys).toHaveLength(1);
+      expect(JSON.parse(sessionStorage.getItem(keys[0]!)!)).toMatchObject({
+        projectId: 'project-new', sessionId: 'conv-new', prompt: 'A bakery site',
+        designBrief: { id: 'brief_home', revision: 2, hash: 'b'.repeat(64) },
+      });
+      expect(mockedDeleteProject).not.toHaveBeenCalled();
+    } finally { attach.mockRestore(); }
+  });
+
+  it('retries a failed accepted brief attachment using the one project already created', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    mockedCreateProject.mockResolvedValue({ project: freshProject, conversationId: 'conv-new' });
+    const attach = vi.spyOn(workbenchProvider, 'attachDesignBrief')
+      .mockRejectedValueOnce(new Error('Attachment unavailable'))
+      .mockResolvedValue({ brief: { id: 'brief_home', revision: 2, hash: 'b'.repeat(64), state: 'accepted' } } as any);
+    try {
+      render(<App />);
+      fireEvent.click(await screen.findByRole('button', { name: 'Send Home brief' }));
+      await waitFor(() => expect(screen.getByTestId('entry-create-error')).toHaveTextContent('Attachment unavailable'));
+      expect(mockedCreateProject).toHaveBeenCalledTimes(1);
+      expect(screen.getByTestId('entry-home-surface')).toBeInTheDocument();
+      expect(screen.getByTestId('entry-project-count')).toHaveTextContent('1');
+      fireEvent.click(screen.getByRole('button', { name: 'Send Home brief' }));
+      await screen.findByTestId('project-view');
+      expect(mockedCreateProject).toHaveBeenCalledTimes(1);
+      expect(attach).toHaveBeenCalledTimes(2);
+    } finally { attach.mockRestore(); }
+  });
+
+  it('stores the Home auto-send prompt outside the project projection before a refresh can drop it', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    mockedCreateProject.mockResolvedValue({
+      project: { ...freshProject, name: 'Prompted project' },
+      conversationId: 'conv-new',
+    });
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Create prompted project' }));
+
+    await screen.findByTestId('project-view');
+    expect(window.sessionStorage.getItem('od:auto-send-first:project-new')).toBe('1');
+    expect(window.sessionStorage.getItem('od:auto-send-prompt:project-new')).toBe(
+      'Build the retained artifact prompt',
+    );
+  });
+
+  it('enters the project preparing surface before Home project creation settles', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    const creation = deferred<{
+      project: Project;
+      conversationId: string;
+    }>();
+    let requestedProjectId: string | undefined;
+    mockedCreateProject.mockImplementation((input) => {
+      requestedProjectId = (input as typeof input & { id?: string }).id;
+      return creation.promise;
+    });
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Create prompted project' }));
+
+    await screen.findByTestId('project-creation-pending-view');
+    expect(requestedProjectId).toBeTruthy();
+    expect(window.location.pathname).toBe(`/projects/${requestedProjectId}`);
+    expect(screen.getByText('Build the retained artifact prompt')).toBeTruthy();
+    expect(screen.getByText('Preparing...')).toBeTruthy();
+    expect(screen.queryByTestId('entry-home-surface')).toBeNull();
+    expect(screen.queryByTestId('project-view')).toBeNull();
+
+    creation.resolve({
+      project: {
+        ...freshProject,
+        id: requestedProjectId!,
+        name: 'Prompted project',
+        pendingPrompt: 'Build the retained artifact prompt',
+      },
+      conversationId: 'conv-new',
+    });
+
+    await screen.findByTestId('project-view');
+    expect(window.location.pathname).toBe(`/projects/${requestedProjectId}`);
+  });
+
+  it('draws the staged Home attachments on the preparing surface without reading the project', async () => {
+    // The bytes are already in the browser: the user picked those files on
+    // Home and they are still `File` objects in memory. Showing them costs no
+    // request, so the first project frame must not read as an empty project.
+    //
+    // The guard half of this spec is the reason the preparing surface exists:
+    // the optimistic project is not persisted or authorized yet, so NOTHING
+    // project-scoped may go out until POST /api/projects answers.
+    mockedListProjects.mockResolvedValue([]);
+    const creation = deferred<{ project: Project; conversationId: string }>();
+    let requestedProjectId: string | undefined;
+    mockedCreateProject.mockImplementation((input) => {
+      requestedProjectId = (input as typeof input & { id?: string }).id;
+      return creation.promise;
+    });
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Create prompted project' }));
+
+    await screen.findByTestId('project-creation-pending-view');
+
+    const attachmentRow = screen.getByTestId('pending-attachment-row');
+    expect(attachmentRow.textContent).toContain('brief');
+    expect(attachmentRow.textContent).toContain('.txt');
+
+    // Same shell as the frame that replaces it: the workspace tab strip docks
+    // above the chat card, and the design-files column shows the centred empty
+    // pill instead of a top-left caption.
+    expect(screen.getByTestId('workspace-tabs-dock')).toBeTruthy();
+    expect(screen.getByTestId('pending-design-files-empty').className).toContain('df-empty');
+
+    // Exact call comparison, not `not.toHaveBeenCalledWith`: an added optional
+    // argument would make a negative argument matcher vacuously true.
+    const projectScopedCalls = vi
+      .mocked(fetch)
+      .mock.calls.filter(([input]) =>
+        String(input).includes(`/api/projects/${requestedProjectId}`),
+      );
+    expect(projectScopedCalls).toHaveLength(0);
+    expect(mockedUploadProjectFiles).toHaveBeenCalledTimes(0);
+    expect(mockedReplaceProjectWorkingDir).toHaveBeenCalledTimes(0);
+
+    creation.resolve({
+      project: {
+        ...freshProject,
+        id: requestedProjectId!,
+        name: 'Prompted project',
+      },
+      conversationId: 'conv-new',
+    });
+    await screen.findByTestId('project-view');
+  });
+
+  it('stages Home files after the working directory and saves the model before attaching receipts', async () => {
+    // Transfer concurrency belongs to the shared intake queue. This shell
+    // oracle covers its working-directory/model/receipt handoff boundary.
+    mockedListProjects.mockResolvedValue([]);
+    mockedReplaceProjectWorkingDir.mockResolvedValue(undefined as never);
+    const gate = deferred<void>();
+    const names = Array.from({ length: 6 }, (_, index) => `shot-${index}.png`);
+    const intake = mockSavedHomeIntake(names, { attachGate: gate.promise });
+
+    render(<App />);
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Create project with many attachments' }),
+    );
+
+    await waitFor(() => expect(intake.attach).toHaveBeenCalledTimes(1));
+    expect(intake.accept).toHaveBeenCalledTimes(1);
+    expect(intake.accept.mock.calls[0]![0].map(file => file.name)).toEqual(names);
+    expect(mockedReplaceProjectWorkingDir.mock.invocationCallOrder[0]!).toBeLessThan(intake.accept.mock.invocationCallOrder[0]!);
+    expect(vi.mocked(workbenchProvider.putSessionModel).mock.invocationCallOrder[0]!).toBeLessThan(intake.attach.mock.invocationCallOrder[0]!);
+    expect(mockedUploadProjectFiles).not.toHaveBeenCalled();
+    await screen.findByTestId('project-view');
+    await act(async () => { gate.resolve(); await gate.promise; });
+    await screen.findByTestId('project-view');
+    await waitFor(() => expect(JSON.parse(sessionStorage.getItem('od:auto-send-attachments:project-new') ?? '[]').map((file: { name: string }) => file.name)).toEqual(names));
+  });
+
+  it('retains successful Home receipts and leaves a failed file pending for retry', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    mockedReplaceProjectWorkingDir.mockResolvedValue(undefined as never);
+    const intake = mockSavedHomeIntake(Array.from({ length: 6 }, (_, index) => `shot-${index}.png`), { failedName: 'shot-2.png' });
+
+    render(<App />);
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Create project with many attachments' }),
+    );
+
+    await screen.findByTestId('project-view');
+    await waitFor(() => expect(intake.attach).toHaveBeenCalledTimes(1));
+    // The five that landed still travel with the first message.
+    const staged = JSON.parse(
+      window.sessionStorage.getItem('od:auto-send-attachments:project-new') ?? '[]',
+    ) as Array<{ name: string }>;
+    expect(staged.map((item) => item.name)).toEqual([
+      'shot-0.png',
+      'shot-1.png',
+      'shot-3.png',
+      'shot-4.png',
+      'shot-5.png',
+    ]);
+    const creationContext = vi.mocked(workbenchProvider.putSessionModel).mock.calls[0]?.[3];
+    expect(readHomeModelHandoff('project-new', workspaceAccountScopedCacheKey(creationContext))).toMatchObject({ ready: false, completedBatchIds: [], batchFileIds: { [intake.batchId]: intake.fileIds } });
+    expect(screen.getByRole('alert').textContent).toContain('home-attachment-incomplete');
+    expect(mockedUploadProjectFiles).not.toHaveBeenCalled();
+  });
+
+  it('rolls a failed optimistic Home creation back with durable localized feedback', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    const creation = deferred<{
+      project: Project;
+      conversationId: string;
+    }>();
+    let requestedProjectId: string | undefined;
+    mockedCreateProject.mockImplementation((input) => {
+      requestedProjectId = (input as typeof input & { id?: string }).id;
+      return creation.promise;
+    });
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Create prompted project' }));
+    await screen.findByTestId('project-creation-pending-view');
+    expect(workspaceTabsHarness.projectIds.has(requestedProjectId!)).toBe(true);
+
+    vi.useFakeTimers();
+    await act(async () => {
+      creation.reject(new Error('Could not create project'));
+      await creation.promise.catch(() => undefined);
+    });
+
+    expect(screen.getByTestId('entry-home-surface')).toBeTruthy();
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('project-creation-pending-view')).toBeNull();
+    expect(screen.queryByTestId(`entry-project-${requestedProjectId}`)).toBeNull();
+    expect(workspaceTabsHarness.projectIds.has(requestedProjectId!)).toBe(false);
+    const alert = screen.getByRole('alert');
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    expect(alert.textContent).toContain('Failed to start the run. Try again.');
+    expect(alert.textContent).not.toContain('Could not create project');
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(4_001);
+    });
+    expect(screen.getByRole('alert')).toBe(alert);
+  });
+
+  // D15: a Website Clone create the daemon refuses (REFERENCE_URL_REFUSED)
+  // must reach Home as the localized refusal — not the generic "Failed to
+  // start the run" — and must not flash the project frame first.
+  it('surfaces a refused Website Clone target as the localized message with no navigation flash', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    const creation = deferred<{ project: Project; conversationId: string }>();
+    mockedCreateProject.mockImplementation(() => creation.promise);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Create web clone project' }));
+    await waitFor(() => expect(mockedCreateProject).toHaveBeenCalledTimes(1));
+
+    // While the daemon decides, Home stays put: no optimistic project frame.
+    expect(screen.queryByTestId('project-creation-pending-view')).toBeNull();
+    expect(window.location.pathname).toBe('/');
+
+    await act(async () => {
+      creation.reject(new ProjectCreateError(
+        'The website to clone is not a public web address.',
+        422,
+        'REFERENCE_URL_REFUSED',
+        false,
+        null,
+      ));
+      await creation.promise.catch(() => undefined);
+    });
+
+    await waitFor(() =>
+      expect(screen.getByTestId('entry-create-error').textContent).toBe(
+        "That address can't be cloned. Enter a public website address, for example https://example.com.",
+      ),
+    );
+    expect(screen.getByTestId('entry-home-surface')).toBeTruthy();
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByText('Failed to start the run. Try again.')).toBeNull();
+  });
+
+  it('releases a persisted project when saved attachment materialization fails after creation', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    mockSavedHomeIntake(['brief.txt'], { attachError: new Error('Attachment materialization failed') });
+    const creation = deferred<{
+      project: Project;
+      conversationId: string;
+    }>();
+    let requestedProjectId: string | undefined;
+    mockedCreateProject.mockImplementation((input) => {
+      requestedProjectId = (input as typeof input & { id?: string }).id;
+      return creation.promise;
+    });
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Create prompted project' }));
+    await screen.findByTestId('project-creation-pending-view');
+
+    creation.resolve({
+      project: {
+        ...freshProject,
+        id: requestedProjectId!,
+        name: 'Persisted prompted project',
+        pendingPrompt: 'Build the retained artifact prompt',
+      },
+      conversationId: 'conv-new',
+    });
+
+    await screen.findByTestId('project-view');
+    expect(screen.getByTestId('project-title').textContent).toBe('Persisted prompted project');
+    expect(window.location.pathname).toBe(`/projects/${requestedProjectId}`);
+    expect(screen.queryByTestId('project-creation-pending-view')).toBeNull();
+    expect(workspaceTabsHarness.projectIds.has(requestedProjectId!)).toBe(true);
+    expect(screen.getByRole('alert').textContent).toContain('Attachment materialization failed');
+  });
+
+  it.each([
+    ['Local CLI', { ...baseConfig, mode: 'daemon' as const, agentId: 'codex' }],
+    ['BYOK', { ...baseConfig, mode: 'api' as const, agentId: 'amr' }],
+  ])(
+    'lets %s create an unscoped project without waiting for AMR identity discovery',
+    async (_label, executionConfig) => {
+      mockedLoadConfig.mockReturnValue(executionConfig);
+      mockedListProjects.mockResolvedValue([]);
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async (input: RequestInfo | URL) => {
+          const pathname = new URL(String(input), 'http://d.local').pathname;
+          if (pathname.endsWith('/integrations/vela/status')) {
+            return new Promise<Response>(() => {});
+          }
+          if (pathname.endsWith('/workspace/directory')) {
+            return new Promise<Response>(() => {});
+          }
+          return new Response('{}', {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }),
+      );
+
+      render(<App />);
+      await screen.findByText('null', { selector: '[data-testid="amr-login-status"]' });
+      fireEvent.click(await screen.findByRole('button', { name: 'Create project' }));
+
+      await waitFor(() => {
+        expect(mockedCreateProject).toHaveBeenCalledWith(
+          expect.objectContaining({ workspaceContext: null }),
+        );
+      });
+      expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    },
+  );
+
+  it('does not wait for directory identity while the richer Workspace context is still loading', async () => {
+    const context = workspaceContext('ws-cold-create', 'wm-cold-create');
+    const richContextRead = deferred<Response>();
+    mockedLoadConfig.mockReturnValue({
+      ...baseConfig,
+      mode: 'daemon',
+      agentId: 'amr',
+    });
+    mockedListProjects.mockResolvedValue([]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/integrations/vela/status')) {
+          return new Response(JSON.stringify({
+            loggedIn: true,
+            profile: 'default',
+            user: { id: 'account-team-member' },
+            configPath: '/test/vela.json',
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+        if (pathname.endsWith('/workspace/directory')) {
+          return new Response(
+            JSON.stringify(workspaceDirectoryFixture([context])),
+            { status: 200, headers: { 'content-type': 'application/json' } },
+          );
+        }
+        if (pathname.endsWith('/workspace/context')) return richContextRead.promise;
+        return new Response('{}', {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      }),
+    );
+
+    render(<App />);
+    await screen.findByText('true', { selector: '[data-testid="amr-login-status"]' });
+    fireEvent.click(await screen.findByRole('button', { name: 'Create project' }));
+
+    await waitFor(() => {
+      expect(mockedCreateProject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          workspaceContext: null,
+        }),
+      );
+    });
+  });
+
+  it.each([
+    ['Local CLI', 'loading', { ...baseConfig, mode: 'daemon' as const, agentId: 'codex' }],
+    ['BYOK', 'unavailable', { ...baseConfig, mode: 'api' as const, agentId: 'amr' }],
+  ])(
+    'lets %s create locally for a signed-in account while Team workspace discovery is %s',
+    async (_label, discoveryState, executionConfig) => {
+      mockedLoadConfig.mockReturnValue(executionConfig);
+      mockedListProjects.mockResolvedValue([]);
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async (input: RequestInfo | URL) => {
+          const pathname = new URL(String(input), 'http://d.local').pathname;
+          if (pathname.endsWith('/integrations/vela/status')) {
+            return new Response(JSON.stringify({
+              loggedIn: true,
+              profile: 'default',
+              user: { id: 'account-team-member' },
+              configPath: '/test/vela.json',
+            }), {
+              status: 200,
+              headers: { 'content-type': 'application/json' },
+            });
+          }
+          if (pathname.endsWith('/workspace/directory')) {
+            if (discoveryState === 'loading') return new Promise<Response>(() => {});
+            return new Response('{}', { status: 503 });
+          }
+          return new Response('{}', {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }),
+      );
+
+      render(<App />);
+      await screen.findByText('true', { selector: '[data-testid="amr-login-status"]' });
+      fireEvent.click(await screen.findByRole('button', { name: 'Create project' }));
+
+      await waitFor(() => {
+        expect(mockedCreateProject).toHaveBeenCalledWith(
+          expect.objectContaining({ workspaceContext: null }),
+        );
+      });
+      expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    },
+  );
+
+  it('allows an unbound local AMR project while workspace discovery is loading', async () => {
+    mockedLoadConfig.mockReturnValue({
+      ...baseConfig,
+      mode: 'daemon',
+      agentId: 'amr',
+    });
+    mockedListProjects.mockResolvedValue([]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/integrations/vela/status')) {
+          return new Response(JSON.stringify({
+            loggedIn: false,
+            profile: 'default',
+            user: null,
+            configPath: '/test/vela.json',
+          }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          });
+        }
+        if (pathname.endsWith('/workspace/directory')) {
+          return new Promise<Response>(() => {});
+        }
+        return new Response('{}', {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      }),
+    );
+
+    render(<App />);
+    await screen.findByText('false', { selector: '[data-testid="amr-login-status"]' });
+    fireEvent.click(await screen.findByRole('button', { name: 'Create project' }));
+
+    await waitFor(() => {
+      expect(mockedCreateProject).toHaveBeenCalledWith(
+        expect.objectContaining({ workspaceContext: null }),
+      );
+    });
+  });
+
+  it('routes "create with this design system" through the default design router, not a prototype', async () => {
+    mockedListProjects.mockResolvedValue([existingProject]);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+    fireEvent.click(screen.getByRole('button', { name: 'Create design from design system' }));
+
+    await waitFor(() => {
+      expect(mockedCreateProject).toHaveBeenCalledWith(
+        expect.objectContaining({
+          name: 'Untitled',
+          skillId: null,
+          designSystemId: 'slack',
+          // No prototype assumption: the click binds the hidden default
+          // router so the agent asks (via the task-type question-form) what
+          // to build, then auto-sends a preset prompt that names the system.
+          pluginId: 'od-default',
+          conversationMode: 'design',
+          pendingPrompt: expect.stringContaining('Slack'),
+          pluginInputs: expect.objectContaining({
+            prompt: expect.stringContaining('Slack'),
+          }),
+          metadata: expect.objectContaining({
+            kind: 'other',
+          }),
+        }),
+      );
+    });
+
+    // The web-prototype scenario and prototype kind must NOT leak in.
+    const call = mockedCreateProject.mock.calls.at(-1)?.[0] as
+      | { pluginId?: string; metadata?: { kind?: string } }
+      | undefined;
+    expect(call?.pluginId).not.toBe('example-web-prototype');
+    expect(call?.metadata?.kind).not.toBe('prototype');
+    expect(window.sessionStorage.getItem('od:auto-send-first:project-new')).toBe('1');
+    expect(window.sessionStorage.getItem('od:auto-send-prompt:project-new')).toContain('Slack');
+  });
+
+  it('stores the extraction prompt when converting an existing project into a design system', async () => {
+    mockedListProjects.mockResolvedValue([existingProject]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Extract design system project' }));
+
+    await waitFor(() => {
+      expect(mockedCreateDesignSystemProjectFromProject).toHaveBeenCalledWith(
+        'project-existing',
+        expect.objectContaining({
+          pendingPrompt: 'Extract the retained design system prompt',
+        }),
+        null,
+      );
+    });
+    expect(window.sessionStorage.getItem('od:auto-send-first:project-design-system')).toBe('1');
+    expect(window.sessionStorage.getItem('od:auto-send-prompt:project-design-system')).toBe(
+      'Extract the retained design system prompt',
+    );
+  });
+
+  it('duplicates from the source project persisted Workspace instead of the ambient shell Workspace', async () => {
+    const sourceProject = { ...existingProject, workspaceId: 'ws-source' };
+    window.history.replaceState(null, '', `/projects/${sourceProject.id}`);
+    mockedListProjects.mockResolvedValue([sourceProject]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        return {
+          ok: true,
+          json: async () =>
+            pathname.endsWith('/workspace/directory')
+              ? workspaceDirectoryFixture([
+                  workspaceContext('ws-source', 'member-source'),
+                  workspaceContext('ws-ambient', 'member-ambient'),
+                ])
+              : pathname.endsWith('/workspace/context')
+                ? workspaceContextPayload('ws-ambient', 'member-ambient')
+                : {},
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    await screen.findByTestId('project-view');
+    fireEvent.click(screen.getByRole('button', { name: 'Duplicate project' }));
+
+    await waitFor(() => {
+      expect(mockedDuplicateProject).toHaveBeenCalledWith(
+        sourceProject.id,
+        { name: 'Scoped duplicate' },
+        expect.objectContaining({
+          workspaceId: 'ws-source',
+          workspaceMemberId: 'member-source',
+        }),
+      );
+    });
+  });
+
+  it('creates a design-system copy in the source project persisted Workspace', async () => {
+    const sourceProject = { ...existingProject, workspaceId: 'ws-source' };
+    window.history.replaceState(null, '', `/projects/${sourceProject.id}`);
+    mockedListProjects.mockResolvedValue([sourceProject]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        return {
+          ok: true,
+          json: async () =>
+            pathname.endsWith('/workspace/directory')
+              ? workspaceDirectoryFixture([
+                  workspaceContext('ws-source', 'member-source'),
+                  workspaceContext('ws-ambient', 'member-ambient'),
+                ])
+              : pathname.endsWith('/workspace/context')
+                ? workspaceContextPayload('ws-ambient', 'member-ambient')
+                : {},
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    await screen.findByTestId('project-view');
+    fireEvent.click(screen.getByRole('button', { name: 'Extract design system project' }));
+
+    await waitFor(() => {
+      expect(mockedCreateDesignSystemProjectFromProject).toHaveBeenCalledWith(
+        sourceProject.id,
+        expect.objectContaining({
+          pendingPrompt: 'Extract the retained design system prompt',
+        }),
+        expect.objectContaining({
+          workspaceId: 'ws-source',
+          workspaceMemberId: 'member-source',
+        }),
+      );
+    });
+  });
+
+  it('keeps a newly created project open when a post-create refresh resolves stale', async () => {
+    const bootstrapProjects = deferred<Project[]>();
+    const staleRefreshProjects = deferred<Project[]>();
+    mockedListProjects
+      .mockReturnValueOnce(bootstrapProjects.promise)
+      .mockReturnValueOnce(staleRefreshProjects.promise)
+      .mockResolvedValue([]);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Create project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    });
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+
+    await act(async () => {
+      staleRefreshProjects.resolve([]);
+      await staleRefreshProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    await act(async () => {
+      bootstrapProjects.resolve([]);
+      await bootstrapProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    expect(window.location.pathname).toBe('/projects/project-new');
+  });
+
+  it('ignores an older stale project list after a newer response confirms the local project', async () => {
+    const bootstrapProjects = deferred<Project[]>();
+    const refreshedProjects = deferred<Project[]>();
+    mockedListProjects
+      .mockReturnValueOnce(bootstrapProjects.promise)
+      .mockReturnValueOnce(refreshedProjects.promise)
+      .mockResolvedValue([]);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Create project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    });
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+
+    await act(async () => {
+      refreshedProjects.resolve([freshProject]);
+      await refreshedProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    await act(async () => {
+      bootstrapProjects.resolve([]);
+      await bootstrapProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    expect(window.location.pathname).toBe('/projects/project-new');
+  });
+
+  it('does not revive nonlocal projects from an older list after a newer empty refresh', async () => {
+    const bootstrapProjects = deferred<Project[]>();
+    const createRefreshProjects = deferred<Project[]>();
+    mockedListProjects
+      .mockReturnValueOnce(bootstrapProjects.promise)
+      .mockReturnValueOnce(createRefreshProjects.promise)
+      .mockResolvedValue([]);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Create project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    });
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+    expect(mockedListProjects).toHaveBeenCalledTimes(2);
+
+    await act(async () => {
+      createRefreshProjects.resolve([]);
+      await createRefreshProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    await act(async () => {
+      bootstrapProjects.resolve([existingProject]);
+      await bootstrapProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-home-surface')).toBeTruthy();
+      expect(screen.getByTestId('entry-project-project-new').textContent).toContain(
+        'Fresh project',
+      );
+    });
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('entry-project-project-existing')).toBeNull();
+  });
+
+  it('removes a locally deleted project from workspace tabs and ignores a stale list', async () => {
+    const initialProjects = deferred<Project[]>();
+    const staleRefreshProjects = deferred<Project[]>();
+    mockedListProjects
+      .mockReturnValueOnce(initialProjects.promise)
+      .mockReturnValueOnce(staleRefreshProjects.promise)
+      .mockResolvedValue([]);
+
+    render(<App />);
+
+    await act(async () => {
+      initialProjects.resolve([freshProject]);
+      await initialProjects.promise;
+    });
+
+    expect(screen.getByTestId('entry-project-project-new').textContent).toContain(
+      'Fresh project',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open Fresh project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    });
+    workspaceTabsHarness.projectIds.add('project-new');
+    expect(workspaceTabsHarness.projectIds.has('project-new')).toBe(true);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+    expect(mockedListProjects).toHaveBeenCalledTimes(2);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Delete Fresh project' }));
+
+    await waitFor(() => {
+      expect(mockedDeleteProject).toHaveBeenCalledWith('project-new', null);
+      expect(screen.queryByTestId('entry-project-project-new')).toBeNull();
+      expect(workspaceTabsHarness.projectIds.has('project-new')).toBe(false);
+    });
+
+    await act(async () => {
+      staleRefreshProjects.resolve([freshProject]);
+      await staleRefreshProjects.promise;
+    });
+
+    expect(screen.queryByTestId('entry-project-project-new')).toBeNull();
+  });
+
+  it('keeps a host-imported project routable when getProject and the list lag behind', async () => {
+    // Desktop import flow (handleImportFolderResponse fallback): the host
+    // bridge has already POSTed the import, but `/api/projects/:id` and
+    // `/api/projects` are both still catching up. Without a placeholder
+    // the stale `[]` list response would drop the just-imported project
+    // from state and the route-guard effect would bounce to Home.
+    const bootstrapProjects = deferred<Project[]>();
+    const importListProjects = deferred<Project[]>();
+    mockedListProjects
+      .mockReturnValueOnce(bootstrapProjects.promise)
+      .mockReturnValueOnce(importListProjects.promise)
+      .mockResolvedValue([]);
+    mockedGetProject.mockResolvedValue(null);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Host import folder' }));
+
+    await act(async () => {
+      importListProjects.resolve([]);
+      await importListProjects.promise;
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-view')).toBeTruthy();
+    });
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    await act(async () => {
+      bootstrapProjects.resolve([]);
+      await bootstrapProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-view')).toBeTruthy();
+    expect(window.location.pathname).toBe('/projects/project-new');
+  });
+
+  it('hydrates a host-import placeholder from an older project list that contains the import', async () => {
+    const bootstrapProjects = deferred<Project[]>();
+    const importListProjects = deferred<Project[]>();
+    mockedListProjects
+      .mockReturnValueOnce(bootstrapProjects.promise)
+      .mockReturnValueOnce(importListProjects.promise)
+      .mockResolvedValue([]);
+    mockedGetProject.mockResolvedValue(null);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Host import folder' }));
+
+    await act(async () => {
+      importListProjects.resolve([]);
+      await importListProjects.promise;
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-view')).toBeTruthy();
+    });
+    expect(screen.getByTestId('project-title').textContent).toBe('');
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    await act(async () => {
+      bootstrapProjects.resolve([freshProject]);
+      await bootstrapProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    expect(window.location.pathname).toBe('/projects/project-new');
+  });
+
+  it('does not revive unrelated projects from an older list that hydrates a host import', async () => {
+    const bootstrapProjects = deferred<Project[]>();
+    const importListProjects = deferred<Project[]>();
+    mockedListProjects
+      .mockReturnValueOnce(bootstrapProjects.promise)
+      .mockReturnValueOnce(importListProjects.promise)
+      .mockResolvedValue([]);
+    mockedGetProject.mockResolvedValue(null);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Host import folder' }));
+
+    await act(async () => {
+      importListProjects.resolve([]);
+      await importListProjects.promise;
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-view')).toBeTruthy();
+    });
+    expect(screen.getByTestId('project-title').textContent).toBe('');
+    expect(window.location.pathname).toBe('/projects/project-new');
+
+    await act(async () => {
+      bootstrapProjects.resolve([freshProject, existingProject]);
+      await bootstrapProjects.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('Fresh project');
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-project-project-new').textContent).toContain(
+        'Fresh project',
+      );
+    });
+    expect(screen.queryByTestId('entry-project-project-existing')).toBeNull();
+  });
+
+  it('switches to the picked working dir before saved Home intake and keeps its exact scope', async () => {
+    // Regression for the "picked working dir + staged attachment" case:
+    // replaceProjectWorkingDir flips metadata.baseDir to the external folder,
+    // so it must run BEFORE uploadProjectFiles — otherwise the staged files
+    // land in the temporary managed .od/projects/<id> root and vanish once the
+    // working dir flips. Asserting the call order locks the ordering in.
+    mockedListProjects.mockResolvedValue([]);
+    mockedReplaceProjectWorkingDir.mockResolvedValue(undefined as never);
+    stubWorkspaceContext('ws-create', 'wm-create');
+    const createContext = workspaceContextPayload('ws-create', 'wm-create').context;
+    const intake = mockSavedHomeIntake(['note.txt']);
+
+    render(<App />);
+    await waitFor(() => {
+      expect(
+        vi.mocked(fetch).mock.calls.some(([input]) =>
+          String(input).includes('/api/workspace/context')),
+      ).toBe(true);
+    });
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Create project with working dir' }),
+    );
+
+    await waitFor(() => {
+      expect(mockedReplaceProjectWorkingDir).toHaveBeenCalledTimes(1);
+      expect(intake.attach).toHaveBeenCalledTimes(1);
+    });
+
+    expect(mockedReplaceProjectWorkingDir).toHaveBeenCalledWith(
+      'project-new',
+      '/Users/me/external',
+      'wd-token',
+      createContext,
+    );
+    // Both target the same project id, and the working-dir handoff is ordered
+    // strictly before the upload so the files land in the final tree.
+    expect(intake.accept.mock.calls[0]?.[1]).toEqual({ destination: { kind: 'pending' }, context: createContext });
+    expect(intake.attach).toHaveBeenCalledWith(intake.batchId, { projectId: 'project-new', conversationId: 'conv-new', clientFileIds: intake.fileIds }, { stage: true });
+    expect(vi.mocked(workbenchProvider.putSessionModel).mock.calls[0]?.[3]).toEqual(createContext);
+    const replaceOrder = mockedReplaceProjectWorkingDir.mock.invocationCallOrder[0]!;
+    expect(replaceOrder).toBeLessThan(intake.accept.mock.invocationCallOrder[0]!);
+    expect(mockedUploadProjectFiles).not.toHaveBeenCalled();
+  });
+
+  it('persists Home context linked dirs into the project create metadata', async () => {
+    mockedListProjects.mockResolvedValue([]);
+
+    render(<App />);
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Create project with context dirs' }),
+    );
+
+    await waitFor(() => {
+      expect(mockedCreateProject).toHaveBeenCalled();
+    });
+    expect(mockedCreateProject.mock.calls[0]?.[0]).toEqual(
+      expect.objectContaining({
+        metadata: expect.objectContaining({
+          linkedDirs: [
+            '/Users/me/existing',
+            '/Users/me/reference',
+            '/Users/me/local-code',
+          ],
+        }),
+      }),
+    );
+  });
+
+  it('short-circuits the upload + auto-send when the working-dir handoff fails', async () => {
+    // Regression for the swallowed-failure case: the desktop working-dir token
+    // has a ~60s TTL, so a slow user (or any rejected POST) makes
+    // replaceProjectWorkingDir throw AFTER the project already exists. The old
+    // code only logged a warning and then uploaded the staged attachments into
+    // the managed root while the user believed their chosen folder was applied.
+    // The fix surfaces a create-time error toast AND aborts the rest of the
+    // submit path so the first run cannot proceed on a tree the user did not
+    // choose.
+    mockedListProjects.mockResolvedValue([]);
+    mockedReplaceProjectWorkingDir.mockRejectedValue(
+      new Error('working-dir token expired'),
+    );
+
+    render(<App />);
+
+    fireEvent.click(
+      await screen.findByRole('button', { name: 'Create project with working dir' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Couldn't apply the chosen folder/i)).toBeTruthy();
+    });
+    expect(mockedReplaceProjectWorkingDir).toHaveBeenCalledTimes(1);
+    // The handoff failed, so the staged attachments must NOT be uploaded into
+    // the managed `.od/projects/<id>` root the user did not pick.
+    expect(mockedUploadProjectFiles).not.toHaveBeenCalled();
+  });
+
+  it('surfaces a toast instead of silently bouncing when opening a missing project', async () => {
+    mockedListProjects.mockResolvedValue([]);
+    mockedGetProject.mockResolvedValue(null);
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Open missing project' }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert').textContent).toContain(
+        'This project has been deleted or no longer exists.',
+      );
+    });
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('project-view')).toBeNull();
+  });
+
+  it('renders the catalog title on the first project frame instead of the local placeholder', async () => {
+    stubWorkspaceContext('ws-1', 'wm-1');
+    mockedListProjects.mockResolvedValue([{
+      id: 'project-shared',
+      name: '共享项目',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-1',
+      createdAt: 20,
+      updatedAt: 20,
+    }]);
+
+    render(<App />);
+
+    await screen.findByTestId('entry-project-project-shared');
+    fireEvent.click(await screen.findByRole('button', { name: 'Open catalog project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Catalog authority');
+    });
+    expect(window.location.pathname).toBe('/projects/project-shared');
+    expect(mockedGetProject).not.toHaveBeenCalled();
+  });
+
+  it('retains the exact card-opening context while the ambient workspace revalidates', async () => {
+    const workspaceProject: Project = {
+      id: 'project-opening-witness',
+      name: 'Workspace project',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-1',
+      createdAt: 20,
+      updatedAt: 20,
+    };
+    const pendingDirectory = new Promise<Response>(() => {});
+    let blockDirectory = false;
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const pathname = new URL(String(input), 'http://d.local').pathname;
+      if (pathname.endsWith('/workspace/directory')) {
+        if (blockDirectory) return pendingDirectory;
+        return new Response(JSON.stringify(
+          workspaceDirectoryFixture([workspaceContext('ws-1', 'wm-1')]),
+        ), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      }
+      if (pathname.endsWith('/workspace/context')) {
+        return new Response(JSON.stringify(workspaceContextPayload('ws-1', 'wm-1')), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        });
+      }
+      return new Response('{}', {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    }));
+    mockedListProjects.mockResolvedValue([workspaceProject]);
+
+    render(<App />);
+
+    await screen.findByTestId(`entry-project-${workspaceProject.id}`);
+    fireEvent.click(screen.getByRole('button', { name: `Open ${workspaceProject.name}` }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-route-workspace-context').textContent).toBe(
+        'ws-1:wm-1',
+      );
+    });
+
+    blockDirectory = true;
+    await act(async () => {
+      window.dispatchEvent(new Event(WORKSPACE_CONTEXT_REFRESH_EVENT));
+      await Promise.resolve();
+    });
+
+    expect(window.location.pathname).toBe(`/projects/${workspaceProject.id}`);
+    expect(screen.getByTestId('project-route-workspace-context').textContent).toBe(
+      'ws-1:wm-1',
+    );
+  });
+
+  it('uses a title hint only after loading the workspace-bound local row', async () => {
+    stubWorkspaceContext('ws-1', 'wm-1');
+    mockedListProjects.mockResolvedValue([]);
+    mockedGetProject.mockResolvedValueOnce({
+      id: 'project-shared',
+      name: '共享项目',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-1',
+      createdAt: 20,
+      updatedAt: 20,
+    });
+
+    render(<App />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Open catalog project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Catalog authority');
+      expect(screen.getByTestId('project-workspace-id').textContent).toBe('ws-1');
+    });
+    expect(mockedGetProject).toHaveBeenCalledWith(
+      'project-shared',
+      workspaceContext('ws-1', 'wm-1'),
+    );
+  });
+
+  it('keeps the original local-open behavior for an own unbound legacy project', async () => {
+    stubWorkspaceContext('ws-1', 'wm-1');
+    mockedListProjects.mockResolvedValue([{
+      id: 'project-own',
+      name: 'Legacy local name',
+      skillId: null,
+      designSystemId: null,
+      createdAt: 20,
+      updatedAt: 20,
+    }]);
+
+    render(<App />);
+
+    await screen.findByTestId('entry-project-project-own');
+    fireEvent.click(screen.getByRole('button', { name: 'Open own unbound project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Own local project');
+      expect(screen.getByTestId('project-workspace-id').textContent).toBe('unbound');
+    });
+    expect(mockedGetProject).not.toHaveBeenCalled();
+  });
+
+  it('rejects an authoritative card whose workspace/member scope is already stale', async () => {
+    let activeWorkspaceId = 'ws-a';
+    mockedListProjects.mockResolvedValue([]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        return {
+          ok: true,
+          json: async () =>
+            pathname.endsWith('/workspace/directory')
+              ? workspaceDirectoryFixture([
+                  workspaceContext('ws-a', 'member-ws-a'),
+                  workspaceContext('ws-b', 'member-ws-b'),
+                ])
+              : pathname.endsWith('/workspace/context')
+                ? workspaceContextPayload(
+                    activeWorkspaceId,
+                    `member-${activeWorkspaceId}`,
+                  )
+                : {},
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    await waitFor(() => {
+      expect(mockedListProjects.mock.calls.some(
+        ([options]) => options?.workspaceContext?.workspaceId === 'ws-a',
+      )).toBe(true);
+    });
+
+    activeWorkspaceId = 'ws-b';
+    notifyWorkspaceContextRefresh({
+      context: workspaceContext('ws-b', 'member-ws-b'),
+    });
+    await waitFor(() => {
+      expect(mockedListProjects.mock.calls.some(
+        ([options]) => options?.workspaceContext?.workspaceId === 'ws-b',
+      )).toBe(true);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open workspace A project' }));
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mockedGetProject).not.toHaveBeenCalled();
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('project-view')).toBeNull();
+  });
+
+  it('rejects an authoritative card from a previous member in the same workspace', async () => {
+    let activeWorkspaceMemberId = 'member-ws-a';
+    mockedListProjects.mockResolvedValue([]);
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const pathname = new URL(String(input), 'http://d.local').pathname;
+      return {
+        ok: true,
+        json: async () =>
+          pathname.endsWith('/workspace/directory')
+            ? workspaceDirectoryFixture([
+                workspaceContext('ws-a', activeWorkspaceMemberId),
+              ])
+            : pathname.endsWith('/workspace/context')
+              ? workspaceContextPayload('ws-a', activeWorkspaceMemberId)
+              : {},
+      } as Response;
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<App />);
+    await waitFor(() => {
+      expect(fetchMock.mock.calls.filter(([input]) =>
+        new URL(String(input), 'http://d.local').pathname.endsWith('/workspace/context'),
+      ).length).toBeGreaterThanOrEqual(1);
+    });
+
+    activeWorkspaceMemberId = 'replacement-member';
+    act(() => {
+      notifyWorkspaceContextRefresh({
+        context: workspaceContext('ws-a', activeWorkspaceMemberId),
+      });
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open workspace A project' }));
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    expect(mockedGetProject).not.toHaveBeenCalled();
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('project-view')).toBeNull();
+  });
+
+  it('ignores a stale non-authoritative title while opening the current bound row', async () => {
+    stubWorkspaceContext('ws-b', 'member-ws-b');
+    mockedListProjects.mockResolvedValue([{
+      id: 'project-same',
+      name: 'Workspace B current title',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-b',
+      createdAt: 30,
+      updatedAt: 30,
+    }]);
+
+    render(<App />);
+    await screen.findByTestId('entry-project-project-same');
+    fireEvent.click(screen.getByRole(
+      'button',
+      { name: 'Open stale own workspace A project' },
+    ));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe(
+        'Workspace B current title',
+      );
+      expect(screen.getByTestId('project-workspace-id').textContent).toBe('ws-b');
+    });
+    expect(mockedGetProject).not.toHaveBeenCalled();
+  });
+
+  it('does not open a project bound to another workspace through a non-hint path', async () => {
+    stubWorkspaceContext('ws-b', 'member-ws-b');
+    const workspaceAProject: Project = {
+      id: 'project-bound-a',
+      name: 'Workspace A local',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-a',
+      createdAt: 20,
+      updatedAt: 20,
+    };
+    mockedListProjects.mockResolvedValue([workspaceAProject]);
+    mockedGetProject.mockResolvedValue(workspaceAProject);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole(
+      'button',
+      { name: 'Open Workspace A local' },
+    ));
+
+    await waitFor(() => {
+      expect(mockedGetProject).toHaveBeenCalledWith(
+        'project-bound-a',
+        workspaceContext('ws-b', 'member-ws-b'),
+      );
+    });
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('project-view')).toBeNull();
+  });
+
+  it('waits for exact current Workspace authority before opening a boot-visible bound project', async () => {
+    const directoryResponse = deferred<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/workspace/directory')) return directoryResponse.promise;
+        return Promise.resolve({
+          ok: true,
+          json: async () => pathname.endsWith('/workspace/context')
+            ? workspaceContextPayload('ws-1', 'wm-1')
+            : {},
+        } as Response);
+      }),
+    );
+    mockedListProjects.mockResolvedValue([{
+      ...existingProject,
+      workspaceId: 'ws-1',
+    }]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(mockedGetProject).not.toHaveBeenCalled();
+    expect(screen.getByTestId('workspace-tabs-active-project-workspace').textContent).toBe(
+      'unresolved',
+    );
+
+    await act(async () => {
+      directoryResponse.resolve({
+        ok: true,
+        json: async () => workspaceDirectoryFixture([
+          workspaceContext('ws-1', 'wm-1'),
+        ]),
+      } as Response);
+      await directoryResponse.promise;
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('workspace-tabs-active-project-workspace').textContent).toBe(
+        'ws-1',
+      );
+    });
+    expect(mockedGetProject).not.toHaveBeenCalled();
+  });
+
+  it('opens a known unbound local project without waiting for cloud Workspace discovery', async () => {
+    const directoryResponse = deferred<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/workspace/directory')) return directoryResponse.promise;
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({}),
+        } as Response);
+      }),
+    );
+    mockedListProjects.mockResolvedValue([existingProject]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+
+    await screen.findByTestId('project-view');
+    expect(mockedGetProject).not.toHaveBeenCalled();
+    expect(screen.getByTestId('project-workspace-id').textContent).toBe('unbound');
+  });
+
+  it('cancels a pending boot-card open when the selected Workspace changes', async () => {
+    const directoryResponse = deferred<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn((input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/workspace/directory')) return directoryResponse.promise;
+        return Promise.resolve({
+          ok: true,
+          json: async () => ({}),
+        } as Response);
+      }),
+    );
+    mockedListProjects.mockResolvedValue([{
+      ...existingProject,
+      workspaceId: 'ws-a',
+    }]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await act(async () => {
+      await Promise.resolve();
+    });
+
+    act(() => {
+      notifyWorkspaceContextRefresh({
+        context: workspaceContext('ws-b', 'wm-b'),
+      });
+    });
+    await act(async () => {
+      directoryResponse.resolve({
+        ok: true,
+        json: async () => workspaceDirectoryFixture([
+          workspaceContext('ws-a', 'wm-a'),
+        ]),
+      } as Response);
+      await directoryResponse.promise;
+      await Promise.resolve();
+    });
+
+    expect(mockedGetProject).not.toHaveBeenCalled();
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('project-view')).toBeNull();
+  });
+
+  it('does not let an async open from workspace A navigate or overwrite same-id workspace B', async () => {
+    let activeWorkspaceId = 'ws-a';
+    const delayedAProject = deferred<Project | null>();
+    mockedGetProject.mockReturnValueOnce(delayedAProject.promise);
+    mockedListProjects.mockImplementation(async (options) => {
+      const workspaceId = options?.workspaceContext?.workspaceId;
+      if (workspaceId === 'ws-b') {
+        return [{
+          id: 'project-same',
+          name: 'Workspace B local',
+          skillId: null,
+          designSystemId: null,
+          workspaceId: 'ws-b',
+          createdAt: 30,
+          updatedAt: 30,
+        }];
+      }
+      return [];
+    });
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/workspace/directory')) {
+          return {
+            ok: true,
+            json: async () => workspaceDirectoryFixture([
+              workspaceContext('ws-a', 'member-ws-a'),
+              workspaceContext('ws-b', 'member-ws-b'),
+            ]),
+          } as Response;
+        }
+        if (pathname.endsWith('/workspace/context')) {
+          return {
+            ok: true,
+            json: async () => workspaceContextPayload(
+              activeWorkspaceId,
+              `member-${activeWorkspaceId}`,
+            ),
+          } as Response;
+        }
+        return {
+          ok: true,
+          json: async () => ({}),
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    await waitFor(() => {
+      expect(mockedListProjects.mock.calls.some(
+        ([options]) => options?.workspaceContext?.workspaceId === 'ws-a',
+      )).toBe(true);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open workspace A project' }));
+    activeWorkspaceId = 'ws-b';
+    notifyWorkspaceContextRefresh({
+      context: workspaceContext('ws-b', 'member-ws-b'),
+    });
+    await screen.findByTestId('entry-project-project-same');
+
+    delayedAProject.resolve({
+      id: 'project-same',
+      name: 'Workspace A stale',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-a',
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    await act(async () => {
+      await delayedAProject.promise;
+      await Promise.resolve();
+    });
+
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('project-view')).toBeNull();
+    expect(screen.getByTestId('entry-project-project-same').textContent).toContain(
+      'Workspace B local',
+    );
+  });
+
+  it('rejects a delayed same-id open after workspace A to B to A returns to the same key', async () => {
+    let activeWorkspaceId = 'ws-a';
+    const delayedAProject = deferred<Project | null>();
+    mockedGetProject.mockReturnValueOnce(delayedAProject.promise);
+    mockedListProjects.mockResolvedValue([]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/workspace/directory')) {
+          return {
+            ok: true,
+            json: async () => workspaceDirectoryFixture([
+              workspaceContext('ws-a', 'member-ws-a'),
+              workspaceContext('ws-b', 'member-ws-b'),
+            ]),
+          } as Response;
+        }
+        return {
+          ok: true,
+          json: async () =>
+            pathname.endsWith('/workspace/context')
+              ? workspaceContextPayload(
+                  activeWorkspaceId,
+                  `member-${activeWorkspaceId}`,
+                )
+              : {},
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    await waitFor(() => {
+      expect(mockedListProjects.mock.calls.some(
+        ([options]) => options?.workspaceContext?.workspaceId === 'ws-a',
+      )).toBe(true);
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Open workspace A project' }));
+
+    activeWorkspaceId = 'ws-b';
+    notifyWorkspaceContextRefresh({
+      context: workspaceContext('ws-b', 'member-ws-b'),
+    });
+    await waitFor(() => {
+      expect(mockedListProjects.mock.calls.some(
+        ([options]) => options?.workspaceContext?.workspaceId === 'ws-b',
+      )).toBe(true);
+    });
+
+    activeWorkspaceId = 'ws-a';
+    act(() => {
+      notifyWorkspaceContextRefresh({
+        context: workspaceContext('ws-a', 'member-ws-a'),
+      });
+    });
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    delayedAProject.resolve({
+      id: 'project-same',
+      name: 'Workspace A stale result',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-a',
+      createdAt: 20,
+      updatedAt: 20,
+    });
+    await act(async () => {
+      await delayedAProject.promise;
+      await Promise.resolve();
+    });
+
+    expect(window.location.pathname).toBe('/');
+    expect(screen.queryByTestId('project-view')).toBeNull();
+  });
+
+  it('does not let an older catalog read roll back a newer card title', async () => {
+    let projectListReads = 0;
+    mockedListProjects.mockImplementation(async () => {
+      const name = projectListReads === 0 ? '共享项目' : 'New card authority';
+      projectListReads += 1;
+      return [{
+        id: 'project-shared',
+        name,
+        skillId: null,
+        designSystemId: null,
+        workspaceId: 'ws-1',
+        createdAt: 20,
+        updatedAt: 20,
+      }];
+    });
+    const olderCatalog = deferred<Response>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/workspace/directory')) {
+          return {
+            ok: true,
+            json: async () => workspaceDirectoryFixture([
+              workspaceContext('ws-1', 'wm-1'),
+            ]),
+          } as Response;
+        }
+        if (pathname.endsWith('/workspace/context')) {
+          return {
+            ok: true,
+            json: async () => workspaceContextPayload('ws-1', 'wm-1'),
+          } as Response;
+        }
+        if (pathname.endsWith('/workspace/projects/team')) {
+          return olderCatalog.promise;
+        }
+        return {
+          ok: true,
+          json: async () => ({}),
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    await screen.findByTestId('entry-project-project-shared');
+    fireEvent.click(screen.getByRole('button', { name: 'Open catalog project' }));
+    await screen.findByTestId('project-view');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh catalog title' }));
+    const listReadsBeforeBack = mockedListProjects.mock.calls.length;
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+    await waitFor(() => {
+      expect(mockedListProjects.mock.calls.length).toBeGreaterThan(listReadsBeforeBack);
+    });
+    fireEvent.click(await screen.findByRole(
+      'button',
+      { name: 'Open updated catalog project' },
+    ));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('New card authority');
+    });
+
+    olderCatalog.resolve({
+      ok: true,
+      json: async () => ({
+        projects: [{
+          projectId: 'project-shared',
+          ownerMemberId: 'owner',
+          sharedAt: '2026-07-27T00:00:00.000Z',
+          name: 'Old catalog title',
+        }],
+      }),
+    } as Response);
+    await act(async () => {
+      await olderCatalog.promise;
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('New card authority');
+    expect(screen.getByTestId('project-authoritative-title').textContent).toBe(
+      'New card authority',
+    );
+  });
+
+  it('rejects an out-of-order older catalog response after a newer rename wins', async () => {
+    mockedListProjects.mockResolvedValue([{
+      id: 'project-shared',
+      name: '共享项目',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-1',
+      createdAt: 20,
+      updatedAt: 20,
+    }]);
+    const olderCatalog = deferred<Response>();
+    const newerCatalog = deferred<Response>();
+    let catalogReads = 0;
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/workspace/directory')) {
+          return {
+            ok: true,
+            json: async () => workspaceDirectoryFixture([
+              workspaceContext('ws-1', 'wm-1'),
+            ]),
+          } as Response;
+        }
+        if (pathname.endsWith('/workspace/context')) {
+          return {
+            ok: true,
+            json: async () => workspaceContextPayload('ws-1', 'wm-1'),
+          } as Response;
+        }
+        if (pathname.endsWith('/workspace/projects/team')) {
+          catalogReads += 1;
+          return catalogReads === 1 ? olderCatalog.promise : newerCatalog.promise;
+        }
+        return {
+          ok: true,
+          json: async () => ({}),
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    await screen.findByTestId('entry-project-project-shared');
+    fireEvent.click(screen.getByRole('button', { name: 'Open catalog project' }));
+    await screen.findByTestId('project-view');
+
+    const refresh = screen.getByRole('button', { name: 'Refresh catalog title' });
+    fireEvent.click(refresh);
+    fireEvent.click(refresh);
+    await waitFor(() => expect(catalogReads).toBe(2));
+
+    newerCatalog.resolve({
+      ok: true,
+      json: async () => ({
+        projects: [{
+          projectId: 'project-shared',
+          ownerMemberId: 'owner',
+          sharedAt: '2026-07-27T00:00:00.000Z',
+          name: 'New catalog rename',
+        }],
+      }),
+    } as Response);
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('New catalog rename');
+    });
+
+    olderCatalog.resolve({
+      ok: true,
+      json: async () => ({
+        projects: [{
+          projectId: 'project-shared',
+          ownerMemberId: 'owner',
+          sharedAt: '2026-07-27T00:00:00.000Z',
+          name: 'Old catalog title',
+        }],
+      }),
+    } as Response);
+    await act(async () => {
+      await olderCatalog.promise;
+      await Promise.resolve();
+    });
+    expect(screen.getByTestId('project-title').textContent).toBe('New catalog rename');
+  });
+
+  it('patches recent projects and the workspace tab from an exact remote rename signal', async () => {
+    const sharedProject: Project = {
+      ...existingProject,
+      id: 'project-shared',
+      name: 'Before rename',
+      workspaceId: 'ws-1',
+    };
+    mockedListProjects.mockResolvedValue([sharedProject]);
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const pathname = new URL(String(input), 'http://d.local').pathname;
+      if (pathname.endsWith('/workspace/directory')) {
+        return new Response(JSON.stringify(workspaceDirectoryFixture([
+          workspaceContext('ws-1', 'wm-viewer'),
+        ])), { status: 200 });
+      }
+      if (pathname.endsWith('/workspace/context')) {
+        return new Response(JSON.stringify(
+          workspaceContextPayload('ws-1', 'wm-viewer'),
+        ), { status: 200 });
+      }
+      if (pathname.endsWith('/workspace/projects/team')) {
+        return new Response(JSON.stringify({
+          projects: [{
+            projectId: sharedProject.id,
+            ownerMemberId: 'wm-owner',
+            name: 'After rename',
+          }],
+        }), { status: 200 });
+      }
+      return new Response('{}', { status: 200 });
+    }));
+
+    render(<App />);
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-project-project-shared').textContent).toContain(
+        'Before rename',
+      );
+      expect(screen.getByTestId('workspace-tab-name-project-shared').textContent).toBe(
+        'Before rename',
+      );
+    });
+
+    const metadataHandler = workspaceInvalidationHarness.handlers
+      .map((handlers) => handlers['team-projects-changed'])
+      .find((handler) => typeof handler === 'function');
+    expect(metadataHandler).toBeTypeOf('function');
+    act(() => metadataHandler!({
+      type: 'team-projects-changed',
+      projectId: sharedProject.id,
+      kind: 'metadata',
+    }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-project-project-shared').textContent).toContain(
+        'After rename',
+      );
+      expect(screen.getByTestId('workspace-tab-name-project-shared').textContent).toBe(
+        'After rename',
+      );
+    });
+  });
+
+  it('silently reconciles the active project list after a remote share or move', async () => {
+    const beforeMove: Project = {
+      ...existingProject,
+      id: 'project-before-move',
+      name: 'Before remote move',
+      workspaceId: 'ws-1',
+    };
+    const afterMove: Project = {
+      ...existingProject,
+      id: 'project-after-move',
+      name: 'After remote move',
+      workspaceId: 'ws-1',
+    };
+    const refreshed = deferred<Project[]>();
+    let reads = 0;
+    let catalogInvalidated = false;
+    mockedListProjects.mockImplementation(async () => {
+      reads += 1;
+      return catalogInvalidated ? refreshed.promise : [beforeMove];
+    });
+    stubWorkspaceContext('ws-1', 'wm-viewer');
+
+    render(<App />);
+    await screen.findByTestId(`entry-project-${beforeMove.id}`);
+    expect(screen.getByTestId('entry-projects-loading').textContent).toBe('false');
+    await act(async () => {
+      await Promise.resolve();
+    });
+    const readsBeforeInvalidation = reads;
+
+    const catalogHandler = workspaceInvalidationHarness.handlers
+      .map((handlers) => handlers['team-projects-changed'])
+      .find((handler) => typeof handler === 'function');
+    expect(catalogHandler).toBeTypeOf('function');
+    act(() => {
+      catalogInvalidated = true;
+      catalogHandler!({
+        type: 'team-projects-changed',
+        projectId: beforeMove.id,
+        kind: 'catalog',
+      });
+    });
+
+    await waitFor(() => expect(reads).toBe(readsBeforeInvalidation + 1));
+    // A stale-while-revalidate refresh must not replace usable rows with a
+    // full-page loader while the exact Workspace identity is unchanged.
+    expect(screen.getByTestId(`entry-project-${beforeMove.id}`)).toBeTruthy();
+    expect(screen.getByTestId('entry-projects-loading').textContent).toBe('false');
+
+    await act(async () => {
+      refreshed.resolve([afterMove]);
+      await refreshed.promise;
+    });
+    await waitFor(() => {
+      expect(screen.queryByTestId(`entry-project-${beforeMove.id}`)).toBeNull();
+      expect(screen.getByTestId(`entry-project-${afterMove.id}`)).toBeTruthy();
+    });
+  });
+
+  it('keeps current, recent, and tab projections on the newest targeted rename response', async () => {
+    const sharedProject: Project = {
+      ...existingProject,
+      id: 'project-shared',
+      name: 'Before rename',
+      workspaceId: 'ws-1',
+    };
+    mockedListProjects.mockResolvedValue([sharedProject]);
+    const olderMetadataRefresh = deferred<Response>();
+    const newerMetadataRefresh = deferred<Response>();
+    let catalogReads = 0;
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const pathname = new URL(String(input), 'http://d.local').pathname;
+      if (pathname.endsWith('/workspace/directory')) {
+        return new Response(JSON.stringify(workspaceDirectoryFixture([
+          workspaceContext('ws-1', 'wm-viewer'),
+        ])), { status: 200 });
+      }
+      if (pathname.endsWith('/workspace/context')) {
+        return new Response(JSON.stringify(
+          workspaceContextPayload('ws-1', 'wm-viewer'),
+        ), { status: 200 });
+      }
+      if (pathname.endsWith('/workspace/projects/team')) {
+        catalogReads += 1;
+        if (catalogReads === 1) {
+          return new Response(JSON.stringify({ projects: [{
+            projectId: sharedProject.id,
+            ownerMemberId: 'wm-owner',
+            name: 'Before rename',
+          }] }), { status: 200 });
+        }
+        return catalogReads === 2
+          ? olderMetadataRefresh.promise
+          : newerMetadataRefresh.promise;
+      }
+      return new Response('{}', { status: 200 });
+    }));
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Before rename' }));
+    await screen.findByTestId('project-view');
+    await waitFor(() => expect(catalogReads).toBe(1));
+
+    const metadataHandler = workspaceInvalidationHarness.handlers
+      .map((handlers) => handlers['team-projects-changed'])
+      .find((handler) => typeof handler === 'function');
+    expect(metadataHandler).toBeTypeOf('function');
+    act(() => {
+      metadataHandler!({
+        type: 'team-projects-changed',
+        projectId: sharedProject.id,
+        kind: 'metadata',
+      });
+      metadataHandler!({
+        type: 'team-projects-changed',
+        projectId: sharedProject.id,
+        kind: 'metadata',
+      });
+    });
+
+    await waitFor(() => expect(catalogReads).toBe(3));
+    newerMetadataRefresh.resolve(new Response(JSON.stringify({
+      projects: [{
+        projectId: sharedProject.id,
+        ownerMemberId: 'wm-owner',
+        name: 'Newest rename',
+        updatedAt: 3,
+      }],
+    }), { status: 200 }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Newest rename');
+      expect(screen.getByTestId('workspace-tab-name-project-shared').textContent).toBe(
+        'Newest rename',
+      );
+    });
+
+    olderMetadataRefresh.resolve(new Response(JSON.stringify({
+      projects: [{
+        projectId: sharedProject.id,
+        ownerMemberId: 'wm-owner',
+        name: 'Older rename',
+        updatedAt: 2,
+      }],
+    }), { status: 200 }));
+    await act(async () => {
+      await olderMetadataRefresh.promise;
+      await Promise.resolve();
+    });
+    expect(screen.getByTestId('project-title').textContent).toBe('Newest rename');
+    expect(screen.getByTestId('workspace-tab-name-project-shared').textContent).toBe(
+      'Newest rename',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-project-project-shared').textContent).toContain(
+        'Newest rename',
+      );
+    });
+  });
+
+  it('projects a current-view rename into the tab and recent list immediately', async () => {
+    mockedListProjects.mockResolvedValue([existingProject]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Rename current project' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('After local rename');
+      expect(screen.getByTestId('workspace-tab-name-project-existing').textContent).toBe(
+        'After local rename',
+      );
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-project-project-existing').textContent).toContain(
+        'After local rename',
+      );
+    });
+  });
+
+  it('does not mistake an authoritative remote title update for a local rename fence', async () => {
+    mockedListProjects
+      .mockResolvedValueOnce([existingProject])
+      .mockResolvedValue([{ ...existingProject, name: 'Newer server authority' }]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Apply remote project rename' }));
+    expect(screen.getByTestId('project-title').textContent).toBe('Remote rename');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Newer server authority');
+      expect(screen.getByTestId('workspace-tab-name-project-existing').textContent).toBe(
+        'Newer server authority',
+      );
+    });
+  });
+
+  it('releases a settled local rename fence to a newer authoritative server title', async () => {
+    mockedListProjects
+      .mockResolvedValueOnce([existingProject])
+      .mockResolvedValue([{ ...existingProject, name: 'Other tab rename' }]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Rename current project' }));
+    expect(screen.getByTestId('project-title').textContent).toBe('After local rename');
+    fireEvent.click(screen.getByRole('button', { name: 'Settle current project rename' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Other tab rename');
+      expect(screen.getByTestId('workspace-tab-name-project-existing').textContent).toBe(
+        'Other tab rename',
+      );
+    });
+  });
+
+  it('does not let a pre-rename list response roll back the project title or tab', async () => {
+    const staleList = deferred<Project[]>();
+    mockedListProjects
+      .mockResolvedValueOnce([existingProject])
+      .mockImplementationOnce(() => staleList.promise)
+      .mockResolvedValue([{ ...existingProject, name: 'After local rename' }]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+    fireEvent.click(screen.getByRole('button', { name: 'Rename current project' }));
+    expect(screen.getByTestId('project-title').textContent).toBe('After local rename');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+    await waitFor(() => expect(mockedListProjects).toHaveBeenCalledTimes(2));
+    await act(async () => {
+      staleList.resolve([existingProject]);
+      await staleList.promise;
+    });
+
+    expect(screen.getByTestId('project-title').textContent).toBe('After local rename');
+    expect(screen.getByTestId('workspace-tab-name-project-existing').textContent).toBe(
+      'After local rename',
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Refresh projects' }));
+    await waitFor(() => expect(mockedListProjects).toHaveBeenCalledTimes(3));
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-project-project-existing').textContent).toContain(
+        'After local rename',
+      );
+    });
+  });
+
+  it('serializes list renames and rolls repeated failures back to the confirmed name', async () => {
+    const firstPatch = deferred<Project | null>();
+    const secondPatch = deferred<Project | null>();
+    mockedListProjects.mockResolvedValue([existingProject]);
+    mockedPatchProject
+      .mockImplementationOnce(() => firstPatch.promise)
+      .mockImplementationOnce(() => secondPatch.promise);
+
+    render(<App />);
+    await screen.findByTestId('entry-project-project-existing');
+    fireEvent.click(screen.getByRole('button', { name: 'Rename first project A' }));
+    await waitFor(() => expect(mockedPatchProject).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole('button', { name: 'Rename first project B' }));
+    await act(async () => Promise.resolve());
+    expect(mockedPatchProject).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('entry-project-project-existing').textContent).toContain('Rename B');
+
+    await act(async () => {
+      firstPatch.resolve(null);
+      await firstPatch.promise;
+    });
+    await waitFor(() => expect(mockedPatchProject).toHaveBeenCalledTimes(2));
+    expect(screen.getByTestId('entry-project-project-existing').textContent).toContain('Rename B');
+
+    await act(async () => {
+      secondPatch.resolve(null);
+      await secondPatch.promise;
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId('entry-project-project-existing').textContent).toContain(
+        'Existing project',
+      );
+    });
+  });
+
+  it.each([
+    [true, 'Newer Workspace A authority'],
+    [false, 'Workspace A project'],
+  ])(
+    'settles a captured Workspace rename fence after switching away (success=%s)',
+    async (succeeds, expectedName) => {
+      const workspaceA = workspaceContext('ws-a', 'wm-a');
+      const workspaceB = workspaceContext('ws-b', 'wm-b');
+      const projectA: Project = {
+        ...existingProject,
+        id: 'project-a',
+        name: 'Workspace A project',
+        workspaceId: workspaceA.workspaceId,
+      };
+      const projectB: Project = {
+        ...existingProject,
+        id: 'project-b',
+        name: 'Workspace B project',
+        workspaceId: workspaceB.workspaceId,
+      };
+      const patch = deferred<Project | null>();
+      let workspaceAAuthority = projectA;
+      mockedPatchProject.mockImplementationOnce(() => patch.promise);
+      mockedListProjects.mockImplementation(async (options) =>
+        options?.workspaceContext?.workspaceId === workspaceB.workspaceId
+          ? [projectB]
+          : [workspaceAAuthority]);
+      stubWorkspaceContext(workspaceA.workspaceId, workspaceA.workspaceMemberId);
+
+      render(<App />);
+      await screen.findByTestId('entry-project-project-a');
+      fireEvent.click(screen.getByRole('button', { name: 'Rename first project A' }));
+      await waitFor(() => expect(mockedPatchProject).toHaveBeenCalledTimes(1));
+
+      act(() => notifyWorkspaceContextRefresh({ context: workspaceB }));
+      await screen.findByTestId('entry-project-project-b');
+
+      const persisted = succeeds
+        ? { ...projectA, name: 'Rename A', updatedAt: projectA.updatedAt + 1 }
+        : null;
+      workspaceAAuthority = succeeds
+        ? { ...projectA, name: 'Newer Workspace A authority', updatedAt: projectA.updatedAt + 2 }
+        : projectA;
+      await act(async () => {
+        patch.resolve(persisted);
+        await patch.promise;
+      });
+
+      act(() => notifyWorkspaceContextRefresh({ context: workspaceA }));
+      await waitFor(() => {
+        expect(screen.getByTestId('entry-project-project-a').textContent).toContain(expectedName);
+      });
+    },
+  );
+
+  it('keeps a newly created renamed project when the project route restores an older all snapshot', async () => {
+    const context = workspaceContext('ws-1', 'wm-1');
+    const olderProjects: Project[] = [
+      {
+        ...existingProject,
+        id: 'project-old-a',
+        name: 'Untitled A',
+        workspaceId: context.workspaceId,
+      },
+      {
+        ...existingProject,
+        id: 'project-old-b',
+        name: 'Untitled B',
+        workspaceId: context.workspaceId,
+      },
+    ];
+    const createdProject: Project = {
+      ...freshProject,
+      workspaceId: context.workspaceId,
+    };
+    mockedListProjects.mockResolvedValue(olderProjects);
+    mockedCreateProject.mockResolvedValue({
+      project: createdProject,
+      conversationId: 'conv-new',
+    });
+    stubWorkspaceContext(context.workspaceId, context.workspaceMemberId);
+
+    render(<App />);
+    await screen.findByTestId('entry-project-project-old-a');
+
+    // Project routes use the `all` projection. Reproduce the real browser
+    // state where that projection predates the create performed on Home's
+    // `recent` projection.
+    writeProjectDisplaySnapshot({
+      accountGeneration: currentWorkspaceAccountGeneration(),
+      context,
+      view: 'all',
+    }, olderProjects);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Create project' }));
+    await screen.findByTestId('project-view');
+    fireEvent.click(screen.getByRole('button', { name: 'Rename current project' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('After local rename');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+    await screen.findByTestId('entry-home-surface');
+    expect(screen.getByTestId('entry-project-project-new').textContent).toContain(
+      'After local rename',
+    );
+  });
+
+  it('does not preserve a pending Workspace A project into Workspace B display snapshots', async () => {
+    const workspaceA = workspaceContext('ws-a', 'wm-a');
+    const workspaceB = workspaceContext('ws-b', 'wm-b');
+    const workspaceAProject: Project = {
+      ...freshProject,
+      workspaceId: workspaceA.workspaceId,
+    };
+    const workspaceBProject: Project = {
+      ...existingProject,
+      id: 'project-workspace-b',
+      name: 'Workspace B project',
+      workspaceId: workspaceB.workspaceId,
+    };
+    mockedCreateProject.mockResolvedValue({
+      project: workspaceAProject,
+      conversationId: 'conv-new',
+    });
+    mockedListProjects.mockImplementation(async (options) =>
+      options?.workspaceContext?.workspaceId === workspaceB.workspaceId
+        ? [workspaceBProject]
+        : []);
+    stubWorkspaceContext(workspaceA.workspaceId, workspaceA.workspaceMemberId);
+
+    render(<App />);
+    await waitFor(() => expect(mockedListProjects).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('button', { name: 'Create project' }));
+    await screen.findByTestId('project-view');
+
+    const accountGeneration = currentWorkspaceAccountGeneration();
+    for (const view of ['recent', 'all'] as const) {
+      writeProjectDisplaySnapshot({
+        accountGeneration,
+        context: workspaceB,
+        view,
+      }, [workspaceBProject]);
+    }
+    act(() => notifyWorkspaceContextRefresh({ context: workspaceB }));
+    await waitFor(() => {
+      expect(mockedListProjects.mock.calls.some(
+        ([options]) => options?.workspaceContext?.workspaceId === workspaceB.workspaceId,
+      )).toBe(true);
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+    await screen.findByTestId('entry-project-project-workspace-b');
+    expect(screen.queryByTestId('entry-project-project-new')).toBeNull();
+  });
+
+  it('does not preserve a pending project across an account generation boundary', async () => {
+    const context = workspaceContext('ws-1', 'wm-1');
+    const createdProject: Project = {
+      ...freshProject,
+      workspaceId: context.workspaceId,
+    };
+    mockedListProjects.mockResolvedValue([]);
+    mockedCreateProject.mockResolvedValue({
+      project: createdProject,
+      conversationId: 'conv-new',
+    });
+    stubWorkspaceContext(context.workspaceId, context.workspaceMemberId);
+
+    render(<App />);
+    await waitFor(() => expect(mockedListProjects).toHaveBeenCalled());
+    fireEvent.click(screen.getByRole('button', { name: 'Create project' }));
+    await screen.findByTestId('project-view');
+
+    const previousGeneration = currentWorkspaceAccountGeneration();
+    act(() => notifyWorkspaceContextRefresh());
+    await waitFor(() => {
+      expect(currentWorkspaceAccountGeneration()).toBeGreaterThan(previousGeneration);
+    });
+    const nextGeneration = currentWorkspaceAccountGeneration();
+
+    await waitFor(() => {
+      expect(readProjectDisplaySnapshot(projectDisplaySnapshotKey({
+        accountGeneration: nextGeneration,
+        context,
+        view: 'all',
+      }))?.projects.some((project) => project.id === createdProject.id)).toBe(false);
+    });
+  });
+
+  it('projects a current-view rename into inactive Personal and Team snapshots', async () => {
+    const context = workspaceContext('ws-1', 'wm-1');
+    const scopedProject = {
+      ...existingProject,
+      workspaceId: context.workspaceId,
+    };
+    mockedListProjects.mockResolvedValue([scopedProject]);
+    stubWorkspaceContext(context.workspaceId, context.workspaceMemberId);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+
+    const accountGeneration = currentWorkspaceAccountGeneration();
+    for (const view of ['drafts', 'team'] as const) {
+      writeProjectDisplaySnapshot({ accountGeneration, context, view }, [scopedProject]);
+    }
+
+    fireEvent.click(screen.getByRole('button', { name: 'Rename current project' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('After local rename');
+    });
+
+    for (const view of ['drafts', 'team'] as const) {
+      expect(readProjectDisplaySnapshot(projectDisplaySnapshotKey({
+        accountGeneration,
+        context,
+        view,
+      }))).toMatchObject({
+        projects: [{ id: scopedProject.id, name: 'After local rename' }],
+        dirty: true,
+      });
+    }
+  });
+
+  it('calibrates a deep-linked local placeholder from the other-owner hub catalog', async () => {
+    window.history.replaceState(null, '', '/projects/project-shared');
+    mockedListProjects.mockResolvedValue([{
+      id: 'project-shared',
+      name: '共享项目',
+      skillId: null,
+      designSystemId: null,
+      workspaceId: 'ws-1',
+      createdAt: 20,
+      updatedAt: 999,
+    }]);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (pathname.endsWith('/workspace/directory')) {
+          return {
+            ok: true,
+            json: async () => workspaceDirectoryFixture([
+              workspaceContext('ws-1', 'wm-1'),
+            ]),
+          } as Response;
+        }
+        if (pathname.endsWith('/workspace/context')) {
+          return {
+            ok: true,
+            json: async () => workspaceContextPayload('ws-1', 'wm-1'),
+          } as Response;
+        }
+        if (pathname.endsWith('/workspace/projects/team')) {
+          return {
+            ok: true,
+            json: async () => ({
+              projects: [{
+                projectId: 'project-shared',
+                ownerMemberId: 'wm-owner',
+                sharedAt: '2026-07-27T00:00:00.000Z',
+                name: 'Catalog rename',
+                updatedAt: 42,
+              }],
+            }),
+          } as Response;
+        }
+        return {
+          ok: true,
+          json: async () => ({}),
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-title').textContent).toBe('Catalog rename');
+      expect(screen.getByTestId('project-authoritative-title').textContent).toBe('Catalog rename');
+      expect(screen.getByTestId('project-workspace-id').textContent).toBe('ws-1');
+    });
+  });
+
+  it('passes the active project persisted Workspace to the tab switch guard', async () => {
+    stubWorkspaceContext('ws-1', 'wm-1');
+    mockedListProjects.mockResolvedValue([{
+      ...existingProject,
+      workspaceId: 'ws-1',
+    }]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('workspace-tabs-active-project-workspace').textContent).toBe(
+        'ws-1',
+      );
+    });
+  });
+
+  it('owns one AMR auth continuation above ProjectView and clears it after consume, cancel, or route exit', async () => {
+    stubWorkspaceContext('ws-1', 'wm-1');
+    mockedListProjects.mockResolvedValue([{
+      ...existingProject,
+      workspaceId: 'ws-1',
+    }]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Arm auth continuation' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-auth-continuation').textContent).toBe(
+        'assistant-auth-failure',
+      );
+    });
+
+    const refreshedIdentity = deferred<void>();
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        if (
+          pathname.endsWith('/workspace/directory')
+          || pathname.endsWith('/workspace/context')
+        ) {
+          await refreshedIdentity.promise;
+        }
+        return {
+          ok: true,
+          json: async () =>
+            pathname.endsWith('/workspace/directory')
+              ? workspaceDirectoryFixture([workspaceContext('ws-1', 'wm-1')])
+              : pathname.endsWith('/workspace/context')
+                ? workspaceContextPayload('ws-1', 'wm-1')
+                : {},
+        } as Response;
+      }),
+    );
+    act(() => notifyWorkspaceContextRefresh());
+    await waitFor(() => expect(screen.queryByTestId('project-view')).toBeNull());
+    await act(async () => {
+      refreshedIdentity.resolve();
+      await refreshedIdentity.promise;
+    });
+    await waitFor(() => {
+      expect(screen.getByTestId('project-auth-continuation').textContent).toBe(
+        'assistant-auth-failure',
+      );
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Consume auth continuation' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-auth-continuation').textContent).toBe('none');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Arm auth continuation' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-auth-continuation').textContent).toBe(
+        'assistant-auth-failure',
+      );
+    });
+    act(() => notifyAmrLoginStatusChanged('login-canceled'));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-auth-continuation').textContent).toBe('none');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Arm auth continuation' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-auth-continuation').textContent).toBe(
+        'assistant-auth-failure',
+      );
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Back to projects' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await waitFor(() => {
+      expect(screen.getByTestId('project-auth-continuation').textContent).toBe('none');
+    });
+  });
+
+  it('preserves an exact retry through Settings and returns to its project after sign-in', async () => {
+    mockedListProjects.mockResolvedValue([{
+      ...existingProject,
+      workspaceId: 'ws-1',
+    }]);
+    let loginStatus: VelaLoginStatus = {
+      loggedIn: false,
+      profile: 'test',
+      user: null,
+      configPath: '',
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        return {
+          ok: true,
+          json: async () =>
+            pathname.endsWith('/workspace/directory')
+              ? workspaceDirectoryFixture([workspaceContext('ws-1', 'wm-1')])
+              : pathname.endsWith('/workspace/context')
+                ? workspaceContextPayload('ws-1', 'wm-1')
+                : pathname.endsWith('/integrations/vela/status')
+                  ? loginStatus
+                  : {},
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize in settings' }));
+    await screen.findByTestId('settings-surface');
+    expect(window.location.pathname).toBe('/settings');
+
+    loginStatus = {
+      loggedIn: true,
+      profile: 'test',
+      user: { id: 'account-a', email: 'account-a@example.com', plan: 'free' },
+      configPath: '',
+    };
+    act(() => notifyAmrLoginStatusChanged());
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/projects/project-existing/conversations/conv-auth');
+      expect(screen.getByTestId('project-auth-continuation').textContent).toBe(
+        'assistant-auth-failure',
+      );
+    });
+  });
+
+  it('retains a Cloud retry across Settings when local scope is member and the same caller is owner', async () => {
+    const scopeContext = workspaceContext('ws-1', 'wm-1');
+    const accountContext: WorkspaceCollabContext = {
+      ...scopeContext,
+      role: 'owner',
+      permissions: buildWorkspacePermissions({ role: 'owner', lifecycleState: 'active' }),
+    };
+    // This is the ordinary daemon projection from
+    // resolveLocalProjectWorkspaceScope: member protects creator-only writes.
+    // The routing test owns App; use the real runWorkspaceIdentity helper at
+    // the mocked ProjectView callback boundary to preserve that input shape.
+    projectViewRetryScopeHarness.scope = {
+      kind: 'team',
+      projectId: existingProject.id,
+      workspaceId: 'ws-1',
+      visibility: 'personal',
+      context: scopeContext,
+    };
+    expect(workspaceIdentityCacheKey(scopeContext)).not.toBe(
+      workspaceIdentityCacheKey(accountContext),
+    );
+    mockedListProjects.mockResolvedValue([{ ...existingProject, workspaceId: 'ws-1' }]);
+    const loginStatus: VelaLoginStatus = {
+      loggedIn: true,
+      profile: 'test',
+      user: { id: 'account-a', email: 'account-a@example.com', plan: 'free' },
+      configPath: '',
+    };
+    let settingsStatusResponse: ReturnType<typeof deferred<VelaLoginStatus>> | null = null;
+    const settingsStatusRequested = deferred<void>();
+    vi.stubGlobal('fetch', vi.fn(async (input: RequestInfo | URL) => {
+      const pathname = new URL(String(input), 'http://d.local').pathname;
+      return {
+        ok: true,
+        json: async () => {
+          if (pathname.endsWith('/integrations/vela/status') && settingsStatusResponse) {
+            settingsStatusRequested.resolve();
+            return settingsStatusResponse.promise;
+          }
+          return pathname.endsWith('/workspace/directory')
+            ? workspaceDirectoryFixture([accountContext])
+            : pathname.endsWith('/workspace/context')
+              ? { context: accountContext }
+              : pathname.endsWith('/integrations/vela/status')
+                ? loginStatus
+                : {};
+        },
+      } as Response;
+    }));
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open Existing project' }));
+    await screen.findByTestId('project-view');
+    fireEvent.click(screen.getByRole('button', { name: 'Authorize in settings' }));
+    await screen.findByTestId('settings-surface');
+    expect(window.location.pathname).toBe('/settings');
+
+    expect(projectViewRetryScopeHarness.armedWorkspaceKey).toBe(
+      workspaceIdentityCacheKey(scopeContext),
+    );
+
+    // Own the real status-response boundary. A synchronous act + waitFor
+    // pending can succeed on the returning render before App's discard effect
+    // settles; resolve the request inside async act before inspecting it.
+    settingsStatusResponse = deferred<VelaLoginStatus>();
+    act(() => notifyAmrLoginStatusChanged());
+    await settingsStatusRequested.promise;
+    await act(async () => {
+      settingsStatusResponse!.resolve(loginStatus);
+      await settingsStatusResponse!.promise;
+    });
+    await waitFor(() => expect(screen.getByTestId('project-route-conversation').textContent).toBe('conv-auth'));
+    expect(window.location.pathname).toBe('/projects/project-existing/conversations/conv-auth');
+    // Confirm the fixture actually crossed the two production projections,
+    // instead of accidentally letting App and ProjectView both use member.
+    expect(projectViewRetryScopeHarness.latest?.context).toMatchObject({
+      workspaceId: 'ws-1', workspaceMemberId: 'wm-1', role: 'owner',
+    });
+    const pending = projectViewRetryScopeHarness.latest?.continuation;
+    expect(pending).toMatchObject({
+      assistantId: 'assistant-auth-failure',
+      workspaceIdentityKey: workspaceIdentityCacheKey(scopeContext),
+    });
+    const consume = projectViewRetryScopeHarness.latest?.consume;
+    expect(consume).toBeTypeOf('function');
+    if (!pending || !consume) throw new Error('The Settings retry was discarded before consumption');
+    // This is App's real one-shot callback, not a retry spy. The exact saved
+    // object must remain consumable after effects, and then reject re-use.
+    const results: boolean[] = [];
+    act(() => {
+      results.push(consume(pending), consume(pending));
+    });
+    expect(results).toEqual([true, false]);
+    expect(screen.getByTestId('project-auth-continuation').textContent).toBe('none');
+  });
+
+  it('returns from full-page Settings to the exact project conversation and file route', async () => {
+    window.history.replaceState(
+      null,
+      '',
+      '/projects/project-existing/conversations/conv-exact/files/nested%2Fartifact.html',
+    );
+    stubWorkspaceContext('ws-1', 'wm-1');
+    mockedListProjects.mockResolvedValue([{
+      ...existingProject,
+      workspaceId: 'ws-1',
+    }]);
+
+    render(<App />);
+    await screen.findByTestId('project-view');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings from project' }));
+    await screen.findByTestId('settings-surface');
+    expect(window.location.pathname).toBe('/settings');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close settings' }));
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe(
+        '/projects/project-existing/conversations/conv-exact/files/nested/artifact.html',
+      );
+      expect(screen.getByTestId('project-route-conversation').textContent).toBe('conv-exact');
+    });
+  });
+
+  it('returns home when full-page Settings was opened from home', async () => {
+    mockedListProjects.mockResolvedValue([]);
+
+    render(<App />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Open settings from home' }));
+    await screen.findByTestId('settings-surface');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Close settings' }));
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/');
+      expect(screen.getByTestId('entry-home-surface')).toBeTruthy();
+    });
+  });
+
+  it('fails closed instead of reopening a project after the Settings workspace changes', async () => {
+    window.history.replaceState(
+      null,
+      '',
+      '/projects/project-existing/conversations/conv-exact',
+    );
+    mockedListProjects.mockResolvedValue([{
+      ...existingProject,
+      workspaceId: 'ws-1',
+    }]);
+    const loginStatus: VelaLoginStatus = {
+      loggedIn: true,
+      profile: 'test',
+      user: { id: 'account-a', email: 'account-a@example.com', plan: 'free' },
+      configPath: '',
+    };
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const pathname = new URL(String(input), 'http://d.local').pathname;
+        return {
+          ok: true,
+          json: async () =>
+            pathname.endsWith('/workspace/directory')
+              ? workspaceDirectoryFixture([
+                  workspaceContext('ws-1', 'wm-1'),
+                  workspaceContext('ws-2', 'wm-2'),
+                ])
+              : pathname.endsWith('/workspace/context')
+                ? workspaceContextPayload('ws-1', 'wm-1')
+                : pathname.endsWith('/integrations/vela/status')
+                  ? loginStatus
+                  : {},
+        } as Response;
+      }),
+    );
+
+    render(<App />);
+    await screen.findByTestId('project-view');
+    fireEvent.click(screen.getByRole('button', { name: 'Open settings from project' }));
+    await screen.findByTestId('settings-surface');
+
+    act(() => {
+      notifyWorkspaceContextRefresh({
+        context: workspaceContext('ws-2', 'wm-2'),
+      });
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Close settings' }));
+
+    await waitFor(() => {
+      expect(window.location.pathname).toBe('/');
+      expect(screen.getByTestId('entry-home-surface')).toBeTruthy();
+    });
+  });
+
+  it('opens the seeded brand extraction conversation after creating a design system', async () => {
+    const brandProject: Project = {
+      id: 'brand-acme',
+      name: 'acme.com Design System',
+      skillId: null,
+      designSystemId: null,
+      createdAt: 1778244000000,
+      updatedAt: 1778244000000,
+      metadata: { kind: 'brand', importedFrom: 'brand-extraction', brandId: 'acme' },
+    };
+    window.history.replaceState(null, '', '/design-systems/create');
+    mockedListProjects.mockResolvedValue([]);
+    mockedGetProject.mockResolvedValue(brandProject);
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: unknown, _init?: unknown) => {
+        if (typeof input === 'string' && input === '/api/brands') {
+          return {
+            ok: true,
+            status: 200,
+            json: async () => ({
+              id: 'acme',
+              projectId: brandProject.id,
+              conversationId: 'conv-brand-acme',
+              sourceUrl: 'https://acme.com/',
+              status: 'extracting',
+            }),
+          } as unknown as Response;
+        }
+        return { ok: true, status: 200, json: async () => ({}) } as unknown as Response;
+      }),
+    );
+
+    render(<App />);
+
+    fireEvent.change(await screen.findByPlaceholderText('https://github.com/org/repo'), {
+      target: { value: 'https://acme.com' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /continue to generation/i }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('project-route-conversation').textContent).toBe('conv-brand-acme');
+    });
+    expect(window.location.pathname).toBe(`/projects/${brandProject.id}/conversations/conv-brand-acme`);
+  });
+});

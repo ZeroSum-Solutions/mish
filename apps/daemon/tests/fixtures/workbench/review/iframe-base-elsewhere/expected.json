@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 4 WARN guard: when <base href> points at a host that is not allowed, the same iframe never reaches an allowed host.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "noHits": true } }
+}

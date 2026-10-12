@@ -1,0 +1,40 @@
+Loomwork Docs is the documentation and knowledge base for Loomwork, a workflow automation CLI and
+platform. We want a one-page docs hub where a developer can search, follow a quick start, and find
+API reference material.
+
+Header: Guides, Reference, Changelog links, a "Search the docs…" search field, and a "Get started"
+button.
+
+Hero: "Everything you need to build with Loomwork." Guides, quick-start steps and reference
+material for setting up workflows, connecting integrations and running Loomwork in production.
+
+Quick start, five steps: 1. Install the CLI (install the Loomwork command-line tool for your
+platform); 2. Sign in (authenticate the CLI against your Loomwork workspace); 3. Create a workflow
+(scaffold a new workflow from a starter template); 4. Connect an integration (link a data source
+or service the workflow will use); 5. Deploy (push the workflow to your Loomwork environment).
+
+Guides, task-focused walkthroughs for the most common things builders do with Loomwork:
+Authentication (set up API keys and workspace-scoped tokens), Workflows (design, test and version
+workflow definitions), Integrations (connect Loomwork to the tools your team already uses),
+Webhooks (trigger workflows from external events), Environments (separate staging and production
+configuration), Permissions (control who can view, edit and run each workflow).
+
+API and reference: REST API (endpoints for managing workflows, runs and integrations), CLI
+reference (every command the Loomwork CLI supports, with flags), Webhook payloads (the event
+shapes Loomwork sends to your endpoints), SDKs (client libraries for calling the API from your own
+code).
+
+One code sample section, "Try it": install the CLI and run your first build from a fresh workflow
+project.
+
+Changelog, "What's new": v1.4.0, September 2026 — Workflow environments (separate staging and
+production configuration per workflow). v1.3.0, July 2026 — Webhook triggers (start a workflow run
+from any external event). v1.2.0, May 2026 — Team permissions (role-based access for workflows and
+integrations). v1.1.0, March 2026 — CLI rewrite (faster installs and a redesigned command
+structure).
+
+Get help: ask a question, report an issue or see what's currently up. Support email
+docs-support@loomwork.example, with links to the community forum and the status page.
+
+Footer: Guides, API reference, Changelog links. Contact: docs@loomwork.example. Tagline:
+"Documentation for building and running Loomwork workflows."

@@ -1,0 +1,12 @@
+{
+  "description": "The primary CTA links to a page that does not exist, and a button has no handler.",
+  "outcome": "failed",
+  "criteria": {
+    "core.declared-actions": "fail",
+    "core.text-contrast": "pass",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  }
+}

@@ -1,0 +1,1567 @@
+{
+  "source": "https://mishmash-website-shape-atlas.netlify.app/website-shape-atlas.html",
+  "version": "1.0",
+  "fetched": "2026-09-19",
+  "spines": [
+    {
+      "code": "TL",
+      "kind": "Service",
+      "name": "Trust to lead",
+      "intent": "Help a visitor choose a credible provider.",
+      "steps": [
+        "Need",
+        "relevance",
+        "authority",
+        "proof",
+        "process",
+        "contact"
+      ],
+      "ctas": [
+        "Book",
+        "call",
+        "request quote"
+      ]
+    },
+    {
+      "code": "PA",
+      "kind": "Product",
+      "name": "Product adoption",
+      "intent": "Show how a product solves a defined problem.",
+      "steps": [
+        "Problem",
+        "mechanism",
+        "demo",
+        "proof",
+        "pricing",
+        "start"
+      ],
+      "ctas": [
+        "Start",
+        "try",
+        "request demo"
+      ]
+    },
+    {
+      "code": "CO",
+      "kind": "Transaction",
+      "name": "Commerce",
+      "intent": "Move from merchandise discovery to purchase.",
+      "steps": [
+        "Discover",
+        "evaluate",
+        "reassure",
+        "select",
+        "checkout"
+      ],
+      "ctas": [
+        "Add to cart",
+        "buy"
+      ]
+    },
+    {
+      "code": "SM",
+      "kind": "Discovery",
+      "name": "Search and match",
+      "intent": "Find the right listing, provider, or opportunity.",
+      "steps": [
+        "Query",
+        "filter",
+        "compare",
+        "inspect",
+        "transact"
+      ],
+      "ctas": [
+        "Search",
+        "view",
+        "apply",
+        "contact"
+      ]
+    },
+    {
+      "code": "CS",
+      "kind": "Audience",
+      "name": "Content subscription",
+      "intent": "Turn discovery into a recurring audience relationship.",
+      "steps": [
+        "Discover",
+        "consume",
+        "explore",
+        "subscribe",
+        "return"
+      ],
+      "ctas": [
+        "Read",
+        "subscribe",
+        "follow"
+      ]
+    },
+    {
+      "code": "LM",
+      "kind": "Belonging",
+      "name": "Learning membership",
+      "intent": "Sell transformation, access, or participation.",
+      "steps": [
+        "Aspiration",
+        "method",
+        "proof",
+        "commitment",
+        "participate"
+      ],
+      "ctas": [
+        "Enroll",
+        "join"
+      ]
+    },
+    {
+      "code": "BA",
+      "kind": "Reservation",
+      "name": "Booking attendance",
+      "intent": "Reserve a place, time, or experience.",
+      "steps": [
+        "Inspire",
+        "availability",
+        "compare",
+        "reassure",
+        "reserve"
+      ],
+      "ctas": [
+        "Book",
+        "reserve",
+        "register"
+      ]
+    },
+    {
+      "code": "TU",
+      "kind": "Operation",
+      "name": "Task utility",
+      "intent": "Help someone complete recurring work.",
+      "steps": [
+        "Orient",
+        "input",
+        "act",
+        "feedback",
+        "history"
+      ],
+      "ctas": [
+        "Create",
+        "submit",
+        "manage"
+      ]
+    },
+    {
+      "code": "MI",
+      "kind": "Cause",
+      "name": "Mission impact",
+      "intent": "Turn concern into contribution or public action.",
+      "steps": [
+        "Stakes",
+        "mission",
+        "approach",
+        "impact",
+        "participate"
+      ],
+      "ctas": [
+        "Donate",
+        "volunteer",
+        "support"
+      ]
+    }
+  ],
+  "archetypes": [
+    {
+      "id": "TL.01",
+      "spine": "TL",
+      "name": "Local appointment business",
+      "intent": "Confirm that a nearby provider is suitable, credible, and available.",
+      "steps": [
+        "Local need",
+        "services",
+        "credentials",
+        "reviews",
+        "process",
+        "appointment"
+      ],
+      "sections": [
+        "Hero",
+        "services",
+        "provider profiles",
+        "reviews",
+        "results",
+        "insurance or pricing",
+        "FAQ",
+        "map",
+        "hours"
+      ],
+      "primaryCta": "Book appointment",
+      "closestTransfers": [
+        "Healthcare",
+        "wellness",
+        "pet care",
+        "auto service"
+      ],
+      "keywords": [
+        "local",
+        "appointment",
+        "dentist",
+        "veterinarian",
+        "salon",
+        "therapist",
+        "mechanic",
+        "tutor"
+      ]
+    },
+    {
+      "id": "TL.02",
+      "spine": "TL",
+      "name": "Healthcare or aesthetic practice",
+      "intent": "Understand suitability, safety, expertise, expectations, and the next clinical step.",
+      "steps": [
+        "Concern",
+        "options",
+        "clinical authority",
+        "candidacy",
+        "expectations",
+        "consultation"
+      ],
+      "sections": [
+        "Concerns",
+        "procedures",
+        "credentials",
+        "facilities",
+        "recovery",
+        "approved outcomes",
+        "patient stories",
+        "FAQ"
+      ],
+      "primaryCta": "Request consultation",
+      "closestTransfers": [
+        "Dental",
+        "specialist health",
+        "high-trust advisory"
+      ],
+      "keywords": [
+        "healthcare",
+        "aesthetic",
+        "plastic",
+        "surgeon",
+        "dermatology",
+        "fertility",
+        "dental",
+        "implants",
+        "physiotherapy",
+        "medical"
+      ]
+    },
+    {
+      "id": "TL.03",
+      "spine": "TL",
+      "name": "Professional advisory service",
+      "intent": "Decide whether a firm understands the problem and can handle it.",
+      "steps": [
+        "Problem",
+        "expertise",
+        "service fit",
+        "method",
+        "evidence",
+        "team",
+        "consult"
+      ],
+      "sections": [
+        "Practice areas",
+        "industries",
+        "cases",
+        "credentials",
+        "methodology",
+        "team",
+        "insights",
+        "FAQ"
+      ],
+      "primaryCta": "Schedule consultation",
+      "closestTransfers": [
+        "Consultancy",
+        "agency",
+        "enterprise services"
+      ],
+      "keywords": [
+        "professional",
+        "advisory",
+        "lawyer",
+        "accountant",
+        "financial",
+        "adviser",
+        "consultant",
+        "architecture",
+        "engineering"
+      ]
+    },
+    {
+      "id": "TL.04",
+      "spine": "TL",
+      "name": "Home and property service",
+      "intent": "Confirm service fit, local availability, workmanship, and project process.",
+      "steps": [
+        "Property need",
+        "services",
+        "project proof",
+        "process",
+        "local trust",
+        "estimate"
+      ],
+      "sections": [
+        "Services",
+        "gallery",
+        "service area",
+        "reviews",
+        "process",
+        "warranties",
+        "financing",
+        "estimate form"
+      ],
+      "primaryCta": "Request estimate",
+      "closestTransfers": [
+        "Construction",
+        "maintenance",
+        "commercial facilities"
+      ],
+      "keywords": [
+        "home",
+        "property",
+        "service",
+        "landscaping",
+        "roofing",
+        "hvac",
+        "remodeling",
+        "cleaning",
+        "contractor"
+      ]
+    },
+    {
+      "id": "TL.05",
+      "spine": "TL",
+      "name": "Agency, consultancy, or studio",
+      "intent": "Judge taste, capability, working style, and client fit.",
+      "steps": [
+        "Ambition",
+        "point of view",
+        "selected work",
+        "capabilities",
+        "process",
+        "inquiry"
+      ],
+      "sections": [
+        "Positioning",
+        "portfolio",
+        "case studies",
+        "capabilities",
+        "methodology",
+        "clients",
+        "team",
+        "contact"
+      ],
+      "primaryCta": "Start a project",
+      "closestTransfers": [
+        "Professional service",
+        "portfolio",
+        "B2B service"
+      ],
+      "keywords": [
+        "agency",
+        "consultancy",
+        "studio",
+        "design",
+        "marketing",
+        "development",
+        "creative"
+      ]
+    },
+    {
+      "id": "TL.06",
+      "spine": "TL",
+      "name": "Personal expert or portfolio",
+      "intent": "Understand who the person is, what they make, and whether to hire or follow them.",
+      "steps": [
+        "Identity",
+        "distinctive work",
+        "credibility",
+        "offers",
+        "contact"
+      ],
+      "sections": [
+        "Introduction",
+        "selected work",
+        "biography",
+        "services",
+        "appearances",
+        "testimonials",
+        "writing"
+      ],
+      "primaryCta": "Hire or inquire",
+      "closestTransfers": [
+        "Agency",
+        "creator brand",
+        "coach",
+        "speaker"
+      ],
+      "keywords": [
+        "personal",
+        "expert",
+        "portfolio",
+        "designer",
+        "photographer",
+        "speaker",
+        "creator",
+        "freelance"
+      ]
+    },
+    {
+      "id": "PA.01",
+      "spine": "PA",
+      "name": "Self-serve SaaS",
+      "intent": "Determine whether software solves the problem and deserves a trial.",
+      "steps": [
+        "Problem",
+        "mechanism",
+        "demo",
+        "use cases",
+        "proof",
+        "pricing",
+        "signup"
+      ],
+      "sections": [
+        "Hero",
+        "interactive demo",
+        "feature narrative",
+        "use cases",
+        "integrations",
+        "testimonials",
+        "pricing"
+      ],
+      "primaryCta": "Start free",
+      "closestTransfers": [
+        "Consumer app",
+        "developer tool",
+        "subscription product"
+      ],
+      "keywords": [
+        "self",
+        "serve",
+        "saas",
+        "software",
+        "product",
+        "app"
+      ]
+    },
+    {
+      "id": "PA.02",
+      "spine": "PA",
+      "name": "Enterprise B2B",
+      "intent": "Evaluate business value, implementation risk, security, and vendor credibility.",
+      "steps": [
+        "Strategic problem",
+        "stakeholder outcomes",
+        "evidence",
+        "integration",
+        "security",
+        "sales"
+      ],
+      "sections": [
+        "Solutions",
+        "industries",
+        "role benefits",
+        "cases",
+        "ROI",
+        "integrations",
+        "security",
+        "deployment"
+      ],
+      "primaryCta": "Request demo",
+      "closestTransfers": [
+        "Complex SaaS",
+        "advisory",
+        "infrastructure"
+      ],
+      "keywords": [
+        "enterprise",
+        "b2b",
+        "software",
+        "platform",
+        "infrastructure",
+        "sales"
+      ]
+    },
+    {
+      "id": "PA.03",
+      "spine": "PA",
+      "name": "Developer or open-source product",
+      "intent": "Confirm technical fit and reach first success quickly.",
+      "steps": [
+        "Technical problem",
+        "code example",
+        "install",
+        "capabilities",
+        "docs",
+        "community"
+      ],
+      "sections": [
+        "Code-first hero",
+        "quick start",
+        "architecture",
+        "API examples",
+        "benchmarks",
+        "documentation"
+      ],
+      "primaryCta": "Get started",
+      "closestTransfers": [
+        "SaaS",
+        "documentation",
+        "technical community"
+      ],
+      "keywords": [
+        "developer",
+        "product",
+        "open",
+        "source",
+        "api",
+        "sdk",
+        "technical",
+        "documentation"
+      ]
+    },
+    {
+      "id": "PA.04",
+      "spine": "PA",
+      "name": "Single-product launch",
+      "intent": "Understand, desire, and purchase one focused product.",
+      "steps": [
+        "Promise",
+        "reveal",
+        "mechanism",
+        "benefits",
+        "proof",
+        "specifications",
+        "offer"
+      ],
+      "sections": [
+        "Product reveal",
+        "demonstrations",
+        "use cases",
+        "specifications",
+        "reviews",
+        "comparison",
+        "offer"
+      ],
+      "primaryCta": "Buy or preorder",
+      "closestTransfers": [
+        "SaaS launch",
+        "premium ecommerce",
+        "campaign"
+      ],
+      "keywords": [
+        "single",
+        "product",
+        "launch",
+        "hardware",
+        "app",
+        "flagship",
+        "preorder"
+      ]
+    },
+    {
+      "id": "CO.01",
+      "spine": "CO",
+      "name": "Ecommerce retailer",
+      "intent": "Discover, compare, and purchase products.",
+      "steps": [
+        "Discovery",
+        "category",
+        "evaluation",
+        "reassurance",
+        "cart",
+        "checkout"
+      ],
+      "sections": [
+        "Search",
+        "collections",
+        "product grid",
+        "product detail",
+        "reviews",
+        "shipping",
+        "returns",
+        "recommendations"
+      ],
+      "primaryCta": "Add to cart",
+      "closestTransfers": [
+        "Wholesale",
+        "subscription commerce",
+        "marketplace"
+      ],
+      "keywords": [
+        "ecommerce",
+        "retailer",
+        "shop",
+        "products",
+        "store"
+      ]
+    },
+    {
+      "id": "CO.02",
+      "spine": "CO",
+      "name": "Subscription commerce",
+      "intent": "Understand recurring value and choose a suitable plan.",
+      "steps": [
+        "Recurring need",
+        "plan mechanism",
+        "contents",
+        "flexibility",
+        "proof",
+        "selection"
+      ],
+      "sections": [
+        "How it works",
+        "plans",
+        "included products",
+        "schedule",
+        "savings",
+        "reviews",
+        "cancellation policy"
+      ],
+      "primaryCta": "Choose a plan",
+      "closestTransfers": [
+        "Ecommerce",
+        "membership",
+        "SaaS pricing"
+      ],
+      "keywords": [
+        "subscription",
+        "commerce",
+        "meal",
+        "box",
+        "replenishment",
+        "curated",
+        "membership",
+        "recurring"
+      ]
+    },
+    {
+      "id": "CO.03",
+      "spine": "CO",
+      "name": "Wholesale or B2B catalog",
+      "intent": "Assess range, specifications, availability, and commercial terms.",
+      "steps": [
+        "Category",
+        "specification",
+        "availability",
+        "commercial reassurance",
+        "account or quote"
+      ],
+      "sections": [
+        "Catalog",
+        "specifications",
+        "industries",
+        "minimum orders",
+        "logistics",
+        "certifications",
+        "pricing"
+      ],
+      "primaryCta": "Request quote",
+      "closestTransfers": [
+        "Ecommerce",
+        "industrial B2B",
+        "directory"
+      ],
+      "keywords": [
+        "wholesale",
+        "b2b",
+        "catalog",
+        "industrial",
+        "products",
+        "supplier"
+      ]
+    },
+    {
+      "id": "SM.01",
+      "spine": "SM",
+      "name": "Marketplace",
+      "intent": "Find and transact with the right supplier, listing, or provider.",
+      "steps": [
+        "Express need",
+        "search",
+        "filter",
+        "compare",
+        "trust",
+        "transact"
+      ],
+      "sections": [
+        "Search",
+        "filters",
+        "results",
+        "profiles",
+        "ratings",
+        "availability",
+        "messaging",
+        "safeguards"
+      ],
+      "primaryCta": "Book, buy, or hire",
+      "closestTransfers": [
+        "Directory",
+        "real estate",
+        "travel",
+        "jobs"
+      ],
+      "keywords": [
+        "marketplace",
+        "freelancer",
+        "rental",
+        "provider",
+        "resale"
+      ]
+    },
+    {
+      "id": "SM.02",
+      "spine": "SM",
+      "name": "Directory or listings",
+      "intent": "Locate and evaluate a suitable entity.",
+      "steps": [
+        "Search",
+        "filter",
+        "listing summary",
+        "detail",
+        "contact"
+      ],
+      "sections": [
+        "Taxonomy",
+        "search",
+        "filters",
+        "results",
+        "maps",
+        "profiles",
+        "reviews",
+        "contact details"
+      ],
+      "primaryCta": "View listing",
+      "closestTransfers": [
+        "Marketplace",
+        "local discovery",
+        "real estate"
+      ],
+      "keywords": [
+        "directory",
+        "listings",
+        "local",
+        "discovery",
+        "profiles"
+      ]
+    },
+    {
+      "id": "SM.03",
+      "spine": "SM",
+      "name": "Real estate",
+      "intent": "Discover properties, assess fit, and arrange the next step.",
+      "steps": [
+        "Search area",
+        "filter",
+        "shortlist",
+        "property detail",
+        "neighborhood",
+        "inquiry"
+      ],
+      "sections": [
+        "Map",
+        "listings",
+        "galleries",
+        "specifications",
+        "neighborhood",
+        "financing",
+        "agent profile"
+      ],
+      "primaryCta": "Schedule viewing",
+      "closestTransfers": [
+        "Marketplace",
+        "travel inventory",
+        "directory"
+      ],
+      "keywords": [
+        "real",
+        "estate",
+        "property",
+        "homes",
+        "apartment",
+        "agent"
+      ]
+    },
+    {
+      "id": "SM.04",
+      "spine": "SM",
+      "name": "Jobs or recruiting",
+      "intent": "Find a suitable role or candidate and begin an application.",
+      "steps": [
+        "Search",
+        "role fit",
+        "employer evidence",
+        "requirements",
+        "application"
+      ],
+      "sections": [
+        "Job search",
+        "filters",
+        "role detail",
+        "company profile",
+        "culture",
+        "benefits",
+        "application"
+      ],
+      "primaryCta": "Apply",
+      "closestTransfers": [
+        "Directory",
+        "marketplace",
+        "education pathway"
+      ],
+      "keywords": [
+        "jobs",
+        "recruiting",
+        "careers",
+        "employment",
+        "candidates"
+      ]
+    },
+    {
+      "id": "SM.05",
+      "spine": "SM",
+      "name": "Comparison or review",
+      "intent": "Reduce uncertainty between competing choices.",
+      "steps": [
+        "Criteria",
+        "shortlist",
+        "compare",
+        "tradeoffs",
+        "recommendation",
+        "referral"
+      ],
+      "sections": [
+        "Category guide",
+        "filters",
+        "comparison table",
+        "reviews",
+        "methodology",
+        "recommendations"
+      ],
+      "primaryCta": "Compare options",
+      "closestTransfers": [
+        "Commerce",
+        "directory",
+        "editorial"
+      ],
+      "keywords": [
+        "comparison",
+        "review",
+        "affiliate",
+        "recommendation",
+        "products"
+      ]
+    },
+    {
+      "id": "CS.01",
+      "spine": "CS",
+      "name": "Publication or media",
+      "intent": "Discover useful material and return regularly.",
+      "steps": [
+        "Headline discovery",
+        "consumption",
+        "related exploration",
+        "subscription"
+      ],
+      "sections": [
+        "Lead stories",
+        "topics",
+        "articles",
+        "authors",
+        "related content",
+        "archive",
+        "newsletter"
+      ],
+      "primaryCta": "Read or subscribe",
+      "closestTransfers": [
+        "Creator",
+        "research library",
+        "nonprofit stories"
+      ],
+      "keywords": [
+        "publication",
+        "media",
+        "magazine",
+        "news",
+        "editorial"
+      ]
+    },
+    {
+      "id": "CS.02",
+      "spine": "CS",
+      "name": "Documentation or knowledge base",
+      "intent": "Answer a question or complete a technical task.",
+      "steps": [
+        "Orient",
+        "search",
+        "follow steps",
+        "verify",
+        "troubleshoot",
+        "continue"
+      ],
+      "sections": [
+        "Search",
+        "navigation tree",
+        "quick start",
+        "guides",
+        "reference",
+        "examples",
+        "troubleshooting"
+      ],
+      "primaryCta": "Follow next step",
+      "closestTransfers": [
+        "Developer product",
+        "public service",
+        "learning"
+      ],
+      "keywords": [
+        "documentation",
+        "knowledge",
+        "base",
+        "help",
+        "support",
+        "guides",
+        "developer"
+      ]
+    },
+    {
+      "id": "CS.03",
+      "spine": "CS",
+      "name": "Research library or data resource",
+      "intent": "Find, evaluate, and use authoritative information.",
+      "steps": [
+        "Search",
+        "filter",
+        "inspect provenance",
+        "analyze",
+        "save or export"
+      ],
+      "sections": [
+        "Search",
+        "taxonomy",
+        "result summaries",
+        "source detail",
+        "methodology",
+        "citations",
+        "collections"
+      ],
+      "primaryCta": "Analyze or export",
+      "closestTransfers": [
+        "Documentation",
+        "directory",
+        "professional publication"
+      ],
+      "keywords": [
+        "research",
+        "library",
+        "data",
+        "resource",
+        "database",
+        "knowledge",
+        "citations"
+      ]
+    },
+    {
+      "id": "LM.01",
+      "spine": "LM",
+      "name": "Course or cohort",
+      "intent": "Decide whether a learning experience will produce the desired outcome.",
+      "steps": [
+        "Transformation",
+        "curriculum",
+        "teaching method",
+        "proof",
+        "logistics",
+        "enrollment"
+      ],
+      "sections": [
+        "Outcome",
+        "curriculum",
+        "instructors",
+        "student work",
+        "testimonials",
+        "schedule",
+        "pricing",
+        "FAQ"
+      ],
+      "primaryCta": "Enroll",
+      "closestTransfers": [
+        "Membership",
+        "onboarding",
+        "event"
+      ],
+      "keywords": [
+        "course",
+        "cohort",
+        "education",
+        "training",
+        "learning"
+      ]
+    },
+    {
+      "id": "LM.02",
+      "spine": "LM",
+      "name": "School or university",
+      "intent": "Evaluate programs, institutional fit, cost, and application requirements.",
+      "steps": [
+        "Possibility",
+        "programs",
+        "experience",
+        "outcomes",
+        "admissions",
+        "application"
+      ],
+      "sections": [
+        "Programs",
+        "campus",
+        "faculty",
+        "outcomes",
+        "fees",
+        "aid",
+        "admissions",
+        "events"
+      ],
+      "primaryCta": "Apply",
+      "closestTransfers": [
+        "Course",
+        "public service",
+        "event"
+      ],
+      "keywords": [
+        "school",
+        "university",
+        "college",
+        "training",
+        "institution",
+        "admissions"
+      ]
+    },
+    {
+      "id": "LM.03",
+      "spine": "LM",
+      "name": "Community or membership",
+      "intent": "Judge whether a group provides useful access, identity, or belonging.",
+      "steps": [
+        "Shared identity",
+        "member value",
+        "activity preview",
+        "norms",
+        "membership"
+      ],
+      "sections": [
+        "Benefits",
+        "member stories",
+        "discussions",
+        "events",
+        "resources",
+        "rules",
+        "membership levels"
+      ],
+      "primaryCta": "Join",
+      "closestTransfers": [
+        "Course",
+        "nonprofit",
+        "creator subscription"
+      ],
+      "keywords": [
+        "community",
+        "membership",
+        "club",
+        "group",
+        "network",
+        "belonging"
+      ]
+    },
+    {
+      "id": "BA.01",
+      "spine": "BA",
+      "name": "Hospitality or travel",
+      "intent": "Select and reserve an accommodation or experience.",
+      "steps": [
+        "Inspiration",
+        "availability",
+        "options",
+        "amenities",
+        "reassurance",
+        "booking"
+      ],
+      "sections": [
+        "Destination",
+        "availability",
+        "rooms",
+        "packages",
+        "amenities",
+        "experiences",
+        "reviews",
+        "policies"
+      ],
+      "primaryCta": "Check availability",
+      "closestTransfers": [
+        "Real estate",
+        "event",
+        "marketplace"
+      ],
+      "keywords": [
+        "hospitality",
+        "travel",
+        "hotel",
+        "resort",
+        "vacation"
+      ]
+    },
+    {
+      "id": "BA.02",
+      "spine": "BA",
+      "name": "Restaurant or food business",
+      "intent": "Decide what to eat and how to obtain it.",
+      "steps": [
+        "Appetite",
+        "menu",
+        "atmosphere",
+        "location",
+        "availability",
+        "reserve or order"
+      ],
+      "sections": [
+        "Menu",
+        "photography",
+        "story",
+        "reviews",
+        "location",
+        "hours",
+        "reservation",
+        "ordering"
+      ],
+      "primaryCta": "Reserve or order",
+      "closestTransfers": [
+        "Hospitality",
+        "local service",
+        "ecommerce"
+      ],
+      "keywords": [
+        "restaurant",
+        "food",
+        "dining",
+        "menu",
+        "reservation",
+        "order"
+      ]
+    },
+    {
+      "id": "BA.03",
+      "spine": "BA",
+      "name": "Event, conference, or venue",
+      "intent": "Decide whether attendance is worthwhile and practical.",
+      "steps": [
+        "Promise",
+        "speakers or performers",
+        "program",
+        "proof",
+        "logistics",
+        "ticket"
+      ],
+      "sections": [
+        "Hero",
+        "agenda",
+        "speakers",
+        "venue",
+        "sponsors",
+        "testimonials",
+        "travel",
+        "ticket levels"
+      ],
+      "primaryCta": "Register",
+      "closestTransfers": [
+        "Course",
+        "hospitality",
+        "membership"
+      ],
+      "keywords": [
+        "event",
+        "conference",
+        "venue",
+        "concert",
+        "tickets",
+        "registration"
+      ]
+    },
+    {
+      "id": "TU.01",
+      "spine": "TU",
+      "name": "Web application or dashboard",
+      "intent": "Monitor state and perform recurring work.",
+      "steps": [
+        "Current state",
+        "priorities",
+        "task execution",
+        "feedback",
+        "history"
+      ],
+      "sections": [
+        "Navigation",
+        "status",
+        "work queue",
+        "task workspace",
+        "notifications",
+        "history",
+        "settings"
+      ],
+      "primaryCta": "Complete next task",
+      "closestTransfers": [
+        "Client portal",
+        "internal tool",
+        "public service"
+      ],
+      "keywords": [
+        "web",
+        "application",
+        "dashboard",
+        "analytics",
+        "workflow",
+        "software"
+      ]
+    },
+    {
+      "id": "TU.02",
+      "spine": "TU",
+      "name": "Customer or client portal",
+      "intent": "Manage an existing account, project, service, or relationship.",
+      "steps": [
+        "Authenticate",
+        "status",
+        "action",
+        "records",
+        "support"
+      ],
+      "sections": [
+        "Account summary",
+        "current work",
+        "documents",
+        "billing",
+        "messages",
+        "support"
+      ],
+      "primaryCta": "Complete account task",
+      "closestTransfers": [
+        "Dashboard",
+        "membership",
+        "healthcare portal"
+      ],
+      "keywords": [
+        "customer",
+        "client",
+        "portal",
+        "account",
+        "projects",
+        "billing",
+        "documents",
+        "support"
+      ]
+    },
+    {
+      "id": "TU.03",
+      "spine": "TU",
+      "name": "Public service or government",
+      "intent": "Determine eligibility, understand requirements, and complete a civic task.",
+      "steps": [
+        "Identify need",
+        "eligibility",
+        "requirements",
+        "submit",
+        "confirm",
+        "track"
+      ],
+      "sections": [
+        "Service finder",
+        "eligibility",
+        "requirements",
+        "forms",
+        "status",
+        "locations",
+        "assistance"
+      ],
+      "primaryCta": "Apply or submit",
+      "closestTransfers": [
+        "Documentation",
+        "portal",
+        "nonprofit service"
+      ],
+      "keywords": [
+        "public",
+        "service",
+        "government",
+        "civic",
+        "application",
+        "eligibility",
+        "benefits"
+      ]
+    },
+    {
+      "id": "MI.01",
+      "spine": "MI",
+      "name": "Nonprofit or charity",
+      "intent": "Understand the issue, trust the organization, and contribute.",
+      "steps": [
+        "Human stakes",
+        "mission",
+        "approach",
+        "evidence",
+        "participation"
+      ],
+      "sections": [
+        "Mission",
+        "programs",
+        "impact",
+        "stories",
+        "accountability",
+        "events",
+        "donation options"
+      ],
+      "primaryCta": "Donate",
+      "closestTransfers": [
+        "Campaign",
+        "community",
+        "publication"
+      ],
+      "keywords": [
+        "nonprofit",
+        "charity",
+        "foundation",
+        "donation",
+        "volunteer",
+        "impact"
+      ]
+    },
+    {
+      "id": "MI.02",
+      "spine": "MI",
+      "name": "Advocacy or campaign",
+      "intent": "Turn agreement into coordinated action.",
+      "steps": [
+        "Issue",
+        "position",
+        "urgency",
+        "evidence",
+        "action",
+        "involvement"
+      ],
+      "sections": [
+        "Position",
+        "proposal",
+        "stories",
+        "updates",
+        "events",
+        "action toolkit",
+        "contribution form"
+      ],
+      "primaryCta": "Take action",
+      "closestTransfers": [
+        "Nonprofit",
+        "event",
+        "membership community"
+      ],
+      "keywords": [
+        "advocacy",
+        "campaign",
+        "political",
+        "cause",
+        "petition",
+        "action"
+      ]
+    }
+  ],
+  "compatibility": {
+    "TL": {
+      "TL": 3,
+      "PA": 2,
+      "CO": 1,
+      "SM": 1,
+      "CS": 1,
+      "LM": 1,
+      "BA": 3,
+      "TU": 1,
+      "MI": 2
+    },
+    "PA": {
+      "TL": 2,
+      "PA": 3,
+      "CO": 2,
+      "SM": 1,
+      "CS": 2,
+      "LM": 1,
+      "BA": 1,
+      "TU": 2,
+      "MI": 1
+    },
+    "CO": {
+      "TL": 1,
+      "PA": 2,
+      "CO": 3,
+      "SM": 2,
+      "CS": 1,
+      "LM": 1,
+      "BA": 2,
+      "TU": 1,
+      "MI": 1
+    },
+    "SM": {
+      "TL": 1,
+      "PA": 1,
+      "CO": 2,
+      "SM": 3,
+      "CS": 1,
+      "LM": 1,
+      "BA": 2,
+      "TU": 2,
+      "MI": 0
+    },
+    "CS": {
+      "TL": 1,
+      "PA": 2,
+      "CO": 1,
+      "SM": 1,
+      "CS": 3,
+      "LM": 2,
+      "BA": 1,
+      "TU": 1,
+      "MI": 2
+    },
+    "LM": {
+      "TL": 1,
+      "PA": 1,
+      "CO": 1,
+      "SM": 1,
+      "CS": 2,
+      "LM": 3,
+      "BA": 2,
+      "TU": 2,
+      "MI": 2
+    },
+    "BA": {
+      "TL": 3,
+      "PA": 1,
+      "CO": 2,
+      "SM": 2,
+      "CS": 1,
+      "LM": 2,
+      "BA": 3,
+      "TU": 2,
+      "MI": 1
+    },
+    "TU": {
+      "TL": 1,
+      "PA": 2,
+      "CO": 1,
+      "SM": 2,
+      "CS": 1,
+      "LM": 2,
+      "BA": 2,
+      "TU": 3,
+      "MI": 2
+    },
+    "MI": {
+      "TL": 2,
+      "PA": 1,
+      "CO": 1,
+      "SM": 0,
+      "CS": 2,
+      "LM": 2,
+      "BA": 1,
+      "TU": 2,
+      "MI": 3
+    }
+  },
+  "transferNotes": {
+    "TL": {
+      "headline": "Trust to lead transfers best to booking and mission-led sites.",
+      "transfer": "Keep service, proof, process, and contact blocks. Replace vertical evidence and the final action."
+    },
+    "PA": {
+      "headline": "Product adoption transfers well to commerce, content, and task utilities.",
+      "transfer": "Keep problem, demonstration, proof, and offer logic. Replace onboarding depth, transaction rules, and product evidence."
+    },
+    "CO": {
+      "headline": "Commerce transfers best to marketplaces, booking, and product adoption.",
+      "transfer": "Keep discovery, evaluation, reassurance, and selection. Replace inventory ownership, checkout, fulfillment, and account rules."
+    },
+    "SM": {
+      "headline": "Search and match transfers well to commerce, booking, and task utilities.",
+      "transfer": "Keep query, filter, comparison, and detail views. Replace the entity model, ranking logic, trust signals, and transaction endpoint."
+    },
+    "CS": {
+      "headline": "Content subscription transfers well to learning, product education, and mission sites.",
+      "transfer": "Keep discovery, hierarchy, related content, and return loops. Replace editorial authority, taxonomy, and subscription promise."
+    },
+    "LM": {
+      "headline": "Learning membership transfers broadly to content, booking, utility, and mission systems.",
+      "transfer": "Keep transformation, proof, commitment, and participation. Replace curriculum, member state, access rules, and completion signals."
+    },
+    "BA": {
+      "headline": "Booking attendance transfers directly to service lead generation and strongly to marketplaces.",
+      "transfer": "Keep availability, option comparison, reassurance, and reservation. Replace inventory, scheduling constraints, and cancellation policy."
+    },
+    "TU": {
+      "headline": "Task utility transfers well to product adoption, directories, learning, and public service.",
+      "transfer": "Keep orientation, inputs, feedback, and history. Replace permissions, records, actions, and state transitions."
+    },
+    "MI": {
+      "headline": "Mission impact transfers best to trust-led, content, learning, and public-service sites.",
+      "transfer": "Keep stakes, credibility, evidence, and participation. Replace beneficiary model, impact claims, contribution rules, and reporting."
+    }
+  },
+  "skins": [
+    "Minimal and quiet",
+    "Corporate and institutional",
+    "Editorial",
+    "Luxury",
+    "Playful and illustrative",
+    "Technical and utilitarian",
+    "Catalog and grid-led",
+    "Cinematic and immersive",
+    "Heritage and craft",
+    "Data-dense",
+    "Conversational",
+    "Experimental"
+  ],
+  "formats": [
+    {
+      "name": "Landing page",
+      "summary": "One audience, one action"
+    },
+    {
+      "name": "One-page brochure",
+      "summary": "Compact trust and contact"
+    },
+    {
+      "name": "Authority site",
+      "summary": "Multi-page research journey"
+    },
+    {
+      "name": "Campaign microsite",
+      "summary": "One launch, cause, or event"
+    },
+    {
+      "name": "Conversion funnel",
+      "summary": "Controlled step sequence"
+    },
+    {
+      "name": "Content hub",
+      "summary": "Growing knowledge library"
+    },
+    {
+      "name": "Directory shell",
+      "summary": "Search and compare entities"
+    },
+    {
+      "name": "Portal shell",
+      "summary": "Authenticated recurring tasks"
+    }
+  ]
+}

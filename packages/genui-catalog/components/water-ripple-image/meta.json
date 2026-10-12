@@ -1,0 +1,35 @@
+{
+  "id": "water-ripple-image",
+  "name": "Water Ripple Image",
+  "category": "hover",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; click-driven concentric rings with a refraction read make it distinct from ripple-distortion's pointer-move noise, and masked clones replace WebGL so it ships dependency-free on any media.",
+  "entry": "components/water-ripple-image/index.ts",
+  "css": "components/water-ripple-image/styles.css",
+  "demo": "components/water-ripple-image/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "radius": { "type": "number", "default": 240, "minimum": 1, "description": "Radius a ring reaches by the end of its life, in px." },
+      "duration": { "type": "number", "default": 1800, "minimum": 1, "description": "Lifetime of one ring, in ms." },
+      "rings": { "type": "number", "default": 3, "minimum": 1, "maximum": 6, "description": "Concentric rings per drop." },
+      "spacing": { "type": "number", "default": 160, "minimum": 0, "description": "Delay between the rings of one drop, in ms." },
+      "strength": { "type": "number", "default": 0.05, "minimum": 0, "maximum": 0.3, "description": "Peak refraction: how far a crest magnifies (and a trough shrinks) the image." },
+      "band": { "type": "number", "default": 16, "minimum": 1, "description": "Half-width of a ring band, in px." },
+      "glint": { "type": "number", "default": 0.2, "minimum": 0, "maximum": 1, "description": "How much a crest brightens and a trough darkens." },
+      "maxDrops": { "type": "number", "default": 4, "minimum": 1, "description": "Drops alive at once; the oldest is cleared first." },
+      "autoDrip": { "type": "number", "default": 0, "minimum": 0, "description": "Drop at a random spot every this many ms while on screen; 0 turns it off." }
+    }
+  },
+  "a11y": [
+    "Every ring is an aria-hidden, inert clone of the media with its ids stripped, so screen readers meet the image's label once and no cloned link or control can take focus.",
+    "Rings ignore pointer events and nothing calls preventDefault, so a click still reaches any link or control inside the host.",
+    "The host is not made focusable: the ripple is decoration only and never carries information.",
+    "Reduced motion (at mount or changed live) clears every ring, stops the loop and ignores clicks; forced-colors mode hides the rings."
+  ],
+  "reducedMotion": "static"
+}

@@ -1,0 +1,39 @@
+/* particle-text — clean-room, from the effect description "Type dissolves into particles" only. Every selector is under .genui-particle-text. */
+
+:where(.genui-particle-text) {
+  position: relative;
+}
+
+/* The real text stays in place (and in the accessibility tree); only its paint is hidden. */
+.genui-particle-text.genui-particle-text--active {
+  -webkit-text-fill-color: transparent;
+}
+
+.genui-particle-text--active::selection,
+.genui-particle-text--active ::selection {
+  -webkit-text-fill-color: currentcolor;
+}
+
+.genui-particle-text__canvas {
+  position: absolute;
+  display: block;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-particle-text .genui-particle-text__canvas {
+    display: none;
+  }
+  .genui-particle-text.genui-particle-text--active {
+    -webkit-text-fill-color: currentcolor;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-particle-text .genui-particle-text__canvas {
+    display: none;
+  }
+  .genui-particle-text.genui-particle-text--active {
+    -webkit-text-fill-color: CanvasText;
+  }
+}

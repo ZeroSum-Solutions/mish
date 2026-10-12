@@ -1,0 +1,90 @@
+{
+  "contextRevision": 1,
+  "checks": [
+    {
+      "checkId": "contrast-strict",
+      "required": true,
+      "severity": "high",
+      "requiredBasis": {
+        "type": "mandatory",
+        "criterionId": "core.text-contrast"
+      },
+      "provenance": {
+        "origin": "user-confirmed",
+        "derivation": "project-input",
+        "source": null,
+        "rationale": "Owner declaration"
+      },
+      "evidenceTypes": [
+        "computed-style"
+      ],
+      "sourceCriteria": [],
+      "kind": "mechanical",
+      "parameters": {
+        "type": "contrast",
+        "normalTextMinRatio": 7,
+        "largeTextMinRatio": 4.5,
+        "viewports": [
+          320,
+          375,
+          768,
+          1440,
+          1920
+        ]
+      }
+    },
+    {
+      "checkId": "focus-optional",
+      "required": false,
+      "severity": "medium",
+      "requiredBasis": null,
+      "provenance": {
+        "origin": "user-confirmed",
+        "derivation": "project-input",
+        "source": null,
+        "rationale": "Owner declaration"
+      },
+      "evidenceTypes": [
+        "keyboard-trace"
+      ],
+      "sourceCriteria": [],
+      "kind": "mechanical",
+      "parameters": {
+        "type": "keyboard-focus",
+        "requireVisibleFocus": true,
+        "requireFocusReturn": false,
+        "viewports": [
+          320,
+          375,
+          768,
+          1440
+        ]
+      }
+    },
+    {
+      "checkId": "hierarchy",
+      "required": false,
+      "severity": "low",
+      "requiredBasis": null,
+      "provenance": {
+        "origin": "user-confirmed",
+        "derivation": "project-input",
+        "source": null,
+        "rationale": "Owner declaration"
+      },
+      "evidenceTypes": [
+        "judgment-rationale"
+      ],
+      "sourceCriteria": [],
+      "kind": "judgment",
+      "parameters": {
+        "type": "criterion",
+        "criterion": "The booking CTA leads the page hierarchy."
+      }
+    }
+  ],
+  "schema": "workbench-rubric/1",
+  "projectId": "p",
+  "revision": 3,
+  "updatedAt": "2026-10-07T07:00:00.000Z"
+}

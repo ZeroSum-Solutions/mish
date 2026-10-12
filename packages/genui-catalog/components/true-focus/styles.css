@@ -1,0 +1,105 @@
+/* true-focus — clean-room, from the effect description only. Every selector is under .genui-true-focus. */
+
+:where(.genui-true-focus) {
+  position: relative;
+}
+
+.genui-true-focus__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.genui-true-focus__word {
+  display: inline-block;
+  filter: blur(var(--genui-true-focus-blur, 5px));
+  opacity: var(--genui-true-focus-dim, .55);
+  transition:
+    filter var(--genui-true-focus-duration, 500ms) ease,
+    opacity var(--genui-true-focus-duration, 500ms) ease;
+}
+
+.genui-true-focus .genui-true-focus__word--active,
+.genui-true-focus.genui-true-focus--idle .genui-true-focus__word {
+  filter: none;
+  opacity: 1;
+}
+
+.genui-true-focus__frame {
+  --genui-true-focus-pad: .18em;
+  --genui-true-focus-c: var(--genui-true-focus-color, #8ab4ff);
+  --genui-true-focus-l: .42em;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(var(--genui-true-focus-w, 0px) + 2 * var(--genui-true-focus-pad));
+  height: calc(var(--genui-true-focus-h, 0px) + 2 * var(--genui-true-focus-pad));
+  transform: translate(
+    calc(var(--genui-true-focus-x, 0px) - var(--genui-true-focus-pad)),
+    calc(var(--genui-true-focus-y, 0px) - var(--genui-true-focus-pad))
+  );
+  pointer-events: none;
+  background:
+    linear-gradient(var(--genui-true-focus-c), var(--genui-true-focus-c)) left top / var(--genui-true-focus-l) 3px,
+    linear-gradient(var(--genui-true-focus-c), var(--genui-true-focus-c)) left top / 3px var(--genui-true-focus-l),
+    linear-gradient(var(--genui-true-focus-c), var(--genui-true-focus-c)) right top / var(--genui-true-focus-l) 3px,
+    linear-gradient(var(--genui-true-focus-c), var(--genui-true-focus-c)) right top / 3px var(--genui-true-focus-l),
+    linear-gradient(var(--genui-true-focus-c), var(--genui-true-focus-c)) left bottom / var(--genui-true-focus-l) 3px,
+    linear-gradient(var(--genui-true-focus-c), var(--genui-true-focus-c)) left bottom / 3px var(--genui-true-focus-l),
+    linear-gradient(var(--genui-true-focus-c), var(--genui-true-focus-c)) right bottom / var(--genui-true-focus-l) 3px,
+    linear-gradient(var(--genui-true-focus-c), var(--genui-true-focus-c)) right bottom / 3px var(--genui-true-focus-l);
+  background-repeat: no-repeat;
+  border-radius: 3px;
+  filter: drop-shadow(0 0 5px var(--genui-true-focus-glow, rgba(138, 180, 255, .55)));
+  transition:
+    transform var(--genui-true-focus-duration, 500ms) cubic-bezier(.4, 0, .2, 1),
+    width var(--genui-true-focus-duration, 500ms) cubic-bezier(.4, 0, .2, 1),
+    height var(--genui-true-focus-duration, 500ms) cubic-bezier(.4, 0, .2, 1),
+    opacity var(--genui-true-focus-duration, 500ms) ease;
+}
+
+.genui-true-focus.genui-true-focus--idle .genui-true-focus__frame,
+.genui-true-focus.genui-true-focus--no-frame .genui-true-focus__frame {
+  opacity: 0;
+}
+
+.genui-true-focus.genui-true-focus--reduced .genui-true-focus__word {
+  filter: none;
+  opacity: 1;
+  transition: none;
+}
+
+.genui-true-focus.genui-true-focus--reduced .genui-true-focus__frame {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-true-focus .genui-true-focus__word {
+    filter: none;
+    opacity: 1;
+    transition: none;
+  }
+
+  .genui-true-focus .genui-true-focus__frame {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-true-focus .genui-true-focus__word {
+    filter: none;
+    opacity: 1;
+  }
+
+  .genui-true-focus .genui-true-focus__frame {
+    background: none;
+    border: 2px solid CanvasText;
+    filter: none;
+  }
+}

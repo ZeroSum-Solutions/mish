@@ -1,0 +1,141 @@
+/* accordion-gallery — clean-room, component-specs.md §5. Every selector is under .genui-accordion-gallery. */
+
+:where(.genui-accordion-gallery) {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 4px;
+  min-height: var(--genui-accordion-gallery-height, 420px);
+  overflow: hidden;
+  /* Lets panels below read the host's own rendered width via `cqi`, independent of the
+     viewport — this is what makes `--genui-accordion-gallery-stack` able to lower the
+     baked-in 640px breakpoint (see the media query at the bottom) instead of only ever
+     matching it. An element can't be a container for its own size, so the toggle below
+     lives on `.genui-accordion-gallery__panel` (a descendant), not here. */
+  container-type: inline-size;
+  container-name: genui-accordion-gallery;
+}
+
+.genui-accordion-gallery__panel {
+  position: relative;
+  /*
+   * `--genui-accordion-gallery-stack-flag` is a container-query-driven toggle in [0, 1]:
+   * 1 while the host's own inline size (100cqi) is at or above `--genui-accordion-gallery-
+   * stack`, 0 once it drops below. `stack` is clamped to <= 640px in index.ts (toVars), so
+   * this can only ever make panels stack *earlier* than the baked-in 640px media-query
+   * default below, never later.
+   */
+  --genui-accordion-gallery-stack-flag: clamp(0, calc((100cqi - var(--genui-accordion-gallery-stack, 640px)) / 1px), 1);
+  flex-grow: var(--genui-accordion-gallery-stack-flag);
+  flex-shrink: 1;
+  flex-basis: calc((1 - var(--genui-accordion-gallery-stack-flag)) * 100%);
+  min-height: calc((1 - var(--genui-accordion-gallery-stack-flag)) * 88px);
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 12px;
+  outline-offset: 2px;
+  transition:
+    flex-grow var(--genui-accordion-gallery-duration, 500ms) var(--genui-accordion-gallery-easing, cubic-bezier(.2, .8, .2, 1)),
+    min-height var(--genui-accordion-gallery-duration, 500ms) var(--genui-accordion-gallery-easing, cubic-bezier(.2, .8, .2, 1));
+}
+
+/* Below 220px of container width there is no room for the link text; a real (static)
+   @container size query, distinct from the dynamic stack-flag toggle above. */
+@container genui-accordion-gallery (max-width: 220px) {
+  .genui-accordion-gallery__link {
+    display: none;
+  }
+}
+
+.genui-accordion-gallery__panel:hover,
+.genui-accordion-gallery__panel:focus-within,
+.genui-accordion-gallery__panel.is-active {
+  flex-grow: calc(var(--genui-accordion-gallery-expand, 4) * var(--genui-accordion-gallery-stack-flag, 1));
+  min-height: calc((1 - var(--genui-accordion-gallery-stack-flag, 1)) * 168px);
+}
+
+.genui-accordion-gallery:has(.genui-accordion-gallery__panel:hover, .genui-accordion-gallery__panel:focus-within)
+  .genui-accordion-gallery__panel.is-active:not(:hover):not(:focus-within) {
+  flex-grow: 1;
+}
+
+.genui-accordion-gallery__media {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(var(--genui-accordion-gallery-gray, 1));
+  transition: filter var(--genui-accordion-gallery-duration, 500ms) var(--genui-accordion-gallery-easing, cubic-bezier(.2, .8, .2, 1));
+}
+
+.genui-accordion-gallery__panel:hover .genui-accordion-gallery__media,
+.genui-accordion-gallery__panel:focus-within .genui-accordion-gallery__media,
+.genui-accordion-gallery__panel.is-active .genui-accordion-gallery__media {
+  filter: grayscale(0);
+}
+
+.genui-accordion-gallery__label {
+  position: absolute;
+  inset: auto 0 0 0;
+  padding: 16px 14px;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, .82), transparent 80%);
+  font: 600 15px/1.3 system-ui, sans-serif;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity var(--genui-accordion-gallery-duration, 500ms), transform var(--genui-accordion-gallery-duration, 500ms);
+}
+
+.genui-accordion-gallery__panel:hover .genui-accordion-gallery__label,
+.genui-accordion-gallery__panel:focus-within .genui-accordion-gallery__label,
+.genui-accordion-gallery__panel.is-active .genui-accordion-gallery__label {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.genui-accordion-gallery__link {
+  display: inline-block;
+  margin-top: 4px;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 400;
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-accordion-gallery__panel,
+  .genui-accordion-gallery__media,
+  .genui-accordion-gallery__label {
+    transition-duration: 0s;
+  }
+}
+
+@media (max-width: 640px) {
+  :where(.genui-accordion-gallery) {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .genui-accordion-gallery__panel {
+    flex: none;
+    height: 88px;
+  }
+
+  .genui-accordion-gallery__panel:hover,
+  .genui-accordion-gallery__panel:focus-within,
+  .genui-accordion-gallery__panel.is-active {
+    flex-grow: 0;
+    height: 168px;
+  }
+
+  .genui-accordion-gallery__media {
+    filter: grayscale(0);
+  }
+
+  .genui-accordion-gallery__label {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,0 +1,177 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-design.ai/schemas/agency-site/app-shell/recipe.v2.json",
+  "title": "app-shell recipe",
+  "description": "A static web-app shell page kind: top nav, grouped side nav, an empty state, one five-row list view, one detail view and a settings page. Mirrors compiler/scripts/families/app-shell/{slots.ts,contract.ts} field for field; run render.test.ts's schema cross-check before trusting either copy alone.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "family", "revision", "brand", "sections"],
+  "sectionOrder": ["app-shell-topnav", "app-shell-sidenav", "app-shell-empty", "app-shell-list", "app-shell-detail", "app-shell-settings"],
+  "$comment": "contract.ts additionally enforces control-character/markup-free plain text on every slot, and that a null appears only where APP_SHELL_NULLABLE_ATOMS (slots.ts) allows it: side-nav groups 3 and 4 as a whole item, and each settings section as a whole item.",
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "family": { "const": "app-shell" },
+    "revision": { "type": "integer", "minimum": 1, "maximum": 9999 },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "descriptor"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "descriptor": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "items"],
+          "properties": {
+            "id": { "const": "app-shell-topnav" },
+            "type": { "const": "top-nav" },
+            "items": {
+              "type": "object", "additionalProperties": false, "required": ["links", "user"],
+              "properties": {
+                "links": { "type": "array", "minItems": 4, "maxItems": 4, "items": { "x-label": true, "type": "string", "minLength": 1, "maxLength": 24 } },
+                "user": { "type": "string", "minLength": 1, "maxLength": 40, "x-mock": true }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "items"],
+          "properties": {
+            "id": { "const": "app-shell-sidenav" },
+            "type": { "const": "side-nav" },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": false,
+              "prefixItems": [
+                { "$ref": "#/$defs/navGroup" },
+                { "$ref": "#/$defs/navGroup" },
+                { "$ref": "#/$defs/navGroupOrNull", "x-atom": "nav-group" },
+                { "$ref": "#/$defs/navGroupOrNull", "x-atom": "nav-group" }
+              ]
+            }
+          }
+        },
+        {
+          "type": ["object", "null"],
+          "x-optional": {
+            "label": "empty state",
+            "dropWhen": "The brief gives this shell nothing to show yet: no zero-data heading, body or call to action for an empty list.",
+            "keepWhen": "The brief describes what a user sees before any data exists (a heading, body copy and a call to action to create the first item).",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": ["id", "type", "text"],
+          "properties": {
+            "id": { "const": "app-shell-empty" },
+            "type": { "const": "empty-state" },
+            "text": {
+              "type": "object", "additionalProperties": false, "required": ["heading", "body", "cta"],
+              "properties": {
+                "heading": { "type": "string", "minLength": 1, "maxLength": 60 },
+                "body": { "type": "string", "minLength": 1, "maxLength": 160 },
+                "cta": { "type": "string", "minLength": 1, "maxLength": 32 }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text", "items"],
+          "properties": {
+            "id": { "const": "app-shell-list" },
+            "type": { "const": "list-view" },
+            "text": {
+              "type": "object", "additionalProperties": false, "required": ["heading"],
+              "properties": { "heading": { "type": "string", "minLength": 1, "maxLength": 60 } }
+            },
+            "items": {
+              "type": "array", "minItems": 5, "maxItems": 5,
+              "items": { "$ref": "#/$defs/listRow" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text", "items"],
+          "properties": {
+            "id": { "const": "app-shell-detail" },
+            "type": { "const": "detail-view" },
+            "text": {
+              "type": "object", "additionalProperties": false, "required": ["heading"],
+              "properties": { "heading": { "type": "string", "minLength": 1, "maxLength": 60, "x-mock": true } }
+            },
+            "items": {
+              "type": "array", "minItems": 5, "maxItems": 5,
+              "items": { "$ref": "#/$defs/detailPair" }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "items"],
+          "properties": {
+            "id": { "const": "app-shell-settings" },
+            "type": { "const": "settings" },
+            "items": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 3,
+              "items": { "$ref": "#/$defs/settingsSectionOrNull", "x-atom": "settings-section" }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "navGroup": {
+      "type": "object", "additionalProperties": false, "required": ["heading", "links"],
+      "properties": {
+        "heading": { "x-label": true, "type": "string", "minLength": 1, "maxLength": 24 },
+        "links": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "x-label": true, "type": "string", "minLength": 1, "maxLength": 24 } }
+      }
+    },
+    "navGroupOrNull": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/navGroup" }] },
+    "listRow": {
+      "x-mock": true,
+      "type": "object", "additionalProperties": false, "required": ["name", "status", "owner", "updated"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "status": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "owner": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "updated": { "type": "string", "minLength": 1, "maxLength": 24 }
+      }
+    },
+    "detailPair": {
+      "type": "object", "additionalProperties": false, "required": ["label", "value"],
+      "properties": {
+        "label": { "x-label": true, "type": "string", "minLength": 1, "maxLength": 32 },
+        "value": { "type": "string", "minLength": 1, "maxLength": 80, "x-mock": true }
+      }
+    },
+    "settingsSection": {
+      "type": "object", "additionalProperties": false, "required": ["heading", "body"],
+      "properties": {
+        "heading": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "body": { "type": "string", "minLength": 1, "maxLength": 160 }
+      }
+    },
+    "settingsSectionOrNull": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/settingsSection" }] }
+  }
+}

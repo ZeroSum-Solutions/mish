@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 3 BLOCK 1: a project subframe whose meta refresh carries data to an allowed host. A meta refresh is never a static initial frame load, so it is refused and recorded.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "noHits": true, "consoleOutcome": "inconclusive" } }
+}

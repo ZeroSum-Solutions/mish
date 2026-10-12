@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-10",
+  "businessName": "Millbrook Home Health",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Millbrook Home Health"
+    },
+    {
+      "field": "address",
+      "value": "88 Concord Street, Manchester, New Hampshire"
+    },
+    {
+      "field": "phone",
+      "value": "(603) 555-0132"
+    },
+    {
+      "field": "email",
+      "value": "scheduling@millbrookhomehealth.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 7 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed as a home health agency by the State of New Hampshire"
+    },
+    {
+      "field": "other",
+      "value": "Serves two counties; six schedulers"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample visit-list row shown only to illustrate layout",
+      "text": "E. Whitcombe, nurse R. Bellamy, wound care, 11:00 a.m., completed"
+    }
+  ]
+}

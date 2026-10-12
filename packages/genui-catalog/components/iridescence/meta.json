@@ -1,0 +1,33 @@
+{
+  "id": "iridescence",
+  "name": "Iridescence",
+  "category": "background",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room WebGL port written from the one-line effect description only (no upstream source read): a dependency-free thin-film interference shader gives hero sections and feature panels an opal-like, colour-shifting backdrop, with a static multi-hue CSS gradient when WebGL is unavailable.",
+  "entry": "components/iridescence/index.ts",
+  "css": "components/iridescence/styles.css",
+  "demo": "components/iridescence/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "speed": { "type": "number", "default": 0.4, "minimum": 0, "description": "Flow speed; 0 holds a still frame." },
+      "scale": { "type": "number", "default": 1.1, "minimum": 0.2, "maximum": 10, "description": "Size of the undulation; larger gives finer ripples." },
+      "thickness": { "type": "number", "default": 1.6, "minimum": 0.5, "maximum": 8, "description": "Film thickness: how many colour bands cross each swell." },
+      "hue": { "type": "number", "default": 0, "description": "Rotates the whole palette, in degrees; also shifts the CSS fallback gradient." },
+      "sheen": { "type": "number", "default": 0.55, "minimum": 0, "maximum": 1, "description": "Strength of the specular glint and rim light." },
+      "depth": { "type": "number", "default": 0.45, "minimum": 0, "maximum": 1, "description": "How far the troughs darken, for a gem-like body." },
+      "interactive": { "type": "boolean", "default": true, "description": "Ease the glint toward the pointer while the surface is animating." }
+    }
+  },
+  "a11y": [
+    "The injected canvas is aria-hidden and pointer-events: none; the host's content, reading order and focus behaviour are unchanged.",
+    "The surface runs from deep troughs to bright glints, so text on it should sit on its own dark scrim to keep 4.5:1 contrast (the demo does this).",
+    "The pointer only moves a highlight; no information or action depends on it, and no click or key is intercepted.",
+    "Reduced motion stops the shader loop and the fallback drift and shows one still frame; forced-colors mode hides the canvas and paints the host in Canvas/CanvasText."
+  ],
+  "reducedMotion": "static"
+}

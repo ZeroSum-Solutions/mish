@@ -1,0 +1,5 @@
+{
+  "description": "An img whose src swaps every 90 ms with no controls and no reduced-motion handling: the check fails.",
+  "parameters": {},
+  "motion": "fail"
+}

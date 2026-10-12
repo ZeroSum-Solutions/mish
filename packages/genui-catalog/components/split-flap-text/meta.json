@@ -1,0 +1,35 @@
+{
+  "id": "split-flap-text",
+  "name": "Split Flap Text",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only (\"Airport departure-board flip\"); no upstream source or docs were read, and it ships as dependency-free DOM tiles with CSS 3D flaps and one timer.",
+  "entry": "components/split-flap-text/index.ts",
+  "css": "components/split-flap-text/styles.css",
+  "demo": "components/split-flap-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "flips": { "type": "number", "default": 6, "minimum": 0, "description": "Random characters each tile shows before it settles (each tile uses between half and all of them)." },
+      "flipDuration": { "type": "number", "default": 80, "minimum": 16, "description": "Duration of one flap turn, in ms." },
+      "stagger": { "type": "number", "default": 40, "minimum": 0, "description": "Delay between neighbouring tiles starting, in ms." },
+      "charset": { "type": "string", "default": "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", "description": "Characters the tiles cycle through on the way to their target." },
+      "uppercase": { "type": "boolean", "default": true, "description": "Show the board in capitals; the spoken text keeps its original case." },
+      "replayOnHover": { "type": "boolean", "default": true, "description": "Replay the flip when the pointer enters or the host receives focus." },
+      "loop": { "type": "number", "default": 0, "minimum": 0, "description": "Replay the flip this many ms after it settles; 0 plays once." },
+      "tile": { "type": "string", "default": "#1a1d24", "description": "Tile colour." },
+      "ink": { "type": "string", "default": "#f4efe2", "description": "Character colour." }
+    }
+  },
+  "a11y": [
+    "The original text is kept once, in a visually hidden span that screen readers read; the tile board is aria-hidden, so the random intermediate characters are never announced.",
+    "The host keeps its element, role and heading level; no aria-label or live region is added.",
+    "Choose ink and tile colours that pass 4.5:1 against each other; the defaults (#f4efe2 on #1a1d24) are about 14:1.",
+    "Reduced motion shows the final characters on still tiles: no flips, timers or IntersectionObserver."
+  ],
+  "reducedMotion": "static"
+}

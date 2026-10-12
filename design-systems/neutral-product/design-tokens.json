@@ -1,0 +1,701 @@
+{
+  "schemaVersion": 1,
+  "format": "od-design-tokens/v1",
+  "contract": "TOKEN_SCHEMA",
+  "generatedAt": "2026-09-22T00:00:00.000Z",
+  "source": {
+    "tokensCss": "tokens.css",
+    "tokenContractReport": "source/token-contract.report.json"
+  },
+  "summary": {
+    "totalTokens": 56,
+    "declaredTokens": 56,
+    "sourceBackedTokens": 56,
+    "sourceBackedA1": 26,
+    "fallbackTokens": 0,
+    "aliasTokens": 0,
+    "layerCounts": {
+      "A1-identity": 8,
+      "B-slot": 4,
+      "A2": 26,
+      "A1-structure": 18
+    },
+    "score": 100,
+    "grade": "excellent",
+    "recommendRebuild": false
+  },
+  "tokens": [
+    {
+      "name": "--bg",
+      "value": "#f8f8f7",
+      "type": "color",
+      "layer": "A1-identity",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --bg; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:36"
+      ],
+      "sourceName": "--bg"
+    },
+    {
+      "name": "--surface",
+      "value": "#ffffff",
+      "type": "color",
+      "layer": "A1-identity",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --surface; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:37"
+      ],
+      "sourceName": "--surface"
+    },
+    {
+      "name": "--surface-warm",
+      "value": "#f0f0ee",
+      "type": "color",
+      "layer": "B-slot",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --surface-warm; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:38"
+      ],
+      "sourceName": "--surface-warm"
+    },
+    {
+      "name": "--fg",
+      "value": "#16171a",
+      "type": "color",
+      "layer": "A1-identity",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --fg; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:40"
+      ],
+      "sourceName": "--fg"
+    },
+    {
+      "name": "--fg-2",
+      "value": "#3a3c41",
+      "type": "color",
+      "layer": "B-slot",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --fg-2; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:41"
+      ],
+      "sourceName": "--fg-2"
+    },
+    {
+      "name": "--muted",
+      "value": "#55585f",
+      "type": "color",
+      "layer": "A1-identity",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --muted; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:42"
+      ],
+      "sourceName": "--muted"
+    },
+    {
+      "name": "--meta",
+      "value": "#65686f",
+      "type": "color",
+      "layer": "B-slot",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --meta; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:43"
+      ],
+      "sourceName": "--meta"
+    },
+    {
+      "name": "--border",
+      "value": "#dedfdb",
+      "type": "color",
+      "layer": "A1-identity",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --border; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:45"
+      ],
+      "sourceName": "--border"
+    },
+    {
+      "name": "--border-soft",
+      "value": "#ebebe8",
+      "type": "color",
+      "layer": "B-slot",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --border-soft; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:46"
+      ],
+      "sourceName": "--border-soft"
+    },
+    {
+      "name": "--accent",
+      "value": "#1e5a78",
+      "type": "color",
+      "layer": "A1-identity",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --accent; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:49"
+      ],
+      "sourceName": "--accent"
+    },
+    {
+      "name": "--accent-on",
+      "value": "#ffffff",
+      "type": "color",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --accent-on; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:50"
+      ],
+      "sourceName": "--accent-on"
+    },
+    {
+      "name": "--accent-hover",
+      "value": "#194c66",
+      "type": "color",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --accent-hover; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:51"
+      ],
+      "sourceName": "--accent-hover"
+    },
+    {
+      "name": "--accent-active",
+      "value": "#153f55",
+      "type": "color",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --accent-active; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:52"
+      ],
+      "sourceName": "--accent-active"
+    },
+    {
+      "name": "--success",
+      "value": "#1d7348",
+      "type": "color",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --success; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:54"
+      ],
+      "sourceName": "--success"
+    },
+    {
+      "name": "--warn",
+      "value": "#8a5300",
+      "type": "color",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --warn; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:55"
+      ],
+      "sourceName": "--warn"
+    },
+    {
+      "name": "--danger",
+      "value": "#b3261e",
+      "type": "color",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --danger; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:56"
+      ],
+      "sourceName": "--danger"
+    },
+    {
+      "name": "--font-display",
+      "value": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Noto Sans\", \"Helvetica Neue\", Arial, sans-serif",
+      "type": "fontFamily",
+      "layer": "A1-identity",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --font-display; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:58"
+      ],
+      "sourceName": "--font-display"
+    },
+    {
+      "name": "--font-body",
+      "value": "system-ui, -apple-system, \"Segoe UI\", Roboto, \"Noto Sans\", \"Helvetica Neue\", Arial, sans-serif",
+      "type": "fontFamily",
+      "layer": "A1-identity",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --font-body; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:59"
+      ],
+      "sourceName": "--font-body"
+    },
+    {
+      "name": "--font-mono",
+      "value": "ui-monospace, \"SF Mono\", Menlo, Consolas, \"Liberation Mono\", monospace",
+      "type": "fontFamily",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --font-mono; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:60"
+      ],
+      "sourceName": "--font-mono"
+    },
+    {
+      "name": "--text-xs",
+      "value": "12px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --text-xs; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:62"
+      ],
+      "sourceName": "--text-xs"
+    },
+    {
+      "name": "--text-sm",
+      "value": "14px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --text-sm; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:63"
+      ],
+      "sourceName": "--text-sm"
+    },
+    {
+      "name": "--text-base",
+      "value": "16px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --text-base; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:64"
+      ],
+      "sourceName": "--text-base"
+    },
+    {
+      "name": "--text-lg",
+      "value": "18px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --text-lg; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:65"
+      ],
+      "sourceName": "--text-lg"
+    },
+    {
+      "name": "--text-xl",
+      "value": "22px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --text-xl; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:66"
+      ],
+      "sourceName": "--text-xl"
+    },
+    {
+      "name": "--text-2xl",
+      "value": "28px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --text-2xl; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:67"
+      ],
+      "sourceName": "--text-2xl"
+    },
+    {
+      "name": "--text-3xl",
+      "value": "36px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --text-3xl; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:68"
+      ],
+      "sourceName": "--text-3xl"
+    },
+    {
+      "name": "--text-4xl",
+      "value": "48px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --text-4xl; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:69"
+      ],
+      "sourceName": "--text-4xl"
+    },
+    {
+      "name": "--leading-body",
+      "value": "1.55",
+      "type": "number",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --leading-body; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:71"
+      ],
+      "sourceName": "--leading-body"
+    },
+    {
+      "name": "--leading-tight",
+      "value": "1.2",
+      "type": "number",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --leading-tight; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:72"
+      ],
+      "sourceName": "--leading-tight"
+    },
+    {
+      "name": "--tracking-display",
+      "value": "-0.015em",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --tracking-display; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:73"
+      ],
+      "sourceName": "--tracking-display"
+    },
+    {
+      "name": "--space-1",
+      "value": "4px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --space-1; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:75"
+      ],
+      "sourceName": "--space-1"
+    },
+    {
+      "name": "--space-2",
+      "value": "8px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --space-2; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:76"
+      ],
+      "sourceName": "--space-2"
+    },
+    {
+      "name": "--space-3",
+      "value": "12px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --space-3; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:77"
+      ],
+      "sourceName": "--space-3"
+    },
+    {
+      "name": "--space-4",
+      "value": "16px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --space-4; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:78"
+      ],
+      "sourceName": "--space-4"
+    },
+    {
+      "name": "--space-5",
+      "value": "20px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --space-5; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:79"
+      ],
+      "sourceName": "--space-5"
+    },
+    {
+      "name": "--space-6",
+      "value": "24px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --space-6; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:80"
+      ],
+      "sourceName": "--space-6"
+    },
+    {
+      "name": "--space-8",
+      "value": "32px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --space-8; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:81"
+      ],
+      "sourceName": "--space-8"
+    },
+    {
+      "name": "--space-12",
+      "value": "48px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --space-12; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:82"
+      ],
+      "sourceName": "--space-12"
+    },
+    {
+      "name": "--section-y-desktop",
+      "value": "96px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --section-y-desktop; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:84"
+      ],
+      "sourceName": "--section-y-desktop"
+    },
+    {
+      "name": "--section-y-tablet",
+      "value": "72px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --section-y-tablet; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:85"
+      ],
+      "sourceName": "--section-y-tablet"
+    },
+    {
+      "name": "--section-y-phone",
+      "value": "48px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --section-y-phone; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:86"
+      ],
+      "sourceName": "--section-y-phone"
+    },
+    {
+      "name": "--radius-sm",
+      "value": "6px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --radius-sm; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:88"
+      ],
+      "sourceName": "--radius-sm"
+    },
+    {
+      "name": "--radius-md",
+      "value": "8px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --radius-md; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:89"
+      ],
+      "sourceName": "--radius-md"
+    },
+    {
+      "name": "--radius-lg",
+      "value": "12px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --radius-lg; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:90"
+      ],
+      "sourceName": "--radius-lg"
+    },
+    {
+      "name": "--radius-pill",
+      "value": "9999px",
+      "type": "dimension",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --radius-pill; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:91"
+      ],
+      "sourceName": "--radius-pill"
+    },
+    {
+      "name": "--elev-flat",
+      "value": "none",
+      "type": "shadow",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --elev-flat; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:93"
+      ],
+      "sourceName": "--elev-flat"
+    },
+    {
+      "name": "--elev-ring",
+      "value": "0 0 0 1px var(--border)",
+      "type": "shadow",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --elev-ring; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:94"
+      ],
+      "sourceName": "--elev-ring"
+    },
+    {
+      "name": "--elev-raised",
+      "value": "0 1px 2px rgba(22, 23, 26, 0.06), 0 4px 12px rgba(22, 23, 26, 0.06)",
+      "type": "shadow",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --elev-raised; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:95"
+      ],
+      "sourceName": "--elev-raised"
+    },
+    {
+      "name": "--focus-ring",
+      "value": "0 0 0 2px var(--surface), 0 0 0 4px var(--accent)",
+      "type": "shadow",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --focus-ring; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:97"
+      ],
+      "sourceName": "--focus-ring"
+    },
+    {
+      "name": "--motion-fast",
+      "value": "140ms",
+      "type": "duration",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --motion-fast; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:99"
+      ],
+      "sourceName": "--motion-fast"
+    },
+    {
+      "name": "--motion-base",
+      "value": "200ms",
+      "type": "duration",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --motion-base; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:100"
+      ],
+      "sourceName": "--motion-base"
+    },
+    {
+      "name": "--ease-standard",
+      "value": "cubic-bezier(0.23, 1, 0.32, 1)",
+      "type": "cubicBezier",
+      "layer": "A2",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --ease-standard; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:101"
+      ],
+      "sourceName": "--ease-standard"
+    },
+    {
+      "name": "--container-max",
+      "value": "1200px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --container-max; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:103"
+      ],
+      "sourceName": "--container-max"
+    },
+    {
+      "name": "--container-gutter-desktop",
+      "value": "32px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --container-gutter-desktop; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:104"
+      ],
+      "sourceName": "--container-gutter-desktop"
+    },
+    {
+      "name": "--container-gutter-tablet",
+      "value": "24px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --container-gutter-tablet; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:105"
+      ],
+      "sourceName": "--container-gutter-tablet"
+    },
+    {
+      "name": "--container-gutter-phone",
+      "value": "16px",
+      "type": "dimension",
+      "layer": "A1-structure",
+      "confidence": "high",
+      "reason": "Original Neutral Product tokens.css declares --container-gutter-phone; authored for this archetype, not sampled from a brand.",
+      "sources": [
+        "tokens.css:106"
+      ],
+      "sourceName": "--container-gutter-phone"
+    }
+  ]
+}

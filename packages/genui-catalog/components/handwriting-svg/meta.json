@@ -1,0 +1,36 @@
+{
+  "id": "handwriting-svg",
+  "name": "Handwriting SVG",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/handwriting-svg/index.ts",
+  "css": "components/handwriting-svg/styles.css",
+  "demo": "components/handwriting-svg/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "mode": {
+        "type": "string",
+        "enum": ["paths", "text"],
+        "default": "paths",
+        "description": "paths: author-supplied single-stroke <path> children. text: draws an aria-hidden outline copy of the host's own text."
+      },
+      "duration": { "type": "number", "default": 1800, "minimum": 0, "description": "Total draw duration, in ms, split across the strokes in proportion to their length." },
+      "stagger": { "type": "number", "default": 80, "minimum": 0, "description": "Delay between each stroke's start, in ms." },
+      "strokeWidth": { "type": "number", "default": 2, "minimum": 0 },
+      "colour": { "type": "string", "default": "currentColor" },
+      "fillAfter": { "type": "boolean", "default": false, "description": "Fade a solid fill in once the last stroke finishes drawing." },
+      "easing": { "type": "string", "default": "cubic-bezier(.45,.05,.35,1)" },
+      "threshold": { "type": "number", "default": 0.4, "minimum": 0, "maximum": 1 }
+    }
+  },
+  "a11y": [
+    "In paths mode, mount adds role=\"img\" to the host SVG when it is missing and logs a console warning when there is no aria-label, since the drawn strokes carry no text alternative on their own.",
+    "In text mode, the original text stays in the DOM as visually hidden real text (.genui-handwriting-svg__sr) and the drawn SVG copy is aria-hidden, so screen readers read the phrase once, not twice.",
+    "The drawing plays once, never loops and traps no focus; nothing in the effect is interactive.",
+    "Stroke and fill colour contrast against the background is the author's own responsibility."
+  ],
+  "reducedMotion": "reduced"
+}

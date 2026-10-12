@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 4 (captain decision): page-originated free text is never persisted raw. Console and exception text become records of kind, count, length, digest and a redacted source location; click errors, heading text, contrast samples and font family names appear only as length+digest tokens. Covers Sol's IPv6, IDN and token-shaped URLs.",
+  "cases": { "default-deny": { "allowHosts": [], "consoleOutcome": "fail", "notPassed": true, "secretsAbsent": ["v6S3cret", "v6V4lue", "2606:4700", "idnS3cret", "例え", "deadbeefcafe", "pl41nS3cret", "thr0wnS3cret", "cl1ckS3cret", "h34dS3cret", "c0ntr4stS3cret", "f0ntS3cret"], "evidenceIncludes": "console errors (hashes" } }
+}

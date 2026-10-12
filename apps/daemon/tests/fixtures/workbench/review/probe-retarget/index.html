@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Probe retarget</title>
+</head>
+<body style="margin:0;font:16px system-ui;color:#111;background:#fff">
+<main style="padding:16px">
+<h1>Probe retarget</h1>
+<!-- Sol round 8: on every reload after the first load, the page inserts a working button before the others, so a positional selector captured on the first load points at a different button after the probe reloads. -->
+<script>
+const first = !sessionStorage.getItem('loaded');
+sessionStorage.setItem('loaded', 'yes');
+document.write(first ? '' : '<button style="padding:15px" onclick="document.body.dataset.clicked=1">X</button>');
+</script>
+<button style="padding:15px" onclick="document.body.dataset.clicked=2">A</button>
+<button style="padding:15px">B</button>
+</main>
+</body>
+</html>

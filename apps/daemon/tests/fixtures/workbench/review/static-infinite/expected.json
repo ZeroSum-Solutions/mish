@@ -1,0 +1,5 @@
+{
+  "description": "An infinite animation whose keyframes hold one opacity value: nothing changes on screen, so the check is not-applicable.",
+  "parameters": {},
+  "motion": "not-applicable"
+}

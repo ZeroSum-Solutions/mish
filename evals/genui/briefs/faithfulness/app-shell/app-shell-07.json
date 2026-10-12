@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-07",
+  "businessName": "Craneridge Fleet Services",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Craneridge Fleet Services"
+    },
+    {
+      "field": "address",
+      "value": "900 Depot Street, Louisville, Kentucky"
+    },
+    {
+      "field": "phone",
+      "value": "(502) 555-0144"
+    },
+    {
+      "field": "email",
+      "value": "fleet@craneridgeservices.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Saturday, 6 a.m. to 4 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed commercial vehicle repair facility in Kentucky"
+    },
+    {
+      "field": "other",
+      "value": "Manages a 140-vehicle fleet; five technicians"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample vehicle-list row shown only to illustrate layout",
+      "text": "Van 118, 42,300 miles, oil and brake inspection, Bay 2, in progress"
+    }
+  ]
+}

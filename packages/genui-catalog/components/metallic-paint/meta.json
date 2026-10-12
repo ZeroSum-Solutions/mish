@@ -1,0 +1,32 @@
+{
+  "id": "metallic-paint",
+  "name": "Metallic Paint",
+  "category": "surface",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room WebGL port written from the one-line effect description only (no upstream source read): a dependency-free fragment shader gives product cards and hero panels a flowing liquid-metal finish, with a static CSS gradient when WebGL is unavailable.",
+  "entry": "components/metallic-paint/index.ts",
+  "css": "components/metallic-paint/styles.css",
+  "demo": "components/metallic-paint/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "refract": { "type": "number", "default": 0.7, "minimum": 0, "maximum": 2, "description": "How far the surface relief bends the reflected light." },
+      "fresnel": { "type": "number", "default": 1.2, "minimum": 0, "maximum": 3, "description": "Rim brightening at grazing angles." },
+      "chroma": { "type": "number", "default": 0.25, "minimum": 0, "maximum": 1, "description": "Per-channel split of the reflection, for a thin-film colour fringe." },
+      "tint": { "type": "string", "default": "#c9d2de", "description": "Metal colour, as #rgb or #rrggbb; also tints the CSS fallback gradient." },
+      "speed": { "type": "number", "default": 0.5, "minimum": 0, "description": "Flow speed; 0 holds a still frame." },
+      "scale": { "type": "number", "default": 2.2, "minimum": 0.2, "maximum": 12, "description": "Size of the flow pattern; larger gives finer ripples." }
+    }
+  },
+  "a11y": [
+    "The injected canvas is aria-hidden and pointer-events: none; the host's content, reading order and focus behaviour are unchanged.",
+    "The metal varies from dark to near-white, so text placed on it should sit on its own opaque or high-alpha scrim to keep 4.5:1 contrast (the demo does this).",
+    "Reduced motion stops the shader loop and the fallback sheen and shows one still frame of the metal.",
+    "Forced-colors mode hides the canvas and paints the host in Canvas/CanvasText with a visible border."
+  ],
+  "reducedMotion": "static"
+}

@@ -1,0 +1,70 @@
+/* reflective-card — clean-room, component-specs.md §4. Every selector is under .genui-reflective-card. */
+
+:where(.genui-reflective-card) {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  outline-offset: 3px;
+  color: var(--genui-reflective-card-ink, #111);
+  background-color: var(--genui-reflective-card-tone, #b8bcc4);
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--genui-reflective-card-tone, #b8bcc4), #000 calc(var(--genui-reflective-card-metalness, .8) * 55%)) 0,
+      color-mix(in srgb, var(--genui-reflective-card-tone, #b8bcc4), #000 calc(var(--genui-reflective-card-metalness, .8) * 55%)) calc(1px + var(--genui-reflective-card-roughness, .3) * 3px),
+      color-mix(in srgb, var(--genui-reflective-card-tone, #b8bcc4), #fff calc(var(--genui-reflective-card-metalness, .8) * 40%)) calc(1px + var(--genui-reflective-card-roughness, .3) * 3px),
+      color-mix(in srgb, var(--genui-reflective-card-tone, #b8bcc4), #fff calc(var(--genui-reflective-card-metalness, .8) * 40%)) calc(2px + var(--genui-reflective-card-roughness, .3) * 6px)
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--genui-reflective-card-tone, #b8bcc4), #fff calc(var(--genui-reflective-card-metalness, .8) * 18%)) 0%,
+      var(--genui-reflective-card-tone, #b8bcc4) 55%,
+      color-mix(in srgb, var(--genui-reflective-card-tone, #b8bcc4), #000 calc(var(--genui-reflective-card-metalness, .8) * 22%)) 100%
+    );
+}
+
+.genui-reflective-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    var(--genui-reflective-card-angle, 115deg),
+    transparent calc(46% - var(--genui-reflective-card-roughness, .3) * 14%),
+    color-mix(in srgb, #fff calc(var(--genui-reflective-card-specular, .9) * 100%), transparent) 50%,
+    transparent calc(54% + var(--genui-reflective-card-roughness, .3) * 14%)
+  );
+  background-size: 220% 220%;
+  background-position: 50% 50%;
+  transition: background-position var(--genui-reflective-card-duration, 700ms) ease;
+}
+
+.genui-reflective-card:hover::after,
+.genui-reflective-card:focus-visible::after,
+.genui-reflective-card:focus-within::after {
+  background-position:
+    calc(50% + var(--genui-reflective-card-shift, 30%))
+    calc(50% - var(--genui-reflective-card-shift, 30%));
+}
+
+.genui-reflective-card.genui-reflective-card--reduced::after {
+  transition: none;
+}
+
+.genui-reflective-card.genui-reflective-card--reduced:hover::after,
+.genui-reflective-card.genui-reflective-card--reduced:focus-visible::after,
+.genui-reflective-card.genui-reflective-card--reduced:focus-within::after {
+  background-position: 50% 50%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-reflective-card::after {
+    transition: none;
+  }
+
+  .genui-reflective-card:hover::after,
+  .genui-reflective-card:focus-visible::after,
+  .genui-reflective-card:focus-within::after {
+    background-position: 50% 50%;
+  }
+}

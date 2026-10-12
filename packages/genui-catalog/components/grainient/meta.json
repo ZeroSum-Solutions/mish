@@ -1,0 +1,35 @@
+{
+  "id": "grainient",
+  "name": "Grainient",
+  "category": "background",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; no upstream source was read. The drifting gradient is pure CSS and the grain is a 2D canvas drawn once per size, so it replaces the WebGL original with no dependency and no animation loop.",
+  "entry": "components/grainient/index.ts",
+  "css": "components/grainient/styles.css",
+  "demo": "components/grainient/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "colorA": { "type": "string", "default": "#6d5dfc", "description": "First gradient blob colour (top left)." },
+      "colorB": { "type": "string", "default": "#ff7a59", "description": "Second gradient blob colour (top right)." },
+      "colorC": { "type": "string", "default": "#22c1c3", "description": "Third gradient blob colour (bottom)." },
+      "base": { "type": "string", "default": "#0b0d12", "description": "Background colour under the blobs." },
+      "intensity": { "type": "number", "default": 0.85, "minimum": 0, "maximum": 1, "description": "Opacity of the gradient layer over the base." },
+      "speed": { "type": "number", "default": 18, "minimum": 1, "description": "Seconds per drift pass (the drift alternates)." },
+      "grain": { "type": "number", "default": 0.22, "minimum": 0, "maximum": 1, "description": "Opacity of the grain layer; 0 skips the canvas." },
+      "grainSize": { "type": "number", "default": 1.5, "minimum": 1, "maximum": 6, "description": "Size of one grain speck, in CSS px." },
+      "animate": { "type": "boolean", "default": true, "description": "Let the gradient drift slowly; false keeps it still." }
+    }
+  },
+  "a11y": [
+    "The gradient is a pseudo-element and the grain canvas is aria-hidden with pointer-events none, so neither is announced, focusable or able to intercept clicks.",
+    "Content inside the host stays in normal flow above both layers; intensity caps the gradient so text over it can keep 4.5:1 contrast on the base colour.",
+    "Reduced motion stops the drift entirely; the grain is never animated, so nothing flickers.",
+    "Forced-colors mode removes the gradient and grain and leaves the system background."
+  ],
+  "reducedMotion": "static"
+}

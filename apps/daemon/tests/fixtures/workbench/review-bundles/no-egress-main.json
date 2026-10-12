@@ -1,0 +1,307 @@
+{
+  "schema": "workbench-verification-bundle/1",
+  "id": "rv_legacy_no_egress",
+  "projectId": "legacy-project",
+  "entry": "index.html",
+  "sourceHashes": [
+    {
+      "path": "index.html",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "contextRevision": 0,
+  "rubricRevision": 0,
+  "previewOrigin": "http://project.od-review.localhost",
+  "environment": {
+    "worker": "cdp-chromium",
+    "browserVersion": "HeadlessChrome/140.0.0.0",
+    "runnerVersion": "mechanical/1"
+  },
+  "viewports": [
+    320,
+    375,
+    768,
+    1440
+  ],
+  "startedAt": "2026-10-07T20:00:00.000Z",
+  "endedAt": "2026-10-07T20:00:00.000Z",
+  "results": [
+    {
+      "checkId": "core.declared-actions",
+      "criterionId": "core.declared-actions",
+      "parameterType": "cta",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": "Passed at 320, 375, 768, 1440 px",
+      "evidenceIds": [
+        "core.declared-actions@320",
+        "core.declared-actions@375",
+        "core.declared-actions@768",
+        "core.declared-actions@1440"
+      ]
+    },
+    {
+      "checkId": "core.text-contrast",
+      "criterionId": "core.text-contrast",
+      "parameterType": "contrast",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": "Passed at 320, 375, 768, 1440 px",
+      "evidenceIds": [
+        "core.text-contrast@320",
+        "core.text-contrast@375",
+        "core.text-contrast@768",
+        "core.text-contrast@1440"
+      ]
+    },
+    {
+      "checkId": "core.console-resources",
+      "criterionId": "core.console-resources",
+      "parameterType": "console-resources",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": "Passed at 320, 375, 768, 1440 px",
+      "evidenceIds": [
+        "core.console-resources@320",
+        "core.console-resources@375",
+        "core.console-resources@768",
+        "core.console-resources@1440"
+      ]
+    },
+    {
+      "checkId": "core.responsive-overflow",
+      "criterionId": "core.responsive-overflow",
+      "parameterType": "overflow",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": "Passed at 320, 375, 768, 1440 px",
+      "evidenceIds": [
+        "core.responsive-overflow@320",
+        "core.responsive-overflow@375",
+        "core.responsive-overflow@768",
+        "core.responsive-overflow@1440"
+      ]
+    },
+    {
+      "checkId": "core.keyboard-focus",
+      "criterionId": "core.keyboard-focus",
+      "parameterType": "keyboard-focus",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": "Passed at 320, 375, 768, 1440 px",
+      "evidenceIds": [
+        "core.keyboard-focus@320",
+        "core.keyboard-focus@375",
+        "core.keyboard-focus@768",
+        "core.keyboard-focus@1440"
+      ]
+    },
+    {
+      "checkId": "core.document-semantics",
+      "criterionId": "core.document-semantics",
+      "parameterType": "document-semantics",
+      "synthesized": true,
+      "required": true,
+      "severity": "high",
+      "outcome": "pass",
+      "reason": "Passed at 320, 375, 768, 1440 px",
+      "evidenceIds": [
+        "core.document-semantics@320",
+        "core.document-semantics@375",
+        "core.document-semantics@768",
+        "core.document-semantics@1440"
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "core.declared-actions@320",
+      "viewport": 320,
+      "type": "probe",
+      "summary": "pass at 320px",
+      "observations": []
+    },
+    {
+      "id": "core.declared-actions@375",
+      "viewport": 375,
+      "type": "probe",
+      "summary": "pass at 375px",
+      "observations": []
+    },
+    {
+      "id": "core.declared-actions@768",
+      "viewport": 768,
+      "type": "probe",
+      "summary": "pass at 768px",
+      "observations": []
+    },
+    {
+      "id": "core.declared-actions@1440",
+      "viewport": 1440,
+      "type": "probe",
+      "summary": "pass at 1440px",
+      "observations": []
+    },
+    {
+      "id": "core.text-contrast@320",
+      "viewport": 320,
+      "type": "computed-style",
+      "summary": "pass at 320px",
+      "observations": [
+        "2 text samples measured"
+      ]
+    },
+    {
+      "id": "core.text-contrast@375",
+      "viewport": 375,
+      "type": "computed-style",
+      "summary": "pass at 375px",
+      "observations": [
+        "2 text samples measured"
+      ]
+    },
+    {
+      "id": "core.text-contrast@768",
+      "viewport": 768,
+      "type": "computed-style",
+      "summary": "pass at 768px",
+      "observations": [
+        "2 text samples measured"
+      ]
+    },
+    {
+      "id": "core.text-contrast@1440",
+      "viewport": 1440,
+      "type": "computed-style",
+      "summary": "pass at 1440px",
+      "observations": [
+        "2 text samples measured"
+      ]
+    },
+    {
+      "id": "core.console-resources@320",
+      "viewport": 320,
+      "type": "console",
+      "summary": "pass at 320px",
+      "observations": []
+    },
+    {
+      "id": "core.console-resources@375",
+      "viewport": 375,
+      "type": "console",
+      "summary": "pass at 375px",
+      "observations": []
+    },
+    {
+      "id": "core.console-resources@768",
+      "viewport": 768,
+      "type": "console",
+      "summary": "pass at 768px",
+      "observations": []
+    },
+    {
+      "id": "core.console-resources@1440",
+      "viewport": 1440,
+      "type": "console",
+      "summary": "pass at 1440px",
+      "observations": []
+    },
+    {
+      "id": "core.responsive-overflow@320",
+      "viewport": 320,
+      "type": "probe",
+      "summary": "pass at 320px",
+      "observations": []
+    },
+    {
+      "id": "core.responsive-overflow@375",
+      "viewport": 375,
+      "type": "probe",
+      "summary": "pass at 375px",
+      "observations": []
+    },
+    {
+      "id": "core.responsive-overflow@768",
+      "viewport": 768,
+      "type": "probe",
+      "summary": "pass at 768px",
+      "observations": []
+    },
+    {
+      "id": "core.responsive-overflow@1440",
+      "viewport": 1440,
+      "type": "probe",
+      "summary": "pass at 1440px",
+      "observations": []
+    },
+    {
+      "id": "core.keyboard-focus@320",
+      "viewport": 320,
+      "type": "keyboard-trace",
+      "summary": "pass at 320px",
+      "observations": []
+    },
+    {
+      "id": "core.keyboard-focus@375",
+      "viewport": 375,
+      "type": "keyboard-trace",
+      "summary": "pass at 375px",
+      "observations": []
+    },
+    {
+      "id": "core.keyboard-focus@768",
+      "viewport": 768,
+      "type": "keyboard-trace",
+      "summary": "pass at 768px",
+      "observations": []
+    },
+    {
+      "id": "core.keyboard-focus@1440",
+      "viewport": 1440,
+      "type": "keyboard-trace",
+      "summary": "pass at 1440px",
+      "observations": []
+    },
+    {
+      "id": "core.document-semantics@320",
+      "viewport": 320,
+      "type": "accessibility-tree",
+      "summary": "pass at 320px",
+      "observations": []
+    },
+    {
+      "id": "core.document-semantics@375",
+      "viewport": 375,
+      "type": "accessibility-tree",
+      "summary": "pass at 375px",
+      "observations": []
+    },
+    {
+      "id": "core.document-semantics@768",
+      "viewport": 768,
+      "type": "accessibility-tree",
+      "summary": "pass at 768px",
+      "observations": []
+    },
+    {
+      "id": "core.document-semantics@1440",
+      "viewport": 1440,
+      "type": "accessibility-tree",
+      "summary": "pass at 1440px",
+      "observations": []
+    }
+  ],
+  "unresolvedRequiredChecks": [],
+  "outcome": "passed",
+  "conformanceNote": "Automated checks target WCAG 2.2 AA but cannot claim full conformance; manual accessibility and target-device checks stay separate gates."
+}

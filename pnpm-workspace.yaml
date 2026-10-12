@@ -1,0 +1,64 @@
+packages:
+  - packages/*
+  - apps/*
+  - tools/*
+  - shells/*
+  - e2e
+
+overrides:
+  brace-expansion: 5.0.6
+  devalue: 5.8.1
+  fast-uri: 3.1.2
+  hono: 4.12.19
+  ip-address: 10.2.0
+  postcss: 8.5.15
+  protobufjs: 8.4.0
+  qs: 6.15.2
+  tmp: 0.2.7
+  yaml: 2.9.0
+
+onlyBuiltDependencies:
+  - "@ffmpeg-installer/darwin-arm64"
+  - "@ffmpeg-installer/darwin-x64"
+  - "@ffmpeg-installer/linux-arm"
+  - "@ffmpeg-installer/linux-arm64"
+  - "@ffmpeg-installer/linux-ia32"
+  - "@ffmpeg-installer/linux-x64"
+  - "@ffprobe-installer/darwin-arm64"
+  - "@ffprobe-installer/darwin-x64"
+  - "@ffprobe-installer/linux-arm"
+  - "@ffprobe-installer/linux-arm64"
+  - "@ffprobe-installer/linux-ia32"
+  - "@ffprobe-installer/linux-x64"
+  - "@higgsfield/cli"
+  - better-sqlite3
+  - core-js
+  - electron
+  - electron-winstaller
+  - esbuild
+  - onnxruntime-node
+  - protobufjs
+  - sharp
+
+# Checked by hand (clean `pnpm install`, scripts ignored), plus `npm view <pkg> scripts` for the
+# platform packages we don't run on:
+# - node-pty's prebuilt .node binding loads without its install script running on macOS and
+#   Windows, where it ships a prebuild (`prebuilds/darwin-*` and `prebuilds/win32-*`). It has no
+#   Linux prebuild at all, script or no script — Linux terminal support is a pre-existing gap
+#   that needs a toolchain build, tracked as a follow-up, not something this ignore affects.
+# - @google/genai ships a pre-built dist/ and only needs its postinstall for its own dev
+#   workflow, never as a consumer.
+# - @ffmpeg-installer follows the same rule as @ffprobe-installer below: every platform package
+#   except win32-ia32/win32-x64 has `postinstall: chmod u+x ffmpeg` (checked with
+#   `npm view @ffmpeg-installer/<platform>@<locked version> scripts` for darwin-arm64,
+#   darwin-x64, linux-arm, linux-arm64, linux-ia32 and linux-x64), so all six are approved.
+# - @ffprobe-installer is the one real exception: every one of its platform packages except
+#   win32-ia32/win32-x64 (which have no postinstall at all) ships its `ffprobe` binary
+#   non-executable and needs `postinstall: chmod u+x ffprobe` to run at all — confirmed by hand
+#   for darwin-arm64 (`ffprobe -version` is "permission denied" without it, works after) and by
+#   `npm view @ffprobe-installer/<platform> scripts` for darwin-x64, linux-x64, linux-arm64,
+#   linux-arm and linux-ia32, all of which carry the identical postinstall. ubuntu-latest CI is
+#   linux-x64, so this also fixes CI, not just local darwin-arm64 machines.
+ignoredBuiltDependencies:
+  - "@google/genai"
+  - node-pty

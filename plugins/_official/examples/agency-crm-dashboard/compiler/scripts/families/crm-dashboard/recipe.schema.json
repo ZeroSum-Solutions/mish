@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-design.ai/schemas/agency-site/crm-dashboard/recipe.v2.json",
+  "title": "crm-dashboard recipe",
+  "description": "A static CRM dashboard page kind: four KPIs, a five-row pipeline table, a six-item activity feed, one contact card, owner and stage filters, and one chart. Mirrors compiler/scripts/families/crm-dashboard/{slots.ts,contract.ts} field for field; run render.test.ts's schema cross-check before trusting either copy alone.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "family", "revision", "brand", "sections"],
+  "sectionOrder": ["crm-dashboard-kpis", "crm-dashboard-pipeline", "crm-dashboard-activity", "crm-dashboard-contact", "crm-dashboard-filters", "crm-dashboard-chart"],
+  "$comment": "contract.ts additionally enforces control-character/markup-free plain text, email and phone format on the contact card, and that a null appears only where CRM_DASHBOARD_NULLABLE_ATOMS (slots.ts) allows it: kpis[2]/kpis[3] as a whole item, and the activity and chart sections as a whole content group.",
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "family": { "const": "crm-dashboard" },
+    "revision": { "type": "integer", "minimum": 1, "maximum": 9999 },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "descriptor"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "descriptor": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "items"],
+          "properties": {
+            "id": { "const": "crm-dashboard-kpis" },
+            "type": { "const": "kpi-strip" },
+            "items": {
+              "type": "array",
+              "minItems": 4,
+              "maxItems": 4,
+              "items": false,
+              "prefixItems": [
+                { "$ref": "#/$defs/kpiItem" },
+                { "$ref": "#/$defs/kpiItem" },
+                { "$ref": "#/$defs/kpiItemOrNull", "x-atom": "kpi-item" },
+                { "$ref": "#/$defs/kpiItemOrNull", "x-atom": "kpi-item" }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text", "items"],
+          "properties": {
+            "id": { "const": "crm-dashboard-pipeline" },
+            "type": { "const": "pipeline-table" },
+            "text": {
+              "type": "object", "additionalProperties": false, "required": ["heading"],
+              "properties": { "heading": { "type": "string", "minLength": 1, "maxLength": 60 } }
+            },
+            "items": {
+              "type": "array", "minItems": 5, "maxItems": 5,
+              "items": { "$ref": "#/$defs/pipelineRow" }
+            }
+          }
+        },
+        {
+          "type": ["object", "null"],
+          "x-optional": {
+            "label": "activity feed",
+            "dropWhen": "The brief has no real customer-facing events (named people, named actions) to show as recent activity.",
+            "keepWhen": "The brief supplies real recent activity: named people and the actions they actually took.",
+            "navSlots": []
+          },
+          "additionalProperties": false,
+          "required": ["id", "type", "items"],
+          "properties": {
+            "id": { "const": "crm-dashboard-activity" },
+            "type": { "const": "activity-feed" },
+            "items": {
+              "x-atom": "activity-feed",
+              "x-mock": true,
+              "oneOf": [
+                { "type": "null" },
+                { "type": "array", "minItems": 6, "maxItems": 6, "items": { "$ref": "#/$defs/activityItem" } }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text"],
+          "properties": {
+            "id": { "const": "crm-dashboard-contact" },
+            "type": { "const": "contact-card" },
+            "text": {
+              "x-mock": true,
+              "type": "object", "additionalProperties": false,
+              "required": ["name", "role", "company", "email", "phone", "note"],
+              "properties": {
+                "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+                "role": { "type": "string", "minLength": 1, "maxLength": 60 },
+                "company": { "type": "string", "minLength": 1, "maxLength": 60 },
+                "email": { "type": "string", "minLength": 1, "maxLength": 80 },
+                "phone": { "type": "string", "minLength": 1, "maxLength": 32 },
+                "note": { "type": "string", "minLength": 1, "maxLength": 200 }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "items"],
+          "properties": {
+            "id": { "const": "crm-dashboard-filters" },
+            "type": { "const": "filter-bar" },
+            "items": {
+              "type": "object", "additionalProperties": false, "required": ["owner", "stage"],
+              "properties": {
+                "owner": { "x-mock": true, "type": "array", "minItems": 4, "maxItems": 4, "items": { "type": "string", "minLength": 1, "maxLength": 32 } },
+                "stage": { "type": "array", "minItems": 5, "maxItems": 5, "items": { "x-label": true, "type": "string", "minLength": 1, "maxLength": 32 } }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text", "items"],
+          "properties": {
+            "id": { "const": "crm-dashboard-chart" },
+            "type": { "const": "bar-chart" },
+            "text": {
+              "x-atom": "chart",
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object", "additionalProperties": false, "required": ["title", "unit"],
+                  "properties": {
+                    "title": { "type": "string", "minLength": 1, "maxLength": 60 },
+                    "unit": { "type": "string", "minLength": 1, "maxLength": 12 }
+                  }
+                }
+              ]
+            },
+            "items": {
+              "x-atom": "chart",
+              "x-mock": true,
+              "oneOf": [
+                { "type": "null" },
+                {
+                  "type": "object", "additionalProperties": false, "required": ["values"],
+                  "properties": {
+                    "values": {
+                      "type": "array", "minItems": 8, "maxItems": 8,
+                      "items": {
+                        "type": "object", "additionalProperties": false, "required": ["label", "value"],
+                        "properties": {
+                          "label": { "type": "string", "minLength": 1, "maxLength": 20 },
+                          "value": { "type": "number", "minimum": 0, "maximum": 1000000 }
+                        }
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "kpiItem": {
+      "type": "object", "additionalProperties": false, "required": ["label", "value", "delta"],
+      "properties": {
+        "label": { "x-label": true, "type": "string", "minLength": 1, "maxLength": 40 },
+        "value": { "type": "string", "minLength": 1, "maxLength": 24, "x-mock": true },
+        "delta": { "type": "string", "minLength": 1, "maxLength": 24, "x-mock": true }
+      }
+    },
+    "kpiItemOrNull": {
+      "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/kpiItem" }]
+    },
+    "pipelineRow": {
+      "x-mock": true,
+      "type": "object", "additionalProperties": false, "required": ["company", "owner", "stage", "value", "nextStep"],
+      "properties": {
+        "company": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "owner": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "stage": { "type": "string", "minLength": 1, "maxLength": 24 },
+        "value": { "type": "string", "minLength": 1, "maxLength": 24 },
+        "nextStep": { "type": "string", "minLength": 1, "maxLength": 80 }
+      }
+    },
+    "activityItem": {
+      "type": "object", "additionalProperties": false, "required": ["when", "who", "what"],
+      "properties": {
+        "when": { "type": "string", "minLength": 1, "maxLength": 24 },
+        "who": { "type": "string", "minLength": 1, "maxLength": 40 },
+        "what": { "type": "string", "minLength": 1, "maxLength": 140 }
+      }
+    }
+  }
+}

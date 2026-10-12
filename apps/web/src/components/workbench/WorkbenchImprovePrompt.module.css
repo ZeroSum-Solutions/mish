@@ -1,0 +1,21 @@
+/* R15 Improve prompt dialog. Component-owned; tokens come from the shared UI system. */
+.dialog { width: min(720px, calc(100vw - 32px)); max-height: min(86dvh, 900px); }
+.body { display: flex; flex-direction: column; gap: 12px; overflow: auto; }
+.section h3 { margin: 0 0 6px; font-size: 13px; }
+.section ul { margin: 0; padding-left: 18px; font-size: 13px; }
+.section p { margin: 2px 0; font-size: 13px; }
+.original { padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 8px; background: var(--bg-panel); white-space: pre-wrap; overflow-wrap: anywhere; }
+.fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); gap: 10px; }
+.field { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 8px; font-size: 12px; }
+.field textarea { grid-column: 1 / -1; resize: vertical; }
+.grounding { grid-column: 1 / -1; margin: 0; font: var(--font-caption); color: var(--text-muted); overflow-wrap: anywhere; }
+.changes { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.change { padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 8px; }
+.change dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 8px; margin: 4px 0; font-size: 12px; }
+.change dt { color: var(--text-muted); }
+.change dd { margin: 0; overflow-wrap: anywhere; }
+.muted { color: var(--text-muted); font-size: 12px; }
+.error { color: var(--danger, #c0392b); font-size: 12px; }
+.working { display: flex; align-items: center; gap: 8px; color: var(--text-muted); }
+.actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.attached { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; }

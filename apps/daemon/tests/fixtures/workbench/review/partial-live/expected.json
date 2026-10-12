@@ -1,0 +1,8 @@
+{
+  "description": "Reduced motion stops the bar but the 7.5 s JS carousel ignores a live switch, so the live-change requirement fails.",
+  "parameters": {
+    "requireReducedMotionFallback": false,
+    "requirePauseControl": false
+  },
+  "motion": "fail"
+}

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 2,
+  "family": "marketing-site",
+  "revision": 1,
+  "brand": {
+    "name": "Ledgerline",
+    "descriptor": "Bookkeeping software for small service firms that bill by the hour."
+  },
+  "sections": [
+    {
+      "id": "marketing-site-hero",
+      "type": "hero",
+      "text": {
+        "eyebrow": "For firms that bill by the hour",
+        "heading": "Close the books without the spreadsheet marathon",
+        "body": "Ledgerline pulls tracked hours, invoices and payments into one place, so month end stops being a scramble.",
+        "primaryCta": "Start a free trial",
+        "secondaryCta": "See how it works"
+      }
+    },
+    {
+      "id": "marketing-site-features",
+      "type": "feature-grid",
+      "text": {
+        "heading": "Built for firms that bill by the hour",
+        "body": "Three habits that used to live in three different tools now live in one."
+      },
+      "items": [
+        { "title": "Automatic time capture", "body": "Tracks billable hours as work happens and drops them straight into the next invoice." },
+        { "title": "One-click invoicing", "body": "Turn tracked hours into a client invoice without retyping a line." },
+        { "title": "Live cash position", "body": "See what is billed, paid and outstanding without opening a spreadsheet." }
+      ]
+    },
+    {
+      "id": "marketing-site-proof",
+      "type": "testimonials",
+      "items": [
+        { "quote": "We moved three clients over in a single afternoon and never looked back.", "name": "Renata Ibsen", "role": "Owner, Ibsen Bookkeeping" },
+        { "quote": "Month end used to eat a full week. Now it is an afternoon.", "name": "Oren Castellano", "role": "Founder, Castellano Ledger Co." },
+        { "quote": "The invoices finally match what our team actually billed.", "name": "Priya Someshwar", "role": "Office Manager, Someshwar & Frost" }
+      ]
+    },
+    {
+      "id": "marketing-site-pricing",
+      "type": "pricing",
+      "text": { "heading": "Plans that scale with your client list" },
+      "items": [
+        {
+          "name": "Solo",
+          "price": "$19",
+          "period": "/month",
+          "features": ["1 seat included", "Up to 10 clients", "Email support"],
+          "cta": "Start free"
+        },
+        {
+          "name": "Studio",
+          "price": "$49",
+          "period": "/month",
+          "features": ["5 seats included", "Up to 60 clients", "Priority support"],
+          "cta": "Start free"
+        },
+        {
+          "name": "Firm",
+          "price": "$99",
+          "period": "/month",
+          "features": ["Unlimited seats", "Unlimited clients", "Dedicated onboarding"],
+          "cta": "Talk to sales"
+        }
+      ]
+    },
+    {
+      "id": "marketing-site-cta",
+      "type": "cta",
+      "text": {
+        "heading": "Bring your books in from the cold",
+        "body": "Import your existing client list and reconcile your books without a spreadsheet.",
+        "cta": "Start your free trial"
+      }
+    },
+    {
+      "id": "marketing-site-footer",
+      "type": "footer",
+      "text": { "tagline": "Bookkeeping software for firms that bill by the hour." },
+      "items": {
+        "columns": [
+          { "heading": "Product", "links": ["Time tracking", "Invoicing", "Reports"] },
+          { "heading": "Company", "links": ["About", "Careers", "Contact"] },
+          { "heading": "Resources", "links": ["Guides", "Support", "Status"] }
+        ]
+      }
+    }
+  ]
+}

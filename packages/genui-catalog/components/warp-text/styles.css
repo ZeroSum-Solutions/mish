@@ -1,0 +1,67 @@
+/* warp-text — clean-room, from the effect description only. Every selector is under .genui-warp-text. */
+
+:where(.genui-warp-text) {
+  position: relative;
+  --genui-warp-text-fill: linear-gradient(90deg, var(--genui-warp-text-from, #7dd3fc), var(--genui-warp-text-to, #c084fc));
+}
+
+.genui-warp-text__canvas {
+  position: absolute;
+  top: calc(-1 * var(--genui-warp-text-pad, 16px));
+  left: calc(-1 * var(--genui-warp-text-pad, 16px));
+  width: calc(100% + 2 * var(--genui-warp-text-pad, 16px));
+  height: calc(100% + 2 * var(--genui-warp-text-pad, 16px));
+  display: block;
+  pointer-events: none;
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .genui-warp-text {
+    background-image: var(--genui-warp-text-fill);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .genui-warp-text.genui-warp-text--gl {
+    background-image: none;
+  }
+
+  .genui-warp-text.genui-warp-text--gl.genui-warp-text--reduced {
+    background-image: var(--genui-warp-text-fill);
+  }
+}
+
+.genui-warp-text:not(.genui-warp-text--gl) .genui-warp-text__canvas,
+.genui-warp-text.genui-warp-text--reduced .genui-warp-text__canvas {
+  display: none;
+}
+
+.genui-warp-text.genui-warp-text--gl ::selection {
+  -webkit-text-fill-color: #f5f5f7;
+  background: rgba(192, 132, 252, .35);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-warp-text .genui-warp-text__canvas {
+    display: none;
+  }
+
+  .genui-warp-text.genui-warp-text--gl {
+    background-image: var(--genui-warp-text-fill);
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-warp-text,
+  .genui-warp-text.genui-warp-text--gl {
+    background: none;
+    -webkit-text-fill-color: CanvasText;
+    color: CanvasText;
+  }
+
+  .genui-warp-text .genui-warp-text__canvas {
+    display: none;
+  }
+}

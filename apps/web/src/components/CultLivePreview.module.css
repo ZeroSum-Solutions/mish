@@ -1,0 +1,44 @@
+/* Existing theme and type, with canvas/inspector hierarchy informed by Linear and Framer.
+   Workspace, toolbar, parts, stage and frame layout live in CatalogPreviewViewer.module.css. */
+.dialog { width: min(1320px, calc(100vw - 32px)); height: min(820px, calc(100dvh - 32px)); max-height: calc(100dvh - 32px); padding: 0; gap: 0; overflow: hidden; border-radius: 16px; }
+.inner { display: flex; flex-direction: column; min-width: 0; height: 100%; min-height: 0; }
+.header { position: sticky; top: 0; z-index: 1; flex-shrink: 0; box-sizing: border-box; min-height: 77px; background: var(--bg-panel); display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+.heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; min-width: 0; }
+.title { margin: 0; font-size: 21px; font-weight: 600; letter-spacing: -.025em; }
+.position { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.nav { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+.navButton, .close { min-height: 36px; padding: 0 12px; border: 1px solid var(--border); border-radius: 7px; background: var(--bg-panel); color: var(--text-strong); font: inherit; font-size: 12px; cursor: pointer; }
+.close { width: 36px; padding: 0; font-size: 21px; }
+.navButton:hover, .close:hover { background: var(--bg-subtle); border-color: var(--border-strong); }
+.segment { display: flex; flex-wrap: wrap; max-width: 100%; gap: 2px; padding: 3px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-subtle); }
+.control { min-height: 32px; padding: 0 10px; border: 1px solid transparent; border-radius: 5px; background: transparent; color: var(--text-muted); font: inherit; font-size: 12px; white-space: nowrap; cursor: pointer; }
+.control[aria-pressed='true'] { color: var(--text-strong); background: var(--bg-panel); border-color: var(--border); box-shadow: 0 1px 3px color-mix(in srgb, var(--text-strong) 4%, transparent); }
+.control:hover { color: var(--text-strong); }
+.canvasStatus { min-height: 34px; gap: 8px; flex-wrap: wrap; padding: 4px 0; display: flex; align-items: center; font-size: 11px; color: var(--text-muted); }
+.skeleton { position: relative; flex: 1; min-height: 240px; display: grid; place-items: center; color: var(--text-muted); background: var(--bg-subtle); }
+.detailTitle { margin: 0; color: var(--text-strong); font-size: 13px; font-weight: 600; }
+.detailContents { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.detailContents p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
+.detailContents .selectedPart { color: var(--text-strong); font-weight: 600; }
+.summary { margin: 0; color: var(--text-strong); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+.demoNotes { padding: 12px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); font-size: 12px; color: var(--text-muted); }
+.demoNotes summary { cursor: pointer; color: var(--text-strong); }
+.mockNote { margin: 10px 0 0; line-height: 1.6; }
+.unavailable { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 16px; padding: 24px; overflow: auto; }
+.reason { margin: 0; max-width: 50ch; text-align: center; font-size: 14px; line-height: 1.6; color: var(--text-strong); }
+.thumbnail { display: block; max-width: 100%; max-height: 260px; object-fit: contain; border-radius: 8px; }
+.visuallyHidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.relatedError { display: flex; flex: 1; align-items: center; justify-content: center; gap: 12px; padding: 20px; }
+.close:focus-visible, .navButton:focus-visible, .control:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 960px) {
+ .dialog { height: calc(100dvh - 24px); width: calc(100vw - 24px); max-height: calc(100dvh - 24px); }
+ .header { padding: 16px; flex-wrap: wrap; min-height: 0; }
+ .heading { flex: 1; }
+ .title { font-size: 18px; }
+}
+@media (max-width: 420px) {
+ .header { gap: 12px; }
+ .heading { flex-basis: 100%; }
+ .nav { margin-left: auto; }
+ .control { padding: 0 5px; font-size: 11px; }
+}

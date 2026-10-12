@@ -1,0 +1,12 @@
+{
+  "description": "Body copy in #aaaaaa on white is 2.32:1, below the 4.5:1 normal-text minimum.",
+  "outcome": "failed",
+  "criteria": {
+    "core.declared-actions": "pass",
+    "core.text-contrast": "fail",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  }
+}

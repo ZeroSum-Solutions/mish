@@ -1,0 +1,8 @@
+{
+  "description": "An infinite animation with a working Pause button and an email input labelled \"Stop emails for address\" in a form posting to an external host; the input must never be activated (Enter would submit the form).",
+  "parameters": {
+    "requireReducedMotionFallback": false,
+    "requireLivePreferenceChange": false
+  },
+  "motion": "pass"
+}

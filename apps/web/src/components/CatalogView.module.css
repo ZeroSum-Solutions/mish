@@ -1,0 +1,609 @@
+/* Catalog view (Effects, Blocks, Components, 21st.dev). One system with the redesigned entry
+   pages (docs/design/ui-system.md): a page header (title + one-line description), the view
+   switch as a segmented track, then per view ONE toolbar row (search, filters, count), a
+   responsive card grid with one card anatomy (preview, name, meta, status badge) and one
+   designed empty state. Tokens only; light and dark come from the roles. Twenty1stPanel,
+   CultLivePreview, CultCopyActions and EffectPreview share these class names. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  width: min(1240px, 100%);
+  margin: 0 auto;
+  padding: var(--space-4) var(--space-1) var(--space-16);
+}
+
+/* ── Page header ─────────────────────────────────────────────────────── */
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+.pageTitleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.title {
+  margin: 0;
+  font: var(--font-heading);
+  letter-spacing: var(--tracking-snug);
+  color: var(--text-strong);
+}
+.pageDescription {
+  margin: 0;
+  max-width: 68ch;
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+/* Per-view lede under the switch: supporting copy, never louder than the header. */
+.lede {
+  margin: 0;
+  max-width: 68ch;
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+
+/* ── View switch: recessed track, raised thumb (the segmented recipe) ─── */
+.segments {
+  --ui-selection-surface: var(--segmented-thumb);
+  --ui-selection-shadow: var(--segmented-thumb-shadow);
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: stretch;
+  gap: var(--space-half);
+  max-width: 100%;
+  padding: 3px;
+  border: 1px solid var(--segmented-track-border);
+  border-radius: var(--radius-pill);
+  background: var(--segmented-track);
+  flex-wrap: wrap;
+}
+.segment {
+  appearance: none;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex: 0 0 auto;
+  height: auto;
+  min-height: 30px;
+  padding: var(--space-1) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--text-muted);
+  font: var(--font-label);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+.segment:hover:not(:disabled),
+.segment[aria-selected='true'] {
+  color: var(--text-strong);
+  background: transparent;
+}
+.segment[aria-selected='true'] {
+  background: var(--segmented-thumb);
+  box-shadow: var(--segmented-thumb-shadow);
+}
+/* In the workspace system the shared SelectionIndicator draws the thumb and glides it between
+   tabs; the tab itself stays transparent. */
+:global(html[data-ui-system='workspace']) .segment[aria-selected='true'] {
+  background: transparent;
+  box-shadow: none;
+}
+.segment > :global([data-selection-indicator]) {
+  border-radius: inherit;
+}
+.segment:active {
+  transform: scale(var(--press-scale));
+  transition-duration: var(--motion-hover), var(--motion-press);
+}
+.segment:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+.segmentCount {
+  font: var(--font-micro);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+}
+.segment[aria-selected='true'] .segmentCount {
+  color: var(--text-muted);
+}
+
+/* ── Per-view panel and its one toolbar row ──────────────────────────── */
+.cultPanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  min-width: 0;
+}
+/* The live count sits at the end of the row. */
+.toolbar > .count {
+  margin-inline-start: auto;
+}
+
+/* Search field: the shimmer focus comes from `data-ui-field-shell` (workspace-ui.css). */
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 0 1 280px;
+  min-width: 200px;
+  height: var(--control-h-compact);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-panel);
+  color: var(--text-soft);
+  cursor: text;
+}
+.searchIcon {
+  flex: 0 0 auto;
+}
+.searchField .search {
+  appearance: none;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  outline: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text);
+  font: var(--font-body-sm);
+}
+.searchField .search::placeholder {
+  color: var(--text-soft);
+}
+.searchField .search:focus,
+.searchField .search:focus-visible {
+  outline: none;
+  border: 0;
+  box-shadow: none;
+}
+/* Bare `.search` kept for any consumer that renders the input without the shell. */
+.search {
+  min-width: min(260px, 100%);
+  max-width: 100%;
+  color: var(--text);
+  font: var(--font-body-sm);
+}
+
+/* Select with its label inside one compact field. Selects only strengthen their border on
+   focus (ui-system § 8); the shell carries it. */
+.selectField {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-h-compact);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-panel);
+  transition: border-color var(--motion-hover) var(--ease-out-quint);
+}
+.selectField:hover {
+  border-color: var(--border-strong);
+}
+.selectField:focus-within {
+  border-color: var(--focus-shimmer-base);
+}
+.selectLabel {
+  font: var(--font-label);
+  color: var(--text-soft);
+  white-space: nowrap;
+}
+.selectField .select {
+  appearance: none;
+  height: 100%;
+  min-width: 0;
+  max-width: 220px;
+  padding: 0 var(--space-5) 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-strong);
+  font: var(--font-label);
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.selectField .select:focus,
+.selectField .select:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.selectChevron {
+  position: absolute;
+  right: var(--space-3);
+  color: var(--text-soft);
+  pointer-events: none;
+}
+
+/* Calm chips (packages/components Chip); the count rides in the trailing slot. */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+.chipsLabel {
+  margin-right: var(--space-1);
+  font: var(--font-label);
+  color: var(--text-soft);
+}
+.chip {
+  font: var(--font-label);
+}
+.chipCount {
+  font: var(--font-micro);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Reduced-motion toggle inside the effect preview dialog (EffectPreview). */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  font: var(--font-label);
+  color: var(--text-strong);
+}
+.toggle input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--selected);
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font: var(--font-caption);
+  color: var(--text-muted);
+}
+
+.count,
+.note {
+  margin: 0;
+  font: var(--font-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.note[role='alert'] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  font: var(--font-body-sm);
+}
+.button {
+  flex: none;
+}
+
+/* ── Groups and the card grid ────────────────────────────────────────── */
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+.groupTitle {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin: 0;
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+}
+.groupCount {
+  font: var(--font-caption);
+  font-variant-numeric: tabular-nums;
+  color: var(--text-soft);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* One card anatomy: preview on top, then name (+ status badge) and one meta line. Resting at
+   elevation 1, hover lifts to 2, press springs. */
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  box-shadow: var(--elevation-1);
+  transition:
+    box-shadow var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+.card:has(.cardButton:not(:disabled)):hover,
+.card:has(.cardHitTarget:not(:disabled)):hover {
+  box-shadow: var(--elevation-2);
+  transform: translateY(var(--hover-lift));
+}
+.card:has(.cardButton:not(:disabled)):active,
+.card:has(.cardHitTarget:not(:disabled)):active {
+  transform: scale(var(--press-scale-card));
+  transition-duration: var(--motion-hover), var(--motion-press);
+}
+.card:has(.cardButton:focus-visible),
+.card:has(.cardHitTarget:focus-visible) {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+.cardButton {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.cardButton:hover:not(:disabled) {
+  background: transparent;
+}
+.cardButton:active:not(:disabled) {
+  transform: none;
+}
+.cardButton:focus-visible {
+  outline: none;
+}
+.cardDescription {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.cardHitTarget {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+.cardHitTarget:hover:not(:disabled) {
+  background: transparent;
+}
+.cardHitTarget:active:not(:disabled) {
+  transform: none;
+}
+.cardHitTarget:disabled {
+  cursor: default;
+}
+.cardHitTarget:focus-visible {
+  outline: none;
+}
+
+.demo {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 220px;
+  overflow: hidden;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-soft);
+}
+.demoLoading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg-subtle);
+  color: var(--text-soft);
+  font: var(--font-caption);
+}
+.frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.card .frame {
+  pointer-events: none;
+}
+.noDemo {
+  margin: 0;
+  padding: var(--space-4);
+  font: var(--font-caption);
+  color: var(--text-soft);
+  text-align: center;
+}
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+  padding: var(--space-3) var(--inset-card) var(--inset-card);
+}
+.cardButton .meta {
+  padding: var(--space-3) var(--inset-card) var(--inset-card);
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.name {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.detail {
+  min-width: 0;
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+}
+
+/* Status label used by the preview dialogs (CultLivePreview) and the 21st.dev rights line. */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  height: 20px;
+  padding: 0 var(--space-2);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+  font: var(--font-micro);
+  letter-spacing: var(--tracking-wide);
+  white-space: nowrap;
+}
+.badge[data-status='ported'],
+.badge[data-state='insertable'] {
+  background: var(--bg-fill);
+  color: var(--text-strong);
+}
+.badge[data-state='pending'] {
+  border-color: var(--border);
+  border-style: dashed;
+}
+.badge[data-state='not-converted'] {
+  border-color: var(--border);
+  border-style: dotted;
+}
+
+/* Thumbnail frame for Cult and 21st.dev cards: one fixed 16:10 box for an image and a
+   placeholder alike, so a grid row never shifts while images load or fail. */
+.placeholder {
+  display: grid;
+  place-items: center;
+  height: 120px;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-soft);
+}
+.cultPreview {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--bg-subtle);
+  border-bottom: 1px solid var(--border-soft);
+}
+.placeholder.cultPreview {
+  display: grid;
+}
+.cultPreviewImage {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Preview dialog details (CultLivePreview). */
+.chipLine {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+.spine {
+  padding: var(--space-half) var(--space-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-strong);
+  font: var(--font-micro);
+  font-family: var(--mono, ui-monospace, monospace);
+}
+.tags {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+/* Read by assistive technology, not shown: the tags line's label. */
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Remix into project actions in the expanded preview (CultCopyActions). */
+.copyActions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+.copyButtons {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-2);
+}
+.copyButtons .copyButton {
+  justify-content: center;
+  height: var(--control-h-md);
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-pill);
+  font: var(--font-label);
+}
+
+@media (max-width: 640px) {
+  .toolbar > .count {
+    flex-basis: 100%;
+    margin-inline-start: 0;
+  }
+  .searchField {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: box-shadow var(--motion-hover) var(--ease-out-quint);
+  }
+}

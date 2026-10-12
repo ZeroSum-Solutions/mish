@@ -1,0 +1,213 @@
+{
+  "schemaVersion": 2,
+  "family": "community",
+  "revision": 1,
+  "brand": {
+    "name": "Kiln Row Collective",
+    "descriptor": "A members' studio and community for independent makers and small creative businesses in Bristol."
+  },
+  "sections": [
+    {
+      "id": "community-header",
+      "type": "header",
+      "text": {
+        "cta": "Become a member"
+      }
+    },
+    {
+      "id": "community-hero",
+      "type": "hero",
+      "text": {
+        "eyebrow": "For independent makers and small creative businesses in Bristol",
+        "heading": "A shared studio and a community that has your back",
+        "body": "Kiln Row Collective gives makers, designers and small creative businesses a working studio, kiln access, and a community that shows up for each other's launches.",
+        "cta": "Join Kiln Row",
+        "memberCount": "68 members and counting"
+      }
+    },
+    {
+      "id": "community-benefits",
+      "type": "benefits",
+      "text": {
+        "heading": "What members get"
+      },
+      "items": [
+        {
+          "title": "24-hour studio access",
+          "blurb": "Badge in any time, day or night, to bench space, kiln slots and shared tools."
+        },
+        {
+          "title": "Kiln and equipment access",
+          "blurb": "Two electric kilns, a spray booth and a wood shop, booked through the members' calendar."
+        },
+        {
+          "title": "A working community",
+          "blurb": "Critique nights, skill shares and a group that actually looks at your work."
+        },
+        {
+          "title": "Discounted workshops",
+          "blurb": "Half price on every workshop the studio runs, for you and one guest."
+        }
+      ]
+    },
+    {
+      "id": "community-tiers",
+      "type": "tiers",
+      "text": {
+        "heading": "Membership tiers",
+        "body": "Pick the level of access that matches how often you're in the studio."
+      },
+      "items": [
+        {
+          "name": "Studio Day",
+          "description": "Drop-in bench time for occasional use.",
+          "price": "$45/month",
+          "cta": "Start Studio Day",
+          "features": [
+            "8 studio hours a month",
+            "Shared tool access",
+            "Members' chat channel"
+          ]
+        },
+        {
+          "name": "Full Bench",
+          "description": "A dedicated bench and regular kiln slots.",
+          "price": "$120/month",
+          "cta": "Start Full Bench",
+          "features": [
+            "Unlimited studio hours",
+            "One kiln slot a week",
+            "Locker and shelf space"
+          ]
+        },
+        {
+          "name": "Studio Partner",
+          "description": "For a small creative business based at Kiln Row.",
+          "price": "$260/month",
+          "cta": "Talk to us",
+          "features": [
+            "Two dedicated benches",
+            "Priority kiln booking",
+            "Listed as a studio partner"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "community-how-it-works",
+      "type": "how-it-works",
+      "text": {
+        "heading": "How joining works"
+      },
+      "items": [
+        {
+          "title": "Visit the studio",
+          "body": "Come by on a Tuesday open night and see the space before you commit."
+        },
+        {
+          "title": "Pick a tier",
+          "body": "Choose Studio Day, Full Bench or a partner bench, based on how often you'll be in."
+        },
+        {
+          "title": "Get your induction",
+          "body": "A 30-minute kiln and safety induction, then you're badged in."
+        }
+      ]
+    },
+    {
+      "id": "community-events",
+      "type": "events",
+      "text": {
+        "heading": "Upcoming at the studio"
+      },
+      "items": [
+        {
+          "title": "Open critique night",
+          "date": "First Tuesday, monthly",
+          "blurb": "Bring current work for a group look, no RSVP needed."
+        },
+        {
+          "title": "Glaze chemistry workshop",
+          "date": "14 October",
+          "blurb": "A half-day workshop on mixing your own glazes, led by a member."
+        },
+        {
+          "title": "Winter open studios",
+          "date": "Last weekend of January",
+          "blurb": "Members open their benches to the public for one weekend."
+        }
+      ]
+    },
+    {
+      "id": "community-voices",
+      "type": "voices",
+      "text": {
+        "heading": "What members say"
+      },
+      "items": [
+        {
+          "quote": "I moved my whole practice here in a month and never looked back.",
+          "name": "Priya Odedra",
+          "role": "Ceramicist"
+        },
+        {
+          "quote": "The kiln access alone pays for the membership.",
+          "name": "Femi Adeyemi",
+          "role": "Product designer"
+        },
+        {
+          "quote": "Having other makers around changed how seriously I take my own work.",
+          "name": "Elin Karlsson",
+          "role": "Illustrator"
+        }
+      ]
+    },
+    {
+      "id": "community-faq",
+      "type": "faq",
+      "text": {
+        "heading": "Questions before you join"
+      },
+      "items": [
+        {
+          "question": "Do I need my own tools?",
+          "answer": "No. Shared hand tools and machines are included; bring your own only if you prefer."
+        },
+        {
+          "question": "Can I pause my membership?",
+          "answer": "Yes, pause for up to two months a year with two weeks' notice."
+        },
+        {
+          "question": "Is there a joining fee?",
+          "answer": "No joining fee. You pay the first month's membership and that's it."
+        },
+        {
+          "question": "Can I bring a guest?",
+          "answer": "Members can bring a guest to open nights and workshops at no extra charge."
+        }
+      ]
+    },
+    {
+      "id": "community-join",
+      "type": "join",
+      "text": {
+        "heading": "Ready to join Kiln Row?",
+        "body": "Tell us what you make and how often you'd use the studio. We reply within two working days.",
+        "cta": "Apply for membership",
+        "phone": "0117 555 0148",
+        "email": "join@kilnrow.example"
+      }
+    },
+    {
+      "id": "community-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "A members' studio and community for independent makers in Bristol.",
+        "link1": "Studio guidelines",
+        "link2": "Privacy",
+        "link3": "Contact",
+        "address": "14 Foundry Yard, Bristol, BS2 0QR"
+      }
+    }
+  ]
+}

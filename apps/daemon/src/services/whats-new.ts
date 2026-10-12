@@ -1,0 +1,172 @@
+import type { WhatsNewContent, WhatsNewLocaleContent } from '@open-design/contracts';
+
+// Fetches the post-update "what's new" highlight from a single hosted document
+// on a dedicated R2 bucket. Operators edit that one file after a release; the
+// document carries an `id` that drives the home card's once-per-highlight
+// behavior (see apps/web/src/lib/whats-new.ts). This service does not know
+// about release channels or the running version — content identity is the
+// only thing that matters. A missing, unreachable, or malformed document
+// resolves to `{ id: null, content: null }`; this endpoint must never fail the
+// home surface.
+
+export interface WhatsNewReadResult {
+  id: string | null;
+  content: WhatsNewContent | null;
+  fetchedAt: number;
+  stale: boolean;
+}
+
+export interface WhatsNewServiceOptions {
+  fetchImpl?: typeof fetch;
+  now?: () => number;
+  env?: NodeJS.ProcessEnv;
+}
+
+export interface WhatsNewService {
+  readWhatsNew(channel: string): Promise<WhatsNewReadResult>;
+}
+
+// Short enough that an operator's edit reaches users on their next Home visit
+// without a long stale window, long enough that Home activations do not hammer
+// the origin.
+const WHATS_NEW_CACHE_TTL_MS = 10 * 60 * 1000;
+const WHATS_NEW_TIMEOUT_MS = 4_000;
+
+/**
+ * The document URL, or null when this build must not show the card.
+ * This fork has no hosted highlights document: the card appears only when an
+ * operator sets `OD_WHATS_NEW_URL` (also used by e2e fixtures), on any channel.
+ * The upstream document is never fetched.
+ */
+export function whatsNewSourceUrl(env: NodeJS.ProcessEnv, _channel: string): string | null {
+  return env.OD_WHATS_NEW_URL?.trim() || null;
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+function readNonEmptyString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
+}
+
+function readHttpsUrl(value: unknown): string | null {
+  const raw = readNonEmptyString(value);
+  if (raw == null) return null;
+  try {
+    return new URL(raw).protocol === 'https:' ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+function parseLocaleOverrides(value: unknown): Record<string, WhatsNewLocaleContent> | undefined {
+  if (!isObject(value)) return undefined;
+  const locales: Record<string, WhatsNewLocaleContent> = {};
+  for (const [locale, entry] of Object.entries(value)) {
+    if (!isObject(entry)) continue;
+    const override: WhatsNewLocaleContent = {};
+    const title = readNonEmptyString(entry.title);
+    const body = readNonEmptyString(entry.body);
+    const linkUrl = readHttpsUrl(entry.linkUrl);
+    const ctaLabel = readNonEmptyString(entry.ctaLabel);
+    if (title != null) override.title = title;
+    if (body != null) override.body = body;
+    if (linkUrl != null) override.linkUrl = linkUrl;
+    if (ctaLabel != null) override.ctaLabel = ctaLabel;
+    if (Object.keys(override).length > 0) locales[locale] = override;
+  }
+  return Object.keys(locales).length > 0 ? locales : undefined;
+}
+
+/**
+ * Parses the hosted highlights document. A valid highlight needs a non-empty
+ * `id` (the once-per-highlight key) plus `title` and `body`. Anything missing
+ * or malformed resolves to `{ id: null, content: null }` rather than
+ * propagating a shape error into the UI.
+ */
+export function parseWhatsNewDocument(payload: unknown): { id: string | null; content: WhatsNewContent | null } {
+  if (!isObject(payload)) return { id: null, content: null };
+  const id = readNonEmptyString(payload.id);
+  const title = readNonEmptyString(payload.title);
+  const body = readNonEmptyString(payload.body);
+  if (id == null || title == null || body == null) return { id: null, content: null };
+
+  const imageUrl = readHttpsUrl(payload.imageUrl);
+  const linkUrl = readHttpsUrl(payload.linkUrl);
+  const ctaLabel = readNonEmptyString(payload.ctaLabel);
+  const locales = parseLocaleOverrides(payload.locales);
+  return {
+    id,
+    content: {
+      title,
+      body,
+      ...(imageUrl != null ? { imageUrl } : {}),
+      ...(linkUrl != null ? { linkUrl } : {}),
+      ...(ctaLabel != null ? { ctaLabel } : {}),
+      ...(locales != null ? { locales } : {}),
+    },
+  };
+}
+
+export function createWhatsNewService({
+  fetchImpl = fetch,
+  now = () => Date.now(),
+  env = process.env,
+}: WhatsNewServiceOptions = {}): WhatsNewService {
+  let cache: { key: string; result: WhatsNewReadResult } | null = null;
+  let inflight: Promise<WhatsNewReadResult> | null = null;
+
+  async function readWhatsNew(channel: string): Promise<WhatsNewReadResult> {
+    const sourceUrl = whatsNewSourceUrl(env, channel);
+    if (sourceUrl == null) {
+      // Without OD_WHATS_NEW_URL no build shows the card or reaches out to
+      // the network.
+      return { id: null, content: null, fetchedAt: now(), stale: false };
+    }
+    const cacheKey = sourceUrl;
+    const currentTime = now();
+    if (
+      cache?.key === cacheKey &&
+      currentTime - cache.result.fetchedAt < WHATS_NEW_CACHE_TTL_MS
+    ) {
+      return { ...cache.result, stale: false };
+    }
+    if (inflight) return inflight;
+
+    inflight = (async () => {
+      const ctrl = new AbortController();
+      const timeout = setTimeout(() => ctrl.abort(), WHATS_NEW_TIMEOUT_MS);
+      try {
+        const response = await fetchImpl(sourceUrl, {
+          headers: { accept: 'application/json' },
+          signal: ctrl.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`whats-new document request failed with HTTP ${response.status}`);
+        }
+        const payload = (await response.json()) as unknown;
+        const parsed = parseWhatsNewDocument(payload);
+        const result: WhatsNewReadResult = {
+          id: parsed.id,
+          content: parsed.content,
+          fetchedAt: now(),
+          stale: false,
+        };
+        cache = { key: cacheKey, result };
+        return result;
+      } catch {
+        if (cache?.key === cacheKey) return { ...cache.result, stale: true };
+        // The card is best-effort chrome; a broken document must not break home.
+        return { id: null, content: null, fetchedAt: now(), stale: true };
+      } finally {
+        clearTimeout(timeout);
+        inflight = null;
+      }
+    })();
+
+    return inflight;
+  }
+
+  return { readWhatsNew };
+}

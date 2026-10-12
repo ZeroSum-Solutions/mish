@@ -1,0 +1,195 @@
+/* Settings → Licensed packs.
+ *
+ * The global `.settings-section` supplies the flex column, the gap between
+ * blocks and the entrance animation, so this file adds no wrapper rule. Three
+ * cards: installed packs, install, GitHub access. Tokens only
+ * (docs/design/ui-system.md).
+ */
+
+.pageDesc {
+  margin: 0;
+  max-width: 68ch;
+  font: var(--font-body-sm);
+  color: var(--text-muted);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--inset-card);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+}
+
+.cardTitle {
+  margin: 0;
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+}
+
+.muted {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+}
+
+.ok {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--green);
+}
+
+.error {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--red);
+}
+
+.warn {
+  font: var(--font-caption);
+  color: var(--amber);
+}
+
+.inlineRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+}
+
+.emptyTitle {
+  margin: 0;
+  font: var(--font-label);
+  color: var(--text);
+}
+
+.packList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.packRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding: var(--space-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+}
+
+.packText {
+  display: flex;
+  min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.packHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.packTitle {
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+}
+
+.meta {
+  font: var(--font-caption);
+  color: var(--text-soft);
+  overflow-wrap: anywhere;
+}
+
+.destructive {
+  color: var(--red);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font: var(--font-label);
+  color: var(--text);
+}
+
+.hint {
+  font: var(--font-caption);
+  color: var(--text-muted);
+}
+
+.mono {
+  font-family: var(--mono);
+}
+
+/* The doubled class out-specifies the global `.modal label { flex-direction:
+   column }`, and the checkbox opts out of the base `input { width: 100% }`;
+   without both, Settings stacked the box above its text and centred them. */
+.check.check {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-2);
+  font: var(--font-label);
+  color: var(--text);
+}
+
+.check input[type='checkbox'] {
+  flex: none;
+  width: auto;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.hiddenFile {
+  display: none;
+}
+
+.accessStatus {
+  margin: 0;
+  font: var(--font-label);
+  color: var(--text-strong);
+}
+
+.warnings {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.warningList {
+  margin: 0;
+  padding-left: var(--space-4);
+  font: var(--font-caption);
+  color: var(--amber);
+}

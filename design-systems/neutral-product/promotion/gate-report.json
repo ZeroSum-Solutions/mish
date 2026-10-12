@@ -1,0 +1,662 @@
+{
+  "id": "neutral-product",
+  "version": "0.1.0",
+  "status": "candidate",
+  "ok": true,
+  "errors": [],
+  "criteria": [
+    {
+      "id": "DSP-01",
+      "title": "Reference lock, provenance, and original rationale",
+      "check": "human",
+      "recorded": "fail",
+      "messages": []
+    },
+    {
+      "id": "DSP-02",
+      "title": "Complete semantic tokens",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-03",
+      "title": "Light and dark modes",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-04",
+      "title": "Foundation rules documented",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-05",
+      "title": "Primitives, components, patterns, and states",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-06",
+      "title": "Responsive layouts at 360, 768, and 1280",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-07",
+      "title": "Touch and keyboard operation",
+      "check": "human",
+      "recorded": "fail",
+      "messages": []
+    },
+    {
+      "id": "DSP-08",
+      "title": "Reduced motion",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-09",
+      "title": "Realistic content",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-10",
+      "title": "Localization stress",
+      "check": "human",
+      "recorded": "fail",
+      "messages": []
+    },
+    {
+      "id": "DSP-11",
+      "title": "Contrast evidence (WCAG 2.2 AA)",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-12",
+      "title": "Focus behavior",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-13",
+      "title": "Screen-reader semantics",
+      "check": "human",
+      "recorded": "fail",
+      "messages": []
+    },
+    {
+      "id": "DSP-14",
+      "title": "Design-tool to code mapping",
+      "check": "human",
+      "recorded": "na",
+      "messages": []
+    },
+    {
+      "id": "DSP-15",
+      "title": "Representative specimens",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-16",
+      "title": "Visual-regression fixtures",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-17",
+      "title": "Package contract and implementation checks",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-18",
+      "title": "Documentation",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-19",
+      "title": "Changelog, ownership, and deprecation policy",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    },
+    {
+      "id": "DSP-20",
+      "title": "Independent design critique",
+      "check": "critique",
+      "recorded": "fail",
+      "computed": "fail",
+      "messages": [
+        "no independent critique of version 0.1.0 with verdict pass"
+      ]
+    },
+    {
+      "id": "DSP-21",
+      "title": "Clean-consumer verification",
+      "check": "machine",
+      "recorded": "pass",
+      "computed": "pass",
+      "messages": []
+    }
+  ],
+  "contrast": [
+    {
+      "mode": "light",
+      "fg": "--fg",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 16.87,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--fg",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 17.92,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--fg",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 15.71,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--fg-2",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 10.39,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--fg-2",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 11.04,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--muted",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 6.7,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--muted",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 7.12,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--muted",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 6.24,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--meta",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 5.25,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--meta",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 5.58,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--accent",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 7.09,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--accent",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 7.53,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--accent-on",
+      "bg": "--accent",
+      "kind": "text",
+      "ratio": 7.53,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--accent-on",
+      "bg": "--accent-hover",
+      "kind": "text",
+      "ratio": 9.26,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--accent-on",
+      "bg": "--accent-active",
+      "kind": "text",
+      "ratio": 11.21,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--success",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 5.84,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--warn",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 6.33,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--danger",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 6.54,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--border-strong",
+      "bg": "--surface",
+      "kind": "ui",
+      "ratio": 3.46,
+      "minimum": 3,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--border-strong",
+      "bg": "--bg",
+      "kind": "ui",
+      "ratio": 3.26,
+      "minimum": 3,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--accent-on",
+      "bg": "--danger",
+      "kind": "text",
+      "ratio": 6.54,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--fg-2",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 9.67,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--meta",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 4.89,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--accent",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 6.6,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--success",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 5.49,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--warn",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 5.96,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "fg": "--danger",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 6.15,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--fg",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 15.99,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--fg",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 14.84,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--fg",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 13.56,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--fg-2",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 12.1,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--fg-2",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 11.23,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--muted",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 8.16,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--muted",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 7.57,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--muted",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 6.92,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--meta",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 6.64,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--meta",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 6.16,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--accent",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 8.18,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--accent",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 7.6,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--accent-on",
+      "bg": "--accent",
+      "kind": "text",
+      "ratio": 7.86,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--accent-on",
+      "bg": "--accent-hover",
+      "kind": "text",
+      "ratio": 9.29,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--accent-on",
+      "bg": "--accent-active",
+      "kind": "text",
+      "ratio": 10.66,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--success",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 8.49,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--warn",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 8.42,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--danger",
+      "bg": "--surface",
+      "kind": "text",
+      "ratio": 6.91,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--border-strong",
+      "bg": "--surface",
+      "kind": "ui",
+      "ratio": 3.62,
+      "minimum": 3,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--border-strong",
+      "bg": "--bg",
+      "kind": "ui",
+      "ratio": 3.89,
+      "minimum": 3,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--accent-on",
+      "bg": "--danger",
+      "kind": "text",
+      "ratio": 7.16,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--fg-2",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 10.26,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--meta",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 5.63,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--accent",
+      "bg": "--surface-warm",
+      "kind": "text",
+      "ratio": 6.94,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--success",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 9.14,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--warn",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 9.07,
+      "minimum": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "fg": "--danger",
+      "bg": "--bg",
+      "kind": "text",
+      "ratio": 7.44,
+      "minimum": 4.5,
+      "pass": true
+    }
+  ]
+}

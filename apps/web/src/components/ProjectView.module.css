@@ -1,0 +1,59 @@
+.mobileSwitcher {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .responsiveSplit:global(.split) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+
+  .mobileSwitcher {
+    display: flex;
+    grid-column: 1;
+    grid-row: 1;
+    align-items: center;
+    min-width: 0;
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .responsiveSplit:global(.split) > :global(.split-chat-slot),
+  .responsiveSplit:global(.split) > :global(.workspace) {
+    grid-column: 1;
+    grid-row: 2;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* File tabs own the first row; project actions remain reachable below. */
+  .responsiveSplit :global(.ws-tabs-shell) {
+    height: auto;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .responsiveSplit :global(.ws-tabs-bar) {
+    flex: 1 1 calc(100% - var(--control-h-md) - var(--space-2));
+  }
+
+  .responsiveSplit :global(.ws-tabs-actions) {
+    flex: 1 1 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    margin-inline-start: 0;
+  }
+
+  .responsiveSplit > :global(.split-resize-handle) {
+    display: none;
+  }
+
+  .responsiveSplit :global(.ws-focus-expand) {
+    display: none;
+  }
+
+  .responsiveSplit[data-mobile-pane='chat'] > :global(.workspace),
+  .responsiveSplit[data-mobile-pane='workspace'] > :global(.split-chat-slot) {
+    display: none;
+  }
+}

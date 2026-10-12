@@ -1,0 +1,11 @@
+.genui-gradient-text { color: #c4b5fd; overflow-wrap: anywhere; }
+@supports (background-clip: text) {
+ .genui-gradient-text { background: linear-gradient(110deg, #f0e7ff 15%, #c4b5fd 36%, #a5d8ff 54%, #f0e7ff 76%); background-size: 240% 100%; background-clip: text; color: transparent; animation: genui-gradient-text-shift var(--genui-gradient-text-duration, 1200ms) ease-out both; }
+}
+.genui-gradient-text.genui-gradient-text--static, .genui-gradient-text.genui-gradient-text--reduced { animation: none; }
+@keyframes genui-gradient-text-shift {
+ from { background-position: 100% 50%; }
+ to { background-position: 0% 50%; }
+}
+@media (prefers-reduced-motion: reduce) { .genui-gradient-text { animation: none; } }
+@media (forced-colors: active) { .genui-gradient-text { background: none; color: CanvasText; } }

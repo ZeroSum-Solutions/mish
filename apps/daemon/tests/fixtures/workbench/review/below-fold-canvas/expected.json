@@ -1,0 +1,5 @@
+{
+  "description": "A canvas below the fold animated by a requestAnimationFrame loop: the pixel comparison cannot see it and DOM sampling cannot either, so the motion check is inconclusive, never not-applicable.",
+  "parameters": {},
+  "motion": "inconclusive"
+}

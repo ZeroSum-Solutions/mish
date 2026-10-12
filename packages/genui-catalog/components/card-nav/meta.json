@@ -1,0 +1,32 @@
+{
+  "id": "card-nav",
+  "name": "Card Nav",
+  "category": "navigation",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; a menu bar that expands into staggered link cards, rebuilt with CSS transitions instead of GSAP so it ships dependency-free.",
+  "entry": "components/card-nav/index.ts",
+  "css": "components/card-nav/styles.css",
+  "demo": "components/card-nav/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": { "type": "number", "default": 420, "minimum": 0, "description": "Open/close transition length, in ms." },
+      "stagger": { "type": "number", "default": 60, "minimum": 0, "description": "Delay between each card's entrance, in ms." },
+      "radius": { "type": "string", "default": "14px", "description": "Corner radius of the bar and cards." },
+      "open": { "type": "boolean", "default": false, "description": "Start with the cards shown." },
+      "closeOnOutside": { "type": "boolean", "default": true, "description": "Close when the pointer goes down outside the navigation." },
+      "closeOnLink": { "type": "boolean", "default": true, "description": "Close after a link inside the panel is chosen." }
+    }
+  },
+  "a11y": [
+    "The toggle is a native <button> that carries aria-expanded and aria-controls pointing at the card panel, so Enter and Space open it like a click.",
+    "Esc closes the open panel from anywhere inside the navigation and returns focus to the toggle.",
+    "The closed panel is visibility:hidden, so its links leave the tab order and the accessibility tree; without script the panel is always shown.",
+    "Every link and the toggle keep a visible :focus-visible ring, and forced-colors mode outlines each card."
+  ],
+  "reducedMotion": "static"
+}

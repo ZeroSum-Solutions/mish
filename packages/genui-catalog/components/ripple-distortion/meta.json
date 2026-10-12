@@ -1,0 +1,30 @@
+{
+  "id": "ripple-distortion",
+  "name": "Ripple Distortion",
+  "category": "hover",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/ripple-distortion/index.ts",
+  "css": "components/ripple-distortion/styles.css",
+  "demo": "components/ripple-distortion/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "strength": { "type": "number", "default": 24, "minimum": 0, "description": "Peak displacement-map scale of a ripple." },
+      "duration": { "type": "number", "default": 1400, "minimum": 0, "description": "Ripple lifetime, in ms." },
+      "frequency": { "type": "number", "default": 0.02, "minimum": 0, "description": "Base noise frequency of the ripple filter." },
+      "radius": { "type": "number", "default": 220, "minimum": 0, "description": "Mask radius, in px." },
+      "trigger": { "type": "string", "enum": ["move", "click"], "default": "move" },
+      "throttle": { "type": "number", "default": 120, "minimum": 0, "description": "Minimum time between ripples, in ms." },
+      "ambient": { "type": "boolean", "default": false, "description": "A very slow, low-amplitude shimmer while the host is in view." }
+    }
+  },
+  "a11y": [
+    "The duplicated `__warp` layer is `aria-hidden`; only the original `__media` element carries any label or alt text.",
+    "With `trigger:\"move\"` no click is listened for, so clicks are never intercepted.",
+    "With `trigger:\"click\"` the host is not made focusable: the effect is decoration only, and the host's own interactivity (or lack of it) is unchanged.",
+    "Reduced motion skips duplicating the media entirely: the image stays static and no filter or listener is attached."
+  ],
+  "reducedMotion": "static"
+}

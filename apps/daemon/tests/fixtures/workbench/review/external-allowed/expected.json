@@ -1,0 +1,8 @@
+{
+  "description": "B4-2 egress fixture: the known-good page plus a stylesheet and a gift-card CTA on external hosts. Default-deny leaves the resource and CTA checks inconclusive; allowing both exact hosts fetches them (recorded in the bundle) and every check passes; an allowed host that resolves to a private address stays inconclusive.",
+  "cases": {
+    "default-deny": { "allowHosts": [], "outcome": "inconclusive", "inconclusive": ["core.declared-actions", "core.console-resources"] },
+    "allowed": { "allowHosts": ["styles.review-egress.com", "shop.review-egress.com"], "outcome": "passed", "inconclusive": [] },
+    "private-address": { "allowHosts": ["styles.review-egress.com", "shop.review-egress.com"], "privateHosts": ["styles.review-egress.com"], "outcome": "inconclusive", "inconclusive": ["core.console-resources"] }
+  }
+}

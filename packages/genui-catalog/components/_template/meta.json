@@ -1,0 +1,30 @@
+{
+  "id": "glare-hover",
+  "name": "Glare Hover",
+  "category": "hover",
+  "kind": "css-only",
+  "status": "planned",
+  "entry": "components/glare-hover/index.ts",
+  "css": "components/glare-hover/styles.css",
+  "demo": "components/glare-hover/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "angle": { "type": "number", "default": -45, "description": "Direction of the band, in degrees." },
+      "size": { "type": "number", "default": 250, "minimum": 100, "description": "Size of the gradient band, as a percentage of the host." },
+      "colour": { "type": "string", "default": "#ffffff" },
+      "opacity": { "type": "number", "default": 0.5, "minimum": 0, "maximum": 0.6 },
+      "duration": { "type": "number", "default": 650, "minimum": 0, "description": "Sweep duration in ms." },
+      "easing": { "type": "string", "default": "ease" },
+      "playOnce": { "type": "boolean", "default": false, "description": "Snap back instantly on leave instead of sliding out." }
+    }
+  },
+  "a11y": [
+    "The glare is a pseudo-element, so it is not in the accessibility tree.",
+    "Keyboard focus (:focus-visible / :focus-within) plays the same sweep as hover.",
+    "Opacity is capped at 0.6 so text keeps its contrast while the band passes over it.",
+    "The host's own focus outline is untouched."
+  ],
+  "reducedMotion": "static"
+}

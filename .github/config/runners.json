@@ -1,0 +1,42 @@
+{
+  "schema": {
+    "version": 1
+  },
+  "defaultMode": "economic",
+  "aliases": {
+    "performance": "economic",
+    "blacksmith": "economic"
+  },
+  "profiles": {
+    "github.ubuntu": [
+      "ubuntu-24.04"
+    ],
+    "github.windows": [
+      "windows-latest"
+    ]
+  },
+  "modes": {
+    "default": {
+      "control": "github.ubuntu",
+      "general_medium": "github.ubuntu",
+      "workspace_unit": "github.ubuntu",
+      "windows_tools": "github.windows",
+      "js_hot": "github.ubuntu",
+      "ui_hot": "github.ubuntu",
+      "ui_p0": "github.ubuntu",
+      "ui_p0_heavy": "github.ubuntu",
+      "visual_hot": "github.ubuntu"
+    },
+    "economic": {
+      "control": "github.ubuntu",
+      "general_medium": "github.ubuntu",
+      "workspace_unit": "github.ubuntu",
+      "windows_tools": "github.windows",
+      "js_hot": "github.ubuntu",
+      "ui_hot": "github.ubuntu",
+      "ui_p0": "github.ubuntu",
+      "ui_p0_heavy": "github.ubuntu",
+      "visual_hot": "github.ubuntu"
+    }
+  }
+}

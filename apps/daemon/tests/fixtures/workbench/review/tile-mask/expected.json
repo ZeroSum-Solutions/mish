@@ -1,0 +1,7 @@
+{
+  "description": "The same 8 s img slideshow beside a busy bar without the viewport tampering; Pause stops only the bar. The slide tile changed in the no-preference load, so its later change is motion: pause and live fail.",
+  "parameters": {
+    "requireReducedMotionFallback": false
+  },
+  "motion": "fail"
+}

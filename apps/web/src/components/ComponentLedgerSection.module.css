@@ -1,0 +1,16 @@
+.section { margin-top: var(--space-6); padding: var(--inset-card); font: var(--font-body-sm); }
+.heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--space-3); }
+.heading h3 { margin: 0; font: var(--font-title); color: var(--text-strong); }
+.heading p { color: var(--text-muted); }
+.filters { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.filters label { display: flex; flex: 1; min-width: 0; flex-direction: column; gap: var(--space-1); font: var(--font-label); }
+.scroll { overflow: auto; max-height: 60vh; border: 1px solid var(--border); border-radius: var(--radius-md); }
+.scroll:focus-visible { outline: 2px solid var(--text-strong); outline-offset: var(--space-1); }
+.table { width: 100%; border-collapse: collapse; font: var(--font-body-sm); }
+.table caption { text-align: left; padding: var(--space-3); font: var(--font-title-sm); }
+.table th, .table td { text-align: left; vertical-align: top; padding: var(--space-3); border-bottom: 1px solid var(--border); }
+.table thead th { font: var(--font-label); background: var(--bg-subtle); }
+.table code, .table small { display: block; margin-top: var(--space-1); color: var(--text-muted); font: var(--font-caption); overflow-wrap: anywhere; }
+.table strong { font: var(--font-title-sm); }
+.error { color: var(--red); font: var(--font-caption); }
+@media (max-width: 600px) { .filters { flex-direction: column; } .heading { flex-wrap: wrap; } }

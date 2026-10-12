@@ -1,0 +1,48 @@
+{
+  "catalogComponents": [
+    "split-text",
+    "masked-heading",
+    "scroll-reveal",
+    "glare-hover"
+  ],
+  "effects": {
+    "scriptPolicy": "hash",
+    "maxEffects": 2,
+    "placements": {
+      "hero-title": {
+        "host": {
+          "odId": "listings-search--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-title": {
+        "host": {
+          "odId": "listings-categories--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-reveal": {
+        "host": {
+          "odId": "listings-inquiry--body"
+        },
+        "allow": [
+          "scroll-reveal"
+        ]
+      },
+      "cta": {
+        "host": {
+          "id": "listings-inquiry"
+        },
+        "allow": [
+          "glare-hover"
+        ]
+      }
+    }
+  }
+}

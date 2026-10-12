@@ -1,0 +1,41 @@
+{
+  "id": "marketing-site-02",
+  "businessName": "Larkspur Analytics",
+  "expectedSpine": "PA",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Larkspur Analytics"
+    },
+    {
+      "field": "product_name",
+      "value": "Signalboard"
+    },
+    {
+      "field": "address",
+      "value": "640 Folsom Street, San Francisco, California"
+    },
+    {
+      "field": "phone",
+      "value": "(415) 555-0161"
+    },
+    {
+      "field": "email",
+      "value": "support@larkspuranalytics.com"
+    },
+    {
+      "field": "hours",
+      "value": "Weekdays 8 a.m. to 6 p.m. Pacific"
+    },
+    {
+      "field": "legal",
+      "value": "Delaware corporation; encrypts customer data in transit and at rest"
+    },
+    {
+      "field": "pricing",
+      "value": "Starter $29/mo (1 product, 10,000 events); Growth $99/mo (unlimited products, 200,000 events); 14-day free trial, no card required"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

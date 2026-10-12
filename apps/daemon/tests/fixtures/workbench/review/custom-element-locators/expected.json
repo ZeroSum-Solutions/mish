@@ -1,0 +1,14 @@
+{
+  "description": "Sol round 8 WARN: findings under a custom element keep a usable structural locator. The custom tag is a positional *:nth-child(n) wildcard, never a token for the whole selector and never the page-chosen tag name.",
+  "outcome": "failed",
+  "criteria": {
+    "core.declared-actions": "fail",
+    "core.text-contrast": "fail",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  },
+  "evidenceIncludes": ["body > main > *:nth-child(2) > a (href", "body > main > *:nth-child(2) > p <page text:"],
+  "evidenceExcludes": ["x-card"]
+}

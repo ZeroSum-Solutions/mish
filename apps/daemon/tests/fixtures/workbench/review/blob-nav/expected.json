@@ -1,0 +1,4 @@
+{
+  "description": "B4-2 round 3 (W-B): a real cross-document navigation (to a blob: document under the preview origin) is still detected; every check is inconclusive.",
+  "cases": { "default-deny": { "allowHosts": [], "outcome": "inconclusive", "allInconclusive": true, "reason": "left the reviewed entry" } }
+}

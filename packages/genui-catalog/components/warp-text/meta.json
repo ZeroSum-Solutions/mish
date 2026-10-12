@@ -1,0 +1,33 @@
+{
+  "id": "warp-text",
+  "name": "Warp Text",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room WebGL port written from the one-line effect description only (no upstream source read): the host's real words are rasterised into a texture and drawn through a dependency-free sine-warp fragment shader with a gradient fill, falling back to static gradient text when WebGL is unavailable.",
+  "entry": "components/warp-text/index.ts",
+  "css": "components/warp-text/styles.css",
+  "demo": "components/warp-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "from": { "type": "string", "default": "#7dd3fc", "description": "Gradient start colour (left), as #rgb or #rrggbb; also used by the static fallback." },
+      "to": { "type": "string", "default": "#c084fc", "description": "Gradient end colour (right), as #rgb or #rrggbb." },
+      "amplitude": { "type": "number", "default": 5, "minimum": 0, "maximum": 40, "description": "Peak displacement of the warp, in CSS px." },
+      "frequency": { "type": "number", "default": 1.5, "minimum": 0.1, "maximum": 8, "description": "Wave count across the text." },
+      "speed": { "type": "number", "default": 1, "minimum": 0, "description": "Flow speed; 0 holds a still frame." },
+      "chroma": { "type": "number", "default": 0.8, "minimum": 0, "maximum": 6, "description": "RGB split between the colour channels, in CSS px." },
+      "interactive": { "type": "boolean", "default": true, "description": "A soft lens bulge follows the pointer over the text." }
+    }
+  },
+  "a11y": [
+    "The original text stays in the DOM exactly once, only made transparent while the shader draws, so screen readers, find-in-page, selection and translation all use the real words.",
+    "The warped canvas is aria-hidden and pointer-events: none; focus, links and reading order inside the host are unchanged.",
+    "Reduced motion hides the canvas, stops the render loop and shows the text as a still gradient fill.",
+    "Forced-colors mode drops the gradient and the canvas and paints the text in CanvasText."
+  ],
+  "reducedMotion": "static"
+}

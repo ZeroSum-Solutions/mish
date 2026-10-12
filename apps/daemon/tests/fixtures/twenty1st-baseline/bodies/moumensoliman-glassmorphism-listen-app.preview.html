@@ -1,0 +1,59 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-GuNLGLJOMC++TT0tA9NQ2EN698IurbLtZUn0ZNWUyZA='; style-src 'sha256-h/KC3sJj55o7qPrYqq9mgKm7VKLUJBi8BHDrQ6fWwxM='; style-src-attr 'unsafe-hashes' 'none'; img-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none';"><title>Listening room — original ZeroSum alternative</title><style>html,body{margin:0;min-height:100%;background:transparent}#demo{min-height:100vh}.mm-original{--bg:#101214;--surface:#1a1e22;--ink:#f4f6f8;--muted:#a8b2bb;--line:#343d45;--accent:#a5efcf;color-scheme:dark;background:var(--bg);color:var(--ink);font:14px/1.5 system-ui,sans-serif;min-height:310px;padding:24px;box-sizing:border-box;overflow:hidden;position:relative;display:grid;grid-template-columns:min(100%,600px);justify-content:center;align-content:center;gap:16px}
+.mm-original[data-theme=light]{--bg:#f3f5f7;--surface:#fff;--ink:#141a20;--muted:#53616e;--line:#d3dbe1;--accent:#087951;color-scheme:light}
+.mm-original *{box-sizing:border-box}.mm-original h1,.mm-original h2,.mm-original h3,.mm-original p{margin:0}.mm-original h2{font-size:28px;line-height:1.1;letter-spacing:-1px;font-weight:550;text-wrap:balance}.mm-original h3{font-weight:550;font-size:19px}.mm-original small,.mm-original .muted{color:var(--muted)}.mm-original button,.mm-original input,.mm-original select{font:inherit;color:inherit}.mm-original button{cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:var(--surface);min-height:40px}.mm-original button:hover{border-color:var(--accent)}.mm-original button[aria-pressed=true],.mm-original .primary{background:var(--accent);color:var(--bg);border-color:var(--accent)}.mm-original :focus-visible{outline:2px solid var(--accent);outline-offset:3px}.mm-original .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.mm-original .between{justify-content:space-between}.mm-original .panel{padding:18px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}.mm-original .stack{display:grid;gap:14px}.mm-original .eyebrow{font:11px/1.5 ui-monospace,monospace;text-transform:uppercase;letter-spacing:2px;color:var(--accent)}.mm-original .art{position:relative;min-height:150px;border-radius:14px;background:linear-gradient(135deg,#123d50,#257b75 60%,#debc76);overflow:hidden}.mm-original .art:before{content:'';position:absolute;width:180px;height:180px;background:#fcdec2;border-radius:50%;left:50%;top:40%;box-shadow:0 0 0 30px #fff2;transform:translate(-50%,-50%)}.mm-original .art:after{content:'';position:absolute;width:220px;height:90px;background:#063d46;transform:rotate(-22deg);bottom:-25px;left:20%}.mm-original [role=status]{font-size:12px;color:var(--muted);min-height:18px}.mm-original svg{max-width:100%}.mm-original input:not([type=range]){background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;width:100%;min-width:0}.mm-original [hidden]{display:none!important}.mm-original dialog{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:18px;max-width:calc(100% - 32px);padding:24px}.mm-original dialog::backdrop{background:#0009;backdrop-filter:blur(5px)}
+@media(max-width:420px){.mm-original{padding:16px}.mm-original h2{font-size:25px}}@media(prefers-reduced-motion:reduce){.mm-original *,.mm-original *:before,.mm-original *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}.mm-original[data-reduced-motion=true] *,.mm-original[data-reduced-motion=true] *:before,.mm-original[data-reduced-motion=true] *:after{animation:none!important;transition:none!important}
+.mm-original .listen{background:linear-gradient(140deg,#7c8fc81c,#dbabec18);backdrop-filter:blur(12px);border-color:#8aa6bf55}.mm-original .album{min-height:115px;margin-bottom:14px;background:linear-gradient(130deg,#273c5e,#9082b4)}.mm-original .listen input{width:100%;accent-color:var(--accent);margin:16px 0}.mm-original .listen .art:before{width:100px;height:100px;background:#e4cfdc}
+.mm-original .listen .album:before{width:110px;height:110px;top:50%;background:repeating-radial-gradient(circle,#27313d 0 4px,#52627b 5px 6px);box-shadow:0 0 0 1px #fff3;border:25px solid #15202c}.mm-original .listen .album:after{width:25px;height:25px;background:#ebc8c3;border-radius:50%;left:calc(50% - 12px);top:calc(50% - 12px);bottom:auto;transform:none}
+</style><main id="demo"></main><script type="module">/** Independently authored by ZeroSum. No upstream component source is used. */
+                                                                                      
+                                                   
+function setup(el             , html        , opts                  = {}) {
+  const attributes = [...el.attributes].map(a => [a.name, a.value]         );
+  const children = [...el.childNodes];
+  const abort = new AbortController();
+  el.classList.add('mm-original');
+  el.dataset.theme = opts.theme ?? 'dark';
+  el.dataset.reducedMotion = String(opts.reducedMotion ?? false);
+  el.innerHTML = html;
+  function on(event        , callback                        ) {
+    el.addEventListener(event, callback, { signal: abort.signal });
+  }
+  function query                                 (selector        )    { return el.querySelector   (selector) ; }
+  function status(text        ) { const node = el.querySelector('[role=status]'); if (node) node.textContent = text; }
+  let destroyed = false;
+  return { el, on, query, status, signal: abort.signal, get reducedMotion() { return opts.reducedMotion || el.ownerDocument.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches || false; }, destroy() {
+    if (destroyed) return;
+    destroyed = true;
+    el.querySelectorAll('dialog[open]').forEach(d => (d                     ).close());
+    abort.abort();
+    el.replaceChildren(...children);
+    for (const a of [...el.attributes]) el.removeAttribute(a.name);
+    for (const [name, value] of attributes) el.setAttribute(name, value);
+  } };
+}
+function action(event       )                     {
+  return (event.target           ).closest             ('[data-action]')?.dataset.action;
+}
+function escapeText(value        )         {
+  return value.replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[c] );
+}
+
+/** Independently authored ZeroSum alternative. Upstream is a visual reference only. */
+function mount(el             , opts                  = {})                 {
+    const s = setup(el, "<div class=\"listen panel\"><div class=\"album art\"></div><span class=\"eyebrow\">Listening room \u00b7 UI demo</span><h2 class=\"track-title\">Soft horizon</h2><p class=\"muted\">Studio Session / Vol. 02</p><input type=\"range\" min=\"0\" max=\"180\" value=\"42\" aria-label=\"Playback position\"><div class=\"row between\"><small class=\"position\">0:42 / 3:00</small><div class=\"row\"><button data-action=\"previous\" aria-label=\"Previous track\">\u2190</button><button data-action=\"play\" aria-pressed=\"false\">Play</button><button data-action=\"next\" aria-label=\"Next track\">\u2192</button></div></div><p role=\"status\">Player interaction demo \u00b7 no audio source</p></div>", opts);
+    let i = 0;
+    s.on('click', e => { const a = action(e); if (a === 'play') {
+        const b = e.target               , p = b.getAttribute('aria-pressed') !== 'true';
+        b.setAttribute('aria-pressed', String(p));
+        b.textContent = p ? 'Pause' : 'Play';
+        s.status(p ? 'Playing state · UI demo, no audio source' : 'Paused state · UI demo');
+    } if (a === 'next' || a === 'previous') {
+        i = (i + (a === 'next' ? 1 : 2)) % 3;
+        s.query('.track-title').textContent = ['Soft horizon', 'Night transit', 'Ocean glass'][i] ;
+    } });
+    s.on('input', e => { const n = Number((e.target                    ).value); s.query('.position').textContent = `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')} / 3:00`; });
+    return { destroy: s.destroy };
+}
+
+mount(document.getElementById("demo"), {theme: new URLSearchParams(location.search).get("theme") === "light" ? "light" : "dark", reducedMotion: new URLSearchParams(location.search).get("motion") === "reduced"});
+document.addEventListener("keydown", function(event) { if (event.key === "Escape" && !event.defaultPrevented && !document.querySelector("dialog[open]") && parent !== window) { event.preventDefault(); parent.postMessage({type: "mishh-original-preview-escape"}, "*"); } });</script></html>

@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-03",
+  "businessName": "Brackenfield Recruiting",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Brackenfield Recruiting"
+    },
+    {
+      "field": "address",
+      "value": "233 South Wacker Drive, Suite 1400, Chicago, Illinois"
+    },
+    {
+      "field": "phone",
+      "value": "(312) 555-0129"
+    },
+    {
+      "field": "email",
+      "value": "desk@brackenfieldrecruiting.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Registered staffing agency in the State of Illinois"
+    },
+    {
+      "field": "other",
+      "value": "Six-recruiter desk"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Recruiter A. Voss submitted a candidate to Harrow Manufacturing, moved to interviewing, 25 minutes ago"
+    }
+  ]
+}

@@ -1,0 +1,135 @@
+name: Setup workspace
+description: Install and postinstall-build the Node workspace; reclaim unused Android/.NET SDKs on disposable hosted Linux runners
+
+inputs:
+  node-version:
+    description: Node.js version to install
+    required: false
+    default: '24'
+  pnpm-version:
+    description: pnpm version to install
+    required: false
+    default: '10.33.2'
+  runner-labels:
+    description: JSON array of labels selected for this job's runs-on value
+    required: false
+    default: '[]'
+  save-pnpm-cache:
+    description: Save a missing pnpm cache after install; trusted main seed jobs only
+    required: false
+    default: 'false'
+
+runs:
+  using: composite
+  steps:
+    - name: Prepare hosted Linux disk and memory
+      if: ${{ runner.os == 'Linux' && runner.environment == 'github-hosted' }}
+      shell: bash
+      run: |
+        set -euo pipefail
+        # These disposable Node/Chromium jobs do not use Android or .NET.
+        # Reclaim their preinstalled SDKs before reserving swap: otherwise a
+        # standard hosted image can exhaust disk while extracting Chromium.
+        sudo rm -rf /usr/local/lib/android /usr/share/dotnet
+        memory_kib="$(awk '/^MemTotal:/ { print $2 }' /proc/meminfo)"
+        swap_kib="$(awk '/^SwapTotal:/ { print $2 }' /proc/meminfo)"
+        # Private-repository runners have 7 GB RAM. A browser suite can run
+        # multiple independent daemons even with one Playwright worker.
+        # Keep the full tests, with disk-backed headroom against kernel OOM.
+        if [ "$memory_kib" -lt 12582912 ] && [ "$swap_kib" -lt 8388608 ]; then
+          swap_file="$RUNNER_TEMP/mishmash-ci.swap"
+          sudo fallocate -l 8G "$swap_file"
+          sudo chmod 600 "$swap_file"
+          sudo mkswap "$swap_file"
+          sudo swapon "$swap_file"
+        fi
+        # Leave 12 GiB for the pnpm store, node_modules, browser extraction,
+        # and build output, measured after the separate swap reservation.
+        minimum_free_kib=$((12 * 1024 * 1024))
+        for install_path in "$RUNNER_TEMP" "$GITHUB_WORKSPACE" "$HOME"; do
+          available_kib="$(df -Pk "$install_path" | awk 'NR == 2 { print $4 }')"
+          if [ "$available_kib" -lt "$minimum_free_kib" ]; then
+            echo "Hosted runner needs at least 12 GiB free after swap for dependencies and browsers: $install_path" >&2
+            df -h "$install_path"
+            exit 1
+          fi
+        done
+        free -h
+        df -h "$RUNNER_TEMP" "$GITHUB_WORKSPACE" "$HOME"
+
+    - name: Detect persistent pnpm store
+      id: persistent-pnpm-store
+      shell: bash
+      env:
+        RUNNER_LABELS_JSON: ${{ inputs.runner-labels }}
+      run: |
+        case "$RUNNER_LABELS_JSON" in
+          *'"od-persistent-ci"'*) persistent_enabled=true ;;
+          *) persistent_enabled=false ;;
+        esac
+
+        if [ "$persistent_enabled" = "true" ]; then
+          if [ -z "${OPEN_DESIGN_CI_CACHE:-}" ]; then
+            echo "runner-labels contains od-persistent-ci, but OPEN_DESIGN_CI_CACHE is not set" >&2
+            exit 1
+          fi
+          store_dir="$OPEN_DESIGN_CI_CACHE/pnpm-store"
+          mkdir -p "$store_dir"
+          {
+            echo "NPM_CONFIG_STORE_DIR=$store_dir"
+            echo "npm_config_store_dir=$store_dir"
+          } >> "$GITHUB_ENV"
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+          echo "path=$store_dir" >> "$GITHUB_OUTPUT"
+        else
+          # Force a stable home store path so actions/cache version hashes match
+          # across fleets (hosted vs self-hosted ARC). ARC may copy instead of hardlink;
+          # that is acceptable for cache hit stability.
+          store_dir="$HOME/.pnpm-store"
+          mkdir -p "$store_dir"
+          {
+            echo "NPM_CONFIG_STORE_DIR=$store_dir"
+            echo "npm_config_store_dir=$store_dir"
+          } >> "$GITHUB_ENV"
+          echo "enabled=false" >> "$GITHUB_OUTPUT"
+          echo "path=$store_dir" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v6.0.8
+      with:
+        version: ${{ inputs.pnpm-version }}
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v6.4.0
+      with:
+        node-version: ${{ inputs.node-version }}
+        package-manager-cache: false
+
+    - name: Resolve pnpm store path
+      id: pnpm-store
+      shell: bash
+      run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+    - name: Restore pnpm store
+      id: pnpm-cache-restore
+      if: ${{ steps.persistent-pnpm-store.outputs.enabled != 'true' }}
+      uses: actions/cache/restore@v5
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+        restore-keys: |
+          pnpm-store-${{ runner.os }}-
+
+    - name: Install dependencies
+      shell: bash
+      # Root postinstall builds daemon runtime/declarations and shared packages.
+      # Consumers rely on those outputs even on a warm dependency cache.
+      run: pnpm install --frozen-lockfile --ignore-scripts=false
+
+    - name: Save pnpm store
+      if: ${{ inputs.save-pnpm-cache == 'true' && steps.persistent-pnpm-store.outputs.enabled != 'true' && steps.pnpm-cache-restore.outputs.cache-hit != 'true' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event_name == 'schedule') }}
+      uses: actions/cache/save@v5
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: pnpm-store-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}

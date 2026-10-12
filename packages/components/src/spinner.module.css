@@ -1,0 +1,39 @@
+.spinner {
+  display: inline-block;
+  flex: none;
+  border-radius: var(--radius-pill, 999px);
+  border: 2px solid color-mix(in srgb, currentColor 22%, transparent);
+  border-top-color: currentColor;
+  animation: spinner-turn 720ms linear infinite;
+}
+
+.sm {
+  width: 12px;
+  height: 12px;
+  border-width: 1.5px;
+}
+
+.md {
+  width: 16px;
+  height: 16px;
+}
+
+.lg {
+  width: 24px;
+  height: 24px;
+  border-width: 2.5px;
+}
+
+@keyframes spinner-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    /* Stationary under reduced motion: the half-tinted ring still reads as
+       busy, and the parent's aria-busy / label announces it. */
+    animation: none !important;
+  }
+}

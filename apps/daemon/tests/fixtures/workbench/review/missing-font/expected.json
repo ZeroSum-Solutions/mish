@@ -1,0 +1,12 @@
+{
+  "description": "The heading font file is missing (404). A missing font is a broken resource under core.console-resources.",
+  "outcome": "failed",
+  "criteria": {
+    "core.declared-actions": "pass",
+    "core.text-contrast": "pass",
+    "core.console-resources": "fail",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  }
+}

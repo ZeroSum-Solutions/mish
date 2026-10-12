@@ -1,0 +1,242 @@
+/* Command-palette style dropdown anchored to the tab strip's "+" button.
+   Rendered through a portal into document.body with fixed positioning, so it
+   is immune to the workspace's nested overflow clipping.
+
+   Wave 2 (docs/design/ui-system.md § 7, § 10): a functional-layer menu on the
+   THICK glass at elevation 3; a search FIELD that carries the shared shimmer
+   focus (the row draws no rule); calm filter chips; rows on the menu-item
+   inset with one fill for the active row and no button-shaped pills. */
+
+.menu {
+  position: fixed;
+  z-index: 60;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  display: flex;
+  flex-direction: column;
+  background: var(--glass-surface);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--material-separator);
+  border-radius: var(--radius-md);
+  box-shadow: var(--glass-surface-sheen), var(--elevation-3);
+  overflow: hidden;
+  /* Floating-layer entrance per docs/design/ui-system.md § Motion: the pop
+     spring, from slightly above and scaled down. */
+  transform-origin: top center;
+  animation: launcher-in var(--spring-pop-duration) var(--spring-pop);
+}
+
+@keyframes launcher-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--enter-offset))) scale(var(--enter-scale));
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.searchRow {
+  padding: var(--space-2) var(--space-2) var(--space-1);
+}
+
+/* The field shell: background, sheen and the focus shimmer come from the
+   shared `[data-ui-field-shell]` contract in styles/workspace-ui.css. */
+.searchField {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-h-compact);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  cursor: text;
+}
+
+.searchIcon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--text-soft);
+}
+
+.searchInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font: var(--font-body-sm);
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--text-faint);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+}
+
+.scrollBody {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  max-height: min(420px, calc(100vh - 190px));
+  padding: var(--space-1) var(--inset-menu) var(--inset-menu);
+}
+
+.section {
+  display: block;
+}
+
+.section + .section {
+  margin-top: var(--space-2);
+}
+
+/* Group label: quiet caption, aligned with the row icons below it
+   (menu inset + menu-item inset). */
+.sectionHeader {
+  padding: var(--space-2) var(--space-3) var(--space-1);
+  color: var(--text-soft);
+  font: var(--font-caption);
+  font-weight: var(--weight-medium);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--space-3);
+  width: 100%;
+  /* The global button primitive pins 36px; menu rows size by the menu-item
+     inset and the label line instead (34px). */
+  height: auto;
+  padding: var(--inset-menu-item);
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text);
+  font: var(--font-label);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    box-shadow var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+
+/* Guarded against .rowSelected so the hover fill and the segmented thumb
+   never paint the same row at once (docs/design/ui-system.md § 7: exactly
+   one highlight per row at any time) — explicit, not left to selector
+   source order. */
+.row:hover:not(.rowSelected) {
+  background: var(--chip-hover-fill);
+  color: var(--text-strong);
+}
+
+/* The active row (hover or arrow keys) rides the segmented thumb: the same
+   raised surface that marks the current choice in segmented controls and
+   the nav rail, so selection reads as one system. */
+.row.rowSelected {
+  background: var(--segmented-thumb);
+  box-shadow: var(--segmented-thumb-shadow);
+  color: var(--text-strong);
+}
+
+.row:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+.row:active {
+  transform: scale(var(--press-scale-card));
+  transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-hover), var(--motion-press);
+}
+
+.rowIcon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--text-muted);
+}
+
+.row:hover .rowIcon,
+.row.rowSelected .rowIcon {
+  color: var(--text-strong);
+}
+
+.rowBody {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.rowName {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* "Already open" state on a file row: quiet trailing caption text. */
+.rowState {
+  flex: 0 0 auto;
+  color: var(--text-soft);
+  font: var(--font-caption);
+}
+
+/* Trailing go-glyph: hidden at rest; the hovered or keyboard-selected row
+   shows it. It slides in a few pixels so the row reads as "go here". */
+.rowGo {
+  flex: 0 0 auto;
+  display: inline-flex;
+  color: var(--text-soft);
+  opacity: 0;
+  transform: translateX(calc(-1 * var(--space-1)));
+  transition:
+    opacity var(--motion-exit) var(--ease-out-quint),
+    transform var(--motion-exit) var(--ease-out-quint);
+}
+
+.row:hover .rowGo,
+.row.rowSelected .rowGo,
+.row:focus-visible .rowGo {
+  opacity: 1;
+  transform: none;
+  transition-duration: var(--motion-enter);
+}
+
+.empty {
+  padding: var(--space-4) var(--space-3);
+  text-align: center;
+  color: var(--text-soft);
+  font: var(--font-body-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rowGo {
+    transform: none;
+  }
+}

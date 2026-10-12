@@ -1,0 +1,37 @@
+{
+  "id": "marketing-site-04",
+  "businessName": "Pemberton Homes",
+  "expectedSpine": "SM",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Pemberton Homes"
+    },
+    {
+      "field": "address",
+      "value": "1801 Grove Avenue, Richmond, Virginia"
+    },
+    {
+      "field": "phone",
+      "value": "(804) 555-0154"
+    },
+    {
+      "field": "email",
+      "value": "info@pembertonhomes.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Saturday, 9 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed to conduct real estate brokerage in the Commonwealth of Virginia"
+    },
+    {
+      "field": "other",
+      "value": "Team of eight agents"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

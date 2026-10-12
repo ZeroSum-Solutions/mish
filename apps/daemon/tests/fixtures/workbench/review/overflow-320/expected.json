@@ -1,0 +1,12 @@
+{
+  "description": "A fixed 340px panel makes the document scroll horizontally at 320px only.",
+  "outcome": "failed",
+  "criteria": {
+    "core.declared-actions": "pass",
+    "core.text-contrast": "pass",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "fail",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  }
+}

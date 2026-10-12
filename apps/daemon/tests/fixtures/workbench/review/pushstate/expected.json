@@ -1,0 +1,4 @@
+{
+  "description": "B4-2 round 3 (W-B): an SPA that pushState()s on load stays the same document, so it is judged, not inconclusive.",
+  "cases": { "default-deny": { "allowHosts": [], "outcome": "passed", "notReason": "left the reviewed entry" } }
+}

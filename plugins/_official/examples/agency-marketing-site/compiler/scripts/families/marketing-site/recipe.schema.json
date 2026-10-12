@@ -1,0 +1,197 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-design.ai/schemas/agency-site/marketing-site/recipe.v2.json",
+  "title": "marketing-site recipe",
+  "description": "A static marketing site page kind: a hero, three features, three testimonials, three pricing tiers, one call to action and a footer. Mirrors compiler/scripts/families/marketing-site/{slots.ts,contract.ts} field for field; run render.test.ts's schema cross-check before trusting either copy alone.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "family", "revision", "brand", "sections"],
+  "sectionOrder": ["marketing-site-hero", "marketing-site-features", "marketing-site-proof", "marketing-site-pricing", "marketing-site-cta", "marketing-site-footer"],
+  "$comment": "contract.ts additionally enforces control-character/markup-free plain text on every slot, and that a null appears only where MARKETING_SITE_NULLABLE_ATOMS (slots.ts) allows it: the proof section's items, and the pricing section's items, as a whole array. A pricing tier's period is a required, validated field that render.ts does not expose as its own reconcilable data-od-id slot (kept the family inside the 40-60 slot budget, the same way crm-dashboard's chart unit field works).",
+  "properties": {
+    "schemaVersion": { "const": 2 },
+    "family": { "const": "marketing-site" },
+    "revision": { "type": "integer", "minimum": 1, "maximum": 9999 },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "descriptor"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "descriptor": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "minItems": 6,
+      "maxItems": 6,
+      "items": false,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text"],
+          "properties": {
+            "id": { "const": "marketing-site-hero" },
+            "type": { "const": "hero" },
+            "text": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["eyebrow", "heading", "body", "primaryCta", "secondaryCta"],
+              "properties": {
+                "eyebrow": { "type": "string", "minLength": 1, "maxLength": 40 },
+                "heading": { "type": "string", "minLength": 1, "maxLength": 60 },
+                "body": { "type": "string", "minLength": 1, "maxLength": 200 },
+                "primaryCta": { "type": "string", "minLength": 1, "maxLength": 32 },
+                "secondaryCta": { "type": "string", "minLength": 1, "maxLength": 32 }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text", "items"],
+          "properties": {
+            "id": { "const": "marketing-site-features" },
+            "type": { "const": "feature-grid" },
+            "text": {
+              "type": "object", "additionalProperties": false, "required": ["heading", "body"],
+              "properties": {
+                "heading": { "type": "string", "minLength": 1, "maxLength": 60 },
+                "body": { "type": "string", "minLength": 1, "maxLength": 200 }
+              }
+            },
+            "items": {
+              "type": "array", "minItems": 3, "maxItems": 3,
+              "items": { "$ref": "#/$defs/featureItem" }
+            }
+          }
+        },
+        {
+          "type": ["object", "null"],
+          "x-optional": {
+            "label": "customer testimonials",
+            "dropWhen": "The brief quotes no customer word for word. A brief that only asks for testimonials, reviews or a quote from some client supplies none.",
+            "keepWhen": "The brief itself contains a customer's own words in quotation marks, with who said them, to show as social proof.",
+            "navSlots": [],
+            "requires": "quote"
+          },
+          "additionalProperties": false,
+          "required": ["id", "type", "items"],
+          "properties": {
+            "id": { "const": "marketing-site-proof" },
+            "type": { "const": "testimonials" },
+            "items": {
+              "x-atom": "testimonials",
+              "oneOf": [
+                { "type": "null" },
+                { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/testimonialItem" } }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text", "items"],
+          "properties": {
+            "id": { "const": "marketing-site-pricing" },
+            "type": { "const": "pricing" },
+            "text": {
+              "type": "object", "additionalProperties": false, "required": ["heading"],
+              "properties": { "heading": { "type": "string", "minLength": 1, "maxLength": 60 } }
+            },
+            "items": {
+              "x-atom": "pricing",
+              "x-mock": true,
+              "oneOf": [
+                { "type": "null" },
+                { "type": "array", "minItems": 3, "maxItems": 3, "items": { "$ref": "#/$defs/pricingTier" } }
+              ]
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text"],
+          "properties": {
+            "id": { "const": "marketing-site-cta" },
+            "type": { "const": "cta" },
+            "text": {
+              "type": "object", "additionalProperties": false, "required": ["heading", "body", "cta"],
+              "properties": {
+                "heading": { "type": "string", "minLength": 1, "maxLength": 60 },
+                "body": { "type": "string", "minLength": 1, "maxLength": 200 },
+                "cta": { "type": "string", "minLength": 1, "maxLength": 32 }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["id", "type", "text", "items"],
+          "properties": {
+            "id": { "const": "marketing-site-footer" },
+            "type": { "const": "footer" },
+            "text": {
+              "type": "object", "additionalProperties": false, "required": ["tagline"],
+              "properties": { "tagline": { "type": "string", "minLength": 1, "maxLength": 120 } }
+            },
+            "items": {
+              "type": "object", "additionalProperties": false, "required": ["columns"],
+              "properties": {
+                "columns": {
+                  "type": "array", "minItems": 3, "maxItems": 3,
+                  "items": { "$ref": "#/$defs/footerColumn" }
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "featureItem": {
+      "type": "object", "additionalProperties": false, "required": ["title", "body"],
+      "properties": {
+        "title": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "body": { "type": "string", "minLength": 1, "maxLength": 200 }
+      }
+    },
+    "testimonialItem": {
+      "type": "object", "additionalProperties": false, "required": ["quote", "name", "role"],
+      "properties": {
+        "quote": { "type": "string", "minLength": 1, "maxLength": 200, "x-verify": "quote" },
+        "name": { "type": ["string", "null"], "minLength": 1, "maxLength": 60, "x-atom": "person-name" },
+        "role": { "type": "string", "minLength": 1, "maxLength": 60 }
+      }
+    },
+    "pricingTier": {
+      "type": "object", "additionalProperties": false, "required": ["name", "price", "period", "features", "cta"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1, "maxLength": 60 },
+        "price": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "period": { "type": "string", "minLength": 1, "maxLength": 16 },
+        "features": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "items": { "type": "string", "minLength": 1, "maxLength": 48 }
+        },
+        "cta": { "type": "string", "minLength": 1, "maxLength": 32 }
+      }
+    },
+    "footerColumn": {
+      "type": "object", "additionalProperties": false, "required": ["heading", "links"],
+      "properties": {
+        "heading": { "x-label": true, "type": "string", "minLength": 1, "maxLength": 32 },
+        "links": {
+          "type": "array", "minItems": 3, "maxItems": 3,
+          "items": { "x-label": true, "x-atom": "page-or-service-named-in-brief", "type": ["string", "null"], "minLength": 1, "maxLength": 32 }
+        }
+      }
+    }
+  }
+}

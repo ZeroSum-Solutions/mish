@@ -1,0 +1,37 @@
+{
+  "id": "magnet",
+  "name": "Magnet",
+  "category": "hover",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/magnet/index.ts",
+  "css": "components/magnet/styles.css",
+  "demo": "components/magnet/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "strength": {
+        "type": "number",
+        "default": 10,
+        "minimum": 0,
+        "maximum": 24
+      },
+      "duration": {
+        "type": "number",
+        "default": 240,
+        "minimum": 0,
+        "maximum": 600
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static"
+}

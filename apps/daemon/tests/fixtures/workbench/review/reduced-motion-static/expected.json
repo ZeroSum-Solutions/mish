@@ -1,0 +1,13 @@
+{
+  "description": "The same carousel with a keyboard-reachable Pause button that stops it, a static prefers-reduced-motion: reduce fallback (no transition, no progress animation, no auto-advance) and a matchMedia listener that stops it when the preference switches to reduce mid-session; every mandatory check and the opt-in motion check pass.",
+  "outcome": "passed",
+  "criteria": {
+    "core.declared-actions": "pass",
+    "core.text-contrast": "pass",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  },
+  "motion": "pass"
+}

@@ -1,0 +1,14 @@
+Near-miss fixture — must route to (or stay) `maren`, NOT `storefront`.
+
+Kessler Silverworks is a one-person jewelry studio in Halifax. Every piece is made to order:
+there is no catalog to browse and nothing to buy off a shelf. A client who wants a ring, a chain
+or a custom commission calls or emails to discuss the piece, agree on materials and a price, and
+the studio starts work once the order is placed. There is no shop URL and no "add to cart" — the
+only ways in are a phone call or an email. Materials are hand-selected sterling silver and
+reclaimed gold; turnaround runs six to ten weeks depending on the commission. A few past clients
+have mentioned how carefully their pieces were finished. The studio takes visitors by appointment
+only, at a small bench space above a hardware store.
+
+This is `maren`'s journey (a made-to-order atelier, order by phone or email, no catalog buy), not
+`storefront`'s (a catalog a visitor buys from). `storefront` must not pick this brief: there is no
+merchandise to browse and no buy-or-preorder action, only a commission conversation.

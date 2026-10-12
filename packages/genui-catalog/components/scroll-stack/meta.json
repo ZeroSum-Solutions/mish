@@ -1,0 +1,32 @@
+{
+  "id": "scroll-stack",
+  "name": "Scroll Stack",
+  "category": "scroll",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; sticky-positioned cards pile up natively as the page scrolls, and a small IO-gated scroll listener adds a scale-and-dim depth cue without the upstream smooth-scroll dependency.",
+  "entry": "components/scroll-stack/index.ts",
+  "css": "components/scroll-stack/styles.css",
+  "demo": "components/scroll-stack/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "top": { "type": "number", "default": 24, "description": "Distance from the top of the scroll container where the first card pins, in px." },
+      "offset": { "type": "number", "default": 12, "minimum": 0, "description": "Extra pin offset per card, in px, so a ledge of each earlier card stays visible." },
+      "gap": { "type": "number", "default": 48, "minimum": 0, "description": "Scroll distance between cards before they stack, in px." },
+      "scaleStep": { "type": "number", "default": 0.05, "minimum": 0, "maximum": 0.3, "description": "Scale lost per card stacked on top." },
+      "dim": { "type": "number", "default": 0.15, "minimum": 0, "maximum": 0.8, "description": "Brightness lost per card stacked on top." },
+      "maxDepth": { "type": "number", "default": 3, "minimum": 0, "description": "Maximum number of stacked cards that keep adding depth." }
+    }
+  },
+  "a11y": [
+    "Cards stay in DOM order and nothing is cloned or aria-hidden, so screen readers read every card once, in sequence.",
+    "Scrolling is never hijacked or smoothed: wheel, touch, keyboard and scrollbar scrolling behave natively.",
+    "A card that holds keyboard focus (:focus-within) rises above the pile at full size and brightness, so a focused link or button is never covered.",
+    "Reduced motion keeps the plain sticky stacking but drops the scale and dim depth cue and attaches no scroll listener."
+  ],
+  "reducedMotion": "reduced"
+}

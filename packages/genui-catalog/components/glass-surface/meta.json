@@ -1,0 +1,37 @@
+{
+  "id": "glass-surface",
+  "name": "Glass Surface",
+  "category": "surface",
+  "kind": "css-only",
+  "status": "ported",
+  "entry": "components/glass-surface/index.ts",
+  "css": "components/glass-surface/styles.css",
+  "demo": "components/glass-surface/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "blur": { "type": "number", "default": 12, "minimum": 0, "description": "Backdrop blur radius, in px." },
+      "brightness": { "type": "number", "default": 1.1, "minimum": 0 },
+      "saturate": { "type": "number", "default": 1.4, "minimum": 0 },
+      "opacity": { "type": "number", "default": 0.18, "minimum": 0, "maximum": 1, "description": "Tint alpha." },
+      "tint": { "type": "string", "default": "#ffffff" },
+      "radius": { "type": "number", "default": 20, "minimum": 0, "description": "Corner radius, in px." },
+      "borderAlpha": { "type": "number", "default": 0.35, "minimum": 0, "maximum": 1, "description": "Alpha of the edge rim." },
+      "displace": {
+        "type": "number",
+        "default": 0,
+        "minimum": 0,
+        "maximum": 30,
+        "description": "0 turns the edge warp off; otherwise the feDisplacementMap scale, 0-30. Needs JS; the css-only path stays a clean blur."
+      }
+    }
+  },
+  "a11y": [
+    "The panel is decorative; its content stays in normal DOM order.",
+    "The fallback tint (no backdrop-filter support, or prefers-reduced-transparency: reduce) is opaque enough to keep text contrast against the worst case behind it.",
+    "The injected SVG filter defs are aria-hidden and take no layout space.",
+    "The host's own focus outline and focus-within state are untouched."
+  ],
+  "reducedMotion": "static"
+}

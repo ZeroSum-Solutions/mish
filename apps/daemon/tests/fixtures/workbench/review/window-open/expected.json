@@ -1,0 +1,4 @@
+{
+  "description": "B4-2 round 3 (NIT-b): a window.open() attempt is recorded in the evidence as a blocked request and never followed; the resource check cannot pass.",
+  "cases": { "allowed": { "allowHosts": ["good.review-egress.com"], "noHits": true, "consoleOutcome": "inconclusive", "blockedReason": "new window" } }
+}

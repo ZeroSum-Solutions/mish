@@ -1,0 +1,4 @@
+/* Bundled OFL fonts. Keep assets/OFL.txt with redistributed copies. */
+@font-face{font-family:Archivo;src:url('./assets/archivo.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:Bodoni;src:url('./assets/bodoni.woff2') format('woff2');font-weight:400 900;font-display:swap}
+@font-face{font-family:Plex;src:url('./assets/plex.woff2') format('woff2');font-weight:400;font-display:swap}

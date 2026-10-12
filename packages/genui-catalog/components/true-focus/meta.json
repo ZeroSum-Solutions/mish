@@ -1,0 +1,34 @@
+{
+  "id": "true-focus",
+  "name": "True Focus",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only (no React Bits source read): a dependency-free word-by-word focus pull with a gliding corner frame, useful for hero taglines and section headings.",
+  "entry": "components/true-focus/index.ts",
+  "css": "components/true-focus/styles.css",
+  "demo": "components/true-focus/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "blur": { "type": "number", "default": 5, "minimum": 0, "description": "Blur on the words out of focus, in px." },
+      "dim": { "type": "number", "default": 0.55, "minimum": 0, "maximum": 1, "description": "Opacity of the words out of focus." },
+      "duration": { "type": "number", "default": 500, "minimum": 0, "description": "Focus-pull transition time, in ms." },
+      "pause": { "type": "number", "default": 1000, "minimum": 0, "description": "Time each word holds focus before the next pull, in ms." },
+      "frameColor": { "type": "string", "default": "#8ab4ff", "description": "Colour of the corner-bracket frame." },
+      "glowColor": { "type": "string", "default": "rgba(138,180,255,.55)", "description": "Colour of the glow around the frame." },
+      "frame": { "type": "boolean", "default": true, "description": "Draw the corner-bracket frame around the focused word." },
+      "manual": { "type": "boolean", "default": false, "description": "Hover drives the focus instead of the timer; the resting state is fully sharp." }
+    }
+  },
+  "a11y": [
+    "The original child nodes move unchanged into a visually hidden span, so screen readers read the text once with its inline markup; the split word copy and the frame are aria-hidden.",
+    "The host keeps its element, heading level and role; no aria-label or tabindex is added.",
+    "With manual set, the resting state is fully sharp, so keyboard and touch users who never hover see every word clearly.",
+    "Reduced motion and forced-colors mode remove the blur and dimming entirely, and reduced motion also hides the frame and stops the timer."
+  ],
+  "reducedMotion": "static"
+}

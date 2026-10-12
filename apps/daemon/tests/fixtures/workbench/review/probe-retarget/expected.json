@@ -1,0 +1,15 @@
+{
+  "description": "Sol rounds 8 and 9 BLOCK: a sibling inserted before the inert button B on reload shifts its positional selector onto another button. The probe never clicks an element other than the one it captured, found again uniquely at the same place; here the selector lands elsewhere (relocated), so nothing is clicked and the declared-actions check is inconclusive, never passed.",
+  "outcome": "inconclusive",
+  "criteria": {
+    "core.declared-actions": "inconclusive",
+    "core.text-contrast": "pass",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  },
+  "evidenceIncludes": [
+    "resolved to a different element after the probe reloaded the page"
+  ]
+}

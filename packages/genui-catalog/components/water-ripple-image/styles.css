@@ -1,0 +1,53 @@
+/* water-ripple-image — clean-room, from the effect description only. Every selector is under .genui-water-ripple-image. */
+
+:where(.genui-water-ripple-image) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  cursor: pointer;
+}
+
+:where(.genui-water-ripple-image) :where(.genui-water-ripple-image__media) {
+  display: block;
+}
+
+/* A ring is a clone of the media, masked to a soft annulus and scaled about the drop point. */
+.genui-water-ripple-image .genui-water-ripple-image__ring {
+  --genui-water-ripple-image-w: calc(var(--genui-water-ripple-image-band, 16px) * var(--genui-water-ripple-image-k, 1));
+  position: absolute;
+  z-index: 1;
+  margin: 0;
+  pointer-events: none;
+  user-select: none;
+  opacity: var(--genui-water-ripple-image-o, 0);
+  transform-origin: var(--genui-water-ripple-image-x, 50%) var(--genui-water-ripple-image-y, 50%);
+  transform: scale(calc(1 + var(--genui-water-ripple-image-strength, 0.05) * var(--genui-water-ripple-image-g, 0)));
+  filter: brightness(calc(1 + var(--genui-water-ripple-image-glint, 0.2) * var(--genui-water-ripple-image-g, 0))) saturate(1.15);
+  -webkit-mask-image: radial-gradient(circle at var(--genui-water-ripple-image-x, 50%) var(--genui-water-ripple-image-y, 50%), transparent calc(var(--genui-water-ripple-image-r, 0px) - var(--genui-water-ripple-image-w)), #000 var(--genui-water-ripple-image-r, 0px), transparent calc(var(--genui-water-ripple-image-r, 0px) + var(--genui-water-ripple-image-w)));
+  mask-image: radial-gradient(circle at var(--genui-water-ripple-image-x, 50%) var(--genui-water-ripple-image-y, 50%), transparent calc(var(--genui-water-ripple-image-r, 0px) - var(--genui-water-ripple-image-w)), #000 var(--genui-water-ripple-image-r, 0px), transparent calc(var(--genui-water-ripple-image-r, 0px) + var(--genui-water-ripple-image-w)));
+  will-change: transform, opacity;
+}
+
+.genui-water-ripple-image.genui-water-ripple-image--reduced {
+  cursor: auto;
+}
+
+.genui-water-ripple-image.genui-water-ripple-image--reduced .genui-water-ripple-image__ring {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-water-ripple-image {
+    cursor: auto;
+  }
+
+  .genui-water-ripple-image .genui-water-ripple-image__ring {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-water-ripple-image .genui-water-ripple-image__ring {
+    display: none;
+  }
+}

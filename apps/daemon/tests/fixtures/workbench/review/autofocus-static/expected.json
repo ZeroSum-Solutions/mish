@@ -1,0 +1,5 @@
+{
+  "description": "A static page with an autofocused text input: its blinking caret is not moving content, so the check is not-applicable.",
+  "parameters": {},
+  "motion": "not-applicable"
+}

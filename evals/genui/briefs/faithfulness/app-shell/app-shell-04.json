@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-04",
+  "businessName": "Ledger Peak Bookkeeping",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Ledger Peak Bookkeeping"
+    },
+    {
+      "field": "address",
+      "value": "1500 Market Street, Suite 810, Denver, Colorado"
+    },
+    {
+      "field": "phone",
+      "value": "(303) 555-0159"
+    },
+    {
+      "field": "email",
+      "value": "support@ledgerpeakbooks.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8 a.m. to 5 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Registered Colorado business"
+    },
+    {
+      "field": "other",
+      "value": "Serves ninety small-business clients; seven bookkeepers"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample task-list row shown only to illustrate layout",
+      "text": "Harlow Design Co, bank reconciliation, assigned to R. Chen, in review, due the 5th"
+    }
+  ]
+}

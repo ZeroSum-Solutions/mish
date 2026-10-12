@@ -1,0 +1,230 @@
+{
+  "schemaVersion": 2,
+  "family": "listings",
+  "revision": 1,
+  "brand": {
+    "name": "Harbourline Homes",
+    "descriptor": "A directory of homes to rent and buy along the Cornish coast, listed by local agents."
+  },
+  "sections": [
+    {
+      "id": "listings-header",
+      "type": "header",
+      "text": {
+        "cta": "List a property"
+      }
+    },
+    {
+      "id": "listings-search",
+      "type": "search-hero",
+      "text": {
+        "eyebrow": "Homes on the Cornish coast",
+        "heading": "Find a place by the sea, from people who know the street",
+        "body": "Every listing comes from a local agent who has walked through the door. Search by town, then filter by bedrooms, budget and how far you want to be from the water.",
+        "queryPlaceholder": "Search by town or postcode",
+        "searchCta": "Search homes"
+      }
+    },
+    {
+      "id": "listings-categories",
+      "type": "categories",
+      "text": {
+        "heading": "Browse by kind of home"
+      },
+      "items": [
+        {
+          "title": "Harbour cottages",
+          "blurb": "Stone cottages a short walk from the quay."
+        },
+        {
+          "title": "Family houses",
+          "blurb": "Three bedrooms and up, with gardens and parking."
+        },
+        {
+          "title": "Flats with a view",
+          "blurb": "Upper-floor flats that look out over the bay."
+        },
+        {
+          "title": "Holiday lets",
+          "blurb": "Furnished homes for a week or a season."
+        }
+      ]
+    },
+    {
+      "id": "listings-filters",
+      "type": "filters",
+      "text": {
+        "heading": "Narrow it down"
+      },
+      "items": [
+        {
+          "label": "Bedrooms",
+          "options": [
+            "One",
+            "Two",
+            "Three or more"
+          ]
+        },
+        {
+          "label": "Budget",
+          "options": [
+            "Under 1,200 a month",
+            "1,200 to 1,800 a month",
+            "Over 1,800 a month"
+          ]
+        },
+        {
+          "label": "Distance to sea",
+          "options": [
+            "Under 5 minutes",
+            "Under 15 minutes",
+            "Any distance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "listings-results",
+      "type": "results",
+      "text": {
+        "heading": "Homes to rent this week",
+        "sorts": [
+          "Newest",
+          "Lowest price",
+          "Nearest the sea"
+        ]
+      },
+      "items": [
+        {
+          "location": "St Ives, TR26",
+          "title": "Two-bed cottage on Fore Street",
+          "price": "1,450 a month",
+          "summary": "Whitewashed cottage with a log burner, two minutes from the harbour."
+        },
+        {
+          "location": "Falmouth, TR11",
+          "title": "Top-floor flat over the bay",
+          "price": "1,150 a month",
+          "summary": "Bright one-bed flat with a balcony and views across Carrick Roads."
+        },
+        {
+          "location": "Penzance, TR18",
+          "title": "Three-bed family house",
+          "price": "1,750 a month",
+          "summary": "Semi-detached house with a walled garden, near the primary school."
+        },
+        {
+          "location": "Mousehole, TR19",
+          "title": "Fisherman's loft",
+          "price": "1,300 a month",
+          "summary": "Converted net loft with beams, a mezzanine bedroom and a harbour view."
+        }
+      ]
+    },
+    {
+      "id": "listings-compare",
+      "type": "comparison",
+      "text": {
+        "heading": "Compare the towns",
+        "columns": [
+          "Town",
+          "Typical rent",
+          "Walk to the sea"
+        ]
+      },
+      "items": [
+        {
+          "cells": [
+            "St Ives",
+            "1,400 a month",
+            "3 minutes"
+          ]
+        },
+        {
+          "cells": [
+            "Falmouth",
+            "1,200 a month",
+            "8 minutes"
+          ]
+        },
+        {
+          "cells": [
+            "Penzance",
+            "1,050 a month",
+            "10 minutes"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "listings-featured",
+      "type": "featured",
+      "text": {
+        "heading": "Featured this week",
+        "body": "A restored coastguard cottage above Porthleven, let unfurnished on a twelve-month tenancy."
+      },
+      "items": [
+        {
+          "label": "Bedrooms",
+          "value": "Three, one with an en-suite"
+        },
+        {
+          "label": "Rent",
+          "value": "1,650 a month"
+        },
+        {
+          "label": "Available",
+          "value": "From the first of next month"
+        }
+      ]
+    },
+    {
+      "id": "listings-reviews",
+      "type": "reviews",
+      "text": {
+        "heading": "What renters say"
+      },
+      "items": [
+        {
+          "title": "Found our cottage in a weekend",
+          "quote": "The agent had photos of every room and answered the questions the listing did not.",
+          "name": "Tamsin Rowe"
+        },
+        {
+          "title": "Honest about the damp",
+          "quote": "They told us which houses struggle in winter before we booked a viewing.",
+          "name": "Idris Pengelly"
+        },
+        {
+          "title": "Clear on the costs",
+          "quote": "Rent, deposit and council tax band were on the listing, so there were no surprises.",
+          "name": "Hannah Lobb"
+        }
+      ]
+    },
+    {
+      "id": "listings-inquiry",
+      "type": "inquiry",
+      "text": {
+        "heading": "Ask about a home",
+        "body": "Tell us which listing you like and when you can view it. The listing agent replies within one working day.",
+        "cta": "Book a viewing",
+        "phone": "01736 555 0142",
+        "email": "hello@harbourline.example"
+      }
+    },
+    {
+      "id": "listings-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Homes to rent and buy along the Cornish coast, listed by local agents.",
+        "links": [
+          "Terms",
+          "Privacy",
+          "Cookies"
+        ],
+        "address": "4 Wharf Road, St Ives, TR26 1LF"
+      }
+    }
+  ]
+}

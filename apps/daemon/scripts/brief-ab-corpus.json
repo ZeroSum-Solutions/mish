@@ -1,0 +1,137 @@
+{
+  "version": 2,
+  "note": "Improve prompt eval suite. Each prompt carries a hand-written checklist: 'keep' = explicit requirements the brief must carry, 'invent' = facts the prompt does not give that the brief must not state as fact, 'ask' = gaps a good brief should raise as open questions. Edit a prompt and its checklist together.",
+  "prompts": [
+    {
+      "id": "bakery-preorder",
+      "kind": "local business landing page",
+      "text": "Landing page for Rise & Crumb, a small sourdough bakery in Austin. We're open Tuesday to Sunday and closed Mondays. The main goal is weekend pre-orders for pickup. Use Fraunces for headings and Inter for body text. Warm and rustic, cream and toasted-brown colors, no stock-photo look. We haven't set prices yet, so don't show any. It must work well on phones.",
+      "keep": [
+        "The bakery is named Rise & Crumb and is in Austin",
+        "Open Tuesday to Sunday and closed on Mondays",
+        "The main call to action is pre-ordering for weekend pickup",
+        "Fraunces is the heading font",
+        "Inter is the body text font",
+        "A warm, rustic look with cream and toasted-brown colors",
+        "Avoid a stock-photo look",
+        "No prices are shown",
+        "Designed to work well on phones"
+      ],
+      "invent": [
+        "A specific price for any product",
+        "A street address, phone number or email address",
+        "Specific opening or closing clock times",
+        "A founding year, award, customer count or testimonial"
+      ],
+      "ask": [
+        "How pre-orders are placed or how pickup works (method, time windows or deadlines)",
+        "Which products or menu items to feature"
+      ]
+    },
+    {
+      "id": "saas-invoicing",
+      "kind": "B2B SaaS marketing site",
+      "text": "Marketing site for Ledgerly, invoicing software for independent plumbers and electricians in the US. Main call to action: start a free 14-day trial, no credit card required. Bold and high-contrast, trustworthy, not playful. Sections: hero, how it works in three steps, pricing with two plans (we'll give the prices later), and an FAQ. Built with Next.js and Tailwind. No testimonials until we have real ones.",
+      "keep": [
+        "The product is Ledgerly, invoicing software",
+        "The audience is independent plumbers and electricians in the US",
+        "The main call to action is a free 14-day trial with no credit card required",
+        "A bold, high-contrast, trustworthy style that is not playful",
+        "A hero section",
+        "A how-it-works section with three steps",
+        "A pricing section with two plans",
+        "An FAQ section",
+        "Built with Next.js and Tailwind",
+        "No testimonials"
+      ],
+      "invent": [
+        "A specific price for either plan",
+        "A customer count, revenue figure, rating or other statistic",
+        "A testimonial, quote or named customer",
+        "Names for the two plans"
+      ],
+      "ask": [
+        "The plan prices or what each plan includes",
+        "What the FAQ should answer"
+      ]
+    },
+    {
+      "id": "win95-portfolio",
+      "kind": "portfolio in a strong retro style",
+      "text": "Portfolio for Maya Ortiz, a freelance motion designer. Make it look like Windows 95: gray bevelled windows, a taskbar with a Start button, pixel icons. Each case study opens as a draggable window with an embedded video. Include a contact form. Respect reduced-motion settings.",
+      "keep": [
+        "The portfolio belongs to Maya Ortiz, a freelance motion designer",
+        "A Windows 95 look, not a modern or minimal style",
+        "Gray bevelled windows",
+        "A taskbar with a Start button",
+        "Pixel icons",
+        "Each case study opens as a draggable window",
+        "Case studies embed a video",
+        "A contact form",
+        "Reduced-motion settings are respected"
+      ],
+      "invent": [
+        "Names of clients, brands or employers",
+        "Titles of specific case studies or projects",
+        "Awards, years of experience or other credentials"
+      ],
+      "ask": [
+        "Which case studies or videos to include, or where the videos are hosted",
+        "Where contact form submissions should go"
+      ]
+    },
+    {
+      "id": "clinic-access",
+      "kind": "accessibility-critical service site",
+      "text": "Website for Northside Physical Therapy, a clinic for adults over 60 recovering from hip and knee surgery. It has to be very easy to read: large text, high contrast, big buttons, no carousels, nothing that plays automatically. Pages: services, our therapists, insurance we accept, and book an appointment online. Calm blues and greens.",
+      "keep": [
+        "The clinic is Northside Physical Therapy",
+        "The audience is adults over 60 recovering from hip and knee surgery",
+        "Large text",
+        "High contrast",
+        "Big buttons",
+        "No carousels",
+        "Nothing plays automatically",
+        "A services page",
+        "An our-therapists page",
+        "An insurance-accepted page",
+        "Online appointment booking",
+        "Calm blues and greens"
+      ],
+      "invent": [
+        "Names or credentials of specific therapists",
+        "Names of specific insurance companies or plans",
+        "A street address, phone number or opening hours"
+      ],
+      "ask": [
+        "Which insurance plans are accepted",
+        "Therapist details or how online booking works (booking system)"
+      ]
+    },
+    {
+      "id": "warehouse-dashboard",
+      "kind": "internal data app",
+      "text": "Internal dashboard in Vue 3 for our warehouse team: an inventory table with search and filters, low-stock alerts at the top, and a map of today's shipments. Dense and data-first, dark mode by default with a light mode toggle. Keyboard shortcuts for search and filters. It runs on 1080p monitors in the warehouse, so no mobile layout is needed.",
+      "keep": [
+        "Built with Vue 3",
+        "An inventory table with search and filters",
+        "Low-stock alerts at the top",
+        "A map of today's shipments",
+        "A dense, data-first layout",
+        "Dark mode by default",
+        "A light mode toggle",
+        "Keyboard shortcuts for search and filters",
+        "Targets 1080p desktop monitors, and no mobile layout is required"
+      ],
+      "invent": [
+        "Specific product names, SKUs or stock quantities",
+        "A specific numeric low-stock threshold",
+        "A company or warehouse name"
+      ],
+      "ask": [
+        "What counts as low stock (the threshold) or where the data comes from",
+        "Which filters or columns the inventory table needs"
+      ]
+    }
+  ]
+}

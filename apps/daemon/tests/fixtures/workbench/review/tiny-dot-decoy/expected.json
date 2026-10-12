@@ -1,0 +1,8 @@
+{
+  "description": "The same tiny redrawn dot next to a bar animation whose Pause button stops only the bar. The dot keeps moving after the pause, so the pause requirement fails.",
+  "parameters": {
+    "requireReducedMotionFallback": false,
+    "requireLivePreferenceChange": false
+  },
+  "motion": "fail"
+}

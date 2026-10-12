@@ -1,0 +1,31 @@
+We're a mid-market services team and we want a mock of our working sales pipeline screen — a
+static dashboard we can show around before we commit to a real CRM build. Call the product Anchor
+Pipeline.
+
+Top KPI strip: open pipeline $482,300 (+12.4%), deals won this month 18 (+3), average deal size
+$26,800 (-4.1%), win rate 31% (+2 pts).
+
+Open pipeline table, five deals: Bramblewood Logistics, owned by Dana Ruiz, stage Proposal, value
+$64,000, next step "Send the updated MSA". Colter Analytics, owned by Marcus Lee, stage
+Negotiation, value $118,500, next step "Confirm final pricing on the call". Ferro and Vale, owned
+by Priya Nair, stage Discovery, value $32,000, next step "Schedule the technical demo". Halstead
+Grove, owned by Dana Ruiz, stage Qualified, value $54,750, next step "Share two relevant case
+studies". Ondine Works, owned by Marcus Lee, stage Closed won, value $212,000, next step "Kick off
+onboarding".
+
+Activity feed, six recent items: Today 9:12 AM — Dana Ruiz logged a call with Bramblewood
+Logistics about contract terms. Yesterday 4:40 PM — Marcus Lee sent the revised proposal to Colter
+Analytics. Yesterday 11:05 AM — Priya Nair booked a technical demo with Ferro and Vale for next
+week. Tue 2:18 PM — Dana Ruiz added the Halstead Grove case study links to the deal notes. Tue
+10:00 AM — Marcus Lee closed the Ondine Works deal and notified onboarding. Mon 3:30 PM — Priya
+Nair updated the Ferro and Vale discovery notes after the intro call.
+
+One contact card to show: Dana Ruiz, Senior Account Executive at Anchor Pipeline,
+dana.ruiz@example.com, +1 415-555-0148, note: "Prefers async updates before Thursday's pipeline
+review."
+
+Filters: by owner (Dana Ruiz, Marcus Lee, Priya Nair, Unassigned) and by stage (Discovery,
+Qualified, Proposal, Negotiation, Closed won).
+
+One chart: pipeline value by stage, in $k — Discovery 32, Qualified 55, Proposal 64, Negotiation
+119, Closed won 212, On hold 18, At risk 9, Renewal 41.

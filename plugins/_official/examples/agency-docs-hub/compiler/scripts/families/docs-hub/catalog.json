@@ -1,0 +1,39 @@
+{
+  "catalogComponents": [
+    "split-text",
+    "masked-heading",
+    "scroll-reveal"
+  ],
+  "effects": {
+    "scriptPolicy": "hash",
+    "maxEffects": 2,
+    "placements": {
+      "hero-title": {
+        "host": {
+          "odId": "docs-hub-hero--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-title": {
+        "host": {
+          "odId": "docs-hub-guides--heading"
+        },
+        "allow": [
+          "split-text",
+          "masked-heading"
+        ]
+      },
+      "section-reveal": {
+        "host": {
+          "odId": "docs-hub-guides--body"
+        },
+        "allow": [
+          "scroll-reveal"
+        ]
+      }
+    }
+  }
+}

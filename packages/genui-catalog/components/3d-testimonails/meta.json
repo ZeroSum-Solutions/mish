@@ -1,0 +1,37 @@
+{
+  "id": "3d-testimonails",
+  "name": "3D Testimonials",
+  "category": "gallery",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; no 21st.dev source was fetched or read, so no MIT attribution is owed. A tilted, endlessly looping testimonial wall is a common social-proof section and costs no dependency: CSS keyframes do the motion and the script only adds the seamless-loop copies.",
+  "entry": "components/3d-testimonails/index.ts",
+  "css": "components/3d-testimonails/styles.css",
+  "demo": "components/3d-testimonails/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": { "type": "number", "default": 28, "minimum": 1, "description": "Seconds for one full loop of a row." },
+      "gap": { "type": "string", "default": "14px", "description": "Space between cards and between rows." },
+      "direction": { "type": "string", "enum": ["horizontal", "vertical"], "default": "horizontal", "description": "Rows scroll sideways, or columns scroll up." },
+      "reverse": { "type": "boolean", "default": false, "description": "Run the first row the other way." },
+      "alternate": { "type": "boolean", "default": true, "description": "Every second row runs the opposite way." },
+      "pauseOnHover": { "type": "boolean", "default": true, "description": "Pause while the pointer or keyboard focus is inside." },
+      "tiltX": { "type": "number", "default": 18, "description": "Plane rotation about the X axis, in degrees." },
+      "tiltY": { "type": "number", "default": -10, "description": "Plane rotation about the Y axis, in degrees." },
+      "tiltZ": { "type": "number", "default": 4, "description": "Plane rotation about the Z axis, in degrees." },
+      "perspective": { "type": "number", "default": 900, "minimum": 100, "description": "Perspective distance, in px." },
+      "fade": { "type": "boolean", "default": true, "description": "Fade the leading and trailing edges of each row." }
+    }
+  },
+  "a11y": [
+    "Each testimonial is in the DOM once for assistive technology: the loop copies are aria-hidden and inert, so they are never read or focused.",
+    "Hover and keyboard focus inside the wall pause the loop (pauseOnHover), so a quote can be read to the end.",
+    "The loop pauses while the host is off screen, and reduced motion removes the copies and stops the rows; each row then scrolls by hand.",
+    "Forced-colors mode draws each card with a CanvasText border on Canvas."
+  ],
+  "reducedMotion": "static"
+}

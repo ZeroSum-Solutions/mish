@@ -1,0 +1,32 @@
+{
+  "id": "scroll-locked-video-hero",
+  "name": "Scroll-Locked Video Hero",
+  "category": "hero",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "rationale": "Clean-room implementation from component-specs.md §9 prose only; no 21st.dev source was fetched or read.",
+  "entry": "components/scroll-locked-video-hero/index.ts",
+  "css": "components/scroll-locked-video-hero/styles.css",
+  "demo": "components/scroll-locked-video-hero/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "trackHeight": { "type": "string", "default": "300vh", "description": "CSS height of the scroll track the hero pins through." },
+      "source": { "type": "string", "enum": ["auto", "video", "canvas"], "default": "auto", "description": "Which child media element to scrub; auto picks the first video, else the first canvas." },
+      "smoothing": { "type": "number", "default": 0.15, "minimum": 0, "maximum": 1, "description": "Lerp fraction applied per animation frame toward the scroll-driven target." },
+      "overlayOut": { "type": "number", "default": 0.3, "minimum": 0, "maximum": 1, "description": "Fraction of the track over which the headline overlay fades and lifts in." },
+      "canvasScene": { "type": "string", "enum": ["gradient-orbit", "none"], "default": "gradient-orbit", "description": "Built-in procedural frame renderer used when no media element is supplied." },
+      "poster": { "type": "string", "default": "#0b0d12", "description": "Solid background colour behind the canvas scene and shown while media is idle." }
+    }
+  },
+  "a11y": [
+    "The overlay is real text in DOM order, not painted into the media.",
+    "The media (video or built-in canvas) is decorative: aria-hidden and stripped of controls; supply an aria-label on your own <video> for meaningful content instead.",
+    "The overlay sits on a scrim/text-shadow for at least 4.5:1 contrast against the media.",
+    "Nothing traps scroll or keyboard focus; the sticky stage releases normally once the track ends.",
+    "prefers-reduced-motion removes the pin and scrub entirely: the media holds one frame and the overlay is fully visible with no fade or lift."
+  ],
+  "reducedMotion": "static"
+}

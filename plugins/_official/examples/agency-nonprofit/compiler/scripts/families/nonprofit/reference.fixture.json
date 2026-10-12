@@ -1,0 +1,195 @@
+{
+  "schemaVersion": 2,
+  "family": "nonprofit",
+  "revision": 1,
+  "brand": {
+    "name": "Riverkeepers Trust",
+    "descriptor": "A local charity that cleans, restores and watches over the rivers of the Wye valley with volunteers."
+  },
+  "sections": [
+    {
+      "id": "nonprofit-header",
+      "type": "header",
+      "text": {
+        "donateCta": "Donate"
+      }
+    },
+    {
+      "id": "nonprofit-hero",
+      "type": "hero",
+      "text": {
+        "eyebrow": "Rivers of the Wye valley",
+        "heading": "Our rivers are choking. Volunteers are bringing them back.",
+        "body": "Farm run-off and plastic have turned stretches of the Wye and its streams green and still. Every weekend, local people pull out rubbish, plant banks and test the water.",
+        "donateCta": "Donate today",
+        "volunteerCta": "Join a clean-up"
+      }
+    },
+    {
+      "id": "nonprofit-mission",
+      "type": "mission",
+      "text": {
+        "heading": "Why we exist",
+        "body": "We believe a river belongs to everyone who lives along it, and that the people who live along it are the ones best placed to look after it. We train volunteers, restore riverbanks and publish what the water tests show, so the whole valley can see what is changing."
+      }
+    },
+    {
+      "id": "nonprofit-programs",
+      "type": "programs",
+      "text": {
+        "heading": "What we do",
+        "body": "Three programmes, all run by volunteers with a small staff team behind them."
+      },
+      "items": [
+        {
+          "title": "Clean-ups",
+          "body": "Monthly work days that clear rubbish and invasive weeds from the banks."
+        },
+        {
+          "title": "Bank planting",
+          "body": "Native trees and reeds that hold the soil and shade the water."
+        },
+        {
+          "title": "Citizen testing",
+          "body": "Trained volunteers sample the water each week and publish the results."
+        }
+      ]
+    },
+    {
+      "id": "nonprofit-impact",
+      "type": "impact",
+      "text": {
+        "heading": "Last year on the river",
+        "body": "Figures from our annual report, counted by volunteers and checked by our staff."
+      },
+      "items": [
+        {
+          "label": "Volunteers",
+          "value": "640"
+        },
+        {
+          "label": "Tonnes of rubbish",
+          "value": "18"
+        },
+        {
+          "label": "Trees planted",
+          "value": "4,200"
+        },
+        {
+          "label": "Water samples",
+          "value": "1,150"
+        }
+      ]
+    },
+    {
+      "id": "nonprofit-stories",
+      "type": "stories",
+      "text": {
+        "heading": "Stories from the bank"
+      },
+      "items": [
+        {
+          "quote": "I came for one Saturday clean-up. Three years later I run the testing team for our stretch.",
+          "name": "Delyth Morgan",
+          "role": "Volunteer, Hay-on-Wye"
+        },
+        {
+          "quote": "The kingfishers came back to the bend below our farm the second summer after the planting.",
+          "name": "Gareth Pryce",
+          "role": "Farmer, Builth Wells"
+        }
+      ]
+    },
+    {
+      "id": "nonprofit-accountability",
+      "type": "accountability",
+      "text": {
+        "heading": "Where your money goes",
+        "body": "We publish our accounts and our water results every year."
+      },
+      "items": [
+        {
+          "fact": "Registered charity number 1180000 in England and Wales"
+        },
+        {
+          "fact": "82 pence in every pound goes straight to river work"
+        },
+        {
+          "fact": "Accounts independently examined every year"
+        }
+      ]
+    },
+    {
+      "id": "nonprofit-events",
+      "type": "events",
+      "text": {
+        "heading": "Coming up"
+      },
+      "items": [
+        {
+          "date": "Saturday 4 October",
+          "title": "Autumn clean-up at Glasbury",
+          "body": "Bring boots and gloves; we bring the grabbers, bags and tea."
+        },
+        {
+          "date": "Thursday 16 October",
+          "title": "Water testing training",
+          "body": "An evening session for new testers in Builth Wells."
+        },
+        {
+          "date": "Saturday 8 November",
+          "title": "Tree planting day",
+          "body": "Four hundred alders and willows along the Ithon."
+        }
+      ]
+    },
+    {
+      "id": "nonprofit-give",
+      "type": "give",
+      "text": {
+        "heading": "Give to the river",
+        "body": "A one-off gift pays for a clean-up day. A monthly gift keeps testing going all year."
+      },
+      "items": [
+        {
+          "name": "One-off gift",
+          "amount": "25",
+          "period": "once",
+          "impact": "Buys grabbers and bags for a clean-up team of ten.",
+          "cta": "Give once"
+        },
+        {
+          "name": "Monthly gift",
+          "amount": "10",
+          "period": "a month",
+          "impact": "Covers a year of test kits for one volunteer tester.",
+          "cta": "Give monthly"
+        }
+      ]
+    },
+    {
+      "id": "nonprofit-volunteer",
+      "type": "volunteer",
+      "text": {
+        "heading": "Give a Saturday to the river",
+        "body": "No experience needed. We train you, lend you the kit and pair you with someone who knows the stretch.",
+        "cta": "Sign up to volunteer"
+      }
+    },
+    {
+      "id": "nonprofit-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Volunteers restoring the rivers of the Wye valley.",
+        "links": [
+          "Annual report",
+          "Privacy",
+          "Contact"
+        ],
+        "address": "The Old Boathouse, Glasbury, HR3 5NP",
+        "phone": "01497 555 0199",
+        "email": "hello@riverkeepers.example"
+      }
+    }
+  ]
+}

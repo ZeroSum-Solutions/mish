@@ -1,0 +1,20 @@
+/* AC-R12.2 connector search and AC-R12.4 owned imports: canvas resource flyout panels. */
+.root { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-soft); color: var(--text); }
+.title { margin: 0; font-size: 13px; font-weight: 600; }
+.hint { margin: 0; font-size: 12px; color: var(--text-muted); }
+.controls { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 8px; }
+.controls > label, .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px; min-width: 0; font-size: 12px; color: var(--text-muted); }
+.list { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.row { display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 8px; background: var(--bg-panel); }
+.rowTitle { margin: 0; font-size: 13px; font-weight: 500; overflow-wrap: anywhere; }
+.meta { margin: 0; font-size: 12px; color: var(--text-muted); overflow-wrap: anywhere; }
+/* Provider usage notice (G29 Mobbin `ai_usage_notice`): verbatim plain text with its line breaks. */
+.notice { margin: 0; padding: 8px 10px; border: 1px solid var(--border-soft); border-radius: 8px; font-size: 12px; color: var(--text-muted); white-space: pre-wrap; overflow-wrap: anywhere; }
+.facts { display: grid; grid-template-columns: minmax(80px, max-content) 1fr; gap: 2px 10px; margin: 0; font-size: 12px; }
+.facts dt { color: var(--text-muted); }
+.facts dd { margin: 0; overflow-wrap: anywhere; }
+.facts ul { margin: 0; padding-left: 16px; }
+.error { margin: 0; font-size: 12px; color: var(--red); }
+.error p { margin: 0; }
+.error ul { margin: 4px 0 0; padding-left: 16px; }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr; } }

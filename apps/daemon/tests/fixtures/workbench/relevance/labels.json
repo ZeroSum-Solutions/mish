@@ -1,0 +1,14 @@
+{
+  "schema": "workbench-relevance-labels/1",
+  "notHumanRated": true,
+  "note": "PLACEHOLDER labels for the AC-R05.3 relevance-benchmark harness (U3). The 'dentistry-booking' and 'retro-arcade' entries are exactly hand-derived from the current ranking implementation against items.json, so the harness math is checked against a known-correct answer. Every other entry is an unverified draft guess. AC-R05.3's actual acceptance gate requires two independent human raters (Devin or designated reviewers) to label a frozen ten-query/five-spine pool before any pass/fail benchmark run can close that criterion; this file must be replaced by that human-labeled pool first.",
+  "labels": {
+    "dentistry-booking": { "acceptable": ["calendar-widget", "booking-cta-band", "hero-variant-a", "hero-variant-b", "intake-form", "class-booking-calendar"] },
+    "retro-arcade": { "acceptable": ["particle-starfield-hero", "react95-window-chrome", "retro-arcade-marquee", "windows95-form-kit"] },
+    "saas-signup": { "acceptable": ["saas-signup-hero", "saas-pricing-table", "newsletter-waitlist-block"] },
+    "commerce-checkout": { "acceptable": ["checkout-product-grid", "saas-pricing-table"] },
+    "class-booking": { "acceptable": ["class-booking-calendar", "calendar-widget", "booking-cta-band"] },
+    "contact-sales": { "acceptable": ["contact-sales-form"] },
+    "task-utility-dashboard": { "acceptable": ["task-utility-dashboard", "newsletter-waitlist-block", "owned-ambient-loader"] }
+  }
+}

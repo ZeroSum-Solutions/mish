@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-05",
+  "businessName": "Pinehaven Medical Devices",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Pinehaven Medical Devices"
+    },
+    {
+      "field": "address",
+      "value": "5500 Wisconsin Avenue, Suite 700, Chevy Chase, Maryland"
+    },
+    {
+      "field": "phone",
+      "value": "(301) 555-0122"
+    },
+    {
+      "field": "email",
+      "value": "sales@pinehavenmed.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Holds active FDA device registration"
+    },
+    {
+      "field": "other",
+      "value": "Six-rep regional sales team"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Rep S. Holbrook logged a clinical trial update at Ferncrest Regional, moved to committee review, 2 hours ago"
+    }
+  ]
+}

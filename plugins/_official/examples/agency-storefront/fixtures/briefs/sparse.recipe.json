@@ -1,0 +1,69 @@
+{
+  "schemaVersion": 2,
+  "family": "storefront",
+  "revision": 1,
+  "brand": {
+    "name": "Halberd Audio",
+    "descriptor": "A first-product speaker maker opening preorders for one desktop speaker."
+  },
+  "sections": [
+    {
+      "id": "storefront-header",
+      "type": "header",
+      "text": {
+        "cta": "Preorder now"
+      }
+    },
+    {
+      "id": "storefront-hero",
+      "type": "hero",
+      "text": {
+        "eyebrow": "First product, now taking preorders",
+        "heading": "The Halberd One desktop speaker",
+        "body": "Halberd Audio is opening preorders for its first product: a single-driver desktop speaker."
+      }
+    },
+    {
+      "id": "storefront-featured-product",
+      "type": "featured-product",
+      "text": {
+        "heading": "The Halberd One",
+        "name": "Halberd One desktop speaker",
+        "description": "Our first and only product. Single-driver desktop speaker, preorder now for the first production run.",
+        "price": "$189"
+      }
+    },
+    null,
+    null,
+    {
+      "id": "storefront-buy-preorder",
+      "type": "buy-preorder",
+      "text": {
+        "heading": "Preorder the Halberd One",
+        "body": "We're taking preorders for our first production run.",
+        "ctaLabel": "Preorder now",
+        "url": "https://preorder.halberdaudio.example/one",
+        "phone": null,
+        "email": "orders@halberdaudio.example"
+      }
+    },
+    null,
+    null,
+    null,
+    {
+      "id": "storefront-footer",
+      "type": "footer",
+      "text": {
+        "tagline": "Our first product, now taking preorders.",
+        "links": [
+          "Shop",
+          "Preorder",
+          "Contact"
+        ],
+        "phone": null,
+        "email": "orders@halberdaudio.example",
+        "address": null
+      }
+    }
+  ]
+}

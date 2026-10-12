@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "revision": "r1",
+  "name": "AUREL — Studio Collection",
+  "description": "A fictional jewelry concept. Original generated imagery for design exploration.",
+  "direction": "editorial",
+  "brand": {
+    "background": "#f6f3ed",
+    "ink": "#25211d",
+    "muted": "#62574c",
+    "accent": "#65451e",
+    "surface": "#e9e3d8",
+    "display": "serif"
+  },
+  "sections": [
+    {
+      "id": "introduction",
+      "type": "hero",
+      "eyebrow": "Studio collection / No. 01",
+      "title": "A quiet kind of presence.",
+      "body": "An exploration of weight, proportion and light. Sculptural forms conceived to feel as considered in the hand as they look from across a room.",
+      "image": {
+        "file": "jewelry-cuff-hero.png",
+        "alt": "Generated concept of a sculptural gold cuff resting on pale limestone.",
+        "focal": "right"
+      },
+      "action": {
+        "label": "Explore the collection",
+        "href": "#contact"
+      }
+    },
+    {
+      "id": "collection",
+      "type": "collection",
+      "eyebrow": "The design vocabulary",
+      "title": "Few gestures. Lasting expression.",
+      "items": [
+        {
+          "label": "01 / Form",
+          "title": "The open curve",
+          "body": "A continuous line, softened at its edges. The starting point for a small family of sculptural pieces."
+        },
+        {
+          "label": "02 / Surface",
+          "title": "Light in motion",
+          "body": "Polished planes meet quieter textures. Contrast gives each imagined object its character."
+        },
+        {
+          "label": "03 / Proportion",
+          "title": "Made to be noticed",
+          "body": "A study in balance: generous volume, clean profiles and room for the material to speak."
+        }
+      ]
+    },
+    {
+      "id": "atelier",
+      "type": "proof",
+      "eyebrow": "Inside the concept",
+      "title": "The idea comes before the object.",
+      "body": "This is a fictional studio brief, with original generated imagery. Material claims, prices and availability require a real product specification before a client launch.",
+      "facts": [
+        {
+          "label": "Design study",
+          "value": "Sculpture for the everyday"
+        },
+        {
+          "label": "Image provenance",
+          "value": "Original generated concept"
+        },
+        {
+          "label": "Next decision",
+          "value": "Materials and dimensions"
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "type": "contact",
+      "eyebrow": "Begin a conversation",
+      "title": "Let the next piece begin with you.",
+      "body": "This sample links to an example email address. Replace it with the client’s approved appointment or inquiry destination before sharing.",
+      "action": {
+        "label": "Contact the studio",
+        "href": "mailto:studio@example.com"
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+/* One segmented control for every exclusive 2–5 option choice
+   (docs/design/ui-system.md § 10): a recessed pill track with a raised
+   thumb that slides to the chosen option. Mirrors the pets source tabs. */
+.group {
+  --ui-selection-surface: var(--segmented-thumb);
+  --ui-selection-shadow: var(--segmented-thumb-shadow);
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--segmented-track-border);
+  border-radius: var(--radius-pill);
+  background: var(--segmented-track);
+  max-width: 100%;
+  width: max-content;
+}
+.option {
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: auto;
+  min-height: 30px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+  padding: var(--space-1) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-pill);
+  font-size: var(--type-label-size);
+  font-weight: var(--weight-medium);
+  color: var(--text-muted);
+  background: transparent;
+}
+.option:hover:not(:disabled) {
+  color: var(--text-strong);
+  background: transparent;
+}
+.option[aria-checked='true'], .option[aria-checked='true']:hover:not(:disabled) {
+  color: var(--text-strong);
+  background: var(--segmented-thumb);
+  box-shadow: var(--segmented-thumb-shadow);
+}
+:global(html[data-ui-system='workspace']) .option[aria-checked='true'],
+:global(html[data-ui-system='workspace']) .option[aria-checked='true']:hover:not(:disabled) {
+  background: transparent;
+  box-shadow: none;
+}
+.option:active:not(:disabled) { transform: none; }
+@media (max-width: 480px) {
+  .option { padding-inline: 10px; }
+}
+
+.option > :global([data-selection-indicator]) { border-radius: inherit; }

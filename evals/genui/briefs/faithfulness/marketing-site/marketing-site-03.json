@@ -1,0 +1,41 @@
+{
+  "id": "marketing-site-03",
+  "businessName": "Hollowbrook Coffee Roasters",
+  "expectedSpine": "CO",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Hollowbrook Coffee Roasters"
+    },
+    {
+      "field": "address",
+      "value": "214 Mill Street, Asheville, North Carolina"
+    },
+    {
+      "field": "phone",
+      "value": "(828) 555-0175"
+    },
+    {
+      "field": "email",
+      "value": "hello@hollowbrookcoffee.com"
+    },
+    {
+      "field": "hours",
+      "value": "Retail counter open daily, 7 a.m. to 5 p.m.; online orders ship within two business days"
+    },
+    {
+      "field": "legal",
+      "value": "Registered North Carolina business; collects state sales tax"
+    },
+    {
+      "field": "pricing",
+      "value": "Roaster's Choice subscription $22/mo (1 bag) or $38/mo (2 bags); free shipping over $40"
+    },
+    {
+      "field": "other",
+      "value": "Direct-trade relationships with four partner farms"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

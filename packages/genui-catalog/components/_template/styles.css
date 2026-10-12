@@ -1,0 +1,59 @@
+/* glare-hover — clean-room, component-specs.md §1. Every selector is under .genui-glare-hover. */
+
+:where(.genui-glare-hover) {
+  position: relative;
+  overflow: hidden;
+}
+
+.genui-glare-hover::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image: linear-gradient(
+    var(--genui-glare-hover-angle, -45deg),
+    transparent 0%,
+    transparent 40%,
+    color-mix(in srgb, var(--genui-glare-hover-colour, #ffffff) calc(var(--genui-glare-hover-opacity, 0.5) * 100%), transparent) 50%,
+    transparent 60%,
+    transparent 100%
+  );
+  background-repeat: no-repeat;
+  background-size: var(--genui-glare-hover-size, 250%) var(--genui-glare-hover-size, 250%);
+  background-position: 100% 100%;
+  transition: background-position var(--genui-glare-hover-return-duration, 650ms) var(--genui-glare-hover-easing, ease);
+}
+
+.genui-glare-hover:hover::before,
+.genui-glare-hover:focus-visible::before,
+.genui-glare-hover:focus-within::before {
+  background-position: 0% 0%;
+  transition-duration: var(--genui-glare-hover-duration, 650ms);
+}
+
+.genui-glare-hover.genui-glare-hover--reduced::before {
+  transition: none;
+  opacity: 0;
+  background-position: 50% 50%;
+}
+
+.genui-glare-hover.genui-glare-hover--reduced:hover::before,
+.genui-glare-hover.genui-glare-hover--reduced:focus-visible::before,
+.genui-glare-hover.genui-glare-hover--reduced:focus-within::before {
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-glare-hover::before {
+    transition: none;
+    opacity: 0;
+    background-position: 50% 50%;
+  }
+
+  .genui-glare-hover:hover::before,
+  .genui-glare-hover:focus-visible::before,
+  .genui-glare-hover:focus-within::before {
+    opacity: 0.4;
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-09",
+  "businessName": "Corbin Ridge Roofing",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Corbin Ridge Roofing"
+    },
+    {
+      "field": "address",
+      "value": "1500 Demonbreun Street, Nashville, Tennessee"
+    },
+    {
+      "field": "phone",
+      "value": "(615) 555-0158"
+    },
+    {
+      "field": "email",
+      "value": "sales@corbinridgeroofing.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Saturday, 7 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed and insured to perform roofing work in the State of Tennessee"
+    },
+    {
+      "field": "other",
+      "value": "Five-person sales team"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Rep B. Okonkwo logged an insurance approval for the Featherstone job, moved to signed, 12 minutes ago"
+    }
+  ]
+}

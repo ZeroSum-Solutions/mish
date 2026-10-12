@@ -1,0 +1,41 @@
+{
+  "id": "marketing-site-06",
+  "businessName": "Ashgrove Language Academy",
+  "expectedSpine": "LM",
+  "expectedPageKind": "marketing-site",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Ashgrove Language Academy"
+    },
+    {
+      "field": "address",
+      "value": "90 Newbury Street, Boston, Massachusetts"
+    },
+    {
+      "field": "phone",
+      "value": "(617) 555-0126"
+    },
+    {
+      "field": "email",
+      "value": "enroll@ashgrovelanguage.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 10 a.m. to 7 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed as a private occupational school by the Massachusetts Department of Education"
+    },
+    {
+      "field": "pricing",
+      "value": "$480 per eight-week cohort; two-week trial refund window"
+    },
+    {
+      "field": "other",
+      "value": "Cohorts capped at ten students; five instructors"
+    }
+  ],
+  "illustrative_demo_numbers": []
+}

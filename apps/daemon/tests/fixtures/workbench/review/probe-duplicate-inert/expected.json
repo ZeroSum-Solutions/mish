@@ -1,0 +1,13 @@
+{
+  "description": "Captain round 10 refinement: a repeated Buy CTA whose hero copy is inert. The group size stays stable, so each member is probed by its ordinal; the inert member has no effect, so the declared actions fail with that evidence.",
+  "outcome": "failed",
+  "criteria": {
+    "core.declared-actions": "fail",
+    "core.text-contrast": "pass",
+    "core.console-resources": "pass",
+    "core.responsive-overflow": "pass",
+    "core.keyboard-focus": "pass",
+    "core.document-semantics": "pass"
+  },
+  "evidenceIncludes": ["body > main > button had no observable effect when activated"]
+}

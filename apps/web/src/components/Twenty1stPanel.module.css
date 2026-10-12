@@ -1,0 +1,77 @@
+.card { overflow: hidden; min-width: 0; }
+.summary { display: block; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* Same outer bounds as the Cult/Effects viewer dialog (CultLivePreview.module.css `.dialog`). */
+.modal {
+  width: min(1320px, calc(100vw - 32px));
+  height: min(820px, calc(100dvh - 32px));
+  max-width: none;
+  max-height: none;
+  box-sizing: border-box;
+  padding: 0;
+  /* A ring instead of a border keeps the content box, and so the toolbar, where the Cult viewer has it. */
+  border: 0;
+  border-radius: 12px;
+  background: var(--bg-panel);
+  color: var(--text-strong);
+  font-family: var(--sans);
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--border), 0 24px 80px #0003;
+}
+.modal[open] { display: flex; flex-direction: column; }
+.modal::backdrop { background: #0009; backdrop-filter: blur(8px); }
+.modal button, .modal a, .modal select {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font: 500 12px/1.3 var(--sans);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  min-height: 36px;
+  padding: 7px 12px;
+  background: var(--bg-panel);
+  color: var(--text-strong);
+  cursor: pointer;
+  text-decoration: none;
+}
+.modal button:hover, .modal a:hover { background: var(--bg-subtle); border-color: var(--border-strong); }
+.modal button[aria-pressed=true] { background: var(--bg-subtle); border-color: var(--text-muted); }
+.modal button:disabled { cursor: wait; opacity: .6; }
+.modal button:focus-visible, .modal a:focus-visible, .modal select:focus-visible { outline: 2px solid var(--text-strong); outline-offset: 3px; }
+.header { display: flex; justify-content: space-between; align-items: center; gap: 16px; box-sizing: border-box; height: 77px; padding: 12px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.heading { min-width: 0; }
+.heading h3 { margin: 0; font-size: 18px; font-weight: 600; line-height: 1.3; overflow-wrap: anywhere; }
+.heading p { margin: 5px 0 0; font-size: 12px; color: var(--text-muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.previewMain { display: flex; flex-direction: column; flex: 1; min-height: 0; min-width: 0; background: var(--bg-subtle); }
+.controls { display: flex; gap: 6px; }
+/* A reference-only item without a saved implementation shows its image in the stage area. */
+.previewViewport { position: relative; flex: 1; min-width: 0; min-height: 0; overflow: auto; background: var(--bg-subtle); }
+.previewViewport > div { height: 100%; border: 0; }
+.previewViewport img { object-fit: contain; }
+.previewStatus { flex-shrink: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0; border-top: 1px solid var(--border); padding: 10px 16px; background: var(--bg-panel); color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.previewStatus[role=alert] { color: var(--text-strong); }
+.info { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.info p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--text-muted); overflow-wrap: anywhere; }
+.owned { font-size: 12px; font-weight: 600; }
+.provenance { font-size: 11px !important; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.source { display: grid; gap: 10px; min-width: 0; }
+.source label { font-size: 12px; color: var(--text-muted); }
+.source select { width: 100%; min-width: 0; text-overflow: ellipsis; }
+.source pre { overflow: auto; max-height: 280px; white-space: pre; font: 11px/1.6 var(--mono, ui-monospace, monospace); padding: 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 6px; max-width: 100%; margin: 0; }
+.source button { justify-self: start; }
+.sourceError { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px; }
+.rights { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; border-top: 1px solid var(--border); margin-top: 4px; padding-top: 16px; }
+.licenseNotice { margin: 0; max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; font: 11px/1.5 var(--mono, ui-monospace, monospace); color: var(--text-muted); }
+@media (max-width: 960px) {
+  /* The rendered Cult viewer bounds at this width (its Dialog caps width at 100vw - 32px). */
+  .modal { width: calc(100vw - 32px); height: calc(100dvh - 24px); }
+  .header { height: auto; min-height: 69px; padding: 12px 16px; gap: 10px; }
+  .heading h3 { font-size: 16px; }
+  .heading p { max-width: 100%; }
+}
+@media (max-width: 420px) {
+  .controls { width: 100%; }
+  .controls button { flex: 1; }
+}

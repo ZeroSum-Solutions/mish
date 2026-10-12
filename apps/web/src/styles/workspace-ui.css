@@ -1,0 +1,617 @@
+/* Shared application visual roles, including Catalog.
+   See docs/ui-system/workspace-ui.md for contrast, shape and motion rules. */
+html[data-ui-system='workspace'] {
+  --bg: #ffffff;
+  --bg-app: #f4f5f7;
+  --bg-panel: #f9fafb;
+  --bg-subtle: #eceff3;
+  --bg-muted: #e1e6ed;
+  --bg-elevated: #ffffff;
+  --border: #d3d9e2;
+  --border-soft: #e3e7ed;
+  --border-strong: #858d9a;
+  --border-selected: #626d7d;
+  --text: #303846;
+  --text-strong: #171d28;
+  --text-muted: #505c6d;
+  --text-soft: #596577;
+  --text-faint: #596577;
+  --accent: #303846;
+  --accent-contrast: #ffffff;
+  --accent-strong: #171d28;
+  --accent-soft: #eceff3;
+  --accent-tint: #f9fafb;
+  --accent-hover: #303846;
+  --selected: #171d28;
+  --select-ink: #171d28;
+  --selected-soft: #e1e6ed;
+  --brand-text: #285d18;
+  --brand-soft: #eef8e9;
+  --brand-weak: #d0eac1;
+  --green: #246b39;
+  --green-bg: #edf7ee;
+  --green-border: #639b72;
+  --red: #b52736;
+  --red-bg: #fff0f1;
+  --red-border: #c9646d;
+  --blue: #225cc4;
+  --blue-bg: #edf3ff;
+  --blue-border: #6b8cce;
+  --amber: #8b4b05;
+  --amber-bg: #fff4dc;
+  --amber-border: #b77a30;
+  --purple: #6d42b2;
+  --purple-bg: #f4efff;
+  --purple-border: #9477c1;
+  --ui-control-border: #858d9a;
+  --ui-focus: #225cc4;
+  --ui-button-primary-hover: #303846;
+  --ui-selection-surface: #e1e6ed;
+  --ui-selection-shadow: inset 0 0 0 1px #c5cdd8;
+  --glass-regular: rgba(249, 250, 251, 0.78);
+  --glass-edge-highlight: rgba(255, 255, 255, 0.8);
+  --shadow-xs: 0 1px 2px rgb(23 29 40 / 5%);
+  --shadow-sm: 0 2px 5px rgb(23 29 40 / 5%), 0 0 0 1px rgb(23 29 40 / 3%);
+  --shadow-md: 0 12px 36px rgb(23 29 40 / 9%), 0 2px 8px rgb(23 29 40 / 5%);
+  --shadow-lg: 0 24px 72px rgb(23 29 40 / 18%), 0 4px 16px rgb(23 29 40 / 7%);
+}
+html[data-ui-system='workspace'][data-theme='dark'] {
+  --bg: #0c0c0e;
+  --bg-app: #080809;
+  --bg-panel: #141416;
+  --bg-subtle: #1d1d21;
+  --bg-muted: #2b2b31;
+  --bg-elevated: #1a1a1e;
+  --border: #303036;
+  --border-soft: #222227;
+  --border-strong: #7f818c;
+  --border-selected: #aeb0ba;
+  --text: #e4e4eb;
+  --text-strong: #fafafa;
+  --text-muted: #c4c4ce;
+  --text-soft: #b4b4c0;
+  --text-faint: #b4b4c0;
+  --accent: #e4e4eb;
+  --accent-contrast: #0c0c0e;
+  --accent-strong: #fafafa;
+  --accent-soft: #1d1d21;
+  --accent-tint: #141416;
+  --accent-hover: #e4e4eb;
+  --selected: #fafafa;
+  --select-ink: #fafafa;
+  --selected-soft: #2b2b31;
+  --brand-text: #a4e18a;
+  --brand-soft: #203225;
+  --brand-weak: #2e4b30;
+  --green: #9ad9a8;
+  --green-bg: #203225;
+  --green-border: #639b72;
+  --red: #ffa4ab;
+  --red-bg: #3d242c;
+  --red-border: #c9646d;
+  --blue: #a1c2ff;
+  --blue-bg: #202e49;
+  --blue-border: #6b8cce;
+  --amber: #f4cd87;
+  --amber-bg: #3c3020;
+  --amber-border: #b77a30;
+  --purple: #cab3ff;
+  --purple-bg: #302641;
+  --purple-border: #9477c1;
+  --ui-control-border: #7f818c;
+  --ui-focus: #a1c2ff;
+  --ui-button-primary-hover: #e4e4eb;
+  --ui-selection-surface: #2b2b31;
+  --ui-selection-shadow: inset 0 0 0 1px #45454e;
+  --glass-regular: rgba(20, 20, 22, 0.78);
+  --glass-edge-highlight: rgba(255, 255, 255, 0.10);
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 18%);
+  --shadow-sm: 0 2px 5px rgb(0 0 0 / 20%), 0 0 0 1px rgb(255 255 255 / 3%);
+  --shadow-md: 0 12px 36px rgb(0 0 0 / 28%), 0 2px 8px rgb(0 0 0 / 18%);
+  --shadow-lg: 0 24px 72px rgb(0 0 0 / 40%), 0 4px 16px rgb(0 0 0 / 24%);
+}
+@media (prefers-color-scheme: dark) {
+  html[data-ui-system='workspace']:not([data-theme]) {
+  --bg: #0c0c0e;
+  --bg-app: #080809;
+  --bg-panel: #141416;
+  --bg-subtle: #1d1d21;
+  --bg-muted: #2b2b31;
+  --bg-elevated: #1a1a1e;
+  --border: #303036;
+  --border-soft: #222227;
+  --border-strong: #7f818c;
+  --border-selected: #aeb0ba;
+  --text: #e4e4eb;
+  --text-strong: #fafafa;
+  --text-muted: #c4c4ce;
+  --text-soft: #b4b4c0;
+  --text-faint: #b4b4c0;
+  --accent: #e4e4eb;
+  --accent-contrast: #0c0c0e;
+  --accent-strong: #fafafa;
+  --accent-soft: #1d1d21;
+  --accent-tint: #141416;
+  --accent-hover: #e4e4eb;
+  --selected: #fafafa;
+  --select-ink: #fafafa;
+  --selected-soft: #2b2b31;
+  --brand-text: #a4e18a;
+  --brand-soft: #203225;
+  --brand-weak: #2e4b30;
+  --green: #9ad9a8;
+  --green-bg: #203225;
+  --green-border: #639b72;
+  --red: #ffa4ab;
+  --red-bg: #3d242c;
+  --red-border: #c9646d;
+  --blue: #a1c2ff;
+  --blue-bg: #202e49;
+  --blue-border: #6b8cce;
+  --amber: #f4cd87;
+  --amber-bg: #3c3020;
+  --amber-border: #b77a30;
+  --purple: #cab3ff;
+  --purple-bg: #302641;
+  --purple-border: #9477c1;
+  --ui-control-border: #7f818c;
+  --ui-focus: #a1c2ff;
+  --ui-button-primary-hover: #e4e4eb;
+  --ui-selection-surface: #2b2b31;
+  --ui-selection-shadow: inset 0 0 0 1px #45454e;
+  --glass-regular: rgba(20, 20, 22, 0.78);
+  --glass-edge-highlight: rgba(255, 255, 255, 0.10);
+  --shadow-xs: 0 1px 2px rgb(0 0 0 / 18%);
+  --shadow-sm: 0 2px 5px rgb(0 0 0 / 20%), 0 0 0 1px rgb(255 255 255 / 3%);
+  --shadow-md: 0 12px 36px rgb(0 0 0 / 28%), 0 2px 8px rgb(0 0 0 / 18%);
+  --shadow-lg: 0 24px 72px rgb(0 0 0 / 40%), 0 4px 16px rgb(0 0 0 / 24%);
+}
+}
+
+html[data-ui-system='workspace'] {
+  color-scheme: light;
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
+  --radius-xlarge: 16px;
+  --radius-2xlarge: 20px;
+  --ui-radius-dialog: 20px;
+  --ui-caption-size: 12px;
+  --ui-caption-color: var(--text-muted);
+  --ui-info-fill: #225cc4;
+  --ui-info-fill-ink: #ffffff;
+  --ui-on-fill: var(--bg);
+  --ui-on-accent: var(--accent-contrast);
+  --ui-on-accent-hover: var(--accent-contrast);
+  --ui-on-accent-strong: var(--accent-contrast);
+  --ui-accent-hover-fill: var(--accent-hover);
+  --ui-accent-strong-fill: var(--accent-strong);
+  --ui-description-leading: 1.5;
+  --ui-field-radius: 12px;
+  --ui-action-radius: var(--radius-pill);
+  --ui-action-surface: var(--bg-subtle);
+  --ui-field-surface: var(--bg-panel);
+  --ui-field-sheen: inset 0 1px 0 var(--glass-edge-highlight), var(--shadow-xs);
+  --ui-field-focus-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--ui-focus);
+  --curve-decelerate-mid: cubic-bezier(0.23, 1, 0.32, 1);
+  --curve-easy-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --duration-ultra-fast: 100ms;
+  --dur-enter: 200ms;
+  --dur-exit: 140ms;
+  --app-wash: var(--bg-app);
+  --entry-ground: var(--bg-app);
+  --veil-shell: var(--bg-app);
+  --veil-page: var(--bg-app);
+  --veil-canvas: var(--bg);
+  --veil-panel: var(--bg-panel);
+  --code-header-bg: var(--bg-subtle);
+  --code-body-bg: var(--bg-panel);
+}
+html[data-ui-system='workspace'][data-theme='dark'] { color-scheme: dark; }
+@media (prefers-color-scheme: dark) {
+  html[data-ui-system='workspace']:not([data-theme]) { color-scheme: dark; }
+}
+
+/* One focus contract across shared primitives and legacy native controls.
+   Text fields are excluded: they show the shimmer border instead (Field
+   focus v2, below). Selects, checkboxes, radios, ranges and file inputs
+   keep the outline. */
+html[data-ui-system='workspace'] :is(button, a, select, [tabindex]:not(input, textarea),
+  input:is([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'], [type='button'], [type='submit'], [type='reset'])):focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 3px;
+}
+/* Style visible standalone fields. Composite search rows own their surface;
+   their inner inputs and the terminal's hidden textarea stay bare. */
+html[data-ui-system='workspace'] :is(input, select, textarea):not(:where(
+  [type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'],
+  [type='hidden'], .xterm-helper-textarea,
+  .entry-nav-rail input, :is(.plugins-home__search, .plus-menu__search, .file-version-search,
+  .chat-history-search, .onboarding-view__select-search, .home-hero__plus-search,
+  .plugin-marketplace__search, .plugins-view__search, .recent-projects__search,
+  .workspace-tabs-search, .project-ds-picker-search, .db-address-form,
+  .db-browser-use-search, .db-reference-search, .page-creator-search,
+  [data-ui-field-shell]) input
+)) {
+  border-radius: var(--ui-field-radius);
+  background-color: var(--ui-field-surface);
+  box-shadow: var(--ui-field-sheen);
+  color: var(--text);
+}
+/* Boundary colors remain component-owned for error/required/read-only states. */
+html[data-ui-system='workspace'] :where(input:not([type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'], [type='hidden']), select, textarea) {
+  border-color: var(--ui-control-border);
+}
+html[data-ui-system='workspace'] :is(input, select, textarea):not(:where(
+  [type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'],
+  [type='hidden'], .xterm-helper-textarea,
+  .entry-nav-rail input, :is(.plugins-home__search, .plus-menu__search, .file-version-search,
+  .chat-history-search, .onboarding-view__select-search, .home-hero__plus-search,
+  .plugin-marketplace__search, .plugins-view__search, .recent-projects__search,
+  .workspace-tabs-search, .project-ds-picker-search, .db-address-form,
+  .db-browser-use-search, .db-reference-search, .page-creator-search,
+  [data-ui-field-shell]) input
+)):focus-visible {
+  box-shadow: var(--ui-field-sheen), var(--ui-field-focus-shadow);
+}
+html[data-ui-system='workspace'] :is(.plugins-home__search, .plus-menu__search, .file-version-search,
+  .chat-history-search, .onboarding-view__select-search, .home-hero__plus-search,
+  .plugin-marketplace__search, .plugins-view__search, .recent-projects__search,
+  .workspace-tabs-search, .project-ds-picker-search, .db-address-form,
+  .db-browser-use-search, .db-reference-search, .page-creator-search,
+  [data-ui-field-shell]) {
+  background-color: var(--ui-field-surface);
+  box-shadow: var(--ui-field-sheen);
+}
+html[data-ui-system='workspace'] :is(.plugins-home__search, .plus-menu__search, .file-version-search,
+  .chat-history-search, .onboarding-view__select-search, .home-hero__plus-search,
+  .plugin-marketplace__search, .plugins-view__search, .recent-projects__search,
+  .workspace-tabs-search, .project-ds-picker-search, .db-address-form,
+  .db-browser-use-search, .db-reference-search, .page-creator-search,
+  [data-ui-field-shell]):focus-within {
+  border-color: var(--ui-focus);
+  box-shadow: var(--ui-field-sheen), var(--ui-field-focus-shadow);
+}
+/* The surrounding row carries the single keyboard-focus ring. */
+html[data-ui-system='workspace'] :is(.plugins-home__search, .plus-menu__search, .file-version-search,
+  .chat-history-search, .onboarding-view__select-search, .home-hero__plus-search,
+  .plugin-marketplace__search, .plugins-view__search, .recent-projects__search,
+  .workspace-tabs-search, .project-ds-picker-search, .db-address-form,
+  .db-browser-use-search, .db-reference-search, .page-creator-search,
+  [data-ui-field-shell], .entry-nav-rail) input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+/* The composer shell owns depth; its editable inner surface stays unchanged. */
+html[data-ui-system='workspace'] .composer-shell:not(:focus-within) {
+  box-shadow: var(--ui-field-sheen);
+}
+html[data-ui-system='workspace'] :where(input, textarea)::placeholder {
+  color: var(--text-faint);
+  opacity: 1;
+}
+html[data-ui-system='workspace'] :where(.hint, .subtitle, .empty, .library-card-desc, .recent-projects__description) {
+  line-height: 1.5;
+}
+
+/* Navigation surfaces share one shape and one moving selection layer. */
+html[data-ui-system='workspace'] .entry-nav-rail__panel {
+  background: var(--glass-regular);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  backdrop-filter: var(--glass-backdrop);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 1px 0 var(--glass-edge-highlight), var(--shadow-sm);
+}
+html[data-ui-system='workspace'] :is(.entry-nav-rail__btn, .settings-nav-item) {
+  position: relative;
+  isolation: isolate;
+  color: var(--text-muted);
+  min-height: 38px;
+  border-radius: var(--radius-sm);
+  transform: none;
+}
+html[data-ui-system='workspace'] :is(.entry-nav-rail__btn-icon, .settings-page-shell .settings-nav-item svg, .settings-page-shell .settings-nav-item .od-icon) {
+  color: currentColor;
+  opacity: 1;
+}
+html[data-ui-system='workspace'] :is(.entry-nav-rail__btn.is-active, .entry-nav-rail__btn.is-active:hover, .settings-nav-item.active, .settings-nav-item.active:hover) {
+  background: transparent;
+  color: var(--text-strong);
+}
+/* Anchor destinations have no shared indicator. */
+html[data-ui-system='workspace'] .entry-nav-rail__btn.is-active:not(:has([data-selection-indicator])) {
+  background: var(--ui-selection-surface);
+}
+html[data-ui-system='workspace'] .entry-nav-rail__btn-label { font-weight: 500; }
+html[data-ui-system='workspace'] .entry-nav-rail__btn.is-active .entry-nav-rail__btn-label { font-weight: 600; }
+/* Rail items: 34px rows on the rail glass. The current page rides the same
+   raised thumb as the segmented control, so selection reads as one system. */
+html[data-ui-system='workspace'] .entry-nav-rail {
+  --ui-selection-surface: var(--segmented-thumb);
+  --ui-selection-shadow: var(--segmented-thumb-shadow);
+}
+html[data-ui-system='workspace'] .entry-nav-rail__btn {
+  min-height: 34px;
+  border-radius: var(--radius-md);
+}
+html[data-ui-system='workspace'] .entry-nav-rail__btn:active {
+  transform: scale(var(--press-scale-card));
+}
+html[data-ui-system='workspace'] .entry-nav-rail__btn:not(.is-active):hover {
+  background: var(--vibrancy-fill-tertiary);
+  color: var(--text-strong);
+}
+/* The search trigger keeps its recessed well (entry-layout.css); only the
+   workspace ink applies here. */
+html[data-ui-system='workspace'] .entry-nav-rail__search {
+  color: var(--text-muted);
+}
+html[data-ui-system='workspace'] .entry-nav-rail__search:hover {
+  color: var(--text-strong);
+}
+html[data-ui-system='workspace'] .settings-page-shell .settings-sidebar {
+  margin: 12px 0 12px 12px;
+  padding: 12px;
+  background: var(--glass-regular);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  backdrop-filter: var(--glass-backdrop);
+  box-shadow: inset 0 1px 0 var(--glass-edge-highlight);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+html[data-ui-system='workspace'] .settings-general-field {
+  gap: 14px;
+  flex-wrap: wrap;
+}
+html[data-ui-system='workspace'] .settings-general-label { color: var(--text-strong); font-weight: 500; }
+html[data-ui-system='workspace'] :is(.modal-settings, .settings-content, .settings-execution-sticky) { background: var(--bg); }
+html[data-ui-system='workspace'] :is(.settings-section-card, .agent-card, .library-card, .library-ds-card) {
+  border-color: var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+}
+html[data-ui-system='workspace'] .settings-general-block {
+  padding-block: 22px;
+  border-color: var(--border);
+}
+html[data-ui-system='workspace'] :is(.settings-nav-item.active svg, .settings-nav-item.active .od-icon, .settings-nav-item.active strong) {
+  color: var(--text-strong);
+  opacity: 1;
+}
+/* The indicator is decoration, never a grid/flex child that consumes a
+   label's column. Keep this contract explicit across legacy navigation. */
+html[data-ui-system='workspace'] [data-selection-indicator] {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  min-width: 0;
+  pointer-events: none;
+  background: var(--ui-selection-surface);
+  box-shadow: var(--ui-selection-shadow);
+}
+html[data-ui-system='workspace'] .settings-nav-item > [data-selection-indicator] {
+  border-radius: var(--radius-sm);
+}
+
+/* Existing workflows inherit the roles; content previews retain their own art. */
+html[data-ui-system='workspace'] :is(.project-search-modal, .workspace-tabs-popover, .entry-settings-menu__popover, .od-select-menu) {
+  background: var(--glass-regular);
+  -webkit-backdrop-filter: var(--glass-backdrop);
+  backdrop-filter: var(--glass-backdrop);
+  border-color: var(--border);
+  border-radius: var(--radius);
+  box-shadow: inset 0 1px 0 var(--glass-edge-highlight), var(--shadow-md);
+}
+html[data-ui-system='workspace'] :is(.automations-metric, .automation-empty, .automations-saved__item, .recent-projects__empty) {
+  background: var(--bg-panel);
+  border-color: var(--border);
+  border-radius: var(--radius);
+}
+html[data-ui-system='workspace'] :is(.library-card-name, .library-ds-card-name, .recent-projects__title, .automations-section__label) {
+  color: var(--text-strong);
+}
+html[data-ui-system='workspace'] .workspace-tabs-chrome.app-chrome-header {
+  background: var(--bg-app);
+}
+html[data-ui-system='workspace'] .workspace-tabs-glide__pill {
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-sm);
+}
+/* Native desktop vibrancy must not lower working-surface contrast. */
+html[data-ui-system='workspace'] body { background: var(--bg-app); }
+html[data-ui-system='workspace'] body::before { background: var(--bg-app); opacity: 1; }
+
+@media (max-width: 600px) {
+  html[data-ui-system='workspace'] .settings-general-field { align-items: flex-start; }
+  html[data-ui-system='workspace'] .settings-page-shell .settings-sidebar { margin-inline-start: 8px; padding: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-system='workspace'] { --dur-enter: 0ms; --dur-exit: 0ms; }
+}
+
+/* Filled controls need their own ink role; semantic foregrounds are not fills. */
+html[data-ui-system='workspace'] .df-row.selected { background: var(--ui-info-fill); }
+html[data-ui-system='workspace'] .df-row.selected :is(.df-row-name, .df-row-sub, .df-row-size, .df-row-time, .df-row-check) {
+  color: var(--ui-info-fill-ink);
+}
+html[data-ui-system='workspace'] :is(.protocol-chip.active, .protocol-chip.active:hover) { color: var(--bg); }
+html[data-ui-system='workspace'] .protocol-chip.active .media-provider-chip-status {
+  background: var(--bg);
+  animation: none;
+}
+html[data-ui-system='workspace'] .viewer-action.primary { color: var(--ui-on-accent); }
+html[data-ui-system='workspace'] .viewer-action.primary:hover:not(:disabled) { color: var(--ui-on-accent-hover); }
+html[data-ui-system='workspace'] :is(.plugins-home__chip--saved.is-active .plugins-home__chip-count,
+  .plugins-home__pill.is-active .plugins-home__pill-count) { color: var(--ui-on-accent); opacity: 1; }
+html[data-ui-system='workspace'] .plugin-action-button--primary:hover:not(:disabled) {
+  background: var(--ui-accent-hover-fill);
+  color: var(--ui-on-accent-hover);
+  filter: none;
+}
+
+html[data-ui-system='workspace'] .app .df-file-row.selected:hover {
+  background: var(--ui-info-fill);
+}
+html[data-ui-system='workspace'] .settings-section-byok .settings-test-btn,
+html[data-ui-system='workspace'] .settings-section-byok .settings-test-btn:is(.loading, :hover, :focus-visible, :disabled) {
+  color: var(--bg);
+}
+html[data-ui-system='workspace'] .settings-general-select select {
+  height: 40px;
+  border: 1px solid var(--ui-control-border);
+  border-radius: var(--ui-action-radius);
+  background-color: var(--ui-field-surface);
+  background-image: none; /* General renders its own chevron icon. */
+  padding-inline: 12px 32px;
+}
+
+html[data-ui-system='workspace'] .chat-error-action:hover,
+html[data-ui-system='workspace'] .chat-error-amr-login .amr-account-control--signed-out .amr-account-control__action:hover,
+html[data-ui-system='workspace'] .chat-error-amr-login .amr-account-control--error .amr-account-control__action:hover,
+html[data-ui-system='workspace'] .orbit-artifact-open:hover,
+html[data-ui-system='workspace'] .orbit-run-cta:hover:not(:disabled),
+html[data-ui-system='workspace'] .questions-continue:hover:not(:disabled) {
+  color: var(--ui-on-accent-hover);
+}
+
+html[data-ui-system='workspace'] .use-everywhere-modal__primary:hover,
+html[data-ui-system='workspace'] .automation-modal__submit:hover:not(:disabled),
+html[data-ui-system='workspace'] .automation-popover__done-btn:hover,
+html[data-ui-system='workspace'] .plugins-view__primary:hover:not(:disabled),
+html[data-ui-system='workspace'] .agent-card-amr-upgrade:hover:not(:disabled),
+html[data-ui-system='workspace'] .amr-login-activation__open:hover,
+html[data-ui-system='workspace'] .ds-modal-primary-action:hover:not(:disabled),
+html[data-ui-system='workspace'] .plugin-details-modal__primary:hover:not(:disabled) {
+  color: var(--ui-on-accent-strong);
+}
+
+html[data-ui-system='workspace'] .agent-card-amr-upgrade { color: var(--ui-on-accent); }
+html[data-ui-system='workspace'] .use-everywhere-modal__primary { color: var(--ui-on-accent); }
+
+/* Icon-only actions must not lose their glyph to shared button padding. */
+html[data-ui-system='workspace'] button[aria-label]:has(> svg:only-child) { padding-inline: 0; }
+html[data-ui-system='workspace'] button > svg { flex-shrink: 0; }
+html[data-ui-system='workspace'] .automation-template-card__desc {
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+html[data-ui-system='workspace'] :is(.entry-invite__btn.is-primary, .entry-invite__submit,
+  .recent-projects__invite, .project-actions-button-primary, .plugin-marketplace__create) { color: var(--ui-on-accent); }
+html[data-ui-system='workspace'] :is(.entry-invite__btn.is-primary, .entry-invite__submit,
+  .recent-projects__invite, .project-actions-button-primary, .plugin-marketplace__create):hover:not(:disabled) {
+  background: var(--ui-accent-hover-fill);
+  color: var(--ui-on-accent-hover);
+  filter: none;
+}
+
+/* Keep navigation usable when the docked rail no longer fits. */
+@media (max-width: 1080px) {
+  html[data-ui-system='workspace'] .entry-shell--no-header .entry.entry--rail-open { position: relative; }
+  html[data-ui-system='workspace'] .entry-shell--no-header .entry.entry--rail-open > .entry-main { grid-column: 2; }
+  html[data-ui-system='workspace'] .entry-shell--no-header .entry.entry--rail-open .entry-nav-rail {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: min(var(--entry-rail-width, 236px), calc(100vw - 24px));
+    overflow: visible;
+    pointer-events: auto;
+  }
+}
+
+/* Text-bearing controls grow with translated or wrapped labels. Icon actions
+   retain their own square/circular sizing. */
+html[data-ui-system='workspace'] :is(.settings-nav-item, .entry-nav-rail__btn) {
+  height: auto;
+  white-space: normal;
+  line-height: 1.4;
+}
+html[data-ui-system='workspace'] .settings-nav-item strong { white-space: normal; }
+html[data-ui-system='workspace'] .seg-control {
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 var(--glass-edge-highlight);
+}
+html[data-ui-system='workspace'] .seg-btn {
+  height: auto;
+  min-height: 36px;
+  line-height: 1.4;
+}
+html[data-ui-system='workspace'] .seg-btn .seg-title {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+/* The token fallback applies after this stylesheet's workspace overrides. */
+@media (prefers-reduced-transparency: reduce) {
+  html[data-ui-system='workspace']:root {
+    --glass-regular: var(--bg-panel);
+    --glass-backdrop: none;
+  }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  html[data-ui-system='workspace']:root {
+    --glass-regular: var(--bg-panel);
+    --glass-backdrop: none;
+  }
+}
+
+/* ── Field focus v2 — the shimmer border (docs/design/ui-system.md § 8) ──
+   Replaces the 2px halo ring on text fields. A field that receives focus
+   keeps its own size and fill; its 1px border becomes a slow conic sweep:
+   a contrast-safe base with a travelling highlight. Selects keep a plain
+   border change (their background carries the chevron). Buttons and other
+   controls keep the keyboard-only outline above. */
+/* @property --od-shimmer-angle and @keyframes od-focus-shimmer live in
+   primitives.css: this file holds only workspace-scoped rules. */
+html[data-ui-system='workspace'] {
+  --od-focus-shimmer: conic-gradient(
+    from var(--od-shimmer-angle),
+    var(--focus-shimmer-base) 0deg,
+    var(--focus-shimmer-base) 200deg,
+    var(--focus-shimmer-tint-a) 250deg,
+    var(--focus-shimmer-hi) 285deg,
+    var(--focus-shimmer-tint-b) 320deg,
+    var(--focus-shimmer-base) 360deg
+  );
+}
+html[data-ui-system='workspace'] :is(input, textarea):not(:where(
+  [type='checkbox'], [type='radio'], [type='range'], [type='color'], [type='file'],
+  [type='hidden'], .xterm-helper-textarea,
+  .entry-nav-rail input, :is(.plugins-home__search, .plus-menu__search, .file-version-search,
+  .chat-history-search, .onboarding-view__select-search, .home-hero__plus-search,
+  .plugin-marketplace__search, .plugins-view__search, .recent-projects__search,
+  .workspace-tabs-search, .project-ds-picker-search, .db-address-form,
+  .db-browser-use-search, .db-reference-search, .page-creator-search,
+  [data-ui-field-shell]) input
+)):focus-visible,
+html[data-ui-system='workspace'] :is(.plugins-home__search, .plus-menu__search, .file-version-search,
+  .chat-history-search, .onboarding-view__select-search, .home-hero__plus-search,
+  .plugin-marketplace__search, .plugins-view__search, .recent-projects__search,
+  .workspace-tabs-search, .db-address-form,
+  .db-browser-use-search, .db-reference-search, .page-creator-search,
+  [data-ui-field-shell]):focus-within {
+  outline: none;
+  border-color: transparent;
+  background:
+    linear-gradient(var(--ui-field-surface), var(--ui-field-surface)) padding-box,
+    var(--od-focus-shimmer) border-box;
+  box-shadow: var(--ui-field-sheen), 0 0 0 4px color-mix(in srgb, var(--text-strong) 4%, transparent);
+  animation: od-focus-shimmer var(--focus-shimmer-duration) linear infinite;
+}
+html[data-ui-system='workspace'] select:focus-visible {
+  outline: none;
+  border-color: var(--focus-shimmer-base);
+  box-shadow: var(--ui-field-sheen);
+}
+/* A search row that only draws a bottom rule gets a quiet stronger rule. */
+html[data-ui-system='workspace'] .project-ds-picker-search:focus-within {
+  border-color: var(--focus-shimmer-base);
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-system='workspace'] :is(input, textarea, [data-ui-field-shell], .plugins-home__search, .plus-menu__search, .recent-projects__search, .workspace-tabs-search) {
+    animation: none !important;
+  }
+}

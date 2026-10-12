@@ -1,0 +1,49 @@
+{
+  "id": "split-text",
+  "name": "Split Text",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "entry": "components/split-text/index.ts",
+  "css": "components/split-text/styles.css",
+  "demo": "components/split-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "split": {
+        "type": "string",
+        "enum": ["chars", "words", "lines"],
+        "default": "chars",
+        "description": "The unit each animated piece is split into."
+      },
+      "from": {
+        "type": "object",
+        "additionalProperties": false,
+        "default": { "y": "0.6em", "opacity": 0, "rotate": 0, "blur": 0 },
+        "properties": {
+          "y": { "type": "string", "default": "0.6em", "description": "Starting vertical offset, any CSS length." },
+          "opacity": { "type": "number", "default": 0, "minimum": 0, "maximum": 1 },
+          "rotate": { "type": "number", "default": 0, "description": "Starting rotation, in degrees." },
+          "blur": { "type": "number", "default": 0, "minimum": 0, "description": "Starting blur, in px." }
+        }
+      },
+      "duration": { "type": "number", "default": 600, "minimum": 0, "description": "Per-piece animation duration in ms." },
+      "stagger": { "type": "number", "default": 30, "minimum": 0, "description": "Delay between pieces, in ms." },
+      "easing": { "type": "string", "default": "cubic-bezier(.2,.7,.2,1)" },
+      "threshold": { "type": "number", "default": 0.3, "minimum": 0, "maximum": 1 },
+      "rootMargin": { "type": "string", "default": "0px 0px -10% 0px" },
+      "replayOnReenter": {
+        "type": "boolean",
+        "default": false,
+        "description": "Replay the reveal every time the host scrolls back into view."
+      }
+    }
+  },
+  "a11y": [
+    "The original text is kept once, in a visually hidden span read by screen readers; the split copy is aria-hidden.",
+    "No aria-label is added to the host; its heading level and role are unchanged.",
+    "With JS off, the author's plain heading shows, with no split and no hidden state."
+  ],
+  "reducedMotion": "reduced"
+}

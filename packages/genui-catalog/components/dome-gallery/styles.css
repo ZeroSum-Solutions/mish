@@ -1,0 +1,96 @@
+/* dome-gallery — clean-room, from the effect description only. Every selector is under .genui-dome-gallery. */
+
+/* No-JS and reduced-motion layout: a flat, horizontally scrollable strip of tiles. */
+:where(.genui-dome-gallery) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+:where(.genui-dome-gallery) .genui-dome-gallery__item {
+  flex: 0 0 var(--genui-dome-gallery-tile, 140px);
+  width: var(--genui-dome-gallery-tile, 140px);
+  position: relative;
+  scroll-snap-align: center;
+}
+
+.genui-dome-gallery:focus-visible {
+  outline: 2px solid #8ab4ff;
+  outline-offset: -2px;
+}
+
+.genui-dome-gallery.genui-dome-gallery--3d {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  padding: 0;
+  perspective: var(--genui-dome-gallery-radius, 420px);
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.genui-dome-gallery--3d.genui-dome-gallery--dragging {
+  cursor: grabbing;
+}
+
+.genui-dome-gallery--3d .genui-dome-gallery__item {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  width: var(--genui-dome-gallery-tile, 140px);
+  transform:
+    translate(-50%, -50%)
+    translateZ(var(--genui-dome-gallery-radius, 420px))
+    rotateX(var(--genui-dome-gallery-pitch, 0deg))
+    rotateY(calc(var(--genui-dome-gallery-yaw, 0deg) + var(--genui-dome-gallery-lon, 0deg)))
+    rotateX(var(--genui-dome-gallery-lat, 0deg))
+    translateZ(calc(-1 * var(--genui-dome-gallery-radius, 420px)));
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transition: opacity 240ms ease;
+  will-change: transform;
+}
+
+.genui-dome-gallery--3d .genui-dome-gallery__item--away {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.genui-dome-gallery--3d.genui-dome-gallery--dragging .genui-dome-gallery__item {
+  pointer-events: none;
+}
+
+.genui-dome-gallery.genui-dome-gallery--reduced {
+  display: flex;
+  overflow-x: auto;
+  perspective: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-dome-gallery.genui-dome-gallery--3d {
+    display: flex;
+    overflow-x: auto;
+    padding: 12px;
+    perspective: none;
+    cursor: auto;
+  }
+
+  .genui-dome-gallery--3d .genui-dome-gallery__item {
+    position: relative;
+    flex: 0 0 var(--genui-dome-gallery-tile, 140px);
+    transform: none;
+    transition: none;
+  }
+
+  .genui-dome-gallery--3d .genui-dome-gallery__item--away {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}

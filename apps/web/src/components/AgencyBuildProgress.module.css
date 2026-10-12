@@ -1,0 +1,80 @@
+/* The agency build card's own primitives: the card frame, its head and title, note and error
+   lines, the step/progress rows and the secondary button. Owned here because two surfaces draw the
+   same build card — the Design index Route panel (`DesignIndexView`'s `BuildPanel`) and Home's
+   "Build with Jev" card (`HomeJevBuild`) — and neither should restyle the other through its own
+   stylesheet. The values match the Design index primitives of the same names
+   (`DesignIndexView.module.css`), so the build card still reads as part of that view. Every colour
+   goes through the shared theme tokens, which already carry the dark-mode values. */
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--bg-panel);
+}
+.cardHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.cardTitle {
+  flex: 1 1 auto;
+  margin: 0;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--text-strong);
+  overflow-wrap: anywhere;
+}
+
+.note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--red, #d9534f);
+}
+.errorAction {
+  margin-inline-start: 10px;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+.row {
+  display: grid;
+  grid-template-columns: minmax(96px, 34%) minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+
+.secondary {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 8px);
+  background: var(--bg-panel);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.secondary:hover:not(:disabled) {
+  background: var(--bg-subtle);
+}
+.secondary:disabled {
+  opacity: 0.55;
+  cursor: default;
+}

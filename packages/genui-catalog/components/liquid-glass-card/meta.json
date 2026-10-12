@@ -1,0 +1,33 @@
+{
+  "id": "liquid-glass-card",
+  "name": "Liquid Glass Card",
+  "category": "surface",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "entry": "components/liquid-glass-card/index.ts",
+  "css": "components/liquid-glass-card/styles.css",
+  "demo": "components/liquid-glass-card/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "blur": { "type": "number", "default": 6, "minimum": 0, "description": "Backdrop blur radius, in px." },
+      "scale": { "type": "number", "default": 18, "minimum": 0, "description": "Resting feDisplacementMap scale." },
+      "hoverScale": { "type": "number", "default": 32, "minimum": 0, "description": "feDisplacementMap scale while hovered or focused." },
+      "frequency": { "type": "number", "default": 0.012, "minimum": 0, "description": "feTurbulence baseFrequency." },
+      "octaves": { "type": "number", "default": 2, "minimum": 1, "description": "feTurbulence numOctaves." },
+      "idlePeriod": { "type": "number", "default": 8000, "minimum": 0, "description": "Idle drift loop period, in ms; 0 turns the drift off." },
+      "tint": { "type": "string", "default": "rgba(255,255,255,.12)" },
+      "radius": { "type": "number", "default": 24, "minimum": 0, "description": "Corner radius, in px." },
+      "specular": { "type": "boolean", "default": true, "description": "Show the pointer-following specular highlight." }
+    }
+  },
+  "a11y": [
+    "The lens, shine and defs are aria-hidden and pointer-events:none, so they never enter the accessibility tree.",
+    "Content keeps its original DOM order inside .genui-liquid-glass-card__content.",
+    "The fallback tint (no backdrop-filter, or prefers-reduced-transparency: reduce) is opaque enough to hold text contrast.",
+    "Keyboard focus centres the specular highlight and swells the displacement the same as pointer hover."
+  ],
+  "reducedMotion": "static"
+}

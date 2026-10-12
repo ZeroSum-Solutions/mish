@@ -1,0 +1,94 @@
+@open-design/genui-catalog — third-party notices
+
+Every component in components/ except the Cult UI Pro ports listed in their own section at the
+end of this file is a clean-room implementation written from the behaviour
+descriptions in the catalog's component specs (the effect name and the one-line "What it does"
+column of data/source-csv-snapshot.csv). No React Bits, 21st.dev or Kokonut UI implementation source code or component
+documentation was read, copied or recalled to write them (one incidental usage example appeared
+in a React Bits homepage fetch during discovery and was not used; see docs/component-gap-inventory.md), and no component depends on React,
+GSAP, three.js or any other package.
+
+The names in catalog.json (source.component, sourceUrl) record where each effect was first seen,
+and source.license records that source's licence verbatim, as evidence for the licence decision.
+They do not mean any code was taken from that source.
+
+A porter appends one line per ported component below:
+<id> — clean-room implementation of the effect named "<Component>" (<sourceUrl>); no upstream code.
+
+Attribution for plain-MIT sources (licenceDecision "port-with-attribution" in catalog.json):
+none. The plain-MIT effects ported so far (glyph-portal, liquid-glass-card) are clean-room
+implementations from their behaviour descriptions, recorded as licenceDecision "clean-room"; no
+upstream code was copied, so no upstream notice applies.
+
+HyperUI (https://github.com/markmead/hyperui), MIT licence, Copyright (c) Mark Mead: the compiled HyperUI kind CSS that
+scripts/sync-catalog-assets.ts copies into the app-shell, crm-dashboard and marketing-site Agency
+family packages (compiler/scripts/catalog/hyperui/<kind>.css) comes from
+plugins/_official/shared/ui-kits/hyperui/ and ships with its licence text beside it
+(compiler/scripts/catalog/hyperui/LICENSE).
+
+## Ported 2026-09-25 (clean-room, no upstream code)
+circular-gallery — clean-room implementation of the effect named "CircularGallery" (https://reactbits.dev/components/circular-gallery); no upstream code.
+flying-posters — clean-room implementation of the effect named "FlyingPosters" (https://reactbits.dev/components/flying-posters); no upstream code.
+dome-gallery — clean-room implementation of the effect named "DomeGallery" (https://reactbits.dev/components/dome-gallery); no upstream code.
+fluid-glass — clean-room implementation of the effect named "FluidGlass" (https://reactbits.dev/components/fluid-glass); no upstream code.
+metallic-paint — clean-room implementation of the effect named "MetallicPaint" (https://reactbits.dev/animations/metallic-paint); no upstream code.
+silk — clean-room implementation of the effect named "Silk" (https://reactbits.dev/backgrounds/silk); no upstream code.
+grainient — clean-room implementation of the effect named "Grainient" (https://reactbits.dev/backgrounds/grainient); no upstream code.
+iridescence — clean-room implementation of the effect named "Iridescence" (https://reactbits.dev/backgrounds/iridescence); no upstream code.
+text-scroll-animation — clean-room implementation of the effect named "text-scroll-animation" (https://21st.dev/); no upstream code.
+shader-svg — clean-room implementation of the effect named "shader-svg" (https://21st.dev/); no upstream code.
+atc-shader — clean-room implementation of the effect named "atc-shader" (https://21st.dev/); no upstream code.
+model-viewer — clean-room implementation of the effect named "ModelViewer" (https://reactbits.dev/components/model-viewer); no upstream code.
+water-ripple-image — clean-room implementation of the effect named "water-ripple-image" (https://21st.dev/); no upstream code.
+3d-testimonails — clean-room implementation of the effect named "3d-testimonails" (https://21st.dev/); no upstream code.
+animated-testimonials — clean-room implementation of the effect named "animated-testimonials" (https://21st.dev/); no upstream code.
+true-focus — clean-room implementation of the effect named "TrueFocus" (https://reactbits.dev/text-animations/true-focus); no upstream code.
+particle-text — clean-room implementation of the effect named "ParticleText" (https://reactbits.dev/text-animations/particle-text); no upstream code.
+split-flap-text — clean-room implementation of the effect named "SplitFlapText" (https://reactbits.dev/text-animations/split-flap-text); no upstream code.
+warp-text — clean-room implementation of the effect named "WarpText" (https://reactbits.dev/text-animations/warp-text); no upstream code.
+blur-text — clean-room implementation of the effect named "BlurText" (https://reactbits.dev/text-animations/blur-text); no upstream code.
+stroke-text — clean-room implementation of the effect named "StrokeText" (https://reactbits.dev/text-animations/stroke-text); no upstream code.
+scroll-stack — clean-room implementation of the effect named "ScrollStack" (https://reactbits.dev/components/scroll-stack); no upstream code.
+depth-carousel — clean-room implementation of the effect named "DepthCarousel" (https://reactbits.dev/components/depth-carousel); no upstream code.
+staggered-menu — clean-room implementation of the effect named "StaggeredMenu" (https://reactbits.dev/components/staggered-menu); no upstream code.
+card-nav — clean-room implementation of the effect named "CardNav" (https://reactbits.dev/components/card-nav); no upstream code.
+pill-nav — clean-room implementation of the effect named "PillNav" (https://reactbits.dev/components/pill-nav); no upstream code.
+flowing-menu — clean-room implementation of the effect named "FlowingMenu" (https://reactbits.dev/components/flowing-menu); no upstream code.
+magic-bento — clean-room implementation of the effect named "MagicBento" (https://reactbits.dev/components/magic-bento); no upstream code.
+gradual-blur — clean-room implementation of the effect named "GradualBlur" (https://reactbits.dev/animations/gradual-blur); no upstream code.
+halftone-reveal — clean-room implementation of the effect named "HalftoneReveal" (https://reactbits.dev/animations/halftone-reveal); no upstream code.
+scroll-expand — clean-room implementation of the effect named "ScrollExpand" (https://reactbits.dev/animations/scroll-expand); no upstream code.
+soft-aurora — clean-room implementation of the effect named "SoftAurora" (https://reactbits.dev/backgrounds/soft-aurora); no upstream code.
+liquid-chrome — clean-room implementation of the effect named "LiquidChrome" (https://reactbits.dev/backgrounds/liquid-chrome); no upstream code.
+molten-metal — clean-room implementation of the effect named "MoltenMetal" (https://reactbits.dev/backgrounds/molten-metal); no upstream code.
+
+## Cult UI Pro (licensed, 2026-09-25)
+Cult UI Pro (https://pro.cult-ui.com), used under the owner's Cult UI Pro lifetime licence, which
+permits bundling and derivative use in Mishh Mashh and the sites it builds (owner decision of
+2026-09-25, recorded in docs/legal/cult-ui-pro-rights.md). These components are derivatives ported
+directly from the licensed Cult UI Pro source (React/Tailwind, rewritten as framework-free ESM and
+CSS); they are not clean-room. catalog.json records them as source.name "cult-ui-pro",
+licenceDecision "licensed". The faithful source stays in the private mm-source-kits snapshot and is
+not redistributed here.
+organic-button — ported from Cult UI Pro "organic-button" (copy bundled in the licensed "organic" page item).
+organic-card — ported from Cult UI Pro "organic-card" (copy bundled in the licensed "organic" page item).
+organic-card-small — ported from Cult UI Pro "organic-card-small" (copy bundled in the licensed "organic" page item).
+shadow-card — ported from Cult UI Pro "shadow-card" (copy bundled in the licensed "sass-colorful" page item).
+texture-card — ported from Cult UI Pro TextureCard (bundled in the licensed "marketing-bento-texture" and "marketing-blog-texture" section items).
+texture-button — ported from Cult UI Pro TextureButton (bundled in the licensed "marketing-bento-texture" and "marketing-blog-texture" section items).
+
+## Harvest 2026-10-08 (clean-room, public index names only)
+gradient-text — clean-room implementation of the effect named "Gradient Text" (https://reactbits.dev/text-animations/gradient-text); no upstream code.
+count-up — clean-room implementation of the effect named "Count Up" (https://reactbits.dev/text-animations/count-up); no upstream code.
+rotating-text — clean-room implementation of the effect named "Rotating Text" (https://reactbits.dev/text-animations/rotating-text); no upstream code.
+decrypted-text — clean-room implementation of the effect named "Decrypted Text" (https://reactbits.dev/text-animations/decrypted-text); no upstream code.
+animated-content — clean-room implementation of the effect named "Animated Content" (https://reactbits.dev/animations/animated-content); no upstream code.
+magnet — clean-room implementation of the effect named "Magnet" (https://reactbits.dev/animations/magnet); no upstream code.
+star-border — clean-room implementation of the effect named "Star Border" (https://reactbits.dev/animations/star-border); no upstream code.
+logo-loop — clean-room implementation of the effect named "Logo Loop" (https://reactbits.dev/animations/logo-loop); no upstream code.
+dot-grid — clean-room implementation of the effect named "Dot Grid" (https://reactbits.dev/backgrounds/dot-grid); no upstream code.
+light-rays — clean-room implementation of the effect named "Light Rays" (https://reactbits.dev/backgrounds/light-rays); no upstream code.
+waves — clean-room implementation of the effect named "Waves" (https://reactbits.dev/backgrounds/waves); no upstream code.
+animated-list — clean-room implementation of the effect named "Animated List" (https://reactbits.dev/components/animated-list); no upstream code.
+text-type — clean-room implementation of the effect named "Text Type" (https://reactbits.dev/text-animations/text-type); no upstream code.
+pixel-transition — clean-room implementation of the effect named "Pixel Transition" (https://reactbits.dev/animations/pixel-transition); no upstream code.

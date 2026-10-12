@@ -1,0 +1,108 @@
+/* circular-gallery — clean-room, from the effect description only. Every selector is under .genui-circular-gallery. */
+
+:where(.genui-circular-gallery) {
+  position: relative;
+  display: flex;
+  gap: var(--genui-circular-gallery-gap, 16px);
+  margin: 0;
+  padding: 8px 0;
+  list-style: none;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+}
+
+.genui-circular-gallery__item {
+  position: relative;
+  flex: 0 0 auto;
+  margin: 0;
+  scroll-snap-align: center;
+  transform-origin: 50% 50%;
+}
+
+.genui-circular-gallery__media {
+  display: block;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+}
+
+.genui-circular-gallery__caption {
+  display: block;
+  margin-top: 6px;
+  color: #d7dae0;
+  font: 500 12px/1.3 system-ui, sans-serif;
+  text-align: center;
+}
+
+.genui-circular-gallery__item a {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.genui-circular-gallery__item :focus-visible {
+  outline: 2px solid #8ab4ff;
+  outline-offset: 3px;
+  border-radius: 14px;
+}
+
+/* Live: JS owns the position of every item on the arc. */
+.genui-circular-gallery.genui-circular-gallery--live {
+  overflow: hidden;
+  scroll-snap-type: none;
+  padding-top: calc(8px + var(--genui-circular-gallery-pt, 0px));
+  padding-bottom: calc(8px + var(--genui-circular-gallery-pb, 0px));
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.genui-circular-gallery.genui-circular-gallery--dragging {
+  cursor: grabbing;
+}
+
+.genui-circular-gallery--live .genui-circular-gallery__item {
+  will-change: transform;
+}
+
+/* The bend: items foreshorten and dim as they curve away from the centre. */
+.genui-circular-gallery--live .genui-circular-gallery__media {
+  transform: perspective(520px) rotateY(calc(var(--genui-circular-gallery-t, 0) * var(--genui-circular-gallery-bend, 22deg) * -1.4)) scale(calc(1 - var(--genui-circular-gallery-a, 0) * .08));
+  filter: brightness(calc(1 - var(--genui-circular-gallery-a, 0) * .35));
+}
+
+.genui-circular-gallery--live .genui-circular-gallery__caption {
+  opacity: calc(1 - var(--genui-circular-gallery-a, 0) * .6);
+}
+
+.genui-circular-gallery--live img,
+.genui-circular-gallery--live svg {
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.genui-circular-gallery.genui-circular-gallery--reduced {
+  scroll-behavior: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-circular-gallery {
+    scroll-behavior: auto;
+  }
+
+  .genui-circular-gallery .genui-circular-gallery__item,
+  .genui-circular-gallery .genui-circular-gallery__media {
+    transform: none;
+    filter: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-circular-gallery__media {
+    border: 1px solid CanvasText;
+    filter: none;
+  }
+}

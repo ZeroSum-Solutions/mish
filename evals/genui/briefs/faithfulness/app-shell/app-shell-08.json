@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-08",
+  "businessName": "Oakmere Events",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Oakmere Events"
+    },
+    {
+      "field": "address",
+      "value": "210 Riverside Drive, Savannah, Georgia"
+    },
+    {
+      "field": "phone",
+      "value": "(912) 555-0151"
+    },
+    {
+      "field": "email",
+      "value": "events@oakmerevenue.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 10 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Holds a valid Georgia event venue and alcohol service license"
+    },
+    {
+      "field": "other",
+      "value": "Single venue; four-person booking team"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample inquiry-list row shown only to illustrate layout",
+      "text": "Whitfield anniversary, October 4, 90 guests, coordinator J. Byrne, contract sent"
+    }
+  ]
+}

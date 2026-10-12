@@ -1,0 +1,70 @@
+{
+  "schema": "workbench-relevance-queries/1",
+  "note": "AC-R05.3 relevance-benchmark harness input (U3). Covers the AC-R05 preamble's required explicit retro query and application-flow query, plus five further spines for benchmark-math coverage. This is NOT the frozen, human-rated ten-query/five-spine curation AC-R05.3 itself calls for; see labels.json.",
+  "queries": [
+    {
+      "id": "dentistry-booking",
+      "type": "application-flow",
+      "query": "Build a calm premium dentistry landing page where new patients book their first appointment and fill out an intake form",
+      "context": {
+        "spineCode": "SM",
+        "conversions": [{ "id": "book", "kind": "booking", "role": "primary", "label": "Book a dental appointment" }]
+      }
+    },
+    {
+      "id": "retro-arcade",
+      "type": "retro",
+      "query": "Give this indie arcade game studio site a playful retro Windows95 look with a VHS glow",
+      "context": {
+        "spineCode": "MI",
+        "styleDirection": "retro arcade windows95",
+        "conversions": []
+      }
+    },
+    {
+      "id": "saas-signup",
+      "type": "standard",
+      "query": "Create a SaaS account signup hero with a clear call to action and a pricing table",
+      "context": {
+        "spineCode": "PA",
+        "conversions": [{ "id": "signup", "kind": "signup", "role": "primary", "label": "Sign up" }]
+      }
+    },
+    {
+      "id": "commerce-checkout",
+      "type": "application-flow",
+      "query": "Design a checkout flow with a product grid for an online store",
+      "context": {
+        "spineCode": "CO",
+        "conversions": [{ "id": "purchase", "kind": "purchase", "role": "primary", "label": "Buy now" }]
+      }
+    },
+    {
+      "id": "class-booking",
+      "type": "application-flow",
+      "query": "Build a class booking calendar for a yoga studio with a clear booking call to action",
+      "context": {
+        "spineCode": "BA",
+        "conversions": [{ "id": "book", "kind": "booking", "role": "primary", "label": "Reserve a class" }]
+      }
+    },
+    {
+      "id": "contact-sales",
+      "type": "application-flow",
+      "query": "Create a contact sales inquiry form for enterprise customers",
+      "context": {
+        "spineCode": "CS",
+        "conversions": [{ "id": "contact", "kind": "contact", "role": "primary", "label": "Talk to sales" }]
+      }
+    },
+    {
+      "id": "task-utility-dashboard",
+      "type": "standard",
+      "query": "Design a task utility dashboard hero with a subscribe newsletter block",
+      "context": {
+        "spineCode": "TU",
+        "conversions": [{ "id": "subscribe", "kind": "subscribe", "role": "primary", "label": "Subscribe" }]
+      }
+    }
+  ]
+}

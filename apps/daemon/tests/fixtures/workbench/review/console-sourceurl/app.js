@@ -1,0 +1,1 @@
+console.error("from the served script");

@@ -1,0 +1,78 @@
+/* shiny-text — clean-room, component-specs.md §14. Every selector is under .genui-shiny-text. */
+
+@keyframes genui-shiny-text-sweep {
+  from { background-position: 200% 0; }
+  to { background-position: -100% 0; }
+}
+
+.genui-shiny-text {
+  background-image: linear-gradient(
+    var(--genui-shiny-text-angle, 110deg),
+    var(--genui-shiny-text-base, #9aa0a6) 0 calc(50% - var(--genui-shiny-text-band, 20%) / 2),
+    var(--genui-shiny-text-shine, #ffffff) 50%,
+    var(--genui-shiny-text-base, #9aa0a6) calc(50% + var(--genui-shiny-text-band, 20%) / 2) 100%
+  );
+  background-repeat: no-repeat;
+  background-size: 250% 100%;
+  background-position: 50% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* The sweep must occupy exactly `speed` seconds of the `speed + pause` cycle, then hold for
+     the remaining `pause` seconds — speed and pause are independently meaningful (spec §14), not
+     a fixed ratio. Two fixed keyframes (from/to) always run over the full duration; `linear()`
+     reshapes the *pacing* within that duration from a calc()'d fraction, so the 0%→100% position
+     sweep finishes at `speed / (speed + pause)` of the cycle and then holds flat (output stays at
+     1) for the rest. Falls back to the initial `ease` timing (no fallback for `linear()` itself is
+     defined; an unsupporting engine still animates, just without the exact hold ratio).
+  */
+  animation-name: genui-shiny-text-sweep;
+  animation-duration: calc(var(--genui-shiny-text-speed, 3s) + var(--genui-shiny-text-pause, 1.5s));
+  animation-timing-function: linear(
+    0,
+    1 calc(var(--genui-shiny-text-speed, 3s) / (var(--genui-shiny-text-speed, 3s) + var(--genui-shiny-text-pause, 1.5s)) * 100%),
+    1
+  );
+  animation-iteration-count: infinite;
+}
+
+.genui-shiny-text.genui-shiny-text--pause-hover:hover,
+.genui-shiny-text.genui-shiny-text--pause-hover:focus-within {
+  animation-play-state: paused;
+}
+
+.genui-shiny-text.genui-shiny-text--disabled {
+  animation: none;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  color: var(--genui-shiny-text-base, #9aa0a6);
+}
+
+.genui-shiny-text.genui-shiny-text--reduced {
+  animation: none;
+  background-position: 50% 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-shiny-text {
+    animation: none;
+    background-position: 50% 0;
+  }
+}
+
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+  .genui-shiny-text {
+    animation: none;
+    background: none;
+    color: var(--genui-shiny-text-base, #9aa0a6);
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-shiny-text {
+    animation: none;
+    background: none;
+    -webkit-text-fill-color: CanvasText;
+    color: CanvasText;
+  }
+}

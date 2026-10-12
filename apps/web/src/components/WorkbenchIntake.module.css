@@ -1,0 +1,33 @@
+/* Keep the passive tray below portalled menus (80+), version history (85), and modals. */
+.tray { position: fixed; right: 16px; bottom: 16px; z-index: 70; width: min(380px, calc(100vw - 32px)); max-height: min(60vh, 560px); overflow: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-panel); color: var(--text); box-shadow: var(--shadow-lg); font-size: 12px; }
+/* J4-06: at composer widths the tray's own `bottom: 16px` lands in the same
+   band as the fixed chat composer. Anchoring the tray to the top instead at
+   narrow widths keeps the two from ever sharing space, without needing to
+   measure the composer's live height. Round 2: the top anchor landed UNDER
+   the docked `.app-chrome-header` (its own fixed 44-52px bar), covering the
+   close button instead of clearing it — `--intake-header-clearance` is set
+   inline from a live measurement of that header (WorkbenchIntake.tsx); the
+   52px fallback below covers both known header heights when JS hasn't
+   measured yet (first paint, jsdom, reduced-script contexts). */
+@media (max-width: 480px) {
+ .tray { top: calc(var(--intake-header-clearance, 52px) + 8px); bottom: auto; right: 16px; left: 16px; width: auto; max-height: min(50vh, 420px); }
+}
+.headingRow { display: flex; align-items: center; gap: 4px; padding-right: 8px; }
+.heading { flex: 1; min-width: 0; text-align: left; padding: 12px; color: inherit; font: inherit; font-weight: 600; background: transparent; border: 0; cursor: pointer; }
+.content { padding: 0 12px 12px; }
+.note, .rows small { color: var(--text-muted); }
+/* Destination and size/type are separate lines; inline <small> siblings ran together ("Library67.6 MB"). */
+.rows small { display: block; }
+.rows { padding: 0; margin: 0; list-style: none; display: grid; gap: 12px; }
+.rows li { padding-top: 10px; border-top: 1px solid var(--border); }
+.filename { font-weight: 600; overflow-wrap: anywhere; }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 6px; }
+.actions button, .actions a, .reselect { display: inline-flex; align-items: center; line-height: 1.4; font: inherit; color: var(--accent); border: 0; background: transparent; padding: 2px; cursor: pointer; text-decoration: none; }
+.reselect input { width: 1px; height: 1px; position: absolute; opacity: 0; }
+.reselect:focus-within { outline: 2px solid var(--accent); }
+.rows progress { width: 100%; accent-color: var(--accent); }
+
+.dropMode { position: fixed; inset: 0; z-index: 1100; display: grid; place-items: center; background: color-mix(in srgb, var(--bg-panel) 95%, transparent); color: var(--text); padding: 24px; text-align: center; outline: 2px dashed var(--accent); outline-offset: -12px; }
+.dropMode h2 { font-size: 20px; }
+.dropMode p { max-width: 420px; color: var(--text-muted); }
+.dropMode button { font: inherit; border: 1px solid var(--border); border-radius: 8px; padding: 8px 16px; background: var(--bg-panel); color: var(--text); cursor: pointer; }

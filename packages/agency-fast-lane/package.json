@@ -1,0 +1,46 @@
+{
+  "name": "@open-design/agency-fast-lane",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "GenUI fast lane: a client brief becomes a compiled Agency Site page in seconds. One structured model call per page or per section, the family compiler in-process; verifies with Jev and publishes once by default (--verify-mode strict), or progressively with --verify-mode advisory/off.",
+  "files": ["dist"],
+  "exports": {
+    "./data": { "types": "./dist/data.d.ts", "default": "./dist/data.js" },
+    "./route": { "types": "./dist/route.d.ts", "default": "./dist/route.js" },
+    "./build": { "types": "./dist/build.d.ts", "default": "./dist/build.js" },
+    "./family": { "types": "./dist/family.d.ts", "default": "./dist/family.js" },
+    "./profile": { "types": "./dist/profile.d.ts", "default": "./dist/profile.js" },
+    "./profile-questions": { "types": "./dist/profile-questions.d.ts", "default": "./dist/profile-questions.js" },
+    "./design-index": { "types": "./dist/design-index.d.ts", "default": "./dist/design-index.js" },
+    "./html-facts": { "types": "./dist/html-facts.d.ts", "default": "./dist/html-facts.js" },
+    "./preview-url": { "types": "./dist/preview-url.d.ts", "default": "./dist/preview-url.js" },
+    "./atlas": { "types": "./dist/atlas.d.ts", "default": "./dist/atlas.js" },
+    "./taxonomy": { "types": "./dist/taxonomy.d.ts", "default": "./dist/taxonomy.js" },
+    "./jev": { "types": "./dist/jev.d.ts", "default": "./dist/jev.js" },
+    "./sections": { "types": "./dist/sections.d.ts", "default": "./dist/sections.js" },
+    "./effects": { "types": "./dist/effects.d.ts", "default": "./dist/effects.js" },
+    "./section-overlay": { "types": "./dist/section-overlay.d.ts", "default": "./dist/section-overlay.js" },
+    "./block-plan": { "types": "./dist/block-plan.d.ts", "default": "./dist/block-plan.js" },
+    "./block-compose": { "types": "./dist/block-compose.d.ts", "default": "./dist/block-compose.js" },
+    "./deepseek": { "types": "./dist/deepseek.d.ts", "default": "./dist/deepseek.js" },
+    "./failover": { "types": "./dist/failover.d.ts", "default": "./dist/failover.js" },
+    "./cult-public-ids": { "types": "./dist/cult-public-ids.d.ts", "default": "./dist/cult-public-ids.js" }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json && node --experimental-strip-types scripts/copy-dist-data.ts",
+    "fast-lane": "node --experimental-strip-types src/cli.ts",
+    "import-atlas": "node --experimental-strip-types scripts/import-shape-atlas.ts",
+    "design-index": "node --experimental-strip-types src/design-index-cli.ts",
+    "profile-catalog": "node --experimental-strip-types scripts/profile-catalog.ts",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@open-design/cult-ui-catalog": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "24.12.2",
+    "typescript": "6.0.3"
+  }
+}

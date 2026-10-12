@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Low contrast</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', sans-serif; color: #1f2937; background: #ffffff; }
+    header, main, footer { padding: 16px; max-width: 960px; margin: 0 auto; }
+    nav a { color: #1d4ed8; }
+    .cta { display: inline-block; padding: 12px 20px; background: #1d4ed8; color: #ffffff; text-decoration: none; border-radius: 6px; }
+    form { display: grid; gap: 8px; max-width: 280px; }
+    input { padding: 10px; border: 1px solid #4b5563; font: inherit; }
+    button { padding: 10px 16px; background: #1d4ed8; color: #ffffff; border: 0; border-radius: 6px; font: inherit; }
+    .muted { color: #aaaaaa; }
+  </style>
+</head>
+<body>
+  <header>
+    <nav aria-label="Primary"><a href="#how">How it works</a></nav>
+  </header>
+  <main>
+    <h1>Book a visit</h1>
+    <p>Pick a time that suits you and we will confirm by email.</p>
+    <a class="cta" href="book.html">Book now</a>
+    <p class="muted">Prices include tax and a free first consultation.</p>
+    <h2 id="how">How it works</h2>
+    <p>Choose a slot, leave your email, and we send a confirmation.</p>
+    <form action="subscribe" method="post" aria-label="Newsletter">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required>
+      <button type="submit">Subscribe</button>
+    </form>
+  </main>
+  <footer><p>Example studio</p></footer>
+</body>
+</html>

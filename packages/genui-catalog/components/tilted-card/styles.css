@@ -1,0 +1,101 @@
+/* tilted-card — clean-room, component-specs.md §16. Every selector is under .genui-tilted-card. */
+
+:where(.genui-tilted-card) {
+  position: relative;
+  display: inline-block;
+}
+
+.genui-tilted-card__inner {
+  display: block;
+  position: relative;
+  transform: rotateX(var(--genui-tilted-card-rx, 0deg)) rotateY(var(--genui-tilted-card-ry, 0deg)) scale(var(--genui-tilted-card-s, 1));
+  transform-style: preserve-3d;
+  transition: transform var(--genui-tilted-card-reset, 500ms) ease;
+  will-change: transform;
+}
+
+.genui-tilted-card--active .genui-tilted-card__inner {
+  transition: none;
+}
+
+.genui-tilted-card__glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: var(--genui-tilted-card-glare-opacity, 0.25);
+  background: radial-gradient(
+    circle 60% at var(--genui-tilted-card-gx, 50%) var(--genui-tilted-card-gy, 50%),
+    #fff,
+    transparent 70%
+  );
+}
+
+.genui-tilted-card__caption {
+  position: absolute;
+  left: var(--genui-tilted-card-gx, 50%);
+  top: var(--genui-tilted-card-gy, 50%);
+  transform: translate(-50%, -140%);
+  pointer-events: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.78);
+  color: #fff;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.genui-tilted-card--active .genui-tilted-card__caption {
+  opacity: 1;
+}
+
+.genui-tilted-card__desc {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.genui-tilted-card.genui-tilted-card--reduced .genui-tilted-card__inner {
+  transition: none;
+}
+
+.genui-tilted-card.genui-tilted-card--reduced .genui-tilted-card__caption {
+  display: none;
+}
+
+/* Reduced motion: no tilt, but hover (--active) still applies a static scale and reveals the
+   glare at its fixed default position (component-specs.md §16 "Reduced motion"). */
+.genui-tilted-card.genui-tilted-card--reduced .genui-tilted-card__glare {
+  opacity: 0;
+}
+
+.genui-tilted-card.genui-tilted-card--reduced.genui-tilted-card--active .genui-tilted-card__glare {
+  opacity: var(--genui-tilted-card-glare-opacity, 0.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-tilted-card__inner {
+    transition: none;
+  }
+
+  .genui-tilted-card__caption {
+    display: none;
+  }
+
+  .genui-tilted-card__glare {
+    opacity: 0;
+  }
+
+  .genui-tilted-card--active .genui-tilted-card__glare {
+    opacity: var(--genui-tilted-card-glare-opacity, 0.25);
+  }
+}

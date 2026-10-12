@@ -1,0 +1,67 @@
+/* liquid-glass-card — clean-room, component-specs.md §3. Every selector is under .genui-liquid-glass-card. */
+
+.genui-liquid-glass-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--genui-liquid-glass-card-radius, 24px);
+}
+
+.genui-liquid-glass-card__defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.genui-liquid-glass-card__lens {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: var(--genui-liquid-glass-card-tint, rgba(255, 255, 255, 0.12));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.16);
+}
+
+.genui-liquid-glass-card__shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.55;
+  mix-blend-mode: overlay;
+  background: radial-gradient(
+    220px circle at var(--genui-liquid-glass-card-x, 50%) var(--genui-liquid-glass-card-y, 50%),
+    rgba(255, 255, 255, 0.55),
+    transparent 60%
+  );
+}
+
+.genui-liquid-glass-card.genui-liquid-glass-card--no-specular .genui-liquid-glass-card__shine {
+  opacity: 0;
+}
+
+.genui-liquid-glass-card__content {
+  position: relative;
+  z-index: 1;
+}
+
+/* No backdrop-filter support: fall back to a more opaque solid tint so content stays readable. */
+@supports not (backdrop-filter: blur(1px)) {
+  .genui-liquid-glass-card__lens {
+    background: color-mix(in srgb, var(--genui-liquid-glass-card-tint, #fff) 85%, black 15%);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .genui-liquid-glass-card__lens {
+    background: color-mix(in srgb, var(--genui-liquid-glass-card-tint, #fff) 90%, black 10%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-liquid-glass-card__shine {
+    background: radial-gradient(220px circle at 50% 50%, rgba(255, 255, 255, 0.55), transparent 60%);
+  }
+}

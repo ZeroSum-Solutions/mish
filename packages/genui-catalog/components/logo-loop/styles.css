@@ -1,0 +1,22 @@
+.genui-logo-loop { min-width: 0; max-width: 100%; }
+.genui-logo-loop .genui-logo-loop__viewport { overflow: hidden; }
+.genui-logo-loop .genui-logo-loop__rail { display: flex; width: max-content; animation: genui-logo-loop-travel var(--genui-logo-loop-duration, 18000ms) linear infinite; }
+.genui-logo-loop .genui-logo-loop__group { display: flex; flex: none; align-items: center; justify-content: space-around; gap: var(--genui-logo-loop-gap, 48px); padding-inline-end: var(--genui-logo-loop-gap, 48px); box-sizing: border-box; min-width: var(--genui-logo-loop-width, 0px); }
+.genui-logo-loop .genui-logo-loop__group > * { flex: none; }
+.genui-logo-loop .genui-logo-loop__pause { display: block; margin: 24px auto 0; min-height: 44px; padding: 8px 14px; border: 1px solid #69738b; border-radius: 999px; background: #202436; color: #f0e7ff; font: 500 12px/1.4 system-ui, sans-serif; cursor: pointer; }
+.genui-logo-loop .genui-logo-loop__pause[hidden] { display: none; }
+.genui-logo-loop .genui-logo-loop__pause:focus-visible { outline: 2px solid #a5d8ff; outline-offset: 4px; }
+.genui-logo-loop.genui-logo-loop--paused .genui-logo-loop__rail, .genui-logo-loop .genui-logo-loop__viewport:hover .genui-logo-loop__rail, .genui-logo-loop .genui-logo-loop__viewport:focus-within .genui-logo-loop__rail { animation-play-state: paused; }
+.genui-logo-loop.genui-logo-loop--reduced .genui-logo-loop__rail { animation: none; width: 100%; }
+.genui-logo-loop.genui-logo-loop--reduced .genui-logo-loop__copy { display: none; }
+.genui-logo-loop.genui-logo-loop--reduced .genui-logo-loop__group { min-width: 0; width: 100%; flex-wrap: wrap; padding: 0; }
+@keyframes genui-logo-loop-travel {
+ to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+ .genui-logo-loop .genui-logo-loop__rail { animation: none; width: 100%; }
+ .genui-logo-loop .genui-logo-loop__copy { display: none; }
+ .genui-logo-loop .genui-logo-loop__group { min-width: 0; width: 100%; flex-wrap: wrap; padding: 0; }
+}
+@media (forced-colors: active) { .genui-logo-loop .genui-logo-loop__pause { color: ButtonText; background: ButtonFace; border-color: ButtonText; } }
+.genui-logo-loop .genui-logo-loop__pause[aria-disabled="true"] { cursor: default; }

@@ -1,0 +1,57 @@
+Mish!
+Copyright 2026 ZeroSum Solutions
+
+This product is a modified version of Open Design
+(https://github.com/nexu-io/open-design), Copyright 2026 Open Design
+contributors, licensed under the Apache License, Version 2.0. See LICENSE.
+
+ZeroSum Solutions modified the original work, starting from upstream commit
+73953213a6fec2c8092e8e77d229a3074aa828a9 (see docs/FORK-PIN.md). This public
+repository starts from a snapshot of ZeroSum's private working repository
+(Mishh Mashh 2, commit 354ec9a700); many files were modified after the
+upstream pin. Changes include the
+product name, the removal of upstream community and support links, and
+upstream network services turned off by default.
+
+"Open Design", "OpenDesign" and related names and logos belong to their
+owners. This product is not affiliated with or endorsed by the Open Design
+project or nexu-io.
+
+This product includes third-party components under their own licenses:
+- skills/web-clone (MIT) - see skills/web-clone/LICENSE
+- dom-to-pptx (MIT) - see apps/desktop/vendor/dom-to-pptx/LICENSE
+- English word list from the English Speller Database (ESDB, formerly SCOWL),
+  size 50, Copyright 2000-2026 Kevin Atkinson (permissive licence) - see
+  packages/agency-fast-lane/src/wordlist/LICENSE-SCOWL.txt
+- 7-Zip (GNU LGPL + unRAR restriction) - see tools/pack/resources/win/7zip/License.txt
+- HyperUI (MIT), Copyright (c) Mark Mead - see
+  plugins/_official/shared/ui-kits/hyperui/LICENSE. Vendored blocks and their pinned upstream
+  commit are recorded in plugins/_official/shared/ui-kits/hyperui/UPSTREAM.json and
+  manifest.json; see packages/genui-catalog/NOTICE for where those blocks ship.
+  packages/section-catalog/catalog.json only references HyperUI blocks by id and content sha256
+  (see packages/section-catalog/src/types.ts SectionContent "vendored-block") — it does not
+  itself ship block markup. Three reviewed, generated derivatives of pinned HyperUI blocks
+  (marketing/ctas/1, marketing/feature-grids/1, marketing/sections/1) ship as
+  plugins/_official/shared/agency-compiler/scripts/section-adapter-{ctas-1,feature-grids-1,
+  sections-1}.ts, built by scripts/build-section-adapters.ts; the pinned source blocks themselves
+  are untouched.
+- React95 code (MIT), Copyright (c) 2019 Artur Bień. The pinned vendored
+  source, complete MIT notice and font notices are preserved in
+  apps/daemon/src/workbench/kits/react95/kit.generated.ts (notices).
+  The "MS Sans Serif" and "MS Sans Serif Bold" fonts by "lou" use
+  CC-BY-SA-3.0; the same record preserves their FontStruct attribution,
+  licence text and redistribution instructions. The fonts retain their
+  own terms, separate from the React95 code licence.
+- GSAP 3.15.0, Copyright GreenSock (Webflow), all rights reserved, uses the
+  custom GSAP Standard "no charge" License, not an open-source licence:
+  https://gsap.com/standard-license. Copyright notices in shipped runtime
+  files are retained. apps/daemon/src/workbench/recipes/gsap/runtime.ts
+  records the pinned source and gsapNotice terms, including the restriction
+  on competing visual animation-authoring tools and separate assessment
+  of reusable-source redistribution. React recipes declare @gsap/react
+  2.1.2; exported units carry the lane's notices.
+- The owned MotionSites replacements bundle third-party SIL OFL 1.1 fonts (for example
+  Archivo, Bodoni Moda, IBM Plex Mono); each package lists them in RIGHTS.md and ships
+  assets/OFL.txt.
+npm dependencies keep the licenses declared in their packages
+(`pnpm licenses list`).

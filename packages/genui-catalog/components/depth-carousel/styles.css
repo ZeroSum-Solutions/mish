@@ -1,0 +1,111 @@
+/* depth-carousel — clean-room, from the effect description only. Every selector is under .genui-depth-carousel. */
+
+:where(.genui-depth-carousel) {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  perspective: 900px;
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.genui-depth-carousel .genui-depth-carousel__item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  box-sizing: border-box;
+  transform:
+    translate(-50%, -50%)
+    translate3d(
+      calc(var(--genui-depth-carousel-o, 0) * var(--genui-depth-carousel-spacing, 120px)),
+      0,
+      calc(var(--genui-depth-carousel-a, 0) * -1 * var(--genui-depth-carousel-depth, 160px))
+    )
+    rotateY(calc(clamp(-1, var(--genui-depth-carousel-o, 0), 1) * -1 * var(--genui-depth-carousel-rotate, 35deg)));
+  opacity: clamp(0, calc(1 + var(--genui-depth-carousel-visible, 2) - var(--genui-depth-carousel-a, 0)), 1);
+  filter: brightness(calc(1 - min(var(--genui-depth-carousel-a, 0), 3) * .18));
+  z-index: calc(100 - var(--genui-depth-carousel-a, 0));
+  cursor: pointer;
+  transition:
+    transform var(--genui-depth-carousel-duration, 600ms) cubic-bezier(.22, .8, .3, 1),
+    opacity var(--genui-depth-carousel-duration, 600ms) ease,
+    filter var(--genui-depth-carousel-duration, 600ms) ease;
+}
+
+.genui-depth-carousel .genui-depth-carousel__item--active {
+  cursor: auto;
+}
+
+.genui-depth-carousel .genui-depth-carousel__item--far {
+  pointer-events: none;
+}
+
+.genui-depth-carousel .genui-depth-carousel__item:focus-visible {
+  outline: 2px solid #f5f5f7;
+  outline-offset: 3px;
+}
+
+.genui-depth-carousel__btn {
+  position: absolute;
+  top: 50%;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  padding: 0 0 3px;
+  border: 1px solid rgba(255, 255, 255, .18);
+  border-radius: 50%;
+  background: rgba(11, 13, 18, .7);
+  color: #f5f5f7;
+  font: 600 22px/1 system-ui, sans-serif;
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  transition: background-color .2s ease, opacity .2s ease;
+}
+
+.genui-depth-carousel__btn--prev { left: 8px; }
+.genui-depth-carousel__btn--next { right: 8px; }
+
+.genui-depth-carousel__btn:hover { background: rgba(255, 255, 255, .16); }
+
+.genui-depth-carousel__btn:focus-visible {
+  outline: 2px solid #f5f5f7;
+  outline-offset: 2px;
+}
+
+.genui-depth-carousel__btn:disabled {
+  opacity: .35;
+  cursor: default;
+}
+
+.genui-depth-carousel__status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.genui-depth-carousel.genui-depth-carousel--reduced .genui-depth-carousel__item {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-depth-carousel .genui-depth-carousel__item {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-depth-carousel .genui-depth-carousel__item {
+    filter: none;
+  }
+  .genui-depth-carousel__btn {
+    border-color: ButtonText;
+  }
+}

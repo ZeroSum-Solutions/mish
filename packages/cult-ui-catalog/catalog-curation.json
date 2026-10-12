@@ -1,0 +1,395 @@
+{
+  "schema": "cult-catalog-curation/1",
+  "relations": [
+    {
+      "parentId": "cult:agent-suggest-card-stack",
+      "childId": "cult:agent-suggest-card-stack-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:ai-blob-warp",
+      "childId": "cult:ai-blob-warp-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:analytics-chart",
+      "childId": "cult:analytics-chart-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-badge",
+      "childId": "cult:animated-badge-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-button",
+      "childId": "cult:animated-button-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-card",
+      "childId": "cult:animated-card-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-composer",
+      "childId": "cult:animated-composer-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-dropzone",
+      "childId": "cult:animated-dropzone-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-field",
+      "childId": "cult:animated-field-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-input",
+      "childId": "cult:animated-input-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-notification",
+      "childId": "cult:animated-notification-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-progress",
+      "childId": "cult:animated-progress-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-search",
+      "childId": "cult:animated-search-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-segmented",
+      "childId": "cult:animated-segmented-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-select",
+      "childId": "cult:animated-select-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-switch",
+      "childId": "cult:animated-switch-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-tabs",
+      "childId": "cult:animated-tabs-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-toast",
+      "childId": "cult:animated-toast-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:animated-toggle-group",
+      "childId": "cult:animated-toggle-group-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:phone-series-a",
+      "childId": "cult:phone-demo-series-a",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:keyboard-series-a",
+      "childId": "cult:keyboard-demo-series-a",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:display-series-a",
+      "childId": "cult:display-demo-series-a",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:watch-series-a",
+      "childId": "cult:watch-demo-series-a",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:border-beam-button",
+      "childId": "cult:border-beam-button-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:border-beam-card",
+      "childId": "cult:border-beam-card-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:border-beam-input",
+      "childId": "cult:border-beam-input-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:circuit-board",
+      "childId": "cult:circuit-board-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:collab-avatar",
+      "childId": "cult:collab-avatar-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:collab-toolbar",
+      "childId": "cult:collab-toolbar-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:copy-button",
+      "childId": "cult:copy-button-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:feature-sticky-section",
+      "childId": "cult:feature-sticky-section-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:fluid-ai-workloads",
+      "childId": "cult:fluid-ai-workloads-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:fluted-glass",
+      "childId": "cult:fluted-glass-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:folded-card",
+      "childId": "cult:folded-card-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:gateway-endpoint-illustration",
+      "childId": "cult:gateway-endpoint-illustration-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:gateway-route-illustration",
+      "childId": "cult:gateway-route-illustration-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:gateway-svg-illustration",
+      "childId": "cult:gateway-svg-illustration-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:globe",
+      "childId": "cult:globe-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:icons",
+      "childId": "cult:icons-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:illustration-card-grid",
+      "childId": "cult:illustration-card-grid-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:illustration-comment-bubble",
+      "childId": "cult:illustration-comment-bubble-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:illustration-cursor",
+      "childId": "cult:illustration-cursor-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:illustration-fluid-rendering",
+      "childId": "cult:illustration-fluid-rendering-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:illustration-globe-series-v",
+      "childId": "cult:illustration-globe-demo-series-v",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:illustration-graph",
+      "childId": "cult:illustration-graph-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:kanban-board",
+      "childId": "cult:kanban-board-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:screen-series-a",
+      "childId": "cult:screen-demo-series-a",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:feature-code",
+      "childId": "cult:feature-code-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:hero-analytics",
+      "childId": "cult:hero-analytics-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:merging-bubbles",
+      "childId": "cult:merging-bubbles-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:organic-button",
+      "childId": "cult:organic-button-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:organic-card",
+      "childId": "cult:organic-card-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:organic-card-small",
+      "childId": "cult:organic-card-small-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:security-checkpoint",
+      "childId": "cult:security-checkpoint-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:shadow-card",
+      "childId": "cult:shadow-card-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:speech-bubble",
+      "childId": "cult:speech-bubble-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:tabs-illustration-series-v",
+      "childId": "cult:tabs-illustration-demo-series-v",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:wizard-expandable",
+      "childId": "cult:wizard-expandable-demo",
+      "relationship": "example"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:banner-section-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:faq-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:hero-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:pattern-guide-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:primary-cta-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:shader-settings-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:site-footer-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:social-proof-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:tabs-showcase-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:organic-dither",
+      "childId": "cult:use-cases-page-organic-dither",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:faq-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:features-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:hero-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:how-it-works-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:integrations-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:navbar-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:primary-cta-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:site-footer-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:social-proof-page-saas-colorful",
+      "relationship": "section"
+    },
+    {
+      "parentId": "cult:saas-colorful",
+      "childId": "cult:testimonials-page-saas-colorful",
+      "relationship": "section"
+    }
+  ]
+}

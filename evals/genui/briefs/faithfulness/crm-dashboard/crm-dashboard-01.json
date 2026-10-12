@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-01",
+  "businessName": "Aldermere Solar",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Aldermere Solar"
+    },
+    {
+      "field": "address",
+      "value": "4100 North Central Avenue, Phoenix, Arizona"
+    },
+    {
+      "field": "phone",
+      "value": "(602) 555-0141"
+    },
+    {
+      "field": "email",
+      "value": "sales@aldermeresolar.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Saturday, 8 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed as a contractor in the State of Arizona"
+    },
+    {
+      "field": "other",
+      "value": "Seven-person sales team"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "M. Delgado logged a site assessment for the Osei residence, moved to proposal, 40 minutes ago"
+    }
+  ]
+}

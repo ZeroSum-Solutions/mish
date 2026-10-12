@@ -1,0 +1,42 @@
+{
+  "id": "app-shell-02",
+  "businessName": "Basincreek Logistics",
+  "expectedSpine": "TU",
+  "expectedPageKind": "app-shell",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Basincreek Logistics"
+    },
+    {
+      "field": "address",
+      "value": "4500 Freight Yard Road, Memphis, Tennessee"
+    },
+    {
+      "field": "phone",
+      "value": "(901) 555-0173"
+    },
+    {
+      "field": "email",
+      "value": "returns@basincreeklogistics.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Saturday, 6 a.m. to 6 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Licensed freight and warehousing company registered in Tennessee"
+    },
+    {
+      "field": "other",
+      "value": "Handles returns for three retail partners; six processors"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample case-list row shown only to illustrate layout",
+      "text": "ORD-88214, Northgate Retail, wrong item, inspected, assigned to D. Ochoa"
+    }
+  ]
+}

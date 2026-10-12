@@ -1,0 +1,59 @@
+/* handwriting-svg — clean-room, component-specs.md §21. Every selector is under .genui-handwriting-svg. */
+
+:where(.genui-handwriting-svg) {
+  position: relative;
+}
+
+.genui-handwriting-svg path {
+  fill: none;
+  stroke: var(--genui-handwriting-svg-colour, currentColor);
+  stroke-width: calc(var(--genui-handwriting-svg-stroke-width, 2) * 1px);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: fill 300ms ease;
+}
+
+.genui-handwriting-svg--drawn path {
+  fill: var(--genui-handwriting-svg-colour, currentColor);
+}
+
+.genui-handwriting-svg__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.genui-handwriting-svg__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.genui-handwriting-svg__svg text {
+  font: inherit;
+  fill: none;
+  stroke: var(--genui-handwriting-svg-colour, currentColor);
+  stroke-width: calc(var(--genui-handwriting-svg-stroke-width, 2) * 1px);
+  transition: fill 300ms ease;
+}
+
+.genui-handwriting-svg--drawn .genui-handwriting-svg__svg text {
+  fill: var(--genui-handwriting-svg-colour, currentColor);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-handwriting-svg--pending path,
+  .genui-handwriting-svg--pending .genui-handwriting-svg__svg text {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .genui-handwriting-svg path,
+  .genui-handwriting-svg__svg text {
+    transition: none;
+  }
+}

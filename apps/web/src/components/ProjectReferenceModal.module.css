@@ -1,0 +1,267 @@
+/* Reference another project — a dialog: solid fill, elevation 4, pop-in.
+   Rows are two clean lines (name over location) with a trailing check, so a
+   long path never collides with the title. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1600;
+  display: grid;
+  place-items: center;
+  padding: var(--space-6);
+  background: rgba(15, 15, 15, 0.38);
+  animation: projectReferenceBackdropIn var(--motion-enter) var(--ease-out-quint);
+}
+
+@keyframes projectReferenceBackdropIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modal {
+  width: min(520px, calc(100vw - var(--space-8)));
+  max-height: min(640px, calc(100vh - var(--space-12)));
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--material-separator);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  box-shadow: var(--glass-surface-sheen), var(--elevation-4);
+  animation: projectReferenceModalIn var(--spring-pop-duration) var(--spring-pop);
+}
+
+@keyframes projectReferenceModalIn {
+  from {
+    opacity: 0;
+    transform: translateY(var(--enter-offset)) scale(var(--enter-scale));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .modal {
+    animation: none;
+  }
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-5) var(--space-5) var(--space-3) var(--inset-dialog);
+}
+
+.headText {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  margin: 0;
+  color: var(--text-strong);
+  font: var(--font-heading);
+  letter-spacing: var(--tracking-snug);
+}
+
+.hint {
+  margin: 0;
+  color: var(--text-muted);
+  font: var(--font-body-sm);
+}
+
+.body {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0 var(--inset-dialog) var(--space-4);
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--control-h-md);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg);
+  color: var(--text-soft);
+  flex: 0 0 auto;
+}
+
+.search input {
+  min-width: 0;
+  flex: 1 1 auto;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: var(--font-body);
+}
+
+.search input:focus,
+.search input:focus-visible {
+  outline: none;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.list {
+  min-height: 0;
+  max-height: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+  margin: 0 calc(-1 * var(--space-2));
+  padding: var(--space-half) var(--space-2);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.item {
+  appearance: none;
+  width: 100%;
+  /* The global `button` rule pins 36px; a two-line row must size to fit. */
+  height: auto;
+  min-height: 52px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-3) var(--space-2) var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  white-space: normal;
+  cursor: pointer;
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+
+.item:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--chip-hover-fill);
+}
+
+.item:active:not(:disabled) {
+  transform: scale(var(--press-scale-card));
+  transition-duration: var(--motion-hover), var(--motion-press);
+}
+
+.item:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: calc(var(--focus-offset) * -1);
+}
+
+.item[aria-selected='true'] {
+  background: var(--chip-selected-fill);
+}
+
+.itemIcon {
+  width: var(--control-h-md);
+  height: var(--control-h-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--bg-subtle);
+  color: var(--text-muted);
+}
+
+.item[aria-selected='true'] .itemIcon {
+  background: var(--bg-elevated);
+  color: var(--text-strong);
+}
+
+.itemText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-half);
+}
+
+.itemTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-strong);
+  font: var(--font-title-sm);
+}
+
+.itemMeta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-muted);
+  font: var(--font-caption);
+}
+
+/* Trailing check: an empty ring at rest, a filled disc with a tick once
+   the row is picked. */
+.check {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-pill);
+  color: var(--bg);
+  transition:
+    background-color var(--motion-hover) var(--ease-out-quint),
+    border-color var(--motion-hover) var(--ease-out-quint);
+}
+
+.item[aria-selected='true'] .check {
+  border-color: var(--text-strong);
+  background: var(--text-strong);
+}
+
+.empty {
+  padding: var(--space-8) var(--space-4);
+  color: var(--text-muted);
+  font: var(--font-body-sm);
+  text-align: center;
+}
+
+.error {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid color-mix(in srgb, var(--danger, #b42318) 35%, var(--border));
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--danger, #b42318) 8%, transparent);
+  color: var(--danger, #b42318);
+  font: var(--font-body-sm);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--inset-dialog) var(--inset-dialog);
+  border-top: 1px solid var(--material-separator);
+}
+
+.count {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--text-muted);
+  font: var(--font-caption);
+}

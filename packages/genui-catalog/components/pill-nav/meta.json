@@ -1,0 +1,34 @@
+{
+  "id": "pill-nav",
+  "name": "Pill Nav",
+  "category": "navigation",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; a rounded link track with a springy sliding pill indicator that collapses to a dropdown on narrow hosts, rebuilt with CSS transitions instead of GSAP so it ships dependency-free.",
+  "entry": "components/pill-nav/index.ts",
+  "css": "components/pill-nav/styles.css",
+  "demo": "components/pill-nav/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "duration": { "type": "number", "default": 380, "minimum": 0, "description": "Indicator slide length, in ms." },
+      "radius": { "type": "string", "default": "999px", "description": "Corner radius of the track, pills and indicator." },
+      "accent": { "type": "string", "default": "#f5f5f7", "description": "Indicator fill colour." },
+      "accentText": { "type": "string", "default": "#0b0d12", "description": "Link text colour while the indicator sits under it." },
+      "collapseBelow": { "type": "number", "default": 480, "minimum": 0, "description": "Collapse behind the menu button when the host is narrower than this, in px (0 never collapses)." },
+      "followHover": { "type": "boolean", "default": true, "description": "Move the indicator to the hovered or focused link." },
+      "trackActive": { "type": "boolean", "default": true, "description": "Make a clicked link the current one (aria-current=\"page\")." },
+      "closeOnOutside": { "type": "boolean", "default": true, "description": "Close the collapsed menu when the pointer goes down outside the navigation." }
+    }
+  },
+  "a11y": [
+    "Links stay native <a> elements in a <ul> inside a <nav>; the current one carries aria-current=\"page\" and the sliding pill is an aria-hidden decoration.",
+    "Keyboard focus moves the pill exactly as hover does, and every link and the menu button keep a visible :focus-visible ring.",
+    "When collapsed, the menu button is a native <button> with aria-expanded and aria-controls; Esc closes the menu and returns focus to it, and the closed list is visibility:hidden so its links leave the tab order.",
+    "The list only collapses when a menu button exists to reopen it, and forced-colors mode paints the pill in Highlight."
+  ],
+  "reducedMotion": "static"
+}

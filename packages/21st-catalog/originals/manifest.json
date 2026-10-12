@@ -1,0 +1,178 @@
+[
+  {
+    "id": "21st:dhileepkumargm-3d-cards-slider",
+    "slug": "dhileepkumargm-3d-cards-slider",
+    "title": "Depth deck",
+    "description": "Cycle an original perspective card deck with keyboard and buttons.",
+    "referenceUrl": "https://21st.dev/@dhileepkumargm/components/3d-cards-slider",
+    "referenceAuthor": "dhileepkumargm"
+  },
+  {
+    "id": "21st:efferd-dialog",
+    "slug": "efferd-dialog",
+    "title": "Decision dialog",
+    "description": "Native modal focus trapping, Escape dismissal, and a local confirmation.",
+    "referenceUrl": "https://21st.dev/@efferd/components/dialog",
+    "referenceAuthor": "efferd"
+  },
+  {
+    "id": "21st:hero-ui-card",
+    "slug": "hero-ui-card",
+    "title": "Destination card",
+    "description": "An original destination card with local date and guest selection.",
+    "referenceUrl": "https://21st.dev/@hero_ui/components/heroui-card",
+    "referenceAuthor": "hero_ui"
+  },
+  {
+    "id": "21st:isaiahbjork-coach-scheduling-card",
+    "slug": "isaiahbjork-coach-scheduling-card",
+    "title": "Session planner",
+    "description": "Select a local sample session slot and confirm it without creating a booking.",
+    "referenceUrl": "https://21st.dev/@isaiahbjork/components/coach-scheduling-card",
+    "referenceAuthor": "isaiahbjork"
+  },
+  {
+    "id": "21st:isaiahbjork-system-monitor",
+    "slug": "isaiahbjork-system-monitor",
+    "title": "Machine pulse",
+    "description": "Switch between explicit sample CPU and memory telemetry.",
+    "referenceUrl": "https://21st.dev/@isaiahbjork/components/system-monitor",
+    "referenceAuthor": "isaiahbjork"
+  },
+  {
+    "id": "21st:jahed-glass-testimonial-swiper",
+    "slug": "jahed-glass-testimonial-swiper",
+    "title": "Studio voices",
+    "description": "Swipe or use arrow keys to browse an original testimonial deck.",
+    "referenceUrl": "https://21st.dev/@jahed/components/glass-testimonial-swiper",
+    "referenceAuthor": "jahed"
+  },
+  {
+    "id": "21st:jahed-shared-element-gallery",
+    "slug": "jahed-shared-element-gallery",
+    "title": "Expanded moments",
+    "description": "Open local artwork in a focus-managed native dialog.",
+    "referenceUrl": "https://21st.dev/@jahed/components/shared-element-gallery",
+    "referenceAuthor": "jahed"
+  },
+  {
+    "id": "21st:jatin-yadav05-animated-geometric-card",
+    "slug": "jatin-yadav05-animated-geometric-card",
+    "title": "Orbital study",
+    "description": "Floating geometry, pointer tilt, and a palette switch.",
+    "referenceUrl": "https://21st.dev/@jatin-yadav05/components/animated-geometric-card",
+    "referenceAuthor": "jatin-yadav05"
+  },
+  {
+    "id": "21st:kokonutd-background-paths",
+    "slug": "kokonutd-background-paths",
+    "title": "Contour field",
+    "description": "An animated SVG contour field with density and pause controls.",
+    "referenceUrl": "https://21st.dev/@kokonutd/components/background-paths",
+    "referenceAuthor": "kokonutd"
+  },
+  {
+    "id": "21st:legionwebdev-radar-chart",
+    "slug": "legionwebdev-radar-chart",
+    "title": "Capability map",
+    "description": "Compare two sample radar datasets in an accessible SVG chart.",
+    "referenceUrl": "https://21st.dev/@LegionWebDev/components/radar-chart",
+    "referenceAuthor": "LegionWebDev"
+  },
+  {
+    "id": "21st:moumensoliman-glassmorphism-listen-app",
+    "slug": "moumensoliman-glassmorphism-listen-app",
+    "title": "Listening room",
+    "description": "A glass music player with local play state, seek, and track controls. No audio file is implied.",
+    "referenceUrl": "https://21st.dev/@moumensoliman/components/glassmorphism-listen-app-block-shadcnui",
+    "referenceAuthor": "moumensoliman"
+  },
+  {
+    "id": "21st:moumensoliman-glassmorphism-portfolio",
+    "slug": "moumensoliman-glassmorphism-portfolio",
+    "title": "Studio profile",
+    "description": "A glass profile with a working local project filter.",
+    "referenceUrl": "https://21st.dev/@moumensoliman/components/glassmorphism-portfolio-block-shadcnui",
+    "referenceAuthor": "moumensoliman"
+  },
+  {
+    "id": "21st:rahil1202-scannercardstream",
+    "slug": "rahil1202-scannercardstream",
+    "title": "Inspection lane",
+    "description": "Pause and inspect a moving scanner with a verified local status.",
+    "referenceUrl": "https://21st.dev/@rahil1202/components/scanner-card-stream",
+    "referenceAuthor": "rahil1202"
+  },
+  {
+    "id": "21st:ravikatiyar162-card",
+    "slug": "ravikatiyar162-card",
+    "title": "Collection card",
+    "description": "Expand an original art collection card and save it.",
+    "referenceUrl": "https://21st.dev/@ravikatiyar162/components/card-12",
+    "referenceAuthor": "ravikatiyar162"
+  },
+  {
+    "id": "21st:ravikatiyar162-offer-carousel",
+    "slug": "ravikatiyar162-offer-carousel",
+    "title": "Weekend editions",
+    "description": "Browse locally authored offer slides and apply a sample offer.",
+    "referenceUrl": "https://21st.dev/@ravikatiyar162/components/offer-carousel",
+    "referenceAuthor": "ravikatiyar162"
+  },
+  {
+    "id": "21st:ruixen-ui-gallery-hover-carousel",
+    "slug": "ruixen-ui-gallery-hover-carousel",
+    "title": "Chromatic atlas",
+    "description": "Hover or focus to expand each work in a horizontal gallery.",
+    "referenceUrl": "https://21st.dev/@ruixen.ui/components/gallery-hover-carousel",
+    "referenceAuthor": "ruixen.ui"
+  },
+  {
+    "id": "21st:ruixen-ui-image-stream-hero",
+    "slug": "ruixen-ui-image-stream-hero",
+    "title": "Field notes",
+    "description": "An art stream with direction controls and pause.",
+    "referenceUrl": "https://21st.dev/@ruixen.ui/components/image-stream-hero",
+    "referenceAuthor": "ruixen.ui"
+  },
+  {
+    "id": "21st:ruixen-ui-ruixenmonochat",
+    "slug": "ruixen-ui-ruixenmonochat",
+    "title": "Conversation sketch",
+    "description": "Send messages into a local-only chat transcript, with explicit canned replies.",
+    "referenceUrl": "https://21st.dev/@ruixen.ui/components/ruixen-mono-chat",
+    "referenceAuthor": "ruixen.ui"
+  },
+  {
+    "id": "21st:ruixen-ui-socialpostcard",
+    "slug": "ruixen-ui-socialpostcard",
+    "title": "Field dispatch",
+    "description": "Toggle like and saved state on an original social post.",
+    "referenceUrl": "https://21st.dev/@ruixen.ui/components/social-post-card",
+    "referenceAuthor": "ruixen.ui"
+  },
+  {
+    "id": "21st:serafimcloud-spline-scene",
+    "slug": "serafimcloud-spline-scene",
+    "title": "Spatial object",
+    "description": "A local CSS 3D object with an orbit slider; no Spline account or remote scene.",
+    "referenceUrl": "https://21st.dev/@serafimcloud/components/splite",
+    "referenceAuthor": "serafimcloud"
+  },
+  {
+    "id": "21st:uniquesonu-dashboard-activities",
+    "slug": "uniquesonu-dashboard-activities",
+    "title": "Activity ledger",
+    "description": "Filter a sample event timeline and mark events reviewed.",
+    "referenceUrl": "https://21st.dev/@uniquesonu/components/dashboard-activities",
+    "referenceAuthor": "uniquesonu"
+  },
+  {
+    "id": "21st:xordev-phosphor-30",
+    "slug": "xordev-phosphor-30",
+    "title": "Signal laboratory",
+    "description": "Adjust a code-native phosphor display and its brightness.",
+    "referenceUrl": "https://21st.dev/@xordev/components/phosphor-30",
+    "referenceAuthor": "xordev"
+  }
+]

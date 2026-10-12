@@ -1,0 +1,5 @@
+{
+  "description": "An animation that a timer starts 10 s after load, after the observation window ends: the pending timer makes the check inconclusive, never not-applicable.",
+  "parameters": {},
+  "motion": "inconclusive"
+}

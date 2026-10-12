@@ -1,0 +1,44 @@
+Field Notes Weekly is an independent weekly magazine and newsletter about small farms, food and
+the people who grow it. We want a one-page site that gets a reader to subscribe or become a
+member.
+
+Masthead nav: Latest, Series, Archive, About, with a Subscribe call to action.
+
+This week's lead story: "The orchard that kept its old apples and found a new market." A family
+farm in the Welsh borders stopped chasing supermarket varieties. Ten years on, its heritage cider
+apples sell out before the blossom falls. By Morwenna Hale.
+
+Browse by topic: Growing, Markets, Kitchens, Land, Weather.
+
+Latest stories: "Why the Saturday market moved to Thursday evenings" (Markets, 12 September) —
+traders swapped the weekend crowd for commuters, and takings went up. "A no-dig bed, one season
+later" (Growing, 5 September) — what worked, what rotted, and what a first-year grower would
+change. "Cooking the glut: forty ways with courgettes" (Kitchens, 29 August) — readers sent their
+best late-summer recipes; we tested the top ten. "Hedgerows are back on the balance sheet" (Land,
+22 August) — how new grants are changing the sums for farms that plant field edges.
+
+Running series: First Harvest (new growers on their first full season), The Long Table (one
+recipe from one farm, every fortnight), Ground Truth (soil, water and the numbers behind them),
+Market Day (portraits of the stalls that keep towns fed).
+
+From the archive: "The seed library under the village hall" (Spring issue) — how a shoebox of
+saved beans became a lending library for three counties. "Lambing in the dark months" (Winter
+issue) — a week on a hill farm where the busiest nights fall in January. "The last miller on the
+river" (Autumn issue) — a water mill that still grinds flour for the bakers down the valley.
+"Bees, borders and the neighbours" (Summer issue) — a beekeeper and an arable farmer on sharing
+the same fields.
+
+Who writes Field Notes: Morwenna Hale, Editor for farming and markets — grew up on a dairy farm
+and has covered rural economics for fifteen years. Tobias Achebe, Food and kitchens — a former
+restaurant cook who now writes about what small kitchens do with a harvest. Ilse Varga, Land and
+climate — a soil scientist turned reporter, happiest with a spade and a spreadsheet.
+
+Newsletter: "Get Field Notes in your inbox" — one email with the week's stories, a recipe from a
+working farm and the dates of the markets near you, every Friday morning. Button: "Sign up free".
+
+Support independent farm journalism, two tiers: Reader — free, always (the weekly newsletter,
+three stories a month, the market calendar, "Sign up"). Member — 5 a month (every story and the
+archive, the printed seasonal issue, member-only farm visits, "Become a member").
+
+Footer: tagline "Independent writing about small farms, food and the people who grow it." Links:
+Contact, Privacy, Advertise. Contact email: editors@fieldnotes.example.

@@ -1,0 +1,42 @@
+{
+  "id": "crm-dashboard-06",
+  "businessName": "Clovermill Franchise Group",
+  "expectedSpine": "TU",
+  "expectedPageKind": "crm-dashboard",
+  "claims": [
+    {
+      "field": "business_name",
+      "value": "Clovermill Franchise Group"
+    },
+    {
+      "field": "address",
+      "value": "2200 Ross Avenue, Suite 3100, Dallas, Texas"
+    },
+    {
+      "field": "phone",
+      "value": "(214) 555-0146"
+    },
+    {
+      "field": "email",
+      "value": "franchise@clovermillgroup.com"
+    },
+    {
+      "field": "hours",
+      "value": "Monday through Friday, 8:30 a.m. to 5:30 p.m."
+    },
+    {
+      "field": "legal",
+      "value": "Registered as a franchisor with the Texas Secretary of State"
+    },
+    {
+      "field": "other",
+      "value": "Five-person franchise development team"
+    }
+  ],
+  "illustrative_demo_numbers": [
+    {
+      "context": "sample activity-feed line shown only to illustrate layout",
+      "text": "Manager D. Faris logged a financial review call with prospect W. Ibbotson, moved to signed, 5 minutes ago"
+    }
+  ]
+}

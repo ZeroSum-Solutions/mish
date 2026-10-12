@@ -1,0 +1,4 @@
+{
+  "description": "B4-2 round 3 (W-B regression): hash and replaceState changes stay on the entry document and are judged.",
+  "cases": { "default-deny": { "allowHosts": [], "outcome": "passed", "notReason": "left the reviewed entry" } }
+}

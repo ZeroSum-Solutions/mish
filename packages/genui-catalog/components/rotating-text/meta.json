@@ -1,0 +1,51 @@
+{
+  "id": "rotating-text",
+  "name": "Rotating Text",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "entry": "components/rotating-text/index.ts",
+  "css": "components/rotating-text/styles.css",
+  "demo": "components/rotating-text/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "words": {
+        "type": "array",
+        "default": [
+          "strategy",
+          "identity",
+          "digital"
+        ],
+        "items": {
+          "type": "string"
+        },
+        "minItems": 1,
+        "maxItems": 12
+      },
+      "interval": {
+        "type": "number",
+        "default": 2600,
+        "minimum": 1500,
+        "maximum": 30000
+      },
+      "duration": {
+        "type": "number",
+        "default": 420,
+        "minimum": 0,
+        "maximum": 800
+      }
+    }
+  },
+  "a11y": [
+    "Retains semantic host content and its focus outline.",
+    "Decorative layers are hidden from assistive technology.",
+    "Motion settles within five seconds, or offers an explicit pause control.",
+    "Responds to reduced motion at mount and on preference changes."
+  ],
+  "reducedMotion": "static",
+  "motion": "continuous"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "text-scroll-animation",
+  "name": "Text Scroll Animation",
+  "category": "text",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line effect description only; no upstream source was read, and the smooth-scroll dependency was dropped so native scrolling is never hijacked.",
+  "entry": "components/text-scroll-animation/index.ts",
+  "css": "components/text-scroll-animation/styles.css",
+  "demo": "components/text-scroll-animation/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "baseOpacity": { "type": "number", "default": 0.14, "minimum": 0, "maximum": 1, "description": "Opacity of a character before it animates in." },
+      "rise": { "type": "string", "default": "0.45em", "description": "Starting vertical offset of a character, any CSS length." },
+      "tilt": { "type": "number", "default": 55, "description": "Starting tilt of a character around its baseline, in degrees." },
+      "spread": { "type": "number", "default": 8, "minimum": 1, "description": "How many characters animate at once." },
+      "start": { "type": "number", "default": 0.95, "minimum": 0, "maximum": 1, "description": "Viewport fraction of the host's top where progress is 0." },
+      "end": { "type": "number", "default": 0.35, "minimum": 0, "maximum": 1, "description": "Viewport fraction of the host's top where progress is 1." }
+    }
+  },
+  "a11y": [
+    "The per-character copy is aria-hidden; a visually hidden span carries the original text once, so screen readers read whole words, not letters.",
+    "Scrolling is never intercepted or smoothed: the effect only reads native scroll position through a passive listener.",
+    "The host keeps its element, heading level and role; with JS off the plain authored text shows at full opacity.",
+    "Reduced motion skips the split and the scroll listener entirely, and a live switch to reduce snaps every character to its final, fully legible state."
+  ],
+  "reducedMotion": "static"
+}

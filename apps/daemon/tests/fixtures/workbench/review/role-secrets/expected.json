@@ -1,0 +1,4 @@
+{
+  "description": "Sol round 5 BLOCK: page-derived enum-like values (ARIA role, tag names) are kept only when they are in the known ARIA/HTML vocabulary; anything else becomes a length+digest token before it can reach a finding, the UI or reviewer input.",
+  "cases": { "default-deny": { "allowHosts": [], "notPassed": true, "secretsAbsent": ["r0leS3cret", "cdn.other-review.org", "t4gs3cret"] } }
+}

@@ -1,0 +1,50 @@
+{
+  "name": "@open-design/genui-catalog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "The owned GenUI component catalog: clean-room, dependency-free effect components (plain ESM + CSS, mount(el, opts) => { destroy() }) and the validated catalog.json that records each one's source, licence evidence, verdict and port status.",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "catalog.json",
+    "data",
+    "schema",
+    "NOTICE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.mjs"
+    },
+    "./data": {
+      "types": "./dist/data.d.ts",
+      "default": "./dist/data.js"
+    },
+    "./components/*": "./dist/components/*/index.js",
+    "./catalog.json": "./catalog.json",
+    "./schema/catalog.schema.json": "./schema/catalog.schema.json"
+  },
+  "scripts": {
+    "build": "node --experimental-strip-types scripts/build.ts && tsc -p tsconfig.json --emitDeclarationOnly && node --experimental-strip-types scripts/copy-dist-data.ts",
+    "catalog": "node --experimental-strip-types scripts/build-catalog.ts",
+    "check": "node --experimental-strip-types scripts/build-catalog.ts --check",
+    "report": "node --experimental-strip-types scripts/report-ported.ts",
+    "sync-assets": "node --experimental-strip-types scripts/sync-catalog-assets.ts",
+    "sync-assets:check": "node --experimental-strip-types scripts/sync-catalog-assets.ts --check",
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.tests.json --noEmit",
+    "preview:harvest": "node --experimental-strip-types scripts/preview-harvest.ts"
+  },
+  "devDependencies": {
+    "@types/node": "24.12.2",
+    "esbuild": "0.28.0",
+    "jsdom": "29.1.1",
+    "typescript": "5.9.3",
+    "vitest": "4.1.6"
+  },
+  "engines": {
+    "node": "~24"
+  }
+}

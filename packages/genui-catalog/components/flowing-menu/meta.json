@@ -1,0 +1,35 @@
+{
+  "id": "flowing-menu",
+  "name": "Flowing Menu",
+  "category": "navigation",
+  "kind": "js",
+  "status": "ported",
+  "licenceDecision": "clean-room",
+  "verdict": "keep",
+  "rationale": "Clean-room implementation from the one-line description \"Flowing menu treatment\" only; no upstream source was read and the GSAP tweens are replaced by direction-aware CSS transitions and one CSS marquee loop.",
+  "entry": "components/flowing-menu/index.ts",
+  "css": "components/flowing-menu/styles.css",
+  "demo": "components/flowing-menu/demo.html",
+  "props": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "speed": { "type": "number", "default": 10, "minimum": 0.5, "description": "Seconds for one full marquee loop inside the band." },
+      "duration": { "type": "number", "default": 480, "minimum": 0, "description": "Time the band takes to flow in or out, in ms." },
+      "repeat": { "type": "number", "default": 4, "minimum": 1, "maximum": 8, "description": "Label copies in each half of the marquee." },
+      "height": { "type": "string", "default": "56px", "description": "Row height (any CSS length); the label size follows it." },
+      "ink": { "type": "string", "default": "#f5f5f7", "description": "Link text colour." },
+      "band": { "type": "string", "default": "#f5f5f7", "description": "Band colour." },
+      "bandInk": { "type": "string", "default": "#0b0d12", "description": "Text colour inside the band." },
+      "rule": { "type": "string", "default": "rgba(245,245,247,.16)", "description": "Divider line colour between rows." },
+      "open": { "type": "boolean", "default": true, "description": "Start open when a toggle button is present." }
+    }
+  },
+  "a11y": [
+    "Every row is a real <a> inside a <nav>; the band and its marquee copies are aria-hidden, so each link is announced once by its own text.",
+    "Keyboard focus plays the same flow as hover, and a :focus-visible outline is drawn inside the row so overflow never clips it.",
+    "The optional toggle is a real <button> whose aria-expanded tracks the list; Escape closes the list and returns focus to the toggle.",
+    "Reduced motion shows the band in place with a still marquee, and forced-colors mode paints it in Highlight and HighlightText."
+  ],
+  "reducedMotion": "static"
+}

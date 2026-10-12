@@ -1,0 +1,125 @@
+/* model-viewer — clean-room, from the effect description only. Every selector is under .genui-model-viewer. */
+
+:where(.genui-model-viewer) {
+  position: relative;
+  perspective: 900px;
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.genui-model-viewer:focus-visible {
+  outline: 2px solid var(--genui-model-viewer-accent, #d9dfef);
+  outline-offset: 4px;
+}
+
+.genui-model-viewer.genui-model-viewer--dragging {
+  cursor: grabbing;
+}
+
+.genui-model-viewer .genui-model-viewer__model {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--genui-model-viewer-rx, -14deg)) rotateY(var(--genui-model-viewer-ry, -30deg));
+  animation: genui-model-viewer-float 4.5s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.genui-model-viewer__face,
+.genui-model-viewer__cap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+}
+
+.genui-model-viewer__face {
+  width: var(--genui-model-viewer-w, 13px);
+  height: var(--genui-model-viewer-h, 150px);
+  margin: calc(var(--genui-model-viewer-h, 150px) / -2) 0 0 calc(var(--genui-model-viewer-w, 13px) / -2);
+  backface-visibility: hidden;
+  transform: rotateY(var(--genui-model-viewer-a, 0deg)) translateZ(var(--genui-model-viewer-r, 48px));
+  background: linear-gradient(
+    var(--genui-model-viewer-accent, #d9dfef) 0 15%,
+    #0d1018 15% 17%,
+    var(--genui-model-viewer-colour, #3b4a6b) 17% 58%,
+    var(--genui-model-viewer-accent, #d9dfef) 58% 70%,
+    var(--genui-model-viewer-colour, #3b4a6b) 70% 97%,
+    #0d1018 97%
+  );
+}
+
+.genui-model-viewer__face::before,
+.genui-model-viewer__face::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.genui-model-viewer__face::after {
+  background: #05070b;
+}
+
+.genui-model-viewer__face::before {
+  background: linear-gradient(transparent 16%, #fff 30% 50%, transparent 90%);
+}
+
+@supports (opacity: calc(cos(0deg) * 1)) {
+  .genui-model-viewer__face::after {
+    opacity: calc(0.78 - 0.7 * max(0, cos(var(--genui-model-viewer-a, 0deg) + var(--genui-model-viewer-ry, -30deg) + 40deg)));
+  }
+
+  .genui-model-viewer__face::before {
+    opacity: calc(4 * max(0, cos(var(--genui-model-viewer-a, 0deg) + var(--genui-model-viewer-ry, -30deg) + 40deg) - 0.9));
+  }
+}
+
+.genui-model-viewer__cap {
+  width: var(--genui-model-viewer-size, 96px);
+  height: var(--genui-model-viewer-size, 96px);
+  margin: calc(var(--genui-model-viewer-size, 96px) / -2) 0 0 calc(var(--genui-model-viewer-size, 96px) / -2);
+  border-radius: 50%;
+  transform: rotateX(90deg) translateZ(calc(var(--genui-model-viewer-h, 150px) / 2));
+  background: radial-gradient(circle at 40% 40%, #fff 0 8%, var(--genui-model-viewer-accent, #d9dfef) 30%, color-mix(in srgb, var(--genui-model-viewer-accent, #d9dfef) 55%, #000) 100%);
+}
+
+.genui-model-viewer__cap.genui-model-viewer__cap--bottom {
+  transform: rotateX(-90deg) translateZ(calc(var(--genui-model-viewer-h, 150px) / 2));
+  background: #0d1018;
+}
+
+.genui-model-viewer__shadow {
+  position: absolute;
+  left: 50%;
+  top: calc(50% + var(--genui-model-viewer-h, 150px) / 2 + 10px);
+  width: calc(var(--genui-model-viewer-size, 96px) * 1.3);
+  height: 16px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.65), transparent);
+  pointer-events: none;
+}
+
+@keyframes genui-model-viewer-float {
+  to { translate: 0 -6px; }
+}
+
+.genui-model-viewer.genui-model-viewer--reduced .genui-model-viewer__model {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .genui-model-viewer .genui-model-viewer__model {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .genui-model-viewer__face,
+  .genui-model-viewer__cap {
+    background: CanvasText;
+    border: 1px solid Canvas;
+  }
+}

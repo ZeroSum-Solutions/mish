@@ -1,0 +1,382 @@
+/* Canvas media workbench (AC-R10.1, AC-R10.2). Tokens only; see
+ * docs/design/ui-system.md. The dialog stays mounted once opened and toggles
+ * `.backdropOpen` / `.backdropClosed` so its exit can play. */
+
+.backdrop {
+  transition:
+    opacity var(--motion-enter) var(--ease-out-quint),
+    visibility 0s linear 0s;
+}
+.backdropOpen {
+  opacity: 1;
+  visibility: visible;
+}
+.backdropClosed {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  /* Exits are faster than entrances; visibility flips after the fade. */
+  transition:
+    opacity var(--motion-exit) var(--ease-out-quint),
+    visibility 0s linear var(--motion-exit);
+}
+
+.dialog.dialog {
+  width: min(880px, calc(100vw - var(--space-8)));
+  max-height: min(88dvh, 920px);
+  overflow: auto;
+  box-sizing: border-box;
+  transition: transform var(--spring-pop-duration) var(--spring-pop);
+}
+.backdropClosed .dialog {
+  transform: translateY(var(--enter-offset)) scale(var(--enter-scale));
+  transition: transform var(--motion-exit) var(--ease-out-quint);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  min-width: 0;
+  color: var(--text);
+  container-type: inline-size;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.sectionTitle {
+  margin: 0;
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+}
+
+/* ------------------------------------------------------------ create form */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.fieldRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1 1 160px;
+  min-width: 0;
+  font: var(--font-label);
+  color: var(--text-muted);
+}
+.field > select,
+.field > input,
+.field > textarea {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+.fieldWide {
+  flex-basis: 100%;
+}
+.segmented {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+.segmented legend,
+.filterGroup legend {
+  padding: 0;
+  margin-bottom: var(--space-1);
+  font: var(--font-label);
+  color: var(--text-muted);
+}
+.formFooter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.hint {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+.error {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--red);
+  overflow-wrap: anywhere;
+}
+
+/* --------------------------------------------------------------- filters */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.filters .field {
+  flex: 1 1 140px;
+}
+.filterGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  flex: 1 1 100%;
+}
+
+/* --------------------------------------------------------------- entries */
+
+.entries {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+.entry {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg-panel);
+  min-width: 0;
+}
+@container (max-width: 400px) {
+  .entry {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-soft);
+  font: var(--font-caption);
+  text-align: center;
+}
+@container (max-width: 400px) {
+  .thumb {
+    max-width: 160px;
+  }
+}
+.thumb img,
+.thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Playback needs room for native controls, not a tiny silent thumbnail. */
+.entry[data-kind='video'],
+.entry[data-kind='audio'] {
+  grid-template-columns: minmax(0, 1fr);
+}
+.entry[data-kind='video'] .thumb {
+  aspect-ratio: 16 / 9;
+  max-width: none;
+}
+.entry[data-kind='video'] video {
+  object-fit: contain;
+}
+.entry[data-kind='audio'] .thumb {
+  aspect-ratio: auto;
+  min-height: var(--control-h-lg);
+  max-width: none;
+}
+.thumb audio { width: 100%; }
+
+/* A stub is drawn as a placeholder, never as a finished asset: dashed edge
+ * and a diagonal hatch over the image. */
+.stubThumb {
+  outline: 1px dashed var(--border-strong);
+  outline-offset: -1px;
+}
+.stubThumb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--bg-subtle) 70%, transparent) 0 6px,
+    transparent 6px 12px
+  );
+  pointer-events: none;
+}
+
+.entryBody {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.entryHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+.entryName {
+  font: var(--font-title-sm);
+  color: var(--text-strong);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.meta {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-soft);
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.notice {
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+/* The download action is a link styled as a secondary button. */
+.linkButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--control-h-sm);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-pill);
+  font: var(--font-label);
+  color: var(--text);
+  text-decoration: none;
+  transition:
+    border-color var(--motion-hover) var(--ease-out-quint),
+    color var(--motion-hover) var(--ease-out-quint),
+    transform var(--spring-snappy-duration) var(--spring-snappy);
+}
+.linkButton:hover {
+  border-color: var(--border-strong);
+  color: var(--text-strong);
+}
+.linkButton:active {
+  transform: scale(var(--press-scale));
+  transition-duration: var(--motion-hover), var(--motion-hover), var(--motion-press);
+}
+.linkButton:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+}
+
+/* Destructive: secondary treatment plus red text (UI system §2). */
+.destructive.destructive {
+  color: var(--red);
+}
+
+.subpanel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-2);
+  min-width: 0;
+}
+.chain {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+.chainItem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  font: var(--font-caption);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+.chainItem[aria-current='true'] {
+  background: var(--bg-subtle);
+  color: var(--text-strong);
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+}
+.liveRegion {
+  min-height: 0;
+  margin: 0;
+  font: var(--font-caption);
+  color: var(--text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .backdropClosed,
+  .dialog.dialog,
+  .backdropClosed .dialog,
+  .linkButton {
+    transition: none;
+  }
+  .backdropClosed .dialog {
+    transform: none;
+  }
+}
