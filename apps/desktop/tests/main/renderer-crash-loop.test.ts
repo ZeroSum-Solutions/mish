@@ -185,8 +185,8 @@ describe("isFirstPartyMailtoUrl", () => {
     expect(isFirstPartyMailtoUrl("mailto:devin@zerosumsolutions.com")).toBe(true);
     expect(isFirstPartyMailtoUrl("mailto:devin@zerosumsolutions.com?subject=Hi&body=there")).toBe(true);
     expect(isFirstPartyMailtoUrl("mailto:Devin@ZeroSumSolutions.com")).toBe(true);
-    // The retired upstream addresses are no longer first-party.
-    expect(isFirstPartyMailtoUrl("mailto:devin@zerosumsolutions.com")).toBe(false);
+    // Retired upstream addresses are no longer first-party.
+    expect(isFirstPartyMailtoUrl("mailto:support@retired-upstream.invalid")).toBe(false);
   });
 
   test("keeps the support predicate narrow so the open-external bridge does not widen", () => {
