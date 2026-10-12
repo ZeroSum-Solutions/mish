@@ -7543,6 +7543,8 @@ export interface Dict {
   'packs.provides.pets': string;
   'packs.provides.promptTemplates': string;
   'packs.provides.styleCatalog': string;
+  'packs.provides.projects': string;
+  'packs.provides.designIndex': string;
   'packs.provides.item': string;
   'packs.mcp': string;
   'packs.settingsList': string;

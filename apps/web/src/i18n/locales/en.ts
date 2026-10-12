@@ -7290,6 +7290,8 @@ export const en: Dict = {
   'packs.provides.pets': 'Pets',
   'packs.provides.promptTemplates': 'Prompt templates',
   'packs.provides.styleCatalog': 'Style previews',
+  'packs.provides.projects': 'Saved projects',
+  'packs.provides.designIndex': 'Design index profiles',
   'packs.provides.item': '{kind} ({count})',
   'packs.mcp': 'MCP servers: {list}',
   'packs.settingsList': 'Settings: {list}',

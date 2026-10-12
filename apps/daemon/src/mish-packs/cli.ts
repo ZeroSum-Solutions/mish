@@ -31,12 +31,14 @@ export interface MishPacksCliResult {
 export const MISH_PACKS_USAGE = `Usage:
   od packs install <folder | file.zip> [--json]
       Install a Mish pack from a folder or a .zip on this machine. The pack
-      restores private catalogues, kits, skills, design systems and MCP server
-      entries. Installing the same pack id again replaces it.
+      restores private catalogues, kits, skills, design systems, saved projects,
+      design-index profiles and MCP server entries. Installing the same pack id
+      again replaces it; if the new version fails, the old one is put back.
   od packs list [--json]
       List installed packs and what each one provides.
   od packs remove <id> [--json]
-      Remove an installed pack and everything its install added.
+      Remove an installed pack and what its install added. A copy you changed
+      is moved to a backup folder; a saved project you used stays yours.
 
 Options:
   --json                Machine-readable output.

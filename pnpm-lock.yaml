@@ -87,9 +87,6 @@ importers:
       '@higgsfield/cli':
         specifier: 1.1.26
         version: 1.1.26
-      '@modelcontextprotocol/sdk':
-        specifier: 1.29.0
-        version: 1.29.0(zod@4.4.2)
       '@mish/21st-catalog':
         specifier: workspace:*
         version: link:../../packages/21st-catalog
@@ -135,6 +132,9 @@ importers:
       '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../../packages/sidecar-proto
+      '@modelcontextprotocol/sdk':
+        specifier: 1.29.0
+        version: 1.29.0(zod@4.4.2)
       '@opentelemetry/api':
         specifier: 1.9.1
         version: 1.9.1
@@ -204,6 +204,9 @@ importers:
       undici:
         specifier: 7.29.0
         version: 7.29.0
+      yauzl:
+        specifier: 2.10.0
+        version: 2.10.0
     devDependencies:
       '@babel/types':
         specifier: 7.29.0
@@ -232,6 +235,9 @@ importers:
       '@types/styled-components':
         specifier: 5.1.36
         version: 5.1.36
+      '@types/yauzl':
+        specifier: 2.10.3
+        version: 2.10.3
       esbuild:
         specifier: 0.28.0
         version: 0.28.0
@@ -9704,7 +9710,6 @@ snapshots:
   '@types/yauzl@2.10.3':
     dependencies:
       '@types/node': 24.12.2
-    optional: true
 
   '@ungap/structured-clone@1.3.0': {}
 

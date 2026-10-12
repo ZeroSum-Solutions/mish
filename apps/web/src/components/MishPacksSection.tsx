@@ -48,6 +48,8 @@ const PROVIDES_KEYS: Record<MishPackResourceKey, keyof Dict> = {
   pets: 'packs.provides.pets',
   promptTemplates: 'packs.provides.promptTemplates',
   styleCatalog: 'packs.provides.styleCatalog',
+  projects: 'packs.provides.projects',
+  designIndex: 'packs.provides.designIndex',
 };
 
 const ERROR_KEYS: Record<MishPackClientErrorCode, keyof Dict> = {
