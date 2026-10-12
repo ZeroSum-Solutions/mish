@@ -80,7 +80,7 @@ COPY design-templates ./design-templates
 COPY assets ./assets
 # The public repository carries no community pets (a Mish pack can add them); keep the folder so
 # the runtime-stage COPY below finds a path on a clean checkout.
-RUN mkdir -p ./assets/community-pets
+RUN mkdir -p /app/assets/community-pets
 # `data/plugin-previews/manifest.json` is committed by the bake pipeline and is
 # what `resolvePluginPreviewsDir()` looks for at runtime. Without it in the
 # image, `loadManifest()` returns `{}` and every plugin silently falls back to
