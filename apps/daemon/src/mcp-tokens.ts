@@ -274,3 +274,71 @@ export function isTokenExpired(
   if (typeof token.expiresAt !== 'number') return false;
   return token.expiresAt - skew <= now;
 }
+
+/** Subset of an OAuth token-endpoint response (RFC 6749 §5.1) the refresh helper consumes. */
+export interface McpRefreshResponse {
+  access_token: string;
+  token_type?: string;
+  expires_in?: number;
+  refresh_token?: string;
+  scope?: string;
+}
+
+const refreshInflight = new Map<string, Promise<StoredMcpToken | null>>();
+
+/**
+ * Refresh the stored token for `serverId` at most once at a time per data dir.
+ *
+ * Concurrent callers (agent spawn, connector calls, parallel chats) share one
+ * flight. Inside it the stored token is re-read and the network refresh is
+ * skipped when it is no longer expired or its refresh token already rotated.
+ * The result is written only if the stored entry is still the one that was
+ * refreshed (compare-and-set on refresh token + access token), so a refresh
+ * that finishes after Disconnect or a fresh sign-in cannot overwrite it.
+ *
+ * Resolves to the token now stored, or null when the entry was cleared.
+ * Rejects with the refresh function's own error; callers map it.
+ */
+export function refreshMcpTokenSingleFlight(
+  dataDir: string,
+  serverId: string,
+  refresh: (current: StoredMcpToken) => Promise<McpRefreshResponse>,
+): Promise<StoredMcpToken | null> {
+  const key = `${dataDir}\0${serverId}`;
+  const existing = refreshInflight.get(key);
+  if (existing) return existing;
+  const task = (async () => {
+    const current = await getToken(dataDir, serverId);
+    if (!current) return null;
+    if (!isTokenExpired(current)) return current;
+    if (!current.refreshToken || !current.tokenEndpoint || !current.clientId) {
+      throw new Error('stored MCP token cannot be refreshed');
+    }
+    const refreshed = await refresh(current);
+    // RFC 6749 §5.1: an absent expires_in means no defined lifetime; an absent scope means unchanged.
+    const { expiresAt: _staleExpiresAt, scope: staleScope, ...rest } = current;
+    const nextScope = refreshed.scope ?? staleScope;
+    const next: StoredMcpToken = {
+      ...rest,
+      accessToken: refreshed.access_token,
+      refreshToken: refreshed.refresh_token ?? current.refreshToken,
+      tokenType: refreshed.token_type ?? current.tokenType,
+      ...(nextScope !== undefined ? { scope: nextScope } : {}),
+      ...(typeof refreshed.expires_in === 'number' ? { expiresAt: Date.now() + refreshed.expires_in * 1000 } : {}),
+      savedAt: Date.now(),
+    };
+    return withLock(dataDir, async () => {
+      const file = await readTokensFile(dataDir);
+      const latest = Object.hasOwn(file.servers, serverId) ? file.servers[serverId] : undefined;
+      if (!latest) return null;
+      if (latest.refreshToken !== current.refreshToken || latest.accessToken !== current.accessToken) return latest;
+      file.servers[serverId] = next;
+      await writeTokensFile(dataDir, file);
+      return next;
+    });
+  })().finally(() => {
+    if (refreshInflight.get(key) === task) refreshInflight.delete(key);
+  });
+  refreshInflight.set(key, task);
+  return task;
+}

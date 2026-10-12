@@ -9,6 +9,7 @@ import {
   isTokenExpired,
   readAllTokens,
   readTokensFile,
+  refreshMcpTokenSingleFlight,
   sanitizeTokensFile,
   setToken,
   type StoredMcpToken,
@@ -33,6 +34,54 @@ describe('mcp-tokens storage', () => {
     expect(await getToken(dataDir, 'constructor')).toEqual(tok);
     await clearToken(dataDir, 'constructor');
     expect(await getToken(dataDir, 'constructor')).toBeNull();
+  });
+
+  describe('refreshMcpTokenSingleFlight', () => {
+    const expired: StoredMcpToken = {
+      accessToken: 'old', refreshToken: 'rt-1', tokenType: 'Bearer', savedAt: 1, expiresAt: 1,
+      tokenEndpoint: 'https://auth.example/token', clientId: 'cid',
+    };
+
+    it('shares one network refresh between concurrent callers', async () => {
+      await setToken(dataDir, 's1', expired);
+      let calls = 0;
+      const refresh = async () => {
+        calls += 1;
+        await new Promise((r) => setTimeout(r, 20));
+        return { access_token: 'new', refresh_token: 'rt-2', expires_in: 3600 };
+      };
+      const [a, b] = await Promise.all([
+        refreshMcpTokenSingleFlight(dataDir, 's1', refresh),
+        refreshMcpTokenSingleFlight(dataDir, 's1', refresh),
+      ]);
+      expect(calls).toBe(1);
+      expect(a?.accessToken).toBe('new');
+      expect(b?.accessToken).toBe('new');
+      // A later caller sees a fresh token and does not refresh again.
+      await refreshMcpTokenSingleFlight(dataDir, 's1', refresh);
+      expect(calls).toBe(1);
+    });
+
+    it('does not overwrite a token replaced while the refresh was in flight', async () => {
+      await setToken(dataDir, 's1', expired);
+      const replacement: StoredMcpToken = { ...expired, accessToken: 'signed-in', refreshToken: 'rt-new', expiresAt: Date.now() + 3_600_000 };
+      const result = await refreshMcpTokenSingleFlight(dataDir, 's1', async () => {
+        await setToken(dataDir, 's1', replacement);
+        return { access_token: 'stale-refresh' };
+      });
+      expect(result?.accessToken).toBe('signed-in');
+      expect((await getToken(dataDir, 's1'))?.accessToken).toBe('signed-in');
+    });
+
+    it('does not restore a token cleared while the refresh was in flight', async () => {
+      await setToken(dataDir, 's1', expired);
+      const result = await refreshMcpTokenSingleFlight(dataDir, 's1', async () => {
+        await clearToken(dataDir, 's1');
+        return { access_token: 'stale-refresh' };
+      });
+      expect(result).toBeNull();
+      expect(await getToken(dataDir, 's1')).toBeNull();
+    });
   });
 
   it('returns no servers when the file is missing', async () => {

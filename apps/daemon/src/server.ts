@@ -734,7 +734,7 @@ import {
   getToken,
   isTokenExpired,
   readAllTokens,
-  setToken,
+  refreshMcpTokenSingleFlight,
 } from './mcp-tokens.js';
 import {
   agentCliEnvForAgent,
@@ -1656,34 +1656,18 @@ async function refreshAndPersistToken(dataDir, serverId, current) {
   if (current.resourceUrl && !isPublicMcpResource(current.resourceUrl)) return null;
   if (!current.refreshToken) return null;
   if (!current.tokenEndpoint || !current.clientId) return null;
-  const tokenResp = await refreshAccessToken({
-    tokenEndpoint: current.tokenEndpoint,
-    clientId: current.clientId,
-    clientSecret: current.clientSecret,
-    refreshToken: current.refreshToken,
-    scope: current.scope,
-    resource: current.resourceUrl,
-  });
-  const next = {
-    accessToken: tokenResp.access_token,
-    refreshToken: tokenResp.refresh_token ?? current.refreshToken,
-    tokenType: tokenResp.token_type ?? 'Bearer',
-    scope: tokenResp.scope ?? current.scope,
-    expiresAt:
-      typeof tokenResp.expires_in === 'number'
-        ? Date.now() + tokenResp.expires_in * 1000
-        : undefined,
-    savedAt: Date.now(),
-    tokenEndpoint: current.tokenEndpoint,
-    clientId: current.clientId,
-    clientSecret: current.clientSecret,
-    authServerIssuer: current.authServerIssuer,
-    redirectUri: current.redirectUri,
-    resourceUrl: current.resourceUrl,
-    endpointFingerprint: current.endpointFingerprint,
-  };
-  await setToken(dataDir, serverId, next);
-  return next;
+  // Single-flight + compare-and-set: concurrent spawns share one refresh and a
+  // stale result never overwrites a newer sign-in or a Disconnect.
+  return refreshMcpTokenSingleFlight(dataDir, serverId, (stored) =>
+    refreshAccessToken({
+      tokenEndpoint: stored.tokenEndpoint!,
+      clientId: stored.clientId!,
+      clientSecret: stored.clientSecret,
+      refreshToken: stored.refreshToken!,
+      scope: stored.scope,
+      resource: stored.resourceUrl,
+    }),
+  );
 }
 
 const activeChatAgentEventSinks = new Map();
