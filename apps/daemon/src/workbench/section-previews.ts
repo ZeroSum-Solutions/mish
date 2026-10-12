@@ -30,9 +30,11 @@ export const SECTION_PREVIEW_FRAME_CSP = `${SECTION_PREVIEW_DOCUMENT_CSP}; sandb
 export interface SectionPreviewRoots {
   /** `plugins/_official/shared/ui-kits/hyperui` under the bundled-plugins resource root. */
   hyperuiRoot: string | null;
-  /** The bundled licensed Cult kit (`resolveCultKitDir`). */
-  cultKitDir: string | null;
+  /** The licensed Cult kit (`resolveCultKitDir`); a function is read per request so an installed pack takes effect without a restart. */
+  cultKitDir: string | null | (() => string | null);
 }
+
+const cultKitDirOf = (roots: SectionPreviewRoots): string | null => (typeof roots.cultKitDir === 'function' ? roots.cultKitDir() : roots.cultKitDir);
 
 export const sectionPreviewPath = (publicId: string) => `/api/sections/${encodeURIComponent(publicId)}/preview`;
 const PREVIEW_CSS = path.join('css', 'preview.css');
@@ -95,9 +97,10 @@ export function sectionPreviewCapability(entry: SectionCatalogEntry, catalog: re
     return { available: true, kind: 'html', url: sectionPreviewPath(entry.id), reason: null, adapter: 'compiled-html-section' };
   }
   if (entry.content.kind === 'cult-item') {
-    if (!roots.cultKitDir) return unavailable('licensed-kit-not-configured');
+    const kitDir = cultKitDirOf(roots);
+    if (!kitDir) return unavailable('licensed-kit-not-configured');
     const name = cultRegistryName(cultInternalId(entry.id));
-    return name && convertedDir(roots.cultKitDir, name) ? { available: true, kind: 'html', url: sectionPreviewPath(entry.id), reason: null, adapter: 'compiled-html-section' } : unavailable('compiled-section-missing');
+    return name && convertedDir(kitDir, name) ? { available: true, kind: 'html', url: sectionPreviewPath(entry.id), reason: null, adapter: 'compiled-html-section' } : unavailable('compiled-section-missing');
   }
   return null;
 }
@@ -143,7 +146,7 @@ export function renderSectionPreview(entry: SectionCatalogEntry, catalog: readon
   }
   if (entry.content.kind === 'cult-item') {
     const name = cultRegistryName(cultInternalId(entry.id));
-    const html = name ? convertedPreviewHtml(roots.cultKitDir, name, 'light', SECTION_PREVIEW_DOCUMENT_CSP) : null;
+    const html = name ? convertedPreviewHtml(cultKitDirOf(roots), name, 'light', SECTION_PREVIEW_DOCUMENT_CSP) : null;
     return html === null ? missing(true) : { status: 200, html, licensed: true };
   }
   return missing(false);

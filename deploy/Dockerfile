@@ -78,10 +78,9 @@ COPY craft ./craft
 # runtime both resolve from <PROJECT_ROOT>/design-templates.
 COPY design-templates ./design-templates
 COPY assets ./assets
-# Community pets ship only in a private pack; an empty directory keeps the
-# runtime COPY below valid on a public checkout, where the daemon simply
-# reports no baked pets.
-RUN mkdir -p /app/assets/community-pets
+# The public repository carries no community pets (a Mish pack can add them); keep the folder so
+# the runtime-stage COPY below finds a path on a clean checkout.
+RUN mkdir -p ./assets/community-pets
 # `data/plugin-previews/manifest.json` is committed by the bake pipeline and is
 # what `resolvePluginPreviewsDir()` looks for at runtime. Without it in the
 # image, `loadManifest()` returns `{}` and every plugin silently falls back to

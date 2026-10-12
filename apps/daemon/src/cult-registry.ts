@@ -47,6 +47,7 @@ import {
 } from '@mish/contracts';
 
 import { expandHomePrefix } from './home-expansion.js';
+import { firstPackResourcePath } from './mish-packs/overlay.js';
 import { cultRefinedSourceCopy } from './cult-copy-refinements.js';
 import { cultResponsiveSourceCopy } from './cult-responsive-source.js';
 
@@ -78,10 +79,15 @@ export class CultRegistryError extends Error {
   }
 }
 
-/** The source-kit directory from `CULT_KIT_DIR` (the package scripts' variable), or null. */
+/**
+ * The source-kit directory: `CULT_KIT_DIR` (the package scripts' variable), else the kit an
+ * installed Mish pack provides, else the bundled one when its manifest exists, or null.
+ */
 export function resolveCultKitDir(env: NodeJS.ProcessEnv = process.env, resourceRoot?: string | null): string | null {
   const raw = env.CULT_KIT_DIR?.trim();
   if (raw) return path.resolve(expandHomePrefix(raw));
+  const fromPack = firstPackResourcePath('cultKit');
+  if (fromPack && existsSync(path.join(fromPack, 'manifest.json'))) return fromPack;
   const bundled = resourceRoot ? path.join(resourceRoot, 'data', 'component-kits', 'cult-ui-pro') : null;
   return bundled && existsSync(path.join(bundled, 'manifest.json')) ? bundled : null;
 }

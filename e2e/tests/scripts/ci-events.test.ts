@@ -67,11 +67,14 @@ const cases = [
 ];
 
 describe("public CI planning and gate", () => {
-  test("keeps one read-only workflow with hosted runners and no storage reuse", () => {
-    expect(readdirSync(path.join(root, ".github/workflows"))).toEqual(["ci.yml"]);
+  test("keeps one read-only CI workflow with hosted runners and no storage reuse", () => {
+    expect(readdirSync(path.join(root, ".github/workflows")).sort()).toEqual(["ci.yml", "release-mac.yml"]);
     expect(workflowText).toContain("merge_group:");
     expect(workflowText).toContain("run: $" + "{{ steps.scopes.outputs.run }}");
     expect(workflowText).not.toMatch(/secrets\.|vars\.|pull_request_target|self-hosted|convergence|WORKLOAD_RESULTS/);
+    const release = readFileSync(path.join(root, ".github/workflows/release-mac.yml"), "utf8");
+    expect(release).not.toMatch(/secrets\.|vars\.|pull_request(_target)?:|self-hosted/);
+    expect(release).toMatch(/^permissions:\n  contents: read$/m);
     for (const name of readdirSync(path.join(root, ".github/config")).filter((name) => name.endsWith(".json"))) {
       const config = readFileSync(path.join(root, ".github/config", name), "utf8");
       for (const match of config.matchAll(/"(\.github\/workflows\/[^"\n]+)"/g)) {

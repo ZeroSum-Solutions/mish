@@ -4391,7 +4391,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
                 id,
                 f.name,
                 Buffer.from(f.content, 'utf8'),
-                { existingName: true },
+                { verbatimName: true },
                 projectMetadata,
               );
             } catch {
@@ -4670,6 +4670,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
         await ensureProject(PROJECTS_DIR, targetProjectId, metadata);
         const sourceFiles = await listFiles(PROJECTS_DIR, sourceProject.id, {
           metadata: sourceProject.metadata,
+          keepBuildDirs: true,
         });
         const copiedFiles: string[] = [];
         for (const file of sourceFiles) {
@@ -4689,8 +4690,8 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
             sourceFile.name,
             sourceFile.buffer,
             {
-              overwrite: false,
-              existingName: true,
+              overwrite: true,
+              verbatimName: true,
               ...(sourceFile.artifactManifest ? { artifactManifest: sourceFile.artifactManifest } : {}),
             },
             metadata,
@@ -4848,7 +4849,7 @@ export function registerProjectRoutes(app: Express, ctx: RegisterProjectRoutesDe
             sourceFile.buffer,
             {
               overwrite: false,
-              existingName: true,
+              verbatimName: true,
               ...(sourceFile.artifactManifest ? { artifactManifest: sourceFile.artifactManifest } : {}),
             },
             metadata,
@@ -8021,6 +8022,9 @@ export function registerProjectFileRoutes(app: Express, ctx: RegisterProjectFile
           return sendApiError(res, 422, 'ARTIFACT_PUBLICATION_BLOCKED', err.message, {
             details: { placeholders: err.placeholders },
           });
+        }
+        if (err?.code === 'EINVALIDNAME') {
+          return sendApiError(res, 400, 'BAD_REQUEST', err.message);
         }
         if (err?.code === 'EEXIST') {
           return sendApiError(res, 409, 'FILE_EXISTS', 'file already exists');

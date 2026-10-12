@@ -1,4 +1,5 @@
 import { execFile } from "node:child_process";
+import { assertMainWindowSender, registerMainWindowContents } from "./main-window-sender.js";
 import { createHmac, randomBytes } from "node:crypto";
 import { appendFile, mkdir, realpath, stat, writeFile } from "node:fs/promises";
 import { release } from "node:os";
@@ -1829,7 +1830,8 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   for (const channel of UPDATER_IPC_CHANNELS) {
     ipcMain.removeHandler(channel);
   }
-  ipcMain.handle("shell:open-external", async (_event, url: string) => {
+  ipcMain.handle("shell:open-external", async (event, url: string) => {
+    assertMainWindowSender(event);
     // http(s) as before, plus a mailto strictly to our support address (the
     // crash screen's "Email us"); no other scheme opens.
     if (isSupportMailtoUrl(url)) return openFirstPartyMailto(url);
@@ -1858,6 +1860,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   ipcMain.handle(
     "dialog:pick-and-import",
     async (event, init?: MishHostProjectImportInit) => {
+      assertMainWindowSender(event);
       // Defensive failsafe for non-production runtimes (test harnesses
       // that construct createDesktopRuntime without a secret). Round-5
       // production wiring in runDesktopMain ALWAYS passes the per-process
@@ -1910,6 +1913,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   ipcMain.handle(
     "dialog:pick-and-replace-working-dir",
     async (event, init?: { projectId?: string }) => {
+      assertMainWindowSender(event);
       if (options.desktopAuthSecret == null) {
         return { ok: false, reason: "desktop auth secret not registered" };
       }
@@ -1947,6 +1951,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   // exists. Main remains the single source of filesystem paths crossing into
   // the daemon (same trust boundary as dialog:pick-and-replace-working-dir).
   ipcMain.handle("dialog:pick-working-dir", async (event) => {
+    assertMainWindowSender(event);
     if (options.desktopAuthSecret == null) {
       return { ok: false, reason: "desktop auth secret not registered" };
     }
@@ -1984,7 +1989,8 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   // interpretation of mrcfps's round-3 review: "only allowing
   // openPath(projectId) for projects whose resolvedDir came from that
   // trusted flow."
-  ipcMain.handle("shell:open-path", async (_event, projectId: string) => {
+  ipcMain.handle("shell:open-path", async (event, projectId: string) => {
+    assertMainWindowSender(event);
     // Round-7 (lefarcen P2): same packaged od:// → daemon URL pivot as
     // the dialog:pick-and-import handler above.
     const apiBaseUrl =
@@ -2258,6 +2264,7 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
     window.webContents.send(UPDATER_STATUS_EVENT, status);
   };
   const unsubscribeUpdater = options.updater?.subscribe(() => sendUpdaterStatus()) ?? (() => undefined);
+  registerMainWindowContents(window.webContents);
   const requireMainWindowSender = (event: Electron.IpcMainInvokeEvent): void => {
     if (event.sender !== window.webContents) {
       throw new Error("host IPC is only available to the main Mishh Mashh window");
@@ -2426,7 +2433,8 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   });
 
   ipcMain.removeHandler('od:print-pdf');
-  ipcMain.handle('od:print-pdf', async (_event, html: unknown, nonce: unknown, options: unknown): Promise<void> => {
+  ipcMain.handle('od:print-pdf', async (event, html: unknown, nonce: unknown, options: unknown): Promise<void> => {
+    assertMainWindowSender(event);
     if (typeof html !== 'string') {
       throw new Error('Invalid print payload: expected HTML string');
     }
@@ -2471,7 +2479,20 @@ export async function createDesktopRuntime(options: DesktopRuntimeOptions): Prom
   window.on("blur", () => showWindowButtons(window));
 
   window.webContents.setWindowOpenHandler(({ url }) => {
-    if (isAllowedChildWindowUrl(url)) return { action: "allow" };
+    if (isAllowedChildWindowUrl(url)) {
+      // Child windows run generated HTML: no preload, so no host bridge.
+      return {
+        action: "allow",
+        overrideBrowserWindowOptions: {
+          webPreferences: {
+            preload: undefined,
+            sandbox: true,
+            contextIsolation: true,
+            nodeIntegration: false,
+          },
+        },
+      };
+    }
     if (isHttpUrl(url)) void shell.openExternal(url);
     else if (isFirstPartyMailtoUrl(url)) void openFirstPartyMailto(url);
     return { action: "deny" };

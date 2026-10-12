@@ -44,12 +44,12 @@ Running the installer without flags launches an interactive wizard:
   ▸ Runtime: docker Docker version 26.1.3, build b72abbb
   ▸ Compose: Docker Compose version v2.27.1
 
-Docker image [ghcr.io/zerosum-solutions/od:latest]:
+Docker image [ghcr.io/zerosum-solutions/mish:latest]:
 Port [7456]:
 Allowed origins (CORS, comma-separated, or empty) []:
 Memory limit [384m]:
 
-  ▸ Pulling image: ghcr.io/zerosum-solutions/od:latest
+  ▸ Pulling image: ghcr.io/zerosum-solutions/mish:latest
   ▸ Starting Mishh Mashh...
   ▸ Waiting for health check (up to 60s)...
   ✓ Daemon is healthy (200 OK)
@@ -59,7 +59,7 @@ Memory limit [384m]:
 
 | Prompt | Default | Notes |
 |--------|---------|-------|
-| **Docker image** | `ghcr.io/zerosum-solutions/od:latest` | Use `:latest` for the newest stable image, `:<version>` for a pinned release, or `@sha256:<digest>` for reproducibility |
+| **Docker image** | `ghcr.io/zerosum-solutions/mish:latest` | Use `:latest` for the newest stable image, `:<version>` for a pinned release, or `@sha256:<digest>` for reproducibility |
 | **Port** | `7456` | The port the daemon listens on. Must not be in use. |
 | **Allowed origins** | _(empty)_ | CORS origins for reverse-proxy setups. See [`deploy/README.md`](../deploy/README.md). Leave empty for localhost-only use. |
 | **Memory limit** | `384m` | Container memory cap. Raise for large concurrent agent runs. |
@@ -143,7 +143,7 @@ bash deploy/scripts/update.sh
 To update to a specific image:
 
 ```bash
-bash deploy/scripts/update.sh --image=ghcr.io/zerosum-solutions/od@sha256:<digest>
+bash deploy/scripts/update.sh --image=ghcr.io/zerosum-solutions/mish@sha256:<digest>
 ```
 
 The update script:
@@ -175,7 +175,7 @@ All settings live in `deploy/.env`. Edit it directly or re-run the installer to 
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `MISH_IMAGE` | `ghcr.io/zerosum-solutions/od:latest` | Full image reference |
+| `MISH_IMAGE` | `ghcr.io/zerosum-solutions/mish:latest` | Full image reference |
 | `MISH_PORT` | `7456` | Host-side port (bound to `127.0.0.1`) |
 | `MISH_ALLOWED_ORIGINS` | _(empty)_ | CORS origins for reverse-proxy setups |
 | `MISH_MEM_LIMIT` | `384m` | Container memory cap |

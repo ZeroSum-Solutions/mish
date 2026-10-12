@@ -24,19 +24,17 @@ Before starting:
    - default: paste the token into `OD_API_TOKEN=`
    - trusted reverse proxy that already authenticates every request: leave `OD_API_TOKEN=` empty and set `MISH_DISABLE_API_AUTH=1`
 
-Then pull and start the service:
+Then build the image from this checkout and start the service. No registry login is needed:
 
 ```bash
-docker login ghcr.io
-MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose pull
-MISH_IMAGE=ghcr.io/zerosum-solutions/od:latest docker compose up -d --no-build
+docker compose build
+docker compose up -d --no-build
 ```
 
-The Compose default `MISH_IMAGE` is `ghcr.io/zerosum-solutions/od:latest`, the
-image `deploy/scripts/publish-images.sh` publishes. Set
-`MISH_IMAGE=ghcr.io/zerosum-solutions/od:<version>` to pin a release. No image
-is published from this repository's CI; until one has been published with
-`publish-images.sh`, build the image locally instead of pulling it.
+The build tags the image `ghcr.io/zerosum-solutions/mish:latest` (the Compose
+default), so `Dockerfile.local` can extend it. A published image is optional. If
+your team publishes one (`deploy/scripts/publish-images.sh`), set `MISH_IMAGE` to
+that image and use `docker compose pull` instead.
 
 Upgrading from a deployment created before the Mish rename: the Compose project,
 container, and data volume are now all named `mish`, and the settings are read
@@ -54,10 +52,6 @@ non-loopback peer, the browser displays its native sign-in dialog. Enter
 password. The browser reuses those credentials for same-origin API requests;
 CLI clients and reverse proxies can continue to send
 `Authorization: Bearer <OD_API_TOKEN>`.
-
-The `ghcr.io/zerosum-solutions/od` package is private. Run `docker login ghcr.io`
-with a GitHub token that has `read:packages` before `docker compose pull`. Do not
-make the package public.
 
 Defaults:
 
@@ -97,7 +91,7 @@ Compose variable maps to daemon env `OD_DISABLE_API_AUTH`.
 Pin a specific published image with a digest instead of the mutable `latest` tag:
 
 ```bash
-MISH_IMAGE=ghcr.io/zerosum-solutions/od@sha256:<digest> docker compose up -d --no-build
+MISH_IMAGE=ghcr.io/zerosum-solutions/mish@sha256:<digest> docker compose up -d --no-build
 ```
 The image intentionally does not bundle Claude/Codex/Gemini CLI binaries. Keep
 those outside the image, or build a separate private runtime layer if a server
@@ -231,7 +225,7 @@ deploy/scripts/publish-images.sh --image ghcr.io/your-org/od:0.1.0
 
 The script defaults to:
 
-- `ghcr.io/zerosum-solutions/od:<tag>`
+- `ghcr.io/zerosum-solutions/mish:<tag>`
 - `linux/amd64,linux/arm64`
 - `skopeo` push strategy with registry credentials read from `~/.docker/config.json`
 - preloading base images through `skopeo` to reduce Docker Hub pull flakiness

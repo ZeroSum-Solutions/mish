@@ -1614,13 +1614,13 @@ Both products are decoupled the same way: the terminal flow is sufficient; the I
 
 ## 15. Deployment and portability — Docker, any cloud
 
-> **Status:** this section is the original design target, not current behavior. Today the image is built from [`deploy/Dockerfile`](../deploy/Dockerfile), listens on port `7456`, and is named `ghcr.io/zerosum-solutions/od`; no GitHub workflow in this repository publishes it, and an operator pushes it with [`deploy/scripts/publish-images.sh`](../deploy/scripts/publish-images.sh). For running it, follow [`deployment/docker.md`](deployment/docker.md), [`install-guide.md`](install-guide.md) and the cloud guides under [`deployment/cloud/`](deployment/cloud/azure.md).
+> **Status:** this section is the original design target, not current behavior. Today the image is built from [`deploy/Dockerfile`](../deploy/Dockerfile), listens on port `7456`, and is named `ghcr.io/zerosum-solutions/mish`; no GitHub workflow in this repository publishes it, and an operator pushes it with [`deploy/scripts/publish-images.sh`](../deploy/scripts/publish-images.sh). For running it, follow [`deployment/docker.md`](deployment/docker.md), [`install-guide.md`](install-guide.md) and the cloud guides under [`deployment/cloud/`](deployment/cloud/azure.md).
 
 OD ships as a single multi-arch Docker image so the full plugin/marketplace system can be brought up with one command and run unchanged on every major cloud. This is the substrate for the ecosystem and commercial story: a partner self-hosts inside their VPC; an enterprise runs a private marketplace; a CI job spins up a per-job OD daemon. The image is the headless mode of §11.7 packaged for ops, optionally serving the web UI from §11.6 when `--serve-web` is set.
 
 ### 15.1 Image shape
 
-- **Tag**: `ghcr.io/zerosum-solutions/od:<version>` plus moving `:latest`.
+- **Tag**: `ghcr.io/zerosum-solutions/mish:<version>` plus moving `:latest`.
 - **Architectures**: `linux/amd64` and `linux/arm64` (single manifest list).
 - **Contents**:
   - Node 24 runtime + the daemon `dist/` bundle.
@@ -1669,7 +1669,7 @@ Anything settable via the desktop UI is also settable via `docker exec od od con
 Local laptop:
 
 ```bash
-docker run --rm -p 17456:17456 ghcr.io/zerosum-solutions/od:latest
+docker run --rm -p 17456:17456 ghcr.io/zerosum-solutions/mish:latest
 open http://localhost:17456
 ```
 

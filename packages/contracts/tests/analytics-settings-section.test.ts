@@ -15,6 +15,10 @@ describe('settingsSectionToTracking', () => {
     expect(settingsSectionToTracking('licensedPacks')).toBe('licensed_packs');
   });
 
+  it('gives the Packs settings page an area of its own', () => {
+    expect(settingsSectionToTracking('packs')).toBe('packs');
+  });
+
   it('keeps each mapped sidebar section distinct from the execution fallback', () => {
     const sections = [
       'instructions',
@@ -24,6 +28,7 @@ describe('settingsSectionToTracking', () => {
       'about',
       'labs',
       'licensedPacks',
+      'packs',
     ] as const;
     const areas = sections.map((section) => settingsSectionToTracking(section));
     expect(areas).not.toContain('configure_execution_mode');

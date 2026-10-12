@@ -11,7 +11,7 @@ set -euo pipefail
 # Configuration
 # ---------------------------------------------------------------------------
 DEFAULT_PORT=7456
-DEFAULT_IMAGE="ghcr.io/zerosum-solutions/od:latest"
+DEFAULT_IMAGE="ghcr.io/zerosum-solutions/mish:latest"
 DEFAULT_MEM_LIMIT="384m"
 HEALTH_TIMEOUT=60
 

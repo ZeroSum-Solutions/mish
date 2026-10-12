@@ -1,20 +1,17 @@
-/**
- * Verify the licensed component payload before producing an installer.
- *
- * The payload is a private pack: a public checkout has no `cult-ui-pro` directory at all, and the
- * packaged daemon then reports the kit as not installed. When the directory exists, every file must
- * match its manifest; a directory without a manifest is a broken payload and fails the build.
- */
+/** Verify the checked-in, licensed component payload before producing an installer. */
 import { createHash } from 'node:crypto';
 import { lstat, readFile, readdir } from 'node:fs/promises';
 import { join } from 'node:path';
 
-export async function verifyBundledComponentKit(workspaceRoot: string): Promise<'absent' | 'verified'> {
+export async function verifyBundledComponentKit(workspaceRoot: string): Promise<void> {
   const root = join(workspaceRoot, 'data', 'component-kits', 'cult-ui-pro');
+  // The public repository carries no licensed kit: a checkout without a manifest packages without
+  // one, and the installed app gets the kit from a Mish pack. A manifest that is present is still
+  // verified file by file below, so a private build cannot ship a damaged or partial kit.
   try {
-    await lstat(root);
+    await lstat(join(root, 'manifest.json'));
   } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return 'absent';
+    if ((error as NodeJS.ErrnoException).code === 'ENOENT') return;
     throw error;
   }
   const manifest = JSON.parse(await readFile(join(root, 'manifest.json'), 'utf8')) as {
@@ -42,5 +39,4 @@ export async function verifyBundledComponentKit(workspaceRoot: string): Promise<
     if (bytes.length !== entry.bytes || createHash('sha256').update(bytes).digest('hex') !== entry.sha256) throw new Error(`Bundled component checksum mismatch: ${entry.file}`);
   }
   await validateTree();
-  return 'verified';
 }

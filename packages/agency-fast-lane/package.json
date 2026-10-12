@@ -25,7 +25,8 @@
     "./block-compose": { "types": "./dist/block-compose.d.ts", "default": "./dist/block-compose.js" },
     "./deepseek": { "types": "./dist/deepseek.d.ts", "default": "./dist/deepseek.js" },
     "./failover": { "types": "./dist/failover.d.ts", "default": "./dist/failover.js" },
-    "./cult-public-ids": { "types": "./dist/cult-public-ids.d.ts", "default": "./dist/cult-public-ids.js" }
+    "./cult-public-ids": { "types": "./dist/cult-public-ids.d.ts", "default": "./dist/cult-public-ids.js" },
+    "./pack-overlay": { "types": "./dist/pack-overlay.d.ts", "default": "./dist/pack-overlay.js" }
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json && node --experimental-strip-types scripts/copy-dist-data.ts",

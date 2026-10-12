@@ -8,7 +8,7 @@
 // directory to prevent path traversal — see resolveSafe().
 
 import { constants as fsConstants, createReadStream } from 'node:fs';
-import { link, lstat, mkdir, readdir, readFile, realpath, rename, rm, stat, unlink, writeFile } from 'node:fs/promises';
+import { chmod, link, lstat, mkdir, readdir, readFile, realpath, rename, rm, stat, unlink, writeFile } from 'node:fs/promises';
 import { PlacementCoordinationError } from './workbench/placement/write-coordinator.js';
 import path from 'node:path';
 import { Readable } from 'node:stream';
@@ -157,7 +157,12 @@ export async function listFiles(projectsRoot, projectId, opts = {}) {
   // Skip generated dependency/build trees for all project roots. Standard OD
   // projects can contain framework installs too; surfacing package HTML like
   // node_modules/tslib/*.html as artifacts produces blank previews.
-  await collectFiles(dir, '', out, isIgnoredProjectDirName, dir);
+  // `keepBuildDirs` (project duplication) keeps user folders such as out/ or
+  // build/ in daemon-managed projects; only dependency installs stay skipped.
+  const skipDir = opts?.keepBuildDirs && !usesExternalProjectRoot(metadata)
+    ? (name) => String(name).toLowerCase() === 'node_modules'
+    : isIgnoredProjectDirName;
+  await collectFiles(dir, '', out, skipDir, dir);
   // Newest first — matches the visual order users expect after generating.
   out.sort((a, b) => b.mtime - a.mtime);
   const since = Number(opts.since);
@@ -921,24 +926,69 @@ export async function resolveProjectFilePath(projectsRoot, projectId, name, meta
   };
 }
 
+// The mode a plain writeFile would have produced for a new file.
+function defaultFileMode() {
+  return 0o666 & ~process.umask();
+}
+
+// Write through a sibling temp file so readers and watchers never see a
+// truncated file. overwrite:false links the temp file into place, which fails
+// with EEXIST atomically instead of racing a prior stat().
+async function commitProjectFile(target, body, overwrite) {
+  const tmp = path.join(
+    path.dirname(target),
+    `.${path.basename(target)}.${process.pid}.${Math.random().toString(36).slice(2, 10)}.tmp`,
+  );
+  try {
+    // Create the temp file private so new contents never sit in a wider-mode
+    // sibling; the final mode is set below before it becomes visible.
+    await writeFile(tmp, body, { mode: 0o600 });
+    if (overwrite) {
+      // rename() replaces the target inode, so carry over the existing file's
+      // permission bits (an executable stays executable, a 0600 file stays
+      // private) instead of falling back to the umask default.
+      const existing = await stat(target).catch((err) => {
+        if (err && err.code === 'ENOENT') return null;
+        throw err;
+      });
+      await chmod(tmp, existing ? existing.mode & 0o7777 : defaultFileMode());
+      await rename(tmp, target);
+      return;
+    }
+    await chmod(tmp, defaultFileMode());
+    try {
+      await link(tmp, target);
+    } catch (err) {
+      if (err && err.code === 'EEXIST') {
+        const e = new Error('file already exists');
+        e.code = 'EEXIST';
+        throw e;
+      }
+      if (!err || !['EPERM', 'ENOTSUP', 'EXDEV', 'ENOSYS'].includes(err.code)) throw err;
+      await writeFile(target, body, { flag: 'wx' });
+    }
+  } finally {
+    await unlink(tmp).catch(() => {});
+  }
+}
+
 export async function writeProjectFile(
   projectsRoot,
   projectId,
   name,
   body,
-  { overwrite = true, artifactManifest = null, finalIO = null, preserveName = false, existingName = false } = {},
+  { overwrite = true, artifactManifest = null, finalIO = null, preserveName = false, verbatimName = false } = {},
   metadata?,
 ) {
   assertVisibleForImportedProject(name, metadata);
   // `preserveName` is for callers copying a package whose files reference
   // each other by name (design-system kits): renaming one would break those
   // references, so an unportable name is refused instead of rewritten.
-  // `existingName` is for callers copying a file that already exists in a
-  // project on this machine (duplicate, template seed): the name is only
-  // validated for confinement, so the copy keeps every name and reference.
-  const safeName = existingName
-    ? validateProjectPath(name)
-    : preserveName ? validatePortableProjectPath(name) : sanitizePath(name);
+  // `verbatimName` copies an existing file under its current name (project
+  // duplication): the path is still validated, but not rewritten.
+  const safeName = preserveName
+    ? validatePortableProjectPath(name)
+    : verbatimName ? validateProjectPath(name) : sanitizePath(name);
   const dir = await ensureProject(projectsRoot, projectId, metadata, finalIO);
   const target = await resolveSafeReal(dir, safeName);
   body = normalizeArtifactRuntimeImports(safeName, body);
@@ -1009,13 +1059,13 @@ export async function writeProjectFile(
     }
   }
   finalIO?.assertCurrent();
-  await writeFile(target, body);
+  await commitProjectFile(target, body, overwrite);
   await projectFileWriteTestHooks.afterCommit?.({ safeName, target, body });
   if (validatedManifest) {
     const manifestFileName = artifactManifestNameFor(safeName);
     const manifestTarget = await resolveSafeReal(dir, manifestFileName);
     finalIO?.assertCurrent();
-    await writeFile(manifestTarget, JSON.stringify(validatedManifest, null, 2));
+    await commitProjectFile(manifestTarget, JSON.stringify(validatedManifest, null, 2), true);
   }
   const st = await stat(target);
   const persistedManifest = await readManifestForPath(dir, safeName);
@@ -1615,20 +1665,26 @@ export function sanitizePath(raw) {
   return normalized.split('/').map(sanitizeName).join('/');
 }
 
+function invalidProjectPathError(message) {
+  const err = new Error(message);
+  err.code = 'EINVALIDNAME';
+  return err;
+}
+
 export function validateProjectPath(raw) {
   if (typeof raw !== 'string' || !raw.trim()) {
-    throw new Error('invalid file name');
+    throw invalidProjectPathError('invalid file name');
   }
   const normalized = raw.replace(/\\/g, '/');
   if (raw.includes('\0') || /^[A-Za-z]:/.test(normalized) || normalized.startsWith('/')) {
-    throw new Error('invalid file name');
+    throw invalidProjectPathError('invalid file name');
   }
   const parts = normalized.split('/').filter(Boolean);
   if (parts.length === 0 || parts.some((p) => FORBIDDEN_SEGMENT.test(p))) {
-    throw new Error('invalid file name');
+    throw invalidProjectPathError('invalid file name');
   }
   if (parts.some(isReservedProjectSegment)) {
-    throw new Error('reserved project path');
+    throw invalidProjectPathError('reserved project path');
   }
   return parts.join('/');
 }

@@ -223,10 +223,10 @@ describe("copyBundledResourceTrees", () => {
       await expect(readdir(join(resourceRoot, "data", "component-kits"))).resolves.toEqual(["README.md"]);
       await expect(readdir(join(resourceRoot, "community-pets"))).resolves.toEqual([]);
 
-      // A partially present kit (directory without its manifest) is a broken private payload.
+      // A kit directory without its manifest is treated as absent: the kit is verified only when a
+      // private build supplies the manifest (see resources/component-kits.ts).
       await mkdir(join(workspaceRoot, "data", "component-kits", "cult-ui-pro"), { recursive: true });
-      await expect(copyBundledResourceTrees({ workspaceRoot, resourceRoot }))
-        .rejects.toMatchObject({ code: "ENOENT" });
+      await expect(copyBundledResourceTrees({ workspaceRoot, resourceRoot })).resolves.toBeUndefined();
     } finally {
       await rm(root, { recursive: true, force: true });
     }

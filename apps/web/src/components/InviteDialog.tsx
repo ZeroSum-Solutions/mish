@@ -521,16 +521,16 @@ export function InviteDialog({
           <span className="entry-invite__art-glow" />
           <div className="entry-invite__art-cluster">
             <span className="entry-invite__art-avatar">
-              <img src="/team-avatars/a2.png" alt="" />
+              <Icon name="users" size={26} />
             </span>
             <span className="entry-invite__art-avatar">
-              <img src="/team-avatars/a1.png" alt="" />
+              <Icon name="users" size={26} />
             </span>
             <span className="entry-invite__art-avatar">
-              <img src="/team-avatars/a4.png" alt="" />
+              <Icon name="users" size={26} />
             </span>
             <span className="entry-invite__art-avatar">
-              <img src="/team-avatars/a6.png" alt="" />
+              <Icon name="users" size={26} />
             </span>
             <span className="entry-invite__art-avatar entry-invite__art-avatar--invite">
               <Icon name="plus" size={26} />

@@ -10,7 +10,7 @@ param containerGroupName string = 'mish'
 param dnsNameLabel string = toLower('mish-${uniqueString(resourceGroup().id, location)}')
 
 @description('Mishh Mashh container image.')
-param image string = 'ghcr.io/zerosum-solutions/od:latest'
+param image string = 'ghcr.io/zerosum-solutions/mish:latest'
 
 @secure()
 @description('Required Mishh Mashh API token. Generate with: openssl rand -hex 32')

@@ -34,9 +34,8 @@ import path from 'node:path';
 import type { Express } from 'express';
 import type { CultCatalogItem, CultCatalogItemResponse, CultCatalogListResponse } from '@mish/contracts';
 import { CULT_CATALOG_KIND_FILTERS, CULT_CATALOG_STATES, isCultCatalogState } from '@mish/contracts';
-import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
-import cultCurationJson from '@mish/cult-ui-catalog/catalog-curation.json' with { type: 'json' };
-import cultThumbnailsJson from '@mish/cult-ui-catalog/generated/thumbnails.json' with { type: 'json' };
+import { cultCurationData, cultInventoryData, cultThumbnailData } from '../cult-data.js';
+import { mishPackGeneration, packCultGeneratedDir } from '../mish-packs/overlay.js';
 import { cultSlugs } from './cult-registry.js';
 import type { RouteDeps } from '../server-context.js';
 import {
@@ -55,19 +54,34 @@ export interface RegisterCultCatalogRoutesDeps extends RouteDeps<'http'> {}
 let projected: CultCatalogListResponse['catalog'] | null = null;
 let previews: Map<string, CultPreviewFile> | null = null;
 let allItems: CultCatalogItem[] | null = null;
+let lookup: Map<string, { item: CultCatalogItem; rowId: string }> | null = null;
+let cachedGeneration = -1;
+
+/** Derived data is built from the bundled files or an installed pack's; drop it when the packs change. */
+function syncGeneration(): void {
+  const generation = mishPackGeneration();
+  if (generation === cachedGeneration) return;
+  cachedGeneration = generation;
+  projected = null;
+  previews = null;
+  allItems = null;
+  lookup = null;
+}
 
 /** Every row's preview file (converter preview or rendered thumbnail), built on first use. */
 export function cultPreviews(): Map<string, CultPreviewFile> {
-  previews ??= cultPreviewIndex(cultInventoryJson as unknown as CultInventory, cultThumbnailsJson as unknown as CultThumbnailManifest);
+  syncGeneration();
+  previews ??= cultPreviewIndex(cultInventoryData() as unknown as CultInventory, cultThumbnailData() as unknown as CultThumbnailManifest);
   return previews;
 }
 
 /** The projected catalog, built on first use and reused (the inventory ships with the package). */
 export function cultCatalog(): CultCatalogListResponse['catalog'] {
+  syncGeneration();
   if (projected === null) {
-    const next = projectCultCatalog(cultInventoryJson as unknown as CultInventory, cultPreviews(), cultSlugs());
+    const next = projectCultCatalog(cultInventoryData() as unknown as CultInventory, cultPreviews(), cultSlugs());
     const hashes = new Map<string, string>();
-    const rows = (cultInventoryJson as unknown as CultInventory).rows;
+    const rows = (cultInventoryData() as unknown as CultInventory).rows;
     next.items.forEach((item, index) => {
       if (item.preview.kind !== 'image') return;
       const file = cultPreviewPath(rows[index]!.id, cultGeneratedDir());
@@ -79,23 +93,23 @@ export function cultCatalog(): CultCatalogListResponse['catalog'] {
       }
       item.preview = { ...item.preview, revision };
     });
-    const curated = curateCultCatalogItems(next.items, cultInventoryJson as unknown as CultInventory, cultCurationJson as CultCatalogCuration);
+    const curated = curateCultCatalogItems(next.items, cultInventoryData() as unknown as CultInventory, cultCurationData() as CultCatalogCuration);
     allItems = curated.allItems;
     projected = { ...next, items: curated.items };
   }
   return projected;
 }
 
-let lookup: Map<string, { item: CultCatalogItem; rowId: string }> | null = null;
 
 /**
  * One catalog item by its public id (`cult:<slug>`) or slug, or by an alias: the internal
  * `cult:<name>` id or bare name. The response only ever carries the public id.
  */
 export function findCultCatalogItem(key: string): { item: CultCatalogItem; rowId: string } | undefined {
+  syncGeneration();
   if (lookup === null) {
     const next = new Map<string, { item: CultCatalogItem; rowId: string }>();
-    const rows = (cultInventoryJson as unknown as CultInventory).rows;
+    const rows = (cultInventoryData() as unknown as CultInventory).rows;
     cultCatalog();
     const items = allItems!;
     rows.forEach((row, index) => {
@@ -118,6 +132,8 @@ export function findCultCatalogItem(key: string): { item: CultCatalogItem; rowId
  * `catalog.json` export (the images are files, not modules, so they are read from disk).
  */
 export function cultGeneratedDir(): string {
+  const fromPack = packCultGeneratedDir();
+  if (fromPack) return fromPack;
   const require = createRequire(import.meta.url);
   return path.join(path.dirname(require.resolve('@mish/cult-ui-catalog/catalog.json')), 'generated');
 }

@@ -8,7 +8,7 @@ ACI is the daemon upstream in this topology. The browser-facing app URL must be 
 
 - Azure CLI installed and signed in
 - Permission to create a resource group, storage account, file share, and container group
-- A Mishh Mashh image in a registry that ACI can pull. The template defaults to `ghcr.io/zerosum-solutions/od:latest`, but no workflow in this repository publishes that image; push one with [`deploy/scripts/publish-images.sh`](../../../deploy/scripts/publish-images.sh) and pass it as `image` (see [Optional Parameters](#optional-parameters))
+- A Mishh Mashh image in a registry that ACI can pull. The template defaults to `ghcr.io/zerosum-solutions/mish:latest`, but no workflow in this repository publishes that image; push one with [`deploy/scripts/publish-images.sh`](../../../deploy/scripts/publish-images.sh) and pass it as `image` (see [Optional Parameters](#optional-parameters))
 
 ## Step 1: Choose Names
 
@@ -120,7 +120,7 @@ az deployment group create \
     odApiToken="$OD_API_TOKEN" \
     dnsNameLabel="$DNS_LABEL" \
     allowedOrigins="$BROWSER_ORIGIN" \
-    image="ghcr.io/zerosum-solutions/od:latest" \
+    image="ghcr.io/zerosum-solutions/mish:latest" \
     cpuCores=1 \
     memoryInGB=1 \
     fileShareQuotaGB=10

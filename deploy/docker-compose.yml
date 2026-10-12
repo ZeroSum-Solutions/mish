@@ -3,7 +3,7 @@ name: mish
 services:
   mish:
     container_name: mish
-    image: ${MISH_IMAGE:-ghcr.io/zerosum-solutions/od:latest}
+    image: ${MISH_IMAGE:-ghcr.io/zerosum-solutions/mish:latest}
     build:
       context: ..
       dockerfile: deploy/Dockerfile

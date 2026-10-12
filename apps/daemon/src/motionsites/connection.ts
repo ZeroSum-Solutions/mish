@@ -8,7 +8,7 @@ import { isPublicMcpResource, mcpTokenMatchesEndpoint } from '../mcp-endpoint.js
  */
 
 import { refreshAccessToken } from '../mcp-oauth.js';
-import { getToken, isTokenExpired, setToken, type StoredMcpToken } from '../mcp-tokens.js';
+import { getToken, isTokenExpired, refreshMcpTokenSingleFlight, type StoredMcpToken } from '../mcp-tokens.js';
 import { effectiveMcpAuthMode, readMcpConfig, writeMcpConfig, type McpServerConfig } from '../mcp-config.js';
 import { MOTIONSITES_MCP_SERVER_ID, MOTIONSITES_MCP_TEMPLATE, MOTIONSITES_MCP_URL } from './config.js';
 import { MotionSitesLoginRequiredError } from './errors.js';
@@ -50,11 +50,11 @@ export async function resolveMotionSitesAccessToken(dataDir: string, fetchImpl: 
   const stored = await getToken(dataDir, MOTIONSITES_MCP_SERVER_ID);
   if (!stored) throw new MotionSitesLoginRequiredError();
   const endpoint = resourceUrl ?? (await configuredMotionSitesServer(dataDir)).url;
-  if (!mcpTokenMatchesEndpoint(stored, endpoint)) {
+  if (!endpoint || !mcpTokenMatchesEndpoint(stored, endpoint)) {
     throw new MotionSitesLoginRequiredError('The configured MotionSites URL changed — reconnect this server before using its saved OAuth token.');
   }
   if (!isTokenExpired(stored)) return stored.accessToken;
-  return refreshStoredToken(dataDir, stored, fetchImpl);
+  return refreshStoredToken(dataDir, endpoint, stored, fetchImpl);
 }
 
 async function configuredMotionSitesServer(dataDir: string): Promise<McpServerConfig> {
@@ -81,53 +81,35 @@ export async function resolveMotionSitesMcpConnection(dataDir: string, fetchImpl
   return { url: server.url, accessToken, ...(server.headers ? { headers: server.headers } : {}) };
 }
 
-async function refreshStoredToken(dataDir: string, stored: StoredMcpToken, fetchImpl: typeof fetch): Promise<string> {
+/** Refreshes the token saved for `endpoint`; a result bound to another endpoint is never returned. */
+async function refreshStoredToken(dataDir: string, endpoint: string, stored: StoredMcpToken, fetchImpl: typeof fetch): Promise<string> {
   if ((stored.resourceUrl && !isPublicMcpResource(stored.resourceUrl)) || !stored.refreshToken || !stored.tokenEndpoint || !stored.clientId) {
     throw new MotionSitesLoginRequiredError(
       'Stored MotionSites token expired and cannot be refreshed — sign in again via POST /api/mcp/oauth/start.',
     );
   }
-  let refreshed;
+  let next: StoredMcpToken | null;
   try {
-    refreshed = await refreshAccessToken(
+    next = await refreshMcpTokenSingleFlight(dataDir, MOTIONSITES_MCP_SERVER_ID, endpoint, (current) => refreshAccessToken(
       {
-        tokenEndpoint: stored.tokenEndpoint,
-        clientId: stored.clientId,
-        refreshToken: stored.refreshToken,
-        // exactOptionalPropertyTypes: only present a key here when it actually has a value —
-        // `{ clientSecret: undefined }` is not the same as omitting `clientSecret` under that
-        // compiler flag, and RefreshTokenInput's optional fields are not typed to accept the
-        // former.
-        ...(stored.clientSecret !== undefined ? { clientSecret: stored.clientSecret } : {}),
-        ...(stored.scope !== undefined ? { scope: stored.scope } : {}),
-        ...(stored.resourceUrl !== undefined ? { resource: stored.resourceUrl } : {}),
+        tokenEndpoint: current.tokenEndpoint!,
+        clientId: current.clientId!,
+        refreshToken: current.refreshToken!,
+        // exactOptionalPropertyTypes: only present a key when it has a value.
+        ...(current.clientSecret !== undefined ? { clientSecret: current.clientSecret } : {}),
+        ...(current.scope !== undefined ? { scope: current.scope } : {}),
+        ...(current.resourceUrl !== undefined ? { resource: current.resourceUrl } : {}),
       },
       fetchImpl,
-    );
+    ));
   } catch (err) {
     throw new MotionSitesLoginRequiredError(
       'Stored MotionSites token expired and refresh failed — sign in again.',
     );
   }
-  // Per RFC 6749 §5.1, an absent `expires_in` on the refresh response means "no defined
-  // lifetime" — carrying the OLD (just-expired) `expiresAt` forward here would make this freshly
-  // refreshed token look expired again on the very next `isTokenExpired` check. `nextScope`/
-  // `nextExpiresAt` are therefore computed from the refresh response alone, not from `stored`
-  // (except when the refresh response omits `scope`, which the OAuth spec allows to mean
-  // "unchanged" — RFC 6749 §5.1's "unless identical to the scope requested").
-  const { expiresAt: _staleExpiresAt, scope: staleScope, ...storedRest } = stored;
-  const nextExpiresAt = typeof refreshed.expires_in === 'number' ? Date.now() + refreshed.expires_in * 1000 : undefined;
-  const nextScope = refreshed.scope ?? staleScope;
-  const next: StoredMcpToken = {
-    ...storedRest,
-    accessToken: refreshed.access_token,
-    refreshToken: refreshed.refresh_token ?? stored.refreshToken,
-    tokenType: refreshed.token_type ?? stored.tokenType,
-    ...(nextScope !== undefined ? { scope: nextScope } : {}),
-    ...(nextExpiresAt !== undefined ? { expiresAt: nextExpiresAt } : {}),
-    savedAt: Date.now(),
-  };
-  await setToken(dataDir, MOTIONSITES_MCP_SERVER_ID, next);
+  if (!next || !mcpTokenMatchesEndpoint(next, endpoint)) {
+    throw new MotionSitesLoginRequiredError('MotionSites is not connected — sign in again.');
+  }
   return next.accessToken;
 }
 

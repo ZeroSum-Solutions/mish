@@ -1430,14 +1430,16 @@ export async function openExternalUrl(url: string): Promise<boolean> {
       if (json?.ok === true) return true;
     }
   } catch {
-    // Fall through to current-tab navigation below.
+    // Fall through to a new-tab open below.
   }
+  // Never navigate the app window away; only open http(s) URLs in a new tab.
   try {
-    window.location.assign(targetUrl);
+    const parsed = new URL(targetUrl);
+    if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
+    return window.open(parsed.toString(), '_blank', 'noopener,noreferrer') !== null;
   } catch {
     return false;
   }
-  return false;
 }
 
 async function bridgeFirstPartyUrl(url: string): Promise<string | null> {
@@ -1515,8 +1517,7 @@ export async function connectConnector(connectorId: string): Promise<ConnectorAc
       } else {
         // The embedded browser can block even the synchronous placeholder
         // popup. Ask the local daemon to open the system browser; if that
-        // route is unavailable, openExternalUrl falls back to current-tab
-        // navigation.
+        // route is unavailable, openExternalUrl falls back to a new tab.
         await openExternalUrl(json.auth.redirectUrl);
       }
     } else if (json.auth?.kind === 'connected') {
@@ -1572,8 +1573,8 @@ function openConnectorAuthRedirect(authWindow: Window | null, redirectUrl: strin
       // clickable fallback in the popup so the user can continue.
     }
   }
-  const opened = window.open(redirectUrl, '_blank');
-  if (!opened) window.location.assign(redirectUrl);
+  // Never navigate the app window away if the popup is blocked.
+  window.open(redirectUrl, '_blank');
 }
 
 function renderConnectorAuthLoading(authWindow: Window | null, copy: { title: string; body: string }): void {

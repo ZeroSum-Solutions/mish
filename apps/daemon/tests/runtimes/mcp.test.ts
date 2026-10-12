@@ -83,6 +83,10 @@ test('MCP-capable agents can discover equivalent live artifact and connector too
   assert.equal(initialized.result.serverInfo.name, 'mish-live-artifacts');
   assert.deepEqual(initialized.result.capabilities, { tools: {} });
 
+  assert.equal(await handleLiveArtifactsMcpRequest({ jsonrpc: '2.0', method: 'notifications/cancelled', params: {} }), undefined);
+  assert.equal(await handleLiveArtifactsMcpRequest({ jsonrpc: '2.0', method: 'notifications/roots/list_changed' }), undefined);
+  assert.deepEqual(await handleLiveArtifactsMcpRequest({ jsonrpc: '2.0', id: 9, method: 'ping' }), { jsonrpc: '2.0', id: 9, result: {} });
+
   const listed = await handleLiveArtifactsMcpRequest({ jsonrpc: '2.0', id: 2, method: 'tools/list', params: {} }) as { result: { tools: Array<{ name: string }> } };
   assert.deepEqual(listed.result.tools.map((tool) => tool.name), tools.map((tool) => tool.name));
 

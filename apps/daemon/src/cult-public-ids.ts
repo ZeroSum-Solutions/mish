@@ -8,15 +8,30 @@
  * `sectionSelection.entryId` maps it back.
  */
 
-import cultSlugsJson from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
+import { cultSlugData } from './cult-data.js';
+import { mishPackGeneration } from './mish-packs/overlay.js';
 
-const SLUGS = (cultSlugsJson as unknown as { items: Record<string, string> }).items;
-const PUBLIC_BY_INTERNAL = new Map(Object.entries(SLUGS).map(([id, slug]) => [id, `cult:${slug}`]));
-const INTERNAL_BY_PUBLIC = new Map([...PUBLIC_BY_INTERNAL].map(([id, publicId]) => [publicId, id]));
+interface IdMaps {
+  generation: number;
+  publicByInternal: Map<string, string>;
+  internalByPublic: Map<string, string>;
+}
+let maps: IdMaps | null = null;
+
+/** Built from the bundled slugs or an installed pack's; rebuilt when the set of packs changes. */
+function idMaps(): IdMaps {
+  const generation = mishPackGeneration();
+  if (maps?.generation === generation) return maps;
+  const slugs = (cultSlugData() as unknown as { items: Record<string, string> }).items;
+  const publicByInternal = new Map(Object.entries(slugs).map(([id, slug]) => [id, `cult:${slug}`]));
+  const internalByPublic = new Map([...publicByInternal].map(([id, publicId]) => [publicId, id]));
+  maps = { generation, publicByInternal, internalByPublic };
+  return maps;
+}
 
 /** The public id (`cult:<slug>`) of an internal Cult row id, or undefined for any other id. */
 export function cultPublicId(internalId: string): string | undefined {
-  return PUBLIC_BY_INTERNAL.get(internalId);
+  return idMaps().publicByInternal.get(internalId);
 }
 
 /**
@@ -24,5 +39,6 @@ export function cultPublicId(internalId: string): string | undefined {
  * an internal id, is returned unchanged.
  */
 export function cultInternalId(key: string): string {
-  return INTERNAL_BY_PUBLIC.get(key) ?? INTERNAL_BY_PUBLIC.get(`cult:${key}`) ?? key;
+  const { internalByPublic } = idMaps();
+  return internalByPublic.get(key) ?? internalByPublic.get(`cult:${key}`) ?? key;
 }

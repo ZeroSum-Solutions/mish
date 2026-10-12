@@ -102,6 +102,8 @@ describe("generic filesystem primitives", () => {
     expect(pathContains(root, join(root, "child", "file.txt"))).toBe(true);
     expect(pathContains(root, root)).toBe(true);
     expect(pathContains(root, join(root, "..", "outside.txt"))).toBe(false);
+    expect(pathContains(root, join(root, "..cache", "file.txt"))).toBe(true);
+    expect(pathContains(root, join(root, "..hidden"))).toBe(true);
   });
 
   it("copies through a destination-local temporary file", async () => {

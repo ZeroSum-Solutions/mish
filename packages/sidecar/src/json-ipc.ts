@@ -159,6 +159,9 @@ async function prepareIpcPath(socketPath: string): Promise<void> {
   if (await staleUnixSocketExists(socketPath)) await rm(socketPath, { force: true });
 }
 
+/** Largest unterminated request frame the server buffers before dropping the connection. */
+const MAX_JSON_IPC_FRAME_BYTES = 1024 * 1024;
+
 /**
  * Start a newline-delimited JSON IPC server on a unix socket / named pipe: each
  * connection carries one JSON request, the handler's result is written back as
@@ -175,6 +178,7 @@ export async function createJsonIpcServer({
   await prepareIpcPath(socketPath);
   const server = createNetServer((socket) => {
     let buffer = "";
+    let frameHandled = false;
     // Decode UTF-8 across chunk boundaries: a multibyte character (e.g. CJK,
     // 3 bytes) can be split across two `data` events. `chunk.toString()` per
     // chunk would turn each half into U+FFFD, corrupting the payload (observed
@@ -206,9 +210,17 @@ export async function createJsonIpcServer({
         socketPath,
         traceId,
       });
+      if (frameHandled) return;
       buffer += decoder.write(chunk);
       const newlineIndex = buffer.indexOf("\n");
-      if (newlineIndex < 0) return;
+      if (newlineIndex < 0) {
+        if (Buffer.byteLength(buffer) > MAX_JSON_IPC_FRAME_BYTES) {
+          frameHandled = true;
+          socket.destroy();
+        }
+        return;
+      }
+      frameHandled = true;
       const frame = buffer.slice(0, newlineIndex);
       buffer = buffer.slice(newlineIndex + 1);
       let message: unknown;

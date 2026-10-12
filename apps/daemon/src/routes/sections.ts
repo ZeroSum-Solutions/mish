@@ -41,10 +41,11 @@ import type {
   SectionEntryResponse,
   SectionsListResponse,
 } from '@mish/contracts/api/section-catalog';
-import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
 import { listDesignDirections } from '@mish/agency-fast-lane/section-overlay';
 import { cultDisplayText, cultLocalOnlyRefusal } from '@mish/contracts';
 import { cultPublicId } from '../cult-public-ids.js';
+import { mishPackGeneration } from '../mish-packs/overlay.js';
+import { sectionCatalogData } from '../section-catalog-data.js';
 import { fetchMotionSitesCatalogEntries } from '../motionsites/catalog.js';
 import { renderSectionPreview, SECTION_PREVIEW_FRAME_CSP, type SectionPreviewRoots } from '../workbench/section-previews.js';
 
@@ -55,14 +56,22 @@ export interface SectionsRouteOptions {
   previewRoots?: SectionPreviewRoots;
 }
 
-/** The static half of the merged catalog — read once at module load, never re-parsed per
- * request (it ships with the package; only the MotionSites half needs a live fetch). */
-const RAW_STATIC_ENTRIES: readonly SectionCatalogEntry[] = (sectionCatalogJson as { entries: SectionCatalogEntry[] }).entries;
-const STATIC_ENTRIES: readonly SectionCatalogEntry[] = RAW_STATIC_ENTRIES
-  .flatMap((entry) => {
-    const served = publicCultEntry(entry);
-    return served ? [served] : [];
+/** The static half of the merged catalog: the bundled file plus any installed pack's entries,
+ * built once per pack generation, never re-parsed per request. Only the MotionSites half needs a
+ * live fetch. */
+let staticCache: { generation: number; raw: readonly SectionCatalogEntry[]; served: readonly SectionCatalogEntry[] } | null = null;
+
+function staticEntries(): { raw: readonly SectionCatalogEntry[]; served: readonly SectionCatalogEntry[] } {
+  const generation = mishPackGeneration();
+  if (staticCache?.generation === generation) return staticCache;
+  const raw = (sectionCatalogData() as unknown as { entries: SectionCatalogEntry[] }).entries;
+  const served = raw.flatMap((entry) => {
+    const entryServed = publicCultEntry(entry);
+    return entryServed ? [entryServed] : [];
   });
+  staticCache = { generation, raw, served };
+  return staticCache;
+}
 
 /**
  * A Cult entry as it is served: the internal inventory id (`cult:<name>`) can name the provider
@@ -130,7 +139,7 @@ export function registerSectionsRoutes(app: Express, ctx: RegisterSectionsRoutes
    * entries can change between requests (a new prompt saved, an account connected). */
   const mergedEntries = async (): Promise<{ entries: SectionCatalogEntry[]; upstream?: SectionsListResponse['upstream'] }> => {
     const { entries: federated, upstream } = await fetchMotionSitesCatalogEntries(RUNTIME_DATA_DIR);
-    return { entries: [...STATIC_ENTRIES, ...federated], ...(upstream ? { upstream } : {}) };
+    return { entries: [...staticEntries().served, ...federated], ...(upstream ? { upstream } : {}) };
   };
 
   app.get('/api/sections', async (req, res) => {
@@ -166,14 +175,14 @@ export function registerSectionsRoutes(app: Express, ctx: RegisterSectionsRoutes
   app.get('/api/sections/:id/preview', (req, res) => {
     const key = req.params.id;
     const id = cultPublicId(key) ?? key;
-    const entry = STATIC_ENTRIES.find((candidate) => candidate.id === id);
+    const entry = staticEntries().served.find((candidate) => candidate.id === id);
     const roots = options.previewRoots ?? { hyperuiRoot: null, cultKitDir: null };
     if (!entry) return sendApiError(res, 404, 'NOT_FOUND', 'no section catalog entry with that id');
     if (entry.content.kind === 'cult-item') {
       const refusal = cultLocalOnlyRefusal({ peer: req.socket.remoteAddress, header: (name) => req.get(name) });
       if (refusal !== null) return sendApiError(res, 403, 'FORBIDDEN', `licensed source is served to this machine only: ${refusal}`);
     }
-    const preview = renderSectionPreview(entry, RAW_STATIC_ENTRIES, roots);
+    const preview = renderSectionPreview(entry, staticEntries().raw, roots);
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Content-Type-Options', 'nosniff');
     if (preview.status !== 200) return sendApiError(res, preview.status, preview.code, preview.message);

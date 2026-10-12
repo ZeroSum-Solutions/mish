@@ -65,8 +65,10 @@ import { optionalSectionsOf } from '@mish/agency-fast-lane/sections';
 import { listComposableAdapterIds, resolveDesignDirection, resolveSectionAdapter, SectionSelectionRefusedError } from '@mish/agency-fast-lane/section-overlay';
 import { BlockPlanReplayError, blockCatalogFrom, COMPOSED_FAMILY, COMPOSITION_FALLBACKS, COMPOSITION_MODES, type BlockCatalog } from '@mish/agency-fast-lane/block-plan';
 import { ComposedPageTooLargeError, CompositionVerifyError, type CompositionResult } from '@mish/agency-fast-lane/block-compose';
-import sectionCatalogJson from '@mish/section-catalog/catalog.json' with { type: 'json' };
-import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
+import { mishPackGeneration } from '../mish-packs/overlay.js';
+import { cultInventoryData } from '../cult-data.js';
+import { fastLanePackGeneration } from '@mish/agency-fast-lane/pack-overlay';
+import { sectionCatalogData } from '../section-catalog-data.js';
 import { AgencyJevConfigUnreadableError, AgencyModelKeyUnavailableError, type AgencyJevKeyStore } from '../storage/agency-config.js';
 import { cultInternalId, cultPublicId } from '../cult-public-ids.js';
 import type { RouteDeps } from '../server-context.js';
@@ -203,18 +205,24 @@ export interface AgencyBuildDeps {
   designKits?: AgencyDesignKitDeps;
 }
 
-let bundledBlockCatalog: Promise<BlockCatalog> | undefined;
+let bundledBlockCatalog: { generation: number; catalog: Promise<BlockCatalog> } | undefined;
 
-/** The block catalog from this daemon's bundled JSON, restricted to ids the adapter registry
- * resolves. Built once per process. */
+/** The block catalog from this daemon's bundled JSON (plus any installed pack's rows), restricted
+ * to ids the adapter registry resolves. Built once per pack generation. */
 function defaultBlockCatalog(): Promise<BlockCatalog> {
-  bundledBlockCatalog ??= (async () => blockCatalogFrom(
-    sectionCatalogJson as unknown as Parameters<typeof blockCatalogFrom>[0],
-    cultInventoryJson as unknown as Parameters<typeof blockCatalogFrom>[1],
-    // Composable ids only (G9 dry run): see the fast lane's `composeRefusalFor`.
-    await listComposableAdapterIds(),
-  ))();
-  return bundledBlockCatalog;
+  const generation = mishPackGeneration() * 1_000_003 + fastLanePackGeneration();
+  if (bundledBlockCatalog?.generation !== generation) {
+    bundledBlockCatalog = {
+      generation,
+      catalog: (async () => blockCatalogFrom(
+        sectionCatalogData() as unknown as Parameters<typeof blockCatalogFrom>[0],
+        cultInventoryData() as unknown as Parameters<typeof blockCatalogFrom>[1],
+        // Composable ids only (G9 dry run): see the fast lane's `composeRefusalFor`.
+        await listComposableAdapterIds(),
+      ))(),
+    };
+  }
+  return bundledBlockCatalog.catalog;
 }
 
 /** A Cult entry's public id (`cult:<slug>`); any other id, or one already public, unchanged. */
