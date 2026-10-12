@@ -1,7 +1,7 @@
 import { isPublicMcpResource, mcpTokenMatchesEndpoint } from '../../mcp-endpoint.js';
 import { effectiveMcpAuthMode, readMcpConfig, type McpServerConfig } from '../../mcp-config.js';
 import { refreshAccessToken } from '../../mcp-oauth.js';
-import { getToken, isTokenExpired, setToken, type StoredMcpToken } from '../../mcp-tokens.js';
+import { getToken, isTokenExpired, refreshMcpTokenSingleFlight, type StoredMcpToken } from '../../mcp-tokens.js';
 
 /**
  * The daemon's own binding for a connector: a server entry in the daemon's MCP
@@ -64,28 +64,18 @@ export async function resolveDaemonMcpConnection(dataDir: string, match: DaemonM
 
 async function refreshStored(dataDir: string, serverId: string, stored: StoredMcpToken, fetchImpl: typeof fetch): Promise<string> {
   if ((stored.resourceUrl && !isPublicMcpResource(stored.resourceUrl)) || !stored.refreshToken || !stored.tokenEndpoint || !stored.clientId) throw new DaemonBindingError('connector-needs-sign-in', 'expired');
-  let refreshed;
+  let next: StoredMcpToken | null;
   try {
     // Refresh credentials belong to the saved endpoint, including image-access calls.
-    refreshed = await refreshAccessToken({
-      tokenEndpoint: stored.tokenEndpoint, clientId: stored.clientId, refreshToken: stored.refreshToken,
-      ...(stored.clientSecret !== undefined ? { clientSecret: stored.clientSecret } : {}),
-      ...(stored.scope !== undefined ? { scope: stored.scope } : {}),
-      ...(stored.resourceUrl !== undefined ? { resource: stored.resourceUrl } : {}),
-    }, (input, init) => fetchImpl(input, { ...init, redirect: 'error' }));
+    next = await refreshMcpTokenSingleFlight(dataDir, serverId, (current) => refreshAccessToken({
+      tokenEndpoint: current.tokenEndpoint!, clientId: current.clientId!, refreshToken: current.refreshToken!,
+      ...(current.clientSecret !== undefined ? { clientSecret: current.clientSecret } : {}),
+      ...(current.scope !== undefined ? { scope: current.scope } : {}),
+      ...(current.resourceUrl !== undefined ? { resource: current.resourceUrl } : {}),
+    }, (input, init) => fetchImpl(input, { ...init, redirect: 'error' })));
   } catch {
     throw new DaemonBindingError('connector-needs-sign-in', 'refresh-failed');
   }
-  // RFC 6749 §5.1: an absent expires_in means no defined lifetime; an absent scope means unchanged.
-  const { expiresAt: _stale, scope: staleScope, ...rest } = stored;
-  const nextScope = refreshed.scope ?? staleScope;
-  const next: StoredMcpToken = {
-    ...rest, accessToken: refreshed.access_token, refreshToken: refreshed.refresh_token ?? stored.refreshToken,
-    tokenType: refreshed.token_type ?? stored.tokenType,
-    ...(nextScope !== undefined ? { scope: nextScope } : {}),
-    ...(typeof refreshed.expires_in === 'number' ? { expiresAt: Date.now() + refreshed.expires_in * 1000 } : {}),
-    savedAt: Date.now(),
-  };
-  await setToken(dataDir, serverId, next);
+  if (!next) throw new DaemonBindingError('connector-needs-sign-in', 'no-token');
   return next.accessToken;
 }

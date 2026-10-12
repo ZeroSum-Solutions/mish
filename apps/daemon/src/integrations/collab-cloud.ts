@@ -89,7 +89,7 @@ export function createCollabCloudClient(options: CollabCloudClientOptions = {}) 
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      const response = await fetchImpl(new URL(path, config!.baseUrl), {
+      const response = await fetchImpl(new URL(config!.baseUrl.replace(/\/+$/, '') + path), {
         method,
         headers: authHeaders(extraHeaders),
         ...(body === undefined ? {} : { body: JSON.stringify(body) }),

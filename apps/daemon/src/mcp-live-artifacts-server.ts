@@ -206,9 +206,14 @@ export async function handleLiveArtifactsMcpRequest(request: JsonRpcRequest): Pr
   const id = request.id ?? null;
   const method = request.method;
 
-  if (method === 'notifications/initialized') return undefined;
+  // Notifications (no id, or a notifications/* method) never get a response.
+  if (request.id === undefined || (typeof method === 'string' && method.startsWith('notifications/'))) {
+    return undefined;
+  }
 
   try {
+    if (method === 'ping') return { jsonrpc: '2.0', id, result: {} };
+
     if (method === 'initialize') {
       return {
         jsonrpc: '2.0',

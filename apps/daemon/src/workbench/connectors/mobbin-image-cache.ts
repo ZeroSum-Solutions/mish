@@ -85,9 +85,19 @@ export class MobbinImageCache {
     }
   }
 
+  /** Selection-time read: an unverifiable record is a cache miss; drop it so a re-download can heal it. */
+  async readForSelect(key: string): Promise<{ detail: ConnectorReferenceDetailResponse; bytes: Buffer } | null> {
+    try { return await this.read(key); }
+    catch (error) {
+      if (!(error instanceof ConnectorError) || error.code !== 'connector-cache-unavailable') throw error;
+      await rm(path.join(this.#dir, `${key}.json`), { force: true });
+      return null;
+    }
+  }
+
   async select(detail: ConnectorReferenceDetailResponse, sourceUrl: unknown): Promise<ConnectorReferenceDetailResponse> {
     const key = this.key(detail.resource.itemId, detail.resource.capturedAt);
-    const existing = await this.read(key);
+    const existing = await this.readForSelect(key);
     if (existing) return existing.detail;
     const pending = this.#pending.get(key);
     if (pending) return pending;

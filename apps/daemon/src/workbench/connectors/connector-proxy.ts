@@ -259,7 +259,7 @@ export class ConnectorProxy {
     let request;
     try { request = parseConnectorSelectionRequest(input); } catch { throw requestInvalid('Invalid connector selection'); }
     await this.#imageAccess(definition);
-    const saved = await this.#images.read(this.#images.key(request.itemId, request.capturedAt));
+    const saved = await this.#images.readForSelect(this.#images.key(request.itemId, request.capturedAt));
     if (saved) return saved.detail;
     const captured = this.#captured.get(definition.id)?.get(request.itemId);
     if (!captured) throw new ConnectorError(404, 'connector-item-unknown', 'Search Mobbin before selecting this reference');
