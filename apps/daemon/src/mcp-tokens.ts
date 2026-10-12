@@ -59,7 +59,14 @@ export interface McpTokensFile {
   servers: Record<string, StoredMcpToken>;
 }
 
-const EMPTY: McpTokensFile = { servers: {} };
+/** Token maps are null-prototype so ids such as `constructor` or `toString` are ordinary keys. */
+function emptyServers(): Record<string, StoredMcpToken> {
+  return Object.create(null) as Record<string, StoredMcpToken>;
+}
+
+function emptyFile(): McpTokensFile {
+  return { servers: emptyServers() };
+}
 
 function tokensFile(dataDir: string): string {
   return path.join(dataDir, 'mcp-tokens.json');
@@ -73,12 +80,12 @@ function isPlainObject(v: unknown): v is Record<string, unknown> {
  * doesn't deserialize cleanly. Used both at read time and as a defensive
  * pass when third-party tooling has hand-edited the file. */
 export function sanitizeTokensFile(raw: unknown): McpTokensFile {
-  if (!isPlainObject(raw)) return { servers: {} };
+  if (!isPlainObject(raw)) return emptyFile();
   const servers = raw.servers;
-  if (!isPlainObject(servers)) return { servers: {} };
-  const out: Record<string, StoredMcpToken> = {};
+  if (!isPlainObject(servers)) return emptyFile();
+  const out = emptyServers();
   for (const [id, value] of Object.entries(servers)) {
-    if (id === '__proto__' || id === 'constructor') continue;
+    if (id === '__proto__') continue;
     const tok = sanitizeToken(value);
     if (!tok) continue;
     out[id] = tok;
@@ -155,10 +162,10 @@ export async function readTokensFile(dataDir: string): Promise<McpTokensFile> {
     return sanitizeTokensFile(JSON.parse(raw));
   } catch (err: unknown) {
     const e = err as { code?: string; name?: string; message?: string };
-    if (e.code === 'ENOENT') return { ...EMPTY, servers: { ...EMPTY.servers } };
+    if (e.code === 'ENOENT') return emptyFile();
     if (e.name === 'SyntaxError') {
       console.error('[mcp-tokens] Corrupted JSON, returning empty.');
-      return { ...EMPTY, servers: { ...EMPTY.servers } };
+      return emptyFile();
     }
     throw err;
   }
@@ -218,7 +225,7 @@ export async function getToken(
   serverId: string,
 ): Promise<StoredMcpToken | null> {
   const file = await readTokensFile(dataDir);
-  return file.servers[serverId] ?? null;
+  return Object.hasOwn(file.servers, serverId) ? (file.servers[serverId] ?? null) : null;
 }
 
 /** Atomically merge a new token for `serverId` into the tokens file. */
@@ -241,7 +248,7 @@ export async function clearToken(
 ): Promise<void> {
   await withLock(dataDir, async () => {
     const file = await readTokensFile(dataDir);
-    if (!(serverId in file.servers)) return;
+    if (!Object.hasOwn(file.servers, serverId)) return;
     delete file.servers[serverId];
     await writeTokensFile(dataDir, file);
   });

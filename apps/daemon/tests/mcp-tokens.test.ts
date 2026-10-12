@@ -25,6 +25,16 @@ describe('mcp-tokens storage', () => {
     await rm(dataDir, { recursive: true, force: true });
   });
 
+  it('treats prototype-member server ids as ordinary keys', async () => {
+    expect(await getToken(dataDir, 'toString')).toBeNull();
+    expect((await readAllTokens(dataDir))['valueOf']).toBeUndefined();
+    const tok: StoredMcpToken = { accessToken: 'a', tokenType: 'Bearer', savedAt: 1 };
+    await setToken(dataDir, 'constructor', tok);
+    expect(await getToken(dataDir, 'constructor')).toEqual(tok);
+    await clearToken(dataDir, 'constructor');
+    expect(await getToken(dataDir, 'constructor')).toBeNull();
+  });
+
   it('returns no servers when the file is missing', async () => {
     expect(await readTokensFile(dataDir)).toEqual({ servers: {} });
     expect(await getToken(dataDir, 'higgsfield')).toBeNull();
