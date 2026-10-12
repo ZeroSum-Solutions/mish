@@ -5,7 +5,7 @@ import { buildCatalog } from '../src/build.ts';
 import { readKit } from '../src/kit.ts';
 import { applyOverrides, parseOverrides } from '../src/overrides.ts';
 import type { CultCatalog } from '../src/types.ts';
-import { catalogIssues, catalogWithheld } from '../src/validate.ts';
+import { catalogIssues } from '../src/validate.ts';
 import { writeFixtureKit } from './helpers/fixture-kit.ts';
 
 function fresh(): CultCatalog {
@@ -59,25 +59,6 @@ test('snapshot counts must match the rows', () => {
   const catalog = fresh();
   catalog.snapshot.fetchedItems += 1;
   assert.ok(catalogIssues(catalog).length > 0);
-});
-
-test('a catalog whose licensed rows are withheld is valid; a partly emptied one is not', () => {
-  const withheld = fresh();
-  withheld.rows = [];
-  assert.equal(catalogWithheld(withheld), true);
-  assert.deepEqual(catalogIssues(withheld), []);
-  withheld.snapshot.pendingItems += 1;
-  assert.ok(catalogIssues(withheld).includes('snapshot: pending count is inconsistent'));
-
-  const partial = fresh();
-  partial.rows = partial.rows.filter((r) => r.derivedFrom === undefined).slice(0, 1);
-  assert.equal(catalogWithheld(partial), false);
-  assert.ok(catalogIssues(partial).some((i) => i.startsWith('snapshot: 1 source rows')));
-
-  const empty = fresh();
-  empty.rows = [];
-  empty.snapshot = { ...empty.snapshot, expectedItems: 0, fetchedItems: 0, pendingItems: 0 };
-  assert.equal(catalogWithheld(empty), false, 'a snapshot of zero items withholds nothing');
 });
 
 test('overrides apply last, need a note, and must name an existing row', () => {

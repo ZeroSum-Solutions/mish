@@ -76,16 +76,6 @@ function rowIssues(row: CultCatalogRow, snapshotId: string, ids: ReadonlySet<str
   return issues;
 }
 
-/**
- * True when the catalog pins a non-empty licensed snapshot but carries none of its rows. The Cult UI
- * Pro rows are licensed content that ships in a private pack; a public checkout keeps the pinned
- * snapshot identity (so an installed pack is compared against the right registry) and no rows.
- * Any partly emptied catalog is still held to the snapshot counts.
- */
-export function catalogWithheld(catalog: Pick<CultCatalog, 'rows' | 'snapshot'>): boolean {
-  return catalog.rows.length === 0 && catalog.snapshot.expectedItems > 0;
-}
-
 /** Every schema and policy violation; empty when the catalog is valid. */
 export function catalogIssues(catalog: unknown): string[] {
   const schemaIssues = validateAgainstSchema(catalog, cultCatalogSchema);
@@ -105,13 +95,12 @@ export function catalogIssues(catalog: unknown): string[] {
     if (row.derivedFrom !== undefined) issues.push(...derivedIssues(row, byId));
   }
   // Registry items and derived rows are counted apart, so the index invariant stays checkable.
-  if (snapshot.expectedItems - snapshot.fetchedItems !== snapshot.pendingItems) issues.push('snapshot: pending count is inconsistent');
-  if (catalogWithheld({ rows, snapshot })) return issues;
   const sourceRows = rows.filter((r) => r.derivedFrom === undefined);
   const derivedRows = rows.length - sourceRows.length;
   const fetched = sourceRows.filter((r) => r.conversion.status !== 'pending-fetch').length;
   if (sourceRows.length !== snapshot.expectedItems) issues.push(`snapshot: ${sourceRows.length} source rows, expected ${snapshot.expectedItems}`);
   if (derivedRows !== snapshot.derivedRows) issues.push(`snapshot: ${derivedRows} derived rows, snapshot says ${snapshot.derivedRows}`);
   if (fetched !== snapshot.fetchedItems) issues.push(`snapshot: ${fetched} fetched rows, snapshot says ${snapshot.fetchedItems}`);
+  if (snapshot.expectedItems - snapshot.fetchedItems !== snapshot.pendingItems) issues.push('snapshot: pending count is inconsistent');
   return issues;
 }
