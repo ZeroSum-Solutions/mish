@@ -33,6 +33,10 @@ import {
 } from '../../src/runtime/amr-balance-branch';
 import { isMaxPlanTier, isTopPlanTier } from '../../src/collab/team-plan';
 import { workspaceUpgradeUrl } from '../../src/components/EntryNavRail';
+import { useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 function context({
   role,

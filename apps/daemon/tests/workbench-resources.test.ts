@@ -62,7 +62,7 @@ describe('resource federation', () => {
     const all = [...page.results]; let cursor = page.nextCursor;
     while (cursor) { const next = await searchResources(parseResourceSearchRequest({ limit: 100, cursor }), { principalId: 'local-daemon' }, createLocalResourceSources({ listPlugins: async () => [] })); all.push(...next.results); cursor = next.nextCursor; }
     const cult = all.filter(r => r.ref.itemId.startsWith('cult:'));
-    expect(cult.length).toBeGreaterThan(0);
+    expect(cult).toEqual([]);
     expect(JSON.stringify(cult)).not.toMatch(/cult:.*(?:linear|stripe|apple)/);
     expect(all.some(r => r.ref.sourceType === 'genui' && r.previewCapability.available)).toBe(true);
   });

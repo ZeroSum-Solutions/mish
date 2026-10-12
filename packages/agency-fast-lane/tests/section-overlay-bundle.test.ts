@@ -36,6 +36,7 @@ before(async () => {
   await writeFile(entry, [
     `export * from ${JSON.stringify(path.join(emitted, 'section-overlay.js'))};`,
     `export { publicAdapterText, publicSectionEntryId, internalSectionEntryId } from ${JSON.stringify(path.join(emitted, 'cult-public-ids.js'))};`,
+    `export { publicAdapterNamesForId } from ${JSON.stringify(path.join(emitted, 'cult-adapter-names.js'))};`,
   ].join('\n'));
   const bundle = await build({ metafile: true, entryPoints: [entry], bundle: true, platform: 'node', format: 'esm',
     splitting: true, target: 'node24', outdir: built, outExtension: { '.js': '.mjs' },
@@ -74,13 +75,13 @@ async function runRelocated(assertions: string): Promise<void> {
   assert.equal(stdout.trim(), 'relocated catalogue assertions passed');
 }
 
-test('relocated split bundle resolves every composable Cult and HyperUI adapter without source files', async () => {
+test('relocated split bundle resolves public adapters and refuses removed vendor adapters without source files', async () => {
   // Read the independent authoring inventory outside the bundle so registry truncation cannot pass.
   const catalog = JSON.parse(await readFile(path.join(workspace, 'packages/cult-ui-catalog/catalog.json'), 'utf8')) as {
     rows: Array<{ id: string; conversion: { status: string } }>;
   };
   const expectedCultIds = catalog.rows.filter(row => row.conversion.status === 'insertable').map(row => row.id).sort();
-  assert.ok(expectedCultIds.length > 0, 'the authoring inventory contains insertable Cult rows');
+  assert.deepEqual(expectedCultIds, [], 'the public inventory contains no licensed rows');
   assert.equal(new Set(expectedCultIds).size, expectedCultIds.length, 'the inventory ids are unique');
   await runRelocated(`
     const ids = await overlay.listSectionAdapterIds();
@@ -89,15 +90,12 @@ test('relocated split bundle resolves every composable Cult and HyperUI adapter 
     assert.deepEqual(ids.filter(id => id.startsWith('cult:')).sort(), expectedCultIds, 'every independently inventoried Cult row survives bundling');
     assert.deepEqual(ids.filter(id => !id.startsWith('cult:')).sort(), expectedHyperUIIds.slice().sort(), 'exactly the three supported HyperUI adapters survive bundling');
     assert.equal(ids.length, expectedCultIds.length + 3, 'the bundled registry is complete without extra or duplicate rows');
-    for (const id of ['hyperui:marketing/ctas/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/sections/1', 'cult:marketing-hero-large-image']) {
+    for (const id of ['hyperui:marketing/ctas/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/sections/1']) {
       assert.ok(ids.includes(id), id);
       assert.equal((await overlay.resolveSectionAdapter(id)).id, id);
     }
     const composable = await overlay.listComposableAdapterIds();
-    assert.ok(composable.includes('cult:marketing-hero-large-image'));
-    assert.ok(ids.includes('cult:marketing-footer-apple'), 'the refused row still exists');
-    assert.equal(overlay.composeRefusalFor(await overlay.resolveSectionAdapter('cult:marketing-footer-apple')), 'fixed-link-name');
-    assert.ok(!composable.includes('cult:marketing-footer-apple'), 'vendor-link refusal remains enforced');
+    assert.deepEqual(composable.slice().sort(), expectedHyperUIIds.slice().sort());
     await assert.rejects(() => overlay.resolveSectionAdapter('cult:not-a-reviewed-adapter'), overlay.SectionSelectionRefusedError);
     for (const id of composable) assert.equal(overlay.composeRefusalFor(await overlay.resolveSectionAdapter(id)), undefined, id);
   `);
@@ -119,27 +117,17 @@ test('relocated split bundle loads all authored design directions and renders sc
     assert.match(css, /--role-background/);
     assert.ok(!html.includes('Own <x>'), 'adapter text stays escaped');
     assert.ok(html.includes('Own &lt;x&gt;'), 'escaped text stays present');
-    const cult = await overlay.resolveSectionAdapter('cult:marketing-hero-large-image');
-    const cultFill = { text: Object.fromEntries(cult.text.map(slot => [slot.name, 'Own <x>'])) };
-    const renderedCult = kit.renderSectionAdapter(cult, cultFill);
-    assert.equal(renderedCult, cult.render(cultFill), 'Cult adapter from the registry renders through the overlay renderer');
-    assert.throws(() => kit.renderSectionAdapter(cult, { text: {} }), error =>
-      error.name === 'AdapterFillRejectedError' && error.errors.some(issue => issue.slot === cult.text[0].name),
-      'invalid Cult fill is refused across module instances without instanceof');
-    const published = overlay.publicAdapterText(cult.id, renderedCult);
-    assert.ok(published.includes('Own &lt;x&gt;'), 'published text stays present and escaped');
-    assert.ok(!published.includes('Own <x>'));
-    const publicId = overlay.publicSectionEntryId(cult.id);
-    assert.notEqual(publicId, cult.id, 'published Cult identity uses the reviewed slug map');
-    assert.equal(overlay.internalSectionEntryId(publicId), cult.id);
-    assert.equal((await overlay.resolveSectionAdapter(publicId)).id, cult.id);
-    const branded = '<label for="footer-vite-email" aria-label="Visit us on Discord">Owned</label><input id="footer-vite-email">';
-    const scrubbed = overlay.publicAdapterText('cult:marketing-footer-vite', branded);
-    assert.ok(!scrubbed.includes('footer-vite-email'));
-    assert.ok(!scrubbed.includes('Discord'));
-    assert.ok(scrubbed.includes('Visit us on a third-party service'), 'scrubbed prose remains present');
-    const target = /for="([^"]+)"/.exec(scrubbed)[1];
-    assert.ok(scrubbed.includes('id="' + target + '"'), 'rewritten references remain paired');
+    assert.throws(() => kit.renderSectionAdapter(adapter, { text: {} }), error =>
+      error.name === 'AdapterFillRejectedError' && error.errors.some(issue => issue.slot === adapter.text[0].name));
+    assert.equal(overlay.publicAdapterText(adapter.id, html), html);
+    const internal = '<label class="cult-fixture-vendor" for="fixture-vendor-email">Owned</label><input id="fixture-vendor-email"><a href="#fixture-vendor-email">Contact</a>';
+    const renamed = overlay.publicAdapterNamesForId('cult:fixture-vendor', internal, 'cult:fixture-public');
+    assert.ok(!renamed.includes('fixture-vendor'));
+    assert.ok(renamed.includes('class="cult-fixture-public"'));
+    assert.ok(renamed.includes('for="fixture-public-email"') && renamed.includes('id="fixture-public-email"'));
+    assert.ok(renamed.includes('href="#fixture-public-email"'));
+    assert.equal(overlay.internalSectionEntryId(overlay.publicSectionEntryId(adapter.id)), adapter.id);
+    await assert.rejects(() => overlay.resolveSectionAdapter('cult:marketing-hero-large-image'), overlay.SectionSelectionRefusedError);
   `);
 });
 
@@ -152,7 +140,29 @@ test('relocated split bundle retains the shared HTML tokenizer for real section 
   `);
 });
 
-test('the adapter gate and public-name generator bootstrap with public names absent', async () => {
+test('public generated registry stubs contain no licensed adapters or aliases', async () => {
+  const aliases = JSON.parse(await readFile(path.join(workspace, 'packages/cult-ui-catalog/generated/public-names.json'), 'utf8'));
+  assert.deepEqual(aliases.items, {});
+  await runRelocated(`assert.deepEqual((await overlay.listSectionAdapterIds()).filter(id => id.startsWith('cult:')), []);`);
+});
+
+test('Node 24 loads the source and emitted cross-package specifiers directly', async () => {
+  for (const url of [pathToFileURL(path.join(workspace, 'packages/agency-fast-lane/src/section-overlay.ts')).href, emittedUrl]) {
+    const { stdout } = await execFileAsync(process.execPath, ['--experimental-strip-types', '--input-type=module', '--eval', `
+      import assert from 'node:assert/strict';
+      globalThis.fetch = () => { throw new Error('provider/network calls forbidden in direct import regression'); };
+      const overlay = await import(${JSON.stringify(url)});
+      await assert.rejects(() => overlay.resolveSectionAdapter('cult:marketing-hero-large-image'), overlay.SectionSelectionRefusedError);
+      assert.equal((await overlay.listDesignDirections()).length, 5);
+      assert.equal((await overlay.resolveSectionAdapter('hyperui:marketing/ctas/1')).id, 'hyperui:marketing/ctas/1');
+      console.log('direct imports passed');
+    `], { cwd: temporary, env: { PATH: path.dirname(process.execPath), HOME: temporary, TMPDIR: temporary }, timeout: 20_000, maxBuffer: 1024 * 1024 });
+    assert.equal(stdout.trim(), 'direct imports passed');
+  }
+});
+
+
+test('the public-name generator bootstraps without its output and scrubs an owned brand fixture', async () => {
   const cloned = path.join(temporary, 'generator-workspace/packages');
   const catalog = path.join(cloned, 'cult-ui-catalog');
   const fastLane = path.join(cloned, 'agency-fast-lane');
@@ -167,37 +177,18 @@ test('the adapter gate and public-name generator bootstrap with public names abs
   await mkdir(path.join(fastLane, 'node_modules/@mish'), { recursive: true });
   await symlink(catalog, path.join(fastLane, 'node_modules/@mish/cult-ui-catalog'), 'dir');
   await rm(path.join(catalog, 'generated/public-names.json'));
-  // The first adapters-script step must load and validate the real generated registry before
-  // public-names.ts recreates the missing output. No private source kit is required for this gate.
-  const adapterScript = path.join(catalog, 'scripts/adapters.ts');
-  const adapterCheck = await execFileAsync(process.execPath, ['--experimental-strip-types', '--input-type=module', '--eval', `
-    globalThis.fetch = () => { throw new Error('provider/network calls forbidden in adapter bootstrap regression'); };
-    process.argv.push('--check');
-    await import(${JSON.stringify(pathToFileURL(adapterScript).href)});
-  `], { cwd: catalog, env: { PATH: path.dirname(process.execPath), HOME: temporary, TMPDIR: temporary }, timeout: 30_000, maxBuffer: 1024 * 1024 });
-  assert.match(adapterCheck.stdout, /Cult adapters valid/);
-  await assert.rejects(() => readFile(path.join(catalog, 'generated/public-names.json')), { code: 'ENOENT' });
   const script = path.join(catalog, 'scripts/public-names.ts');
   const { stdout } = await execFileAsync(process.execPath, ['--experimental-strip-types', '--input-type=module', '--eval', `
+    import assert from 'node:assert/strict';
     globalThis.fetch = () => { throw new Error('provider/network calls forbidden in generator regression'); };
-    process.argv[1] = ${JSON.stringify(script)};
-    await import(${JSON.stringify(pathToFileURL(script).href)});
+    const { realpathSync } = await import('node:fs');
+    process.argv[1] = realpathSync(${JSON.stringify(script)});
+    const generator = await import(${JSON.stringify(pathToFileURL(script).href)});
+    const names = generator.publicNamesOf({ id: 'cult:fixture', css: '', text: [], render: () => '<label for="fixture-vite-email" aria-label="Visit us on Discord">Owned</label><input id="fixture-vite-email">' }, [{}]);
+    assert.ok(names.tokens['fixture-vite-email']);
+    assert.ok(!names.tokens['fixture-vite-email'].includes('vite'));
+    assert.equal(names.prose['Visit us on Discord'], 'Visit us on a third-party service');
   `], { cwd: catalog, env: { PATH: path.dirname(process.execPath), HOME: temporary, TMPDIR: temporary }, timeout: 30_000, maxBuffer: 1024 * 1024 });
-  assert.match(stdout, /generated\/public-names\.json:/);
+  assert.match(stdout, /generated\/public-names\.json: 0 adapters/);
   assert.equal(await readFile(path.join(catalog, 'generated/public-names.json'), 'utf8'), await readFile(path.join(workspace, 'packages/cult-ui-catalog/generated/public-names.json'), 'utf8'));
-});
-
-test('Node 24 loads the source and emitted cross-package specifiers directly', async () => {
-  for (const url of [pathToFileURL(path.join(workspace, 'packages/agency-fast-lane/src/section-overlay.ts')).href, emittedUrl]) {
-    const { stdout } = await execFileAsync(process.execPath, ['--experimental-strip-types', '--input-type=module', '--eval', `
-      import assert from 'node:assert/strict';
-      globalThis.fetch = () => { throw new Error('provider/network calls forbidden in direct import regression'); };
-      const overlay = await import(${JSON.stringify(url)});
-      assert.equal((await overlay.resolveSectionAdapter('cult:marketing-hero-large-image')).id, 'cult:marketing-hero-large-image');
-      assert.equal((await overlay.listDesignDirections()).length, 5);
-      assert.equal((await overlay.resolveSectionAdapter('hyperui:marketing/ctas/1')).id, 'hyperui:marketing/ctas/1');
-      console.log('direct imports passed');
-    `], { cwd: temporary, env: { PATH: path.dirname(process.execPath), HOME: temporary, TMPDIR: temporary }, timeout: 20_000, maxBuffer: 1024 * 1024 });
-    assert.equal(stdout.trim(), 'direct imports passed');
-  }
 });

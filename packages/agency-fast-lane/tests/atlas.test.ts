@@ -85,7 +85,7 @@ test('every one of the nine atlas spines has at least one registered family', as
   assert.equal(atlas.spines.length, 9);
   const covered = new Set(registry.families.map((entry) => entry.spine));
   const uncovered = atlas.spines.map((spine) => spine.code).filter((code) => !covered.has(code));
-  assert.deepEqual(uncovered, [], 'spines with no family');
+  assert.deepEqual(uncovered, [], 'spines with no public family');
 });
 
 test('the SM, CS and MI families name the businesses they fit, so routing can reach them', async () => {
@@ -121,7 +121,7 @@ test('publication (CS.01) and docs-hub (CS.02) summaries stay mutually distingui
   }
 });
 
-test('community (LM.03) names its own membership words and disclaims course/cohort language, so it never steals emmpo\'s LM.01 briefs', async () => {
+test('community (LM.03) names its own membership words and disclaims course/cohort language, so it never steals ownedlearning\'s LM.01 briefs', async () => {
   const registry = await loadFamilyRegistry();
   const summaryOf = (family: string) => registry.families.find((entry) => entry.family === family)?.summary.toLowerCase() ?? '';
   const community = registry.families.find((entry) => entry.family === 'community');
@@ -129,13 +129,9 @@ test('community (LM.03) names its own membership words and disclaims course/coho
   assert.equal(community!.spine, 'LM');
   assert.equal(community!.archetype, 'LM.03');
   for (const word of ['studio', 'coworking', 'club', 'membership']) assert.ok(summaryOf('community').includes(word), `community summary names ${word}`);
-  // The router asks Jev to choose between LM.01 (emmpo) and LM.03 (community) on the same LM
-  // spine; a summary that only lists positive keywords risks bleeding into emmpo's course/cohort
+  // The router asks Jev to choose between LM.01 (ownedlearning) and LM.03 (community) on the same LM
+  // spine; a summary that only lists positive keywords risks bleeding into ownedlearning's course/cohort
   // briefs, so it must also say in words what it is not.
   for (const word of ['course', 'cohort', 'curriculum']) assert.ok(summaryOf('community').includes(word), `community summary disclaims ${word}`);
-  // emmpo's own summary is unchanged by adding community: still names courses/cohorts/enrol, and
-  // still does not use community's own vocabulary (studio, coworking, club membership).
-  const emmpo = summaryOf('emmpo');
-  for (const word of ['course', 'cohort', 'enrol']) assert.ok(emmpo.includes(word), `emmpo summary still names ${word}`);
-  for (const word of ['coworking', 'studio and community', 'shared studio']) assert.ok(!emmpo.includes(word), `emmpo summary does not borrow community's own words (${word})`);
+  assert.equal(registry.families.some(entry => entry.family === 'emmpo'), false);
 });

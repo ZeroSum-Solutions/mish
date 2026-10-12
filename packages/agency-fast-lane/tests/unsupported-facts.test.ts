@@ -18,14 +18,14 @@ import { getAtPath, isObject, type Json, type JsonObject } from '../src/spine.ts
 import { fillTemplate, promptBlock, type Filler } from './fixtures.ts';
 
 const EXAMPLES = new URL('../../../plugins/_official/examples/', import.meta.url);
-const FAMILIES = ['maben', 'watson', 'wrenfield', 'fervor', 'halcyon', 'maren', 'emmpo', 'marketing-site', 'app-shell', 'crm-dashboard', 'listings', 'publication', 'nonprofit', 'storefront', 'practice'] as const;
+const FAMILIES = ['marketing-site', 'app-shell', 'crm-dashboard', 'listings', 'publication', 'nonprofit', 'storefront', 'practice'] as const;
 const BRIEF = 'Riverbend Dental, a family dental practice in Boise.';
 /**
  * practice's `providers` section is required and never droppable (`min: 1`, per slots.ts's own
  * doc: "a clinical or appointment practice earns trust through who treats the visitor"), and its
  * `name` field is `x-atom: 'person-name'` — a fact this deterministic gate never lets a filler
  * invent. A brief this bare about who treats you is not a realistic practice brief (every real
- * one names at least its own practitioner), so this override names one, the same way Watson's
+ * one names at least its own practitioner), so this override names one, the same way TestEditorial's
  * `lockPaths: ['brand.name']` below carries a family-specific format requirement the shared BRIEF
  * cannot satisfy generically.
  */
@@ -135,7 +135,7 @@ for (const family of FAMILIES) {
     const report = await runFastLane({
       pkg, brief, mode: 'sections', entry: `${family}-r1.html`, revision: 1,
       model: silentBriefModel(family), modelName: 'fake', verify, strict: true,
-      // Watson's brand name has its own glyph rule a generic filler cannot meet (see
+      // TestEditorial's brand name has its own glyph rule a generic filler cannot meet (see
       // strict-families-regression.test.ts); it is not a fact slot either way.
       lockPaths: ['brand.name'],
       dropSections: optional,
@@ -181,7 +181,7 @@ function referenceLinkTargets(fixture: Json): string[] {
  * The static template links a no-facts page may keep. Anything else — `mailto:`/`tel:`/`sms:`, an
  * `http(s)://` or protocol-relative URL, or any other scheme — must come from a filled fact, and a
  * no-facts brief fills none.
- * - `#…` in-page anchors (section ids, the skip link, the emmpo/watson demo routes, and the `#`
+ * - `#…` in-page anchors (section ids, the skip link, the ownedlearning/ownededitorial demo routes, and the `#`
  *   placeholder the tailwind families use for CTAs): they leave the page for nowhere.
  * - `assets/…` and other scheme-less relative paths: the family's own resolved asset files (the
  *   hero preload `<link href>`), never a reference-client destination.

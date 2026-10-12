@@ -81,27 +81,29 @@ test('blockCatalogFrom: insertable HyperUI/Cult rows whose adapter resolves, sor
       { id: 'cult:a', title: 'A', sourceKind: 'cult-pro', sectionKind: 'features', availability: 'insertable', spineAffinities: 'any', content: { adapterId: 'cult:a' } },
       { id: 'cult:no-adapter', title: 'N', sourceKind: 'cult-pro', sectionKind: 'faq', availability: 'insertable', spineAffinities: ['PA'], content: { adapterId: 'cult:no-adapter' } },
       { id: 'cult:needs', title: 'X', sourceKind: 'cult-pro', sectionKind: 'faq', availability: 'adapter-needed', spineAffinities: ['PA'], content: { adapterId: 'cult:needs' } },
-      { id: 'family:watson-hero', title: 'W', sourceKind: 'family', sectionKind: 'hero', availability: 'insertable', spineAffinities: ['TL'], content: { adapterId: 'family:watson-hero' } },
+      { id: 'family:ownededitorial-hero', title: 'W', sourceKind: 'family', sectionKind: 'hero', availability: 'insertable', spineAffinities: ['TL'], content: { adapterId: 'family:ownededitorial-hero' } },
       { id: 'hyperui:h', title: 'H', sourceKind: 'hyperui', sectionKind: 'hero', availability: 'insertable', spineAffinities: 'any', content: { adapterId: 'hyperui:h' } },
     ],
   };
   const cult = { rows: [{ id: 'cult:b', original: { useCases: ['SaaS help centre'], tags: ['faq'] }, taxonomy: { style: { density: 'airy' } } }] };
-  const catalog = blockCatalogFrom(section, cult, ['cult:a', 'cult:b', 'cult:needs', 'family:watson-hero', 'hyperui:h']);
+  const catalog = blockCatalogFrom(section, cult, ['cult:a', 'cult:b', 'cult:needs', 'family:ownededitorial-hero', 'hyperui:h']);
   assert.deepEqual(catalog.blocks.map((block) => block.id), ['cult:a', 'cult:b', 'hyperui:h']);
   const b = catalog.blocks.find((block) => block.id === 'cult:b')!;
   assert.deepEqual([b.useCases, b.tags, b.density], [['SaaS help centre'], ['faq'], 'airy']);
   assert.ok(catalog.blocks.find((block) => block.id === 'hyperui:h')!.useCases.length > 0, 'HyperUI blocks carry fixed notes');
 });
 
-test('the real catalog: 3 HyperUI adapters plus reviewed Cult blocks; PA is the one spine auto may compose', async () => {
+test('the real catalog: the public catalog has only the three supported HyperUI adapters and no automatic spine coverage', async () => {
   const catalog = await loadBlockCatalogFromSource();
   const ids = catalog.blocks.map((block) => block.id);
   for (const id of ['hyperui:marketing/sections/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/ctas/1']) assert.ok(ids.includes(id), id);
-  assert.ok(ids.filter((id) => id.startsWith('cult:')).length >= 30);
+  assert.equal(ids.filter((id) => id.startsWith('cult:')).length, 0);
+  assert.equal(ids.length, 3);
   assert.deepEqual([...ids].sort(), ids, 'sorted by id');
-  assert.equal(autoCoverage(catalog, 'PA'), true);
+  assert.equal(autoCoverage(catalog, 'PA'), false);
   assert.equal(autoCoverage(catalog, 'BA'), false, 'HyperUI "any" blocks alone never qualify a spine for auto');
-  assert.ok(composableSpines(catalog).includes('PA'));
+  assert.equal(composableSpines(catalog).length, 9);
+  for (const spine of composableSpines(catalog)) assert.equal(autoCoverage(catalog, spine), false);
 });
 
 test('shortlistBlocks: deterministic roles in page order; explicit affinity first; unclassified and whole pages excluded', () => {

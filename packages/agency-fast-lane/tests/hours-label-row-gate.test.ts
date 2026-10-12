@@ -2,7 +2,7 @@
  * The hours gate, FAIL CLOSED, VERBATIM, MECHANICAL (PR #137 rulings; `hours-label.ts`). An hours
  * row passes only as an exact copy (ASCII case and whitespace folded) of ONE row of a sentence
  * that starts "Hours:" / "Opening hours:" / "Open:", and only when that whole clause is clean rows;
- * a group shows every row in order or none; halcyon's rail never shows hours.
+ * a group shows every row in order or none; ownedinstitution's rail never shows hours.
  *
  * Must flag: every example from the G8 diagnosis (restaurant r1..r6), Opus rounds 1-3 and Sol
  * rounds 1-3, asserting the whole row set (every row) and the rail. Must pass: each reference
@@ -21,13 +21,14 @@ import { HOURS_LABEL_PLACEHOLDER, HOURS_LABEL_RULE, HOURS_ROW_PLACEHOLDER, isHou
 import { hoursLabelRepairHint, hoursNullRepairHint } from '../src/repair-hints.ts';
 import { faithfulnessRepairError, runFastLane, setTextAtPathLabel, type RunEvent } from '../src/run.ts';
 import { editableTemplate, hoursGroupsFor, hoursLabelPathsFor, hoursNullPathsFor, hoursRowValuePathsFor, isObject, type Json, type JsonObject } from '../src/spine.ts';
-import { defaultFill, fakeJevChecker, fakeModel, fillTemplate, HALCYON_DIR, promptBlock, type Filler } from './fixtures.ts';
+import { defaultFill, fakeJevChecker, fakeModel, fillTemplate, TEST_INSTITUTION_DIR, TEST_CONTRACTOR_DIR, promptBlock, type Filler } from './fixtures.ts';
 
 const EXAMPLES = path.join(import.meta.dirname, '../../../plugins/_official/examples');
-const briefOf = (dir: string, family: string) => readFileSync(path.join(EXAMPLES, dir, 'compiler/scripts/families', family, 'reference.fixture.brief.txt'), 'utf8');
+const familyDir = (dir: string) => dir === 'agency-ownedinstitution' ? TEST_INSTITUTION_DIR : dir === 'agency-ownedcontractor' ? TEST_CONTRACTOR_DIR : path.join(EXAMPLES,dir);
+const briefOf = (dir: string, family: string) => readFileSync(path.join(familyDir(dir), 'compiler/scripts/families', family, 'reference.fixture.brief.txt'), 'utf8');
 const RESTAURANT = briefOf('agency-restaurant', 'restaurant');
-const HALCYON = briefOf('agency-halcyon', 'halcyon');
-const WRENFIELD = briefOf('agency-wrenfield', 'wrenfield');
+const TEST_INSTITUTION = briefOf('agency-ownedinstitution', 'ownedinstitution');
+const TEST_CONTRACTOR = briefOf('agency-ownedcontractor', 'ownedcontractor');
 const PRACTICE = briefOf('agency-practice', 'practice');
 
 /** One day label with its own value slot, alone (no group). */
@@ -66,8 +67,8 @@ function everyRowFlags(brief: string, rows: Array<[string, string]>): void {
 test('each reference brief\'s hours clause parses into its verbatim rows', () => {
   assert.deepEqual(briefHoursRowsForHint(RESTAURANT), ['"Tuesday-Thursday" | "5-9:30pm"', '"Friday-Saturday" | "5-10pm"', '"Sunday and Monday" | "closed"']);
   assert.deepEqual(briefHoursRowsForHint(PRACTICE), ['"Monday-Thursday" | "8am-5pm"', '"Friday" | "8am-2pm"', '"Saturday and Sunday" | "closed"']);
-  assert.deepEqual(briefHoursRowsForHint(HALCYON), ['"Wednesday-Friday" | "11:00-18:00"', '"Saturday" | "10:00-19:00"', '"Sunday" | "10:00-17:00"', '"Monday and Tuesday" | "closed"']);
-  assert.deepEqual(briefHoursRowsForHint(WRENFIELD), ['"Monday-Friday" | "7am-5pm"', '"Saturday" | "by appointment"']);
+  assert.deepEqual(briefHoursRowsForHint(TEST_INSTITUTION), ['"Wednesday-Friday" | "11:00-18:00"', '"Saturday" | "10:00-19:00"', '"Sunday" | "10:00-17:00"', '"Monday and Tuesday" | "closed"']);
+  assert.deepEqual(briefHoursRowsForHint(TEST_CONTRACTOR), ['"Monday-Friday" | "7am-5pm"', '"Saturday" | "by appointment"']);
 });
 
 test('only a sentence that STARTS with "Hours:" / "Opening hours:" / "Open:" is a clause', () => {
@@ -88,18 +89,18 @@ test('restaurant and practice: the whole table of verbatim rows passes', () => {
   assert.deepEqual(table(PRACTICE, [['Monday-Thursday', null], ['Friday', null], ['Saturday and Sunday', null]]), [], 'none shown');
 });
 
-test('halcyon and wrenfield: combined rows pass as the row text, or days + ", " / " | " + status', () => {
-  assert.equal(comb(HALCYON, 'Wednesday-Friday 11:00-18:00'), false);
-  assert.equal(comb(HALCYON, 'Saturday, 10:00-19:00'), false);
-  assert.equal(comb(HALCYON, 'Sunday | 10:00-17:00'), false);
-  assert.equal(comb(HALCYON, 'closed Monday and Tuesday'), false);
-  assert.equal(comb(HALCYON, 'Monday and Tuesday, closed'), false);
-  assert.equal(comb(WRENFIELD, 'Monday-Friday 7am-5pm'), false);
-  assert.equal(comb(WRENFIELD, 'Saturday by appointment'), false);
+test('ownedinstitution and ownedcontractor: combined rows pass as the row text, or days + ", " / " | " + status', () => {
+  assert.equal(comb(TEST_INSTITUTION, 'Wednesday-Friday 11:00-18:00'), false);
+  assert.equal(comb(TEST_INSTITUTION, 'Saturday, 10:00-19:00'), false);
+  assert.equal(comb(TEST_INSTITUTION, 'Sunday | 10:00-17:00'), false);
+  assert.equal(comb(TEST_INSTITUTION, 'closed Monday and Tuesday'), false);
+  assert.equal(comb(TEST_INSTITUTION, 'Monday and Tuesday, closed'), false);
+  assert.equal(comb(TEST_CONTRACTOR, 'Monday-Friday 7am-5pm'), false);
+  assert.equal(comb(TEST_CONTRACTOR, 'Saturday by appointment'), false);
 });
 
 // ---------------------------------------------------------------------------------------------
-// G8 final on 857a46b982: halcyon x cerebras VERIFY_FAILED, footer col2Row1-4 (the "Open" hours
+// G8 final on 857a46b982: ownedinstitution x cerebras VERIFY_FAILED, footer col2Row1-4 (the "Open" hours
 // column) unfaithful after two repair rounds. The reference recipe's own TEMPLATE seed for those
 // rows (and the visit block's own hours row) used "Wednesday to Friday, 11:00 – 18:00" style
 // punctuation (a comma, "to", an en dash) the brief never uses ("Wednesday-Friday 11:00-18:00") —
@@ -115,19 +116,19 @@ test('halcyon and wrenfield: combined rows pass as the row text, or days + ", " 
 // ---------------------------------------------------------------------------------------------
 
 test('the reference recipe\'s own footer and visit hours text passes the gate it will be held to', async () => {
-  const pkg = await loadFamilyPackage(HALCYON_DIR, 'halcyon');
+  const pkg = await loadFamilyPackage(TEST_INSTITUTION_DIR, 'ownedinstitution');
   const sections = (pkg.fixture as { sections?: Array<{ type?: string; content?: Record<string, unknown> }> }).sections ?? [];
   const footer = sections.find((section) => section.type === 'footer')?.content;
   const visit = sections.find((section) => section.type === 'visit')?.content;
-  assert.ok(footer, 'halcyon recipe.json has a footer section');
-  assert.ok(visit, 'halcyon recipe.json has a visit section');
+  assert.ok(footer, 'ownedinstitution recipe.json has a footer section');
+  assert.ok(visit, 'ownedinstitution recipe.json has a visit section');
   for (const key of ['col2Row1', 'col2Row2', 'col2Row3', 'col2Row4'] as const) {
     const rowText: unknown = footer![key];
     assert.equal(typeof rowText, 'string', key);
-    assert.equal(comb(HALCYON, rowText as string), false, `footer.${key}: ${String(rowText)}`);
+    assert.equal(comb(TEST_INSTITUTION, rowText as string), false, `footer.${key}: ${String(rowText)}`);
   }
   assert.deepEqual(
-    table(HALCYON, [
+    table(TEST_INSTITUTION, [
       [visit!.block1Key1 as string, visit!.block1Value1 as string],
       [visit!.block1Key2 as string, visit!.block1Value2 as string],
       [visit!.block1Key3 as string, visit!.block1Value3 as string],
@@ -148,15 +149,15 @@ test('G8 diagnosis and rounds 1-2: wrong, reworded or partial rows flag', () => 
     ['Tuesday-Saturday', '5-10pm'], ['Tuesday', '5-9:30pm'], ['Tuesday–Thursday', '5-9:30pm'], ['Tuesday-Thursday', '5–9:30 pm'],
   ] as const) assert.equal(sep(RESTAURANT, label, value), true, `${label} | ${value}`);
   for (const text of ['Monday-Tuesday', 'Monday and Tuesday', 'Wednesday-Friday', 'Monday-Tuesday open', 'Monday and Tuesday closed', 'Wednesday-Friday: 11:00-18:00', 'Wed to Fri, 11:00 – 18:00'])
-    assert.equal(comb(HALCYON, text), true, text);
+    assert.equal(comb(TEST_INSTITUTION, text), true, text);
   for (const text of ['Monday-Friday', 'Saturday', 'Mon–Fri, 7am–5pm', 'Saturday, no appointment needed', 'Every other Saturday by appointment', 'Monday-Friday 7am-5pm by appointment', 'Saturday by appointment or walk-ins'])
-    assert.equal(comb(WRENFIELD, text), true, text);
+    assert.equal(comb(TEST_CONTRACTOR, text), true, text);
   assert.equal(sep('Hours: Saturday 9pm-5am.', 'Saturday', '9am-5pm'), true);
   assert.equal(sep('Hours: Tuesday 5-9pm.', 'Tuesday not open', '5-9pm'), true);
   assert.equal(sep('Hours: Tuesday-Thursday 5-9pm.', 'Tuesday-Thursday except Tuesday', '5-9pm'), true);
   assert.equal(sep('Hours: Tuesday-Thursday 5-9pm.', 'Closed Tuesday-Thursday', '5-9pm'), true);
   assert.equal(sep('Hours: Tuesday-Thursday 5-9pm. Reservations: Tuesday-Thursday 6-8pm.', 'Tuesday-Thursday', '6-8pm'), true);
-  assert.equal(sep(HALCYON, 'Late Thursdays', 'Free after 17:00'), true);
+  assert.equal(sep(TEST_INSTITUTION, 'Late Thursdays', 'Free after 17:00'), true);
 });
 
 test('rounds 1-2: briefs with no clean clause flag every row', () => {
@@ -247,17 +248,17 @@ const FAMILIES: Array<[string, string, string[], Record<string, string>, Record<
     ['sections[9].items[0].label', 'sections[9].items[1].label', 'sections[9].items[2].label'],
     { 'sections[9].items[0].label': 'sections[9].items[0].value', 'sections[9].items[1].label': 'sections[9].items[1].value', 'sections[9].items[2].label': 'sections[9].items[2].value' },
     { table: ['sections[9].items[0].label', 'sections[9].items[1].label', 'sections[9].items[2].label'] }, []],
-  ['agency-halcyon', 'halcyon',
+  ['agency-ownedinstitution', 'ownedinstitution',
     [...[1, 2, 3, 4].map((n) => `sections[6].content.block1Key${n}`), ...[1, 2, 3, 4].map((n) => `sections[9].content.col2Row${n}`)],
     Object.fromEntries([1, 2, 3, 4].map((n) => [`sections[6].content.block1Key${n}`, `sections[6].content.block1Value${n}`])),
     { visit: [1, 2, 3, 4].map((n) => `sections[6].content.block1Key${n}`), footer: [1, 2, 3, 4].map((n) => `sections[9].content.col2Row${n}`) },
     ['sections[1].content.railValue1', 'sections[1].content.railValue2', 'sections[1].content.railValue3']],
-  ['agency-wrenfield', 'wrenfield', ['sections[9].content.hours1', 'sections[9].content.hours2'], {}, { footer: ['sections[9].content.hours1', 'sections[9].content.hours2'] }, []],
+  ['agency-ownedcontractor', 'ownedcontractor', ['sections[9].content.hours1', 'sections[9].content.hours2'], {}, { footer: ['sections[9].content.hours1', 'sections[9].content.hours2'] }, []],
 ];
 
 for (const [dir, family, labels, values, groups, nulls] of FAMILIES) {
   test(`${family}: every hours slot carries its marker, group and value`, async () => {
-    const pkg = await loadFamilyPackage(path.join(EXAMPLES, dir), family);
+    const pkg = await loadFamilyPackage(familyDir(dir), family);
     const template = editableTemplate(structuredClone(pkg.fixture), undefined, new Set())!;
     assert.deepEqual([...hoursLabelPathsFor(pkg.schema, template)].sort(), [...labels].sort());
     assert.deepEqual(Object.fromEntries(hoursRowValuePathsFor(pkg.schema, template)), values);
@@ -266,8 +267,8 @@ for (const [dir, family, labels, values, groups, nulls] of FAMILIES) {
   });
 }
 
-test('halcyon railValue2 stays limited to 16 characters', async () => {
-  const pkg = await loadFamilyPackage(path.join(EXAMPLES, 'agency-halcyon'), 'halcyon');
+test('ownedinstitution railValue2 stays limited to 16 characters', async () => {
+  const pkg = await loadFamilyPackage(TEST_INSTITUTION_DIR, 'ownedinstitution');
   const node = ((pkg.schema as any).properties.sections.prefixItems[1].properties.content.properties.railValue2) as { maxLength: number };
   assert.equal(node.maxLength, 16);
 });
@@ -285,10 +286,10 @@ test('the fill prompt hides the reference hours labels and quotes the brief\'s r
   assert.ok(prompt!.includes('"Tuesday-Thursday" | "5-9:30pm"; "Friday-Saturday" | "5-10pm"; "Sunday and Monday" | "closed"'));
 });
 
-test('the halcyon hero rail rows 1-3 never reach the model and stay null', async () => {
-  const pkg = await loadFamilyPackage(path.join(EXAMPLES, 'agency-halcyon'), 'halcyon');
+test('the ownedinstitution hero rail rows 1-3 never reach the model and stay null', async () => {
+  const pkg = await loadFamilyPackage(TEST_INSTITUTION_DIR, 'ownedinstitution');
   const model = fakeModel({ fill: (_key, value) => value });
-  const report = await runFastLane({ pkg, brief: HALCYON, mode: 'sections', entry: 'h.html', revision: 1, model, modelName: 'fake' }).catch(() => undefined);
+  const report = await runFastLane({ pkg, brief: TEST_INSTITUTION, mode: 'sections', entry: 'h.html', revision: 1, model, modelName: 'fake' }).catch(() => undefined);
   const hero = model.prompts.find((user) => user.includes('"railKey4"'));
   assert.ok(hero, 'the hero prompt');
   const template = promptBlock(hero!, 'TEMPLATE') as { content: Record<string, unknown> };
@@ -397,12 +398,12 @@ test('a faithfulness repair shows the rejected hours labels in TEMPLATE, never t
 // ---------------------------------------------------------------------------------------------
 
 test('normalizeHoursRowSeparator: a correct day-first, bare-space reorder gets the missing comma', () => {
-  assert.equal(normalizeHoursRowSeparator(HALCYON, 'Monday and Tuesday closed'), 'Monday and Tuesday, closed');
+  assert.equal(normalizeHoursRowSeparator(TEST_INSTITUTION, 'Monday and Tuesday closed'), 'Monday and Tuesday, closed');
 });
 
 test('normalizeHoursRowSeparator: already-accepted forms pass through unchanged', () => {
   for (const text of ['closed Monday and Tuesday', 'Monday and Tuesday, closed', 'Monday and Tuesday | closed', 'Wednesday-Friday 11:00-18:00'])
-    assert.equal(normalizeHoursRowSeparator(HALCYON, text), text);
+    assert.equal(normalizeHoursRowSeparator(TEST_INSTITUTION, text), text);
 });
 
 test('normalizeHoursRowSeparator: adversarial probes never rewrite a wrong answer into a passing one', () => {
@@ -416,7 +417,7 @@ test('normalizeHoursRowSeparator: adversarial probes never rewrite a wrong answe
     ['a single day instead of the row\'s two', 'Monday closed'],
     ['the days reordered within the phrase', 'Tuesday and Monday closed'],
   ];
-  for (const [label, text] of cases) assert.equal(normalizeHoursRowSeparator(HALCYON, text), text, label);
+  for (const [label, text] of cases) assert.equal(normalizeHoursRowSeparator(TEST_INSTITUTION, text), text, label);
 });
 
 // ---------------------------------------------------------------------------------------------
@@ -455,11 +456,11 @@ test('setTextAtPathLabel: a missing path, or a non-string leaf, is a no-op that 
 // ---------------------------------------------------------------------------------------------
 
 test('a day-first, bare-space hours answer is normalized in place and emits hours-normalized with the exact path, before and after', async () => {
-  const pkg = await loadFamilyPackage(HALCYON_DIR, 'halcyon');
+  const pkg = await loadFamilyPackage(TEST_INSTITUTION_DIR, 'ownedinstitution');
   const fill: Filler = (key, value, at, limit) => (at.endsWith('col2Row4') ? 'Monday and Tuesday closed' : defaultFill(key, value, at, limit));
   const model = fakeModel({ fill });
   const events: RunEvent[] = [];
-  const report = await runFastLane({ pkg, brief: HALCYON, mode: 'sections', entry: 'h.html', revision: 1, model, modelName: 'fake', onEvent: (event) => events.push(event) });
+  const report = await runFastLane({ pkg, brief: TEST_INSTITUTION, mode: 'sections', entry: 'h.html', revision: 1, model, modelName: 'fake', onEvent: (event) => events.push(event) });
   const normalized = events.filter((event) => event.type === 'hours-normalized');
   assert.equal(normalized.length, 1, 'exactly one rewrite, for the one slot that needed it');
   const event = normalized[0]!;
@@ -472,11 +473,11 @@ test('a day-first, bare-space hours answer is normalized in place and emits hour
 });
 
 test('an hours answer that already matches an accepted form emits no hours-normalized event', async () => {
-  const pkg = await loadFamilyPackage(HALCYON_DIR, 'halcyon');
+  const pkg = await loadFamilyPackage(TEST_INSTITUTION_DIR, 'ownedinstitution');
   const fill: Filler = (key, value, at, limit) => (at.endsWith('col2Row4') ? 'Monday and Tuesday, closed' : defaultFill(key, value, at, limit));
   const model = fakeModel({ fill });
   const events: RunEvent[] = [];
-  await runFastLane({ pkg, brief: HALCYON, mode: 'sections', entry: 'h.html', revision: 1, model, modelName: 'fake', onEvent: (event) => events.push(event) });
+  await runFastLane({ pkg, brief: TEST_INSTITUTION, mode: 'sections', entry: 'h.html', revision: 1, model, modelName: 'fake', onEvent: (event) => events.push(event) });
   assert.equal(events.filter((event) => event.type === 'hours-normalized').length, 0);
 });
 
@@ -493,7 +494,7 @@ test('an hours answer that already matches an accepted form emits no hours-norma
 // ---------------------------------------------------------------------------------------------
 
 test('the label/value prefix-strip: only a correct duplicate becomes a pass; wrong hours, an extra row, a wrong status and an extra claim all stay flagged', async () => {
-  const pkg = await loadFamilyPackage(HALCYON_DIR, 'halcyon');
+  const pkg = await loadFamilyPackage(TEST_INSTITUTION_DIR, 'ownedinstitution');
   // The deterministic hours gate flags a bad label/value pair by the LABEL's own path (it "names
   // its value slot" — see hours-label.ts's module doc) — never the value's own path, so that is
   // what `remaining` is checked against; `VALUE_PATH` is only where `hours-normalized` fires.
@@ -525,7 +526,7 @@ test('the label/value prefix-strip: only a correct duplicate becomes a pass; wro
       },
     });
     const events: RunEvent[] = [];
-    const report = await runFastLane({ pkg, brief: HALCYON, mode: 'sections', entry: 'h.html', revision: 1, model, modelName: 'fake', verify: fakeJevChecker(), maxFaithfulnessRounds: 0, onEvent: (event) => events.push(event) });
+    const report = await runFastLane({ pkg, brief: TEST_INSTITUTION, mode: 'sections', entry: 'h.html', revision: 1, model, modelName: 'fake', verify: fakeJevChecker(), maxFaithfulnessRounds: 0, onEvent: (event) => events.push(event) });
     // A row still flagged once the repairs are spent is dropped, not refused (2026-10-10), so
     // "stays flagged" means: flagged by the check, and its text is not on the published page.
     return {
@@ -563,10 +564,10 @@ test('the label/value prefix-strip: only a correct duplicate becomes a pass; wro
 // ---------------------------------------------------------------------------------------------
 
 test('every hours-label slot reaches Jev, carrying the neutral context — none are skipped', async () => {
-  const pkg = await loadFamilyPackage(HALCYON_DIR, 'halcyon');
+  const pkg = await loadFamilyPackage(TEST_INSTITUTION_DIR, 'ownedinstitution');
   const template = editableTemplate(structuredClone(pkg.fixture), undefined, new Set())!;
   const expectedHoursPaths = hoursLabelPathsFor(pkg.schema, template);
-  assert.ok(expectedHoursPaths.size > 0, 'halcyon has hours-label slots to check');
+  assert.ok(expectedHoursPaths.size > 0, 'ownedinstitution has hours-label slots to check');
   const seenSlots = new Map<string, string | undefined>();
   const checker = {
     calls: 0,
@@ -576,7 +577,7 @@ test('every hours-label slot reaches Jev, carrying the neutral context — none 
       return { flagged: [], ms: 1, calls: 1 };
     },
   };
-  await runFastLane({ pkg, brief: HALCYON, mode: 'sections', entry: 'h.html', revision: 1, model: fakeModel(), modelName: 'fake', verify: checker, maxFaithfulnessRounds: 0 });
+  await runFastLane({ pkg, brief: TEST_INSTITUTION, mode: 'sections', entry: 'h.html', revision: 1, model: fakeModel(), modelName: 'fake', verify: checker, maxFaithfulnessRounds: 0 });
   assert.ok(checker.calls > 0, 'the checker was actually invoked');
   for (const path of expectedHoursPaths) {
     assert.ok(seenSlots.has(path), `${path} reached Jev as its own slot — never skipped`);

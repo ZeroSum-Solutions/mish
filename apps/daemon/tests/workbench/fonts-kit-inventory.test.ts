@@ -10,9 +10,9 @@ import { sendApiError } from '../../src/http/api-errors.js';
 import { registerWorkbenchRoutes } from '../../src/routes/workbench.js';
 import { runWorkbenchCli } from '../../src/workbench-cli.js';
 import { searchResources } from '../../src/workbench/resources.js';
-import { createFontsResourceSource } from '../../src/workbench/resources-fonts.js';
-import { bundledFontCatalogue } from '../../src/fonts/catalogue.js';
-import { REPO_BUNDLED_PLUGINS_ROOT, authority } from './fonts-fixture.js';
+import { createFontsResourceSource } from '../fixtures/daemon-b/fonts.js';
+import { bundledFontCatalogue } from '../fixtures/daemon-b/fonts.js';
+import { REPO_BUNDLED_PLUGINS_ROOT, authority } from '../fixtures/daemon-b/fonts.js';
 
 const search = (query = '', extra: Record<string, unknown> = {}) => parseResourceSearchRequest({ query, facets: { category: 'font', sourceIds: ['fonts'] }, limit: 20, ...extra });
 const archivoFile = bundledFontCatalogue().families.find(family => family.id === 'archivo')!.localFiles[0]!;
@@ -91,15 +91,12 @@ describe('AC-R11 preamble: every kit/example-declared font family is inventoried
     }
   });
 
-  it('inventories the real bundled kits and examples, mapping the Watson aliases to admitted Kumbh Sans bytes', async () => {
-    const source = createFontsResourceSource({ root: REPO_BUNDLED_PLUGINS_ROOT, kitRoots: [{ id: 'bundled-plugins', path: REPO_BUNDLED_PLUGINS_ROOT }] });
+  it('inventories owned kit aliases by their admitted bytes', async () => {
+    const source = createFontsResourceSource({ root: REPO_BUNDLED_PLUGINS_ROOT, kitRoots: [{ id: 'bundled-plugins', path: kitRoot() }] });
     const inventory = fontKitInventorySchema.parse((await searchResources(search(), authority, [source])).fontKits);
-    expect(inventory.scanned.kits).toBeGreaterThan(30);
-    expect(find(inventory, 'WatsonBody', 'examples/agency-watson')).toMatchObject({ state: 'mapped', catalogueItemId: 'kumbh-sans', kitBytesAdmitted: true });
-    // The owned acreage-farming rewrite self-hosts Archivo bytes identical (by digest) to the
-    // already-admitted agency-halcyon copy, so it maps without any catalogue change.
-    expect(find(inventory, 'Archivo', 'examples/acreage-farming')).toMatchObject({ loading: ['local-font-face'], state: 'mapped', catalogueItemId: 'archivo', kitBytesAdmitted: true });
-    expect(find(inventory, 'Inter', 'examples/stellar-launch')).toMatchObject({ loading: ['google-fonts-css'], state: 'undeclared', reason: 'no-admitted-local-file' });
+    expect(inventory.scanned.kits).toBe(5);
+    expect(find(inventory, 'Brand Sans', 'examples/kit-a')).toMatchObject({ state: 'mapped', catalogueItemId: 'archivo', kitBytesAdmitted: true });
+    expect(find(inventory, 'Brand Sans', 'examples/kit-e')).toMatchObject({ state: 'mapped', catalogueItemId: 'archivo', kitBytesAdmitted: null });
     expect(inventory.counts.mapped).toBeGreaterThan(0);
     expect(inventory.counts.undeclared).toBeGreaterThan(0);
   });

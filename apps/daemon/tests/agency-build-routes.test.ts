@@ -435,29 +435,29 @@ describe('POST /api/agency/build', () => {
     const here = path.dirname(fileURLToPath(import.meta.url));
     const bundledRoot = path.resolve(here, '../../..', 'plugins', '_official');
     loadPackageImpl = (family) => loadFamilyPackage(familyPackageDir(bundledRoot, family), family);
-    registryFixture.families.push({ family: 'wrenfield', pageKind: 'site' });
+    registryFixture.families.push({ family: 'listings', pageKind: 'site' });
 
-    const listed = await get('/api/agency/families/wrenfield/sections');
+    const listed = await get('/api/agency/families/listings/sections');
     expect(listed.status).toBe(200);
     const body = await listed.json() as AgencyFamilySectionsResponse;
-    expect(body.family).toBe('wrenfield');
+    expect(body.family).toBe('listings');
     expect(body.outputScope).toBe('site');
-    expect(body.sections.map(({ id, type }) => ({ id, type }))).toEqual([{ id: 'trust', type: 'trust' }, { id: 'reviews', type: 'reviews' }]);
+    expect(body.sections.map(({ id, type }) => ({ id, type }))).toEqual([{ id: 'listings-reviews', type: 'reviews' }]);
     expect(body.sections[0]!.label.length).toBeGreaterThan(0);
 
     for (const family of ['watson', 'Bad!', '..']) {
       const missing = await get(`/api/agency/families/${encodeURIComponent(family)}/sections`);
       expect(missing.status).toBe(404);
     }
-    expect(loadedFamilies).toEqual(['wrenfield']);
+    expect(loadedFamilies).toEqual(['listings']);
   }, 30_000);
 
   it('answers 500, not an unlabelled family, when a listed family has no valid pageKind', async () => {
     const here = path.dirname(fileURLToPath(import.meta.url));
     const bundledRoot = path.resolve(here, '../../..', 'plugins', '_official');
     loadPackageImpl = (family) => loadFamilyPackage(familyPackageDir(bundledRoot, family), family);
-    registryFixture.families.push({ family: 'wrenfield' });
-    const sections = await get('/api/agency/families/wrenfield/sections');
+    registryFixture.families.push({ family: 'listings' });
+    const sections = await get('/api/agency/families/listings/sections');
     expect(sections.status).toBe(500);
     expect(JSON.stringify(await sections.json())).toContain('no output scope');
     const families = await get('/api/agency/families');
@@ -560,8 +560,8 @@ describe('the family package path', () => {
     // path survives the prebundle, and that the fast lane's `defaultPackageDir` does not.
     const here = path.dirname(fileURLToPath(import.meta.url));
     const bundledRoot = path.resolve(here, '../../..', 'plugins', '_official');
-    const pkg = await loadFamilyPackage(familyPackageDir(bundledRoot, 'wrenfield'), 'wrenfield');
-    expect(pkg.family).toBe('wrenfield');
+    const pkg = await loadFamilyPackage(familyPackageDir(bundledRoot, 'listings'), 'listings');
+    expect(pkg.family).toBe('listings');
     expect(typeof pkg.render).toBe('function');
   }, 30_000);
 });
@@ -1117,30 +1117,12 @@ describe('GET /api/sections', () => {
     expect(body.directions.every((d: { id: string; label: string }) => typeof d.id === 'string' && typeof d.label === 'string')).toBe(true);
   });
 
-  it('lists the Cult UI Pro projection, insertable only through a checked adapter, in a shape the client parser accepts', async () => {
-    const response = await get('/api/sections');
-    const body = await response.json() as SectionsListResponse;
-    // The web picker and `od sections` parse this exact body; a server/client policy drift fails here.
+  it('omits licensed projections and retains exactly the reviewed HyperUI insertable entries', async () => {
+    const body = await (await get('/api/sections')).json() as SectionsListResponse;
     expect(() => parseSectionCatalogResponse(body)).not.toThrow();
-    const cult = body.catalog.entries.filter((entry) => entry.sourceKind === 'cult-pro');
-    expect(cult.length).toBeGreaterThan(100);
-    for (const entry of cult) {
-      expect(entry.id.startsWith('cult:')).toBe(true);
-      const adapterId = entry.content.kind === 'cult-item' ? entry.content.adapterId : undefined;
-      expect(entry.availability).toBe(adapterId === entry.id ? 'insertable' : 'adapter-needed');
-      expect(entry.rights).toEqual({ license: 'licensed', decision: 'bundle', evidence: 'docs/legal/cult-ui-pro-rights.md' });
-      expect(entry.title).not.toMatch(/\b(vercel|vite|apple|shadcn|heerich)\b/i);
-    }
-    expect(cult.some((entry) => entry.sectionKind === 'page-composition')).toBe(true);
-    expect(cult.some((entry) => entry.sectionKind === 'unclassified')).toBe(false);
-    // INSERTABLE_V1 is still exactly the three reviewed HyperUI blocks; every other insertable
-    // entry is a Cult section with a checked adapter.
-    const insertable = body.catalog.entries.filter((entry) => entry.availability === 'insertable');
-    expect(insertable.filter((entry) => entry.sourceKind === 'hyperui').map((entry) => entry.id).sort())
+    expect(body.catalog.entries.filter((entry) => entry.sourceKind === 'cult-pro')).toEqual([]);
+    expect(body.catalog.entries.filter((entry) => entry.availability === 'insertable').map((entry) => entry.id).sort())
       .toEqual(['hyperui:marketing/ctas/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/sections/1']);
-    const cultInsertable = insertable.filter((entry) => entry.sourceKind === 'cult-pro').map((entry) => entry.id);
-    expect(insertable.length).toBe(3 + cultInsertable.length);
-    expect(cultInsertable).toContain(CTA_COSMIC);
   });
 
   it('filters by kind', async () => {
@@ -1174,18 +1156,9 @@ describe('GET /api/sections', () => {
 });
 
 describe('GET /api/sections, brand-free Cult entries', () => {
-  it('serves every Cult entry under its public id, with brand-free content', async () => {
-    const response = await get('/api/sections');
-    const body = await response.json() as SectionsListResponse;
-    const cult = body.catalog.entries.filter((entry) => entry.sourceKind === 'cult-pro');
-    expect(cult.length).toBeGreaterThan(100);
-    for (const entry of cult) {
-      expect(entry.id, entry.id).toMatch(/^cult:[a-z0-9]+(?:-[a-z0-9]+)*$/);
-      // The whole served entry: id, title, summary, source title, provenance and adapter id.
-      expect(brandHit(JSON.stringify(entry)), entry.id).toBeNull();
-    }
-    expect(cult.map((entry) => entry.id)).toContain('cult:bento-series-v');
-    expect(cult.map((entry) => entry.id)).not.toContain('cult:marketing-bento-vercel');
+  it('publishes no licensed entries', async () => {
+    const body = await (await get('/api/sections')).json() as SectionsListResponse;
+    expect(body.catalog.entries.filter((entry) => entry.sourceKind === 'cult-pro')).toEqual([]);
   });
 
   it('leaves out a Cult entry that has no public id yet instead of serving it branded', () => {
@@ -1195,17 +1168,14 @@ describe('GET /api/sections, brand-free Cult entries', () => {
     spy.mockRestore();
   });
 
-  it('answers a Cult entry by its public id, bare slug or old internal id, and never echoes an unknown id', async () => {
-    for (const key of ['cult:pricing-series-v', 'pricing-series-v', 'cult:marketing-pricing-vercel']) {
+  it('404s removed public and historical ids without echoing unknown ids', async () => {
+    for (const key of ['cult:pricing-series-v', 'pricing-series-v', 'cult:marketing-pricing-vercel', 'cult:vercel-nope']) {
       const response = await get(`/api/sections/${encodeURIComponent(key)}`);
-      expect(response.status, key).toBe(200);
+      expect(response.status, key).toBe(404);
       const text = await response.text();
-      expect(brandHit(text), key).toBeNull();
-      expect((JSON.parse(text) as SectionEntryResponse).entry.id).toBe('cult:pricing-series-v');
+      expect(text).not.toContain('vercel');
+      expect(JSON.parse(text).error.code).toBe('NOT_FOUND');
     }
-    const missing = await get(`/api/sections/${encodeURIComponent('cult:vercel-nope')}`);
-    expect(missing.status).toBe(404);
-    expect(await missing.text()).not.toContain('vercel');
   });
 });
 
@@ -1223,13 +1193,10 @@ describe('GET /api/sections/:id', () => {
     expect(body.entry.availability).toBe('insertable');
   });
 
-  it('returns a Cult entry with its public provenance and a brand-free source title and summary', async () => {
+  it('404s a removed licensed section', async () => {
     const response = await get(`/api/sections/${encodeURIComponent('cult:pricing-series-v')}`);
-    expect(response.status).toBe(200);
-    const body = await response.json() as SectionEntryResponse;
-    expect(body.entry).toMatchObject({ id: 'cult:pricing-series-v', title: 'Pricing (series V)', sourceKind: 'cult-pro', sectionKind: 'pricing', availability: 'insertable' });
-    expect(body.entry.content).toMatchObject({ kind: 'cult-item', sourceTitle: 'Pricing (series V)', provenance: { cultId: 'cult:pricing-series-v' }, adapterId: 'cult:pricing-series-v' });
-    expect(body.entry.content.kind === 'cult-item' && body.entry.content.summary).toMatch(/^Series V pricing section/);
+    expect(response.status).toBe(404);
+    expect((await errorOf(response)).code).toBe('NOT_FOUND');
   });
 
   it('404s on an unknown id', async () => {
@@ -1254,30 +1221,28 @@ describe('POST /api/agency/build with sectionSelection', () => {
     expect(buildCalls[0]!.input.sectionSelection).toEqual(VALID_SELECTION);
   });
 
-  it('accepts a Cult entry with a checked adapter as entryId, by the id the catalog serves', async () => {
-    const response = await post('/api/agency/build', { brief: BRIEF, sectionSelection: { ...VALID_SELECTION, entryId: CTA_COSMIC } });
-    expect(response.status).toBe(202);
-    await waitFor((await buildOf(response)).id);
-    expect(buildCalls).toHaveLength(1);
-    // The build runs on the internal id the adapter registry keys on.
-    expect(buildCalls[0]!.input.sectionSelection).toEqual({ ...VALID_SELECTION, entryId: 'cult:marketing-cta-cosmic' });
+  it('rejects a removed section selection before starting a build: accepts a Cult entry with a checked', async () => {
+    const entryId = 'cult:cta-cosmic';
+    const response = await post('/api/agency/build', { brief: BRIEF, sectionSelection: { ...VALID_SELECTION, entryId } });
+    expect(response.status).toBe(400);
+    expect((await errorOf(response)).code).toBe('BAD_REQUEST');
+    expect(buildCalls).toHaveLength(0);
   });
 
-  it('still accepts the old internal id as entryId', async () => {
-    const selection = { ...VALID_SELECTION, entryId: 'cult:marketing-cta-cosmic' };
-    const response = await post('/api/agency/build', { brief: BRIEF, sectionSelection: selection });
-    expect(response.status).toBe(202);
-    await waitFor((await buildOf(response)).id);
-    expect(buildCalls).toHaveLength(1);
-    expect(buildCalls[0]!.input.sectionSelection).toEqual(selection);
+  it('rejects a removed section selection before starting a build: still accepts the old internal', async () => {
+    const entryId = 'cult:marketing-cta-cosmic';
+    const response = await post('/api/agency/build', { brief: BRIEF, sectionSelection: { ...VALID_SELECTION, entryId } });
+    expect(response.status).toBe(400);
+    expect((await errorOf(response)).code).toBe('BAD_REQUEST');
+    expect(buildCalls).toHaveLength(0);
   });
 
-  it('accepts a Cult entry by its public id and threads the internal id to the build', async () => {
-    const response = await post('/api/agency/build', { brief: BRIEF, sectionSelection: { ...VALID_SELECTION, entryId: 'cult:pricing-series-v' } });
-    expect(response.status).toBe(202);
-    await waitFor((await buildOf(response)).id);
-    expect(buildCalls).toHaveLength(1);
-    expect(buildCalls[0]!.input.sectionSelection).toEqual({ ...VALID_SELECTION, entryId: 'cult:marketing-pricing-vercel' });
+  it('rejects a removed section selection before starting a build: accepts a Cult entry by its public', async () => {
+    const entryId = 'cult:pricing-series-v';
+    const response = await post('/api/agency/build', { brief: BRIEF, sectionSelection: { ...VALID_SELECTION, entryId } });
+    expect(response.status).toBe(400);
+    expect((await errorOf(response)).code).toBe('BAD_REQUEST');
+    expect(buildCalls).toHaveLength(0);
   });
 
   it('rejects a catalogued Cult entry (adapter-needed, not insertable) as entryId with 400', async () => {
@@ -1402,28 +1367,18 @@ describe('POST /api/agency/build with sectionSelection', () => {
     expect(finished.sectionOverlay).toEqual({ entryId: VALID_SELECTION.entryId, directionId: VALID_SELECTION.directionId, placement: VALID_SELECTION.placement, flagged: [], remaining: [] });
   });
 
-  it('names a Cult section overlay by its public id on the snapshot, the build list and the SSE build event', async () => {
-    const internal = { entryId: 'cult:marketing-pricing-vercel', directionId: VALID_SELECTION.directionId, placement: VALID_SELECTION.placement, flagged: [], remaining: [] };
+  it('names a supported section overlay on snapshots, lists and SSE build events', async () => {
+    const overlay = { entryId: VALID_SELECTION.entryId, directionId: VALID_SELECTION.directionId, placement: VALID_SELECTION.placement, flagged: [], remaining: [] };
     buildImpl = async () => ({
-      outcome: 'built',
-      provider: 'deepseek',
-      model: 'deepseek-v4-flash',
-      providers: [{ provider: 'deepseek', model: 'deepseek-v4-flash' }],
-      family: 'wrenfield',
-      projectId: 'project-1',
-      // A report naming the internal id (as a build from before public ids did).
-      report: reportFixture({ sectionOverlay: internal } as Partial<Report>),
+      outcome: 'built', provider: 'deepseek', model: 'deepseek-v4-flash', providers: [{ provider: 'deepseek', model: 'deepseek-v4-flash' }],
+      family: 'wrenfield', projectId: 'project-1', report: reportFixture({ sectionOverlay: overlay } as Partial<Report>),
     });
-    const started = await buildOf(await post('/api/agency/build', { brief: BRIEF, sectionSelection: { ...VALID_SELECTION, entryId: 'cult:pricing-series-v' } }));
-    const finished = await waitFor(started.id);
-    expect(finished.sectionOverlay).toEqual({ ...internal, entryId: 'cult:pricing-series-v' });
+    const started = await buildOf(await post('/api/agency/build', { brief: BRIEF, sectionSelection: VALID_SELECTION }));
+    expect((await waitFor(started.id)).sectionOverlay).toEqual(overlay);
     const one = await (await get(`/api/agency/builds/${started.id}`)).text();
     const listed = await (await get('/api/agency/builds')).text();
     const events = JSON.stringify(await readStream(`/api/agency/builds/${started.id}/events`));
-    for (const [where, text] of [['GET /:id', one], ['GET list', listed], ['SSE', events]] as const) {
-      expect(text, where).toContain('cult:pricing-series-v');
-      expect(text, where).not.toContain('marketing-pricing-vercel');
-    }
+    for (const text of [one, listed, events]) expect(text).toContain(VALID_SELECTION.entryId);
   });
 
   it('carries sectionSelection and designReferenceId (never designReferenceText) onto a fork', async () => {

@@ -471,9 +471,9 @@ their existing project-skill behavior.
 
 | Study | Captured design constraints | Evidence limits |
 |---|---|---|
-| [Emmpo](../skills/agency-emmpo/SKILL.md) | Full-bleed photography, oversized condensed yellow type, nine-section page anatomy | Hero and a secondary section captured; the complete interaction sequence is unverified |
-| [Watson](../skills/agency-watson/SKILL.md) | Centered oversized wordmark, flowing mixed serif/sans text, inline imagery | The captured mobile presentation scales the desktop composition; author and test a readable adaptation |
-| [Cult Heroes](../skills/agency-cult-heroes/SKILL.md) | Hero Large Image: centered headline, paired actions, product screenshot over a photographic lower band | Public visual study only; Pro code/docs unavailable in the inspected session, no source code installed |
+| Emmpo | Full-bleed photography, oversized condensed yellow type, nine-section page anatomy | Hero and a secondary section captured; the complete interaction sequence is unverified |
+| Watson | Centered oversized wordmark, flowing mixed serif/sans text, inline imagery | The captured mobile presentation scales the desktop composition; author and test a readable adaptation |
+| Cult Heroes | Hero Large Image: centered headline, paired actions, product screenshot over a photographic lower band | Public visual study only; Pro code/docs unavailable in the inspected session, no source code installed |
 
 The selected skill supplies its actual instructions, evidence notes
 and local desktop/mobile screenshots to the assistant. Emmpo also includes a
@@ -522,8 +522,8 @@ an explicit `emmpo`/`watson` switch, never a model-controlled import path.
 Version 2 recipes contain `schemaVersion: 2`, an exact family ID, a positive integer
 revision, brand fields and ordered typed sections with stable IDs. Models fill only
 named slots; layout, CSS and interaction code belong to reviewed family modules.
-The executable [Emmpo contract](../design-templates/agency-site/scripts/families/emmpo/contract.ts)
-and [Watson contract](../design-templates/agency-site/scripts/families/watson/contract.ts)
+The executable Emmpo contract
+and Watson contract
 are authoritative. Emmpo currently requires eleven section types, including its
 course view; Watson requires five ordered types. The families are finite and do
 not mix arbitrary sections. Watson also validates its supplied font’s limited
@@ -741,7 +741,7 @@ destination with the intended provider settings before client publication.
 
 The maintained compiler checks are
 [compiler.test.ts](../e2e/tests/agency-site/compiler.test.ts) and
-[families.test.ts](../e2e/tests/agency-site/families.test.ts). Scope and provider
+`families.test.ts`. Scope and provider
 coverage live in [agency-deploy-scope.test.ts](../apps/daemon/tests/agency-deploy-scope.test.ts)
 and [deploy-routes.test.ts](../apps/daemon/tests/deploy-routes.test.ts). The native
 canvas witness is [agency-site.test.ts](../e2e/ui/agency-site.test.ts), run with

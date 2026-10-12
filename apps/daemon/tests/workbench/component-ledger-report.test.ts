@@ -14,6 +14,12 @@ import { writeFixturePack } from '../fixtures/licensed-pack/pack-fixture.js';
 const cleanup: string[] = [];
 afterEach(() => cleanup.splice(0).forEach(dir => rmSync(dir, { recursive: true, force: true })));
 const core = () => readComponentLedger()!;
+/** A shipped GenUI row labelled licensed solely to exercise overlay conflict semantics. */
+const licensedCore = () => {
+  const ledger = core();
+  const row = ledger.rows.find(row => row.sourceId === 'genui' && row.built)!;
+  return parseComponentLedger({ ...ledger, rows: ledger.rows.map(item => item.id === row.id ? { ...item, rights: { ...item.rights, implementationOrigin: 'licensed' } } : item) });
+};
 
 describe('R13.1 generated per-ID report', () => {
   it('includes shipped React95 components and GSAP recipe variants in the authoritative inventory', () => {
@@ -38,8 +44,9 @@ describe('R13.1 generated per-ID report', () => {
     const report = buildComponentLedgerReport(ledger);
     expect(Object.keys(report.components).sort()).toEqual(ledger.rows.map(row => row.id).sort());
     expect(report.components['genui:atc-shader']).toMatchObject({ source: 'public-core', built: true, tracked: true, installed: null, verified: false, evidenceDate: null });
-    const licensed = ledger.rows.find(row => row.rights.implementationOrigin === 'licensed')!;
-    expect(report.components[licensed.id]).toMatchObject({ licensed: true, verified: false });
+    expect(ledger.rows.filter(row => row.rights.implementationOrigin === 'licensed')).toEqual([]);
+    const licensed = licensedCore().rows.find(row => row.rights.implementationOrigin === 'licensed')!;
+    expect(buildComponentLedgerReport(licensedCore()).components[licensed.id]).toMatchObject({ licensed: true, verified: false });
     expect(report.components['shadcn:button']?.built).toBe(false);
   });
 
@@ -106,7 +113,7 @@ describe('R13.1 generated per-ID report', () => {
   });
 
   it('rejects different bytes even when the colliding core ID is licensed', async () => {
-    const ledger = core();
+    const ledger = licensedCore();
     const licensed = ledger.rows.find(row => row.rights.implementationOrigin === 'licensed')!;
     const data = mkdtempSync(path.join(tmpdir(), 'r13-licensed-duplicate-'));
     cleanup.push(data);
@@ -123,7 +130,7 @@ describe('R13.1 generated per-ID report', () => {
 
 describe('R13.1 identical licensed overlay digest', () => {
   it('uses the same digest shape for core and overlay, including optional files', async () => {
-    const ledger = core();
+    const ledger = licensedCore();
     const licensed = ledger.rows.find(row => row.sourceId === 'genui' && row.rights.implementationOrigin === 'licensed' && row.built)!;
     const root = path.resolve(import.meta.dirname, '../../../..');
     const catalog = JSON.parse(readFileSync(path.join(root, 'packages/genui-catalog/catalog.json'), 'utf8'));

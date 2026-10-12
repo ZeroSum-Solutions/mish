@@ -3,7 +3,7 @@
 Last reviewed: 2026-10-09.
 
 This guide covers R14 capture, draft, unit-save and standalone insertion contracts. The
-[accepted criteria](plans/2026-10-02-design-workbench/prd.md#ac-r14) remain the
+accepted criteria remain the
 acceptance authority. Native capture validation and explicit conversion remain separate acceptance gates.
 
 ## Workflow
@@ -254,7 +254,7 @@ them through the web app or an owner-run `od` command.
   edit and run its action, then undo while preserving the first project.
   The standalone implementation is available; native capture and browser upload
   release proofs remain separate. Inline adapter gaps remain in the
-  [target-format matrix](plans/2026-10-02-design-workbench/technical-spec.md#rights-use-and-target-formats). A saved reference alone does not prove insertion.
+  target-format matrix. A saved reference alone does not prove insertion.
 - **AC-R14.5:** explicit conversion must create an immutable revision, retain
   original lineage and declare lost/unsupported behavior. Prove action and
   undo for each target adapter. Failed conversion must preserve the original

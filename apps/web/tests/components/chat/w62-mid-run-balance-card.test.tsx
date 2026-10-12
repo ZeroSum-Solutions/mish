@@ -22,6 +22,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { ChatPane } from '../../../src/components/ChatPane';
 import type { AppConfig, ChatMessage } from '../../../src/types';
+import { useConfiguredAmrConsole } from '../../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const translate = (key: string, vars?: Record<string, string | number>) => {
   if (vars && Object.keys(vars).length > 0) {

@@ -12,11 +12,11 @@ import { loadFamilyPackage } from '../src/family.ts';
 import type { ProjectPublisher } from '../src/publish.ts';
 import { runFastLane } from '../src/run.ts';
 import { SectionSelectionRefusedError } from '../src/section-overlay.ts';
-import { fakeJevChecker, fakeModel, promptBlock, WATSON_DIR, type Filler } from './fixtures.ts';
+import { fakeJevChecker, fakeModel, promptBlock, TEST_EDITORIAL_DIR, type Filler } from './fixtures.ts';
 
-const loadWatson = () => loadFamilyPackage(WATSON_DIR, 'watson');
-const ENTRY = 'watson-r1.html';
-const BRIEF = 'Watson, a design and technology studio in Los Angeles. Brand, product and motion work for ambitious teams.';
+const loadTestEditorial = () => loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
+const ENTRY = 'ownededitorial-r1.html';
+const BRIEF = 'TestEditorial, a design and technology studio in Los Angeles. Brand, product and motion work for ambitious teams.';
 
 type Save = { kind: 'page' | 'file'; name: string };
 
@@ -39,21 +39,21 @@ function recordingPublisher(): ProjectPublisher & { saves: Save[] } {
   };
 }
 
-// watson's nullable contact/award atoms (`WATSON_NULLABLE_ATOMS` in slots.ts): a plain honest
+// ownededitorial's nullable contact/award atoms (`TEST_EDITORIAL_NULLABLE_ATOMS` in slots.ts): a plain honest
 // fill would invent an email/phone/address the brief does not state, which the family compiler's
 // own format checks correctly refuse. Answer them null instead — exactly what a real model does
-// for a fact the brief does not carry. Every other watson content key is a required plain string.
+// for a fact the brief does not carry. Every other ownededitorial content key is a required plain string.
 const NULLABLE_ATOMS = ['awardCaption', 'businessEmail', 'jobsEmail', 'addressFirst', 'addressSecond', 'phone'];
-const watsonFill: Filler = (key, _value, _at, limit) => (NULLABLE_ATOMS.includes(key) ? null : `New ${key} for Watson`.slice(0, limit ?? Infinity));
-const watsonModel = () => fakeModel({ fill: watsonFill });
+const ownededitorialFill: Filler = (key, _value, _at, limit) => (NULLABLE_ATOMS.includes(key) ? null : `New ${key} for TestEditorial`.slice(0, limit ?? Infinity));
+const ownededitorialModel = () => fakeModel({ fill: ownededitorialFill });
 
-/** Delegates to a watson-safe fill for every unit except section-fill calls (labeled
+/** Delegates to a ownededitorial-safe fill for every unit except section-fill calls (labeled
  * `section:<adapterId>`), which this test fabricates ON EVERY ATTEMPT (first pass and every
  * faithfulness-repair round alike, unlike `fakeModel`'s own repair path, which defaults back to
  * an honest fill once it sees a rejection prompt) — the point of this fake is to exercise "the
  * fabrication survives every repair round", not just the first round. */
 function modelFabricatingSection(adapterId: string): ModelCall & { prompts: string[] } {
-  const base = watsonModel();
+  const base = ownededitorialModel();
   const prompts: string[] = [];
   const call = (async (request) => {
     prompts.push(request.user);
@@ -69,8 +69,8 @@ function modelFabricatingSection(adapterId: string): ModelCall & { prompts: stri
 }
 
 test('sectionSelection: composes the chosen section into the published page and reports it', async () => {
-  const pkg = await loadWatson();
-  const model = watsonModel();
+  const pkg = await loadTestEditorial();
+  const model = ownededitorialModel();
   const report = await runFastLane({
     pkg,
     brief: BRIEF,
@@ -80,14 +80,14 @@ test('sectionSelection: composes the chosen section into the published page and 
     model,
     modelName: 'fake',
     lockPaths: ['brand.name'],
-    sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' }, directionId: 'modern-minimal' },
+    sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' }, directionId: 'modern-minimal' },
   });
   assert.equal(report.sectionOverlay?.entryId, 'hyperui:marketing/ctas/1');
   assert.equal(report.sectionOverlay?.directionId, 'modern-minimal');
   assert.deepEqual(report.sectionOverlay?.remaining, []);
   assert.ok(report.html.includes('data-od-selected-section="hyperui:marketing/ctas/1"'));
-  assert.ok(report.html.indexOf('data-od-selected-section') > report.html.indexOf('id="watson-hero"'));
-  assert(report.html.includes('href="#watson-footer"'), 'adapter contact action resolves to the actual family footer');
+  assert.ok(report.html.indexOf('data-od-selected-section') > report.html.indexOf('id="ownededitorial-hero"'));
+  assert(report.html.includes('href="#ownededitorial-footer"'), 'adapter contact action resolves to the actual family footer');
   assert(!report.html.includes('href="#contact"'), 'no unresolved adapter fallback');
   assert.equal(report.renderQuality?.passed, true);
   // The published/reported digest is the composed one (base + selection + adapter + direction),
@@ -102,8 +102,8 @@ test('sectionSelection: composes the chosen section into the published page and 
 });
 
 test('sectionSelection: an unknown entry id fails the whole run before any publish', async () => {
-  const pkg = await loadWatson();
-  const model = watsonModel();
+  const pkg = await loadTestEditorial();
+  const model = ownededitorialModel();
   await assert.rejects(
     runFastLane({
       pkg,
@@ -114,15 +114,15 @@ test('sectionSelection: an unknown entry id fails the whole run before any publi
       model,
       modelName: 'fake',
     lockPaths: ['brand.name'],
-      sectionSelection: { entryId: 'hyperui:marketing/no-such-block/9', placement: { mode: 'append', afterSectionId: 'watson-hero' }, directionId: 'modern-minimal' },
+      sectionSelection: { entryId: 'hyperui:marketing/no-such-block/9', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' }, directionId: 'modern-minimal' },
     }),
     SectionSelectionRefusedError,
   );
 });
 
 test('sectionSelection: an absent anchor fails fast, before spending any fill effort on the base recipe', async () => {
-  const pkg = await loadWatson();
-  const model = watsonModel();
+  const pkg = await loadTestEditorial();
+  const model = ownededitorialModel();
   await assert.rejects(
     runFastLane({
       pkg,
@@ -133,7 +133,7 @@ test('sectionSelection: an absent anchor fails fast, before spending any fill ef
       model,
       modelName: 'fake',
     lockPaths: ['brand.name'],
-      sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-nowhere' }, directionId: 'modern-minimal' },
+      sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-nowhere' }, directionId: 'modern-minimal' },
     }),
     SectionSelectionRefusedError,
   );
@@ -141,8 +141,8 @@ test('sectionSelection: an absent anchor fails fast, before spending any fill ef
 });
 
 test('sectionSelection: replace-optional drops the family section first (required-section validation is never bypassed)', async () => {
-  const pkg = await loadWatson();
-  const model = watsonModel();
+  const pkg = await loadTestEditorial();
+  const model = ownededitorialModel();
   const report = await runFastLane({
     pkg,
     brief: BRIEF,
@@ -152,14 +152,14 @@ test('sectionSelection: replace-optional drops the family section first (require
     model,
     modelName: 'fake',
     lockPaths: ['brand.name'],
-    sectionSelection: { entryId: 'hyperui:marketing/sections/1', placement: { mode: 'replace-optional', targetSectionId: 'watson-about' }, directionId: 'human-approachable' },
+    sectionSelection: { entryId: 'hyperui:marketing/sections/1', placement: { mode: 'replace-optional', targetSectionId: 'ownededitorial-about' }, directionId: 'human-approachable' },
   });
-  assert.ok(report.droppedSections?.includes('watson-about'), 'the optional family section must be dropped through the ordinary validated path');
+  assert.ok(report.droppedSections?.includes('ownededitorial-about'), 'the optional family section must be dropped through the ordinary validated path');
   assert.ok(report.html.includes('data-od-selected-section="hyperui:marketing/sections/1"'));
 });
 
 test('sectionSelection: strict blocks publish when the selected section still states an unsupported fact after repair', async () => {
-  const pkg = await loadWatson();
+  const pkg = await loadTestEditorial();
   const model = modelFabricatingSection('hyperui:marketing/ctas/1');
   const verify = fakeJevChecker(['FABRICATED']);
   const publisher = recordingPublisher();
@@ -180,7 +180,7 @@ test('sectionSelection: strict blocks publish when the selected section still st
         ensurePublisherCalls += 1;
         return { publisher, created: true };
       },
-      sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' }, directionId: 'modern-minimal' },
+      sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' }, directionId: 'modern-minimal' },
     }),
     SectionSelectionRefusedError,
   );
@@ -192,9 +192,9 @@ test('sectionSelection: strict blocks publish when the selected section still st
 });
 
 test('designReference: reaches the section prompt, never the report, never the recipe, never the html', async () => {
-  const pkg = await loadWatson();
+  const pkg = await loadTestEditorial();
   const marker = 'ZZ-DESIGN-REFERENCE-MARKER-ZZ';
-  const model = watsonModel();
+  const model = ownededitorialModel();
   const report = await runFastLane({
     pkg,
     brief: BRIEF,
@@ -205,15 +205,15 @@ test('designReference: reaches the section prompt, never the report, never the r
     modelName: 'fake',
     lockPaths: ['brand.name'],
     designReference: `Editorial layout, tight grid, restrained motion: ${marker}`,
-    sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' }, directionId: 'modern-minimal' },
+    sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' }, directionId: 'modern-minimal' },
   });
   assert.ok(model.prompts.some((prompt) => prompt.includes(marker)), 'the section fill prompt must carry the design guidance');
   assert.equal(JSON.stringify(report).includes(marker), false, 'designReference must never surface in RunReport');
 });
 
 test('sectionSelection (family overlay regression): the selected section is filled with the family policy, not the composed one', async () => {
-  const pkg = await loadWatson();
-  const base = watsonModel();
+  const pkg = await loadTestEditorial();
+  const base = ownededitorialModel();
   const sectionPrompts: string[] = [];
   const model: ModelCall = async (request) => {
     if (request.label?.startsWith('section:')) sectionPrompts.push(request.user);
@@ -228,7 +228,7 @@ test('sectionSelection (family overlay regression): the selected section is fill
     model,
     modelName: 'fake',
     lockPaths: ['brand.name'],
-    sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' }, directionId: 'modern-minimal' },
+    sectionSelection: { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' }, directionId: 'modern-minimal' },
   });
   assert.ok(report.html.includes('data-od-selected-section="hyperui:marketing/ctas/1"'));
   assert.equal(sectionPrompts.length, 1, 'one fill call, no name-cut or shorten request');

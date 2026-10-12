@@ -31,14 +31,14 @@ test('ensureProject creates an agency-site project and the publisher posts pages
     assert.deepEqual(daemon.received[0]!.body, { id: projectId, name: 'Riverbend Dental', skillId: 'agency-site' });
 
     const publisher = projectPublisher({ daemonUrl: daemon.url, projectId });
-    await publisher.savePage('maben-r1.html', '<html></html>', { entry: 'maben-r1.html' }, 'stream:brand');
-    await publisher.saveFile('assets/agency-site/maben-r1/hero-frame.png', new Uint8Array([1, 2, 3]));
+    await publisher.savePage('ownedsite-r1.html', '<html></html>', { entry: 'ownedsite-r1.html' }, 'stream:brand');
+    await publisher.saveFile('assets/agency-site/ownedsite-r1/hero-frame.png', new Uint8Array([1, 2, 3]));
     await publisher.saveFile('AGENCY-SITE-STATE.md', '# state');
 
     const [page, image, note] = daemon.received.slice(1);
     assert.equal(page!.url, `/api/projects/${projectId}/files`);
-    assert.deepEqual(page!.body, { name: 'maben-r1.html', content: '<html></html>', encoding: 'utf8', source: 'ai', artifactManifest: { entry: 'maben-r1.html' }, versionLabel: 'stream:brand' });
-    assert.deepEqual(image!.body, { name: 'assets/agency-site/maben-r1/hero-frame.png', content: Buffer.from([1, 2, 3]).toString('base64'), encoding: 'base64', overwrite: true });
+    assert.deepEqual(page!.body, { name: 'ownedsite-r1.html', content: '<html></html>', encoding: 'utf8', source: 'ai', artifactManifest: { entry: 'ownedsite-r1.html' }, versionLabel: 'stream:brand' });
+    assert.deepEqual(image!.body, { name: 'assets/agency-site/ownedsite-r1/hero-frame.png', content: Buffer.from([1, 2, 3]).toString('base64'), encoding: 'base64', overwrite: true });
     assert.deepEqual(note!.body, { name: 'AGENCY-SITE-STATE.md', content: '# state', encoding: 'utf8', overwrite: true });
   } finally {
     daemon.server.close();

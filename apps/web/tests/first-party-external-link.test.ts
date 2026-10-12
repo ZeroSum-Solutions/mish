@@ -7,7 +7,7 @@ describe('openFirstPartyExternalLinkFromClick', () => {
   it('bridges the final URL after a bubbling AMR handler appends attribution parameters', () => {
     const opened = vi.fn();
     const anchor = document.createElement('a');
-    anchor.href = 'https://github.com/ZeroSum-Solutions/mish/console';
+    anchor.href = 'https://mish.invalid/console';
     anchor.addEventListener('click', () => {
       const url = new URL(anchor.href);
       url.searchParams.set('od_origin', 'mish');
@@ -24,7 +24,7 @@ describe('openFirstPartyExternalLinkFromClick', () => {
 
     expect(event.defaultPrevented).toBe(true);
     expect(opened).toHaveBeenCalledWith(
-      'https://github.com/ZeroSum-Solutions/mish/console?od_origin=mish&od_entry_id=settings&od_device_id=install-123',
+      'https://mish.invalid/console?od_origin=mish&od_entry_id=settings&od_device_id=install-123',
     );
   });
 });

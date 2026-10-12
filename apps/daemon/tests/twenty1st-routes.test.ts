@@ -1,16 +1,9 @@
-// Route coverage for GET /api/21st and its item, source, preview, asset, implementation-thumbnail
-// and reference-preview routes (PRD Addendum 3 / G13), plus a byte comparison with the responses
-// the old /api/cult/21st paths returned before the P1-4a rename (fixtures/twenty1st-baseline), plus
-// the cross-route proof that a 21st id is never copyable through Mishh: the Cult UI Pro remix
-// routes (`/api/cult/r/*`, `/api/cult/copy/*`) and `od cult add` (which reads `/api/cult/r/*`) all
-// refuse a 21st id — in every case/encoding variant — because these ids are never part of that
-// route's data. The remix routes are registered here with the REAL 311-row Cult catalog (not a
-// throwaway fixture), so this proves no 21st slug or name is, or ever becomes, a real Cult id.
+// Public 21st route coverage, absent reference images, and owned positive controls.
 
 import type http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { createHash } from 'node:crypto';
-import { mkdtempSync, readFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -30,6 +23,7 @@ import { runCultAddCli } from '../src/cult-add-cli.js';
 
 const ROWS = (twentyFirstJson as unknown as { rows: Array<{ id: string; slug: string; name: string; rights: string }> }).rows;
 const CULT_ROWS = (cultInventoryJson as unknown as { rows: CultRegistryRow[] }).rows;
+const OWNED_CONTROL: CultRegistryRow = { id: 'cult:owned-control', name: 'owned-control', dependencies: [], source: { registrySha256: null, files: [] } };
 const CULT_SLUGS = new Map(Object.entries((cultSlugsJson as unknown as { items: Record<string, string> }).items));
 
 function sendApiError(res: express.Response, status: number, code: string, message: string) {
@@ -44,10 +38,8 @@ beforeAll(async () => {
   delete process.env.TWENTY1ST_PREVIEW_DIR;
   const app = express();
   registerTwenty1stRoutes(app, { http: { sendApiError } } as never);
-  // The real Cult UI Pro remix routes, mounted alongside, with the REAL catalog rows and no kit
-  // configured (kitDir: null): a refused id never needs kit access to be refused, and this proves
-  // the refusal against the actual 311-row inventory, not a throwaway fixture.
-  registerCultRegistryRoutes(app, { http: { sendApiError } } as never, { rows: CULT_ROWS, kitDir: null, slugs: CULT_SLUGS });
+  // An owned row exercises the mounted registry route without private catalogue content.
+  registerCultRegistryRoutes(app, { http: { sendApiError } } as never, { rows: [...CULT_ROWS, OWNED_CONTROL], kitDir: null, slugs: new Map([...CULT_SLUGS, [OWNED_CONTROL.id, OWNED_CONTROL.name]]) });
   server = app.listen(0, '127.0.0.1');
   await new Promise<void>((resolve) => server.once('listening', () => resolve()));
   baseUrl = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
@@ -138,6 +130,11 @@ describe('GET /api/21st matches the pre-rename /api/cult/21st responses (P1-4a s
 
   it.each(BASELINE.records.map((record) => [record.name, record] as const))('%s: same status, headers and body', async (_name, record) => {
     const response = await fetch(`${baseUrl}/api/21st${record.path}`);
+    if (record.path.endsWith('/reference-preview') && record.status === 200) {
+      expect(response.status).toBe(404);
+      expect(await response.json()).toMatchObject({ error: { code: 'NOT_FOUND' } });
+      return;
+    }
     expect(response.status).toBe(record.status);
     for (const [header, value] of Object.entries(record.headers)) {
       // Express derives a weak ETag from the body bytes: the body comparison below covers it, and
@@ -172,10 +169,12 @@ describe('GET /api/21st matches the pre-rename /api/cult/21st responses (P1-4a s
   });
 });
 
-describe('no 21st row is copyable through Mishh (real 311-row catalog, every id variant)', () => {
-  it('positive control: a real Cult slug on the same server gets its expected non-404 response, so an unmounted remix route cannot pass this file by blanket-404ing everything', async () => {
-    const realSlug = [...CULT_SLUGS.values()][0]!;
-    // kitDir is null in this suite's setup (no source files on disk), so a REAL, catalogued slug
+describe('no 21st row is copyable through Mishh (public stub with an owned registry control, every id variant)', () => {
+  it('positive control: the mounted registry returns KIT_UNAVAILABLE for an owned row', async () => {
+    expect(CULT_ROWS).toEqual([]);
+    expect(CULT_SLUGS.size).toBe(0);
+    const realSlug = OWNED_CONTROL.name;
+    // kitDir is null, so an owned catalogued slug
     // reaches the row lookup, matches, and then fails on the (deliberately absent) kit content —
     // 503 KIT_UNAVAILABLE, never 404 NOT_FOUND. A 404 here would mean the route only ever 404s,
     // which would make every "refused" assertion below vacuous.
@@ -188,9 +187,9 @@ describe('no 21st row is copyable through Mishh (real 311-row catalog, every id 
     expect(((await copy.json()) as { error: { code: string } }).error.code, realSlug).toBe('KIT_UNAVAILABLE');
   });
 
-  it('no 21st slug or name is, or collides with, a real Cult catalog slug or name', () => {
-    const cultSlugSet = new Set(CULT_SLUGS.values());
-    const cultNameSet = new Set(CULT_ROWS.map((row) => row.name));
+  it('no 21st slug or name collides with the owned registry control', () => {
+    const cultSlugSet = new Set([...CULT_SLUGS.values(), OWNED_CONTROL.name]);
+    const cultNameSet = new Set([...CULT_ROWS, OWNED_CONTROL].map(row => row.name));
     for (const row of ROWS) {
       expect(cultSlugSet.has(row.slug), row.id).toBe(false);
       expect(cultNameSet.has(row.slug), row.id).toBe(false);
@@ -259,14 +258,34 @@ describe('saved reference preview images', () => {
   // (generated/21st-thumbnails/, twenty1stMayShipLocalImage) — serving a `reference-only` row's
   // image here would redistribute the other creator's screenshot same-origin, which this route
   // must never do.
-  it('serves the 2 mit rows\' reference images, separately from original HTML, including hidden checkout ancestors', async () => {
-    for (const row of ROWS.filter((row) => row.rights === 'mit')) {
+  it('reports removed reference image files as unavailable for the MIT rows', async () => {
+    for (const row of ROWS.filter(row => row.rights === 'mit')) {
       const response = await fetch(`${baseUrl}/api/21st/${row.slug}/reference-preview`);
-      expect(response.status, row.slug).toBe(200);
+      expect(response.status, row.slug).toBe(404);
+      expect(await response.json()).toMatchObject({ error: { code: 'NOT_FOUND' } });
+    }
+  });
+
+  it('serves an owned image fixture beneath a hidden checkout ancestor', async () => {
+    const scratch = mkdtempSync(path.join(tmpdir(), 'mish-owned-preview-'));
+    const generatedDir = path.join(scratch, '.checkout', 'generated');
+    const app = express();
+    const row = ROWS.find(row => row.rights === 'mit')!;
+    const ownedImage = readFileSync(fileURLToPath(new URL('../../../packages/21st-catalog/generated/preview-artwork/glass.webp', import.meta.url)));
+    mkdirSync(path.join(generatedDir, '21st-thumbnails'), { recursive: true });
+    // Owned artwork stands in for bytes only; this makes no source-fidelity claim.
+    writeFileSync(path.join(generatedDir, '21st-thumbnails', `${row.slug}.webp`), ownedImage);
+    registerTwenty1stRoutes(app, { http: { sendApiError } } as never, { generatedDir });
+    const local = app.listen(0, '127.0.0.1');
+    await new Promise<void>(resolve => local.once('listening', resolve));
+    try {
+      const response = await fetch(`http://127.0.0.1:${(local.address() as AddressInfo).port}/api/21st/${row.slug}/reference-preview`);
+      expect(response.status).toBe(200);
       expect(response.headers.get('content-type')).toBe('image/webp');
-      const bytes = Buffer.from(await response.arrayBuffer());
-      expect(bytes.subarray(0, 4).toString()).toBe('RIFF');
-      expect(bytes.subarray(8, 12).toString()).toBe('WEBP');
+      expect(Buffer.from(await response.arrayBuffer())).toEqual(ownedImage);
+    } finally {
+      await new Promise<void>(resolve => local.close(() => resolve()));
+      rmSync(scratch, { recursive: true, force: true });
     }
   });
 

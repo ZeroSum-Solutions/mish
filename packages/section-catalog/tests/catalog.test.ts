@@ -129,88 +129,65 @@ describe('buildCatalog', () => {
   });
 });
 
+// The public repo ships no Cult UI Pro rows (the licensed kit and generated adapters were removed),
+// so projection logic is exercised with small synthetic in-test rows; nothing here is committed data.
+const syntheticCultRow = (overrides: Partial<CultCatalogFile['rows'][number]> = {}): CultCatalogFile['rows'][number] => ({
+  id: 'cult:synthetic-hero', name: 'synthetic-hero', title: 'Marketing Hero Simple', description: 'A synthetic hero used only by tests.',
+  original: { category: 'marketing' }, source: { snapshotId: 'cult-ui-pro@synthetic' }, assetKind: 'section',
+  taxonomy: { sectionKind: 'hero' }, spineAffinities: [],
+  rights: { license: 'licensed', decision: 'bundle', evidence: 'docs/legal/cult-ui-pro-rights.md' },
+  conversion: { status: 'adapter-needed' }, adapter: null, ...overrides,
+});
+const syntheticCultFile = (rows: CultCatalogFile['rows']): CultCatalogFile =>
+  ({ schema: 'cult-ui-catalog/1', snapshot: { id: 'cult-ui-pro@synthetic' }, rows });
+const syntheticCultEntries = () => projectCultEntries(syntheticCultFile([
+  syntheticCultRow(),
+  syntheticCultRow({ id: 'cult:synthetic-page', name: 'synthetic-page', assetKind: 'page', taxonomy: { sectionKind: 'page-composition' } }),
+])).entries;
+
 describe('Cult UI Pro projection', () => {
   const { catalog, cultSkipped } = buildCatalogWithReport();
   const cultEntries = catalog.entries.filter((entry) => entry.sourceKind === 'cult-pro');
-  const sectionOrPageRows = cultCatalog.rows.filter((row) => row.assetKind === 'section' || row.assetKind === 'page');
 
-  it('projects every Cult section/page row exactly once, except the counted skips', () => {
-    const skippedIds = Object.values(cultSkipped).flat();
-    expect(cultEntries.length + skippedIds.length).toBe(sectionOrPageRows.length);
-    const projected = new Set(cultEntries.map((entry) => entry.id));
-    for (const row of sectionOrPageRows) expect(projected.has(row.id) !== skippedIds.includes(row.id)).toBe(true);
+  it('the public repo carries zero Cult rows, so the built catalog has no Cult entries and skips nothing', () => {
+    expect(cultCatalog.rows).toEqual([]);
+    expect(cultEntries).toEqual([]);
+    expect(Object.values(cultSkipped).flat()).toEqual([]);
   });
 
-  it('skips only section rows the inventory left unclassified, and never a primitive or app row', () => {
-    const rowsById = new Map(cultCatalog.rows.map((row) => [row.id, row]));
-    for (const id of Object.values(cultSkipped).flat()) {
-      expect(rowsById.get(id)?.assetKind).toBe('section');
-      expect(rowsById.get(id)?.taxonomy.sectionKind).toBe('unclassified');
-    }
-    for (const entry of cultEntries) expect(['section', 'page']).toContain(rowsById.get(entry.id)?.assetKind);
-    expect(cultEntries.some((entry) => entry.sectionKind === 'unclassified')).toBe(false);
+  it('keeps INSERTABLE_V1 the three HyperUI blocks as the only insertable entries', () => {
+    expect(INSERTABLE_V1).toHaveLength(3);
+    const insertable = catalog.entries.filter((entry) => entry.availability === 'insertable');
+    expect(insertable.map((entry) => entry.id).sort()).toEqual(INSERTABLE_V1.map((id) => `hyperui:${id}`).sort());
+    for (const entry of insertable) expect(entry.sourceKind).toBe('hyperui');
   });
 
-  it('maps section rows to their taxonomy id and page rows to page-composition', () => {
-    const rowsById = new Map(cultCatalog.rows.map((row) => [row.id, row]));
-    for (const entry of cultEntries) {
-      const row = rowsById.get(entry.id)!;
-      expect(entry.sectionKind).toBe(row.assetKind === 'page' ? 'page-composition' : row.taxonomy.sectionKind);
-      expect(entry.sourceType).toBe(row.original.category);
-      expect(entry.spineAffinities).toEqual(row.spineAffinities.length > 0 ? row.spineAffinities : 'unclassified');
-    }
-  });
-
-  it('labels every Cult entry licensed, with provenance to the pinned snapshot, and insertable only with its checked adapter', () => {
-    expect(cultEntries.length).toBeGreaterThan(0);
-    const rowsById = new Map(cultCatalog.rows.map((row) => [row.id, row]));
-    for (const entry of cultEntries) {
-      const row = rowsById.get(entry.id)!;
-      const insertable = row.conversion.status === 'insertable';
-      expect(entry.availability).toBe(insertable ? 'insertable' : 'adapter-needed');
-      if (entry.content.kind === 'cult-item') expect(entry.content.adapterId).toBe(insertable ? entry.id : undefined);
-      if (insertable) {
-        expect(row.adapter?.id).toBe(entry.id);
-        expect(existsSync(new URL(`../../cult-ui-catalog/generated/adapters/${row.name}.ts`, import.meta.url))).toBe(true);
-      }
+  it('projects a synthetic section row and page row as licensed, local, adapter-needed Cult entries with provenance', () => {
+    const [hero, page] = syntheticCultEntries();
+    expect(hero?.sectionKind).toBe('hero');
+    expect(page?.sectionKind).toBe('page-composition');
+    for (const entry of [hero!, page!]) {
+      expect(entry.sourceKind).toBe('cult-pro');
+      expect(entry.availability).toBe('adapter-needed');
       expect(entry.access).toBe('local');
       expect(entry.preview).toEqual({ kind: 'none' });
       expect(entry.rights).toEqual({ license: 'licensed', decision: 'bundle', evidence: 'docs/legal/cult-ui-pro-rights.md' });
+      expect(entry.spineAffinities).toBe('unclassified');
       expect(entry.content.kind).toBe('cult-item');
       if (entry.content.kind !== 'cult-item') continue;
-      expect(entry.content.provenance).toEqual({ cultId: entry.id, snapshotId: cultCatalog.snapshot.id });
-      expect(entry.content.summary.length).toBeGreaterThan(0);
+      expect(entry.content.provenance).toEqual({ cultId: entry.id, snapshotId: 'cult-ui-pro@synthetic' });
+      expect(entry.content.adapterId).toBeUndefined();
     }
-  });
-
-  it('keeps INSERTABLE_V1 the three HyperUI blocks and adds only checked Cult adapters', () => {
-    const insertable = catalog.entries.filter((entry) => entry.availability === 'insertable');
-    expect(insertable.filter((entry) => entry.sourceKind === 'hyperui').map((entry) => entry.id).sort())
-      .toEqual(INSERTABLE_V1.map((id) => `hyperui:${id}`).sort());
-    const cult = insertable.filter((entry) => entry.sourceKind === 'cult-pro');
-    expect(insertable.length).toBe(INSERTABLE_V1.length + cult.length);
-    expect(cult.length).toBeGreaterThanOrEqual(3);
-    expect(cult.map((entry) => entry.id)).toContain('cult:marketing-cta-cosmic');
-    for (const entry of cult) expect(entry.sectionKind).not.toBe('page-composition');
+    expect(hero?.title).toBe('Hero Simple');
   });
 
   it('projectCultEntries makes a row insertable only when its adapter id is the row id and its adapter file exists', () => {
-    const base = cultCatalog.rows.find((row) => row.id === 'cult:marketing-cta-cosmic')!;
-    const project = (rows: CultCatalogFile['rows']) => projectCultEntries({ schema: 'cult-ui-catalog/1', snapshot: cultCatalog.snapshot, rows });
-    const [entry] = project([base]).entries;
-    expect(entry?.availability).toBe('insertable');
-    expect(() => project([{ ...base, adapter: { id: 'cult:other', version: '1.0.0' } }])).toThrow('is not the row id');
-    expect(() => project([{ ...base, id: 'cult:no-such-block', name: 'no-such-block', adapter: { id: 'cult:no-such-block', version: '1.0.0' } }])).toThrow('is missing');
-    const [unconverted] = project([{ ...base, conversion: { status: 'adapter-needed' }, adapter: null }]).entries;
+    const project = (rows: CultCatalogFile['rows']) => projectCultEntries(syntheticCultFile(rows));
+    const [unconverted] = project([syntheticCultRow()]).entries;
     expect(unconverted?.availability).toBe('adapter-needed');
-  });
-
-  it('never names another company in a display title, and keeps the raw title in content.sourceTitle', () => {
-    const rowsById = new Map(cultCatalog.rows.map((row) => [row.id, row]));
-    for (const entry of cultEntries) {
-      for (const [pattern] of CULT_TITLE_BRANDS) expect(entry.title).not.toMatch(pattern);
-      if (entry.content.kind === 'cult-item') expect(entry.content.sourceTitle).toBe(rowsById.get(entry.id)!.title);
-    }
+    const insertable = { conversion: { status: 'insertable' }, adapter: { id: 'cult:synthetic-hero', version: '1.0.0' } };
+    expect(() => project([syntheticCultRow({ ...insertable, adapter: { id: 'cult:other', version: '1.0.0' } })])).toThrow('is not the row id');
+    expect(() => project([syntheticCultRow(insertable)])).toThrow('is missing');
   });
 
   it('cultDisplayTitle swaps brand names for a series letter and drops the "Marketing" prefix', () => {
@@ -228,60 +205,32 @@ describe('Cult UI Pro projection', () => {
   it('cultDisplayTitle fails closed on a word nobody reviewed, so an unknown brand cannot reach a title', () => {
     expect(() => cultDisplayTitle('Marketing Pricing Linear')).toThrow('unreviewed word(s) linear');
     expect(cultDisplayTitle('Hero (page: SaaS Colorful)')).toBe('Hero (page: SaaS Colorful)');
-    for (const entry of cultEntries) expect(unreviewedTitleWords(entry.title, ['A', 'H', 'S', 'V', 'VT'])).toEqual([]);
-  });
-
-  it('projects the sections cut from the whole pages, with their own adapters', () => {
-    const derived = cultCatalog.rows.filter((row) => row.derivedFrom !== undefined);
-    expect(derived.length).toBeGreaterThanOrEqual(14);
-    const hero = cultEntries.find((entry) => entry.id === 'cult:sass-colorful--hero');
-    expect(hero?.title).toBe('Hero (page: SaaS Colorful)');
-    expect(hero?.sectionKind).toBe('hero');
-    expect(hero?.availability).toBe('insertable');
-    if (hero?.content.kind === 'cult-item') expect(hero.content.adapterId).toBe('cult:sass-colorful--hero');
-    for (const row of derived) {
-      const entry = cultEntries.find((candidate) => candidate.id === row.id);
-      if (row.taxonomy.sectionKind === 'unclassified') expect(entry).toBeUndefined();
-      else expect(entry?.availability).toBe(row.conversion.status === 'insertable' ? 'insertable' : 'adapter-needed');
-    }
+    for (const entry of syntheticCultEntries()) expect(unreviewedTitleWords(entry.title, ['A', 'H', 'S', 'V', 'VT'])).toEqual([]);
   });
 
   it('projectCultEntries refuses a row whose rights or adapter reference disagree with the inventory contract', () => {
-    const base = cultCatalog.rows.find((row) => row.id === 'cult:marketing-cta-cosmic')!;
-    const project = (rows: CultCatalogFile['rows']) => projectCultEntries({ schema: 'cult-ui-catalog/1', snapshot: cultCatalog.snapshot, rows });
+    const base = syntheticCultRow();
+    const project = (rows: CultCatalogFile['rows']) => projectCultEntries(syntheticCultFile(rows));
     expect(() => project([{ ...base, rights: { ...base.rights, license: 'mit' } }])).toThrow('recorded Cult UI Pro rights');
-    expect(() => project([{ ...base, adapter: null }])).toThrow('disagrees with its adapter reference');
-    expect(() => project([{ ...base, conversion: { status: 'adapter-needed' } }])).toThrow('disagrees with its adapter reference');
+    expect(() => project([{ ...base, conversion: { status: 'insertable' } }])).toThrow('disagrees with its adapter reference');
+    expect(() => project([{ ...base, adapter: { id: base.id, version: '1.0.0' } }])).toThrow('disagrees with its adapter reference');
   });
 
   it('projectCultEntries skips an unclassified section row and ignores primitive/app rows', () => {
-    // A row whose adapter is null (adapter-needed): the synthetic rows below rename it without also
-    // renaming its adapter reference, so this must not be an insertable row (cultAdapterIdOf's
-    // adapter-id-matches-row-id invariant would otherwise throw on the renamed copy).
-    const base = cultCatalog.rows.find((row) => row.assetKind === 'section' && row.taxonomy.sectionKind === 'hero' && row.adapter === null)!;
-    const synthetic: CultCatalogFile = {
-      schema: 'cult-ui-catalog/1',
-      snapshot: cultCatalog.snapshot,
-      rows: [
-        { ...base, id: 'cult:x-hero', name: 'x-hero' },
-        { ...base, id: 'cult:x-unknown', name: 'x-unknown', taxonomy: { sectionKind: 'unclassified' } },
-        { ...base, id: 'cult:x-button', name: 'x-button', assetKind: 'primitive' },
-        { ...base, id: 'cult:x-page', name: 'x-page', assetKind: 'page', taxonomy: { sectionKind: 'unclassified' } },
-      ],
-    };
-    const { entries, skipped } = projectCultEntries(synthetic);
+    const base = syntheticCultRow();
+    const { entries, skipped } = projectCultEntries(syntheticCultFile([
+      { ...base, id: 'cult:x-hero', name: 'x-hero' },
+      { ...base, id: 'cult:x-unknown', name: 'x-unknown', taxonomy: { sectionKind: 'unclassified' } },
+      { ...base, id: 'cult:x-button', name: 'x-button', assetKind: 'primitive' },
+      { ...base, id: 'cult:x-page', name: 'x-page', assetKind: 'page', taxonomy: { sectionKind: 'unclassified' } },
+    ]));
     expect(entries.map((entry) => [entry.id, entry.sectionKind])).toEqual([['cult:x-hero', 'hero'], ['cult:x-page', 'page-composition']]);
     expect(Object.values(skipped).flat()).toEqual(['cult:x-unknown']);
   });
 
   it('projectCultEntries refuses a row from a different snapshot than the catalog pins', () => {
-    const base = cultCatalog.rows.find((row) => row.assetKind === 'section')!;
-    const synthetic: CultCatalogFile = {
-      schema: 'cult-ui-catalog/1',
-      snapshot: cultCatalog.snapshot,
-      rows: [{ ...base, source: { snapshotId: 'cult-ui-pro@0000000000000000' } }],
-    };
-    expect(() => projectCultEntries(synthetic)).toThrow('is not the catalog snapshot');
+    const rows = [syntheticCultRow({ source: { snapshotId: 'cult-ui-pro@0000000000000000' } })];
+    expect(() => projectCultEntries(syntheticCultFile(rows))).toThrow('is not the catalog snapshot');
   });
 });
 
@@ -385,7 +334,7 @@ describe('validateSectionCatalog / sectionCatalogPolicyIssues', () => {
   });
 
   it('flags a cult-pro entry whose rights differ from the recorded Cult licence', () => {
-    const cultEntry = base.entries.find((entry) => entry.sourceKind === 'cult-pro')!;
+    const cultEntry = syntheticCultEntries()[0]!;
     const bad = { ...cultEntry, rights: { ...cultEntry.rights, decision: 'metadata-only' as const } };
     const issues = sectionCatalogPolicyIssues({ ...base, entries: [bad] });
     expect(issues.some((issue) => issue.path.endsWith('.rights') && issue.message.includes('cult-pro'))).toBe(true);
@@ -399,13 +348,13 @@ describe('validateSectionCatalog / sectionCatalogPolicyIssues', () => {
   });
 
   it('flags a cult-pro entry marked insertable without a reviewed Cult adapter', () => {
-    const cultEntry = base.entries.find((entry) => entry.sourceKind === 'cult-pro' && entry.availability === 'adapter-needed')!;
+    const cultEntry = syntheticCultEntries()[0]!;
     const issues = sectionCatalogPolicyIssues({ ...base, entries: [{ ...cultEntry, availability: 'insertable' as const }] });
     expect(issues.some((issue) => issue.path.endsWith('.availability'))).toBe(true);
   });
 
   it('flags a cult-pro entry with non-cult content, and cult-item content on another source', () => {
-    const cultEntry = base.entries.find((entry) => entry.sourceKind === 'cult-pro')!;
+    const cultEntry = syntheticCultEntries()[0]!;
     const hyperuiEntry = base.entries.find((entry) => entry.sourceKind === 'hyperui')!;
     const issues = sectionCatalogPolicyIssues({
       ...base,
@@ -415,7 +364,7 @@ describe('validateSectionCatalog / sectionCatalogPolicyIssues', () => {
   });
 
   it('flags a cult-pro entry whose provenance names a different id', () => {
-    const cultEntry = base.entries.find((entry) => entry.sourceKind === 'cult-pro')!;
+    const cultEntry = syntheticCultEntries()[0]!;
     if (cultEntry.content.kind !== 'cult-item') throw new Error('expected cult-item content');
     const bad = { ...cultEntry, content: { ...cultEntry.content, provenance: { ...cultEntry.content.provenance, cultId: 'cult:other' } } };
     const issues = sectionCatalogPolicyIssues({ ...base, entries: [bad] });
@@ -423,7 +372,7 @@ describe('validateSectionCatalog / sectionCatalogPolicyIssues', () => {
   });
 
   it('accepts a cult-pro page-composition entry', () => {
-    const page = base.entries.find((entry) => entry.sourceKind === 'cult-pro' && entry.sectionKind === 'page-composition')!;
+    const page = syntheticCultEntries()[1]!;
     expect(page).toBeDefined();
     expect(sectionCatalogPolicyIssues({ ...base, entries: [page] })).toEqual([]);
   });

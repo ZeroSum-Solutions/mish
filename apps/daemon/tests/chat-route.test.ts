@@ -1163,7 +1163,7 @@ if (args[0] === 'model' && args[1] === 'list') {
 }
 const child = spawn(process.execPath, [fixture, ...args], {
   stdio: 'inherit',
-  env: process.env,
+  env: { ...process.env, ...${JSON.stringify({ FAKE_VELA_MODEL_PRESET_JSON: process.env.FAKE_VELA_MODEL_PRESET_JSON, FAKE_VELA_MODEL_LIST_JSON: process.env.FAKE_VELA_MODEL_LIST_JSON })} },
 });
 child.on('exit', (code, signal) => {
   if (signal) process.kill(process.pid, signal);
@@ -1248,7 +1248,7 @@ if (args[0] === 'model' && args[1] === 'list') {
 }
 const child = spawn(process.execPath, [fixture, ...args], {
   stdio: 'inherit',
-  env: process.env,
+  env: { ...process.env, ...${JSON.stringify({ FAKE_VELA_MODEL_PRESET_JSON: process.env.FAKE_VELA_MODEL_PRESET_JSON, FAKE_VELA_MODEL_LIST_JSON: process.env.FAKE_VELA_MODEL_LIST_JSON })} },
 });
 child.on('exit', (code, signal) => {
   if (signal) process.kill(process.pid, signal);
@@ -1352,7 +1352,7 @@ const { spawn } = require('node:child_process');
 const fixture = ${JSON.stringify(FAKE_VELA_FIXTURE)};
 const child = spawn(process.execPath, [fixture, ...process.argv.slice(2)], {
   stdio: 'inherit',
-  env: process.env,
+  env: { ...process.env, ...${JSON.stringify({ FAKE_VELA_MODEL_PRESET_JSON: process.env.FAKE_VELA_MODEL_PRESET_JSON, FAKE_VELA_MODEL_LIST_JSON: process.env.FAKE_VELA_MODEL_LIST_JSON })} },
 });
 child.on('exit', (code, signal) => {
   if (signal) process.kill(process.pid, signal);
@@ -3449,7 +3449,7 @@ let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { input += chunk; });
 process.stdin.on('end', () => {
-  fs.writeFileSync(process.env.OD_CAPTURE_PROMPT_PATH, input, 'utf8');
+  fs.writeFileSync(${JSON.stringify(process.env.OD_CAPTURE_PROMPT_PATH)}, input, 'utf8');
   console.log(JSON.stringify({ type: 'text', part: { text: 'building now' } }));
 });
 `,
@@ -3557,7 +3557,7 @@ let input = '';
 process.stdin.setEncoding('utf8');
 process.stdin.on('data', (chunk) => { input += chunk; });
 process.stdin.on('end', () => {
-  fs.writeFileSync(process.env.OD_CAPTURE_PROMPT_PATH, input, 'utf8');
+  fs.writeFileSync(fs.readFileSync(${JSON.stringify(join(captureDir, 'destination.txt'))}, 'utf8'), input, 'utf8');
   console.log(JSON.stringify({ type: 'text', part: { text: 'ok' } }));
   console.log(JSON.stringify({ type: 'step_finish', part: { tokens: { input: 1, output: 1 } } }));
 });
@@ -3567,6 +3567,7 @@ process.stdin.on('end', () => {
             turn: { message: string; currentPrompt: string },
             capturePath: string,
           ): Promise<string> => {
+            writeFileSync(join(captureDir, 'destination.txt'), capturePath, 'utf8');
             process.env.OD_CAPTURE_PROMPT_PATH = capturePath;
             const response = await fetch(`${baseUrl}/api/runs`, {
               method: 'POST',

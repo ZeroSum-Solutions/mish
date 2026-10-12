@@ -1,6 +1,4 @@
-// `od sections list|get`, text and `--json`, against the real GET /api/sections route: Cult UI
-// Pro sections are shown under their brand-free public id (`cult:<slug>`), never the internal
-// inventory id, and with brand-free content. `get` takes the public id.
+// Public CLI coverage: retained HyperUI entries and absent licensed Cult entries.
 
 import { execFile } from 'node:child_process';
 import { mkdtempSync } from 'node:fs';
@@ -42,35 +40,26 @@ afterAll(async () => {
 
 const od = (...args: string[]) => execFileP(process.execPath, [TSX_CLI, CLI_SRC, ...args, '--daemon-url', baseUrl], { maxBuffer: 16 * 1024 * 1024 });
 
-describe('od sections, Cult entries', () => {
-  it('lists every Cult section by its brand-free public id', async () => {
+describe('od sections without the private Cult pack', () => {
+  it('lists public sections and omits Cult entries in text', async () => {
     const { stdout } = await od('sections', 'list');
-    const cultLines = stdout.split('\n').filter((line) => line.startsWith('cult:'));
-    expect(cultLines.length).toBeGreaterThan(100);
-    expect(stdout).toContain('cult:bento-series-v\t');
-    expect(stdout).not.toContain('cult:marketing-bento-vercel');
-    for (const line of cultLines) expect(brandHit(line), line).toBeNull();
-  }, 60_000);
-
-  it('shows one Cult section by its public id', async () => {
-    const { stdout } = await od('sections', 'get', 'cult:pricing-series-v');
-    expect(stdout).toContain('Id\tcult:pricing-series-v\n');
-    expect(stdout).toContain('Title\tPricing (series V)\n');
+    expect(stdout).toContain('hyperui:application/charts/1');
+    expect(stdout.split('\n').filter(line => line.startsWith('cult:'))).toEqual([]);
     expect(brandHit(stdout)).toBeNull();
   }, 60_000);
 
-  it('prints brand-free JSON for every Cult section with list --json', async () => {
+  it('refuses a removed Cult section by its public id', async () => {
+    await expect(od('sections', 'get', 'cult:pricing-series-v')).rejects.toMatchObject({ code: 1, stderr: expect.stringContaining('NOT_FOUND') });
+  }, 60_000);
+
+  it('lists public sections and omits Cult entries in JSON', async () => {
     const { stdout } = await od('sections', 'list', '--json');
     const body = JSON.parse(stdout) as { catalog: { entries: Array<{ id: string; sourceKind: string }> } };
-    const cult = body.catalog.entries.filter((entry) => entry.sourceKind === 'cult-pro');
-    expect(cult.length).toBeGreaterThan(100);
-    for (const entry of cult) expect(brandHit(JSON.stringify(entry)), entry.id).toBeNull();
-    expect(stdout).not.toContain('cult:marketing-');
+    expect(body.catalog.entries.some(entry => entry.sourceKind === 'hyperui')).toBe(true);
+    expect(body.catalog.entries.filter(entry => entry.sourceKind === 'cult-pro')).toEqual([]);
   }, 60_000);
 
-  it('prints brand-free JSON for one Cult section with get --json', async () => {
-    const { stdout } = await od('sections', 'get', 'cult:pricing-series-v', '--json');
-    expect(JSON.parse(stdout)).toMatchObject({ entry: { id: 'cult:pricing-series-v', content: { sourceTitle: 'Pricing (series V)', provenance: { cultId: 'cult:pricing-series-v' } } } });
-    expect(brandHit(stdout)).toBeNull();
+  it('refuses a removed Cult section with get --json', async () => {
+    await expect(od('sections', 'get', 'cult:pricing-series-v', '--json')).rejects.toMatchObject({ code: 1, stderr: expect.stringContaining('NOT_FOUND') });
   }, 60_000);
 });

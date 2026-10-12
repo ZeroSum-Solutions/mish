@@ -15,10 +15,8 @@ describe('AMR account failure classification', () => {
   // every other assertion in this file references the constant symbolically and
   // would keep passing while pointing users at a surface the product no longer
   // navigates to.
-  it('points the recharge link at the console dashboard, not a wallet page', () => {
-    expect(DEFAULT_AMR_RECHARGE_URL).toBe(
-      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard?source=mish',
-    );
+  it('offers no recharge link unless an AMR console is configured', () => {
+    expect(DEFAULT_AMR_RECHARGE_URL).toBeUndefined();
   });
 
   it('classifies insufficient_balance JSON-RPC failures as rechargeable AMR balance errors', () => {
@@ -29,13 +27,11 @@ describe('AMR account failure classification', () => {
     expect(failure).toMatchObject({
       code: 'AMR_INSUFFICIENT_BALANCE',
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
     });
-    expect(failure?.message).toContain(DEFAULT_AMR_RECHARGE_URL);
+    expect(failure?.message).toContain('Top up your AMR balance in your AMR account');
     expect(amrAccountFailureDetails(failure!)).toEqual({
       kind: 'amr_account',
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
     });
   });
 
@@ -52,7 +48,6 @@ describe('AMR account failure classification', () => {
     expect(failure).toMatchObject({
       code: 'AMR_INSUFFICIENT_BALANCE',
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
     });
   });
 
@@ -234,7 +229,6 @@ describe('AMR account failure classification', () => {
       expect(classifyAmrAccountFailure(text)).toMatchObject({
         code: 'AMR_INSUFFICIENT_BALANCE',
         action: 'recharge',
-        actionUrl: DEFAULT_AMR_RECHARGE_URL,
       });
     }
   });
@@ -249,7 +243,6 @@ describe('AMR account failure classification', () => {
     expect(failure).toMatchObject({
       code: 'AMR_INSUFFICIENT_BALANCE',
       action: 'recharge',
-      actionUrl: DEFAULT_AMR_RECHARGE_URL,
     });
   });
 

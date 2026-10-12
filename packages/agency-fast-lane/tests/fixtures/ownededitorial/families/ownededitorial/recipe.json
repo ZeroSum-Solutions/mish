@@ -1,0 +1,63 @@
+{
+  "schemaVersion": 2,
+  "family": "ownededitorial",
+  "revision": 1,
+  "brand": {
+    "name": "Fixture Studio",
+    "colors": {
+      "ink": "#000000"
+    },
+    "fonts": {
+      "body": "Arial"
+    }
+  },
+  "sections": [
+    {
+      "id": "ownededitorial-nav",
+      "type": "navigation",
+      "content": {
+        "label": "Menu"
+      }
+    },
+    {
+      "id": "ownededitorial-hero",
+      "type": "hero",
+      "content": {
+        "heading": "Fixture studio",
+        "location": "Fixture city"
+      }
+    },
+    {
+      "id": "ownededitorial-statement",
+      "type": "statement",
+      "content": {
+        "opening": "Fixture opening",
+        "city": "Fixture city",
+        "partnershipsFirst": "Fixture partners"
+      }
+    },
+    {
+      "id": "ownededitorial-about",
+      "type": "about",
+      "content": {
+        "heading": "About this fixture",
+        "after": "Fixture details"
+      }
+    },
+    {
+      "id": "ownededitorial-footer",
+      "type": "footer",
+      "content": {
+        "awardCaption": "Fixture detail",
+        "locations": "Fixture detail",
+        "campaigns": "Fixture detail",
+        "businessEmail": "fixture@example.com",
+        "jobsEmail": "fixture@example.com",
+        "addressFirst": "Fixture detail",
+        "addressSecond": "Fixture detail",
+        "phone": "+1 555 0100",
+        "network": "Fixture network"
+      }
+    }
+  ]
+}

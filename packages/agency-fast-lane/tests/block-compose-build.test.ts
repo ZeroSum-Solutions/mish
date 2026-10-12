@@ -12,7 +12,7 @@ import type { FaithfulnessChecker, FaithfulnessSlot } from '../src/jev.ts';
 import type { RouteDecision } from '../src/route.ts';
 import type { JsonObject } from '../src/spine.ts';
 import { loadAtlasData } from '../src/atlas.ts';
-import { fakeModel, loadMaben, type Filler } from './fixtures.ts';
+import { fakeModel, loadTestSite, type Filler } from './fixtures.ts';
 import { clipWholeWords } from '../src/text-clip.ts';
 import { publicSectionEntryId as pub } from '../src/cult-public-ids.ts';
 import type { BlockSupportReceipt } from '../src/block-support.ts';
@@ -23,7 +23,7 @@ const wholeWords: Filler = (key, _value, _at, limit) => {
   return typeof limit === 'number' ? (clipWholeWords(text, limit) ?? 'New') : text;
 };
 
-const pkg = await loadMaben();
+const pkg = await loadTestSite();
 const BRIEF = 'Ledgerline, accounting software for small agencies. Invoices, time tracking and payroll in one place. Start a free trial.';
 const DAEMON = 'http://daemon.test';
 const PLAN = {
@@ -31,7 +31,7 @@ const PLAN = {
   directionId: 'tech-utility',
   // No footer: every Product-adoption footer is refused for composition since the G9 dry run
   // (`section-overlay.ts`'s `composeRefusalFor`), so a PA page closes on its cta band.
-  blocks: ['hyperui:marketing/sections/1', 'cult:marketing-bento-shadcn', 'cult:marketing-faq-apple', 'cult:marketing-cta-cosmic'],
+  blocks: ['hyperui:marketing/sections/1', 'hyperui:marketing/feature-grids/1', 'hyperui:marketing/ctas/1'],
 };
 
 const checker: FaithfulnessChecker = {
@@ -40,7 +40,7 @@ const checker: FaithfulnessChecker = {
   },
 };
 
-const routed = (spine: string, family = 'maben'): RouteDecision => ({
+const routed = (spine: string, family = 'ownedsite'): RouteDecision => ({
   decision: 'routed',
   spine: { code: spine, name: spine, confidence: 0.9, probabilities: { [spine]: 0.9 } },
   spines: [{ code: spine, probability: 0.9 }],
@@ -78,11 +78,11 @@ function input(overrides: Partial<BuildInput> = {}): BuildInput {
     verify: 'strict',
     provider: 'deepseek',
     prepare: async (family: string): Promise<PreparedBuild> => {
-      assert.equal(family, 'maben');
-      return { pkg, entry: 'maben-r1.html' };
+      assert.equal(family, 'ownedsite');
+      return { pkg, entry: 'ownedsite-r1.html' };
     },
     loadAtlas: loadAtlasData,
-    loadBlockCatalog: loadBlockCatalogFromSource,
+    loadBlockCatalog: async () => ({blocks: PLAN.blocks.map((id,index) => ({id,title:id,sectionKind:['hero','features','cta-band'][index]!,spineAffinities:['PA'] as const,useCases:[],tags:[]}))}),
     project: { daemonUrl: DAEMON },
     ...overrides,
   };
@@ -152,7 +152,7 @@ test('blocks: a Jev failure falls back to the family route with its fixed code',
   );
   assert.equal(result.outcome, 'built');
   if (result.outcome !== 'built') return;
-  assert.equal(result.family, 'maben');
+  assert.equal(result.family, 'ownedsite');
   assert.deepEqual(result.report.composition, { requested: 'blocks', used: 'family', fallback: 'jev-timeout', planner: { calls: 0, ms: 1 } });
   const composition = events.find((event) => event.type === 'composition');
   assert.deepEqual(composition && composition.type === 'composition' ? composition.result : undefined, { requested: 'blocks', used: 'family', fallback: 'jev-timeout', planner: { calls: 0, ms: 1 } });
@@ -185,7 +185,7 @@ test('auto: an uncovered spine runs the family route and records no-coverage, wi
   assert.equal(result.outcome, 'built');
   if (result.outcome !== 'built') return;
   assert.equal(seen.length, 0);
-  assert.equal(result.family, 'maben');
+  assert.equal(result.family, 'ownedsite');
   assert.deepEqual(result.report.composition, { requested: 'auto', used: 'family', fallback: 'no-coverage' });
 });
 
@@ -198,7 +198,7 @@ test('auto: a covered spine below the threshold never composes — spine-below-t
   const routedWeak = await buildSite(input({ composition: 'auto' }), deps({ createJevRouter: () => ({ route: async () => weak('routed') }), createBlockPlanner: planner(() => ({ plan: PLAN, confidence: 0.9, ms: 1, calls: 1 }), seen) }));
   assert.equal(routedWeak.outcome, 'built');
   if (routedWeak.outcome !== 'built') return;
-  assert.equal(routedWeak.family, 'maben');
+  assert.equal(routedWeak.family, 'ownedsite');
   assert.deepEqual(routedWeak.report.composition, { requested: 'auto', used: 'family', fallback: 'spine-below-threshold' });
   const unrouted = await buildSite(input({ composition: 'auto' }), deps({ createJevRouter: () => ({ route: async () => weak('unrouted') }), createBlockPlanner: planner(() => ({ plan: PLAN, confidence: 0.9, ms: 1, calls: 1 }), seen) }));
   assert.equal(unrouted.outcome, 'unrouted');
@@ -300,7 +300,7 @@ test('auto: a VALID family "none" answer (Jev honestly says no family fits) with
 });
 
 test('auto with a named family: family-named, the family route runs', async () => {
-  const result = await buildSite(input({ composition: 'auto', family: 'maben' }), deps());
+  const result = await buildSite(input({ composition: 'auto', family: 'ownedsite' }), deps());
   assert.equal(result.outcome, 'built');
   if (result.outcome !== 'built') return;
   assert.equal(result.report.composition?.fallback, 'family-named');
@@ -355,7 +355,7 @@ test('blocks and auto publish only after a strict check: any other verify mode i
 // Devin, 2026-10-10: a dental brief that stated its opening hours routed to `practice` (which has an
 // hours-and-location section) but `auto` composed four generic blocks, none of which can show hours,
 // so the brief's hours never got their own section. A routed brief that states an hours clause keeps
-// its routed family (here the fixture's `maben`) when the composed plan has no block that shows hours.
+// its routed family (here the fixture's `ownedsite`) when the composed plan has no block that shows hours.
 test('auto: a routed brief that states its hours keeps its family when no planned block shows hours', async () => {
   const seen: Array<{ spine?: string }> = [];
   const brief = `${BRIEF} Hours: Monday-Friday 9am-5pm.`;
@@ -365,7 +365,7 @@ test('auto: a routed brief that states its hours keeps its family when no planne
   );
   assert.equal(result.outcome, 'built');
   if (result.outcome !== 'built') return;
-  assert.equal(result.family, 'maben');
+  assert.equal(result.family, 'ownedsite');
   assert.equal(result.report.composition?.used, 'family');
   assert.equal(result.report.composition?.fallback, 'hours-not-covered');
 });
@@ -389,9 +389,9 @@ test('planShowsHours matches whole kind words only', () => {
 
 test('auto: a plan whose block shows hours still composes for a brief that states its hours', async () => {
   const brief = `${BRIEF} Hours: Monday-Friday 9am-5pm.`;
-  const real = await loadBlockCatalogFromSource();
+  const real = await input().loadBlockCatalog!();
   // Re-kind the plan's last block as an hours section: the gate must let this plan compose.
-  const loadBlockCatalog = async () => ({ blocks: real.blocks.map((entry) => (entry.id === PLAN.blocks[3] ? { ...entry, sectionKind: 'hours-location' } : entry)) });
+  const loadBlockCatalog = async () => ({ blocks: [...real.blocks.map((entry) => (entry.id === PLAN.blocks[2] ? { ...entry, sectionKind: 'hours-location' } : entry)), { ...real.blocks[2]!, id: 'test:closing-coverage', sectionKind: 'cta-band' }] });
   const result = await buildSite(
     input({ composition: 'auto', brief, loadBlockCatalog }),
     deps({ createJevRouter: () => ({ route: async () => routed('PA') }), createBlockPlanner: planner(() => ({ plan: PLAN, confidence: 0.9, ms: 1, calls: 1 })) }),
@@ -436,21 +436,17 @@ test('a picked design kit on a build that ends on the family route is reported a
   const result = await buildSite(input({ composition: 'auto', designKit: designKit() }), deps({ createJevRouter: () => ({ route: async () => routed('CO') }) }));
   assert.equal(result.outcome, 'built');
   if (result.outcome !== 'built') return;
-  assert.equal(result.family, 'maben');
+  assert.equal(result.family, 'ownedsite');
   assert.deepEqual(result.report.composition, { requested: 'auto', used: 'family', fallback: 'no-coverage', designKit: { id: 'user:atlas-test', title: 'Atlas test', applied: false } });
 });
 
 // R4 (Devin, 2026-10-10): every SaaS brief composed a plan with the modern bento block and failed
 // RENDER_QUALITY_FAILED (form-labels): the block carries a decorative, unlabelled range slider.
-test('a composed page with the modern bento block passes the form-labels check', async () => {
-  const plan = { spine: 'PA', directionId: 'modern-minimal', blocks: ['hyperui:marketing/sections/1', 'cult:bento-modern', 'cult:marketing-cta-cosmic'] };
-  const result = await buildSite(input({ composition: 'blocks' }), deps({ createBlockPlanner: planner(() => ({ plan, confidence: 0.9, ms: 1, calls: 1 })) }));
-  assert.equal(result.outcome, 'built');
-  if (result.outcome !== 'built') return;
-  assert.equal(result.report.composition?.used, 'blocks');
-  assert.equal(result.report.renderQuality?.passed, true);
-  // The bento block is on the page, its static slider out of the accessibility tree and tab order.
-  assert.match(result.report.html, /<input[^>]*type="range"[^>]*disabled aria-hidden="true" tabindex="-1">/);
+test('an explicit plan naming a removed vendor block is refused before publication', async () => {
+  const plan = { spine: 'PA', directionId: 'modern-minimal', blocks: ['hyperui:marketing/sections/1', 'cult:bento-modern', 'hyperui:marketing/ctas/1'] };
+  const calls: Call[] = [];
+  await assert.rejects(buildSite(input({ composition: 'blocks', blockPlan: plan }), deps({ createBlockPlanner: planner(() => ({ plan, confidence: 0.9, ms: 1, calls: 1 })), daemonFetch: fakeDaemon(calls) })), /plan-no-longer-applies:.*cult:bento-modern is not an insertable catalog block/);
+  assert.equal(calls.length, 0);
 });
 
 test('only the modern bento block\'s known slider is marked decorative; other controls are untouched', async () => {
@@ -458,4 +454,13 @@ test('only the modern bento block\'s known slider is marked decorative; other co
   // Not the bento block: nothing changes, even for disabled-looking text inside attributes.
   assert.equal(markDecorativeBentoSlider('cult:marketing-hero-input', '<input placeholder="temporarily disabled field">'), '<input placeholder="temporarily disabled field">');
   assert.equal(markDecorativeBentoSlider('cult:marketing-hero-input', '<input type="range" disabled>'), '<input type="range" disabled>');
+});
+
+test('the real public catalog composes a HyperUI page that passes render quality', async () => {
+  const result = await buildSite(input({ composition: 'blocks', blockPlan: PLAN, loadBlockCatalog: loadBlockCatalogFromSource }), deps());
+  assert.equal(result.outcome, 'built');
+  if (result.outcome !== 'built') return;
+  assert.deepEqual(selected(result.report.html), PLAN.blocks);
+  assert.equal(result.report.composition?.used, 'blocks');
+  assert.equal(result.report.renderQuality?.passed, true);
 });

@@ -593,6 +593,23 @@ describe('MessageCenter', () => {
     expect(screen.queryByRole('button', { name: 'View update' })).toBeNull();
   });
 
+  it('suppresses CTAs for the repo path itself but not for a sibling path sharing its prefix', async () => {
+    for (const [ctaUrl, visible] of [
+      ['https://github.com/ZeroSum-Solutions/mish', false],
+      ['https://github.com/ZeroSum-Solutions/mish/releases', false],
+      ['https://github.com/ZeroSum-Solutions/mish-other/releases', true],
+    ] as const) {
+      localStorage.clear();
+      mockFetch({ messages: [{ ...defaultMessages[0]!, ctaUrl }] });
+      const { unmount } = renderMessageCenter();
+      await openCenter();
+      fireEvent.click(screen.getByRole('button', { name: /Mishh Mashh 0\.14 is available/ }));
+      expect(Boolean(screen.queryByRole('button', { name: 'View update' }))).toBe(visible);
+      unmount();
+      cleanup();
+    }
+  });
+
   it('closes with Escape and restores trigger focus', async () => {
     renderMessageCenter();
     const trigger = screen.getByTestId('message-center-trigger');

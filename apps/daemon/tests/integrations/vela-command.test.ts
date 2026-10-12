@@ -57,8 +57,8 @@ describe('runVelaCommand', () => {
       return { pid: 4321 };
     });
     await expect(runVelaCommand(['team-projects', 'list'], { env: {
-      VELA_BIN: process.execPath, OD_DATA_DIR: '', VELA_WORKSPACE_ID: 'team-1', HTTPS_PROXY: 'http://localhost:7890',
-    } })).rejects.toBe(failure);
+      VELA_BIN: process.execPath, OD_DATA_DIR: '', HTTPS_PROXY: 'http://localhost:7890',
+    }, configuredEnv: { VELA_WORKSPACE_ID: 'team-1' } })).rejects.toBe(failure);
     expect(record).toHaveBeenCalledWith(expect.objectContaining({
       source: 'team-projects', error: failure, workspaceId: 'team-1', env: expect.objectContaining({ HTTPS_PROXY: 'http://localhost:7890' }),
     }));

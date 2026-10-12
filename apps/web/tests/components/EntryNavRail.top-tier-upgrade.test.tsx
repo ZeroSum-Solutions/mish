@@ -21,6 +21,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { EntryNavRail, resetWorkspaceDirectoryCache } from '../../src/components/EntryNavRail';
 import { I18nProvider } from '../../src/i18n';
+import { useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 const originalFetch = globalThis.fetch;
 

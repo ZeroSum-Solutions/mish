@@ -269,7 +269,7 @@ describe('builds persist across a restart', () => {
     }
   });
 
-  it('serves a build saved before public Cult ids with public ids, and rewrites the record', async () => {
+  it('preserves historic build ids when their catalog mappings are unavailable', async () => {
     mkdirSync(path.dirname(buildsFileFor(tempRoot)), { recursive: true });
     const startedAt = new Date().toISOString();
     writeFileSync(buildsFileFor(tempRoot), JSON.stringify({
@@ -290,14 +290,14 @@ describe('builds persist across a restart', () => {
     try {
       const text = await (await get(app.baseUrl, '/api/agency/builds/old-cult-build-1')).text();
       const snapshot = JSON.parse(text) as { build: AgencyBuildSnapshot };
-      expect(snapshot.build.sectionOverlay?.entryId).toBe('cult:pricing-series-v');
-      expect(snapshot.build.composition?.blocks).toEqual(['hyperui:marketing/sections/1', 'cult:bento-series-vt', 'cult:footer-series-v']);
-      expect(snapshot.build.composition?.budgetDropped).toEqual(['cult:faq-series-vt']);
-      expect(text).not.toMatch(/marketing-(pricing|bento|footer|faq)-/);
-      expect(snapshot.build.events.map((event) => event.label ?? event.composition?.blocks?.[0])).toEqual(['cult:bento-series-vt', 'cult:footer-series-v']);
-      // The hydrated record is rewritten, so the file no longer names the internal ids either.
+      expect(snapshot.build.sectionOverlay?.entryId).toBe('cult:marketing-pricing-vercel');
+      expect(snapshot.build.composition?.blocks).toEqual(['hyperui:marketing/sections/1', 'cult:marketing-bento-vite', 'cult:marketing-footer-vercel']);
+      expect(snapshot.build.composition?.budgetDropped).toEqual(['cult:marketing-faq-vite']);
+      expect(snapshot.build.status).toBe('done');
+      expect(snapshot.build.events.map((event) => event.label ?? event.composition?.blocks?.[0])).toEqual(['cult:marketing-bento-vite', 'cult:marketing-footer-vercel']);
+      // Hydration does not fabricate a public alias for removed content.
       await waitForPersisted(tempRoot, 'old-cult-build-1', 'done');
-      expect(readFileSync(buildsFileFor(tempRoot), 'utf8')).not.toContain('marketing-pricing-vercel');
+      expect(readFileSync(buildsFileFor(tempRoot), 'utf8')).toContain('marketing-pricing-vercel');
     } finally {
       await app.close();
     }

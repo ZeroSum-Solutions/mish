@@ -27,8 +27,10 @@ import {
 
 const require = createRequire(import.meta.url);
 
-function writeFakeDshCarrier(dir: string): string {
-  const fixture = path.resolve('tests/fixtures/dsh-profile/fake-dsh.ts');
+function writeFakeDshCarrier(dir: string, mode?: string): string {
+  const source = path.resolve('tests/fixtures/dsh-profile/fake-dsh.ts');
+  const fixture = mode ? path.join(dir, 'fake-dsh.mjs') : source;
+  if (mode) writeFileSync(fixture, `Object.assign(process.env, ${JSON.stringify({ OD_DSH_FAKE_MODE: mode, OD_DSH_FAKE_SESSION_ROOT: dir })}); await import(${JSON.stringify(pathToFileURL(source).href)});`);
   const tsxLoader = pathToFileURL(require.resolve('tsx')).href;
   if (process.platform === 'win32') {
     const carrier = path.join(dir, 'dsh.cmd');
@@ -161,7 +163,7 @@ describe('DeepSeek Harness Windows carrier', () => {
       OD_DSH_FAKE_SESSION_ROOT: process.env.OD_DSH_FAKE_SESSION_ROOT,
     };
     try {
-      writeFakeDshCarrier(dir);
+      writeFakeDshCarrier(dir, 'missing-credential');
       process.env.PATH = `${dir}${delimiter}${previous.PATH ?? ''}`;
       process.env.DSH_HOME = createProfileHome(dir);
       process.env.OD_DSH_FAKE_MODE = 'missing-credential';

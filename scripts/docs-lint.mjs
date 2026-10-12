@@ -11,7 +11,7 @@
  *       `mise exec --` and `env` stripped) that names a repo script which does not exist: a root
  *       `pnpm run <script>` / `pnpm <script>` missing from `package.json` `scripts`, or a
  *       `scripts/<name>.{ts,mjs,js,sh}` path missing from disk.
- *   (c) the strings "Mish" / "Mish" in any file NOT on the legal-notice allowlist
+ *   (c) the retired upstream product name (any spacing / case) in any file NOT on the legal-notice allowlist
  *       (`docs/FORK-PIN.md`, `NOTICE`, `LICENSE`, `docs/legal/*`, `docs/rebrand-audit-*`) — this repo is a fork that
  *       renamed itself, and every non-legal doc mentioning the old name by name is drift.
  *   (d) required headings: repeatable `--require "file:Heading"` — the named file must contain
@@ -55,7 +55,7 @@ function defaultFiles(root) {
   return [...new Set(out)].sort();
 }
 
-// Files (relative to --root) allowed to say "Mish" / "Mish" — this repo's own
+// Files (relative to --root) allowed to name the retired upstream product — this repo's own
 // legal/fork-provenance notices, and the rebrand audit that lists the identifiers the rename
 // kept on purpose, where the old name is the whole point of the file.
 const LEGAL_ALLOWLIST_EXACT = new Set(['docs/FORK-PIN.md', 'NOTICE', 'LICENSE']);
@@ -265,9 +265,11 @@ function checkFencedScriptRefs(file, text) {
   }
 }
 
-// ---- (c) "Mish" / "Mish" outside the legal allowlist ------------------------------
+// ---- (c) the retired upstream name outside the legal allowlist ------------------------------
 
-const OLD_NAME_RE = /Mish|Mish/g;
+// Built from parts so this file's own source never spells the retired name. Matches it with a
+// space, `-`, `_`, `.` or nothing between the two words, in any case. "Mish" is current branding.
+const OLD_NAME_RE = new RegExp(['Open', 'Design'].join('[ _.-]?'), 'gi');
 
 function checkOldName(file, text) {
   if (isLegalAllowlisted(file)) return;

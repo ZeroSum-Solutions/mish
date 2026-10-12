@@ -58,6 +58,7 @@ describe('tools-dev sandbox mode smoke', () => {
     const capturePath = join(suite.scratchDir, 'captures', 'opencode-run.json');
     const opencodeBin = await writeFakeOpenCodeBin(
       join(suite.scratchDir, 'fake-opencode'),
+      capturePath,
     );
 
     await suite.with.toolsDev(
@@ -186,7 +187,6 @@ describe('tools-dev sandbox mode smoke', () => {
       },
       {
         env: {
-          OD_E2E_SANDBOX_CAPTURE_PATH: capturePath,
           OD_SANDBOX_MODE: '1',
         },
       },
@@ -194,15 +194,15 @@ describe('tools-dev sandbox mode smoke', () => {
   }, 180_000);
 });
 
-async function writeFakeOpenCodeBin(root: string): Promise<string> {
+async function writeFakeOpenCodeBin(root: string, capturePath: string): Promise<string> {
   await mkdir(root, { recursive: true });
   const bin = join(root, 'opencode-sandbox-smoke.cjs');
-  await writeFile(bin, renderFakeOpenCodeScript(), 'utf8');
+  await writeFile(bin, renderFakeOpenCodeScript(capturePath), 'utf8');
   await chmod(bin, 0o755);
   return bin;
 }
 
-function renderFakeOpenCodeScript(): string {
+function renderFakeOpenCodeScript(capturePath: string): string {
   return `#!/usr/bin/env node
 const { mkdirSync, writeFileSync } = require('node:fs');
 const { dirname } = require('node:path');
@@ -240,7 +240,7 @@ setTimeout(() => emitRun(prompt), 500);
 function emitRun(promptText) {
   if (emitted) return;
   emitted = true;
-  const capturePath = process.env.OD_E2E_SANDBOX_CAPTURE_PATH;
+  const capturePath = ${JSON.stringify(capturePath)};
   if (capturePath && process.env.OD_TOOL_TOKEN) {
     const env = {};
     for (const key of captureEnvKeys) {

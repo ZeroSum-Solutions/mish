@@ -189,7 +189,7 @@ describe('download attribution service', () => {
   it('mints a first-party browser bridge only with metrics consent and a ledger secret', async () => {
     await withTempData(async (dataDir) => {
       const fetchImpl = vi.fn(async () => new Response(JSON.stringify({
-        url: 'https://github.com/ZeroSum-Solutions/mish/clipper?od_bridge=odbr_12345678',
+        url: 'https://mish.invalid/clipper?od_bridge=odbr_12345678',
       }), { status: 200 }));
       const service = createAttributionService({
         analytics: analyticsStub(),
@@ -199,8 +199,8 @@ describe('download attribution service', () => {
         paths: { RUNTIME_DATA_DIR: dataDir },
       });
 
-      await expect(service.bridgeUrl('https://github.com/ZeroSum-Solutions/mish/clipper')).resolves.toBe(
-        'https://github.com/ZeroSum-Solutions/mish/clipper?od_bridge=odbr_12345678',
+      await expect(service.bridgeUrl('https://mish.invalid/clipper')).resolves.toBe(
+        'https://mish.invalid/clipper?od_bridge=odbr_12345678',
       );
       expect(fetchImpl).toHaveBeenCalledWith(
         'https://ledger.test/api/attribution/bridge/mint',

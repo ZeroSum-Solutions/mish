@@ -49,7 +49,7 @@ async function withFakeKimi<T>(
   };
   try {
     const bin = join(dir, options.binName ?? 'kimi');
-    await fsp.writeFile(bin, `#!/usr/bin/env node\nimport(${JSON.stringify(FIXTURE)});\n`);
+    await fsp.writeFile(bin, `#!/usr/bin/env node\nObject.assign(process.env, ${JSON.stringify({ FAKE_KIMI_VERSION: options.version, FAKE_KIMI_ACP_VERSION: options.acpVersion, FAKE_KIMI_SESSION_NEW_LOG: sessionNewLog })});\nimport(${JSON.stringify(FIXTURE)});\n`);
     await fsp.chmod(bin, 0o755);
     process.env.PATH = `${dir}${delimiter}${saved.PATH ?? ''}`;
     process.env.FAKE_KIMI_VERSION = options.version;

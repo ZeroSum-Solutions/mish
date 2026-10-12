@@ -7,7 +7,7 @@
 
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { loadAtlasData } from '../src/atlas.ts';
+import { loadAtlasData } from './routing-fixture.ts';
 import { routeBuild } from '../src/build.ts';
 import { shouldRetryRoute, type RouteDecision, type RouteInput } from '../src/route.ts';
 
@@ -24,8 +24,8 @@ const base = {
   model: 'fake-router-model',
   usage: { input_tokens: 100, output_tokens: 10 },
 };
-const spineOnly: RouteDecision = { ...base, decision: 'unrouted', reason: 'family wrenfield at p=0.41 below 0.5' };
-const admitted: RouteDecision = { ...base, decision: 'routed', family: { id: 'wrenfield', probability: 0.78, basis: 'same-spine', transfer: 3, viaSpine: 'CO' } };
+const spineOnly: RouteDecision = { ...base, decision: 'unrouted', reason: 'family ownedcontractor at p=0.41 below 0.5' };
+const admitted: RouteDecision = { ...base, decision: 'routed', family: { id: 'ownedcontractor', probability: 0.78, basis: 'same-spine', transfer: 3, viaSpine: 'CO' } };
 const noSpine: RouteDecision = { ...base, decision: 'unrouted', reason: 'no spine', spine: { code: 'none', name: 'none', confidence: 0.7, probabilities: { none: 0.7 } }, spines: [] };
 const weakSpine: RouteDecision = { ...spineOnly, spine: { ...base.spine, confidence: 0.3 } };
 
@@ -56,7 +56,7 @@ test('first call spine-only, second admits: routed, with routeAttempts 2', async
   const decision = await routeBuild(input, deps);
   assert.equal(requests.length, 2);
   assert.equal(decision.decision, 'routed');
-  assert.equal(decision.family?.id, 'wrenfield');
+  assert.equal(decision.family?.id, 'ownedcontractor');
   assert.equal(decision.routeAttempts, 2);
   assert.equal(decision.ms, 400, 'the route time covers both requests');
   assert.deepEqual(decision.usage, { input_tokens: 200, output_tokens: 20 });

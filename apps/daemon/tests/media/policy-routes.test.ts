@@ -620,7 +620,7 @@ const attachToken = ${JSON.stringify(attachToken)};
   } catch {
     body = { raw: text };
   }
-  fs.writeFileSync(process.env.OD_CAPTURE_MEDIA_RESPONSE, JSON.stringify({
+  fs.writeFileSync(${JSON.stringify(capturePath)}, JSON.stringify({
     status: response.status,
     tokenAvailable: Boolean(token),
     tokenAttached: Boolean(attachToken && token),
@@ -630,7 +630,7 @@ const attachToken = ${JSON.stringify(attachToken)};
   }));
   console.log(JSON.stringify({ type: 'text', part: { text: 'media policy checked' } }));
 })().catch((error) => {
-  fs.writeFileSync(process.env.OD_CAPTURE_MEDIA_RESPONSE, JSON.stringify({
+  fs.writeFileSync(${JSON.stringify(capturePath)}, JSON.stringify({
     status: 0,
     tokenAvailable: Boolean(process.env.OD_TOOL_TOKEN),
     tokenAttached: Boolean(attachToken && process.env.OD_TOOL_TOKEN),

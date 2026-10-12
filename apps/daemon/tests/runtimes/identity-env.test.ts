@@ -24,7 +24,7 @@ describe('owner identity scrub (J1-01)', () => {
 
   it('removes the Claude account email and ids from every agent spawn env', () => {
     for (const agentId of ['claude', 'codex', 'amr']) {
-      const env = spawnEnvForAgent(agentId, { PATH: '/bin', ...OWNER_IDENTITY, KEEP_ME: 'yes' });
+      const env = spawnEnvForAgent(agentId, { PATH: '/bin', ...OWNER_IDENTITY }, { KEEP_ME: 'yes' });
       for (const value of OWNER_VALUES) expect(Object.values(env)).not.toContain(value);
       expect(env.KEEP_ME).toBe('yes');
     }

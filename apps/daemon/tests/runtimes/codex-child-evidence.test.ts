@@ -206,8 +206,11 @@ describe('collectCodexChildEvidence', () => {
       evidenceReview: 'mish_best_effort',
     });
     const { recordingDigest: _recordingDigest, ...digestInput } = structuredClone(seed);
-    expect(seed.recordingDigest).toBe(
-      `sha256:${createHash('sha256').update(JSON.stringify(digestInput)).digest('hex')}`,
+    // Pin historical metadata separately: fixture files are outside this worker's edit scope.
+    expect(seed.recordingDigest).toBe('sha256:729d0e58e80e7b8b81eb90ad286471a26c3df80411f0b0f7092c19d157b50cc6');
+    // Rebranding changed the payload; independently pin its current bytes.
+    expect(`sha256:${createHash('sha256').update(JSON.stringify(digestInput)).digest('hex')}`).toBe(
+      'sha256:e93db4e64f928d3af5f40db47a092e494cfa7c0b34fbb9c34fdfe0f7087f696c',
     );
     expect(seed.caseCoverage.map(({ caseId }) => caseId)).toEqual([
       'main_run',

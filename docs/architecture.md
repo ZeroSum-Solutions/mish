@@ -895,7 +895,7 @@ and Mobbin proxies, deduplicates candidates and uses typed Jev metadata judgment
 request/response contract belongs to `packages/contracts/src/api/workbench-reference-fanout.ts`;
 `apps/daemon/src/workbench/references/cli.ts` serves `od references fanout`, and the web's
 `apps/web/src/components/workbench/WorkbenchReferences.tsx` presents the same report in the first-draft and
-improved-brief flows. See the [V04 interface contract](plans/2026-10-02-design-workbench/technical-spec.md#v04-section-reference-fan-out)
+improved-brief flows. See the V04 interface contract
 for limits, ranking, degraded reports and unchanged connector permission boundaries. Discovery
 does not initiate a build or apply a reference.
 

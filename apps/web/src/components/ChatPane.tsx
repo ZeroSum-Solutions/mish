@@ -2571,7 +2571,13 @@ export function ChatPane({
    * 同样的 device id 传递规则(仅在同意指标上报时带)。入口来源分开记,
    * 这样漏斗能读出「卡」和「弹窗」各自带来多少升级。
    */
+  // `null` when no AMR console origin is configured: the recharge / upgrade
+  // actions are then unavailable (hidden on the error card, disabled on the
+  // balance card).
+  const amrPlansUrl = amrPlansUrlForProfile(amrProfile);
+  const amrRechargeUrl = amrRechargeUrlForProfile(amrProfile);
   const openAmrPlans = useCallback((entrySource: 'chat_error_upgrade' | 'chat_upgrade_card') => {
+    if (!amrPlansUrl) return;
     const attribution = recordAmrEntry(analytics.track, entrySource, new Date(), {
       metricsConsent: config?.telemetry?.metrics === true,
     });
@@ -2581,11 +2587,14 @@ export function ChatPane({
       installationId: config?.installationId,
     });
     window.open(
-      attributedAmrUrl(amrPlansUrlForProfile(amrProfile), attribution, deviceId),
+      attributedAmrUrl(amrPlansUrl, attribution, deviceId),
       '_blank',
       'noopener,noreferrer',
     );
-  }, [amrProfile, analytics.track, config?.installationId, config?.telemetry?.metrics]);
+  }, [amrPlansUrl, analytics.track, config?.installationId, config?.telemetry?.metrics]);
+  const fallbackAmrBalanceUpgrade = amrPlansUrl
+    ? () => openAmrPlans('chat_upgrade_card')
+    : undefined;
   const visibleRecoveryActionTypes = useMemo(() => {
     const actions: TrackingRunRecoveryActionType[] = [];
     if (!retryAssistant || !onRetry || !runFailureUi) return actions;
@@ -4575,7 +4584,7 @@ export function ChatPane({
                   streaming={streaming}
                   lowBalanceTurnCards={lowBalanceTurnCards}
                   onLowBalanceTurnCardUpgrade={
-                    onAmrBalanceUpgrade ?? (() => openAmrPlans('chat_upgrade_card'))
+                    onAmrBalanceUpgrade ?? fallbackAmrBalanceUpgrade
                   }
                   onResendUserMessage={onResendUserMessage}
                   onRetryImage={handleRetryImage}
@@ -4817,7 +4826,7 @@ export function ChatPane({
                               >
                                 {t('chat.runError.openSettingsCta')}
                               </RunErrorCardAction>
-                            ) : runFailureUi.primaryAction === 'recharge' ? (
+                            ) : runFailureUi.primaryAction === 'recharge' && amrRechargeUrl ? (
                               <RunErrorCardAction
                                 type="button"
                                 variant={errorActionVariant}
@@ -4846,7 +4855,7 @@ export function ChatPane({
                                   });
                                   window.open(
                                     attributedAmrUrl(
-                                      amrRechargeUrlForProfile(amrProfile),
+                                      amrRechargeUrl,
                                       attribution,
                                       deviceId,
                                     ),
@@ -4857,7 +4866,7 @@ export function ChatPane({
                               >
                                 {t('chat.amrError.rechargeCta')}
                               </RunErrorCardAction>
-                            ) : runFailureUi.primaryAction === 'upgrade' ? (
+                            ) : runFailureUi.primaryAction === 'upgrade' && amrPlansUrl ? (
                               <RunErrorCardAction
                                 type="button"
                                 variant={errorActionVariant}
@@ -4879,7 +4888,7 @@ export function ChatPane({
                                   });
                                   window.open(
                                     attributedAmrUrl(
-                                      amrPlansUrlForProfile(amrProfile),
+                                      amrPlansUrl,
                                       attribution,
                                       deviceId,
                                     ),
@@ -5035,7 +5044,7 @@ export function ChatPane({
                   <UpgradeCard
                     balanceUsd={tailAmrBalanceCardUsd}
                     onUpgrade={
-                      onAmrBalanceUpgrade ?? (() => openAmrPlans('chat_upgrade_card'))
+                      onAmrBalanceUpgrade ?? fallbackAmrBalanceUpgrade
                     }
                   />
                 ) : null}

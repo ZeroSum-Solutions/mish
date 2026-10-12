@@ -10,7 +10,7 @@ import test from 'node:test';
 import { applySectionDrops, briefHasQuote, buildKeepDropQuestions, createJevSectionJudge, decideSections, optionalSectionsOf, resolveKeepDrop, withoutDroppedSections, type OptionalSection, type SectionJudge } from '../src/sections.ts';
 import { editableTemplate, unitsOf, type JsonObject } from '../src/spine.ts';
 import { loadFamilyPackage } from '../src/family.ts';
-import { WATSON_DIR } from './fixtures.ts';
+import { TEST_EDITORIAL_DIR } from './fixtures.ts';
 
 const BRIEF = 'Riverbend Dental, a family dental practice in Boise. Same-day crowns, open Saturdays.';
 
@@ -183,30 +183,30 @@ test('no judge (verify off, or a repair) keeps every unhinted section; a section
 });
 
 test('optionalSectionsOf reads x-optional off the family schema; applySectionDrops nulls, restores and refuses', async () => {
-  const pkg = await loadFamilyPackage(WATSON_DIR, 'watson');
+  const pkg = await loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
   const optional = optionalSectionsOf(pkg.schema, pkg.fixture);
-  assert.deepEqual(optional.map(({ index, id, type, dropped }) => ({ index, id, type, dropped })), [{ index: 3, id: 'watson-about', type: 'about', dropped: false }]);
+  assert.deepEqual(optional.map(({ index, id, type, dropped }) => ({ index, id, type, dropped })), [{ index: 3, id: 'ownededitorial-about', type: 'about', dropped: false }]);
   assert.ok(optional[0]!.label && optional[0]!.dropWhen && optional[0]!.keepWhen);
 
   const spine = structuredClone(pkg.fixture);
-  assert.deepEqual(applySectionDrops(spine, pkg.schema, pkg.fixture, ['watson-about']), []);
+  assert.deepEqual(applySectionDrops(spine, pkg.schema, pkg.fixture, ['ownededitorial-about']), []);
   assert.equal((spine.sections as unknown[])[3], null);
-  assert.deepEqual(optionalSectionsOf(pkg.schema, spine, pkg.fixture).map((candidate) => [candidate.id, candidate.dropped]), [['watson-about', true]], 'a dropped section keeps its id from the reference recipe');
+  assert.deepEqual(optionalSectionsOf(pkg.schema, spine, pkg.fixture).map((candidate) => [candidate.id, candidate.dropped]), [['ownededitorial-about', true]], 'a dropped section keeps its id from the reference recipe');
 
   // A dropped section is neither a unit nor shown to the whole-page prompt.
   const template = editableTemplate(spine);
   const units = unitsOf(template!, undefined).map((unit) => unit.label);
-  assert.ok(!units.includes('watson-about') && !units.includes('section-3'), 'no unit for a dropped section');
+  assert.ok(!units.includes('ownededitorial-about') && !units.includes('section-3'), 'no unit for a dropped section');
   const shown = withoutDroppedSections(template, template!) as JsonObject;
   assert.equal((shown.sections as unknown[]).length, 4);
 
   // The positional filter refuses a value whose sections do not line up with the template.
   assert.throws(() => withoutDroppedSections({ sections: [{}, {}] }, template!), /do not line up/);
 
-  applySectionDrops(spine, pkg.schema, pkg.fixture, [], ['watson-about']);
+  applySectionDrops(spine, pkg.schema, pkg.fixture, [], ['ownededitorial-about']);
   assert.deepEqual((spine.sections as unknown[])[3], (pkg.fixture.sections as unknown[])[3], 'a keep hint restores the reference section');
 
-  assert.throws(() => applySectionDrops(structuredClone(pkg.fixture), pkg.schema, pkg.fixture, ['watson-hero']), /watson-hero is not an optional section of family watson/);
+  assert.throws(() => applySectionDrops(structuredClone(pkg.fixture), pkg.schema, pkg.fixture, ['ownededitorial-hero']), /ownededitorial-hero is not an optional section of family ownededitorial/);
 });
 
 test('CLI --keep/--drop become hints; a section named by both, or a non-id, is a usage error', async () => {
@@ -215,7 +215,7 @@ test('CLI --keep/--drop become hints; a section named by both, or a non-id, is a
   assert.deepEqual(parseSectionHints(['final-cta'], ['reviews', 'support']), { 'final-cta': 'keep', reviews: 'drop', support: 'drop' });
   assert.throws(() => parseSectionHints(['reviews'], ['reviews']), (error: unknown) => error instanceof CliExit && /both name section reviews/.test(error.message));
   assert.throws(() => parseSectionHints(['Reviews!'], []), (error: unknown) => error instanceof CliExit && /not a section id/.test(error.message));
-  const parsed = parseFastLaneArgs(['--family', 'wrenfield', '--brief', 'b.md', '--drop', 'reviews', '--keep', 'final-cta']);
+  const parsed = parseFastLaneArgs(['--family', 'ownedcontractor', '--brief', 'b.md', '--drop', 'reviews', '--keep', 'final-cta']);
   assert.deepEqual(parsed.sectionHints, { 'final-cta': 'keep', reviews: 'drop' });
 });
 

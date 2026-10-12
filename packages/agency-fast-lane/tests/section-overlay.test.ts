@@ -22,7 +22,7 @@ import {
 import type { ModelCall } from '../src/deepseek.ts';
 import type { FaithfulnessChecker } from '../src/jev.ts';
 import { withAdapterDeterministicGates } from '../src/run.ts';
-import { fakeJevChecker, fakeModel, promptBlock, WATSON_DIR } from './fixtures.ts';
+import { fakeJevChecker, fakeModel, promptBlock, TEST_EDITORIAL_DIR } from './fixtures.ts';
 
 /** Always fabricates, on every attempt including every faithfulness-repair round — unlike
  * `fakeModel`'s own repair path, which defaults back to an honest fill once it sees a rejection
@@ -40,8 +40,8 @@ function alwaysFabricates(): ModelCall & { prompts: string[] } {
   return call;
 }
 
-const loadWatson = () => loadFamilyPackage(WATSON_DIR, 'watson');
-const BRIEF = 'Watson, a design and technology studio in Los Angeles. Brand, product and motion work for ambitious teams.';
+const loadTestEditorial = () => loadFamilyPackage(TEST_EDITORIAL_DIR, 'ownededitorial');
+const BRIEF = 'TestEditorial, a design and technology studio in Los Angeles. Brand, product and motion work for ambitious teams.';
 
 // ---------------------------------------------------------------------------------------------
 // Adapter / direction resolution
@@ -70,13 +70,13 @@ test('resolveDesignDirection: all five ship, an unknown id refuses', async () =>
 // ---------------------------------------------------------------------------------------------
 
 test('resolveAnchorOffset: append lands right after the named section, inside <main>', async () => {
-  const pkg = await loadWatson();
-  const { html } = pkg.render(pkg.fixture, 'watson-r1.html');
-  const placement: SectionPlacement = { mode: 'append', afterSectionId: 'watson-hero' };
+  const pkg = await loadTestEditorial();
+  const { html } = pkg.render(pkg.fixture, 'ownededitorial-r1.html');
+  const placement: SectionPlacement = { mode: 'append', afterSectionId: 'ownededitorial-hero' };
   const fixtureSectionIds = (pkg.fixture.sections as Array<{ id: string } | null>).map((s) => s?.id ?? null);
   const offset = await resolveAnchorOffset(html, fixtureSectionIds, placement);
-  const closeTag = '</header>';
-  const heroCloseAt = html.indexOf(closeTag, html.indexOf('id="watson-hero"')) + closeTag.length;
+  const closeTag = '</section>';
+  const heroCloseAt = html.indexOf(closeTag, html.indexOf('id="ownededitorial-hero"')) + closeTag.length;
   assert.equal(offset, heroCloseAt);
   const mainEnd = html.indexOf('</main>');
   assert.ok(offset > html.indexOf('<main'));
@@ -84,11 +84,11 @@ test('resolveAnchorOffset: append lands right after the named section, inside <m
 });
 
 test('resolveAnchorOffset: append refuses an absent id', async () => {
-  const pkg = await loadWatson();
-  const { html } = pkg.render(pkg.fixture, 'watson-r1.html');
+  const pkg = await loadTestEditorial();
+  const { html } = pkg.render(pkg.fixture, 'ownededitorial-r1.html');
   const fixtureSectionIds = (pkg.fixture.sections as Array<{ id: string } | null>).map((s) => s?.id ?? null);
   await assert.rejects(
-    () => resolveAnchorOffset(html, fixtureSectionIds, { mode: 'append', afterSectionId: 'watson-does-not-exist' }),
+    () => resolveAnchorOffset(html, fixtureSectionIds, { mode: 'append', afterSectionId: 'ownededitorial-does-not-exist' }),
     SectionSelectionRefusedError,
   );
 });
@@ -99,13 +99,13 @@ test('resolveAnchorOffset: append refuses an ambiguous id (more than one match)'
 });
 
 test('resolveAnchorOffset: replace-optional lands after the section that precedes the dropped one', async () => {
-  const pkg = await loadWatson();
-  const { html } = pkg.render(pkg.fixture, 'watson-r1.html');
+  const pkg = await loadTestEditorial();
+  const { html } = pkg.render(pkg.fixture, 'ownededitorial-r1.html');
   const fixtureSectionIds = (pkg.fixture.sections as Array<{ id: string } | null>).map((s) => s?.id ?? null);
-  // watson's fixture order is navigation, hero, statement, about, footer; `about` is the one
-  // optional section (see slots.ts's WATSON_OPTIONAL_SECTIONS).
-  const replaceOffset = await resolveAnchorOffset(html, fixtureSectionIds, { mode: 'replace-optional', targetSectionId: 'watson-about' });
-  const appendOffset = await resolveAnchorOffset(html, fixtureSectionIds, { mode: 'append', afterSectionId: 'watson-statement' });
+  // ownededitorial's fixture order is navigation, hero, statement, about, footer; `about` is the one
+  // optional section (the owned schema's x-optional marker).
+  const replaceOffset = await resolveAnchorOffset(html, fixtureSectionIds, { mode: 'replace-optional', targetSectionId: 'ownededitorial-about' });
+  const appendOffset = await resolveAnchorOffset(html, fixtureSectionIds, { mode: 'append', afterSectionId: 'ownededitorial-statement' });
   assert.equal(replaceOffset, appendOffset, 'replacing the dropped section lands exactly where appending after its predecessor would');
 });
 
@@ -146,25 +146,25 @@ test('resolveAnchorOffset: a family with no <main> falls back to <body>', async 
 // anchor search over the whole body, including any inline script a family emits before its first
 // section, and that search is a plain regex, not the structural-tag tokenizer.
 test('resolveAnchorOffset: an id literal inside a <script> is never treated as a real anchor (refuses, does not anchor inside the script)', async () => {
-  const html = '<html><body><script>var markup = \'<div id="watson-hero">fake</div>\';</script></body></html>';
+  const html = '<html><body><script>var markup = \'<div id="ownededitorial-hero">fake</div>\';</script></body></html>';
   await assert.rejects(
-    () => resolveAnchorOffset(html, ['watson-hero'], { mode: 'append', afterSectionId: 'watson-hero' }),
+    () => resolveAnchorOffset(html, ['ownededitorial-hero'], { mode: 'append', afterSectionId: 'ownededitorial-hero' }),
     SectionSelectionRefusedError,
     'a script-string id must never resolve an anchor',
   );
 });
 
 test('resolveAnchorOffset: a real element wins over a same-id literal inside a <script> (masked out, not counted as ambiguous)', async () => {
-  const html = '<html><body><script>var markup = \'<div id="watson-hero">fake</div>\';</script><section id="watson-hero">real</section></body></html>';
-  const offset = await resolveAnchorOffset(html, ['watson-hero'], { mode: 'append', afterSectionId: 'watson-hero' });
+  const html = '<html><body><script>var markup = \'<div id="ownededitorial-hero">fake</div>\';</script><section id="ownededitorial-hero">real</section></body></html>';
+  const offset = await resolveAnchorOffset(html, ['ownededitorial-hero'], { mode: 'append', afterSectionId: 'ownededitorial-hero' });
   const realCloseAt = html.indexOf('</section>') + '</section>'.length;
   assert.equal(offset, realCloseAt, 'must anchor on the real <section>, not throw ambiguous and not anchor inside the script');
 });
 
 test('resolveAnchorOffset: an id literal inside an HTML comment is never treated as a real anchor', async () => {
-  const html = '<html><body><!-- <div id="watson-hero">commented out</div> --><section id="real-one"></section></body></html>';
+  const html = '<html><body><!-- <div id="ownededitorial-hero">commented out</div> --><section id="real-one"></section></body></html>';
   await assert.rejects(
-    () => resolveAnchorOffset(html, ['watson-hero'], { mode: 'append', afterSectionId: 'watson-hero' }),
+    () => resolveAnchorOffset(html, ['ownededitorial-hero'], { mode: 'append', afterSectionId: 'ownededitorial-hero' }),
     SectionSelectionRefusedError,
   );
 });
@@ -335,26 +335,26 @@ test('artifactDigest: deterministic, and changes with any of its four inputs', (
 // FamilyPackage wrapper: full composition against a real family
 // ---------------------------------------------------------------------------------------------
 
-test('wrapFamilyPackageForOverlay: composes the section into watson without ever changing what the family validator sees', async () => {
-  const pkg = await loadWatson();
+test('wrapFamilyPackageForOverlay: composes the section into ownededitorial without ever changing what the family validator sees', async () => {
+  const pkg = await loadTestEditorial();
   let sawInput: unknown;
   const spyPkg = { ...pkg, render: (input: Parameters<typeof pkg.render>[0], entry: string) => { sawInput = input; return pkg.render(input, entry); } };
-  const selection = { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' } as const, directionId: 'modern-minimal' };
+  const selection = { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' } as const, directionId: 'modern-minimal' };
   const adapter = await resolveSectionAdapter(selection.entryId);
   const direction = await resolveDesignDirection(selection.directionId);
-  const fill = { text: { heading: 'Talk to Watson', body: 'Tell us about your next launch.', cta: 'Book a call' } };
+  const fill = { text: { heading: 'Talk to TestEditorial', body: 'Tell us about your next launch.', cta: 'Book a call' } };
   const wrapped = await wrapFamilyPackageForOverlay(spyPkg, selection, direction, adapter, fill);
-  const result = wrapped.render(pkg.fixture, 'watson-r1.html');
+  const result = wrapped.render(pkg.fixture, 'ownededitorial-r1.html');
 
   assert.equal(sawInput, pkg.fixture, 'the wrapper must hand the family validator the exact, unmodified recipe object');
-  assert.ok(result.html.includes('Talk to Watson'));
+  assert.ok(result.html.includes('Talk to TestEditorial'));
   assert.ok(result.html.includes('data-od-selected-section="hyperui:marketing/ctas/1"'));
   assert.ok(result.html.includes('data-od-selected-direction="modern-minimal"'));
   assert.ok(result.html.includes('--role-accent'), 'the direction\'s role tokens must be bound in the inserted section\'s own scope');
-  assert.ok(result.html.indexOf('Talk to Watson') > result.html.indexOf('id="watson-hero"'), 'inserted after the anchor');
-  assert.ok(result.html.indexOf('Talk to Watson') < result.html.indexOf('</main>'), 'inserted inside <main>');
+  assert.ok(result.html.indexOf('Talk to TestEditorial') > result.html.indexOf('id="ownededitorial-hero"'), 'inserted after the anchor');
+  assert.ok(result.html.indexOf('Talk to TestEditorial') < result.html.indexOf('</main>'), 'inserted inside <main>');
 
-  const baseline = pkg.render(pkg.fixture, 'watson-r1.html');
+  const baseline = pkg.render(pkg.fixture, 'ownededitorial-r1.html');
   assert.notEqual(result.manifest.metadata.agencySite.recipeDigest, baseline.manifest.metadata.agencySite.recipeDigest, 'the composed digest must differ from the unselected base digest');
   const overlayMeta = (result.manifest.metadata.agencySite as unknown as { sectionOverlay: { entryId: string; directionId: string } }).sectionOverlay;
   assert.equal(overlayMeta.entryId, 'hyperui:marketing/ctas/1');
@@ -362,7 +362,7 @@ test('wrapFamilyPackageForOverlay: composes the section into watson without ever
 });
 
 test('wrapFamilyPackageForOverlay: compose is idempotent per section id — a repeated compose never splices twice', async () => {
-  const pkg = await loadWatson();
+  const pkg = await loadTestEditorial();
   // A package that honours `compose` twice and never reports `composed`: the wrapper's own
   // fallback splice then runs a third time on the same page.
   const eager = {
@@ -373,33 +373,33 @@ test('wrapFamilyPackageForOverlay: compose is idempotent per section id — a re
       return { ...base, html };
     },
   };
-  const selection = { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' } as const, directionId: 'modern-minimal' };
+  const selection = { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' } as const, directionId: 'modern-minimal' };
   const adapter = await resolveSectionAdapter(selection.entryId);
   const direction = await resolveDesignDirection(selection.directionId);
-  const wrapped = await wrapFamilyPackageForOverlay(eager, selection, direction, adapter, { text: { heading: 'Talk to Watson', body: 'Tell us more.', cta: 'Book a call' } });
+  const wrapped = await wrapFamilyPackageForOverlay(eager, selection, direction, adapter, { text: { heading: 'Talk to TestEditorial', body: 'Tell us more.', cta: 'Book a call' } });
   const count = (html: string) => html.split('data-od-selected-section="hyperui:marketing/ctas/1"').length - 1;
-  const first = wrapped.render(pkg.fixture, 'watson-r1.html');
-  const second = wrapped.render(pkg.fixture, 'watson-r1.html');
+  const first = wrapped.render(pkg.fixture, 'ownededitorial-r1.html');
+  const second = wrapped.render(pkg.fixture, 'ownededitorial-r1.html');
   assert.equal(count(first.html), 1, 'one spliced section');
   assert.equal(count(second.html), 1, 'one spliced section on a second render through the same package');
   assert.equal(second.html, first.html);
 });
 
 test('wrapFamilyPackageForOverlay: rejects when the anchor is absent, before any composition happens', async () => {
-  const pkg = await loadWatson();
-  const selection = { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-nowhere' } as const, directionId: 'modern-minimal' };
+  const pkg = await loadTestEditorial();
+  const selection = { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-nowhere' } as const, directionId: 'modern-minimal' };
   const adapter = await resolveSectionAdapter(selection.entryId);
   const direction = await resolveDesignDirection(selection.directionId);
   const wrapped = await wrapFamilyPackageForOverlay(pkg, selection, direction, adapter, { text: { heading: 'x', body: 'y', cta: 'z' } });
-  assert.throws(() => wrapped.render(pkg.fixture, 'watson-r1.html'), SectionSelectionRefusedError);
+  assert.throws(() => wrapped.render(pkg.fixture, 'ownededitorial-r1.html'), SectionSelectionRefusedError);
 });
 
 // FIX 5 (delta audit): `wrapFamilyPackageForOverlay` must compute the digest from the ADAPTER
 // OBJECT IT WAS GIVEN, never by re-resolving `selection.entryId` itself — otherwise a caller that
 // filled against one adapter version could publish a digest covering a different one.
 test('wrapFamilyPackageForOverlay: the digest, manifest AND rendered HTML all reflect the exact adapter object passed in, never a re-resolved one', async () => {
-  const pkg = await loadWatson();
-  const selection = { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'watson-hero' } as const, directionId: 'modern-minimal' };
+  const pkg = await loadTestEditorial();
+  const selection = { entryId: 'hyperui:marketing/ctas/1', placement: { mode: 'append', afterSectionId: 'ownededitorial-hero' } as const, directionId: 'modern-minimal' };
   const realAdapter = await resolveSectionAdapter(selection.entryId);
   const direction = await resolveDesignDirection(selection.directionId);
   const RENDER_MARKER = 'PASSED-ADAPTER-RENDER-MARKER-7f2c';
@@ -410,14 +410,14 @@ test('wrapFamilyPackageForOverlay: the digest, manifest AND rendered HTML all re
   // of this test asserted only the digest/manifest, which would still pass if rendering silently
   // re-resolved).
   const passedAdapter = { ...realAdapter, version: '9.9.9-test-only', render: () => `<p>${RENDER_MARKER}</p>` };
-  const fill = { text: { heading: 'Talk to Watson', body: 'Tell us about your next launch.', cta: 'Book a call' } };
+  const fill = { text: { heading: 'Talk to TestEditorial', body: 'Tell us about your next launch.', cta: 'Book a call' } };
   const wrapped = await wrapFamilyPackageForOverlay(pkg, selection, direction, passedAdapter, fill);
-  const result = wrapped.render(pkg.fixture, 'watson-r1.html');
+  const result = wrapped.render(pkg.fixture, 'ownededitorial-r1.html');
 
   assert.ok(result.html.includes(RENDER_MARKER), 'the rendered section must reflect the passed adapter\'s own render output, not a re-resolved one');
-  assert.equal(result.html.includes('Talk to Watson'), false, 'the real (re-resolved) adapter\'s render must never appear');
+  assert.equal(result.html.includes('Talk to TestEditorial'), false, 'the real (re-resolved) adapter\'s render must never appear');
 
-  const baseDigest = pkg.render(pkg.fixture, 'watson-r1.html').manifest.metadata.agencySite.recipeDigest;
+  const baseDigest = pkg.render(pkg.fixture, 'ownededitorial-r1.html').manifest.metadata.agencySite.recipeDigest;
   const expectedDigest = artifactDigest(baseDigest, selection, passedAdapter.version);
   assert.equal(result.manifest.metadata.agencySite.recipeDigest, expectedDigest);
   const overlayMeta = (result.manifest.metadata.agencySite as unknown as { sectionOverlay: { adapterVersion: string } }).sectionOverlay;

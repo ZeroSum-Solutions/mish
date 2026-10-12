@@ -39,12 +39,7 @@ describe('pet main spec', () => {
         spritesheetUrl: `/api/codex-pets/${USER_PET_ID}/spritesheet`,
       }));
 
-      const bundledPet = registry.pets.find((pet) => pet.id === 'clippit');
-      expect(bundledPet).toEqual(expect.objectContaining({
-        bundled: true,
-        id: 'clippit',
-        spritesheetExt: 'webp',
-      }));
+      expect(registry.pets.filter((pet) => pet.bundled)).toEqual([]);
 
       const userSheet = await readCodexPetSpritesheet(webUrl, USER_PET_ID);
       expect(userSheet.status).toBe(200);
@@ -53,10 +48,8 @@ describe('pet main spec', () => {
       expect(userSheet.origin).toBe('null');
       expect(userSheet.body.equals(fixture.png)).toBe(true);
 
-      const bundledSheet = await readCodexPetSpritesheet(webUrl, 'clippit');
-      expect(bundledSheet.status).toBe(200);
-      expect(bundledSheet.contentType).toMatch(/^image\/webp\b/);
-      expect(bundledSheet.body.byteLength).toBeGreaterThan(0);
+      const unavailableSheet = await readCodexPetSpritesheet(webUrl, 'clippit');
+      expect(unavailableSheet.status).toBe(404);
 
       const escapedSheet = await readCodexPetSpritesheet(webUrl, '../../etc/passwd');
       expect(escapedSheet.status).toBe(404);

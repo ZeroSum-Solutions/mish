@@ -27,7 +27,7 @@ import {
   runnerUpSkin,
   topLabels,
 } from '../scripts/profile-catalog.ts';
-import { loadAtlasData } from '../src/atlas.ts';
+import { loadAtlasData } from './routing-fixture.ts';
 import { loadDesignTaxonomy } from '../src/taxonomy.ts';
 import type { JsonObject } from '../src/spine.ts';
 
@@ -56,8 +56,8 @@ function fixtureProfile(overrides: Partial<DesignProfile> = {}): DesignProfile {
       skin: judgment('Cinematic and immersive', { 'Cinematic and immersive': 0.9, Editorial: 0.05, Luxury: 0.05 }),
       format: judgment('Landing page'),
       action: judgment('contact'),
-      family: judgment('maben'),
-      resolved: { archetypeId: 'TL.04', familyId: 'maben', basis: 'exact', transfer: 3 },
+      family: judgment('ownedsite'),
+      resolved: { archetypeId: 'TL.04', familyId: 'ownedsite', basis: 'exact', transfer: 3 },
     },
     sections: zeroed(taxonomy.sections.map((s) => s.id)),
     components: zeroed(taxonomy.components.map((c) => c.id)),

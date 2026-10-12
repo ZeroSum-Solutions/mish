@@ -308,7 +308,7 @@ test('no slots means no request and an empty result', async () => {
 test('collectFaithfulnessSlots: text slots only, never assets, destinations, or the id anchor', () => {
   const recipe = {
     schemaVersion: 2,
-    family: 'watson',
+    family: 'ownededitorial',
     revision: 1,
     wordmark: 'ignored-locked',
     colors: { primary: '#000' },

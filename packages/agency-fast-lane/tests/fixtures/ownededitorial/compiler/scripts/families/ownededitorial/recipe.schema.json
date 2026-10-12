@@ -1,0 +1,245 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {},
+    "family": {
+      "type": "string",
+      "maxLength": 240
+    },
+    "revision": {},
+    "brand": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 60
+        },
+        "colors": {
+          "type": "object",
+          "properties": {
+            "ink": {
+              "type": "string",
+              "maxLength": 240
+            }
+          }
+        },
+        "fonts": {
+          "type": "object",
+          "properties": {
+            "body": {
+              "type": "string",
+              "maxLength": 240
+            }
+          }
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "location": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "plain"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "opening": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "city": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "plain"
+                },
+                "partnershipsFirst": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "after": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          },
+          "x-optional": {
+            "label": "about",
+            "dropWhen": "No background is supplied.",
+            "keepWhen": "Background is supplied.",
+            "navSlots": []
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "awardCaption": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "plain"
+                },
+                "locations": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "address"
+                },
+                "campaigns": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "plain"
+                },
+                "businessEmail": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "email"
+                },
+                "jobsEmail": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "email"
+                },
+                "addressFirst": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "address"
+                },
+                "addressSecond": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "address"
+                },
+                "phone": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 60,
+                  "x-atom": "phone"
+                },
+                "network": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

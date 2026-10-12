@@ -3,13 +3,13 @@
  * (`verify-policy.ts`'s `after` mode, `run.ts`'s `verifyAfterPublish`): a strict run that turns up
  * a faithfulness flag still registers nothing at all — no project, no assets, no pages, no state
  * files — for all sixteen families this package ships today, byte-for-byte the same behaviour
- * `tests/run.test.ts`'s maben-only strict tests already pin.
+ * `tests/run.test.ts`'s ownedsite-only strict tests already pin.
  *
  * One fill per family is enough. There is no single field name every family's schema shares
- * (`watson`'s `brand.name` in particular carries its own strict glyph-set contract rule — see
- * `tests/watson-nullable.test.ts` — and is locked here exactly as `--lock brand.name` would), and
+ * (`ownededitorial`'s `brand.name` in particular carries its own strict glyph-set contract rule — see
+ * `tests/ownededitorial-nullable.test.ts` — and is locked here exactly as `--lock brand.name` would), and
  * every family has at least one nullable contact/award atom (`businessEmail`, `phone`, and
- * similar — see e.g. `tests/watson-nullable.test.ts`'s `NULLABLE_ATOMS`) whose own format a
+ * similar — see e.g. `tests/ownededitorial-nullable.test.ts`'s `NULLABLE_ATOMS`) whose own format a
  * generic fake filler cannot satisfy either, so those are left at the reference fixture's own
  * already-valid text rather than replaced. Everything else with a generous character limit gets
  * the marker — the point here is the strict gate's own behaviour, not each family's render/
@@ -25,12 +25,12 @@ import { fakeJevChecker, fakeModel, type Filler } from './fixtures.ts';
 
 const EXAMPLES = new URL('../../../plugins/_official/examples/', import.meta.url);
 
-const FAMILIES = ['maben', 'watson', 'wrenfield', 'fervor', 'halcyon', 'maren', 'emmpo', 'marketing-site', 'app-shell', 'crm-dashboard', 'listings', 'publication', 'nonprofit', 'docs-hub', 'restaurant', 'community', 'storefront', 'practice', 'guide'] as const;
+const FAMILIES = ['marketing-site', 'app-shell', 'crm-dashboard', 'listings', 'publication', 'nonprofit', 'docs-hub', 'restaurant', 'community', 'storefront', 'practice', 'guide'] as const;
 
 const BRIEF = 'Riverbend Dental, a family dental practice in Boise. Same-day crowns, sedation options, open Saturdays.';
 
 /** Every nullable atom's own key name (`businessEmail`, `phone`, …), by walking the family's own
- * schema the way `watson-nullable.test.ts` does by hand for one family — a fake filler has no
+ * schema the way `ownededitorial-nullable.test.ts` does by hand for one family — a fake filler has no
  * business inventing a format-valid email or phone number, and the fixture's own value already is
  * one. Key name only (not the full path), since a Filler is told the key, not the absolute path. */
 function nullableAtomKeys(pkg: Awaited<ReturnType<typeof loadFamilyPackage>>): Set<string> {
@@ -88,9 +88,9 @@ for (const family of FAMILIES) {
       modelName: 'fake',
       verify,
       strict: true,
-      // Watson's `brand.name` carries its own glyph-set contract rule a generic fake filler
+      // TestEditorial's `brand.name` carries its own glyph-set contract rule a generic fake filler
       // cannot satisfy; locked exactly as `--lock brand.name` would. A no-op for the other nine
-      // families, whose brand unit either has no `name` field the way watson's does at this same
+      // families, whose brand unit either has no `name` field the way ownededitorial's does at this same
       // relative path, or accepts it unlocked without issue either way.
       lockPaths: ['brand.name'],
       ensurePublisher: async () => {

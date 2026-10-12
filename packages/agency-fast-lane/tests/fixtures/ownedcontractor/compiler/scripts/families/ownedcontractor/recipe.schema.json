@@ -1,0 +1,269 @@
+{
+  "type": "object",
+  "properties": {
+    "schemaVersion": {},
+    "family": {
+      "type": "string",
+      "maxLength": 240
+    },
+    "revision": {},
+    "brand": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 240
+        }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "railKey4": {
+                  "type": "string",
+                  "maxLength": 240
+                },
+                "railValue4": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "heading": {
+                  "type": "string",
+                  "maxLength": 240
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "type": {
+              "type": "string",
+              "maxLength": 240
+            },
+            "content": {
+              "type": "object",
+              "properties": {
+                "hours1": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "plain",
+                  "x-verify": "hours-label",
+                  "x-hours-group": "footer"
+                },
+                "hours2": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "maxLength": 240,
+                  "x-atom": "plain",
+                  "x-verify": "hours-label",
+                  "x-hours-group": "footer"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

@@ -9,6 +9,8 @@ import { afterEach, test } from 'vitest';
 
 const LINT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../scripts/docs-lint.mjs');
 const FENCE = '```';
+// The retired upstream product name, assembled so this file never spells it literally.
+const RETIRED_NAME = ['Open', 'Design'].join(' ');
 
 let root = '';
 afterEach(() => {
@@ -83,7 +85,7 @@ test('the default set covers docs/*.md, docs/evals/*.md and evals/genui/README.m
     'README.md': '# Readme\n',
     'docs/guide.md': '# Guide\n\n[gone](nowhere.md)\n',
     'docs/evals/report.md': shell('pnpm missing'),
-    'evals/genui/README.md': '# Evals\n\nMish\n',
+    'evals/genui/README.md': `# Evals\n\n${RETIRED_NAME}\n`,
   });
   const { code, findings } = lint();
   assert.equal(code, 1);
@@ -92,6 +94,14 @@ test('the default set covers docs/*.md, docs/evals/*.md and evals/genui/README.m
     ['docs/guide.md', 'broken-link'],
     ['evals/genui/README.md', 'old-name-mention'],
   ]);
+});
+
+test('current Mish branding passes; every spelling of the retired upstream name fails', () => {
+  const spellings = [RETIRED_NAME, ['Open', 'Design'].join(''), ['open', 'design'].join('-'), ['OPEN', 'DESIGN'].join('_')];
+  fixture({ 'README.md': `# Mish\n\nMish is the product. mish-daemon runs Mish.\n\n${spellings.join('\n')}\n` });
+  const { code, findings } = lint();
+  assert.equal(code, 1);
+  assert.deepEqual(findings.map((f) => [f.check, f.line]), spellings.map((_, i) => ['old-name-mention', 5 + i]));
 });
 
 test('a --require target that is not linted positionally still gets every check', () => {

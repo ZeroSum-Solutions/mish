@@ -3,6 +3,11 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AmrArtifactUpgradeDialog } from '../../src/components/AmrArtifactUpgradeDialog';
+import { setRuntimeAmrConsoleOrigin } from '../../src/runtime/amr-guidance';
+import { TEST_AMR_CONSOLE_ORIGIN, useConfiguredAmrConsole } from '../helpers/amr-console';
+
+// No AMR console ships with the fork; these tests exercise the configured case.
+useConfiguredAmrConsole();
 
 afterEach(() => {
   cleanup();
@@ -51,11 +56,26 @@ describe('AmrArtifactUpgradeDialog', () => {
     const [url, target, features] = open.mock.calls[0] ?? [];
     const plansUrl = new URL(String(url));
     expect(`${plansUrl.origin}${plansUrl.pathname}`).toBe(
-      'https://github.com/ZeroSum-Solutions/mish/amr/dashboard',
+      `${TEST_AMR_CONSOLE_ORIGIN}/dashboard`,
     );
     expect(plansUrl.searchParams.get('billing')).toBe('plan');
     expect(target).toBe('_blank');
     expect(features).toBe('noopener,noreferrer');
+  });
+
+  it('hides the plans CTA when no AMR console origin is configured', () => {
+    setRuntimeAmrConsoleOrigin(null);
+    render(
+      <AmrArtifactUpgradeDialog
+        profile="prod"
+        metricsConsent={false}
+        installationId={null}
+        onClose={vi.fn()}
+        onContinue={vi.fn()}
+      />,
+    );
+    expect(screen.queryByTestId('amr-artifact-upgrade-plans')).toBeNull();
+    expect(screen.getByTestId('amr-artifact-upgrade-later')).toBeTruthy();
   });
 
   it('restarts the seven-day offer countdown at the cycle boundary', () => {

@@ -2015,9 +2015,15 @@ test('[P0] clearing the project design system removes designSystemId from the ne
     await route.continue();
   });
   await routeSuccessfulRuns(page, { bodies: runRequestBodies, runId: 'design-system-clear-run' });
+  // This helper creates through APIRequestContext, bypassing the browser-side
+  // same-session creation witness. Pin the scenario to an exact writable
+  // Personal owner so a slow catalog/status read cannot turn it viewer-only.
+  await mockWritablePersonalProjectScope(page);
 
   await page.goto('/');
-  await createProject(page, 'Header design system clear run context');
+  await createProject(page, 'Header design system clear run context', {
+    headers: AMR_PERSONAL_WORKSPACE_HEADERS,
+  });
   await expectWorkspaceReady(page);
 
   const trigger = projectDesignSystemTrigger(page);

@@ -6,6 +6,10 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { QuestionForm } from '../../src/artifacts/question-form';
 import { QuestionFormView } from '../../src/components/QuestionForm';
 import { VISUAL_STYLE_BATCH_SIZE } from '../../src/runtime/visual-style-deck';
+import { useConfiguredStyleCatalog } from '../helpers/style-catalog';
+
+// No hosted style previews ship with the fork; these tests configure an origin.
+useConfiguredStyleCatalog();
 
 afterEach(cleanup);
 
@@ -39,7 +43,7 @@ describe('visual-direction preview loading', () => {
 
     for (const image of images) {
       expect(image.getAttribute('src')).toMatch(
-        /^https:\/\/repo-assets\.mish\.ai\/cdn-cgi\/image\/width=640,quality=75,format=auto\/style-catalog\/v1\/deck-.*-v1\.webp$/,
+        /^https:\/\/repo-assets\.mish\.invalid\/cdn-cgi\/image\/width=640,quality=75,format=auto\/style-catalog\/v1\/deck-.*-v1\.webp$/,
       );
       expect(image.getAttribute('loading')).toBe('eager');
       expect(image.getAttribute('decoding')).toBe('async');

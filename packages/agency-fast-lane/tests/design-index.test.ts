@@ -52,8 +52,8 @@ function fixtureProfile(overrides: Partial<DesignProfile> & { id: string }): Des
       skin: judgment('Minimal and quiet'),
       format: judgment('Landing page'),
       action: judgment('contact'),
-      family: judgment('maben'),
-      resolved: { archetypeId: 'TL.04', familyId: 'maben', basis: 'exact', transfer: 3 },
+      family: judgment('ownedsite'),
+      resolved: { archetypeId: 'TL.04', familyId: 'ownedsite', basis: 'exact', transfer: 3 },
     },
     sections: zeroed(sectionIds),
     components: zeroed(componentIds),
@@ -222,14 +222,14 @@ test('findProfiles: --archetype, --family, --format, --action, and a style axis 
     route: {
       ...fixtureProfile({ id: 'different' }).route,
       archetype: judgment('BA.03'),
-      family: judgment('halcyon'),
+      family: judgment('ownedinstitution'),
       format: judgment('Authority site'),
       action: judgment('donate'),
     },
     style: { ...fixtureProfile({ id: 'different' }).style, typography: judgment('mono-technical') },
   };
   const index: DesignIndex = { schema: 'design-index/1', profiles: [matching, different] };
-  const query: FindQuery = { archetype: 'TL.04', family: 'maben', format: 'Landing page', action: 'contact', typography: 'grotesk-only' };
+  const query: FindQuery = { archetype: 'TL.04', family: 'ownedsite', format: 'Landing page', action: 'contact', typography: 'grotesk-only' };
   const results = findProfiles(index.profiles, query, taxonomy);
   assert.deepEqual(results.map((p) => p.source.id), ['match']);
 });
