@@ -282,7 +282,9 @@ const handlers = {
     // Every file esbuild read must also live inside the source checkout, so a
     // symlinked import cannot pull outside files into the bundle.
     for (const input of Object.keys(built.metafile.inputs)) {
-      if (input.startsWith('<') || input.includes(':')) continue;
+      // No esbuild plugins run here, so every input except esbuild's own
+      // <runtime> entry is a filesystem path; check them all.
+      if (input.startsWith('<')) continue;
       if (await ctx.uncontained(path.resolve(ctx.source, input), input)) return;
     }
     const folder = path.posix.dirname(resource.to);
