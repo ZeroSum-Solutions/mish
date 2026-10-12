@@ -181,7 +181,8 @@ setTimeout(() => process.exit(0), 10);
     );
     // 属性碎片也不许剩 —— 这两个字符串只可能来自标记内部
     expect(body).not.toContain('Critic');
-    expect(body).not.toContain('8.1');
+    // '8.1' 只在思考文本里查:整条 SSE 里有时间戳和耗时,碰巧含 "8.1" 会误报
+    expect(deltas.join('')).not.toContain('8.1');
     // 而且它连一格空事件都不该变成:那一帧整条被扔,不是被改写成空串。
     // 空串帧的条数恰好等于上游送的空串条数,多一条就说明标记帧漏成了空事件。
     expect(deltas.filter((d) => d === '').length).toBe(EMPTY_THINKING_FRAMES);
