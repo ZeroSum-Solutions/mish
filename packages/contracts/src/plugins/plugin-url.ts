@@ -72,7 +72,15 @@ export function pluginShareUrl(
   id: string,
   origin: string | null = MISH_SITE_ORIGIN,
 ): string | null {
-  const base = origin?.replace(/\/+$/, '');
+  const base = origin == null ? null : trimTrailingSlashes(origin);
   if (!base) return null;
   return `${base}${pluginDetailPath(id)}`;
+}
+
+// Linear-time trim: a `/\/+$/` regex backtracks quadratically on long runs of
+// slashes that are not at the end of the string.
+function trimTrailingSlashes(value: string): string {
+  let end = value.length;
+  while (end > 0 && value.charCodeAt(end - 1) === 47) end -= 1;
+  return value.slice(0, end);
 }

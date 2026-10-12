@@ -65,3 +65,13 @@ describe('pluginShareUrl', () => {
     expect(pluginShareUrl('x', 'https://self.host/')).toBe('https://self.host/plugins/x/');
   });
 });
+
+describe('pluginShareUrl origin trimming', () => {
+  it('trims any number of trailing slashes and stays fast on long slash runs', () => {
+    expect(pluginShareUrl('mish/hero', 'https://example.test///')).toBe(`https://example.test${pluginDetailPath('mish/hero')}`);
+    const hostile = `https://example.test${'/'.repeat(50_000)}x`;
+    const started = performance.now();
+    pluginShareUrl('mish/hero', hostile);
+    expect(performance.now() - started).toBeLessThan(200);
+  });
+});
