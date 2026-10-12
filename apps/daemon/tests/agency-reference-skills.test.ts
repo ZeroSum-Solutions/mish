@@ -65,15 +65,11 @@ describe('agency reference studies reach the selected assistant context', () => 
     const primary = frozen.selections.find((selection) => selection.canonicalId === 'agency-site')!;
     expect(primary.files.length).toBeLessThanOrEqual(32);
     expect(primary.files.some((file) => file.path.endsWith('recipe.schema.json'))).toBe(false);
-    const catalogFiles = [
-      'scripts/catalog-block.ts',
-      'scripts/catalog/components/scroll-reveal/styles.css',
-      'scripts/catalog/components/scroll-reveal/auto.js',
-    ];
+    // No public Agency family declares catalog components (the families that did were removed), so
+    // `sync-assets` generates no scripts/catalog/ folder; the block loader itself is still carried.
     const frozenPaths = primary.files.map((file) => file.path);
-    for (const file of catalogFiles) {
-      expect(frozenPaths, `the frozen agency-site package must carry ${file}`).toContain(file);
-    }
+    expect(frozenPaths, 'the frozen agency-site package must carry scripts/catalog-block.ts').toContain('scripts/catalog-block.ts');
+    expect(frozenPaths.filter((file) => file.startsWith('scripts/catalog/'))).toEqual([]);
     const packageBytes = frozen.selections.reduce((total, selection) => total + selection.bodyByteLength + selection.files.reduce((sum, file) => sum + file.byteLength, 0), 0);
     expect(
       MAX_PACKAGE_BYTES - packageBytes,

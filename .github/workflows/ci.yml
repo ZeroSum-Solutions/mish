@@ -233,10 +233,6 @@ jobs:
           pnpm --filter @mish/genui-catalog check
           pnpm --filter @mish/genui-catalog sync-assets:check
 
-      # No private source kit in CI: `check` validates the committed inventory, overrides and
-      # rights-doc pin, and skips the kit comparison (CULT_REQUIRE_KIT=1 would make that an error).
-      - name: Check Cult UI Pro inventory
-        run: pnpm --filter @mish/cult-ui-catalog check
 
       # The committed 21st.dev metadata, independently authored alternatives and MIT preview images;
       # without a local copy of the saved collection, `check` validates the committed files only.
@@ -385,10 +381,6 @@ jobs:
           install-command: pnpm -C e2e exec playwright install --with-deps chromium
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).workspace_unit) }}
 
-      # Every insertable Cult block, worst-case filled and spliced into real family pages, loaded
-      # in Chromium under the family CSP (no kit needed). Proves itself on a planted self-test.
-      - name: Run Cult render check
-        run: pnpm --filter @mish/cult-ui-catalog render-check
 
   windows_tools_pack_payload_tests:
     name: Windows tools-pack payload tests

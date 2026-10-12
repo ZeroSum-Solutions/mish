@@ -111,8 +111,6 @@ Approved media travels separately and is never bundled into the frozen skill.
 - `scripts/styles.ts`
 - `scripts/catalog-block.ts`
 - `scripts/effects.ts`
-- `scripts/catalog/components/scroll-reveal/styles.css`
-- `scripts/catalog/components/scroll-reveal/auto.js`
 - `scripts/fixtures/service.json`
 
 Not listed above (unused by `compose.ts`/`render.ts`/`family.ts`; loaded in-process instead by
