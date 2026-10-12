@@ -2,6 +2,8 @@
   <img src="./assets/readme/hero.webp" width="100%" alt="Mish!, the local-first AI design workspace from ZeroSum Solutions. A client brief becomes a routed, fact-checked, editable page, built on your own machine. Beside the title: three phone UI mock-ups, two light meal-planning screens and one dark wine-cellar screen, in front of the coral and lime paper M of the Mish! brand.">
 </p>
 
+<p align="center"><b>English</b></p>
+
 <p align="center">
   <a href="https://github.com/ZeroSum-Solutions/mish/releases/latest"><b>Download for Mac</b></a>
   &nbsp;·&nbsp;
