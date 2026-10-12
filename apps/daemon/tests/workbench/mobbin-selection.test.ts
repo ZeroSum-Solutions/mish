@@ -97,6 +97,19 @@ describe('selected Mobbin image cache (B067+B068, stubbed network)', () => {
     await expect(briefs.create({ projectId: 'project-1', originalText: 'Pricing page', selectedReferenceRefs: [connectorResourceRef(resource)] }, { principalId: 'local-owner', projectId: 'project-1' })).rejects.toMatchObject({ name: 'BriefError', status: 422, code: 'connector-image-invalid' });
   });
 
+  it('treats a corrupt saved record as a cache miss and re-downloads on select', async () => {
+    const resource = await found();
+    const input = { itemId: resource.itemId, capturedAt: resource.capturedAt };
+    const selected = await proxy.select('mobbin', input);
+    const key = selected.resource.cachedImage!.url.split('/').at(-1)!;
+    const { writeFile } = await import('node:fs/promises');
+    await writeFile(path.join(dataDir, 'workbench', 'connectors', 'mobbin', `${key}.json`), '{ truncated');
+    const healed = await proxy.select('mobbin', input);
+    expect(healed.resource.cachedImage).toMatchObject({ byteLength: IMAGE.length });
+    expect(imageCalls()).toHaveLength(2);
+    expect((await proxy.selectedImage('mobbin', key)).bytes).toEqual(IMAGE);
+  });
+
   it('refuses Workspace principal selection before owner-account image I/O', async () => {
     const resource = await found();
     await expect(selectReferences([connectorResourceRef(resource)], { principalId: 'workspace:one:member', projectId: 'project-1' }, connectorReferenceSource(proxy), 2000)).rejects.toMatchObject({ code: 'reference-forbidden' });
