@@ -4,6 +4,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { expect, it } from 'vitest';
 import { verifyBundledComponentKit } from '@/resources/component-kits.js';
+it('skips verification when the licensed payload is absent (public build)', async () => {
+  const root=await mkdtemp(join(tmpdir(),'mm-kit-none-'));
+  try { await verifyBundledComponentKit(root); } finally { await rm(root,{recursive:true,force:true}); }
+});
 it('refuses altered or unlisted component payload files before packaging', async () => {
   const root=await mkdtemp(join(tmpdir(),'mm-kit-pack-'));
   const kit=join(root,'data','component-kits','cult-ui-pro');
