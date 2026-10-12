@@ -120,7 +120,7 @@ describe('workspace Team plugin retraction', () => {
       });
       const velaBin = await hub.writeVelaBin(join(ownerSuite.scratchDir, 'fake-vela-plugin'));
       const memberVelaBin = await hub.writeVelaBin(join(memberSuite.scratchDir, 'fake-vela-plugin'));
-      for (const [bin, key] of [[velaBin, OWNER.controlKey], [memberVelaBin, MEMBER.controlKey]]) {
+      for (const [bin, key] of [[velaBin, OWNER.controlKey], [memberVelaBin, MEMBER.controlKey]] as const) {
         const script = await readFile(bin, 'utf8');
         expect(script).toContain('process.env.VELA_CONTROL_KEY');
         const configured = script.replaceAll('process.env.VELA_CONTROL_KEY', JSON.stringify(key));
