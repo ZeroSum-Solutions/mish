@@ -31,9 +31,10 @@ import type { CultPreviewInfoResponse, CultPreviewTheme } from '@mish/contracts'
 import { CULT_PREVIEW_MESSAGE_SOURCE, cultDisplayText, cultLocalOnlyRefusal, cultRegistryName } from '@mish/contracts';
 import { findRealTagOffset, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 import { COMPOSED_PAGE_CSP } from '@mish/agency-fast-lane/block-compose';
-import cultInventoryJson from '@mish/cult-ui-catalog/catalog.json' with { type: 'json' };
 
 import { BundledCultPreviews } from '../services/bundled-cult-previews.js';
+import { cultInventoryData } from '../cult-data.js';
+import { mishPackGeneration } from '../mish-packs/overlay.js';
 import { resolveCultKitDir } from '../cult-registry.js';
 import { cultPreviewPresentationCss } from '../cult-preview-presentation.js';
 import { withCultPreviewReadiness } from '../cult-preview-readiness.js';
@@ -60,8 +61,8 @@ export interface CultPreviewRow {
 export interface CultLivePreviewRouteOptions {
   /** Defaults to the shipped inventory. */
   rows?: readonly CultPreviewRow[];
-  /** The server supplies its validated bundled-kit fallback; a bare registrar defaults to `CULT_KIT_DIR`. */
-  kitDir?: string | null;
+  /** The server supplies its validated bundled-kit fallback; a bare registrar defaults to `CULT_KIT_DIR`. A function is read per request, so an installed pack takes effect without a restart. */
+  kitDir?: string | null | (() => string | null);
   /** Row id → public slug. Defaults to the catalog package's `generated/slugs.json`. */
   slugs?: ReadonlyMap<string, string>;
   /** Defaults to a harness in `CULT_PREVIEW_HARNESS_DIR` or next to the kit. */
@@ -112,17 +113,35 @@ function reasonFrame(rawReason: string): string {
 
 export function registerCultLivePreviewRoutes(app: Express, ctx: RegisterCultLivePreviewRoutesDeps, options: CultLivePreviewRouteOptions = {}): void {
   const { sendApiError } = ctx.http;
-  const rows = options.rows ?? (cultInventoryJson as unknown as { rows: CultPreviewRow[] }).rows;
-  const slugs = options.slugs ?? cultSlugs();
-  const byName = new Map(rows.map((row) => [row.name, row]));
-  const bySlug = new Map(rows.flatMap((row) => {
-    const slug = slugs.get(row.id);
-    return slug === undefined ? [] : [[slug, row] as const];
-  }));
-  const kitDir = options.kitDir === undefined ? resolveCultKitDir() : options.kitDir;
-  const harness = options.harness ?? (BundledCultPreviews.installed(kitDir)
-    ? new BundledCultPreviews(kitDir!)
-    : new CultPreviewHarness({ dir: resolveCultPreviewHarnessDir(kitDir), kitDir }));
+  // Rows, slugs, the kit and the harness are rebuilt when the set of installed Mish packs changes.
+  interface PreviewState {
+    generation: number;
+    kitDir: string | null;
+    byName: Map<string, CultPreviewRow>;
+    bySlug: Map<string, CultPreviewRow>;
+    harness: Pick<CultPreviewHarness, 'info' | 'page'>;
+  }
+  let built: PreviewState | null = null;
+  const state = (): PreviewState => {
+    const generation = mishPackGeneration();
+    const kitDir = typeof options.kitDir === 'function' ? options.kitDir() : options.kitDir === undefined ? resolveCultKitDir() : options.kitDir;
+    if (built && built.generation === generation && built.kitDir === kitDir) return built;
+    const rows = options.rows ?? (cultInventoryData() as unknown as { rows: CultPreviewRow[] }).rows;
+    const slugs = options.slugs ?? cultSlugs();
+    built = {
+      generation,
+      kitDir,
+      byName: new Map(rows.map((row) => [row.name, row])),
+      bySlug: new Map(rows.flatMap((row) => {
+        const slug = slugs.get(row.id);
+        return slug === undefined ? [] : [[slug, row] as const];
+      })),
+      harness: options.harness ?? (BundledCultPreviews.installed(kitDir)
+        ? new BundledCultPreviews(kitDir!)
+        : new CultPreviewHarness({ dir: resolveCultPreviewHarnessDir(kitDir), kitDir })),
+    };
+    return built;
+  };
 
   const localOnly = (req: Request, res: Response): boolean => {
     const refusal = cultLocalOnlyRefusal({ peer: req.socket.remoteAddress, header: (name) => req.get(name) });
@@ -137,6 +156,7 @@ export function registerCultLivePreviewRoutes(app: Express, ctx: RegisterCultLiv
 
   const rowFor = (req: Request, res: Response): CultPreviewRow | null => {
     const name = cultRegistryName(String(req.params.id ?? ''));
+    const { bySlug, byName } = state();
     const row = name === null ? undefined : bySlug.get(name) ?? byName.get(name);
     if (!row || !(CONVERTED_KINDS.has(row.assetKind) || HARNESS_KINDS.has(row.assetKind))) {
       sendApiError(res, 404, 'NOT_FOUND', 'no Cult catalog item with that id');
@@ -152,6 +172,7 @@ export function registerCultLivePreviewRoutes(app: Express, ctx: RegisterCultLiv
     if (!localOnly(req, res)) return;
     const row = rowFor(req, res);
     if (!row) return;
+    const { kitDir, harness } = state();
     let body: CultPreviewInfoResponse;
     if (CONVERTED_KINDS.has(row.assetKind)) {
       body = convertedDir(kitDir, row.name) !== null
@@ -175,6 +196,7 @@ export function registerCultLivePreviewRoutes(app: Express, ctx: RegisterCultLiv
     const row = rowFor(req, res);
     if (!row) return;
     const theme = themeOf(req);
+    const { kitDir, harness } = state();
     res.setHeader('X-Frame-Options', 'SAMEORIGIN');
     res.setHeader('Referrer-Policy', 'no-referrer');
     if (CONVERTED_KINDS.has(row.assetKind)) {

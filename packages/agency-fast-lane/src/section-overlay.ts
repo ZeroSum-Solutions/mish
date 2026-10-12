@@ -64,6 +64,8 @@
  */
 
 import { createHash } from 'node:crypto';
+import { pathToFileURL } from 'node:url';
+import { fastLanePackGeneration, fastLanePackOverlay } from './pack-overlay.ts';
 import { buildUserPrompt, SYSTEM_PROMPT } from './prompt.ts';
 import { claimRepairHint } from './repair-hints.ts';
 import type { ModelCall, Usage } from './deepseek.ts';
@@ -198,10 +200,37 @@ type CultRegistryModule = { CULT_ADAPTERS: Readonly<Record<string, () => Promise
 const CULT_ADAPTER_ID = /^cult:[a-z0-9][a-z0-9-]*$/;
 
 let cultRegistry: Promise<CultRegistryModule> | undefined;
+let packRegistry: { key: string; module: Promise<CultRegistryModule> } | undefined;
 
+/**
+ * An installed pack's prebuilt adapter module, merged over the bundled registry (the pack wins for
+ * an id both define). The pack module is imported by file URL; the generation in the query string
+ * makes Node load a changed file again after the set of packs changes.
+ */
 function loadCultRegistry(): Promise<CultRegistryModule> {
   cultRegistry ??= import('@mish/cult-ui-catalog/generated') as Promise<CultRegistryModule>;
-  return cultRegistry;
+  const file = fastLanePackOverlay()?.cultAdaptersFile?.();
+  if (!file) return cultRegistry;
+  const key = `${file}?v=${fastLanePackGeneration()}`;
+  if (packRegistry?.key !== key) {
+    const bundled = cultRegistry;
+    packRegistry = {
+      key,
+      module: (async (): Promise<CultRegistryModule> => {
+        const base = await bundled;
+        const url = pathToFileURL(file);
+        url.searchParams.set('v', String(fastLanePackGeneration()));
+        const loaded = (await import(url.href)) as Partial<CultRegistryModule>;
+        const adapters = loaded.CULT_ADAPTERS;
+        if (typeof adapters !== 'object' || adapters === null) throw new Error('the pack adapter module does not export CULT_ADAPTERS');
+        const merged: Record<string, () => Promise<SectionAdapter>> = { ...base.CULT_ADAPTERS };
+        for (const [id, load] of Object.entries(adapters)) if (CULT_ADAPTER_ID.test(id) && typeof load === 'function') merged[id] = load;
+        return { CULT_ADAPTERS: merged };
+      })(),
+    };
+    packRegistry.module.catch(() => { packRegistry = undefined; });
+  }
+  return packRegistry.module;
 }
 
 /** Every id this registry resolves: the three HyperUI ids first, then the Cult ids, sorted. */

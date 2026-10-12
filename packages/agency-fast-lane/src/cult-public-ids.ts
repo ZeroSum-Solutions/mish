@@ -12,6 +12,7 @@
  */
 
 import { publicAdapterNamesForId, PROSE_ATTRIBUTES } from './cult-adapter-names.ts';
+import { fastLanePackGeneration, fastLanePackOverlay } from './pack-overlay.ts';
 export { PROSE_ATTRIBUTES } from './cult-adapter-names.ts';
 
 import slugData from '@mish/cult-ui-catalog/generated/slugs.json' with { type: 'json' };
@@ -21,10 +22,14 @@ const slugsSpecifier = '@mish/cult-ui-catalog/generated/slugs.json';
 
 type Maps = { toPublic: ReadonlyMap<string, string>; toInternal: ReadonlyMap<string, string> };
 let maps: Maps | undefined;
+let mapsGeneration = -1;
 
 function load(): Maps {
-  if (maps) return maps;
-  const parsed = slugData as { schema?: unknown; items?: Record<string, unknown> };
+  const generation = fastLanePackGeneration();
+  if (maps && mapsGeneration === generation) return maps;
+  mapsGeneration = generation;
+  // An installed pack's slugs replace the bundled ones; with no pack this is the bundled data.
+  const parsed = (fastLanePackOverlay()?.cultSlugs?.() ?? slugData) as { schema?: unknown; items?: Record<string, unknown> };
   if (parsed.schema !== 'cult-slugs/1' || typeof parsed.items !== 'object' || parsed.items === null) {
     throw new Error(`${slugsSpecifier}: unexpected schema`);
   }
@@ -61,10 +66,13 @@ type PublicNames = {
   prose?: Record<string, string>;
 };
 let publicNames: Readonly<Record<string, PublicNames>> | undefined;
+let publicNamesGeneration = -1;
 
 function loadPublicNames(): Readonly<Record<string, PublicNames>> {
-  if (publicNames) return publicNames;
-  const parsed = publicNameData as { schema?: unknown; items?: Record<string, PublicNames> };
+  const generation = fastLanePackGeneration();
+  if (publicNames && publicNamesGeneration === generation) return publicNames;
+  publicNamesGeneration = generation;
+  const parsed = (fastLanePackOverlay()?.cultPublicNames?.() ?? publicNameData) as { schema?: unknown; items?: Record<string, PublicNames> };
   if (parsed.schema !== 'cult-public-names/1' || typeof parsed.items !== 'object' || parsed.items === null) {
     throw new Error(`${publicNamesSpecifier}: unexpected schema`);
   }
