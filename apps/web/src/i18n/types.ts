@@ -7543,6 +7543,8 @@ export interface Dict {
   'packs.provides.pets': string;
   'packs.provides.promptTemplates': string;
   'packs.provides.styleCatalog': string;
+  'packs.provides.projects': string;
+  'packs.provides.designIndex': string;
   'packs.provides.item': string;
   'packs.mcp': string;
   'packs.settingsList': string;
@@ -7554,6 +7556,7 @@ export interface Dict {
   'packs.removeConfirmAction': string;
   'packs.cancel': string;
   'packs.removed': string;
+  'packs.removedKeptProjects': string;
   'packs.error.INVALID_MANIFEST': string;
   'packs.error.INVALID_ARCHIVE': string;
   'packs.error.UNSAFE_PATH': string;

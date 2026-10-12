@@ -87,12 +87,24 @@ const PACKAGED_DESKTOP_HANDOFF_ENV_KEYS = [
   "OD_UPDATE_PLATFORM",
 ] as const;
 
+// Provider credentials the daemon reads (apps/daemon/src/media/config.ts ENV_KEYS) whose names do
+// not end in `_API_KEY` or `_TOKEN`. They travel only where provider secrets do.
+const PACKAGED_PROVIDER_SECRET_ENV_KEYS = ["FAL_KEY", "OD_FAL_KEY"] as const;
+
+function isProviderSecretEnvKey(key: string): boolean {
+  return (
+    key.endsWith("_API_KEY") ||
+    key.endsWith("_TOKEN") ||
+    PACKAGED_PROVIDER_SECRET_ENV_KEYS.includes(key as (typeof PACKAGED_PROVIDER_SECRET_ENV_KEYS)[number])
+  );
+}
+
 function shouldForwardPackagedChildEnv(key: string, includeProviderSecrets = false): boolean {
   return (
     PACKAGED_CHILD_ENV_ALLOWLIST.includes(
       key as (typeof PACKAGED_CHILD_ENV_ALLOWLIST)[number],
     ) ||
-    (includeProviderSecrets && (key.endsWith("_API_KEY") || key.endsWith("_TOKEN")))
+    (includeProviderSecrets && isProviderSecretEnvKey(key))
   );
 }
 

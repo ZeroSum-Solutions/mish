@@ -35,6 +35,7 @@ import type { JevRouter, RouteDecision as FastLaneRouteDecision } from '@mish/ag
 import type { DesignTaxonomy } from '@mish/agency-fast-lane/taxonomy';
 import { parseDesignProfile } from '../design-profile-parse.js';
 import { createDesignIndexStore } from '../design-index-store.js';
+import { packDesignIndexProfiles } from '../mish-packs/overlay.js';
 import type { AgencyJevKeyStore } from '../storage/agency-config.js';
 import { AgencyConfigSectionInvalidError, AgencyJevConfigUnreadableError, checkAgencyJevConfigBody } from '../storage/agency-config.js';
 import type { RouteDeps } from '../server-context.js';
@@ -199,7 +200,8 @@ function queryNumber(query: Query, key: string, fallback: number, min: number, m
 export function registerDesignIndexRoutes(app: Express, ctx: RegisterDesignIndexRoutesDeps) {
   const { isLocalSameOrigin, resolvedPortRef, sendApiError } = ctx.http;
   const { atlas, registry, taxonomy, router, profiler, jevKeyStore, indexFile } = ctx.designIndex;
-  const store = createDesignIndexStore(indexFile);
+  // Profiles an installed Mish pack carries are served next to the person's own, read in place.
+  const store = createDesignIndexStore(indexFile, { extraProfiles: packDesignIndexProfiles });
 
   const fail = (res: Response, status: number, code: ApiErrorCode, message: string) =>
     sendApiError(res, status, code, message);

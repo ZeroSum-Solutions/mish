@@ -144,6 +144,8 @@ export function declaredPackPath(manifest: MishPackManifest, key: MishPackResour
     case 'pets': return assets?.pets;
     case 'promptTemplates': return assets?.promptTemplates;
     case 'styleCatalog': return assets?.styleCatalog;
+    case 'projects': return manifest.provides.projects;
+    case 'designIndex': return manifest.provides.designIndex;
   }
 }
 
@@ -320,4 +322,23 @@ export function packCultAdaptersFile(): string | null {
 /** The folder behind `/api/mish-packs/assets/style-catalog/v1/`, or null. */
 export function packStyleCatalogDir(): string | null {
   return firstPackResourcePath('styleCatalog');
+}
+
+// ---------------------------------------------------------------------------------------------
+// Design index
+// ---------------------------------------------------------------------------------------------
+
+/**
+ * Stored design profiles from every pack's `index.json` (`design-index/1`), in pack-id order. They
+ * are read in place, next to the person's own index, and never written to it. The design-index
+ * store checks each one with the same parser as a profile posted to the API.
+ */
+export function packDesignIndexProfiles(): unknown[] {
+  const out: unknown[] = [];
+  for (const dir of packResourcePaths('designIndex')) {
+    const value = readPackJson(path.join(dir, 'index.json'));
+    if (isRecord(value) && Array.isArray(value.profiles)) out.push(...value.profiles);
+    else if (value !== null) warnOnce(`shape:${dir}:index.json`, 'index.json in the pack is not a design index and is ignored');
+  }
+  return out;
 }
