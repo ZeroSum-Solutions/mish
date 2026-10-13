@@ -838,7 +838,8 @@ async function checkE2eLayout(): Promise<boolean> {
       repositoryPath === "e2e/vitest.config.ts" ||
       repositoryPath === "e2e/playwright.config.ts" ||
       repositoryPath === "e2e/playwright.visual.config.ts" ||
-      repositoryPath === "e2e/AGENTS.md"
+      repositoryPath === "e2e/AGENTS.md" ||
+      repositoryPath === "e2e/CLAUDE.md"
     ) {
       continue;
     }
@@ -1108,6 +1109,7 @@ const toolsRootAllowlist = new Map<string, "directory" | "file">([
   // Keep top-level tools intentionally small. `tools/launcher` was an incoming
   // Windows shim experiment from PR #683 and is not an active repo boundary.
   ["AGENTS.md", "file"],
+  ["CLAUDE.md", "file"],
   ["dev", "directory"],
   ["pack", "directory"],
   ["release", "directory"],
@@ -1125,7 +1127,7 @@ async function checkToolsLayout(): Promise<boolean> {
     const repositoryPath = `tools/${entry.name}${entry.isDirectory() ? "/" : ""}`;
 
     if (expected == null) {
-      violations.push(`${repositoryPath} -> tools/ top-level entries are allowlisted; expected only AGENTS.md, dev/, pack/, release/, and serve/`);
+      violations.push(`${repositoryPath} -> tools/ top-level entries are allowlisted; expected only AGENTS.md, CLAUDE.md, dev/, pack/, release/, and serve/`);
       continue;
     }
 
