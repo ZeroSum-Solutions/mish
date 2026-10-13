@@ -3501,9 +3501,10 @@ export async function startServer({
 
   const app = express();
   installRouteRegistrationGuard(app);
-  // First in the chain, so the body parsers, API-token check and host guards
-  // below all sit behind the per-peer request budget (js/missing-rate-limiting).
-  app.use(['/api', '/artifacts'], createApiRateLimiter());
+  // First in the chain, so the body parsers, the API-token and SPA Basic-auth
+  // checks and the host guards below all sit behind the per-peer request
+  // budget (js/missing-rate-limiting).
+  app.use(createApiRateLimiter());
   // Clipper page captures are self-contained HTML with inlined images plus a
   // Figma IR, which for an image-heavy site (The Economist, news front pages)
   // runs to tens of MB — far past a normal JSON body. Give the ingest route a

@@ -34,6 +34,8 @@ describe('apiRateLimitMaxFromEnv', () => {
     expect(apiRateLimitMaxFromEnv({})).toBe(API_RATE_LIMIT_DEFAULT_MAX);
     expect(apiRateLimitMaxFromEnv({ OD_API_RATE_LIMIT_PER_MINUTE: 'abc' })).toBe(API_RATE_LIMIT_DEFAULT_MAX);
     expect(apiRateLimitMaxFromEnv({ OD_API_RATE_LIMIT_PER_MINUTE: '0' })).toBe(API_RATE_LIMIT_DEFAULT_MAX);
+    expect(apiRateLimitMaxFromEnv({ OD_API_RATE_LIMIT_PER_MINUTE: '2abc' })).toBe(API_RATE_LIMIT_DEFAULT_MAX);
+    expect(apiRateLimitMaxFromEnv({ OD_API_RATE_LIMIT_PER_MINUTE: '1e3' })).toBe(API_RATE_LIMIT_DEFAULT_MAX);
     expect(apiRateLimitMaxFromEnv({ OD_API_RATE_LIMIT_PER_MINUTE: '25' })).toBe(25);
   });
 });
@@ -46,8 +48,10 @@ describe('createApiRateLimiter', () => {
 
   function build(spoof: boolean): Promise<[http.Server, number]> {
     const app = express();
-    app.use('/api', createApiRateLimiter({ max: 3 }));
+    app.use(createApiRateLimiter({ max: 3 }));
     app.get('/api/ping', (_req, res) => res.json({ ok: true }));
+    app.get('/api/health', (_req, res) => res.json({ ok: true }));
+    app.get('/', (_req, res) => res.send('spa'));
     const srv = http.createServer(app);
     if (spoof) pretendNonLoopback(srv);
     return new Promise((resolve) => srv.listen(0, '127.0.0.1', () => resolve([srv, (srv.address() as { port: number }).port])));
@@ -68,6 +72,15 @@ describe('createApiRateLimiter', () => {
     expect(limited.status).toBe(429);
     expect(limited.headers['retry-after']).toBeDefined();
     expect(JSON.parse(limited.body).error.code).toBe('RATE_LIMITED');
+  });
+
+  it('limits non-API routes too (SPA document credentials) but never the open probes', async () => {
+    const other = await build(true);
+    const statuses: number[] = [];
+    for (let i = 0; i < 5; i += 1) statuses.push((await get(other[1], '/')).status);
+    expect(statuses).toEqual([200, 200, 200, 429, 429]);
+    expect((await get(other[1], '/api/health')).status).toBe(200);
+    other[0].close();
   });
 
   it('does not count loopback peers (desktop UI)', async () => {
@@ -95,8 +108,9 @@ describe('daemon wiring', () => {
 
   it('puts /api behind the limiter for non-loopback peers', async () => {
     const statuses: number[] = [];
-    for (let i = 0; i < 8; i += 1) statuses.push((await get(port, '/api/health')).status);
+    for (let i = 0; i < 8; i += 1) statuses.push((await get(port, '/api/projects')).status);
     expect(statuses).toContain(429);
-    expect(statuses[0]).toBe(200);
+    expect(statuses[0]).not.toBe(429);
+    expect((await get(port, '/api/health')).status).toBe(200);
   });
 });
