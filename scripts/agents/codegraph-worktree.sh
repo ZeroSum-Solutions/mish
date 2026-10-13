@@ -80,7 +80,7 @@ if [ -z "${MISH_CG_LOCKED:-}" ]; then
   MISH_CG_LOCKED=1 exec perl -MFcntl=:flock -e '
     BEGIN { $^F = 255 }  # keep the lock descriptor open across exec
     my ($file, $wait) = (shift, shift);
-    open(my $fh, ">>", $file) or exit 75;
+    open(my $fh, ">>", $file) or do { print "codegraph-worktree: cannot open lock $file: $!\n"; exit 1 };
     my $deadline = time + $wait;
     until (flock($fh, LOCK_EX | LOCK_NB)) {
       if (time > $deadline) { print "codegraph-worktree: another bootstrap still holds $file\n"; exit 1 }
