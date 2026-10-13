@@ -35,8 +35,9 @@ plus scope flags and matrices. Jobs consume that map. The final
 its dependency jobs. It requires every enabled job to succeed and rejects
 failed or cancelled dependencies. `main` has no merge queue; `Validate workspace`
 is its one required status check, and PRs squash-merge after it passes
-(`CONTRIBUTING.md`). Renaming that job or changing its `if:` blocks every PR until
-the `main` ruleset names the new check. Retained notice artifacts are downloadable
+(`CONTRIBUTING.md`). The repository ruleset "main: require Validate workspace"
+enforces it; repository admins can bypass it. Renaming that job or changing its
+`if:` blocks every PR until that ruleset names the new check. Retained notice artifacts are downloadable
 diagnostics; no workflow consumes them to post PR comments.
 
 Reusable workload results are disabled. CI neither calls `convergence.py` nor
