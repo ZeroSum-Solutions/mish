@@ -207,7 +207,7 @@ For a non-featured template, the cheap path is to keep the source metadata compl
 If you set `od.featured: 1`, also:
 
 - [ ] **Add a screenshot** at `docs/screenshots/skills/<template>.png`. PNG, ~1024×640 retina, captured from the real `example.html` at zoomed-out browser scale.
-- The product is English only (see the root `AGENTS.md` i18n rule), so no localized display copy is needed; `apps/web/src/i18n/content.ts` carries no locale bundles.
+- The product is English only (see the `apps/web/AGENTS.md` i18n rule), so no localized display copy is needed; `apps/web/src/i18n/content.ts` carries no locale bundles.
 
 ### Forking
 

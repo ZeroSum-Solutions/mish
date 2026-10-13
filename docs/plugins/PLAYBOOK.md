@@ -210,7 +210,7 @@ Observed directly in `plugins/_official/examples/agency-practice/` and its sibli
 | Reproducible test command | The exact command that runs the family's render tests, checked into the README | `plugins/_official/examples/agency-practice/README.md` ("Test") |
 
 Product note: the product's only locale is English (owner decision 2026-10-10) — see the
-root `AGENTS.md` i18n-keys rule — so `title_i18n`/`description_i18n` only strictly need
+`apps/web/AGENTS.md` i18n-keys rule — so `title_i18n`/`description_i18n` only strictly need
 `en` for anything ZeroSum ships; upstream examples carry more locales because
 they target a wider install base.
 

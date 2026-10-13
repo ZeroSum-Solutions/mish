@@ -75,7 +75,7 @@ export async function ensureRailOpen(page: Page): Promise<void> {
     // `T.short` (3s local / 6s CI) rather than a longer tier: visibility was
     // just asserted above, so all that remains is Playwright's stability /
     // hit-target / enabled polling, and this repo's UI transitions budget
-    // ~200ms (root AGENTS.md) — 3s is an order of magnitude of headroom, and
+    // ~200ms (apps/web/AGENTS.md) — 3s is an order of magnitude of headroom, and
     // `T` already doubles it on CI for slower machines. Longer would not fit:
     // `test:ui:extended` runs rail consumers under `OD_PLAYWRIGHT_TIMEOUT=10000`,
     // where a 10s+ bound is no bound at all. A bound can only turn an
