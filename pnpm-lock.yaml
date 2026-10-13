@@ -87,9 +87,6 @@ importers:
       '@higgsfield/cli':
         specifier: 1.1.26
         version: 1.1.26
-      '@modelcontextprotocol/sdk':
-        specifier: 1.29.0
-        version: 1.29.0(zod@4.4.2)
       '@mish/21st-catalog':
         specifier: workspace:*
         version: link:../../packages/21st-catalog
@@ -135,6 +132,9 @@ importers:
       '@mish/sidecar-proto':
         specifier: workspace:*
         version: link:../../packages/sidecar-proto
+      '@modelcontextprotocol/sdk':
+        specifier: 1.29.0
+        version: 1.29.0(zod@4.4.2)
       '@opentelemetry/api':
         specifier: 1.9.1
         version: 1.9.1
@@ -159,6 +159,9 @@ importers:
       express:
         specifier: 5.2.1
         version: 5.2.1
+      express-rate-limit:
+        specifier: 8.4.1
+        version: 8.4.1(express@5.2.1)
       gsap:
         specifier: 3.15.0
         version: 3.15.0
