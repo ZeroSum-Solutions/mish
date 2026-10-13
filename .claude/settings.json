@@ -38,6 +38,9 @@
       "Bash(git worktree list *)"
     ],
     "deny": [
+      "Bash(pnpm preview)",
+      "Bash(pnpm start)",
+      "Bash(pnpm dev)",
       "Bash(pnpm dev *)",
       "Bash(pnpm start *)",
       "Bash(pnpm preview *)",
@@ -51,7 +54,17 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/agents/writer-slot.sh\" hook-pre",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/scripts/agents/writer-slot.sh\"; [ -f \"$f\" ] || exit 0; exec sh \"$f\" hook-pre",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/scripts/agents/writer-slot.sh\"; [ -f \"$f\" ] || exit 0; exec sh \"$f\" hook-bash",
             "timeout": 15
           }
         ]
@@ -63,8 +76,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/agents/codegraph-worktree.sh\" --hook",
-            "timeout": 15
+            "command": "f=\"$CLAUDE_PROJECT_DIR/scripts/agents/codegraph-worktree.sh\"; [ -f \"$f\" ] || exit 0; exec sh \"$f\" --hook",
+            "timeout": 90
           }
         ]
       }
@@ -74,7 +87,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/agents/writer-slot.sh\" hook-end",
+            "command": "f=\"$CLAUDE_PROJECT_DIR/scripts/agents/writer-slot.sh\"; [ -f \"$f\" ] || exit 0; exec sh \"$f\" hook-end",
             "timeout": 15
           }
         ]

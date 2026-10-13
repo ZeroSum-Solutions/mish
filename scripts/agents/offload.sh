@@ -18,6 +18,9 @@
 # Why this is a shell script and not TypeScript: it only builds a shell job for another
 # machine and needs nothing from the workspace.
 #
+# The job checks out the exact commit origin had when you called it, not the branch tip at
+# run time, and ends with a receipt: commit, command, runtime versions and exit code.
+#
 # Exit: the remote command's exit code · 3 runner busy · 4 timeout · 64 usage
 
 set -u
@@ -34,10 +37,16 @@ fi
 case "$BRANCH" in *[!A-Za-z0-9._/-]*) echo "offload: unsupported branch name: $BRANCH" >&2; exit 64 ;; esac
 command -v "$RUNNER" >/dev/null 2>&1 || { echo "offload: $RUNNER not found; run the check locally" >&2; exit 64; }
 
-if ! git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+SHA=$(git ls-remote --exit-code --heads origin "refs/heads/$BRANCH" 2>/dev/null | cut -f1)
+if [ -z "$SHA" ]; then
   echo "offload: origin has no branch $BRANCH; push it first" >&2
   exit 64
 fi
+LOCAL=$(git rev-parse --verify --quiet "$BRANCH" 2>/dev/null || true)
+[ -n "$LOCAL" ] && [ "$LOCAL" != "$SHA" ] && echo "offload: note: local $BRANCH is $LOCAL; checking origin's $SHA" >&2
+
+# The command, single-quoted for the remote shell.
+Q="'$(printf '%s' "$CMD" | sed "s/'/'\\\\''/g")'"
 
 JOB=$(mktemp -t mish-offload) || exit 1
 trap 'rm -f "$JOB"' EXIT INT TERM
@@ -49,18 +58,27 @@ R="\$HOME/projects/mish"
 C="\$HOME/projects/mish-check"
 [ -d "\$R/.git" ] || git clone --quiet https://github.com/ZeroSum-Solutions/mish.git "\$R"
 git -C "\$R" fetch --quiet --prune origin
+git -C "\$R" cat-file -e "$SHA^{commit}"
 if [ -d "\$C" ]; then
-  git -C "\$C" checkout --quiet --force --detach "origin/$BRANCH"
+  git -C "\$C" checkout --quiet --force --detach "$SHA"
   git -C "\$C" clean -fdxq -e node_modules -e '**/node_modules'
 else
-  git -C "\$R" worktree add --quiet --detach "\$C" "origin/$BRANCH"
+  git -C "\$R" worktree add --quiet --detach "\$C" "$SHA"
 fi
 cd "\$C"
-echo "offload: \$(hostname -s) at \$(git rev-parse --short HEAD) ($BRANCH)"
 command -v mise >/dev/null 2>&1 && eval "\$(mise activate bash --shims)"
 corepack enable >/dev/null 2>&1 || true
 pnpm install --frozen-lockfile --reporter=silent
-$CMD
+set +e
+sh -c $Q
+rc=\$?
+echo "--- offload receipt"
+echo "host:    \$(hostname -s)"
+echo "commit:  \$(git rev-parse HEAD) ($BRANCH)"
+printf 'command: %s\n' $Q
+echo "node:    \$(node --version)  pnpm: \$(pnpm --version)"
+echo "exit:    \$rc"
+exit \$rc
 EOF
 
 "$RUNNER" -t "$TIMEOUT" -f "$JOB"

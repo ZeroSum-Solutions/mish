@@ -73,7 +73,7 @@ Known escape patterns, which must not be copied or extended: module defaults poi
 
 ## CodeGraph
 
-Each checkout carries a git-ignored CodeGraph index in `.codegraph/`. Build the main checkout's index once (`sh scripts/agents/codegraph-worktree.sh`). A linked worktree gets its index from the same script, which clones the main index and syncs only the changed files in seconds; never run `codegraph init` in a worktree. Refresh with `codegraph sync .` after a pull or a large merge.
+Each checkout carries a git-ignored CodeGraph index in `.codegraph/`. Build the main checkout's index once (`sh scripts/agents/codegraph-worktree.sh`). A linked worktree gets its index from the same script, which clones a consistent seed of the main index and syncs only the changed files in seconds; never run `codegraph init` in a worktree. Claude Code runs it at session start; after creating a worktree mid-session, run it yourself before querying, and in a worktree prefer the CLI or pass the worktree as `projectPath` to the MCP tools. Refresh with `codegraph sync .` after a pull or a large merge.
 
 - Before `grep`, `find` or reading files to locate or understand code, run `codegraph explore "<symbol names or question>"` or the `codegraph_explore` MCP tool when it is registered: it returns the symbols' source and the call paths between them, including dynamic-dispatch hops text search cannot follow. Name a file or symbol in the query to read its current source. If it misses, fall back to `rg`.
 - Before changing a symbol, run `codegraph impact <symbol>` or `codegraph callers <symbol>` to see what depends on it and which tests cover it.
@@ -83,8 +83,8 @@ Each checkout carries a git-ignored CodeGraph index in `.codegraph/`. Build the 
 
 One developer machine hosts several agents; keep it responsive. Detail: `docs/agents/local-resources.md`.
 
-- At most 2 checkouts of a clone are edited at once (`MISH_MAX_WRITERS`, never above 3). Claude Code enforces this with hooks; other agents run `sh scripts/agents/writer-slot.sh claim` before their first edit and `release` when done, including before edits made through shell commands.
-- When the limit is reached, wait or offload. Full type checks and package suites for a pushed branch run on the offload machine with `sh scripts/agents/offload.sh <branch> ['<command>']`.
+- One writer session per checkout, and at most 2 checkouts of a clone with a writer at once (`MISH_MAX_WRITERS`, never above 3). Claude Code enforces this with hooks on edits and writing shell commands. Start other agents through `sh scripts/agents/writer-slot.sh run --agent <name> -- <command>`; a slot frees when its owner process exits.
+- When the limit is reached, wait or offload. Full type checks and package suites for a pushed branch run on the offload machine with `sh scripts/agents/offload.sh <branch> ['<command>']`, which checks the exact pushed commit and prints a receipt.
 
 ## Boundary constraints
 
