@@ -250,10 +250,10 @@ describe("launcher desktop handoff descriptors", () => {
     handoffId: "f5d4a712-8ba9-4c28-bcad-6dbed5db2d7c",
     namespace: "release-beta",
     outer: {
-      executablePath: process.platform === "win32" ? "C:\\Program Files\\Mish Beta\\Mish Beta.exe" : "/Applications/Mish Beta.app/Contents/MacOS/Mish Beta",
+      executablePath: process.platform === "win32" ? "C:\\Program Files\\Mishmash Beta\\Mishmash Beta.exe" : "/Applications/Mishmash Beta.app/Contents/MacOS/Mishmash Beta",
       pid: 4321,
     },
-    payloadExecutablePath: process.platform === "win32" ? "C:\\od-data\\payload\\Mish Beta.exe" : "/tmp/od-data/payload/Mish Beta.app/Contents/MacOS/Mish Beta",
+    payloadExecutablePath: process.platform === "win32" ? "C:\\od-data\\payload\\Mishmash Beta.exe" : "/tmp/od-data/payload/Mishmash Beta.app/Contents/MacOS/Mishmash Beta",
     previous: { generation: 0, version: "0.8.1-beta.1" },
     schemaVersion: LAUNCHER_SCHEMA_VERSION,
     source: { generation: 1, version: "0.8.1-beta.2" },

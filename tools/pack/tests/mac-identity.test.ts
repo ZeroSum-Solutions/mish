@@ -59,13 +59,15 @@ describe("resolveMacInstallIdentity", () => {
 
     expect(resolveMacInstallIdentity(config)).toEqual({
       appId: "io.mish.desktop.beta",
-      executableName: "Mishh Mashh Beta",
-      installerTitle: "Mishh Mashh Beta",
-      productName: "Mishh Mashh Beta",
-      publicAppBundleName: "Mishh Mashh Beta.app",
-      systemAppBundleName: "Mishh Mashh Beta.app",
+      executableName: "Mishmash Beta",
+      installerTitle: "Mishmash Beta",
+      productName: "Mishmash Beta",
+      publicAppBundleName: "Mishmash Beta.app",
+      systemAppBundleName: "Mishmash Beta.app",
+      // Pinned: Electron derives Application Support from this, not the visible name.
+      userDataProductName: "Mishh Mashh Beta",
     });
-    expect(resolveMacPaths(config).appPath).toMatch(/Mishh Mashh Beta\.app$/);
+    expect(resolveMacPaths(config).appPath).toMatch(/Mishmash Beta\.app$/);
   });
 
   it("uses first-class preview app identity for preview release namespaces", () => {
@@ -78,6 +80,7 @@ describe("resolveMacInstallIdentity", () => {
       productName: "Mishh Mashh Preview",
       publicAppBundleName: "Mishh Mashh Preview.app",
       systemAppBundleName: "Mishh Mashh Preview.app",
+      userDataProductName: "Mishh Mashh Preview",
     });
     expect(resolveMacPaths(config).appPath).toMatch(/Mishh Mashh Preview\.app$/);
   });
@@ -96,6 +99,7 @@ describe("resolveMacInstallIdentity", () => {
       productName: "Mishh Mashh Prerelease",
       publicAppBundleName: "Mishh Mashh Prerelease.app",
       systemAppBundleName: "Mishh Mashh Prerelease.app",
+      userDataProductName: "Mishh Mashh Prerelease",
     });
     expect(resolveMacPaths(prereleaseVersionConfig).appPath).toMatch(/Mishh Mashh Prerelease\.app$/);
     expect(resolveMacInstallIdentity(prereleaseNamespaceConfig)).toMatchObject({

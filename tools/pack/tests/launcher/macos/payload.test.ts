@@ -100,11 +100,11 @@ describe("tools-pack mac launcher payload archives", () => {
       publicAppBundleName: identity.publicAppBundleName,
       version: "0.9.0-beta.2",
     })).toEqual({
-      appBundleName: "Mishh Mashh Beta.app",
+      appBundleName: "Mishmash Beta.app",
       channel: "beta",
       entry: {
-        cwd: "payload/Mishh Mashh Beta.app",
-        executable: "payload/Mishh Mashh Beta.app/Contents/MacOS/Mishh Mashh Beta",
+        cwd: "payload/Mishmash Beta.app",
+        executable: "payload/Mishmash Beta.app/Contents/MacOS/Mishmash Beta",
       },
       namespace: "release-beta",
       payloadRoot: "payload",
@@ -129,14 +129,14 @@ describe("tools-pack mac launcher payload archives", () => {
         entry: { executable: string };
         version: string;
       };
-      expect(manifest.appBundleName).toBe("Mishh Mashh Beta.app");
-      expect(manifest.entry.executable).toBe("payload/Mishh Mashh Beta.app/Contents/MacOS/Mishh Mashh Beta");
+      expect(manifest.appBundleName).toBe("Mishmash Beta.app");
+      expect(manifest.entry.executable).toBe("payload/Mishmash Beta.app/Contents/MacOS/Mishmash Beta");
       expect(manifest.version).toBe("0.9.0-beta.2");
       await expectPathExists(join(extractRoot, manifest.entry.executable));
       await expectPathExists(join(
         extractRoot,
         "payload",
-        "Mishh Mashh Beta.app",
+        "Mishmash Beta.app",
         "Contents",
         "Resources",
         "mish-config.json",

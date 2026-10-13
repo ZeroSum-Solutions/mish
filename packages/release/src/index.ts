@@ -54,6 +54,11 @@ export const RELEASE_PLATFORM_NAMESPACE_SUFFIXES = Object.freeze({
 } as const satisfies Record<ReleasePlatform, string>);
 
 const PRODUCT_NAME = "Mish";
+/**
+ * User-visible beta app name on every platform. Display only: app ids, storage
+ * prefixes, namespaces and Windows registry keys derive from the channel id.
+ */
+export const BETA_PRODUCT_NAME = "Mishmash Beta";
 const DEFAULT_NAMESPACE = "mish";
 
 const descriptors: Record<"prerelease" | "stable", ReleaseChannelDescriptor> = {
@@ -103,7 +108,7 @@ export function releaseChannelDescriptor(channel: string): ReleaseChannelDescrip
     displayLabel,
     githubReleaseEnabled: false,
     internal: true,
-    productName: `${PRODUCT_NAME} ${displayLabel}`,
+    productName: channel === "beta" ? BETA_PRODUCT_NAME : `${PRODUCT_NAME} ${displayLabel}`,
     releaseVersionField: "releaseVersion",
     storagePrefix: channel,
   };

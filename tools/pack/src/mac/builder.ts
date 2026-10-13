@@ -116,7 +116,7 @@ export async function runElectronBuilder(
     extraMetadata: {
       main: "./main.cjs",
       name: "mish-packaged-app",
-      productName: identity.productName,
+      productName: identity.userDataProductName,
       version: packageVersion,
     },
     extraResources: [

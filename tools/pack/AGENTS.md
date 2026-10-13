@@ -29,7 +29,7 @@ Read `tools/pack/CACHE.md` before changing any build-cache node key, adding a ca
 - Tests import source modules through the test-only `@/*` alias. Tests that intentionally inspect source text use the same alias with Vitest's `?raw` suffix; do not reintroduce directory-depth-dependent `../src/` imports or file URLs.
 - Do not hand-build stamp argv, IPC paths, or process matching; use `@mish/sidecar` launch/discovery/invoke/stop atomics.
 - Do not use port numbers in data/log/runtime/cache path decisions. Namespace decides paths; ports are only transient transports.
-- Public release artifacts must use channel-specific app identity: stable uses `Mish`, beta uses `Mish Beta`, prerelease uses `Mish Prerelease`, and preview uses `Mish Preview`. Local tools-pack installs may still use namespace-scoped install paths only as a developer multi-instance validation convention.
+- Public release artifacts must use channel-specific app identity: stable uses `Mish`, beta uses `Mishmash Beta` (on macOS too; the mac `package.json` productName stays `Mishh Mashh Beta` so Electron userData does not move), prerelease uses `Mish Prerelease`, and preview uses `Mish Preview`. Local tools-pack installs may still use namespace-scoped install paths only as a developer multi-instance validation convention.
 - Do not let namespace-named `.app` installs change data/log/runtime/cache path conventions.
 - `--dir` controls tools-pack output/runtime/install validation roots only. It must not be treated as the cache root. The default workspace tools-pack cache is the hot path. `--cache-dir` is a special-case escape hatch for cache isolation or cold-cache validation, not a routine QA/build parameter.
 - Use `--portable` for public/release artifacts so packaged config does not bake local tools-pack runtime roots from the build machine.
@@ -72,7 +72,7 @@ The runtime updater reads `https://releases.mish.invalid/<channel>/latest/metada
 Channel identity must be stable across install, update install, shortcuts, registry entries, and app data:
 
 - Stable: `Mish`, namespace `default` or stable release namespace.
-- Beta Windows: `Mish Beta`, namespace `release-beta-win`, uninstall key `Mish-release-beta-win`.
+- Beta Windows: `Mishmash Beta`, namespace `release-beta-win`, uninstall key `Mish-release-beta-win`.
 - Prerelease Windows: `Mish Prerelease`, namespace `release-prerelease-win`, uninstall key `Mish-release-prerelease-win`.
 - Preview Windows: `Mish Preview`, namespace `release-preview-win`, uninstall key `Mish-release-preview-win`.
 - Beta-like ad hoc namespaces such as `beta-local-flow` are test namespaces, not the beta channel. They must not be used for user-flow beta validation because they create a different registry key while sharing a confusing display name/path.
@@ -130,7 +130,7 @@ C:\odtp-beta-release-fixed\out\win\namespaces\release-beta-win\builder\Mish-rele
 4. Expected user flow:
 
 - User installs `0.8.0-beta.5` through the NSIS UI.
-- User launches `Mish Beta`.
+- User launches `Mishmash Beta`.
 - App auto-checks the real beta feed and selects the latest Windows launcher payload when the package-launcher context is valid. The installer is the fallback path when the payload artifact or launcher context is unavailable.
 - For the payload path, the app downloads `platforms.win.artifacts.payload`, verifies sha256, prepares the payload under `%APPDATA%\Mish\launcher\channels\beta\namespaces\release-beta-win\versions\<version>\payload`, and shows the web updater popup.
 - The native Windows File menu must not expose update actions. On macOS, the app menu exposes the state-aware update item and opens the renderer update dialog without making background checks intrusive.

@@ -159,7 +159,7 @@ type PlatformCase = {
   expectedPayloadExecutablePath: (root: string, namespace: string) => string;
   expectedResourceRoot: (root: string, namespace: string) => string;
   fixturePlatformKey: "mac" | "win";
-  productName: "Mish" | "Mish Beta" | "Mish Prerelease";
+  productName: "Mish" | "Mishmash Beta" | "Mish Prerelease";
   namespace: "release-beta" | "release-beta-win" | "release-prerelease";
   payloadArchiveName: string;
   payloadPath: string;
@@ -416,12 +416,12 @@ const platformCases: PlatformCase[] = [
     channel: "beta",
     currentVersion: "1.2.3-beta.4",
     expectedPayloadExecutablePath: (root, namespace) =>
-      join(root, "launcher", "channels", "beta", "namespaces", namespace, "versions", "1.2.3-beta.5", "payload", "Mish Beta.app", "Contents", "MacOS", "Mish Beta"),
+      join(root, "launcher", "channels", "beta", "namespaces", namespace, "versions", "1.2.3-beta.5", "payload", "Mishmash Beta.app", "Contents", "MacOS", "Mishmash Beta"),
     expectedResourceRoot: (root, namespace) =>
-      join(root, "launcher", "channels", "beta", "namespaces", namespace, "versions", "1.2.3-beta.5", "payload", "Mish Beta.app", "Contents", "Resources", "mish"),
+      join(root, "launcher", "channels", "beta", "namespaces", namespace, "versions", "1.2.3-beta.5", "payload", "Mishmash Beta.app", "Contents", "Resources", "mish"),
     fixturePlatformKey: "mac",
     namespace: "release-beta",
-    productName: "Mish Beta",
+    productName: "Mishmash Beta",
     payloadArchiveName: "mish-1.2.3-beta.5-mac-arm64-payload.zip",
     payloadPath: "/payload.zip",
     platform: "darwin",

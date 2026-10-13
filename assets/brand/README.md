@@ -6,4 +6,4 @@ The login collage was generated with HiggsField GPT Image 2, job `ce29e3f3-1440-
 
 Reference direction: Refero School (digital scrapbook), Gumroad (strong simple controls), and the Linktree and Playbook split login layouts. The artwork carries the coral and lime accents; the form stays paper and ink.
 
-Mac public names are Mishh Mashh, Mishh Mashh Beta, Mishh Mashh Prerelease, and Mishh Mashh Preview. Existing internal package names and application identifiers remain compatible.
+Mac public names are Mishh Mashh, Mishmash Beta, Mishh Mashh Prerelease, and Mishh Mashh Preview. Existing internal package names and application identifiers remain compatible.

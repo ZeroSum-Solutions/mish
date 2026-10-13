@@ -51,11 +51,11 @@ async function writeActiveMacPayloadFixture(
     root,
     version,
   });
-  const appRoot = join(versionPaths.payloadRoot, "Mish Beta.app");
+  const appRoot = join(versionPaths.payloadRoot, "Mishmash Beta.app");
   const resourcesPath = join(appRoot, "Contents", "Resources");
   await mkdir(join(appRoot, "Contents", "MacOS"), { recursive: true });
   await mkdir(resourcesPath, { recursive: true });
-  await writeFile(join(appRoot, "Contents", "MacOS", "Mish Beta"), "");
+  await writeFile(join(appRoot, "Contents", "MacOS", "Mishmash Beta"), "");
   await writeFile(
     join(resourcesPath, "mish-config.json"),
     `${JSON.stringify({
@@ -69,8 +69,8 @@ async function writeActiveMacPayloadFixture(
     `${JSON.stringify({
       channel: "beta",
       entry: {
-        cwd: "payload/Mish Beta.app",
-        executable: "payload/Mish Beta.app/Contents/MacOS/Mish Beta",
+        cwd: "payload/Mishmash Beta.app",
+        executable: "payload/Mishmash Beta.app/Contents/MacOS/Mishmash Beta",
       },
       namespace: config.namespace,
       payloadRoot: "payload",
@@ -205,16 +205,16 @@ describe("resolvePackagedLauncherRuntime", () => {
         root,
         version: "1.2.3-beta.5",
       });
-      const resourcesPath = join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "Resources");
+      const resourcesPath = join(versionPaths.payloadRoot, "Mishmash Beta.app", "Contents", "Resources");
       const payloadExecutablePath = join(
         versionPaths.payloadRoot,
-        "Mish Beta.app",
+        "Mishmash Beta.app",
         "Contents",
         "MacOS",
-        "Mish Beta",
+        "Mishmash Beta",
       );
       await mkdir(join(resourcesPath, "mish", "bin"), { recursive: true });
-      await mkdir(join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "MacOS"), { recursive: true });
+      await mkdir(join(versionPaths.payloadRoot, "Mishmash Beta.app", "Contents", "MacOS"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "daemon"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "web"), { recursive: true });
       await writeFile(join(resourcesPath, "mish", "bin", "node"), "");
@@ -236,8 +236,8 @@ describe("resolvePackagedLauncherRuntime", () => {
         `${JSON.stringify({
           channel: "beta",
           entry: {
-            cwd: "payload/Mish Beta.app",
-            executable: "payload/Mish Beta.app/Contents/MacOS/Mish Beta",
+            cwd: "payload/Mishmash Beta.app",
+            executable: "payload/Mishmash Beta.app/Contents/MacOS/Mishmash Beta",
           },
           namespace: config.namespace,
           payloadRoot: "payload",
@@ -261,7 +261,7 @@ describe("resolvePackagedLauncherRuntime", () => {
         join(paths.installationRoot, "launcher", "channels", "beta", "namespaces", config.namespace, "install.json"),
         `${JSON.stringify({
           channel: "beta",
-          launchPath: "/Applications/Mish Beta.app",
+          launchPath: "/Applications/Mishmash Beta.app",
           namespace: config.namespace,
           schemaVersion: LAUNCHER_SCHEMA_VERSION,
         })}\n`,
@@ -271,13 +271,13 @@ describe("resolvePackagedLauncherRuntime", () => {
         // The launcher process runs from the stable installed app bundle, so
         // its stable launch path matches the persisted install descriptor and
         // the payload branch keeps the persisted entry untouched.
-        currentExecutablePath: "/Applications/Mish Beta.app",
+        currentExecutablePath: "/Applications/Mishmash Beta.app",
       });
 
       expect(runtime.source).toBe("payload");
       expect(runtime.desktopExecutablePath).toBe(payloadExecutablePath);
       expect(runtime.electronNodeCommand).toBeNull();
-      expect(runtime.installedLaunchPath).toBe("/Applications/Mish Beta.app");
+      expect(runtime.installedLaunchPath).toBe("/Applications/Mishmash Beta.app");
       expect(runtime.targetVersion).toBe("1.2.3-beta.5");
       expect(runtime.config.appVersion).toBe("1.2.3-beta.5");
       expect(runtime.config.resourceRoot).toBe(join(resourcesPath, "mish"));
@@ -357,16 +357,16 @@ describe("resolvePackagedLauncherRuntime", () => {
         root,
         version: "1.2.3-beta.5",
       });
-      const resourcesPath = join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "Resources");
+      const resourcesPath = join(versionPaths.payloadRoot, "Mishmash Beta.app", "Contents", "Resources");
       const payloadExecutablePath = join(
         versionPaths.payloadRoot,
-        "Mish Beta.app",
+        "Mishmash Beta.app",
         "Contents",
         "MacOS",
-        "Mish Beta",
+        "Mishmash Beta",
       );
       await mkdir(join(resourcesPath, "mish", "bin"), { recursive: true });
-      await mkdir(join(versionPaths.payloadRoot, "Mish Beta.app", "Contents", "MacOS"), { recursive: true });
+      await mkdir(join(versionPaths.payloadRoot, "Mishmash Beta.app", "Contents", "MacOS"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "daemon"), { recursive: true });
       await mkdir(join(resourcesPath, "prebundled", "web"), { recursive: true });
       await writeFile(join(resourcesPath, "mish", "bin", "node"), "");
@@ -388,8 +388,8 @@ describe("resolvePackagedLauncherRuntime", () => {
         `${JSON.stringify({
           channel: "beta",
           entry: {
-            cwd: "payload/Mish Beta.app",
-            executable: "payload/Mish Beta.app/Contents/MacOS/Mish Beta",
+            cwd: "payload/Mishmash Beta.app",
+            executable: "payload/Mishmash Beta.app/Contents/MacOS/Mishmash Beta",
           },
           namespace: config.namespace,
           payloadRoot: "payload",
@@ -424,15 +424,15 @@ describe("resolvePackagedLauncherRuntime", () => {
       );
 
       const runtime = await resolvePackagedLauncherRuntime(config, paths, {
-        currentExecutablePath: "/Applications/Mish Beta.app",
+        currentExecutablePath: "/Applications/Mishmash Beta.app",
       });
 
       expect(runtime.source).toBe("payload");
       expect(runtime.payloadDesktopProcess).toBe(false);
-      expect(runtime.installedLaunchPath).toBe("/Applications/Mish Beta.app");
+      expect(runtime.installedLaunchPath).toBe("/Applications/Mishmash Beta.app");
       expect(JSON.parse(await readFile(installPath, "utf8"))).toMatchObject({
         channel: "beta",
-        launchPath: "/Applications/Mish Beta.app",
+        launchPath: "/Applications/Mishmash Beta.app",
         namespace: config.namespace,
         schemaVersion: LAUNCHER_SCHEMA_VERSION,
       });
@@ -459,10 +459,10 @@ describe("resolvePackagedLauncherRuntime", () => {
         "versions",
         secondPayload.version,
         "payload",
-        "Mish Beta.app",
+        "Mishmash Beta.app",
         "Contents",
         "MacOS",
-        "Mish Beta",
+        "Mishmash Beta",
       );
       await mkdir(currentPackageRuntime.launcherPaths.stateRoot, { recursive: true });
       await writeFile(

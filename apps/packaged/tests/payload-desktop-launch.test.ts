@@ -16,10 +16,10 @@ import {
 function fakeRuntime(payloadDesktopProcess: boolean): PackagedLauncherRuntime {
   return {
     config: {} as PackagedLauncherRuntime["config"],
-    desktopExecutablePath: "/tmp/payload/Mish Beta.app/Contents/MacOS/Mish Beta",
+    desktopExecutablePath: "/tmp/payload/Mishmash Beta.app/Contents/MacOS/Mishmash Beta",
     descriptor: {} as PackagedLauncherRuntime["descriptor"],
     electronNodeCommand: null,
-    installedLaunchPath: "/Applications/Mish Beta.app",
+    installedLaunchPath: "/Applications/Mishmash Beta.app",
     launcherPaths: {} as PackagedLauncherRuntime["launcherPaths"],
     paths: { dataRoot: "/tmp/data", runtimeRoot: "/tmp/runtime" } as PackagedLauncherRuntime["paths"],
     payloadDesktopProcess,

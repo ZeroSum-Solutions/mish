@@ -36,11 +36,11 @@ describe("resolveWinInstallIdentity", () => {
 
   it("uses first-class beta display identity for beta release namespaces", () => {
     expect(resolveWinInstallIdentity({ namespace: "release-beta-win" })).toMatchObject({
-      appPathsKey: "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Mish Beta.exe",
-      displayName: "Mish Beta",
+      appPathsKey: "Software\\Microsoft\\Windows\\CurrentVersion\\App Paths\\Mishmash Beta.exe",
+      displayName: "Mishmash Beta",
       registryKey: "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Mish-release-beta-win",
-      shortcutName: "Mish Beta.lnk",
-      uninstallerName: "Uninstall Mish Beta.exe",
+      shortcutName: "Mishmash Beta.lnk",
+      uninstallerName: "Uninstall Mishmash Beta.exe",
     });
   });
 

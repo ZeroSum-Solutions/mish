@@ -376,7 +376,7 @@ export async function writeAssembledApp(
         name: "mish-packaged-app",
         ...(optionalDependencies == null ? {} : { optionalDependencies }),
         private: true,
-        productName: identity.productName,
+        productName: identity.userDataProductName,
         version: packageVersion,
       },
       null,

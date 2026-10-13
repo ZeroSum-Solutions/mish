@@ -16,6 +16,12 @@ export type MacInstallIdentity = {
   productName: string;
   publicAppBundleName: string;
   systemAppBundleName: string;
+  /**
+   * Name written into the packaged app's package.json. Electron derives
+   * userData (`~/Library/Application Support/<name>`) from it, so it must keep
+   * its historical value even when the visible product name changes.
+   */
+  userDataProductName: string;
 };
 
 function sanitizeNamespace(value: string): string {
@@ -29,9 +35,11 @@ export function resolveMacInstallIdentity(config: Pick<ToolPackConfig, "namespac
   const legacyIdentity = channel == null
     ? { appId: "io.mish.desktop" }
     : releaseInstallIdentity(channel);
-  const productName = channel == null || channel === "stable"
+  const userDataProductName = channel == null || channel === "stable"
     ? MAC_PRODUCT_DISPLAY_NAME
     : `${MAC_PRODUCT_DISPLAY_NAME} ${releaseChannelDescriptor(channel).displayLabel}`;
+  // Beta is the only channel with its own visible name ("Mishmash Beta").
+  const productName = channel === "beta" ? releaseChannelDescriptor(channel).productName : userDataProductName;
   const channelIdentity = { appId: legacyIdentity.appId, productName };
   const publicAppBundleName = `${channelIdentity.productName}.app`;
   const systemAppBundleName = channel != null
@@ -44,5 +52,6 @@ export function resolveMacInstallIdentity(config: Pick<ToolPackConfig, "namespac
     installerTitle: channel == null ? `${MAC_PRODUCT_DISPLAY_NAME}-${namespaceToken}` : channelIdentity.productName,
     publicAppBundleName,
     systemAppBundleName,
+    userDataProductName,
   };
 }

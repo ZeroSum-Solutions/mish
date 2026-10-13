@@ -16,7 +16,7 @@ Local packaging control plane for Mishh Mashh.
 - `tools-pack mac cleanup`
 
 Build artifacts are namespace-scoped under `.tmp/tools-pack/out/mac/namespaces/<namespace>/`.
-Public release bundles keep channel-distinct identities: `Mish.app`, `Mish Beta.app`,
+Public release bundles keep channel-distinct identities: `Mish.app`, `Mishmash Beta.app`,
 `Mish Prerelease.app`, or `Mish Preview.app`. Local `tools-pack install` adds the developer
 namespace so installs can coexist without affecting runtime data/log/cache paths.
 

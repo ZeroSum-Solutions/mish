@@ -1473,7 +1473,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
           {
         artifacts: {
           dmg: {
-            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.3.unsigned/Mish Beta.dmg",
+            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.3.unsigned/Mishmash Beta.dmg",
           },
         },
         channel: "beta",
@@ -1557,7 +1557,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
           {
         artifacts: {
           dmg: {
-            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/Mish Beta.dmg",
+            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/Mishmash Beta.dmg",
           },
         },
         channel: "beta",
@@ -1641,7 +1641,7 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
           {
         artifacts: {
           dmg: {
-            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/Mish Beta.dmg",
+            url: "https://releases.mish.invalid/betas/versions/1.2.3-beta.4.unsigned/Mishmash Beta.dmg",
           },
         },
         channel: "beta",

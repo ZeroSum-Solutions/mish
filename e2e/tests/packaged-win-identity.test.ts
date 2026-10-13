@@ -39,7 +39,7 @@ describe("packaged windows smoke identity", () => {
     expect(resolvePackagedWinInstallIdentity({
       namespace: "release-beta-win",
       releaseVersion: undefined,
-    }).displayName).toBe("Mish Beta");
+    }).displayName).toBe("Mishmash Beta");
   });
 
   it("[P2] keeps ad hoc namespaces isolated from release channel identities", () => {

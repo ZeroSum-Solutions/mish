@@ -53,6 +53,12 @@ describe("@mish/release", () => {
       executableName: "Mish Prerelease",
       productName: "Mish Prerelease",
     });
+    expect(releaseChannelDescriptor("beta")).toMatchObject({
+      appId: "io.mish.desktop.beta",
+      displayLabel: "Beta",
+      productName: "Mishmash Beta",
+      storagePrefix: "beta",
+    });
     expect(releaseNamespace("prerelease")).toBe("release-prerelease");
     expect(releaseNamespace("prerelease", "win")).toBe("release-prerelease-win");
     expect(releaseNamespace("prerelease", "macIntel")).toBe("release-prerelease-intel");
