@@ -49,7 +49,7 @@ LOCAL=$(git rev-parse --verify --quiet "$BRANCH" 2>/dev/null || true)
 # The command, single-quoted for the remote shell.
 Q="'$(printf '%s' "$CMD" | sed "s/'/'\\\\''/g")'"
 
-JOB=$(mktemp -t mish-offload) || exit 1
+JOB=$(mktemp "${TMPDIR:-/tmp}/mish-offload.XXXXXX") || exit 1
 trap 'rm -f "$JOB"' EXIT INT TERM
 cat > "$JOB" <<EOF
 set -eu

@@ -14,6 +14,8 @@ from lib.github import append_outputs, append_summary
 
 
 CONFIDENCE = {"medium": 0, "certain": 1}
+INERT_RULE = "inert"
+PR_FILES_CAP = 3000  # GitHub's list-pull-request-files limit
 WORKLOADS = {
     "static_gate",
     "preflight",
@@ -34,8 +36,9 @@ class ScopeContract:
     def __init__(self, path: Path):
         value = object_value(load_json(path), "scopes")
         expected = {"schema", "effects", "matches", "rules", "matrices", "uiP0Shadow"}
-        if set(value) != expected:
-            raise ConfigError(f"scopes keys must be {sorted(expected)}")
+        optional = {"inert"}
+        if not expected <= set(value) <= expected | optional:
+            raise ConfigError(f"scopes keys must be {sorted(expected)}, optionally with {sorted(optional)}")
         schema_v1(value, "scopes")
         self.effects = self._string_list(value["effects"], "scopes.effects")
         if len(set(self.effects)) != len(self.effects):
@@ -44,6 +47,10 @@ class ScopeContract:
         self.rules = value["rules"]
         self.matrices = object_value(value["matrices"], "scopes.matrices")
         self.shadow = object_value(value["uiP0Shadow"], "scopes.uiP0Shadow")
+        # inert names one match whose files feed no build, test or runtime path (agent and
+        # contributor docs). They decide as certain with no effects before any rule runs, so
+        # prefix rules such as apps/web/ cannot arm suites for an AGENTS.md inside them.
+        self.inert = value.get("inert")
         self._validate()
 
     @staticmethod
@@ -104,6 +111,10 @@ class ScopeContract:
                 raise ConfigError(f"scope rule {rule_id} has unknown effects {sorted(unknown)}")
             if rule["confidence"] not in CONFIDENCE:
                 raise ConfigError(f"scope rule {rule_id} has invalid confidence")
+        if self.inert is not None and (not isinstance(self.inert, str) or self.inert not in self.matches):
+            raise ConfigError("scopes.inert must name a known match")
+        if any(rule["id"] == INERT_RULE for rule in self.rules):
+            raise ConfigError(f"scope rule id {INERT_RULE!r} is reserved for scopes.inert")
         if set(self.matrices) != {"ui_p0", "visual"}:
             raise ConfigError("scopes.matrices must contain ui_p0 and visual")
         matrix_names = {}
@@ -160,7 +171,11 @@ def empty_effects(contract):
 def evaluate(contract, files, threshold, derive_workspace):
     outputs = empty_effects(contract)
     decisions = []
+    inert = contract.matches[contract.inert] if contract.inert else None
     for file in files:
+        if inert is not None and contract.match(file, inert):
+            decisions.append({"file": file, "matchedRules": [INERT_RULE], "escalated": False})
+            continue
         matched = [rule for rule in contract.rules if contract.match(file, rule["match"])]
         matched_ids = [rule["id"] for rule in matched]
         if not matched:
@@ -182,9 +197,18 @@ def evaluate(contract, files, threshold, derive_workspace):
     return outputs, decisions
 
 
-def enabled_workloads(outputs, ci_mode, full_lanes):
+def inert_change(files, decisions):
+    """True when every changed file is in scopes.inert (agent and contributor docs). Such a
+    change cannot alter what typecheck or unit tests see, so the broad floor may skip it in
+    every context. Other zero-effect rules (Terminal sources, docs/) keep the floor."""
+    return bool(files) and len(decisions) == len(files) and all(
+        decision["matchedRules"] == [INERT_RULE] for decision in decisions
+    )
+
+
+def enabled_workloads(outputs, ci_mode, full_lanes, inert_only=False):
     any_scope = any(outputs.values())
-    broad = full_lanes or ci_mode == "hot" or any_scope
+    broad = full_lanes or any_scope or (ci_mode == "hot" and not inert_only)
     ui_p0 = full_lanes or outputs["ui_p0_validation_required"]
     enabled = {
         "static_gate": True,
@@ -205,13 +229,16 @@ def enabled_workloads(outputs, ci_mode, full_lanes):
     return enabled, broad
 
 
-def build_plan(contract, files, source, threshold, ci_mode, full_lanes, derive_workspace, resolved=True):
+def build_plan(contract, files, source, threshold, ci_mode, full_lanes, derive_workspace, resolved=True, complete=False):
     if threshold is None:
         outputs = {effect: True for effect in contract.effects}
         decisions = []
     else:
         outputs, decisions = evaluate(contract, files, threshold, derive_workspace)
-    enabled, broad = enabled_workloads(outputs, ci_mode, full_lanes)
+    # Omitting the broad floor needs proof the file list is the whole change: GitHub caps PR
+    # file lists at 3,000 and comparisons at 300, and a capped list could hide source files.
+    inert_only = threshold is not None and resolved and complete and inert_change(files, decisions)
+    enabled, broad = enabled_workloads(outputs, ci_mode, full_lanes, inert_only)
     hits = Counter(rule for decision in decisions for rule in decision["matchedRules"])
     shadow_match = contract.matches[contract.shadow["match"]]
     candidate = bool(files) and resolved and all(contract.match(file, shadow_match) for file in files)
@@ -262,6 +289,21 @@ def run_gh(args):
     return subprocess.run(command, check=True, text=True, stdout=subprocess.PIPE).stdout
 
 
+def parse_pr_files(output):
+    """Split tagged PR file records ("F\t<file>", "P\t<previous name>") into the path list
+    and the number of file records; an untagged line counts as a path but never as a record."""
+    files, records, untagged = [], 0, False
+    for line in output.splitlines():
+        tag, separator, name = line.partition("\t")
+        if separator and tag in {"F", "P"} and name:
+            files.append(name)
+            records += tag == "F"
+        elif line:
+            files.append(line)
+            untagged = True
+    return files, -1 if untagged else records
+
+
 def changed_files_for_environment():
     event_name = required_env("GITHUB_EVENT_NAME")
     repository = required_env("GITHUB_REPOSITORY")
@@ -270,8 +312,15 @@ def changed_files_for_environment():
         number = event.get("pull_request", {}).get("number")
         if number is None:
             raise ConfigError("pull_request.number is required")
-        output = run_gh(["api", "--paginate", f"repos/{repository}/pulls/{number}/files", "--jq", ".[] | .filename, (.previous_filename // empty)"])
-        return event_name, output.splitlines(), "medium", "hot", False, True, True
+        output = run_gh(["api", "--paginate", f"repos/{repository}/pulls/{number}/files", "--jq",
+                         '.[] | "F\\t" + .filename, (if .previous_filename then "P\\t" + .previous_filename else empty end)'])
+        files, records = parse_pr_files(output)
+        changed = event.get("pull_request", {}).get("changed_files")
+        # Complete only when the count of returned records matches the PR's own count and sits
+        # under the listing cap; any untagged line also marks the list unverified.
+        complete = (isinstance(changed, int) and not isinstance(changed, bool)
+                    and 0 < changed < PR_FILES_CAP and records == changed)
+        return event_name, files, "medium", "hot", False, True, True, complete
     if event_name == "workflow_dispatch":
         mode = event.get("inputs", {}).get("ci_mode", "full")
         if mode not in {"hot", "full"}:
@@ -279,8 +328,9 @@ def changed_files_for_environment():
         if mode == "hot":
             sha = required_env("GITHUB_SHA")
             output = run_gh(["api", "--paginate", f"repos/{repository}/compare/main...{sha}", "--jq", "(.files // [])[] | .filename, (.previous_filename // empty)"])
-            return "workflow_dispatch:hot", output.splitlines(), "medium", "hot", False, False, True
-        return event_name, [], None, "full", True, False, False
+            # The comparison API caps at 300 files with no count to check against: never complete.
+            return "workflow_dispatch:hot", output.splitlines(), "medium", "hot", False, False, True, False
+        return event_name, [], None, "full", True, False, False, False
     if event_name == "merge_group":
         group = event.get("merge_group", {})
         base, head = group.get("base_sha"), group.get("head_sha")
@@ -293,12 +343,12 @@ def changed_files_for_environment():
                 raise ConfigError("merge_group comparison reached the 300-file ceiling")
             files = [name for record in records for name in (record.get("filename"), record.get("previous_filename")) if isinstance(name, str)]
             if not files:
-                return "merge_group:empty-resolution", [], None, "full", True, True, False
-            return event_name, files, "certain", "full", False, True, True
+                return "merge_group:empty-resolution", [], None, "full", True, True, False, False
+            return event_name, files, "certain", "full", False, True, True, True
         except (subprocess.SubprocessError, json.JSONDecodeError, ConfigError) as error:
             print(f"::warning::merge_group resolution failed; using full plan: {error}", file=sys.stderr)
-            return "merge_group:resolution-error", [], None, "full", True, True, False
-    return event_name, [], None, "full", True, False, False
+            return "merge_group:resolution-error", [], None, "full", True, True, False, False
+    return event_name, [], None, "full", True, False, False, False
 
 
 def emit_plan(plan, output_path=None):
@@ -352,8 +402,8 @@ def main():
             print(f"{rule['id']}\n  confidence: {rule['confidence']}\n  effects: {', '.join(rule['effects']) or '(none)'}")
         return 0
     if args.command == "github-output":
-        source, files, threshold, mode, full_lanes, derive, resolved = changed_files_for_environment()
-        emit_plan(build_plan(contract, files, source, threshold, mode, full_lanes, derive, resolved), args.output)
+        source, files, threshold, mode, full_lanes, derive, resolved, complete = changed_files_for_environment()
+        emit_plan(build_plan(contract, files, source, threshold, mode, full_lanes, derive, resolved, complete), args.output)
         return 0
     files = list(args.files)
     if args.files_from:
@@ -366,7 +416,8 @@ def main():
     else:
         settings = ("medium", "hot", False, True, True)
     threshold, mode, full_lanes, derive, resolved = settings
-    print(json.dumps(build_plan(contract, files, f"cli:{args.context}", threshold, mode, full_lanes, derive, resolved), indent=2, sort_keys=True))
+    # A CLI plan takes the caller's file list as the whole change.
+    print(json.dumps(build_plan(contract, files, f"cli:{args.context}", threshold, mode, full_lanes, derive, resolved, True), indent=2, sort_keys=True))
     return 0
 
 
