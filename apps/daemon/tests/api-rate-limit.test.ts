@@ -52,6 +52,7 @@ describe('createApiRateLimiter', () => {
     app.get('/api/ping', (_req, res) => res.json({ ok: true }));
     app.get('/api/health', (_req, res) => res.json({ ok: true }));
     app.get('/', (_req, res) => res.send('spa'));
+    app.get('/health', (_req, res) => res.send('spa'));
     const srv = http.createServer(app);
     if (spoof) pretendNonLoopback(srv);
     return new Promise((resolve) => srv.listen(0, '127.0.0.1', () => resolve([srv, (srv.address() as { port: number }).port])));
@@ -79,6 +80,7 @@ describe('createApiRateLimiter', () => {
     const statuses: number[] = [];
     for (let i = 0; i < 5; i += 1) statuses.push((await get(other[1], '/')).status);
     expect(statuses).toEqual([200, 200, 200, 429, 429]);
+    expect((await get(other[1], '/health')).status).toBe(429);
     expect((await get(other[1], '/api/health')).status).toBe(200);
     other[0].close();
   });

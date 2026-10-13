@@ -24,9 +24,7 @@ export function apiRateLimitMaxFromEnv(env: NodeJS.ProcessEnv = process.env): nu
 
 // Unauthenticated liveness probes stay open so monitors never see 429 from a
 // busy peer; they carry no secrets and do no work.
-const OPEN_PROBE_PATHS = new Set([
-  '/health', '/api/health', '/ready', '/api/ready', '/version', '/api/version',
-]);
+const OPEN_PROBE_PATHS = new Set(['/api/health', '/api/ready', '/api/version']);
 
 export function createApiRateLimiter(
   options: { max?: number; windowMs?: number } = {},
