@@ -778,15 +778,15 @@ else { process.stderr.write("unexpected gh call: " + args + "\\n"); process.exit
           fi`);
   });
 
-  it("[P1] runs the complete daemon suite in four required shards", async () => {
+  it("[P1] runs the complete daemon suite in six required shards", async () => {
     const workflow = await readFile(ciWorkflowPath, "utf8");
     const daemonTests = sectionBetween(workflow, "  daemon_unit_tests:", "  windows_tools_pack_payload_tests:");
     const validate = sectionBetween(workflow, "  validate:", "  runtime_summary:");
 
     expect(daemonTests).toContain("if: ${{ fromJSON(needs.plan.outputs.run).daemon_unit_tests }}");
     expect(daemonTests).toContain("fail-fast: false");
-    expect(daemonTests).toContain("shard: [1, 2, 3, 4]");
-    expect(daemonTests).toContain("pnpm --filter @mish/daemon test --shard=${{ matrix.shard }}/4");
+    expect(daemonTests).toContain("shard: [1, 2, 3, 4, 5, 6]");
+    expect(daemonTests).toContain("pnpm --filter @mish/daemon test --shard=${{ matrix.shard }}/6");
     expect(validate).toContain("- daemon_unit_tests");
     expect(validate).toContain("[$run | to_entries[] | select(.value) | .key]");
   });

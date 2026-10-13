@@ -1,9 +1,12 @@
 # GitHub automation guide
 
 Follow the root `AGENTS.md`. This public fork keeps `.github/workflows/ci.yml`
-for validation and `.github/workflows/release-mac.yml`, which builds the unsigned
+for validation, `.github/workflows/cache-seed.yml`, which saves the pnpm store
+cache from `main` (daily, on lockfile changes and by hand; read-only, runs no
+tests) so pull-request jobs restore dependencies instead of installing cold, and
+`.github/workflows/release-mac.yml`, which builds the unsigned
 macOS package on a stable `v*` tag (read-only build job) and publishes it to
-GitHub Releases from a separate write-scoped job. Nothing in CI depends on it. Upstream release, bot, trusted-write and convergence
+GitHub Releases from a separate write-scoped job. Nothing in CI depends on either. Upstream release, bot, trusted-write and convergence
 workflows were removed deliberately. Do not restore them as a CI dependency.
 
 ## Required reading
@@ -30,12 +33,22 @@ The Linux, stdlib-only control plane resolves runners and then scopes.
 plus scope flags and matrices. Jobs consume that map. The final
 `Validate workspace` gate requires a complete boolean workload map matching
 its dependency jobs. It requires every enabled job to succeed and rejects
-failed or cancelled dependencies. Merge policy remains merge-group-only. Retained notice artifacts are downloadable
+failed or cancelled dependencies. `main` has no merge queue; `Validate workspace`
+is its one required status check, and PRs squash-merge after it passes
+(`CONTRIBUTING.md`). The repository ruleset "main: require Validate workspace"
+enforces it; repository admins can bypass it. Renaming that job or changing its
+`if:` blocks every PR until that ruleset names the new check. Retained notice artifacts are downloadable
 diagnostics; no workflow consumes them to post PR comments.
 
 Reusable workload results are disabled. CI neither calls `convergence.py` nor
 reads R2 receipts or produces convergence handoffs. Retained convergence helpers
 and configuration are inactive compatibility code, not planning authority.
+
+`scopes.json` `inert` names the match for agent and contributor docs. Those files
+decide before every rule, so a source-directory prefix cannot arm suites for an
+`AGENTS.md` inside it, and a change made only of inert files also skips the broad
+floor (typecheck, workspace unit tests). Never add a path the product, a build or
+a test reads; `pnpm guard` still checks these files in preflight.
 
 Keep normal scope confidence, unknown-input fallback, rename handling and
 matrix validation intact. Remove references to deleted workflows from active
