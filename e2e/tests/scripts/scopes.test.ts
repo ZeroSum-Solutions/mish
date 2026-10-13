@@ -306,6 +306,66 @@ describe("workflow scope planner", () => {
     expect(unknown.trace.escalations).toHaveLength(1);
   });
 
+  test("treats agent and contributor docs as inert, even inside source directories", () => {
+    const docs = [
+      "README.md",
+      "CONTRIBUTING.md",
+      "apps/web/AGENTS.md",
+      "apps/daemon/src/critique/CLAUDE.md",
+      "design-systems/_schema/CLAUDE.md",
+      ".claude/settings.json",
+      "assets/readme/hero.webp",
+    ];
+    for (const context of ["pr", "merge-queue"] as const) {
+      const docsPlan = plan(context, docs);
+      expect(docsPlan, context).toMatchObject({
+        scopes: { run_preflight_typecheck: false },
+        enabled: { static_gate: true, preflight: true, workspace_unit_tests: false, daemon_unit_tests: false, e2e_vitest: false, ui_p0: false, playwright_critical: false },
+        trace: { escalations: [] },
+      });
+      expect(Object.values(docsPlan.scopes).filter((value) => value === true), context).toEqual([]);
+    }
+    // Runtime content keeps its routes: skills and other markdown the product loads are not inert.
+    expect(plan("pr", ["skills/example/SKILL.md"])).toMatchObject({ enabled: { daemon_unit_tests: true, workspace_unit_tests: true } });
+    // Other zero-effect inputs keep the PR broad floor; only inert inputs drop it.
+    for (const file of ["e2e/README.md", "docs/architecture.md", "apps/closure/src/index.ts"]) {
+      expect(plan("pr", [file]), file).toMatchObject({ scopes: { run_preflight_typecheck: true }, enabled: { workspace_unit_tests: true } });
+    }
+    // Mixing a doc with source keeps the source route.
+    expect(plan("pr", ["apps/web/AGENTS.md", "apps/web/src/App.tsx"])).toMatchObject({
+      enabled: { web_workspace_tests: true, ui_p0: true, workspace_unit_tests: true },
+    });
+  });
+
+  test("routes agent tooling to its focused test inside the workspace unit job", () => {
+    for (const file of ["scripts/agents/writer-slot.sh", "e2e/tests/scripts/agent-writer-slot.test.ts"]) {
+      expect(plan("pr", [file]), file).toMatchObject({
+        scopes: { agent_scripts_tests_required: true, workspace_validation_required: false },
+        enabled: { workspace_unit_tests: true, e2e_vitest: false, daemon_unit_tests: false, playwright_critical: false },
+        trace: { escalations: [] },
+      });
+    }
+    expect(plan("pr", ["scripts/guard.ts"])).toMatchObject({ scopes: { agent_scripts_tests_required: false }, enabled: { daemon_unit_tests: true } });
+    const workflow = readFileSync(path.join(repoRoot, ".github/workflows/ci.yml"), "utf8");
+    expect(workflow).toContain("fromJSON(needs.plan.outputs.scopes).agent_scripts_tests_required");
+    expect(workflow).toContain("pnpm --filter @mish/e2e test tests/scripts/agent-writer-slot.test.ts");
+  });
+
+  test("rejects an inert match that names no declared match", () => {
+    const temporaryRoot = mkdtempSync(path.join(tmpdir(), "scope-inert-"));
+    try {
+      const config = JSON.parse(readFileSync(path.join(repoRoot, ".github/config/scopes.json"), "utf8")) as { inert: string };
+      config.inert = "missing-match";
+      const configPath = path.join(temporaryRoot, "scopes.json");
+      writeFileSync(configPath, JSON.stringify(config));
+      const failed = spawnSync("python3", [script, "--config", configPath, "validate"], { cwd: repoRoot, encoding: "utf8" });
+      expect(failed.status).toBe(2);
+      expect(failed.stderr).toContain("scopes.inert must name a known match");
+    } finally {
+      rmSync(temporaryRoot, { force: true, recursive: true });
+    }
+  });
+
   test("keeps the Windows payload workload in forced-full plans", () => {
     expect(plan("full")).toMatchObject({ enabled: { windows_tools_pack_payload_tests: true } });
   });

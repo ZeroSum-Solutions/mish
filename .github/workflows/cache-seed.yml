@@ -1,0 +1,40 @@
+name: cache-seed
+
+# Saves the pnpm store cache from main, so pull-request jobs restore dependencies
+# instead of downloading them. GitHub lets a pull request read caches its base
+# branch saved, but pull requests cannot save caches main can use, and ci.yml
+# runs only on pull requests. Without this seed every CI job installs cold.
+# Read-only token; it runs no tests and nothing depends on it.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - pnpm-lock.yaml
+      - .github/actions/setup-workspace/**
+      - .github/workflows/cache-seed.yml
+  schedule:
+    # Daily, so the seed outlives GitHub's 7-day eviction of unused caches.
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cache-seed
+  cancel-in-progress: true
+
+jobs:
+  pnpm_store:
+    name: Seed pnpm store
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Setup workspace
+        uses: ./.github/actions/setup-workspace
+        with:
+          save-pnpm-cache: 'true'

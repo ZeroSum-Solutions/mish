@@ -11,9 +11,19 @@
     "visual_validation_required",
     "workspace_validation_required",
     "render_tests_required",
-    "agency_tests_required"
+    "agency_tests_required",
+    "agent_scripts_tests_required"
   ],
+  "inert": "agent-docs",
   "matches": {
+    "agent-docs": {
+      "prefixes": [".claude/", "assets/readme/"],
+      "regexes": ["(^|/)(AGENTS|CLAUDE)\\.md$", "^[^/]+\\.md$"]
+    },
+    "agent-scripts": {
+      "prefixes": ["scripts/agents/"],
+      "exact": ["e2e/tests/scripts/agent-writer-slot.test.ts"]
+    },
     "daemon-runtime-definition": {
       "prefixes": ["apps/daemon/src/runtimes/defs/"],
       "exact": [
@@ -87,7 +97,7 @@
       "include": ["match://certain-exempt", "match://packaged-leaf", "match://daemon-core"]
     },
     "workspace-exempt": {
-      "include": ["match://certain-exempt", "match://medium-exempt", "match://packaged-leaf", "match://daemon-core", "match://terminal-exact"]
+      "include": ["match://agent-scripts", "match://certain-exempt", "match://medium-exempt", "match://packaged-leaf", "match://daemon-core", "match://terminal-exact"]
     },
     "catalog-data": {
       "prefixes": ["packages/cult-ui-catalog/"]
@@ -100,7 +110,7 @@
       "prefixes": ["packages/21st-catalog/"]
     },
     "ui-critical-exempt": {
-      "include": ["match://certain-exempt", "match://medium-exempt", "match://daemon-core", "match://terminal-exact", "match://catalog-data", "match://twenty-first-catalog-data"],
+      "include": ["match://agent-scripts", "match://certain-exempt", "match://medium-exempt", "match://daemon-core", "match://terminal-exact", "match://catalog-data", "match://twenty-first-catalog-data"],
       "prefixes": ["apps/desktop/", "apps/packaged/", "tools/pack/"]
     }
   },
@@ -153,7 +163,10 @@
     },
     {
       "id": "runtime-content",
-      "match": { "prefixes": ["scripts/", "assets/", "skills/", "prompt-templates/", "design-systems/", "design-templates/", "craft/"] },
+      "match": {
+        "prefixes": ["scripts/", "assets/", "skills/", "prompt-templates/", "design-systems/", "design-templates/", "craft/"],
+        "exclude": ["match://agent-scripts"]
+      },
       "effects": ["daemon_tests_required", "web_tests_required"], "confidence": "medium"
     },
     {
@@ -175,8 +188,12 @@
       "effects": ["web_tests_required"], "confidence": "medium"
     },
     {
-      "id": "script-contract-tests", "match": { "prefixes": ["e2e/tests/scripts/"] },
+      "id": "script-contract-tests", "match": { "prefixes": ["e2e/tests/scripts/"], "exclude": ["match://agent-scripts"] },
       "effects": ["daemon_tests_required", "web_tests_required"], "confidence": "medium"
+    },
+    {
+      "id": "agent-scripts-tests", "match": { "include": ["match://agent-scripts"] },
+      "effects": ["agent_scripts_tests_required"], "confidence": "medium"
     },
     {
       "id": "tools-dev-sources",

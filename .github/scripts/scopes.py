@@ -14,6 +14,7 @@ from lib.github import append_outputs, append_summary
 
 
 CONFIDENCE = {"medium": 0, "certain": 1}
+INERT_RULE = "inert"
 WORKLOADS = {
     "static_gate",
     "preflight",
@@ -34,8 +35,9 @@ class ScopeContract:
     def __init__(self, path: Path):
         value = object_value(load_json(path), "scopes")
         expected = {"schema", "effects", "matches", "rules", "matrices", "uiP0Shadow"}
-        if set(value) != expected:
-            raise ConfigError(f"scopes keys must be {sorted(expected)}")
+        optional = {"inert"}
+        if not expected <= set(value) <= expected | optional:
+            raise ConfigError(f"scopes keys must be {sorted(expected)}, optionally with {sorted(optional)}")
         schema_v1(value, "scopes")
         self.effects = self._string_list(value["effects"], "scopes.effects")
         if len(set(self.effects)) != len(self.effects):
@@ -44,6 +46,10 @@ class ScopeContract:
         self.rules = value["rules"]
         self.matrices = object_value(value["matrices"], "scopes.matrices")
         self.shadow = object_value(value["uiP0Shadow"], "scopes.uiP0Shadow")
+        # inert names one match whose files feed no build, test or runtime path (agent and
+        # contributor docs). They decide as certain with no effects before any rule runs, so
+        # prefix rules such as apps/web/ cannot arm suites for an AGENTS.md inside them.
+        self.inert = value.get("inert")
         self._validate()
 
     @staticmethod
@@ -104,6 +110,10 @@ class ScopeContract:
                 raise ConfigError(f"scope rule {rule_id} has unknown effects {sorted(unknown)}")
             if rule["confidence"] not in CONFIDENCE:
                 raise ConfigError(f"scope rule {rule_id} has invalid confidence")
+        if self.inert is not None and (not isinstance(self.inert, str) or self.inert not in self.matches):
+            raise ConfigError("scopes.inert must name a known match")
+        if any(rule["id"] == INERT_RULE for rule in self.rules):
+            raise ConfigError(f"scope rule id {INERT_RULE!r} is reserved for scopes.inert")
         if set(self.matrices) != {"ui_p0", "visual"}:
             raise ConfigError("scopes.matrices must contain ui_p0 and visual")
         matrix_names = {}
@@ -160,7 +170,11 @@ def empty_effects(contract):
 def evaluate(contract, files, threshold, derive_workspace):
     outputs = empty_effects(contract)
     decisions = []
+    inert = contract.matches[contract.inert] if contract.inert else None
     for file in files:
+        if inert is not None and contract.match(file, inert):
+            decisions.append({"file": file, "matchedRules": [INERT_RULE], "escalated": False})
+            continue
         matched = [rule for rule in contract.rules if contract.match(file, rule["match"])]
         matched_ids = [rule["id"] for rule in matched]
         if not matched:
@@ -182,9 +196,18 @@ def evaluate(contract, files, threshold, derive_workspace):
     return outputs, decisions
 
 
-def enabled_workloads(outputs, ci_mode, full_lanes):
+def inert_change(files, decisions):
+    """True when every changed file is in scopes.inert (agent and contributor docs). Such a
+    change cannot alter what typecheck or unit tests see, so the broad floor may skip it in
+    every context. Other zero-effect rules (Terminal sources, docs/) keep the floor."""
+    return bool(files) and len(decisions) == len(files) and all(
+        decision["matchedRules"] == [INERT_RULE] for decision in decisions
+    )
+
+
+def enabled_workloads(outputs, ci_mode, full_lanes, inert_only=False):
     any_scope = any(outputs.values())
-    broad = full_lanes or ci_mode == "hot" or any_scope
+    broad = full_lanes or any_scope or (ci_mode == "hot" and not inert_only)
     ui_p0 = full_lanes or outputs["ui_p0_validation_required"]
     enabled = {
         "static_gate": True,
@@ -211,7 +234,8 @@ def build_plan(contract, files, source, threshold, ci_mode, full_lanes, derive_w
         decisions = []
     else:
         outputs, decisions = evaluate(contract, files, threshold, derive_workspace)
-    enabled, broad = enabled_workloads(outputs, ci_mode, full_lanes)
+    inert_only = threshold is not None and resolved and inert_change(files, decisions)
+    enabled, broad = enabled_workloads(outputs, ci_mode, full_lanes, inert_only)
     hits = Counter(rule for decision in decisions for rule in decision["matchedRules"])
     shadow_match = contract.matches[contract.shadow["match"]]
     candidate = bool(files) and resolved and all(contract.match(file, shadow_match) for file in files)

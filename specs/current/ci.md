@@ -198,8 +198,10 @@ structure checks in every applicable run.
 
 Broad app declaration builds, workspace typecheck, and
 `run_workspace_unit_tests` may skip only for a merge-queue plan whose
-certain-tier evaluation claims zero validation effects. PR, manual-hot,
-forced-full, and escalated queue plans retain broad workspace validation.
+certain-tier evaluation claims zero validation effects, or for any resolved
+plan whose every changed path is in the `inert` match (agent and contributor
+docs that no product, build or test reads). PR, manual-hot, forced-full, and
+escalated queue plans otherwise retain broad workspace validation.
 
 ### Confidence tiers
 
