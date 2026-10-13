@@ -12,7 +12,8 @@
     "workspace_validation_required",
     "render_tests_required",
     "agency_tests_required",
-    "agent_scripts_tests_required"
+    "agent_scripts_tests_required",
+    "public_docs_tests_required"
   ],
   "inert": "agent-docs",
   "matches": {
@@ -21,9 +22,17 @@
       "exact": ["README.md", "TRANSLATIONS.md", "PRIVACY.md"],
       "regexes": ["(^|/)(AGENTS|CLAUDE)\\.md$"]
     },
+    "public-docs": {
+      "exact": [
+        "QUICKSTART.md", "CONTRIBUTING.md", "docs/install-guide.md", "docs/deployment/docker.md",
+        "docs/deployment/cloud/aliyun.md", "docs/deployment/workspace-team-rollout.md", "docs/wsl-setup.md",
+        "docs/skills-contributing.md", "docs/windows-troubleshooting.md", "docs/whats-new.md", "docs/notebooklm.md",
+        "e2e/tests/public-docs-consistency.test.ts"
+      ]
+    },
     "agent-scripts": {
       "prefixes": ["scripts/agents/"],
-      "exact": ["e2e/tests/scripts/agent-writer-slot.test.ts"]
+      "exact": ["e2e/tests/scripts/agent-writer-slot.test.ts", "e2e/tests/scripts/agent-tools.test.ts"]
     },
     "daemon-runtime-definition": {
       "prefixes": ["apps/daemon/src/runtimes/defs/"],
@@ -191,6 +200,10 @@
     {
       "id": "script-contract-tests", "match": { "prefixes": ["e2e/tests/scripts/"], "exclude": ["match://agent-scripts"] },
       "effects": ["daemon_tests_required", "web_tests_required"], "confidence": "medium"
+    },
+    {
+      "id": "public-docs-tests", "match": { "include": ["match://public-docs"] },
+      "effects": ["public_docs_tests_required"], "confidence": "certain"
     },
     {
       "id": "agent-scripts-tests", "match": { "include": ["match://agent-scripts"] },

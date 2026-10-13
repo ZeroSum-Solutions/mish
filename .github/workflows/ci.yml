@@ -287,13 +287,17 @@ jobs:
               pnpm --filter @mish/e2e test tests/packaged-launcher-update-loop.test.ts
             fi
           fi
-          # Agent tooling (scripts/agents/) runs here instead of arming the whole E2E Vitest
-          # lane: a POSIX syntax check of every script, then the writer-slot contract test.
+          # Focused E2E Vitest files run here instead of arming the whole E2E Vitest lane:
+          # agent tooling (scripts/agents/) and the public setup docs.
           if [ "${{ fromJSON(needs.plan.outputs.scopes).agent_scripts_tests_required }}" = "true" ]; then
             for script in scripts/agents/*.sh; do sh -n "$script"; done
             if [ "${{ fromJSON(needs.plan.outputs.run).e2e_vitest }}" != "true" ]; then
-              pnpm --filter @mish/e2e test tests/scripts/agent-writer-slot.test.ts
+              pnpm --filter @mish/e2e test tests/scripts/agent-writer-slot.test.ts tests/scripts/agent-tools.test.ts
             fi
+          fi
+          if [ "${{ fromJSON(needs.plan.outputs.scopes).public_docs_tests_required }}" = "true" ] &&
+             [ "${{ fromJSON(needs.plan.outputs.run).e2e_vitest }}" != "true" ]; then
+            pnpm --filter @mish/e2e test tests/public-docs-consistency.test.ts
           fi
 
 

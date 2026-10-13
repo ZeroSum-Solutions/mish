@@ -289,6 +289,21 @@ def run_gh(args):
     return subprocess.run(command, check=True, text=True, stdout=subprocess.PIPE).stdout
 
 
+def parse_pr_files(output):
+    """Split tagged PR file records ("F\t<file>", "P\t<previous name>") into the path list
+    and the number of file records; an untagged line counts as a path but never as a record."""
+    files, records, untagged = [], 0, False
+    for line in output.splitlines():
+        tag, separator, name = line.partition("\t")
+        if separator and tag in {"F", "P"} and name:
+            files.append(name)
+            records += tag == "F"
+        elif line:
+            files.append(line)
+            untagged = True
+    return files, -1 if untagged else records
+
+
 def changed_files_for_environment():
     event_name = required_env("GITHUB_EVENT_NAME")
     repository = required_env("GITHUB_REPOSITORY")
@@ -297,10 +312,15 @@ def changed_files_for_environment():
         number = event.get("pull_request", {}).get("number")
         if number is None:
             raise ConfigError("pull_request.number is required")
-        output = run_gh(["api", "--paginate", f"repos/{repository}/pulls/{number}/files", "--jq", ".[] | .filename, (.previous_filename // empty)"])
+        output = run_gh(["api", "--paginate", f"repos/{repository}/pulls/{number}/files", "--jq",
+                         '.[] | "F\\t" + .filename, (if .previous_filename then "P\\t" + .previous_filename else empty end)'])
+        files, records = parse_pr_files(output)
         changed = event.get("pull_request", {}).get("changed_files")
-        complete = isinstance(changed, int) and not isinstance(changed, bool) and 0 < changed < PR_FILES_CAP
-        return event_name, output.splitlines(), "medium", "hot", False, True, True, complete
+        # Complete only when the count of returned records matches the PR's own count and sits
+        # under the listing cap; any untagged line also marks the list unverified.
+        complete = (isinstance(changed, int) and not isinstance(changed, bool)
+                    and 0 < changed < PR_FILES_CAP and records == changed)
+        return event_name, files, "medium", "hot", False, True, True, complete
     if event_name == "workflow_dispatch":
         mode = event.get("inputs", {}).get("ci_mode", "full")
         if mode not in {"hot", "full"}:
