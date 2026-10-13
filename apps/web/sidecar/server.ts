@@ -280,7 +280,17 @@ function resolveHttpProxyTarget(
     return null;
   }
 
-  return new URL(`${parsedRequestUrl.pathname}${parsedRequestUrl.search}`, origin);
+  // A raw request target such as `/x/..//evil.example/api/y` normalizes to the
+  // pathname `//evil.example/api/y`, which `new URL(..., origin)` reads as a
+  // scheme-relative URL and so replaces the upstream host. Only the configured
+  // upstream origin may ever be dialed.
+  let target: URL;
+  try {
+    target = new URL(`${parsedRequestUrl.pathname}${parsedRequestUrl.search}`, origin);
+  } catch {
+    return null;
+  }
+  return target.origin === new URL(origin).origin ? target : null;
 }
 
 /**
