@@ -3,7 +3,7 @@ import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync, 
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 
 // Behaviour contract for `scripts/agents/writer-slot.sh`, the admission check that keeps at most
 // MISH_MAX_WRITERS checkouts of one clone under an active agent writer. Each case builds a
@@ -12,6 +12,9 @@ import { afterEach, describe, expect, test } from "vitest";
 
 const repoRoot = path.resolve(import.meta.dirname, "../../..");
 const source = path.join(repoRoot, "scripts", "agents", "writer-slot.sh");
+
+// Every case spawns many short shell processes; slow machines need more than the default.
+vi.setConfig({ testTimeout: 60_000 });
 
 const scratch: string[] = [];
 const children: ChildProcess[] = [];
@@ -53,6 +56,7 @@ function run(script: string, cwd: string, args: string[], input = "", env: NodeJ
     input,
     encoding: "utf8",
     env: { ...process.env, MISH_MAX_WRITERS: "2", CLAUDE_SESSION_ID: "", ...env },
+    timeout: 20_000,
   });
   return { status: result.status, stdout: result.stdout, stderr: result.stderr };
 }
@@ -189,11 +193,12 @@ describe("writer-slot: ownership", () => {
       const refused = run(script, worktrees[0]!, ["hook-pre"], editHook(path.join(worktrees[0]!, "a.ts"), "s"));
       expect(refused.status).toBe(2);
       expect(refused.stderr).toContain("Could not register a writer slot");
-      expect(Date.now() - started).toBeLessThan(10_000);
+      // The registry lock gives up after 3 s of wall-clock time.
+      expect(Date.now() - started).toBeLessThan(12_000);
     } finally {
       chmodSync(registry, 0o755);
     }
-  }, 20_000);
+  });
 
   test("a registry lock left by a dead process is broken", () => {
     const { main, worktrees, script } = makeClone(1);

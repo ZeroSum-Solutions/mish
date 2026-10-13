@@ -65,29 +65,45 @@ if [ "$HOOK" = 1 ]; then
   # Run in the foreground so the session's first query sees this worktree's index. Stay
   # silent on success; a failure only adds a note to the session, it never blocks it.
   # Wait at most 45 s for another bootstrap's lock, inside the hook's 120 s budget.
-  if MISH_CG_LOCK_WAIT=90 sh "$0" "$WT" >>"$LOG" 2>&1 </dev/null; then exit 0; fi
+  if MISH_CG_LOCK_WAIT=45 sh "$0" "$WT" >>"$LOG" 2>&1 </dev/null; then exit 0; fi
   echo "CodeGraph could not prepare this worktree's index (log: $LOG). Answers may come from the main checkout's index; run \`sh scripts/agents/codegraph-worktree.sh\` or read files directly."
   exit 0
 fi
 
 mtime() { date -r "$1" +%s 2>/dev/null || echo 0; }
 
-# take_lock <dir>: one holder at a time. The directory holds its owner's pid; a waiter breaks
-# it only when that owner has exited. Waits MISH_CG_LOCK_WAIT half-seconds (default 600).
+# break_stale <lock dir> <holder pid read by the caller, or empty>: delete a lock whose holder
+# has exited. Breakers take a short mutex and re-check the holder under it; only breakers ever
+# delete another process's lock, so the re-check cannot go stale before the delete.
+break_stale() {
+  if ! mkdir "$1.break" 2>/dev/null; then
+    # A breaker holds this for milliseconds; one older than 5 s was killed mid-break.
+    [ $(( $(date +%s) - $(mtime "$1.break") )) -gt 5 ] && rmdir "$1.break" 2>/dev/null
+    return 1
+  fi
+  now_holder=$(cat "$1/pid" 2>/dev/null)
+  if [ "$now_holder" = "$2" ]; then
+    if [ -n "$2" ]; then
+      kill -0 "$2" 2>/dev/null || rm -rf "$1"
+    elif [ $(( $(date +%s) - $(mtime "$1") )) -gt 10 ]; then
+      rm -rf "$1"
+    fi
+  fi
+  rmdir "$1.break"
+}
+
+# take_lock <dir>: one bootstrap per checkout at a time, to avoid duplicate work; correctness
+# does not depend on it (every temporary file is unique and published by rename). The
+# directory holds its owner's pid. Waits MISH_CG_LOCK_WAIT seconds (default 300).
 take_lock() {
-  i=0
+  deadline=$(( $(date +%s) + ${MISH_CG_LOCK_WAIT:-300} ))
   until mkdir "$1" 2>/dev/null; do
+    [ "$(date +%s)" -gt "$deadline" ] && return 1
     holder=$(cat "$1/pid" 2>/dev/null)
     if { [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; } ||
-       { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$1") )) -gt 60 ]; }; then
-      # Rename away (one waiter wins); delete only if it is still the dead holder's lock.
-      if mv "$1" "$1.stale.$$" 2>/dev/null; then
-        if [ "$(cat "$1.stale.$$/pid" 2>/dev/null)" = "$holder" ]; then rm -rf "$1.stale.$$"
-        else mv "$1.stale.$$" "$1" 2>/dev/null || rm -rf "$1.stale.$$"; fi
-        continue
-      fi
+       { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$1") )) -gt 10 ]; }; then
+      break_stale "$1" "$holder" && continue
     fi
-    i=$((i + 1)); [ "$i" -gt "${MISH_CG_LOCK_WAIT:-600}" ] && return 1
     sleep 0.5
   done
   echo $$ > "$1/pid"
@@ -98,7 +114,7 @@ drop_lock() { [ "$(cat "$1/pid" 2>/dev/null)" = "$$" ] && rm -rf "$1"; }
 
 LOCK="$STATE/$KEY.lock"
 take_lock "$LOCK" || { echo "codegraph-worktree: another bootstrap still holds $LOCK"; exit 1; }
-trap 'drop_lock "$LOCK"; drop_lock "$STATE/seed.lock"' EXIT INT TERM
+trap 'drop_lock "$LOCK"; rm -f "$STATE/seed.db.tmp.$$"* "$DB.tmp.$$"' EXIT INT TERM
 
 echo "[$(date -u +%FT%TZ)] bootstrap $WT"
 
@@ -122,26 +138,26 @@ if [ ! -s "$DB" ]; then
   SEED="$STATE/seed.db"
   newest=$(mtime "$SRC"); [ -e "$SRC-wal" ] && [ "$(mtime "$SRC-wal")" -gt "$newest" ] && newest=$(mtime "$SRC-wal")
   if [ ! -s "$SEED" ] || [ "$newest" -gt "$(mtime "$SEED")" ]; then
-    take_lock "$STATE/seed.lock" || { echo "seed lock busy"; exit 1; }
+    # No lock: each refresher writes its own temporary file and publishes it by rename, so
+    # concurrent refreshes only repeat work. The seed is one self-contained file (rollback
+    # journal, no WAL), so cloning it is safe. The backup goes to a bare relative name, so no
+    # path needs quoting inside the dot-command.
     echo "refreshing the seed from $SRC (online backup)"
-    rm -f "$SEED.tmp" "$SEED.tmp-wal" "$SEED.tmp-shm"
-    # The seed is one self-contained file (rollback journal, no WAL), so cloning it is safe.
-    # Back up to a bare relative name, so no path needs quoting inside the dot-command.
-    if (cd "$STATE" && sqlite3 "$SRC" ".backup seed.db.tmp") &&
-       sqlite3 "$SEED.tmp" 'PRAGMA journal_mode=DELETE;' >/dev/null &&
-       [ "$(sqlite3 "$SEED.tmp" 'PRAGMA quick_check;')" = "ok" ]; then
-      mv "$SEED.tmp" "$SEED"; rm -f "$SEED.tmp-wal" "$SEED.tmp-shm"
+    TMPSEED="seed.db.tmp.$$"
+    if (cd "$STATE" && sqlite3 "$SRC" ".backup $TMPSEED") &&
+       sqlite3 "$STATE/$TMPSEED" 'PRAGMA journal_mode=DELETE;' >/dev/null &&
+       [ "$(sqlite3 "$STATE/$TMPSEED" 'PRAGMA quick_check;')" = "ok" ]; then
+      mv "$STATE/$TMPSEED" "$SEED"
     else
-      rm -f "$SEED.tmp"; drop_lock "$STATE/seed.lock"; echo "backup of the main index failed"; exit 1
+      echo "backup of the main index failed"; exit 1
     fi
-    drop_lock "$STATE/seed.lock"
   fi
 
   mkdir -p "$WT/.codegraph"
   [ -f "$MAIN/.codegraph/.gitignore" ] && cp "$MAIN/.codegraph/.gitignore" "$WT/.codegraph/.gitignore"
   # The seed is a closed, consistent file, so an APFS clone of it is safe; plain cp elsewhere.
-  cp -c "$SEED" "$DB.tmp" 2>/dev/null || cp "$SEED" "$DB.tmp" || exit 1
-  mv "$DB.tmp" "$DB"
+  cp -c "$SEED" "$DB.tmp.$$" 2>/dev/null || cp "$SEED" "$DB.tmp.$$" || exit 1
+  mv "$DB.tmp.$$" "$DB"
   echo "index cloned from the seed"
 fi
 

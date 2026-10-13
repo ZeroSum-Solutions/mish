@@ -92,26 +92,33 @@ json_fields() {
     });'
 }
 
-# break_stale <lock dir> <dead holder pid or empty>: rename the lock away (atomic, so one
-# waiter wins), and delete it only if it still belongs to that holder; a lock a new owner took
-# in the meantime is put back.
+# break_stale <lock dir> <holder pid read by the caller, or empty>: delete a lock whose holder
+# has exited. Breakers take a short mutex and re-check the holder under it; only breakers ever
+# delete another process's lock, so the re-check cannot go stale before the delete.
 break_stale() {
-  mv "$1" "$1.stale.$$" 2>/dev/null || return 1
-  if [ "$(cat "$1.stale.$$/pid" 2>/dev/null)" = "$2" ]; then
-    rm -rf "$1.stale.$$"
-  else
-    mv "$1.stale.$$" "$1" 2>/dev/null || rm -rf "$1.stale.$$"
+  if ! mkdir "$1.break" 2>/dev/null; then
+    # A breaker holds this for milliseconds; one older than 5 s was killed mid-break.
+    [ $(( $(date +%s) - $(mtime "$1.break") )) -gt 5 ] && rmdir "$1.break" 2>/dev/null
+    return 1
   fi
+  now_holder=$(cat "$1/pid" 2>/dev/null)
+  if [ "$now_holder" = "$2" ]; then
+    if [ -n "$2" ]; then
+      kill -0 "$2" 2>/dev/null || rm -rf "$1"
+    elif [ $(( $(date +%s) - $(mtime "$1") )) -gt 10 ]; then
+      rm -rf "$1"
+    fi
+  fi
+  rmdir "$1.break"
 }
 
 # The registry mutex: a directory holding its owner's pid. A waiter breaks it only when that
 # owner is dead (or never wrote its pid within 10 s). Holds last milliseconds, so it gives up
-# after about 3 s.
+# after 3 s of wall-clock time.
 lock() {
-  i=0
+  deadline=$(( $(date +%s) + 3 ))
   until mkdir "$DIR/.lock" 2>/dev/null; do
-    i=$((i + 1))
-    [ "$i" -gt 60 ] && return 1
+    [ "$(date +%s)" -gt "$deadline" ] && return 1
     holder=$(cat "$DIR/.lock/pid" 2>/dev/null)
     if { [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; } ||
        { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$DIR/.lock") )) -gt 10 ]; }; then
