@@ -125,6 +125,19 @@ describe("public CI planning and gate", () => {
     },
   );
 
+  test("skips the broad floor for an inert-only PR only when GitHub's file count proves the list complete", () => {
+    const docs = "README.md\napps/web/AGENTS.md\n";
+    const pr = (changed: unknown) => planEvent("pull_request", { pull_request: { number: 42, draft: false, changed_files: changed } }, docs).plan;
+    expect(pr(2)).toMatchObject({ enabled: { workspace_unit_tests: false }, scopes: { run_preflight_typecheck: false } });
+    // At or above the 3,000-file cap, or with no count, the list may be truncated: keep the floor.
+    for (const changed of [3000, 4200, undefined, "2"]) {
+      expect(pr(changed), String(changed)).toMatchObject({ enabled: { workspace_unit_tests: true }, scopes: { run_preflight_typecheck: true } });
+    }
+    // The comparison API behind manual-hot runs caps at 300 files with no count: never complete.
+    const hot = planEvent("workflow_dispatch", { inputs: { ci_mode: "hot" } }, docs).plan;
+    expect(hot).toMatchObject({ enabled: { workspace_unit_tests: true }, scopes: { run_preflight_typecheck: true } });
+  });
+
   test("rejects non-boolean workload flags", () => {
     const { plan } = planEvent("workflow_dispatch", { inputs: { ci_mode: "full" } }, "");
     const needs = {

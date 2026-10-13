@@ -15,6 +15,7 @@ from lib.github import append_outputs, append_summary
 
 CONFIDENCE = {"medium": 0, "certain": 1}
 INERT_RULE = "inert"
+PR_FILES_CAP = 3000  # GitHub's list-pull-request-files limit
 WORKLOADS = {
     "static_gate",
     "preflight",
@@ -228,13 +229,15 @@ def enabled_workloads(outputs, ci_mode, full_lanes, inert_only=False):
     return enabled, broad
 
 
-def build_plan(contract, files, source, threshold, ci_mode, full_lanes, derive_workspace, resolved=True):
+def build_plan(contract, files, source, threshold, ci_mode, full_lanes, derive_workspace, resolved=True, complete=False):
     if threshold is None:
         outputs = {effect: True for effect in contract.effects}
         decisions = []
     else:
         outputs, decisions = evaluate(contract, files, threshold, derive_workspace)
-    inert_only = threshold is not None and resolved and inert_change(files, decisions)
+    # Omitting the broad floor needs proof the file list is the whole change: GitHub caps PR
+    # file lists at 3,000 and comparisons at 300, and a capped list could hide source files.
+    inert_only = threshold is not None and resolved and complete and inert_change(files, decisions)
     enabled, broad = enabled_workloads(outputs, ci_mode, full_lanes, inert_only)
     hits = Counter(rule for decision in decisions for rule in decision["matchedRules"])
     shadow_match = contract.matches[contract.shadow["match"]]
@@ -295,7 +298,9 @@ def changed_files_for_environment():
         if number is None:
             raise ConfigError("pull_request.number is required")
         output = run_gh(["api", "--paginate", f"repos/{repository}/pulls/{number}/files", "--jq", ".[] | .filename, (.previous_filename // empty)"])
-        return event_name, output.splitlines(), "medium", "hot", False, True, True
+        changed = event.get("pull_request", {}).get("changed_files")
+        complete = isinstance(changed, int) and not isinstance(changed, bool) and 0 < changed < PR_FILES_CAP
+        return event_name, output.splitlines(), "medium", "hot", False, True, True, complete
     if event_name == "workflow_dispatch":
         mode = event.get("inputs", {}).get("ci_mode", "full")
         if mode not in {"hot", "full"}:
@@ -303,8 +308,9 @@ def changed_files_for_environment():
         if mode == "hot":
             sha = required_env("GITHUB_SHA")
             output = run_gh(["api", "--paginate", f"repos/{repository}/compare/main...{sha}", "--jq", "(.files // [])[] | .filename, (.previous_filename // empty)"])
-            return "workflow_dispatch:hot", output.splitlines(), "medium", "hot", False, False, True
-        return event_name, [], None, "full", True, False, False
+            # The comparison API caps at 300 files with no count to check against: never complete.
+            return "workflow_dispatch:hot", output.splitlines(), "medium", "hot", False, False, True, False
+        return event_name, [], None, "full", True, False, False, False
     if event_name == "merge_group":
         group = event.get("merge_group", {})
         base, head = group.get("base_sha"), group.get("head_sha")
@@ -317,12 +323,12 @@ def changed_files_for_environment():
                 raise ConfigError("merge_group comparison reached the 300-file ceiling")
             files = [name for record in records for name in (record.get("filename"), record.get("previous_filename")) if isinstance(name, str)]
             if not files:
-                return "merge_group:empty-resolution", [], None, "full", True, True, False
-            return event_name, files, "certain", "full", False, True, True
+                return "merge_group:empty-resolution", [], None, "full", True, True, False, False
+            return event_name, files, "certain", "full", False, True, True, True
         except (subprocess.SubprocessError, json.JSONDecodeError, ConfigError) as error:
             print(f"::warning::merge_group resolution failed; using full plan: {error}", file=sys.stderr)
-            return "merge_group:resolution-error", [], None, "full", True, True, False
-    return event_name, [], None, "full", True, False, False
+            return "merge_group:resolution-error", [], None, "full", True, True, False, False
+    return event_name, [], None, "full", True, False, False, False
 
 
 def emit_plan(plan, output_path=None):
@@ -376,8 +382,8 @@ def main():
             print(f"{rule['id']}\n  confidence: {rule['confidence']}\n  effects: {', '.join(rule['effects']) or '(none)'}")
         return 0
     if args.command == "github-output":
-        source, files, threshold, mode, full_lanes, derive, resolved = changed_files_for_environment()
-        emit_plan(build_plan(contract, files, source, threshold, mode, full_lanes, derive, resolved), args.output)
+        source, files, threshold, mode, full_lanes, derive, resolved, complete = changed_files_for_environment()
+        emit_plan(build_plan(contract, files, source, threshold, mode, full_lanes, derive, resolved, complete), args.output)
         return 0
     files = list(args.files)
     if args.files_from:
@@ -390,7 +396,8 @@ def main():
     else:
         settings = ("medium", "hot", False, True, True)
     threshold, mode, full_lanes, derive, resolved = settings
-    print(json.dumps(build_plan(contract, files, f"cli:{args.context}", threshold, mode, full_lanes, derive, resolved), indent=2, sort_keys=True))
+    # A CLI plan takes the caller's file list as the whole change.
+    print(json.dumps(build_plan(contract, files, f"cli:{args.context}", threshold, mode, full_lanes, derive, resolved, True), indent=2, sort_keys=True))
     return 0
 
 

@@ -309,7 +309,6 @@ describe("workflow scope planner", () => {
   test("treats agent and contributor docs as inert, even inside source directories", () => {
     const docs = [
       "README.md",
-      "CONTRIBUTING.md",
       "apps/web/AGENTS.md",
       "apps/daemon/src/critique/CLAUDE.md",
       "design-systems/_schema/CLAUDE.md",
@@ -328,7 +327,8 @@ describe("workflow scope planner", () => {
     // Runtime content keeps its routes: skills and other markdown the product loads are not inert.
     expect(plan("pr", ["skills/example/SKILL.md"])).toMatchObject({ enabled: { daemon_unit_tests: true, workspace_unit_tests: true } });
     // Other zero-effect inputs keep the PR broad floor; only inert inputs drop it.
-    for (const file of ["e2e/README.md", "docs/architecture.md", "apps/closure/src/index.ts"]) {
+    // QUICKSTART.md and CONTRIBUTING.md are read by public-docs-consistency.test.ts, so they are not inert.
+    for (const file of ["e2e/README.md", "docs/architecture.md", "apps/closure/src/index.ts", "QUICKSTART.md", "CONTRIBUTING.md"]) {
       expect(plan("pr", [file]), file).toMatchObject({ scopes: { run_preflight_typecheck: true }, enabled: { workspace_unit_tests: true } });
     }
     // Mixing a doc with source keeps the source route.
@@ -349,6 +349,7 @@ describe("workflow scope planner", () => {
     const workflow = readFileSync(path.join(repoRoot, ".github/workflows/ci.yml"), "utf8");
     expect(workflow).toContain("fromJSON(needs.plan.outputs.scopes).agent_scripts_tests_required");
     expect(workflow).toContain("pnpm --filter @mish/e2e test tests/scripts/agent-writer-slot.test.ts");
+    expect(workflow).toContain('for script in scripts/agents/*.sh; do sh -n "$script"; done');
   });
 
   test("rejects an inert match that names no declared match", () => {

@@ -18,7 +18,8 @@
   "matches": {
     "agent-docs": {
       "prefixes": [".claude/", "assets/readme/"],
-      "regexes": ["(^|/)(AGENTS|CLAUDE)\\.md$", "^[^/]+\\.md$"]
+      "exact": ["README.md", "TRANSLATIONS.md", "PRIVACY.md"],
+      "regexes": ["(^|/)(AGENTS|CLAUDE)\\.md$"]
     },
     "agent-scripts": {
       "prefixes": ["scripts/agents/"],

@@ -198,16 +198,19 @@ structure checks in every applicable run.
 
 Broad app declaration builds, workspace typecheck, and
 `run_workspace_unit_tests` may skip only for a merge-queue plan whose
-certain-tier evaluation claims zero validation effects, or for any resolved
-plan whose every changed path is in the `inert` match (agent and contributor
-docs that no product, build or test reads). PR, manual-hot, forced-full, and
+certain-tier evaluation claims zero validation effects, or for a resolved
+plan whose file list is provably complete (a PR whose `changed_files` count is
+under GitHub's 3,000-file listing cap, or a resolved queue comparison) and whose
+every changed path is in the `inert` match (agent and contributor docs that no
+product, build or test reads). PR, manual-hot, forced-full, and
 escalated queue plans otherwise retain broad workspace validation.
 
 ### Confidence tiers
 
-The error cost is asymmetric. A wrong `medium` rule can under-arm a PR and be
-backstopped by the merge queue's stricter threshold, at the cost of a queue
-bounce. A wrong `certain` rule can let an invalid change reach `main` without
+The error cost is asymmetric. With a merge queue, a wrong `medium` rule can
+under-arm a PR and be backstopped by the queue's stricter threshold, at the cost
+of a queue bounce. This repository's `main` has no merge queue, so a wrong
+`medium` rule is caught only by later runs or by `main` failing. A wrong `certain` rule can let an invalid change reach `main` without
 automatic detection behind it.
 
 A `medium` rule refinement requires a rule-table diff, direct planner goldens,
@@ -240,7 +243,8 @@ a `certain` decision.
 ### Workload identity, products, and publication
 
 > State of this public repository: `.github/workflows/ci.yml` is the only
-> workflow, and it does not invoke `.github/scripts/convergence.py`. No workload
+> validation workflow (`cache-seed.yml` only saves the pnpm store cache and
+> `release-mac.yml` only packages tags), and it does not invoke `.github/scripts/convergence.py`. No workload
 > reads reusable-result receipts, no convergence handoff is produced, and the
 > trusted `convergence.atom.yml` and `comment.atom.yml` consumers described below
 > are not published here, so every selected workload executes and nothing is
