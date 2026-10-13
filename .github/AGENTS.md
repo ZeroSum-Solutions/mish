@@ -30,7 +30,8 @@ The Linux, stdlib-only control plane resolves runners and then scopes.
 plus scope flags and matrices. Jobs consume that map. The final
 `Validate workspace` gate requires a complete boolean workload map matching
 its dependency jobs. It requires every enabled job to succeed and rejects
-failed or cancelled dependencies. Merge policy remains merge-group-only. Retained notice artifacts are downloadable
+failed or cancelled dependencies. `main` has no merge queue and no required
+status check: PRs squash-merge after `Validate workspace` passes (`CONTRIBUTING.md`). Retained notice artifacts are downloadable
 diagnostics; no workflow consumes them to post PR comments.
 
 Reusable workload results are disabled. CI neither calls `convergence.py` nor
