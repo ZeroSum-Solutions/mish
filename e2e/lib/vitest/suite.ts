@@ -8,6 +8,7 @@ import {
   createToolsDevSuite,
   e2eWorkspaceRoot as resolveE2eWorkspaceRoot,
 } from '../tools-dev/runtime.ts';
+import { reapNamespaceProcesses } from '../tools-dev/process-reaper.ts';
 import type {
   ToolsDevCheckResult,
   ToolsDevLogResult,
@@ -17,6 +18,7 @@ import type {
   ToolsDevStatusResult,
 } from '../tools-dev/types.ts';
 import { assertRelativeReportPath, createReport, type E2eReport } from './report.ts';
+import { recordRunNamespace } from './run-ledger.ts';
 
 export { e2eWorkspaceRoot } from '../tools-dev/runtime.ts';
 
@@ -114,6 +116,7 @@ export async function createSmokeSuite(
 ): Promise<SmokeSuite> {
   const namespace = `e2e-${sanitizeSegment(name)}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   const root = join(workspaceRoot, '.tmp', 'e2e', namespace);
+  recordRunNamespace(namespace);
   const reportDir = join(root, 'report');
   const scratchDir = join(root, 'scratch');
   const codexHomeDir = join(scratchDir, 'codex-home');
@@ -291,9 +294,11 @@ async function runToolsDevSuite(
   let diagnostics: unknown = null;
   let caughtError: unknown = null;
   let success = false;
+  const supervisorPids: number[] = [];
 
   try {
     const start = await toolsDev.startWeb(runtimeEnv);
+    rememberSupervisorPids(supervisorPids, start);
     const runtime = toolsDev.portAllocation;
     if (runtime == null) throw new Error('tools-dev did not expose its allocated ports');
     const webUrl = assertRuntimeUrl(start.web?.status.url, 'web');
@@ -336,6 +341,9 @@ async function runToolsDevSuite(
     } catch (error) {
       stopError = error;
     }
+    const leftover = await reapNamespaceLeftovers(suite.namespace, supervisorPids);
+    if (leftover.reaped != null) diagnostics = { diagnostics, reapedAfterStop: leftover.reaped };
+    stopError ??= leftover.error;
     if (stopError != null) {
       diagnostics = {
         diagnostics,
@@ -380,6 +388,38 @@ function assertNoFatalLogs(logs: Record<string, { lines: string[] }>): void {
   expect(combined).not.toMatch(/Agent completed without producing any output/i);
 }
 
+/** `tools-dev start` reports each sidecar's supervisor pid, which leads its process group. */
+function rememberSupervisorPids(into: number[], start: ToolsDevStartResult): void {
+  for (const pid of [start.daemon?.pid, start.web?.pid]) {
+    if (typeof pid === 'number' && pid > 1 && !into.includes(pid)) into.push(pid);
+  }
+}
+
+/**
+ * Teardown backstop after `tools-dev stop`: kill the process group of every
+ * process still stamped with this suite's namespace (SIGTERM, then SIGKILL).
+ * A stop that raced a slow start, timed out, or failed must not leave sidecar
+ * supervisors and their daemon/web children running. Survivors of SIGKILL are
+ * a teardown error.
+ */
+async function reapNamespaceLeftovers(
+  namespace: string,
+  supervisorPids: readonly number[],
+): Promise<{ error: Error | null; reaped: string[] | null }> {
+  try {
+    const result = await reapNamespaceProcesses(namespace, { knownGroupLeaders: supervisorPids });
+    const reaped = result.found.length === 0
+      ? null
+      : result.found.map((entry) => `${entry.pid} ${entry.command.slice(0, 160)}`);
+    const error = result.remainingPids.length === 0
+      ? null
+      : new Error(`tools-dev namespace ${namespace} still has live processes after SIGKILL: ${result.remainingPids.join(', ')}`);
+    return { error, reaped };
+  } catch (error) {
+    return { error: error instanceof Error ? error : new Error(String(error)), reaped: null };
+  }
+}
+
 function sanitizeSegment(value: string): string {
   const safe = value.replace(/[^A-Za-z0-9._-]+/g, '-').replace(/^-+|-+$/g, '');
   return safe || 'suite';
@@ -413,11 +453,17 @@ async function runToolsDevDaemonSuite(
   });
   let caughtError: unknown = null;
   let diagnostics: unknown = null;
+  let reapFailure: Error | null = null;
+  const supervisorPids: number[] = [];
   try {
     await run({
       daemonUrl: () => toolsDev.url.daemon('/'),
       logs: () => toolsDev.logs(runtimeEnv),
-      start: (startOptions) => toolsDev.startDaemon(runtimeEnv, startOptions),
+      start: async (startOptions) => {
+        const result = await toolsDev.startDaemon(runtimeEnv, startOptions);
+        rememberSupervisorPids(supervisorPids, result);
+        return result;
+      },
       status: () => toolsDev.status(runtimeEnv),
       stop: () => toolsDev.stopDaemon(runtimeEnv),
     });
@@ -430,7 +476,14 @@ async function runToolsDevDaemonSuite(
     await toolsDev.stopDaemon(runtimeEnv).catch((stopError: unknown) => {
       diagnostics = { diagnostics, stopError: formatUnknown(stopError) };
     });
-    await suite.finalize({ diagnostics, error: caughtError, success: caughtError == null });
+    const leftover = await reapNamespaceLeftovers(suite.namespace, supervisorPids);
+    if (leftover.reaped != null) diagnostics = { diagnostics, reapedAfterStop: leftover.reaped };
+    reapFailure = caughtError == null ? leftover.error : null;
+    if (leftover.error != null) diagnostics = { diagnostics, reapError: formatUnknown(leftover.error) };
+    const finalError = caughtError ?? reapFailure;
+    await suite.finalize({ diagnostics, error: finalError, success: finalError == null });
   }
+  // A clean body with an unkillable leftover is still a failed suite.
+  if (reapFailure != null) throw reapFailure;
   return suite.report.root;
 }

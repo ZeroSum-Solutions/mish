@@ -13,6 +13,7 @@ import { ACP_PROTOCOL_VERSION, DEFAULT_TIMEOUT_MS, MODEL_CONFIG_OPTION_IDS } fro
 import { errorMessage, resolveAcpTimeoutMs, asObject } from './json.js';
 import { sendRpc, rpcErrorMessage } from './rpc.js';
 import { buildAcpSessionNewParams } from './session-params.js';
+import { assertAgentProbeAllowed, trackAgentProbeChild } from '../../runtimes/probe-lifetime.js';
 
 /** A single model entry exposed to the daemon's model-selection UI and to `session/set_model` calls. */
 export interface ModelOption {
@@ -223,12 +224,30 @@ export async function detectAcpModels({
   defaultModelOption = { id: 'default', label: 'Default (CLI config)' },
 }: DetectAcpModelsOptions): Promise<ModelOption[]> {
   const effectiveTimeoutMs = resolveAcpTimeoutMs(env, timeoutMs);
+  assertAgentProbeAllowed();
+  // An ACP probe starts a real agent session, which may spawn helpers of its
+  // own. On POSIX it gets its own process group so stopping the probe stops
+  // the whole session instead of reparenting those helpers to PID 1.
+  const processGroup = process.platform !== 'win32';
   return await new Promise<ModelOption[]>((resolve, reject) => {
     const child = spawn(bin, args, {
       cwd,
+      detached: processGroup,
       stdio: ['pipe', 'pipe', 'pipe'],
       env: { ...env },
     });
+    trackAgentProbeChild(child, { processGroup });
+    const stopProbe = () => {
+      if (processGroup && child.pid != null) {
+        try {
+          process.kill(-child.pid, 'SIGTERM');
+          return;
+        } catch {
+          // The group is already gone; fall through to the direct kill.
+        }
+      }
+      if (!child.killed) child.kill('SIGTERM');
+    };
     child.stdout.setEncoding('utf8');
     child.stderr.setEncoding('utf8');
 
@@ -250,7 +269,7 @@ export async function detectAcpModels({
 
     const fail = (message: string) => {
       finish(reject, new Error(message));
-      if (!child.killed) child.kill('SIGTERM');
+      stopProbe();
     };
 
     const writeRpc = (id: JsonRpcId, method: string, params: unknown) => {
@@ -289,7 +308,7 @@ export async function detectAcpModels({
       if (expectedId === 2) {
         const models = normalizeModels(result.models, defaultModelOption, result.configOptions);
         finish(resolve, models);
-        if (!child.killed) child.kill('SIGTERM');
+        stopProbe();
       }
     });
 

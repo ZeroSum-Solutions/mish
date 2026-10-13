@@ -5,8 +5,11 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { afterAll } from 'vitest';
+
 import { configureComposioConfigStore } from '../src/connectors/composio-config.js';
 import { composioConnectorProvider } from '../src/connectors/composio.js';
+import { installHermeticAgentEnv, takeBlockedAgentSpawns } from './helpers/hermetic-agent-env.js';
 
 const daemonRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const daemonCliDist = path.join(daemonRoot, 'dist', 'cli.js');
@@ -86,3 +89,20 @@ process.env.OD_DAEMON_CLI_PATH = daemonCliDist;
 // public address here instead of real DNS. A test that needs a
 // private answer replaces this slot for its own duration.
 (globalThis as Record<symbol, unknown>)[Symbol.for('mish.daemon.publicProbeResolveHost')] = async () => ['93.184.216.34'];
+
+// Hermetic agent environment: PATH = fixture bin dir + system dirs, HOME = a
+// temp dir, no detection warm-up on startServer(), and any spawn of a real
+// agent CLI outside the allowed roots is refused and fails the test file
+// (tests/helpers/hermetic-agent-env.ts). Applied after the CLI build above,
+// which needs the developer's real toolchain on PATH.
+installHermeticAgentEnv(path.resolve(daemonRoot, '..', '..'));
+
+afterAll(() => {
+  const blocked = takeBlockedAgentSpawns();
+  if (blocked.length === 0) return;
+  const lines = blocked.map((entry) => `  ${entry.resolved} (${entry.command})`);
+  throw new Error(
+    `test spawned ${blocked.length} real agent binar${blocked.length === 1 ? 'y' : 'ies'} outside the fixture dirs; `
+    + `use a fake agent under a temp dir or OD_TEST_FIXTURE_BIN_DIR instead:\n${lines.join('\n')}`,
+  );
+});

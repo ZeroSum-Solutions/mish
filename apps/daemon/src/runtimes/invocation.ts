@@ -3,6 +3,7 @@ import os from 'node:os';
 import { promisify } from 'node:util';
 import { createCommandInvocation } from '@mish/platform';
 import type { RuntimeExecOptions } from './types.js';
+import { assertAgentProbeAllowed, trackAgentProbeChild } from './probe-lifetime.js';
 
 const execFileP = promisify(execFile);
 
@@ -22,6 +23,9 @@ export function execAgentFile(
   args: string[],
   options: RuntimeExecOptions = {},
 ) {
+  // A probe started on behalf of a daemon that is shutting down must not
+  // spawn; one already running dies with that daemon (probe-lifetime.ts).
+  assertAgentProbeAllowed();
   const invocation = createCommandInvocation(
     options.env
       ? {
@@ -46,6 +50,7 @@ export function execAgentFile(
     cwd: options.cwd ?? os.tmpdir(),
     windowsVerbatimArguments: invocation.windowsVerbatimArguments,
   });
+  trackAgentProbeChild(pending.child);
   lowerProbePriority(pending.child?.pid);
   return pending;
 }

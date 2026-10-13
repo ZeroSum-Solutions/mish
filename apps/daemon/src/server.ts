@@ -296,6 +296,7 @@ import { withAcpServiceFailureCode } from './runtimes/acp-service-failure.js';
 import { preflightCodexDefaultModel } from './runtimes/codex-model-preflight.js';
 import { preparePromptFileForAgent } from './runtimes/prompt-file.js';
 import { TerminalControlSequenceStripper } from './runtimes/terminal-control.js';
+import { agentDetectionWarmupDisabled, createAgentProbeScope } from './runtimes/probe-lifetime.js';
 import { stampToolTiming } from './runtimes/tool-timing.js';
 import {
   buildOpenCodeByokProviderConfig,
@@ -3498,6 +3499,11 @@ export async function startServer({
 
   const app = express();
   installRouteRegistrationGuard(app);
+  // Agent metadata probes started by this daemon (its warm-up and any request
+  // handler) belong to this scope, so closing the server kills them instead of
+  // leaving them reparented to PID 1 (runtimes/probe-lifetime.ts).
+  const agentProbeScope = createAgentProbeScope();
+  app.use((_req, _res, next) => agentProbeScope.run(next));
   // Clipper page captures are self-contained HTML with inlined images plus a
   // Figma IR, which for an image-heavy site (The Economist, news front pages)
   // runs to tens of MB — far past a normal JSON body. Give the ingest route a
@@ -4124,12 +4130,15 @@ export async function startServer({
   // Warm agent-capability probes (e.g. whether the installed Claude Code
   // build advertises --include-partial-messages) so the first /api/chat
   // hits a populated cache even if /api/agents hasn't been called yet.
-  void readAppConfig(RUNTIME_DATA_DIR)
+  // `OD_SKIP_AGENT_DETECTION_WARMUP=1` (set by the daemon test setup) skips
+  // the probes so a test server never runs the developer's real agent CLIs.
+  const warmAgentDetection = !agentDetectionWarmupDisabled(process.env);
+  void agentProbeScope.run(() => readAppConfig(RUNTIME_DATA_DIR)
     .then((config) => {
       orbitService.configure(config.orbit);
-      return detectAgents(config.agentCliEnv ?? {});
+      if (warmAgentDetection) return detectAgents(config.agentCliEnv ?? {});
     })
-    .catch(() => detectAgents().catch(() => {}));
+    .catch(() => (warmAgentDetection ? detectAgents().catch(() => {}) : undefined)));
 
   // Warm the design-system listing cache so Home's first catalogue read after
   // a daemon start is answered from memory, not parsed in the page-load burst.
@@ -19175,6 +19184,7 @@ export async function startServer({
       // Idempotent: a sealing stop runs it before the database closes, and the server's close handler runs it again.
       if (daemonBackgroundWorkCleaned) return;
       daemonBackgroundWorkCleaned = true;
+      agentProbeScope.close();
       clearTerminalTelemetryFallbackTimers();
       amrTerminalReportDelivery.stop();
       telemetry.disposeFatalHandlers();
@@ -19203,6 +19213,7 @@ export async function startServer({
     };
     const runDaemonShutdown = async () => {
       daemonShuttingDown = true;
+      agentProbeScope.close();
       // Refuse new placement admission now, but await the drain only after the
       // runs and services that hold permits were told to stop.
       const coordinator = placement.coordinator;
@@ -19329,6 +19340,7 @@ export async function startServer({
       return;
     }
     server.once('close', () => {
+      agentProbeScope.close();
       void finishDaemonShutdown(shutdownDaemonRuns(), cleanupDaemonBackgroundWork);
     });
     // `app.listen` throws synchronously when the port is already in use on
