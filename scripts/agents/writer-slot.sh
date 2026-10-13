@@ -92,48 +92,20 @@ json_fields() {
     });'
 }
 
-# break_stale <lock dir> <holder pid read by the caller, or empty>: delete a lock whose holder
-# has exited. Breakers take a short mutex and re-check the holder under it; only breakers ever
-# delete another process's lock, so the re-check cannot go stale before the delete.
-break_stale() {
-  if ! mkdir "$1.break" 2>/dev/null; then
-    # A breaker holds this for milliseconds; one older than 5 s was killed mid-break.
-    [ $(( $(date +%s) - $(mtime "$1.break") )) -gt 5 ] && rmdir "$1.break" 2>/dev/null
-    return 1
-  fi
-  now_holder=$(cat "$1/pid" 2>/dev/null)
-  if [ "$now_holder" = "$2" ]; then
-    if [ -n "$2" ]; then
-      kill -0 "$2" 2>/dev/null || rm -rf "$1"
-    elif [ $(( $(date +%s) - $(mtime "$1") )) -gt 10 ]; then
-      rm -rf "$1"
-    fi
-  fi
-  rmdir "$1.break"
-}
-
-# The registry mutex: a directory holding its owner's pid. A waiter breaks it only when that
-# owner is dead (or never wrote its pid within 10 s). Holds last milliseconds, so it gives up
-# after 3 s of wall-clock time.
-lock() {
-  deadline=$(( $(date +%s) + 3 ))
-  until mkdir "$DIR/.lock" 2>/dev/null; do
-    [ "$(date +%s)" -gt "$deadline" ] && return 1
-    holder=$(cat "$DIR/.lock/pid" 2>/dev/null)
-    if { [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; } ||
-       { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$DIR/.lock") )) -gt 10 ]; }; then
-      break_stale "$DIR/.lock" "$holder" && continue
-    fi
-    sleep 0.05
-  done
-  echo $$ > "$DIR/.lock/pid"
-  trap 'unlock' EXIT INT TERM
-}
-
-# Releases the mutex only while this process still owns it.
-unlock() {
-  [ "$(cat "$DIR/.lock/pid" 2>/dev/null)" = "$$" ] && rm -rf "$DIR/.lock"
-  trap - EXIT INT TERM
+# with_lock <command…>: run <command> holding an exclusive kernel lock (flock) on the registry.
+# The kernel drops the lock when its holder exits, however it exits, so a killed process can
+# never leave the registry locked. Gives up after 3 s (exit 75); holds last milliseconds.
+with_lock() {
+  perl -MFcntl=:flock -e '
+    BEGIN { $^F = 255 }  # keep the lock descriptor open across exec
+    my $file = shift;
+    open(my $fh, ">>", $file) or exit 75;
+    my $deadline = time + 3;
+    until (flock($fh, LOCK_EX | LOCK_NB)) {
+      exit 75 if time > $deadline;
+      select(undef, undef, undef, 0.05);
+    }
+    exec { $ARGV[0] } @ARGV or exit 75;' "$DIR/registry.lock" "$@"
 }
 
 slot_live() {
@@ -189,25 +161,16 @@ owned_by_ancestor() {
 # Returns 0 when held, 3 when every slot is taken, 4 when another writer owns this checkout,
 # 5 when the registry could not be locked or written.
 claim() {
-  slot=$(slot_path "$1")
-  lock || return 5
-  reap
-  if [ -e "$slot" ]; then
-    if [ "$(field session "$slot")" = "$2" ] || owned_by_ancestor "$slot"; then
-      touch "$slot"; unlock; return 0
-    fi
-    unlock; return 4
-  fi
-  if [ "$(count_slots)" -ge "$MAX" ]; then unlock; return 3; fi
-  write_slot "$slot" "$1" "$2" "$3" "$4" && [ "$(field session "$slot")" = "$2" ] || { unlock; return 5; }
-  unlock
-  return 0
+  export DIR
+  with_lock sh "$0" __claim "$@"
+  rc=$?
+  case "$rc" in 0|3|4) return "$rc" ;; *) return 5 ;; esac
 }
 
 refusal() {
   if [ "$1" = 5 ]; then
     printf 'Could not register a writer slot for %s: the registry in %s is locked or not writable.\n' "$2" "$DIR"
-    printf '%s\n' "Run \`sh scripts/agents/writer-slot.sh status\`; it breaks a lock whose owner has exited."
+    printf '%s\n' "Another process has held the registry lock for over 3 s, or the directory is not writable."
   elif [ "$1" = 4 ]; then
     printf 'Another agent session is the writer for %s:\n' "$2"
     describe_slots | grep -F "$2 ("
@@ -237,6 +200,39 @@ hook_claim() {
 
 cmd="${1:-}"; [ -n "$cmd" ] && shift
 
+# Internal steps that run under with_lock in a child process; DIR comes from the environment.
+case "$cmd" in
+  __claim)
+    slot=$(slot_path "$1")
+    reap
+    if [ -e "$slot" ]; then
+      if [ "$(field session "$slot")" = "$2" ] || owned_by_ancestor "$slot"; then
+        touch "$slot"; exit 0
+      fi
+      exit 4
+    fi
+    [ "$(count_slots)" -ge "$MAX" ] && exit 3
+    write_slot "$slot" "$1" "$2" "$3" "$4" && [ "$(field session "$slot")" = "$2" ] || exit 5
+    exit 0
+    ;;
+  __release)  # <worktree> <my session> <force>
+    slot=$(slot_path "$1")
+    if [ -e "$slot" ] && [ "$3" = 0 ] && slot_live "$slot" && [ "$(field session "$slot")" != "$2" ] && ! owned_by_ancestor "$slot"; then
+      printf 'writer slot for %s belongs to a live session (%s); not releasing. Use --force only if that session is gone.\n' "$1" "$(field session "$slot")" >&2
+      exit 3
+    fi
+    rm -f "$slot"
+    exit 0
+    ;;
+  __end)  # <session>
+    for f in "$DIR"/*.slot; do
+      [ -e "$f" ] && [ "$(field session "$f")" = "$1" ] && rm -f "$f"
+    done
+    exit 0
+    ;;
+  __reap) reap; exit 0 ;;
+esac
+
 case "$cmd" in
   hook-pre)
     fields=$(json_fields)
@@ -256,11 +252,8 @@ case "$cmd" in
     session=$(json_fields | sed -n 1p)
     DIR="$(common_dir_of "$SELF_DIR")/mish-writers"
     [ -d "$DIR" ] && [ -n "$session" ] || exit 0
-    lock || exit 0
-    for f in "$DIR"/*.slot; do
-      [ -e "$f" ] && [ "$(field session "$f")" = "$session" ] && rm -f "$f"
-    done
-    unlock
+    export DIR
+    with_lock sh "$0" __end "$session"
     exit 0
     ;;
 esac
@@ -301,21 +294,17 @@ case "$cmd" in
     exit 3
     ;;
   release)
-    lock || { refusal 5 "$WT" >&2; exit 3; }
-    slot=$(slot_path "$WT")
     [ -n "$PID" ] || PID=$(agent_pid)
-    me="${CLAUDE_SESSION_ID:-pid-${PID:-none}}"
-    if [ -e "$slot" ] && [ "$FORCE" = 0 ] && slot_live "$slot" && [ "$(field session "$slot")" != "$me" ] && ! owned_by_ancestor "$slot"; then
-      unlock
-      printf 'writer slot for %s belongs to a live session (%s); not releasing. Use --force only if that session is gone.\n' "$WT" "$(field session "$slot")" >&2
-      exit 3
-    fi
-    rm -f "$slot"
-    unlock
+    export DIR
+    with_lock sh "$0" __release "$WT" "${CLAUDE_SESSION_ID:-pid-${PID:-none}}" "$FORCE"
+    rc=$?
+    [ "$rc" = 75 ] && { refusal 5 "$WT" >&2; exit 3; }
+    [ "$rc" = 0 ] || exit 3
     echo "writer slot released: $WT"
     ;;
   status)
-    lock && { reap; unlock; }
+    export DIR
+    with_lock sh "$0" __reap
     printf 'Writers: %s of %s\n' "$(count_slots)" "$MAX"
     describe_slots
     ;;

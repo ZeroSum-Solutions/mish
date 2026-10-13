@@ -18,7 +18,7 @@ A writer is one agent session editing one checkout (the main checkout or a linke
   An agent that cannot be wrapped claims before its first edit and releases when it finishes (`claim --agent <name>`, `release`). `release` frees only your own slot; `release --force` frees another session's, for a session you know has ended. An agent started without either is not counted; that is a rule violation, not a gap to use.
 - Claude Code under `run` (for example `writer-slot.sh run --agent claude -- claude -p …`) uses the wrapper's slot; its own hooks do not claim a second one.
 - The shell-command check is a pattern match, not a parser. It catches common writes (`git commit`, `git -C … commit`, `sed -i`, redirects, `pnpm install`, `mv`/`cp`/`rm`) and claims the checkout of the command's working directory. A command that writes in another checkout through `cd` is not seen; claim that checkout yourself.
-- If the registry cannot be locked or written, the edit is refused rather than let through uncounted. `status` breaks a lock whose owner process has exited.
+- If the registry cannot be locked or written, the edit is refused rather than let through uncounted. The registry uses a kernel file lock, which the system drops when its holder exits, so a crashed process never leaves it locked.
 - Reading, searching, reviewing and planning need no slot.
 
 When the limit is reached, do not work around it. Wait for a writer to finish, or move the work to the offload machine.

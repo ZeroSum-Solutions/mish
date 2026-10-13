@@ -1,5 +1,5 @@
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
-import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -185,8 +185,7 @@ describe("writer-slot: ownership", () => {
   test("[P0] an edit is refused, promptly, when the registry cannot be locked or written", () => {
     const { main, worktrees, script } = makeClone(1);
     const registry = path.join(main, ".git", "mish-writers");
-    mkdirSync(path.join(registry, ".lock"), { recursive: true });
-    writeFileSync(path.join(registry, ".lock", "pid"), "999999\n");
+    mkdirSync(registry, { recursive: true });
     chmodSync(registry, 0o555);
     try {
       const started = Date.now();
@@ -200,11 +199,18 @@ describe("writer-slot: ownership", () => {
     }
   });
 
-  test("a registry lock left by a dead process is broken", () => {
+  test("[P0] a registry lock holder blocks claims only while it is alive", async () => {
     const { main, worktrees, script } = makeClone(1);
-    const lockDir = path.join(main, ".git", "mish-writers", ".lock");
-    mkdirSync(lockDir, { recursive: true });
-    writeFileSync(path.join(lockDir, "pid"), "999999\n");
+    const lockFile = path.join(main, ".git", "mish-writers", "registry.lock");
+    mkdirSync(path.dirname(lockFile), { recursive: true });
+    const holder = spawn("perl", ["-MFcntl=:flock", "-e", 'open(F, ">>", $ARGV[0]) or die; flock(F, LOCK_EX) or die; $| = 1; print "held\\n"; sleep 60', lockFile]);
+    children.push(holder);
+    await new Promise((resolve) => holder.stdout!.once("data", resolve));
+    const blocked = run(script, worktrees[0]!, ["claim", "--pid", String(owner().pid)]);
+    expect(blocked.status).toBe(3);
+    expect(blocked.stderr).toContain("Could not register a writer slot");
+    holder.kill("SIGKILL");
+    await waitForExit(holder);
     expect(run(script, worktrees[0]!, ["claim", "--pid", String(owner().pid)]).status).toBe(0);
   });
 });

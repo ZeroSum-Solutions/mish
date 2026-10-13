@@ -72,49 +72,23 @@ fi
 
 mtime() { date -r "$1" +%s 2>/dev/null || echo 0; }
 
-# break_stale <lock dir> <holder pid read by the caller, or empty>: delete a lock whose holder
-# has exited. Breakers take a short mutex and re-check the holder under it; only breakers ever
-# delete another process's lock, so the re-check cannot go stale before the delete.
-break_stale() {
-  if ! mkdir "$1.break" 2>/dev/null; then
-    # A breaker holds this for milliseconds; one older than 5 s was killed mid-break.
-    [ $(( $(date +%s) - $(mtime "$1.break") )) -gt 5 ] && rmdir "$1.break" 2>/dev/null
-    return 1
-  fi
-  now_holder=$(cat "$1/pid" 2>/dev/null)
-  if [ "$now_holder" = "$2" ]; then
-    if [ -n "$2" ]; then
-      kill -0 "$2" 2>/dev/null || rm -rf "$1"
-    elif [ $(( $(date +%s) - $(mtime "$1") )) -gt 10 ]; then
-      rm -rf "$1"
-    fi
-  fi
-  rmdir "$1.break"
-}
-
-# take_lock <dir>: one bootstrap per checkout at a time, to avoid duplicate work; correctness
-# does not depend on it (every temporary file is unique and published by rename). The
-# directory holds its owner's pid. Waits MISH_CG_LOCK_WAIT seconds (default 300).
-take_lock() {
-  deadline=$(( $(date +%s) + ${MISH_CG_LOCK_WAIT:-300} ))
-  until mkdir "$1" 2>/dev/null; do
-    [ "$(date +%s)" -gt "$deadline" ] && return 1
-    holder=$(cat "$1/pid" 2>/dev/null)
-    if { [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; } ||
-       { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$1") )) -gt 10 ]; }; then
-      break_stale "$1" "$holder" && continue
-    fi
-    sleep 0.5
-  done
-  echo $$ > "$1/pid"
-}
-
-# drop_lock <dir>: release only a lock this process holds.
-drop_lock() { [ "$(cat "$1/pid" 2>/dev/null)" = "$$" ] && rm -rf "$1"; }
-
-LOCK="$STATE/$KEY.lock"
-take_lock "$LOCK" || { echo "codegraph-worktree: another bootstrap still holds $LOCK"; exit 1; }
-trap 'drop_lock "$LOCK"; rm -f "$STATE/seed.db.tmp.$$"* "$DB.tmp.$$"' EXIT INT TERM
+# One bootstrap per checkout at a time, to avoid duplicate work; correctness does not depend on
+# it (every temporary file is unique and published by rename). The script re-runs itself under
+# an exclusive kernel lock (flock), which the kernel drops when the holder exits, so a killed
+# bootstrap never leaves it held. Waits MISH_CG_LOCK_WAIT seconds (default 300).
+if [ -z "${MISH_CG_LOCKED:-}" ]; then
+  MISH_CG_LOCKED=1 exec perl -MFcntl=:flock -e '
+    BEGIN { $^F = 255 }  # keep the lock descriptor open across exec
+    my ($file, $wait) = (shift, shift);
+    open(my $fh, ">>", $file) or exit 75;
+    my $deadline = time + $wait;
+    until (flock($fh, LOCK_EX | LOCK_NB)) {
+      if (time > $deadline) { print "codegraph-worktree: another bootstrap still holds $file\n"; exit 1 }
+      select(undef, undef, undef, 0.5);
+    }
+    exec { $ARGV[0] } @ARGV or exit 1;' "$STATE/$KEY.flock" "${MISH_CG_LOCK_WAIT:-300}" sh "$0" "$WT"
+fi
+trap 'rm -f "$STATE/seed.db.tmp.$$"* "$DB.tmp.$$"' EXIT INT TERM
 
 echo "[$(date -u +%FT%TZ)] bootstrap $WT"
 
