@@ -507,9 +507,9 @@ describe('composeSystemPrompt', () => {
         { id: 'github' },
       ]);
       expect(directive).toContain('## External MCP servers — already authenticated');
-      expect(directive).toContain('`higgsfield-openclaw`');
+      expect(directive).toContain('`mishmash-higgsfield-openclaw`');
       expect(directive).toContain('Higgsfield (OpenClaw)');
-      expect(directive).toContain('`github`');
+      expect(directive).toContain('`mishmash-github`');
       expect(directive).toContain(
         '**Do NOT call any tool whose name matches `mcp__<server>__authenticate` or `mcp__<server>__complete_authentication`',
       );
@@ -533,8 +533,8 @@ describe('composeSystemPrompt', () => {
 
     it('does not duplicate the label when it equals the id', () => {
       const directive = renderConnectedExternalMcpDirective([{ id: 'github', label: 'github' }]);
-      expect(directive).toContain('- `github`\n');
-      expect(directive).not.toContain('- `github` (github)');
+      expect(directive).toContain('- `mishmash-github`\n');
+      expect(directive).not.toContain('- `mishmash-github` (github)');
     });
 
     it('has no leading separator so it composes cleanly in a `---`-joined slice', () => {

@@ -15,6 +15,7 @@
 // users can copy-paste between Mishh Mashh and other tools without
 // translation.
 
+import { spawnedMcpServerName } from './mcp-server-name.js';
 import { mkdir, open, rename, rm } from 'node:fs/promises';
 import { realpathSync } from 'node:fs';
 import { randomBytes } from 'node:crypto';
@@ -361,7 +362,7 @@ export function buildClaudeMcpJson(
       const entry: Record<string, unknown> = { command: s.command };
       if (s.args && s.args.length > 0) entry.args = s.args;
       if (s.env && Object.keys(s.env).length > 0) entry.env = s.env;
-      out[s.id] = entry;
+      out[spawnedMcpServerName(s.id)] = entry;
     } else {
       const entry: Record<string, unknown> = {
         type: s.transport, // 'sse' | 'http'
@@ -372,7 +373,7 @@ export function buildClaudeMcpJson(
         effectiveMcpAuthMode(s) === 'oauth' ? tokens[s.id] : undefined,
       );
       if (headers && Object.keys(headers).length > 0) entry.headers = headers;
-      out[s.id] = entry;
+      out[spawnedMcpServerName(s.id)] = entry;
     }
   }
   return { mcpServers: out };
@@ -436,7 +437,7 @@ export function buildAcpMcpServers(servers: McpServerConfig[]): AcpMcpServer[] {
     }
     out.push({
       type: 'stdio',
-      name: s.id,
+      name: spawnedMcpServerName(s.id),
       command: s.command ?? '',
       args: Array.isArray(s.args) ? [...s.args] : [],
       env: envEntries,
@@ -512,7 +513,7 @@ export function buildOpenCodeMcpConfigContent(
         entry.environment = { ...s.env };
       }
       entry.enabled = true;
-      mcp[s.id] = entry;
+      mcp[spawnedMcpServerName(s.id)] = entry;
     } else {
       const url = typeof s.url === 'string' ? s.url.trim() : '';
       if (!url) continue;
@@ -526,7 +527,7 @@ export function buildOpenCodeMcpConfigContent(
       );
       if (headers && Object.keys(headers).length > 0) entry.headers = headers;
       entry.enabled = true;
-      mcp[s.id] = entry;
+      mcp[spawnedMcpServerName(s.id)] = entry;
     }
   }
   const externalDirectory = buildOpenCodeExternalDirectoryAllowlist(

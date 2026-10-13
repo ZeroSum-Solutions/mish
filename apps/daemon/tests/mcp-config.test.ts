@@ -170,7 +170,7 @@ describe('buildClaudeMcpJson', () => {
     ]);
     expect(out).toEqual({
       mcpServers: {
-        github: {
+        'mishmash-github': {
           command: 'npx',
           args: ['-y', '@modelcontextprotocol/server-github'],
           env: { GITHUB_PERSONAL_ACCESS_TOKEN: 'ghp' },
@@ -189,7 +189,7 @@ describe('buildClaudeMcpJson', () => {
         headers: { Authorization: 'Bearer abc' },
       },
     ]) as { mcpServers: Record<string, Record<string, unknown>> };
-    expect(out.mcpServers.higgsfield).toEqual({
+    expect(out.mcpServers['mishmash-higgsfield']).toEqual({
       type: 'sse',
       url: 'https://mcp.higgsfield.ai',
       headers: { Authorization: 'Bearer abc' },
@@ -211,7 +211,7 @@ describe('buildClaudeMcpJson', () => {
         command: 'rm',
       },
     ]) as { mcpServers: Record<string, unknown> };
-    expect(Object.keys(out.mcpServers)).toEqual(['a']);
+    expect(Object.keys(out.mcpServers)).toEqual(['mishmash-a']);
   });
 
   it('injects an Authorization Bearer header when a stored OAuth token is supplied', () => {
@@ -226,7 +226,7 @@ describe('buildClaudeMcpJson', () => {
       ],
       { higgsfield: 'access-tok-xyz' },
     ) as { mcpServers: Record<string, Record<string, unknown>> };
-    expect(out.mcpServers.higgsfield?.headers).toEqual({
+    expect(out.mcpServers['mishmash-higgsfield']?.headers).toEqual({
       Authorization: 'Bearer access-tok-xyz',
     });
   });
@@ -260,7 +260,7 @@ describe('buildClaudeMcpJson', () => {
       ],
       { higgsfield: 'access-tok-xyz' },
     ) as { mcpServers: Record<string, Record<string, unknown>> };
-    expect(out.mcpServers.higgsfield?.headers).toEqual({
+    expect(out.mcpServers['mishmash-higgsfield']?.headers).toEqual({
       authorization: 'Bearer manual-token',
     });
   });
@@ -278,7 +278,7 @@ describe('buildClaudeMcpJson', () => {
       ],
       { higgsfield: 'access-tok-xyz' },
     ) as { mcpServers: Record<string, Record<string, unknown>> };
-    expect(out.mcpServers.higgsfield?.headers).toEqual({
+    expect(out.mcpServers['mishmash-higgsfield']?.headers).toEqual({
       Authorization: 'Bearer access-tok-xyz',
     });
   });
@@ -294,7 +294,7 @@ describe('buildClaudeMcpJson', () => {
       },
     ]) as { mcpServers: Record<string, Record<string, unknown>> };
     // Empty Authorization is worse than missing — should be omitted.
-    expect(out.mcpServers.higgsfield?.headers).toBeUndefined();
+    expect(out.mcpServers['mishmash-higgsfield']?.headers).toBeUndefined();
   });
 });
 
@@ -344,7 +344,7 @@ describe('sanitizeMcpServer headers', () => {
       ],
       { higgsfield: 'tok' },
     ) as { mcpServers: Record<string, Record<string, unknown>> };
-    expect(out.mcpServers.higgsfield?.headers).toEqual({
+    expect(out.mcpServers['mishmash-higgsfield']?.headers).toEqual({
       Authorization: 'Bearer tok',
     });
     expect(out.mcpServers.untouched?.headers).toBeUndefined();
@@ -367,7 +367,7 @@ describe('buildAcpMcpServers', () => {
         url: 'https://example.com',
       },
     ]);
-    expect(out.map((s) => s.name)).toEqual(['a']);
+    expect(out.map((s) => s.name)).toEqual(['mishmash-a']);
   });
 
   it('flattens env to ACP {name,value} array shape', () => {
@@ -383,7 +383,7 @@ describe('buildAcpMcpServers', () => {
     ]);
     expect(out[0]).toEqual({
       type: 'stdio',
-      name: 'gh',
+      name: 'mishmash-gh',
       command: 'npx',
       args: ['-y', '@modelcontextprotocol/server-github'],
       env: [{ name: 'TOKEN', value: 'x' }],
@@ -463,7 +463,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
       mcp: Record<string, Record<string, unknown>>;
     };
 
-    expect(parsed.mcp['basic-memory']).toEqual({
+    expect(parsed.mcp['mishmash-basic-memory']).toEqual({
       type: 'local',
       command: ['/opt/homebrew/bin/uvx', 'basic-memory', 'mcp'],
       enabled: true,
@@ -513,7 +513,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
       name: 'Mishh Mashh BYOK',
       npm: '@ai-sdk/openai-compatible',
     });
-    expect(parsed.mcp?.['basic-memory']).toBeTruthy();
+    expect(parsed.mcp?.['mishmash-basic-memory']).toBeTruthy();
     expect(parsed.permission?.external_directory?.['/tmp/od-project']).toBe('allow');
   });
 
@@ -532,7 +532,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
     const parsed = JSON.parse(raw as string) as {
       mcp: Record<string, Record<string, unknown>>;
     };
-    expect(parsed.mcp['basic-memory']).toEqual({
+    expect(parsed.mcp['mishmash-basic-memory']).toEqual({
       type: 'local',
       command: ['/opt/homebrew/bin/uvx', 'basic-memory', 'mcp'],
       enabled: true,
@@ -553,7 +553,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
     const parsed = JSON.parse(raw as string) as {
       mcp: Record<string, Record<string, unknown>>;
     };
-    expect(parsed.mcp.github).toEqual({
+    expect(parsed.mcp['mishmash-github']).toEqual({
       type: 'local',
       command: ['npx', '-y', '@modelcontextprotocol/server-github'],
       environment: { GITHUB_PERSONAL_ACCESS_TOKEN: 'ghp_xxx' },
@@ -574,7 +574,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
     const parsed = JSON.parse(raw as string) as {
       mcp: Record<string, Record<string, unknown>>;
     };
-    expect(parsed.mcp.higgsfield).toEqual({
+    expect(parsed.mcp['mishmash-higgsfield']).toEqual({
       type: 'remote',
       url: 'https://mcp.higgsfield.ai',
       headers: { Authorization: 'Bearer abc' },
@@ -600,7 +600,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
     const parsed = JSON.parse(raw as string) as {
       mcp: Record<string, unknown>;
     };
-    expect(Object.keys(parsed.mcp)).toEqual(['a']);
+    expect(Object.keys(parsed.mcp)).toEqual(['mishmash-a']);
   });
 
   it('skips stdio servers missing a command (sanitize lets them through; we must guard at build)', () => {
@@ -621,7 +621,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
     const parsed = JSON.parse(raw as string) as {
       mcp: Record<string, unknown>;
     };
-    expect(Object.keys(parsed.mcp)).toEqual(['good']);
+    expect(Object.keys(parsed.mcp)).toEqual(['mishmash-good']);
   });
 
   it('skips remote servers missing a url', () => {
@@ -652,7 +652,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
     const parsed = JSON.parse(raw as string) as {
       mcp: Record<string, Record<string, unknown>>;
     };
-    expect(parsed.mcp.higgsfield?.headers).toEqual({
+    expect(parsed.mcp['mishmash-higgsfield']?.headers).toEqual({
       Authorization: 'Bearer access-tok-xyz',
     });
   });
@@ -674,7 +674,7 @@ describe('buildOpenCodeMcpConfigContent', () => {
     const parsed = JSON.parse(raw as string) as {
       mcp: Record<string, Record<string, unknown>>;
     };
-    expect(parsed.mcp.higgsfield?.headers).toEqual({
+    expect(parsed.mcp['mishmash-higgsfield']?.headers).toEqual({
       authorization: 'Bearer manual-token',
     });
   });
