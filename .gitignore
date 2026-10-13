@@ -55,6 +55,8 @@ apps/desktop/vendor/dom-to-pptx/dom-to-pptx.bundle.js
 .opencode/
 .claude/*
 !.claude/settings.json
+!.claude/agents/
+!.claude/skills/
 .codex/
 .codegraph/
 .deepseek/

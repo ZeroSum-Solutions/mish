@@ -59,7 +59,7 @@ The only repository-wide source of truth for daemon-managed data paths. Every RE
 Sanctioned exceptions:
 
 - `OD_MEDIA_CONFIG_DIR` overrides `media-config.json` only. `OD_LEGACY_DATA_DIR` is a legacy-import source only. Neither is a second data root.
-- External tool homes such as `CODEX_HOME` are integration inputs, not Mishh Mashh runtime data. Agent/project-cwd skill staging aliases, manifest metadata keys and CSS identifiers are not data roots either.
+- External tool homes such as `CODEX_HOME` are integration inputs, not Mish runtime data. Agent/project-cwd skill staging aliases, manifest metadata keys and CSS identifiers are not data roots either.
 - Placement adoption helper (decided 2026-10-08): with an explicit `OD_DATA_DIR` and `--placement-adoption-executor`, tools-dev builds the helper into `<data root>/placement/adoption-helper`, and writes the root creation record named by `WORKBENCH_ADOPTION_ROOT_RECORD` when its own `mkdir` creates the root. The daemon re-derives the path from `RUNTIME_DATA_DIR` and re-verifies ownership, permissions and digest.
 
 Known escape patterns, which must not be copied or extended: module defaults pointing at a cwd-relative legacy directory; helpers such as `defaultRegistryRoots()` that recompute a root from `process.env.OD_DATA_DIR` or cwd; `openDatabase(projectRoot)` relying on its fallback; help text suggesting concrete legacy directories. When the fix is obvious, route the path through `RUNTIME_DATA_DIR` or an explicit data-root argument; otherwise block the PR and ask a core maintainer.
@@ -73,11 +73,18 @@ Known escape patterns, which must not be copied or extended: module defaults poi
 
 ## CodeGraph
 
-Each checkout can carry a git-ignored CodeGraph index in `.codegraph/`. A worktree is its own checkout, so build one from each worktree's root with `codegraph init .`, and refresh it with `codegraph sync .` after a pull or a large merge.
+Each checkout carries a git-ignored CodeGraph index in `.codegraph/`. Build the main checkout's index once (`sh scripts/agents/codegraph-worktree.sh`). A linked worktree gets its index from the same script, which clones the main index and syncs only the changed files in seconds; never run `codegraph init` in a worktree. Refresh with `codegraph sync .` after a pull or a large merge.
 
 - Before `grep`, `find` or reading files to locate or understand code, run `codegraph explore "<symbol names or question>"` or the `codegraph_explore` MCP tool when it is registered: it returns the symbols' source and the call paths between them, including dynamic-dispatch hops text search cannot follow. Name a file or symbol in the query to read its current source. If it misses, fall back to `rg`.
 - Before changing a symbol, run `codegraph impact <symbol>` or `codegraph callers <symbol>` to see what depends on it and which tests cover it.
-- Build a worktree's index before agents start using CodeGraph there. An agent's CodeGraph MCP server starts a background daemon for the checkout, and a daemon attached to a half-built index keeps retrying the writer lock: a 2-minute build took about 10. Do not stop a daemon another session may be using.
+- Run every CodeGraph process with `CODEGRAPH_PARSE_WORKERS=2`, `CODEGRAPH_RESOLVE_WORKERS=2` and `CODEGRAPH_QUERY_POOL_SIZE=2`; uncapped, each checkout's daemon starts a query thread per core. Do not stop a daemon another session may be using.
+
+## Local resources
+
+One developer machine hosts several agents; keep it responsive. Detail: `docs/agents/local-resources.md`.
+
+- At most 2 checkouts of a clone are edited at once (`MISH_MAX_WRITERS`, never above 3). Claude Code enforces this with hooks; other agents run `sh scripts/agents/writer-slot.sh claim` before their first edit and `release` when done, including before edits made through shell commands.
+- When the limit is reached, wait or offload. Full type checks and package suites for a pushed branch run on the offload machine with `sh scripts/agents/offload.sh <branch> ['<command>']`.
 
 ## Boundary constraints
 
@@ -92,7 +99,7 @@ Each checkout can carry a git-ignored CodeGraph index in `.codegraph/`. A worktr
 
 ## Capability exposure (UI and CLI)
 
-Every user-facing capability ships in both the web UI and the `od` CLI (`apps/daemon/src/cli.ts`). External agents (hermes-agent, openclaw, chat bots, other shells) drive Mishh Mashh only through `od`, so a UI-only capability cannot be composed into them.
+Every user-facing capability ships in both the web UI and the `od` CLI (`apps/daemon/src/cli.ts`). External agents (hermes-agent, openclaw, chat bots, other shells) drive Mish only through `od`, so a UI-only capability cannot be composed into them.
 
 - Both surfaces call the same `/api/*` endpoints, with DTOs in `packages/contracts`.
 - CLI commands support `--json` and accept long prompts via `--prompt-file <path|->`.

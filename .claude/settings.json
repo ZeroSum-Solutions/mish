@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CODEGRAPH_PARSE_WORKERS": "2",
+    "CODEGRAPH_RESOLVE_WORKERS": "2",
+    "CODEGRAPH_QUERY_POOL_SIZE": "2"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(pnpm guard)",
+      "Bash(pnpm typecheck)",
+      "Bash(pnpm --filter * typecheck)",
+      "Bash(pnpm --filter * test)",
+      "Bash(pnpm --filter * test *)",
+      "Bash(pnpm --filter * build)",
+      "Bash(pnpm tools-dev status *)",
+      "Bash(pnpm tools-dev logs *)",
+      "Bash(pnpm tools-dev inspect *)",
+      "Bash(codegraph explore *)",
+      "Bash(codegraph query *)",
+      "Bash(codegraph node *)",
+      "Bash(codegraph callers *)",
+      "Bash(codegraph callees *)",
+      "Bash(codegraph impact *)",
+      "Bash(codegraph status *)",
+      "Bash(codegraph sync *)",
+      "Bash(python3 .github/scripts/scopes.py plan *)",
+      "Bash(sh scripts/agents/writer-slot.sh *)",
+      "Bash(sh scripts/agents/codegraph-worktree.sh *)",
+      "Bash(gh pr view * --repo ZeroSum-Solutions/mish *)",
+      "Bash(gh pr checks * --repo ZeroSum-Solutions/mish *)",
+      "Bash(gh pr list --repo ZeroSum-Solutions/mish *)",
+      "Bash(gh pr diff * --repo ZeroSum-Solutions/mish *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git worktree list *)"
+    ],
+    "deny": [
+      "Bash(pnpm dev *)",
+      "Bash(pnpm start *)",
+      "Bash(pnpm preview *)",
+      "Bash(gh pr merge * --admin *)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/agents/writer-slot.sh\" hook-pre",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/agents/codegraph-worktree.sh\" --hook",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh \"$CLAUDE_PROJECT_DIR/scripts/agents/writer-slot.sh\" hook-end",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
