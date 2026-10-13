@@ -80,8 +80,12 @@ take_lock() {
     holder=$(cat "$1/pid" 2>/dev/null)
     if { [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; } ||
        { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$1") )) -gt 60 ]; }; then
-      mv "$1" "$1.stale.$$" 2>/dev/null && rm -rf "$1.stale.$$"
-      continue
+      # Rename away (one waiter wins); delete only if it is still the dead holder's lock.
+      if mv "$1" "$1.stale.$$" 2>/dev/null; then
+        if [ "$(cat "$1.stale.$$/pid" 2>/dev/null)" = "$holder" ]; then rm -rf "$1.stale.$$"
+        else mv "$1.stale.$$" "$1" 2>/dev/null || rm -rf "$1.stale.$$"; fi
+        continue
+      fi
     fi
     i=$((i + 1)); [ "$i" -gt "${MISH_CG_LOCK_WAIT:-600}" ] && return 1
     sleep 0.5

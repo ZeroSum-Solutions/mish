@@ -1,5 +1,5 @@
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
+import { chmodSync, copyFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -171,6 +171,30 @@ describe("writer-slot: ownership", () => {
     expect(run(script, worktrees[0]!, ["status"], "", { MISH_WRITER_TTL_MIN: "0" }).stdout).toContain("Writers: 0 of 2");
   });
 
+  test("an anonymous claim can release its own slot", () => {
+    const { worktrees, script } = makeClone(1);
+    expect(run(script, worktrees[0]!, ["claim"]).status).toBe(0);
+    expect(run(script, worktrees[0]!, ["release"]).status).toBe(0);
+    expect(run(script, worktrees[0]!, ["status"]).stdout).toContain("Writers: 0 of 2");
+  });
+
+  test("[P0] an edit is refused, promptly, when the registry cannot be locked or written", () => {
+    const { main, worktrees, script } = makeClone(1);
+    const registry = path.join(main, ".git", "mish-writers");
+    mkdirSync(path.join(registry, ".lock"), { recursive: true });
+    writeFileSync(path.join(registry, ".lock", "pid"), "999999\n");
+    chmodSync(registry, 0o555);
+    try {
+      const started = Date.now();
+      const refused = run(script, worktrees[0]!, ["hook-pre"], editHook(path.join(worktrees[0]!, "a.ts"), "s"));
+      expect(refused.status).toBe(2);
+      expect(refused.stderr).toContain("Could not register a writer slot");
+      expect(Date.now() - started).toBeLessThan(10_000);
+    } finally {
+      chmodSync(registry, 0o755);
+    }
+  }, 20_000);
+
   test("a registry lock left by a dead process is broken", () => {
     const { main, worktrees, script } = makeClone(1);
     const lockDir = path.join(main, ".git", "mish-writers", ".lock");
@@ -200,6 +224,12 @@ describe("writer-slot: Claude Code hooks", () => {
     expect(run(script, cwd, ["hook-bash"], bashHook(cwd, "sed -i '' s/a/b/ x.ts", "s")).status).toBe(2);
     expect(run(script, cwd, ["hook-bash"], bashHook(cwd, `git -C ${cwd} commit -m wip`, "s")).status).toBe(2);
     expect(run(script, cwd, ["hook-bash"], bashHook(cwd, "echo hi >> /tmp/out.txt", "s")).status).toBe(2);
+    for (const command of [`git -C "${cwd}" commit -m wip`, "echo hi > '/tmp/out.txt'", "pnpm i", "npm ci"]) {
+      expect(run(script, cwd, ["hook-bash"], bashHook(cwd, command, "s")).status, command).toBe(2);
+    }
+    for (const command of ["pnpm --filter @mish/web test", "git log -1 --stat", "rg -n foo apps"]) {
+      expect(run(script, cwd, ["hook-bash"], bashHook(cwd, command, "s")).status, command).toBe(0);
+    }
   });
 
   test("[P0] hooks of an agent started under `run` use the wrapper's slot", () => {

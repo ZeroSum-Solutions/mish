@@ -92,20 +92,31 @@ json_fields() {
     });'
 }
 
+# break_stale <lock dir> <dead holder pid or empty>: rename the lock away (atomic, so one
+# waiter wins), and delete it only if it still belongs to that holder; a lock a new owner took
+# in the meantime is put back.
+break_stale() {
+  mv "$1" "$1.stale.$$" 2>/dev/null || return 1
+  if [ "$(cat "$1.stale.$$/pid" 2>/dev/null)" = "$2" ]; then
+    rm -rf "$1.stale.$$"
+  else
+    mv "$1.stale.$$" "$1" 2>/dev/null || rm -rf "$1.stale.$$"
+  fi
+}
+
 # The registry mutex: a directory holding its owner's pid. A waiter breaks it only when that
-# owner is dead (or never wrote its pid within 10 s), and renames it away first so two waiters
-# cannot both break it. Gives up after about 10 s.
+# owner is dead (or never wrote its pid within 10 s). Holds last milliseconds, so it gives up
+# after about 3 s.
 lock() {
   i=0
   until mkdir "$DIR/.lock" 2>/dev/null; do
     i=$((i + 1))
+    [ "$i" -gt 60 ] && return 1
     holder=$(cat "$DIR/.lock/pid" 2>/dev/null)
     if { [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; } ||
        { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$DIR/.lock") )) -gt 10 ]; }; then
-      mv "$DIR/.lock" "$DIR/.lock.stale.$$" 2>/dev/null && rm -rf "$DIR/.lock.stale.$$"
-      continue
+      break_stale "$DIR/.lock" "$holder" && continue
     fi
-    [ "$i" -gt 200 ] && return 1
     sleep 0.05
   done
   echo $$ > "$DIR/.lock/pid"
@@ -210,9 +221,8 @@ hook_claim() {
   [ -n "$WT" ] || exit 0
   [ "$(common_dir_of "$WT")" = "$(common_dir_of "$SELF_DIR")" ] || exit 0
   DIR="$(common_dir_of "$WT")/mish-writers"
-  mkdir -p "$DIR" || exit 0
-  claim "$WT" "$session" "claude" "$(agent_pid)"
-  rc=$?
+  rc=5
+  mkdir -p "$DIR" && { claim "$WT" "$session" "claude" "$(agent_pid)"; rc=$?; }
   [ "$rc" = 0 ] && exit 0
   refusal "$rc" "$WT" >&2
   exit 2
@@ -231,7 +241,7 @@ case "$cmd" in
   hook-bash)
     payload=$(cat)
     # Cheap pre-filter: only commands that change files or git state need a slot.
-    printf '%s' "$payload" | grep -Eq 'git( -C [^ ]+)? (commit|merge|rebase|cherry-pick|revert|apply|am|checkout|switch|reset|restore|stash|rm|mv|pull)|sed -i|perl -[a-z]*i|tee |cat >|>>? *[A-Za-z0-9./~$"]|pnpm (install|add|remove|update|i )|npm (install|i )|(^|[;&| "])(mv|cp|rm|mkdir|touch|patch|ln|install) ' || exit 0
+    printf '%s' "$payload" | grep -Eq 'git (-C [^;&|]+ )?(commit|merge|rebase|cherry-pick|revert|apply|am|checkout|switch|reset|restore|stash|rm|mv|pull)|sed -i|perl -[a-z]*i|tee |cat >|>>? *[A-Za-z0-9./~$"'"'"'\\]|pnpm (install|add|remove|update|i)([ ";&|]|$)|npm (install|ci|i)([ ";&|]|$)|(^|[;&| "])(mv|cp|rm|mkdir|touch|patch|ln|install) ' || exit 0
     fields=$(printf '%s' "$payload" | json_fields)
     hook_claim "$(printf '%s\n' "$fields" | sed -n 3p)" "$(printf '%s\n' "$fields" | sed -n 1p)"
     ;;
@@ -286,7 +296,8 @@ case "$cmd" in
   release)
     lock || { refusal 5 "$WT" >&2; exit 3; }
     slot=$(slot_path "$WT")
-    me="${CLAUDE_SESSION_ID:-pid-${PID:-$(agent_pid)}}"
+    [ -n "$PID" ] || PID=$(agent_pid)
+    me="${CLAUDE_SESSION_ID:-pid-${PID:-none}}"
     if [ -e "$slot" ] && [ "$FORCE" = 0 ] && slot_live "$slot" && [ "$(field session "$slot")" != "$me" ] && ! owned_by_ancestor "$slot"; then
       unlock
       printf 'writer slot for %s belongs to a live session (%s); not releasing. Use --force only if that session is gone.\n' "$WT" "$(field session "$slot")" >&2
