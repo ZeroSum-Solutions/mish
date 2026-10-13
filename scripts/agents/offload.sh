@@ -21,7 +21,8 @@
 # The job checks out the exact commit origin had when you called it, not the branch tip at
 # run time, and ends with a receipt: commit, command, runtime versions and exit code.
 #
-# Exit: the remote command's exit code · 3 runner busy · 4 timeout · 64 usage
+# Exit: 0 the command passed · 1 it failed (the receipt's `exit:` line has its real code; the
+# default runner reports every remote failure as 1) · 3 runner busy · 4 timeout · 64 usage
 
 set -u
 

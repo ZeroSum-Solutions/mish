@@ -3,7 +3,7 @@
 #
 #   sh scripts/agents/writer-slot.sh run [--agent <name>] -- <command> [args]   hold a slot while <command> runs
 #   sh scripts/agents/writer-slot.sh claim [--agent <name>] [--pid <pid>] [--worktree <dir>]
-#   sh scripts/agents/writer-slot.sh release [--worktree <dir>]
+#   sh scripts/agents/writer-slot.sh release [--worktree <dir>] [--force]
 #   sh scripts/agents/writer-slot.sh status
 #   sh scripts/agents/writer-slot.sh hook-pre | hook-bash | hook-end   (Claude Code hooks; JSON on stdin)
 #
@@ -20,7 +20,7 @@
 # Why this is a shell script and not TypeScript: it runs before every edit and every writing
 # shell command, so it must start in milliseconds and work before the workspace is installed.
 #
-# Exit: 0 ok · 2 refused (hooks; blocks the tool call) · 3 refused (claim/run) · 64 usage
+# Exit: 0 ok · 2 refused (hooks; blocks the tool call) · 3 refused (claim/run/release) · 64 usage
 
 set -u
 
@@ -51,17 +51,32 @@ mtime() { date -r "$1" +%s 2>/dev/null || echo 0; }
 pid_start() { ps -o lstart= -p "$1" 2>/dev/null | sed 's/^ *//'; }
 field() { sed -n "s/^$1=//p" "$2" | head -n 1; }
 
-# Nearest ancestor of this script that is an agent process (claude, codex, hermes); empty if none.
-agent_pid() {
+# True when process $1 is an agent: its executable, or the script a runtime runs, is named
+# claude, codex or hermes. Only the first two words count, so a shell whose arguments merely
+# mention an agent is not one.
+is_agent() {
+  set -- $(ps -o args= -p "$1" 2>/dev/null)
+  for w in "${1:-}" "${2:-}"; do
+    case "${w##*/}" in claude|codex|hermes) return 0 ;; esac
+  done
+  return 1
+}
+
+# This process and its ancestors, nearest first (at most 16).
+ancestors() {
+  echo $$
   p=$PPID
   i=0
-  while [ "$i" -lt 12 ] && [ -n "$p" ] && [ "$p" -gt 1 ] 2>/dev/null; do
-    case "$(ps -o args= -p "$p" 2>/dev/null)" in
-      *claude*|*codex*|*hermes*) echo "$p"; return ;;
-    esac
+  while [ "$i" -lt 16 ] && [ -n "$p" ] && [ "$p" -gt 1 ] 2>/dev/null; do
+    echo "$p"
     p=$(ps -o ppid= -p "$p" 2>/dev/null | tr -d ' ')
     i=$((i + 1))
   done
+}
+
+# Nearest ancestor that is an agent process; empty if none.
+agent_pid() {
+  for p in $(ancestors | sed 1d); do is_agent "$p" && { echo "$p"; return; }; done
 }
 
 # Fields of the hook JSON on stdin, one per line: session, file path, cwd, bash command.
@@ -77,24 +92,37 @@ json_fields() {
     });'
 }
 
+# The registry mutex: a directory holding its owner's pid. A waiter breaks it only when that
+# owner is dead (or never wrote its pid within 10 s), and renames it away first so two waiters
+# cannot both break it. Gives up after about 10 s.
 lock() {
   i=0
   until mkdir "$DIR/.lock" 2>/dev/null; do
     i=$((i + 1))
-    # A lock older than 10 s belongs to a killed process; rmdir is atomic, so only one waiter wins.
-    if [ $(( $(date +%s) - $(mtime "$DIR/.lock") )) -gt 10 ]; then rmdir "$DIR/.lock" 2>/dev/null; fi
+    holder=$(cat "$DIR/.lock/pid" 2>/dev/null)
+    if { [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; } ||
+       { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$DIR/.lock") )) -gt 10 ]; }; then
+      mv "$DIR/.lock" "$DIR/.lock.stale.$$" 2>/dev/null && rm -rf "$DIR/.lock.stale.$$"
+      continue
+    fi
     [ "$i" -gt 200 ] && return 1
     sleep 0.05
   done
-  trap 'rmdir "$DIR/.lock" 2>/dev/null' EXIT INT TERM
+  echo $$ > "$DIR/.lock/pid"
+  trap 'unlock' EXIT INT TERM
 }
 
-unlock() { rmdir "$DIR/.lock" 2>/dev/null; trap - EXIT INT TERM; }
+# Releases the mutex only while this process still owns it.
+unlock() {
+  [ "$(cat "$DIR/.lock/pid" 2>/dev/null)" = "$$" ] && rm -rf "$DIR/.lock"
+  trap - EXIT INT TERM
+}
 
 slot_live() {
   pid=$(field pid "$1")
-  if [ -n "$pid" ]; then
-    [ "$(pid_start "$pid")" = "$(field pid_start "$1")" ]
+  start=$(field pid_start "$1")
+  if [ -n "$pid" ] && [ -n "$start" ]; then
+    [ "$(pid_start "$pid")" = "$start" ]
   else
     [ $(( $(date +%s) - $(mtime "$1") )) -lt $((TTL_MIN * 60)) ]
   fi
@@ -122,32 +150,47 @@ describe_slots() {
   done
 }
 
+# A pid is stored only with its start-time fingerprint; without one the slot uses the TTL.
 write_slot() {
   tmp="$1.tmp.$$"
+  start=""; [ -n "$5" ] && start=$(pid_start "$5")
+  pid="$5"; [ -n "$start" ] || pid=""
   printf 'worktree=%s\nsession=%s\nagent=%s\npid=%s\npid_start=%s\n' \
-    "$2" "$3" "$4" "$5" "$( [ -n "$5" ] && pid_start "$5")" > "$tmp" && mv "$tmp" "$1"
+    "$2" "$3" "$4" "$pid" "$start" > "$tmp" && mv "$tmp" "$1"
+}
+
+# True when slot $1 was taken by `run` and its live owner process is this process or an
+# ancestor: a hook running under a `run`-wrapped agent belongs to the wrapper's slot.
+owned_by_ancestor() {
+  case "$(field session "$1")" in run-*) ;; *) return 1 ;; esac
+  pid=$(field pid "$1")
+  [ -n "$pid" ] && slot_live "$1" && ancestors | grep -qx "$pid"
 }
 
 # claim <worktree> <session> <agent> <owner pid>
-# Returns 0 when held, 3 when every slot is taken, 4 when another writer owns this checkout.
+# Returns 0 when held, 3 when every slot is taken, 4 when another writer owns this checkout,
+# 5 when the registry could not be locked or written.
 claim() {
   slot=$(slot_path "$1")
-  lock || return 0  # never block work because the lock is unavailable
+  lock || return 5
   reap
   if [ -e "$slot" ]; then
-    if [ "$(field session "$slot")" = "$2" ]; then
+    if [ "$(field session "$slot")" = "$2" ] || owned_by_ancestor "$slot"; then
       touch "$slot"; unlock; return 0
     fi
     unlock; return 4
   fi
   if [ "$(count_slots)" -ge "$MAX" ]; then unlock; return 3; fi
-  write_slot "$slot" "$1" "$2" "$3" "$4"
+  write_slot "$slot" "$1" "$2" "$3" "$4" && [ "$(field session "$slot")" = "$2" ] || { unlock; return 5; }
   unlock
   return 0
 }
 
 refusal() {
-  if [ "$1" = 4 ]; then
+  if [ "$1" = 5 ]; then
+    printf 'Could not register a writer slot for %s: the registry in %s is locked or not writable.\n' "$2" "$DIR"
+    printf '%s\n' "Run \`sh scripts/agents/writer-slot.sh status\`; it breaks a lock whose owner has exited."
+  elif [ "$1" = 4 ]; then
     printf 'Another agent session is the writer for %s:\n' "$2"
     describe_slots | grep -F "$2 ("
     printf '%s\n' "Use your own worktree, or wait for that session to end."
@@ -188,7 +231,7 @@ case "$cmd" in
   hook-bash)
     payload=$(cat)
     # Cheap pre-filter: only commands that change files or git state need a slot.
-    printf '%s' "$payload" | grep -Eq 'git (commit|merge|rebase|cherry-pick|revert|apply|am|checkout|switch|reset|restore|stash|rm|mv)|sed -i|perl -[a-z]*i|tee |cat >|> *[A-Za-z.]|pnpm (install|add|remove|i )|npm (install|i )|(^|[;&| "])(mv|cp|rm|mkdir|touch|patch) ' || exit 0
+    printf '%s' "$payload" | grep -Eq 'git( -C [^ ]+)? (commit|merge|rebase|cherry-pick|revert|apply|am|checkout|switch|reset|restore|stash|rm|mv|pull)|sed -i|perl -[a-z]*i|tee |cat >|>>? *[A-Za-z0-9./~$"]|pnpm (install|add|remove|update|i )|npm (install|i )|(^|[;&| "])(mv|cp|rm|mkdir|touch|patch|ln|install) ' || exit 0
     fields=$(printf '%s' "$payload" | json_fields)
     hook_claim "$(printf '%s\n' "$fields" | sed -n 3p)" "$(printf '%s\n' "$fields" | sed -n 1p)"
     ;;
@@ -205,12 +248,13 @@ case "$cmd" in
     ;;
 esac
 
-WT=""; AGENT="${MISH_AGENT_NAME:-manual}"; PID=""
+WT=""; AGENT="${MISH_AGENT_NAME:-manual}"; PID=""; FORCE=0
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --worktree) WT="${2:-}"; shift 2 ;;
     --agent) AGENT="${2:-}"; shift 2 ;;
     --pid) PID="${2:-}"; shift 2 ;;
+    --force) FORCE=1; shift ;;
     --) shift; break ;;
     *) usage ;;
   esac
@@ -240,8 +284,15 @@ case "$cmd" in
     exit 3
     ;;
   release)
-    lock || true
-    rm -f "$(slot_path "$WT")"
+    lock || { refusal 5 "$WT" >&2; exit 3; }
+    slot=$(slot_path "$WT")
+    me="${CLAUDE_SESSION_ID:-pid-${PID:-$(agent_pid)}}"
+    if [ -e "$slot" ] && [ "$FORCE" = 0 ] && slot_live "$slot" && [ "$(field session "$slot")" != "$me" ] && ! owned_by_ancestor "$slot"; then
+      unlock
+      printf 'writer slot for %s belongs to a live session (%s); not releasing. Use --force only if that session is gone.\n' "$WT" "$(field session "$slot")" >&2
+      exit 3
+    fi
+    rm -f "$slot"
     unlock
     echo "writer slot released: $WT"
     ;;

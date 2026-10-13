@@ -1,5 +1,5 @@
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
-import { copyFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync } from "node:fs";
+import { copyFileSync, mkdirSync, mkdtempSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -87,8 +87,8 @@ async function waitForExit(child: ChildProcess): Promise<void> {
 describe("writer-slot: admission", () => {
   test("[P0] admits writers up to MISH_MAX_WRITERS and refuses the next checkout, naming the holders", () => {
     const { worktrees, script } = makeClone(3);
-    const [a, b, c] = worktrees;
-    expect(run(script, a, ["claim", "--pid", String(owner().pid)]).status).toBe(0);
+    const [a, b, c] = worktrees as [string, string, string];
+    expect(run(script, a,["claim", "--pid", String(owner().pid)]).status).toBe(0);
     expect(run(script, b, ["claim", "--pid", String(owner().pid)]).status).toBe(0);
     const refused = run(script, c, ["claim", "--pid", String(owner().pid)]);
     expect(refused.status).toBe(3);
@@ -154,6 +154,30 @@ describe("writer-slot: ownership", () => {
     expect(during.stdout).toContain("agent codex");
     expect(run(script, worktrees[0]!, ["status"]).stdout).toContain("Writers: 0 of 2");
   });
+
+  test("[P0] release refuses another live session's slot unless forced", () => {
+    const { worktrees, script } = makeClone(1);
+    expect(run(script, worktrees[0]!, ["claim", "--pid", String(owner().pid)]).status).toBe(0);
+    expect(run(script, worktrees[0]!, ["release"]).status).toBe(3);
+    expect(run(script, worktrees[0]!, ["status"]).stdout).toContain("Writers: 1 of 2");
+    expect(run(script, worktrees[0]!, ["release", "--force"]).status).toBe(0);
+    expect(run(script, worktrees[0]!, ["status"]).stdout).toContain("Writers: 0 of 2");
+  });
+
+  test("a claim whose owner cannot be fingerprinted falls back to the TTL instead of living forever", () => {
+    const { worktrees, script } = makeClone(1);
+    expect(run(script, worktrees[0]!, ["claim", "--pid", "999999"]).status).toBe(0);
+    expect(run(script, worktrees[0]!, ["status"]).stdout).toContain("Writers: 1 of 2");
+    expect(run(script, worktrees[0]!, ["status"], "", { MISH_WRITER_TTL_MIN: "0" }).stdout).toContain("Writers: 0 of 2");
+  });
+
+  test("a registry lock left by a dead process is broken", () => {
+    const { main, worktrees, script } = makeClone(1);
+    const lockDir = path.join(main, ".git", "mish-writers", ".lock");
+    mkdirSync(lockDir, { recursive: true });
+    writeFileSync(path.join(lockDir, "pid"), "999999\n");
+    expect(run(script, worktrees[0]!, ["claim", "--pid", String(owner().pid)]).status).toBe(0);
+  });
 });
 
 describe("writer-slot: Claude Code hooks", () => {
@@ -174,5 +198,14 @@ describe("writer-slot: Claude Code hooks", () => {
     expect(run(script, cwd, ["hook-bash"], bashHook(cwd, "git status && rg foo", "s")).status).toBe(0);
     expect(run(script, cwd, ["hook-bash"], bashHook(cwd, "git commit -m wip", "s")).status).toBe(2);
     expect(run(script, cwd, ["hook-bash"], bashHook(cwd, "sed -i '' s/a/b/ x.ts", "s")).status).toBe(2);
+    expect(run(script, cwd, ["hook-bash"], bashHook(cwd, `git -C ${cwd} commit -m wip`, "s")).status).toBe(2);
+    expect(run(script, cwd, ["hook-bash"], bashHook(cwd, "echo hi >> /tmp/out.txt", "s")).status).toBe(2);
+  });
+
+  test("[P0] hooks of an agent started under `run` use the wrapper's slot", () => {
+    const { worktrees, script } = makeClone(1);
+    const file = path.join(worktrees[0]!, "a.ts");
+    const wrapped = run(script, worktrees[0]!, ["run", "--agent", "claude", "--", "sh", "-c", 'sh "$0" hook-pre', script], editHook(file, "uuid-1"));
+    expect(wrapped.status).toBe(0);
   });
 });

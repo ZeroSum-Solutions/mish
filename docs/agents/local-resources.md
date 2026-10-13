@@ -15,7 +15,10 @@ A writer is one agent session editing one checkout (the main checkout or a linke
   sh scripts/agents/writer-slot.sh status
   ```
 
-  An agent that cannot be wrapped claims before its first edit and releases when it finishes (`claim --agent <name>`, `release`). An agent started without either is not counted; that is a rule violation, not a gap to use.
+  An agent that cannot be wrapped claims before its first edit and releases when it finishes (`claim --agent <name>`, `release`). `release` frees only your own slot; `release --force` frees another session's, for a session you know has ended. An agent started without either is not counted; that is a rule violation, not a gap to use.
+- Claude Code under `run` (for example `writer-slot.sh run --agent claude -- claude -p …`) uses the wrapper's slot; its own hooks do not claim a second one.
+- The shell-command check is a pattern match, not a parser. It catches common writes (`git commit`, `git -C … commit`, `sed -i`, redirects, `pnpm install`, `mv`/`cp`/`rm`) and claims the checkout of the command's working directory. A command that writes in another checkout through `cd` is not seen; claim that checkout yourself.
+- If the registry cannot be locked or written, the edit is refused rather than let through uncounted. `status` breaks a lock whose owner process has exited.
 - Reading, searching, reviewing and planning need no slot.
 
 When the limit is reached, do not work around it. Wait for a writer to finish, or move the work to the offload machine.
@@ -31,7 +34,7 @@ The owner's Mac mini runs work the laptop should not: full type checks, package 
   sh scripts/agents/offload.sh <branch> 'pnpm --filter @mish/daemon test'
   ```
 
-  The script resolves the commit origin has for the branch, and the mini checks out exactly that commit in one reusable checkout. The output ends with a receipt (host, commit, command, Node and pnpm versions, exit code); quote it as evidence. Local edits that are not pushed are not checked. Exit 3 means the mini is busy: retry later or run the check locally.
+  The script resolves the commit origin has for the branch, and the mini checks out exactly that commit in one reusable checkout. The output ends with a receipt (host, commit, command, Node and pnpm versions, exit code); quote it as evidence. The receipt's `exit:` line is the command's real exit code; the script itself returns 1 for any remote failure. Local edits that are not pushed are not checked. Exit 3 means the mini is busy: retry later or run the check locally.
 - **An extra writer:** start the agent on the mini in its own clone through the owner's dispatcher (`mini-run`), for example a `codex exec` or `claude -p` job with a written brief. It pushes its own branch and opens its own PR.
 - The mini has 16 GB of memory. Run one heavy job there at a time and keep its CodeGraph caps (below).
 

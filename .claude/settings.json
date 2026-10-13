@@ -25,7 +25,6 @@
       "Bash(codegraph status *)",
       "Bash(codegraph sync *)",
       "Bash(python3 .github/scripts/scopes.py plan *)",
-      "Bash(sh scripts/agents/writer-slot.sh *)",
       "Bash(sh scripts/agents/codegraph-worktree.sh *)",
       "Bash(gh pr view * --repo ZeroSum-Solutions/mish *)",
       "Bash(gh pr checks * --repo ZeroSum-Solutions/mish *)",
@@ -35,7 +34,11 @@
       "Bash(git diff *)",
       "Bash(git log *)",
       "Bash(git show *)",
-      "Bash(git worktree list *)"
+      "Bash(git worktree list *)",
+      "Bash(sh scripts/agents/writer-slot.sh status)",
+      "Bash(sh scripts/agents/writer-slot.sh claim *)",
+      "Bash(sh scripts/agents/writer-slot.sh release)",
+      "Bash(sh scripts/agents/writer-slot.sh release --worktree *)"
     ],
     "deny": [
       "Bash(pnpm preview)",
@@ -44,7 +47,8 @@
       "Bash(pnpm dev *)",
       "Bash(pnpm start *)",
       "Bash(pnpm preview *)",
-      "Bash(gh pr merge * --admin *)"
+      "Bash(gh pr merge * --admin *)",
+      "Bash(gh pr merge * --admin)"
     ]
   },
   "hooks": {
@@ -77,7 +81,7 @@
           {
             "type": "command",
             "command": "f=\"$CLAUDE_PROJECT_DIR/scripts/agents/codegraph-worktree.sh\"; [ -f \"$f\" ] || exit 0; exec sh \"$f\" --hook",
-            "timeout": 90
+            "timeout": 120
           }
         ]
       }

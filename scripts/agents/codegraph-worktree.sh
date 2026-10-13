@@ -64,26 +64,37 @@ LOG="$STATE/$KEY.log"
 if [ "$HOOK" = 1 ]; then
   # Run in the foreground so the session's first query sees this worktree's index. Stay
   # silent on success; a failure only adds a note to the session, it never blocks it.
-  if sh "$0" "$WT" >>"$LOG" 2>&1 </dev/null; then exit 0; fi
+  # Wait at most 45 s for another bootstrap's lock, inside the hook's 120 s budget.
+  if MISH_CG_LOCK_WAIT=90 sh "$0" "$WT" >>"$LOG" 2>&1 </dev/null; then exit 0; fi
   echo "CodeGraph could not prepare this worktree's index (log: $LOG). Answers may come from the main checkout's index; run \`sh scripts/agents/codegraph-worktree.sh\` or read files directly."
   exit 0
 fi
 
 mtime() { date -r "$1" +%s 2>/dev/null || echo 0; }
 
-# take_lock <dir>: one holder at a time; a lock older than 30 minutes belongs to a dead run.
+# take_lock <dir>: one holder at a time. The directory holds its owner's pid; a waiter breaks
+# it only when that owner has exited. Waits MISH_CG_LOCK_WAIT half-seconds (default 600).
 take_lock() {
   i=0
   until mkdir "$1" 2>/dev/null; do
-    if [ $(( $(date +%s) - $(mtime "$1") )) -gt 1800 ]; then rmdir "$1" 2>/dev/null; continue; fi
-    i=$((i + 1)); [ "$i" -gt 600 ] && return 1
+    holder=$(cat "$1/pid" 2>/dev/null)
+    if { [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; } ||
+       { [ -z "$holder" ] && [ $(( $(date +%s) - $(mtime "$1") )) -gt 60 ]; }; then
+      mv "$1" "$1.stale.$$" 2>/dev/null && rm -rf "$1.stale.$$"
+      continue
+    fi
+    i=$((i + 1)); [ "$i" -gt "${MISH_CG_LOCK_WAIT:-600}" ] && return 1
     sleep 0.5
   done
+  echo $$ > "$1/pid"
 }
+
+# drop_lock <dir>: release only a lock this process holds.
+drop_lock() { [ "$(cat "$1/pid" 2>/dev/null)" = "$$" ] && rm -rf "$1"; }
 
 LOCK="$STATE/$KEY.lock"
 take_lock "$LOCK" || { echo "codegraph-worktree: another bootstrap still holds $LOCK"; exit 1; }
-trap 'rmdir "$LOCK" "$STATE/seed.lock" 2>/dev/null' EXIT INT TERM
+trap 'drop_lock "$LOCK"; drop_lock "$STATE/seed.lock"' EXIT INT TERM
 
 echo "[$(date -u +%FT%TZ)] bootstrap $WT"
 
@@ -109,13 +120,17 @@ if [ ! -s "$DB" ]; then
   if [ ! -s "$SEED" ] || [ "$newest" -gt "$(mtime "$SEED")" ]; then
     take_lock "$STATE/seed.lock" || { echo "seed lock busy"; exit 1; }
     echo "refreshing the seed from $SRC (online backup)"
-    rm -f "$SEED.tmp"
-    if sqlite3 "$SRC" ".backup '$SEED.tmp'" && [ "$(sqlite3 "$SEED.tmp" 'PRAGMA quick_check;')" = "ok" ]; then
-      mv "$SEED.tmp" "$SEED"
+    rm -f "$SEED.tmp" "$SEED.tmp-wal" "$SEED.tmp-shm"
+    # The seed is one self-contained file (rollback journal, no WAL), so cloning it is safe.
+    # Back up to a bare relative name, so no path needs quoting inside the dot-command.
+    if (cd "$STATE" && sqlite3 "$SRC" ".backup seed.db.tmp") &&
+       sqlite3 "$SEED.tmp" 'PRAGMA journal_mode=DELETE;' >/dev/null &&
+       [ "$(sqlite3 "$SEED.tmp" 'PRAGMA quick_check;')" = "ok" ]; then
+      mv "$SEED.tmp" "$SEED"; rm -f "$SEED.tmp-wal" "$SEED.tmp-shm"
     else
-      rm -f "$SEED.tmp"; rmdir "$STATE/seed.lock"; echo "backup of the main index failed"; exit 1
+      rm -f "$SEED.tmp"; drop_lock "$STATE/seed.lock"; echo "backup of the main index failed"; exit 1
     fi
-    rmdir "$STATE/seed.lock"
+    drop_lock "$STATE/seed.lock"
   fi
 
   mkdir -p "$WT/.codegraph"
