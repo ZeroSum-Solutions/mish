@@ -12,6 +12,8 @@ import {
   isSandboxDesignSystemFontRead,
   isSandboxPluginFontRead,
   isZeroConfigClipperLibraryRequest,
+  rebindingAllowedHosts,
+  requestHostRefusal,
 } from '../src/origin-validation.js';
 
 type TestRequestOptions = {
@@ -885,5 +887,51 @@ describe('sandboxed plugin font reads', () => {
     expect(isSandboxPluginFontRead('GET', '/plugins/example-official/preview', bundled)).toBe(false);
     expect(isSandboxPluginFontRead('GET', '/plugins/example-official/example/f.woff2', bundled)).toBe(false);
     expect(isSandboxPluginFontRead('GET', '/plugins/example-official%2Fx/asset/f.woff2', () => true)).toBe(false);
+  });
+});
+
+describe('requestHostRefusal (DNS rebinding)', () => {
+  it('refuses a foreign DNS name in Host, with or without browser headers', () => {
+    // A rebound http page sends neither Origin nor fetch metadata on its same-origin GETs.
+    expect(requestHostRefusal({ host: 'attacker.example:7456' }, '127.0.0.1', [])).toBe('host');
+    expect(requestHostRefusal({ host: 'localhost.attacker.example' }, '127.0.0.1', [])).toBe('host');
+    expect(requestHostRefusal({ host: 'attacker.example.' }, '127.0.0.1', [])).toBe('host');
+  });
+
+  it('refuses a foreign name relayed by the web sidecar or a rewrite proxy', () => {
+    expect(requestHostRefusal({ host: '127.0.0.1:7456', 'x-od-client-host': 'attacker.example:3000' }, '127.0.0.1', []))
+      .toBe('x-od-client-host');
+    expect(requestHostRefusal(
+      { host: '127.0.0.1:7456', 'x-forwarded-host': 'localhost:3000, attacker.example' },
+      '127.0.0.1',
+      [],
+    )).toBe('x-forwarded-host');
+  });
+
+  it('allows loopback names, IP literals, the bind host and operator-listed hosts on any port', () => {
+    for (const host of [
+      '127.0.0.1:7456', 'localhost:3000', 'LOCALHOST', 'app.localhost:7456', '[::1]:7456',
+      '192.168.1.20:7456', '10.0.0.4', '[fd00::1]:7456',
+    ]) {
+      expect(requestHostRefusal({ host }, '127.0.0.1', []), host).toBeNull();
+    }
+    expect(requestHostRefusal({ host: 'devbox:7456' }, 'devbox', [])).toBeNull();
+    expect(requestHostRefusal({ host: 'mish.example.com' }, '0.0.0.0', ['mish.example.com'])).toBeNull();
+    expect(requestHostRefusal({ host: 'a.dev.test:3000' }, '127.0.0.1', ['*.dev.test'])).toBeNull();
+    expect(requestHostRefusal({ host: 'dev.test:3000' }, '127.0.0.1', ['*.dev.test'])).toBe('host');
+    expect(requestHostRefusal({ host: '127.0.0.1:7456', 'x-od-client-host': 'localhost:3000' }, '127.0.0.1', []))
+      .toBeNull();
+  });
+
+  it('refuses a missing or malformed Host', () => {
+    expect(requestHostRefusal({}, '127.0.0.1', [])).toBe('host');
+    expect(requestHostRefusal({ host: 'a b' }, '127.0.0.1', [])).toBe('host');
+  });
+
+  it('collects allowed hosts from OD_ALLOWED_ORIGINS and OD_ALLOWED_DEV_ORIGINS', () => {
+    expect(rebindingAllowedHosts(
+      ['https://mish.example.com', 'chrome-extension://abcdef'],
+      { OD_ALLOWED_DEV_ORIGINS: 'http://dev.mish.test:17573, *.local-origin.dev, plainhost' },
+    ).sort()).toEqual(['*.local-origin.dev', 'dev.mish.test', 'mish.example.com', 'plainhost']);
   });
 });

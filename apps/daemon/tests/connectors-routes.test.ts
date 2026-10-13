@@ -474,7 +474,8 @@ describe('connector routes', () => {
     const response = await putWithHostHeader(`${baseUrl}/api/connectors/composio/config`, 'example.com', { apiKey: 'cmp_remote' });
 
     expect(response.status).toBe(403);
-    expect(response.body).toContain('request host must be a loopback daemon address');
+    // Refused by the global DNS-rebinding host guard before the route's own loopback check.
+    expect(response.body).toMatch(/request host (must be a loopback daemon address|is not allowed)/);
     expect(readComposioConfig().apiKey).toBe('cmp_test');
   });
 

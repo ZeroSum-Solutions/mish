@@ -1303,6 +1303,8 @@ import {
   isSandboxDesignSystemFontRead,
   isSandboxPluginFontRead,
   isZeroConfigClipperLibraryRequest,
+  rebindingAllowedHosts,
+  requestHostRefusal,
 } from './origin-validation.js';
 import { registerLibraryRoutes } from './routes/library.js';
 import {
@@ -3722,6 +3724,22 @@ export async function startServer({
   // or popup opened by a powered preview) renders with an opaque origin.
   // R07: a frame or document navigation another site (or a sandboxed preview) started never
   // opens an /api route outside the navigable preview and callback routes. See api-navigation-guard.ts.
+  // DNS-rebinding guard: every request must name the daemon by a host an
+  // attacker's DNS cannot answer for (see requestHostRefusal). A request that
+  // already carries the API token is authenticated and skips it.
+  const rebindingSafeHosts = rebindingAllowedHosts(extraAllowedOrigins);
+  app.use(['/api', '/artifacts'], (req, res, next) => {
+    if (isApiTokenAuthorization(req.get('authorization'))) return next();
+    const refused = requestHostRefusal(req.headers, host, rebindingSafeHosts);
+    if (!refused) return next();
+    return sendApiError(
+      res,
+      403,
+      'FORBIDDEN',
+      'request host is not allowed; add it to OD_ALLOWED_ORIGINS to reach the daemon by that name',
+      { details: { header: refused } },
+    );
+  });
   app.use('/api', createApiNavigationGuard());
   // See createCrossSiteNavigationSandbox for the invariant.
   app.use(['/api', '/artifacts'], createCrossSiteNavigationSandbox(currentPoweredPreviewAuthority));
