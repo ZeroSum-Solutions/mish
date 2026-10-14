@@ -26,7 +26,8 @@ run twice. The host is not in this package yet.
 
 For every form, booking and paid order it:
 
-- **Records what the person did**, as a Klaviyo event with their name on the profile. Events are what
+- **Records what the person did**, as a Klaviyo event. Bookings and paid orders also set the person's
+  name and phone on their profile. Events are what
   automated emails ("flows") start from: a welcome after a form, a reminder before an appointment, a
   thank-you after an order.
 - **Adds them to an email list**, only if they opted in to marketing (`accepts_marketing: true`). Someone
@@ -34,7 +35,7 @@ For every form, booking and paid order it:
 
 | Event | Klaviyo metric | Details sent |
 |---|---|---|
-| `lead.created` | Submitted Form | `kind`, `message`, `page` |
+| `lead.created` | Submitted Form | `kind`, `name`, `phone`, `message`, `page` |
 | `booking.created` | Booked Appointment | `title`, `starts_at`, `ends_at`, `time_zone`, `location`, `notes` |
 | `order.paid` | Paid Order, with its value | `order_id`, `items`, `item_names`, `subtotal`, `discount`, `shipping`, `tax` |
 
@@ -59,6 +60,15 @@ KLAVIYO_API_KEY=… KLAVIYO_LIST_ID=… pnpm --filter @mish/integrations klaviyo
 The first changes nothing. The second sends a test form, booking and $1 order for that address, each twice,
 and subscribes it; use only an address whose owner agreed.
 
+### Forms do not change profiles
+
+Anyone can type someone else's email into a public form. So by default a form identifies the profile by
+email only, and the name, phone and message travel as details on the "Submitted Form" event, where a flow
+can still use them. Bookings and paid orders, which come from a real transaction, set the name and phone.
+`createKlaviyo({ client, listId, formsSetProfile: true })` lets forms set them too, for a client who accepts
+that risk. Form details are whatever the visitor typed: a flow that shows them must treat them as untrusted
+text, and must never use them as links.
+
 ### What Klaviyo does that is worth knowing
 
 - A new subscriber is slow to show: about eight minutes in testing, while events showed within 30
@@ -77,7 +87,8 @@ and subscribes it; use only an address whose owner agreed.
 
 Proven against a real Klaviyo account (single opt-in list, 2026-10-12): an opted-in sign-up delivered twice
 produced one subscribed profile; a form, a booking and a paid order, each delivered twice, produced exactly
-one event each, the order with its value, and set the name on the profile.
+one event each, the order with its value, and set the name on the profile. That run predates the rule that
+forms no longer set profiles by default.
 
 Still needed before a client gets value from it:
 

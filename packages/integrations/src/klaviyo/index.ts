@@ -18,7 +18,8 @@ interface Described {
  * and a store with both would count every order twice.
  */
 const KINDS: { [T in EventType]: (p: EventPayloads[T]) => Described } = {
-  'lead.created': (p) => ({ metric: 'Submitted Form', properties: { kind: p.kind, message: p.message, page: p.page } }),
+  // What the person typed, as they typed it. Flows that show it must treat it as untrusted text.
+  'lead.created': (p) => ({ metric: 'Submitted Form', properties: { kind: p.kind, name: p.name, phone: p.phone, message: p.message, page: p.page } }),
   'booking.created': (p) => ({
     metric: 'Booked Appointment',
     properties: { title: p.title, starts_at: p.starts_at, ends_at: p.ends_at, time_zone: p.timezone, location: p.location, notes: p.notes },
@@ -49,6 +50,12 @@ export interface KlaviyoOptions {
   events?: boolean;
   /** Which events count, e.g. leave out `order.paid` where Klaviyo's Shopify connection already sends orders. */
   types?: EventType[];
+  /**
+   * True lets a site form set the name and phone on the person's Klaviyo profile. Off by default: anyone can
+   * type someone else's email into a public form, so a form only ever identifies the profile by email, and
+   * what was typed travels with the event instead. Bookings and paid orders always set the profile.
+   */
+  formsSetProfile?: boolean;
 }
 
 function describe(event: IntegrationEvent): Described {
@@ -56,8 +63,9 @@ function describe(event: IntegrationEvent): Described {
   return (KINDS[event.type] as (p: EventPayloads[EventType]) => Described)(event.payload);
 }
 
-function personOf(event: IntegrationEvent): KlaviyoPerson {
+function personOf(event: IntegrationEvent, formsSetProfile: boolean): KlaviyoPerson {
   const p = event.payload;
+  if (event.type === 'lead.created' && !formsSetProfile) return { email: p.email };
   const fullName = 'name' in p ? p.name : (p.ship_to?.name ?? '');
   const [first = '', ...rest] = String(fullName ?? '').trim().split(/\s+/);
   const phone = 'phone' in p && E164.test(p.phone || '') ? p.phone : '';
@@ -73,7 +81,7 @@ function personOf(event: IntegrationEvent): KlaviyoPerson {
  * and who they are. People join the list only if they opted in to marketing; everyone else gets a profile
  * and their activity, and stays unsubscribed. Safe to run twice for the same event.
  */
-export function createKlaviyo({ client, listId, events = true, types = KLAVIYO_TYPES }: KlaviyoOptions): Destination {
+export function createKlaviyo({ client, listId, events = true, types = KLAVIYO_TYPES, formsSetProfile = false }: KlaviyoOptions): Destination {
   return {
     name: 'klaviyo',
     types,
@@ -86,7 +94,7 @@ export function createKlaviyo({ client, listId, events = true, types = KLAVIYO_T
           metric,
           uniqueId: `${event.source}:${event.type}:${p.source_ref}`,
           time: event.created_at,
-          person: personOf(event),
+          person: personOf(event, formsSetProfile),
           properties: { ...properties, source: event.source },
           value,
           currency,

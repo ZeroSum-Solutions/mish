@@ -49,7 +49,8 @@ test('Klaviyo is told what each person did, with their name, whether or not they
   const [form, booking, paid] = fake.tracked;
   assert.ok(form && booking && paid);
   assert.deepEqual([form.metric, booking.metric, paid.metric], ['Submitted Form', 'Booked Appointment', 'Paid Order']);
-  assert.deepEqual(form.person, { email: 'dana@example.com', first_name: 'Dana', last_name: 'Lee Park', phone_number: '+13105550100' });
+  assert.deepEqual(form.person, { email: 'dana@example.com' }); // a form cannot change who the profile says this is
+  assert.deepEqual([form.properties.name, form.properties.phone], ['Dana Lee Park', '+13105550100']);
   assert.deepEqual(booking.person, { email: 'dana@example.com', first_name: 'Dana', last_name: 'Lee Park' }); // "555-0100" is not a full number, so it is left out
   assert.deepEqual([form.properties.kind, form.properties.message, form.properties.source], ['appointment', 'Do you resize rings?', 'site']);
   assert.deepEqual([booking.properties.title, booking.properties.starts_at, booking.properties.time_zone], ['Showroom visit', '2026-10-12T18:00:00Z', 'America/Los_Angeles']);
@@ -58,6 +59,12 @@ test('Klaviyo is told what each person did, with their name, whether or not they
   assert.equal(paid.uniqueId, 'shopify:order.paid:555');
   assert.match(form.uniqueId, /^site:lead\.created:[0-9a-f-]{36}$/);
   assert.deepEqual(fake.subscribed, []); // nobody opted in
+});
+
+test('a form sets the profile name and phone only when the client turns that on', async () => {
+  const fake = fakeKlaviyo();
+  await createKlaviyo({ client: fake.client, formsSetProfile: true }).handle(lead(FORM));
+  assert.deepEqual(fake.tracked[0]?.person, { email: 'dana@example.com', first_name: 'Dana', last_name: 'Lee Park', phone_number: '+13105550100' });
 });
 
 test('only people who opted in join the list, and a repeat gets the same unique id', async () => {
