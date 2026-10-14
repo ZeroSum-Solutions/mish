@@ -1,0 +1,26 @@
+{
+  "name": "@mish/integrations",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Business integrations Mishmash sets up for client sites: a standard event shape for leads, bookings and paid orders, a site-form source, and a Klaviyo destination.",
+  "files": ["dist"],
+  "exports": {
+    "./events": { "types": "./dist/events.d.ts", "default": "./dist/events.js" },
+    "./leads": { "types": "./dist/leads.d.ts", "default": "./dist/leads.js" },
+    "./klaviyo": { "types": "./dist/klaviyo/index.d.ts", "default": "./dist/klaviyo/index.js" }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "klaviyo-check": "node --experimental-strip-types scripts/klaviyo-check.ts",
+    "test": "node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "24.12.2",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": "~24"
+  }
+}
