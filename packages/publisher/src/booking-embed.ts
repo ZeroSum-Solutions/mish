@@ -177,21 +177,6 @@ function decodeAttribute(value: string): string {
   });
 }
 
-/** A tag's attributes, names ASCII-lowercased; the first of a repeated name wins, as in HTML. */
-function parseAttributes(source: string, offset: number): Map<string, Attribute> {
-  const attributes = new Map<string, Attribute>();
-  const pattern = /([^\t\n\f\r "'>\/=][^\t\n\f\r "'>\/=]*)(?:[\t\n\f\r ]*=[\t\n\f\r ]*(?:"([^"]*)"|'([^']*)'|([^\t\n\f\r "'=<>`]+)))?/g;
-  let match: RegExpExecArray | null;
-  while ((match = pattern.exec(source)) !== null) {
-    const name = asciiLower(match[1]!);
-    if (attributes.has(name)) continue;
-    const raw = match[2] ?? match[3] ?? match[4] ?? '';
-    const quote = match[2] !== undefined ? '"' : match[3] !== undefined ? "'" : '';
-    const end = offset + match.index + match[0].length - quote.length;
-    attributes.set(name, { value: decodeAttribute(raw), start: end - raw.length, end, quote });
-  }
-  return attributes;
-}
 
 const isTagEnd = (char: string | undefined) => char !== undefined && /[\t\n\f\r />]/.test(char);
 const startsTag = (html: string, at: number, name: string) => asciiLower(html.slice(at, at + name.length)) === name && isTagEnd(html[at + name.length]);
@@ -236,33 +221,111 @@ function rawTextEnd(html: string, name: string, from: number): number | undefine
   return end.exec(html)?.index;
 }
 
+const isSpace = (char: string | undefined) => char === '\t' || char === '\n' || char === '\f' || char === '\r' || char === ' ';
+const isAsciiAlpha = (char: string | undefined) => char !== undefined && ((char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z'));
+
+/** Where a comment whose text starts at `from` ends (past `-->`, `--!>`, or an abrupt `>` / `->`); `undefined` when the page ends inside it. */
+function commentEnd(html: string, from: number): number | undefined {
+  if (html[from] === '>') return from + 1;
+  if (html.startsWith('->', from)) return from + 2;
+  for (let at = html.indexOf('--', from); at >= 0; at = html.indexOf('--', at + 1)) {
+    if (html[at + 2] === '>') return at + 3;
+    if (html[at + 2] === '!' && html[at + 3] === '>') return at + 4;
+  }
+  return undefined;
+}
+
 /**
- * Tags outside comments and raw-text elements, with their attributes. Whitespace is HTML's ASCII
- * whitespace only: a no-break space never ends a tag name or separates attributes. Quoted attribute values may
- * hold `>`; names and raw-text ends match ASCII case-insensitively, so offsets always index `html`.
+ * The tag that starts at `start` (a `<` followed by a letter, or `</` and a letter), read with
+ * HTML's tag states: the name runs to whitespace, `/` or `>`; an attribute value is quoted only
+ * right after `=`; the tag ends at the first `>` outside a quoted value. `undefined` when the page
+ * ends inside the tag, which drops it, as in HTML. Attribute names are ASCII-lowercased and the
+ * first of a repeated name wins.
+ */
+function readTag(html: string, start: number): Omit<Tag, 'inert'> | undefined {
+  const close = html[start + 1] === '/';
+  let at = start + (close ? 2 : 1);
+  const nameStart = at;
+  while (at < html.length && !isSpace(html[at]) && html[at] !== '/' && html[at] !== '>') at += 1;
+  const name = asciiLower(html.slice(nameStart, at));
+  const attributes = new Map<string, Attribute>();
+  const add = (key: string, raw: string, from: number, quote: string) => {
+    if (!attributes.has(key)) attributes.set(key, { value: decodeAttribute(raw), start: from, end: from + raw.length, quote });
+  };
+  let selfClosing = false;
+  while (at < html.length) {
+    const char = html[at];
+    if (char === '>') return { name, close, start, end: at + 1, selfClosing, attributes: close ? new Map() : attributes };
+    selfClosing = false;
+    if (isSpace(char)) { at += 1; continue; }
+    if (char === '/') { selfClosing = html[at + 1] === '>'; at += 1; continue; }
+    // An attribute name; its first character may be `=`.
+    const keyStart = at;
+    at += 1;
+    while (at < html.length && !isSpace(html[at]) && html[at] !== '/' && html[at] !== '>' && html[at] !== '=') at += 1;
+    const key = asciiLower(html.slice(keyStart, at));
+    let equals = at;
+    while (isSpace(html[equals])) equals += 1;
+    if (html[equals] !== '=') { add(key, '', at, ''); at = equals; continue; }
+    at = equals + 1;
+    while (isSpace(html[at])) at += 1;
+    const quote = html[at] === '"' || html[at] === "'" ? html[at]! : '';
+    if (quote) {
+      const end = html.indexOf(quote, at + 1);
+      if (end < 0) return undefined;
+      add(key, html.slice(at + 1, end), at + 1, quote);
+      at = end + 1;
+    } else {
+      const valueStart = at;
+      while (at < html.length && !isSpace(html[at]) && html[at] !== '>') at += 1;
+      add(key, html.slice(valueStart, at), valueStart, '');
+    }
+  }
+  return undefined;
+}
+
+/**
+ * Tags outside comments and raw-text elements, with their attributes, read in one linear pass with
+ * HTML's tokenizer rules: comments (including abrupt `<!-->` and `--!>`), bogus comments and the
+ * doctype (`<!…>`, `<?…>`, `</` and a non-letter) skip to their end, and whitespace is HTML's ASCII
+ * whitespace only, so a no-break space never ends a tag name or separates attributes. Names and
+ * raw-text ends match ASCII case-insensitively, so offsets always index `html`.
  */
 function scanTags(html: string): Tag[] {
   const tags: Tag[] = [];
-  const pattern = /<!--(?:[\s\S]*?-->|[\s\S]*$)|<(\/?)([a-zA-Z][a-zA-Z0-9-]*)(?=[\t\n\f\r />])((?:"[^"]*"|'[^']*'|[^'">])*)>/g;
-  let match: RegExpExecArray | null;
   let templates = 0;
-  while ((match = pattern.exec(html)) !== null) {
-    if (match[2] === undefined) continue;
-    const name = asciiLower(match[2]);
-    const close = match[1] === '/';
-    const rest = match[3]!;
-    const attributesAt = match.index + 1 + match[1]!.length + match[2].length;
-    if (name === 'template' && close) templates = Math.max(0, templates - 1);
-    const tag: Tag = {
-      name, close, start: match.index, end: match.index + match[0].length,
-      selfClosing: /\/[\t\n\f\r ]*$/.test(rest), inert: templates > 0, attributes: close ? new Map() : parseAttributes(rest, attributesAt),
-    };
-    if (name === 'template' && !close) templates += 1;
+  let at = 0;
+  while (at < html.length) {
+    const open = html.indexOf('<', at);
+    if (open < 0) break;
+    const next = html[open + 1];
+    const opensTag = isAsciiAlpha(next) || (next === '/' && isAsciiAlpha(html[open + 2]));
+    if (!opensTag) {
+      if (html.startsWith('<!--', open)) {
+        const end = commentEnd(html, open + 4);
+        if (end === undefined) break;
+        at = end;
+      } else if (next === '!' || next === '?' || (next === '/' && open + 2 < html.length)) {
+        if (next === '/' && html[open + 2] === '>') { at = open + 3; continue; }
+        const end = html.indexOf('>', open + 2);
+        if (end < 0) break;
+        at = end + 1;
+      } else {
+        at = open + 1;
+      }
+      continue;
+    }
+    const read = readTag(html, open);
+    if (!read) break;
+    if (read.name === 'template' && read.close) templates = Math.max(0, templates - 1);
+    const tag: Tag = { ...read, inert: templates > 0 };
+    if (read.name === 'template' && !read.close) templates += 1;
     tags.push(tag);
-    if (!close && RAW_TEXT.has(name)) {
-      const closing = rawTextEnd(html, name, tag.end);
+    at = tag.end;
+    if (!tag.close && RAW_TEXT.has(tag.name)) {
+      const closing = rawTextEnd(html, tag.name, tag.end);
       if (closing === undefined) break;
-      pattern.lastIndex = closing;
+      at = closing;
     }
   }
   return tags;
@@ -309,12 +372,19 @@ function cspMetas(tags: Tag[]): Attribute[] {
   return metas;
 }
 
+/** `policy` without trailing `;` and whitespace. A loop, not a `/[…]+$/` replace, which is quadratic on a long run of them. */
+function trimPolicyEnd(policy: string): string {
+  let end = policy.length;
+  while (end > 0 && (policy[end - 1] === ';' || isSpace(policy[end - 1]))) end -= 1;
+  return policy.slice(0, end);
+}
+
 /** `policy` with `source` allowed by `directive`: added to it, replacing a lone `'none'`, or appended as a new directive. */
 export function allowCspSource(policy: string, directive: 'frame-src' | 'script-src', source: string): string {
   if (!/^[!-~]+$/.test(source) || /[;,]/.test(source)) return fail(`${JSON.stringify(source)} is not a single CSP source expression`);
   const parts = policy.split(';');
   const index = parts.findIndex((part) => asciiLower(part.trim().split(/[\t\n\f\r ]+/)[0]!) === directive);
-  if (index < 0) return `${policy.replace(/[;\t\n\f\r ]+$/, '')}; ${directive} ${source}`;
+  if (index < 0) return `${trimPolicyEnd(policy)}; ${directive} ${source}`;
   const lead = parts[index]!.match(/^[\t\n\f\r ]*/)![0];
   const tokens = parts[index]!.trim().split(/[\t\n\f\r ]+/).slice(1);
   if (tokens.includes(source)) return policy;

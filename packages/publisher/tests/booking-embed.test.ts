@@ -236,6 +236,32 @@ test('booking embed: script text follows HTML escape states and tags end only at
   assert.throws(() => after('<plaintext><div id="x"></div>', 'x'), /found 0/);
 });
 
+test('booking embed: the scanner follows HTML tag and comment rules', () => {
+  const after = (body: string) => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: 'x' } }]);
+  // A quote only opens a value after `=`: `"x` and `<div` are attribute names of <a>, so the id is the <a>'s.
+  assert.match(after('<a "x <div id="x"></a>'), /<a "x <div id="x"><\/a><section id="book-online"/);
+  // Bogus comments and the doctype end at the first `>`; `--!>` and an abrupt `<!-->` end a comment.
+  assert.throws(() => after('<!x <div id="x"></div>'), /found 0/);
+  assert.throws(() => after('<?x <div id="x"></div>'), /found 0/);
+  assert.throws(() => after('</ x <div id="x"></div>'), /found 0/);
+  assert.match(after('<!-- a --!><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
+  assert.match(after('<!--><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
+  assert.match(after('<!---><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
+  // Only `/>` self-closes; `/ >` does not.
+  assert.match(after('<div id="x" / ></div>'), /<div id="x" \/ ><\/div><section id="book-online"/);
+  // A tag cut off by the end of the page is dropped.
+  assert.throws(() => after('<div id="x'), /found 0/);
+});
+
+test('booking embed: scanning is linear on inputs that are quadratic for a backtracking pattern', { timeout: 10_000 }, () => {
+  const n = 200_000;
+  for (const body of ['<!--a'.repeat(n / 5), '<a'.repeat(n / 2), `<a title="${'x'.repeat(n)}`, '<div id="x">'.repeat(n / 12)]) {
+    assert.throws(() => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: 'missing' } }]), BookingEmbedError);
+  }
+  assert.equal(allowCspSource(`frame-src 'none'${'\t'.repeat(n)}x`, 'script-src', 'https://a.test/embed.js'), `frame-src 'none'${'\t'.repeat(n)}x; script-src https://a.test/embed.js`);
+  assert.equal(allowCspSource(`frame-src 'none'${'; \t'.repeat(n)}`, 'script-src', 'https://a.test/embed.js'), "frame-src 'none'; script-src https://a.test/embed.js");
+});
+
 test('booking embed: compile places it on a family page, after effects, with effects still applied', async () => {
   const { compiler } = await loadExample('restaurant');
   const result = await compile({

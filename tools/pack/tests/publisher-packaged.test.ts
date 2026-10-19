@@ -2,14 +2,11 @@
 // The packaged app installs each INTERNAL_PACKAGES entry from its own `pnpm pack` tarball, so every
 // lane must install the publisher, the workspace build must build it before the fast lane, and its
 // tarball must carry the entries the fast lane loads and the notices of what it redistributes.
-import { execFile } from "node:child_process";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { promisify } from "node:util";
 
-import { createPackageManagerInvocation } from "@mish/platform";
 import { describe, expect, it } from "vitest";
 
 import { INTERNAL_PACKAGES as LINUX_INTERNAL_PACKAGES } from "@/linux.js";
@@ -19,25 +16,10 @@ import { INTERNAL_PACKAGES as WIN_INTERNAL_PACKAGES } from "@/win/constants.js";
 import { shouldInstallInternalPackageForWinPrebundle } from "@/win/prebundle.js";
 import { WORKSPACE_BUILD_PACKAGES } from "@/workspace-build.js";
 
-const execFileAsync = promisify(execFile);
 const workspaceRoot = fileURLToPath(new URL("../../../", import.meta.url));
 const packageDir = join(workspaceRoot, "packages", "publisher");
 const NAME = "@mish/publisher";
 const FAST_LANE = "@mish/agency-fast-lane";
-
-async function packedFiles(): Promise<Set<string>> {
-  // Same invocation as the Cult test: the workspace's pinned pnpm, without the runner's npm_* variables.
-  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith("npm_")));
-  const invocation = createPackageManagerInvocation(["-C", packageDir, "pack", "--dry-run", "--json"], env);
-  const { stdout } = await execFileAsync(invocation.command, invocation.args, {
-    cwd: workspaceRoot,
-    env,
-    maxBuffer: 16 * 1024 * 1024,
-    windowsVerbatimArguments: invocation.windowsVerbatimArguments,
-  });
-  const report = JSON.parse(stdout) as { files: Array<{ path: string }> };
-  return new Set(report.files.map((file) => file.path));
-}
 
 describe("packaged publisher", () => {
   it("is installed by every pack lane and built before the fast lane", () => {
@@ -63,14 +45,11 @@ describe("packaged publisher", () => {
     }
   });
 
-  it.skipIf(!existsSync(join(packageDir, "dist", "index.js")))(
-    "ships the runtime entries and the notices in the package tarball",
-    async () => {
-      const files = await packedFiles();
-      for (const file of ["dist/index.js", "dist/index.d.ts", "dist/node.js", "dist/node.d.ts", "dist/LICENSE", "dist/NOTICE"]) {
-        expect(files.has(file), file).toBe(true);
-      }
-    },
-    60_000,
-  );
+  // The tarball ships all of `dist/` (`files`, checked above). The publisher's own consumer test
+  // packs it, installs it into another project and reads LICENSE and NOTICE from the install.
+  it.skipIf(!existsSync(join(packageDir, "dist", "index.js")))("builds the runtime entries and the notices into dist", () => {
+    for (const file of ["dist/index.js", "dist/index.d.ts", "dist/node.js", "dist/node.d.ts", "dist/LICENSE", "dist/NOTICE"]) {
+      expect(existsSync(join(packageDir, file)), file).toBe(true);
+    }
+  });
 });

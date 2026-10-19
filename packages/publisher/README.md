@@ -159,7 +159,8 @@ type BookingEmbed = {
   (`<script>`, `<style>`, `<textarea>`, `<title>`, `<iframe>`, `<noscript>`, `<noembed>`,
   `<noframes>`, `<xmp>`, `<plaintext>`) is never an anchor. Script text follows HTML's escape
   states, so a `</script>` hidden by `<!--<script>` does not end it. Nor is anything inside a
-  `<template>`, which is not in the document.
+  `<template>`, which is not in the document. Tags, comments (`<!-->`, `--!>`), bogus comments
+  (`<!x>`, `<?x>`, `</ x>`) and unclosed quotes follow the HTML tokenizer, in one linear pass.
 - **Content-Security-Policy.** Family pages ship a strict CSP `<meta>` (`default-src 'none'`).
   The slot widens it as little as works: `frame-src` gets the booking origin(s), and in script mode
   `script-src` gets exactly the widget script URL (any effect script hashes stay). That URL must be
