@@ -169,6 +169,12 @@ const placeable = (tag: Tag) => !tag.inert && !tag.foreign && !tag.inSelect;
 
 /** Elements whose content is text, never markup, so nothing inside one is an anchor. `<plaintext>` never ends. */
 const RAW_TEXT = new Set(['iframe', 'noembed', 'noframes', 'noscript', 'plaintext', 'script', 'style', 'textarea', 'title', 'xmp']);
+/**
+ * Elements that are never an anchor: table parts (discarded outside a table, and a section next to
+ * one is moved out of the table), the document's own structure, and head content, where a section
+ * would end the head and push the rest of it, a CSP `<meta>` included, into the body.
+ */
+const NOT_ANCHORS = new Set(['caption', 'col', 'colgroup', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'html', 'head', 'body', 'frameset', 'frame', 'base', 'basefont', 'bgsound', 'link', 'meta', 'noscript', 'script', 'style', 'template', 'title']);
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
 /** HTML start tags that end an inline `<svg>` or `<math>` ("breakout"), and the SVG and MathML elements whose content is HTML or text. */
 const FOREIGN_BREAKOUT = new Set(['b', 'big', 'blockquote', 'body', 'br', 'center', 'code', 'dd', 'div', 'dl', 'dt', 'em', 'embed', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'i', 'img', 'li', 'listing', 'menu', 'meta', 'nobr', 'ol', 'p', 'pre', 'ruby', 's', 'small', 'span', 'strong', 'strike', 'sub', 'sup', 'table', 'tt', 'u', 'ul', 'var']);
@@ -312,6 +318,13 @@ const opensMarkup = (html: string, at: number) => isAsciiAlpha(html[at + 1]) || 
  * plain case, foreign elements and comments, which is what icons are, and refuses the rest rather
  * than guess where the element ends.
  */
+/** Whether the element whose content starts at `from` holds only text: its next markup is its own end tag. */
+function textOnly(html: string, from: number, name: string): boolean {
+  let markup = html.indexOf('<', from);
+  while (markup >= 0 && !opensMarkup(html, markup)) markup = html.indexOf('<', markup + 1);
+  return markup < 0 || (html[markup + 1] === '/' && startsTag(html, markup + 2, name));
+}
+
 /**
  * A `<select>` is parsed by rules of its own, and newer browsers parse it differently again, so the
  * scanner accepts only what every parser reads the same way inside one: options, option groups,
@@ -390,16 +403,15 @@ function scanTags(html: string): Tag[] {
       if (!read.selfClosing) {
         foreign.push(read.name);
         if (FOREIGN_TEXT.has(read.name)) {
-          // Text only: the next markup must be this element's own end tag.
-          let markup = html.indexOf('<', read.end);
-          while (markup >= 0 && !opensMarkup(html, markup)) markup = html.indexOf('<', markup + 1);
-          if (markup >= 0 && !(html[markup + 1] === '/' && startsTag(html, markup + 2, read.name))) return foreignFail(`markup inside <${read.name}>`);
+          if (!textOnly(html, read.end, read.name)) return foreignFail(`markup inside <${read.name}>`);
         }
       }
     }
     tags.push(tag);
     at = tag.end;
     if (!inForeign && !tag.inSelect && !tag.close && RAW_TEXT.has(tag.name)) {
+      // With scripting off, a browser parses <noscript> content as markup, so it must hold only text.
+      if (tag.name === 'noscript' && !textOnly(html, tag.end, 'noscript')) return fail('the page\'s <noscript> contains markup, which a browser without scripting parses as HTML; the booking slot cannot place around it safely');
       const closing = rawTextEnd(html, tag.name, tag.end);
       if (closing === undefined) break;
       at = closing;
@@ -422,6 +434,7 @@ function insertionOffset(tags: Tag[], placement: BookingEmbedPlacement | undefin
   const owners = tags.filter((tag) => placeable(tag) && tag.attributes.get('id')?.value === anchor);
   if (owners.length !== 1) return fail(`placement anchor ${JSON.stringify(anchor)} must name exactly one element (found ${owners.length})`);
   const open = owners[0]!;
+  if (NOT_ANCHORS.has(open.name)) return fail(`placement anchor ${JSON.stringify(anchor)} is a <${open.name}>, which is not a place for the slot`);
   if ('before' in placement) return open.start;
   if (VOID.has(open.name) || open.selfClosing) return fail(`placement anchor ${JSON.stringify(anchor)} is not a container element`);
   if (RAW_TEXT.has(open.name)) {

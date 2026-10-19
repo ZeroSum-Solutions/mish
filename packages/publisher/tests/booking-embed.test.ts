@@ -113,8 +113,22 @@ test('booking embed: placement after, before and by default', () => {
 });
 
 test('booking embed: markup inside comments and raw-text elements is never an anchor', () => {
-  const html = spliceBookingEmbeds(page('<!-- <div id="x"></div> --><script>const s = \'<div id="x">\';</script><style>/* <div id="x"> */</style><iframe title="t"><div id="x"></div></iframe><noscript><div id="x"></div></noscript><textarea><div id="x"></div></TEXTAREA ><div id="x"></div><p id="after"></p>'), [{ ...iframe, placement: { after: 'x' } }]);
+  const html = spliceBookingEmbeds(page('<!-- <div id="x"></div> --><script>const s = \'<div id="x">\';</script><style>/* <div id="x"> */</style><iframe title="t"><div id="x"></div></iframe><noscript>Turn on scripts for the menu.</noscript><textarea><div id="x"></div></TEXTAREA ><div id="x"></div><p id="after"></p>'), [{ ...iframe, placement: { after: 'x' } }]);
   assert.match(html, /<div id="x"><\/div><section id="book-online"[^]*<\/section><p id="after">/);
+  // Without scripting a browser parses <noscript> content as markup, so it must be text only.
+  for (const inner of ['<div id="x"></div>', '<template>', '<!-- c -->', '<textarea>']) {
+    assert.throws(() => spliceBookingEmbeds(page(`<main><noscript>${inner}</noscript></main>`), [iframe]), /<noscript> contains markup/, inner);
+  }
+});
+
+test('booking embed: table parts, document structure and head content are never anchors', () => {
+  const at = (body: string, placement: { after: string } | { before: string }, head = CSP) => spliceBookingEmbeds(page(body, head), [{ ...iframe, placement }]);
+  assert.throws(() => at('<main><tr id="x"></tr></main>', { after: 'x' }), /anchor "x" is a <tr>/);
+  assert.throws(() => at('<table><tr><td id="x"></td></tr></table>', { before: 'x' }), /anchor "x" is a <td>/);
+  assert.throws(() => at('<main></main>', { before: 'x' }, `<title id="x">t</title>${CSP}`), /anchor "x" is a <title>/);
+  assert.throws(() => at('<main></main>', { before: 'x' }, `<meta id="x" charset="utf-8">${CSP}`), /anchor "x" is a <meta>/);
+  assert.throws(() => spliceBookingEmbeds(`<!doctype html><html><head>${CSP}</head><body id="x"></body></html>`, [{ ...iframe, placement: { after: 'x' } }]), /anchor "x" is a <body>/);
+  assert.match(at('<table id="x"><tr><td>a</td></tr></table><p></p>', { after: 'x' }), /<\/table><section id="book-online"[^]*<\/section><p>/, 'a whole table is an anchor');
 });
 
 test('booking embed: the scanner reads attributes, not text that looks like one', () => {
