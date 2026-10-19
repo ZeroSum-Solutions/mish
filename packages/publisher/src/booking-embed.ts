@@ -470,9 +470,11 @@ function insertionOffset(tags: Tag[], placement: BookingEmbedPlacement | undefin
     return end.start;
   }
   const anchor = 'after' in placement ? placement.after : placement.before;
-  const owners = tags.filter((tag) => placeable(tag) && hasId(tag, anchor));
+  // Every element in the document counts toward uniqueness (an <svg> or <select> child too); only a template's content is outside it.
+  const owners = tags.filter((tag) => !tag.inert && !tag.close && hasId(tag, anchor));
   if (owners.length !== 1) return fail(`placement anchor ${JSON.stringify(anchor)} must name exactly one element (found ${owners.length})`);
   const open = owners[0]!;
+  if (!placeable(open)) return fail(`placement anchor ${JSON.stringify(anchor)} is inside an <svg>, <math> or <select>, which is not a place for the slot`);
   if (open.attributes.get('id')!.segments) return fail(`placement anchor ${JSON.stringify(anchor)} may be an id written with a character reference the slot cannot decode`);
   if (NOT_ANCHORS.has(open.name)) return fail(`placement anchor ${JSON.stringify(anchor)} is a <${open.name}>, which is not a place for the slot`);
   if (open.name === 'form' && discardedForm(tags, open)) return fail(`placement anchor ${JSON.stringify(anchor)} is a <form> inside another form, which a browser discards`);

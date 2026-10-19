@@ -272,8 +272,14 @@ test('booking embed: script text follows HTML escape states and tags end only at
 test('booking embed: inline <svg> and <math> are foreign content, never a place for the slot', () => {
   const after = (body: string) => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: 'x' } }]);
   // An icon: elements inside it are SVG elements, so none is an anchor; the <svg> itself is.
-  assert.throws(() => after('<svg><g id="x"><path d="M0 0"/></g></svg>'), /found 0/);
-  assert.throws(() => after('<math><mrow id="x"></mrow></math>'), /found 0/);
+  assert.throws(() => after('<svg><g id="x"><path d="M0 0"/></g></svg>'), /is inside an <svg>, <math> or <select>/);
+  assert.throws(() => after('<math><mrow id="x"></mrow></math>'), /is inside an <svg>, <math> or <select>/);
+  // They still count toward uniqueness: they are in the document.
+  for (const placement of [{ after: 'a_b' }, { before: 'a_b' }]) {
+    for (const body of ['<div id="a_b"></div><svg><g id="a&lowbar;b"></g></svg>', '<div id="a_b"></div><svg><g id="a_b"></g></svg>', '<div id="a_b"></div><math><mi id="a_b">x</mi></math>', '<div id="a_b"></div><select><option id="a&UnderBar;b">a</option></select>']) {
+      assert.throws(() => spliceBookingEmbeds(page(body), [{ ...iframe, placement }]), /found 2/, body);
+    }
+  }
   assert.match(after('<svg id="x" viewBox="0 0 24 24"><svg><path/></svg><path d="M0 0"/></svg><p></p>'), /<path d="M0 0"\/><\/svg><section id="book-online"[^]*<\/section><p>/);
   assert.match(after('<div id="x"><svg><g><path/></g></svg></div><p></p>'), /<\/svg><\/div><section id="book-online"[^]*<\/section><p>/);
   // Text-only <title> and <style>, and an SVG <template>, which is not HTML's inert template.
@@ -283,7 +289,7 @@ test('booking embed: inline <svg> and <math> are foreign content, never a place 
   assert.match(spliceBookingEmbeds(page('<main><svg><g></g></svg></main>'), [iframe]), /<\/svg><section id="book-online"[^]*<\/section><\/main>/);
   // A <select> drops (or, in newer browsers, keeps in its picker) a section, so nothing in one is an
   // anchor, and only options, groups, <hr>, text and comments are accepted inside one.
-  assert.throws(() => after('<select><option id="x">a</option></select>'), /found 0/);
+  assert.throws(() => after('<select><option id="x">a</option></select>'), /is inside an <svg>, <math> or <select>/);
   assert.match(after('<select><optgroup label="g"><option>a<option>b</optgroup><hr><!-- c --></select><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
   for (const inner of ['<b id="x"></b>', '<input>', '<style></style>', '<template></template>', '<textarea></textarea>', '<select>', '</div>']) {
     assert.throws(() => after(`<select>${inner}</select><div id="x"></div>`), /the page's <select> contains/, inner);
