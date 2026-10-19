@@ -1,13 +1,13 @@
 {
   "commit": "37f396f30fabba98c92b39677bf7393a7265ba87",
   "note": "shared compiler closure only, written by scripts/sync-agency-compiler.ts; the nonprofit family module under compiler/scripts/families/nonprofit/ is authored in this package.",
-  "runtimeClosureFiles": 13,
+  "runtimeClosureFiles": 14,
   "files": [
     {
       "path": "plugins/_official/shared/agency-compiler/scripts/assets.ts",
       "file": "compiler/scripts/assets.ts",
-      "bytes": 7255,
-      "sha256": "b728124e30477badefd0ce800de61fa9b0cf2642653772ee6f862758b2c6663b"
+      "bytes": 7956,
+      "sha256": "33323f11f7c66c33b8c0e26ec304c24413b7d1d456d1ba555697f9c3e560f31e"
     },
     {
       "path": "plugins/_official/shared/agency-compiler/scripts/compose.ts",
@@ -54,8 +54,8 @@
     {
       "path": "plugins/_official/shared/agency-compiler/scripts/catalog-block.ts",
       "file": "compiler/scripts/catalog-block.ts",
-      "bytes": 5081,
-      "sha256": "cff09b77dbd6a842cef8f90aa79ac40fb049928d5562a1f359b495bdbc42fe33"
+      "bytes": 5269,
+      "sha256": "251d1f14610696abcf4bebebc4d2d96732cb149128423d6c919faaf7a54d7826"
     },
     {
       "path": "plugins/_official/shared/agency-compiler/scripts/direction-tokens.ts",
@@ -90,8 +90,14 @@
     {
       "path": "plugins/_official/shared/agency-compiler/scripts/effects.ts",
       "file": "compiler/scripts/effects.ts",
-      "bytes": 21520,
-      "sha256": "757cea7c9744408647ee13776988b207f7c9a8cb5f76481e880988abd51cd048"
+      "bytes": 21882,
+      "sha256": "a3654e2b1a5d75ace76c1036ef60025c89a8b316946757c03838ac79d0a3d10b"
+    },
+    {
+      "path": "plugins/_official/shared/agency-compiler/scripts/resources.ts",
+      "file": "compiler/scripts/resources.ts",
+      "bytes": 4331,
+      "sha256": "c139d406189c3d02fd25a63d045607e65b4d99afe9f1bf41b018f3bfb43dcb40"
     }
   ]
 }

@@ -2,14 +2,19 @@
  * Loads an Agency Site family package: its trusted compiler (imported in-process), the
  * reference recipe that serves as the default spine, the recipe JSON schema, and the approved
  * asset manifest with its files.
+ *
+ * Loading and rendering go through the publisher library (`@mish/publisher`): its Node loader
+ * reads the package once, and every render runs from the resources it read, the same call a
+ * headless server makes. This file adds the fast lane's own parts: `--asset` overrides and the
+ * quality checks `run.ts` calls.
  */
 
 import { checkRenderQuality, type RenderQualityReport } from './render-quality.ts';
 import { createHash } from 'node:crypto';
-import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { linkHonestyCheck, readEffectDeclaration, renderPage, type FamilyCompiler } from '@mish/publisher';
+import { loadFamilyCompiler } from '@mish/publisher/node';
 import type { EffectPlan, EffectRenderReport, FamilyEffectDeclaration } from './effects.ts';
 import { isObject, type Json, type JsonObject } from './spine.ts';
 
@@ -53,57 +58,18 @@ export type FamilyPackage = {
    */
   checkLinkHonesty?: (html: string) => string[];
   checkRenderQuality?: (html: string, scope?: 'site' | 'static-prototype') => RenderQualityReport;
+  /**
+   * The package as the publisher sees it, with `--asset` overrides applied to its roster. Absent
+   * on a hand-built test package.
+   */
+  compiler?: FamilyCompiler;
   render(input: Json, entry: string, options?: RenderOptions): RenderResult;
   readAsset(asset: ApprovedAsset): Promise<Buffer>;
 };
 
-type RenderModule = { renderAgencySite: (input: unknown, entry: string, approvedManifest?: unknown, options?: RenderOptions) => RenderResult };
-type EffectsModule = { readFamilyEffectDeclaration: (family: string) => FamilyEffectDeclaration | null };
-type SectionsModule = { dishonestLinks?: (html: string) => string[]; selfSectionAnchors?: (html: string) => string[] };
-
-/**
- * The family's link-honesty check, loaded from its compiler copy's `sections.ts` when present:
- * `dishonestLinks` (a `#` placeholder, a scheme-only href, or an anchor to an id nothing on the
- * page owns) COMPOSED with `selfSectionAnchors` (an `<a href="#own-section">` — a button that
- * only scrolls to the top of the block it already sits in, invisible to `dishonestLinks` alone
- * since the id genuinely exists — see that function's own docblock, added after a Grok audit
- * found six families shipping exactly this as a placeholder). Missing the file, or the file
- * exporting neither, is not an error — it just means this compiler copy predates the link-honesty
- * gate, and `run.ts` skips the check for it.
- */
-async function loadLinkHonestyCheck(scripts: string): Promise<((html: string) => string[]) | undefined> {
-  const file = path.join(scripts, 'sections.ts');
-  if (!existsSync(file)) return undefined;
-  const module = await import(pathToFileURL(file).href) as SectionsModule;
-  const dishonest = typeof module.dishonestLinks === 'function' ? module.dishonestLinks : undefined;
-  const selfAnchors = typeof module.selfSectionAnchors === 'function' ? module.selfSectionAnchors : undefined;
-  if (!dishonest && !selfAnchors) return undefined;
-  return (html: string) => [...(dishonest?.(html) ?? []), ...(selfAnchors?.(html) ?? [])];
-}
-
-/**
- * The family's effect declaration through the compiler copy's `effects.ts`. A copy without that
- * module (synced before effect placements existed) declares none; any other failure — a
- * declaration that does not validate — is thrown, so a broken catalog.json fails loudly.
- */
-async function loadEffectDeclaration(scripts: string, family: string): Promise<FamilyEffectDeclaration | null> {
-  const file = path.join(scripts, 'effects.ts');
-  if (!existsSync(file)) return null;
-  const module = await import(pathToFileURL(file).href) as EffectsModule;
-  if (typeof module.readFamilyEffectDeclaration !== 'function') return null;
-  return module.readFamilyEffectDeclaration(family) ?? null;
-}
-type AssetsModule = { readApprovedAsset: (root: string, asset: ApprovedAsset) => Promise<Buffer> };
-
 /** Bundled family packages live under plugins/_official/examples/agency-<family>. */
 export function defaultPackageDir(family: string): string {
   return path.resolve(import.meta.dirname, '../../../plugins/_official/examples', `agency-${family}`);
-}
-
-async function readJson(file: string): Promise<JsonObject> {
-  const value = JSON.parse(await readFile(file, 'utf8')) as Json;
-  if (!isObject(value)) throw new Error(`${file}: expected a JSON object`);
-  return value;
 }
 
 const MEDIA_TYPES: Record<string, string> = { png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', webp: 'image/webp', avif: 'image/avif' };
@@ -135,38 +101,33 @@ async function withAssetOverrides(manifest: JsonObject, overrides: Record<string
 }
 
 export async function loadFamilyPackage(packageDir: string, family: string, assetOverrides: Record<string, string> = {}): Promise<FamilyPackage> {
-  if (!/^[a-z][a-z0-9-]*$/.test(family)) throw new Error('family: use a lowercase id');
-  const scripts = path.join(packageDir, 'compiler', 'scripts');
-  const familyDir = path.join(packageDir, 'families', family);
-  const [fixture, schema, packageManifest, renderModule, assetsModule, effects, checkLinkHonesty] = await Promise.all([
-    readJson(path.join(familyDir, 'recipe.json')),
-    readJson(path.join(scripts, 'families', family, 'recipe.schema.json')),
-    readJson(path.join(familyDir, 'approved-assets.json')),
-    import(pathToFileURL(path.join(scripts, 'render.ts')).href) as Promise<RenderModule>,
-    import(pathToFileURL(path.join(scripts, 'assets.ts')).href) as Promise<AssetsModule>,
-    loadEffectDeclaration(scripts, family),
-    loadLinkHonestyCheck(scripts),
-  ]);
-  if (fixture.family !== family) throw new Error(`${familyDir}/recipe.json is for family ${String(fixture.family)}, not ${family}`);
-  const manifest = await withAssetOverrides(packageManifest, assetOverrides);
-  const assetsDir = path.join(familyDir, 'assets');
+  const loaded = await loadFamilyCompiler(packageDir, family);
+  const manifest = await withAssetOverrides(loaded.compiler.approvedAssets, assetOverrides);
+  const compiler: FamilyCompiler = { ...loaded.compiler, approvedAssets: manifest };
+  // A copy without effects.ts (synced before effect placements existed) declares none; a
+  // declaration that does not validate throws here, so a broken catalog.json fails loudly.
+  const effects = readEffectDeclaration(compiler) as FamilyEffectDeclaration | null;
+  // `dishonestLinks` composed with `selfSectionAnchors` from the copy's `sections.ts` (a `#`
+  // placeholder, a scheme-only href, an anchor to an id nothing owns, or a button that only
+  // scrolls to the top of its own block). A copy that predates the gate has neither, and
+  // `run.ts` skips the check for it.
+  const checkLinkHonesty = linkHonestyCheck(compiler);
   return {
     family,
     packageDir,
-    fixture,
-    schema,
+    fixture: compiler.reference,
+    schema: compiler.schema,
     manifest,
-    assetsDir,
+    assetsDir: loaded.assetsDir,
     effects,
     ...(checkLinkHonesty ? { checkLinkHonesty } : {}),
     checkRenderQuality,
+    compiler,
     // The plan goes to the compiler as is; it validates every item against the declaration.
-    render: (input, entry, options) => (options?.effects || options?.compose
-      ? renderModule.renderAgencySite(input, entry, manifest, { ...(options.effects ? { effects: options.effects } : {}), ...(options.compose ? { compose: options.compose } : {}) })
-      : renderModule.renderAgencySite(input, entry, manifest)),
+    render: (input, entry, options) => renderPage(compiler, input, entry, options) as RenderResult,
     readAsset: (asset) => {
       const override = assetOverrides[asset.id];
-      return assetsModule.readApprovedAsset(override ? path.dirname(path.resolve(override)) : assetsDir, asset);
+      return loaded.readApprovedAsset(override ? path.dirname(path.resolve(override)) : loaded.assetsDir, asset);
     },
   };
 }

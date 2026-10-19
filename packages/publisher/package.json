@@ -1,0 +1,28 @@
+{
+  "name": "@mish/publisher",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Headless Agency Site publisher: compile({ compiler, spec, brandTokens, assets }) turns typed section JSON into deterministic static files, with no filesystem, environment or clock access. Ships a Node loader for family packages and prebuilt bundles of the bundled families.",
+  "license": "Apache-2.0",
+  "files": ["dist", "README.md"],
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "default": "./dist/index.js" },
+    "./node": { "types": "./dist/node.d.ts", "default": "./dist/node.js" },
+    "./families": { "types": "./dist/families/index.d.ts", "default": "./dist/families/index.js" },
+    "./families/*": { "types": "./dist/families/*.d.ts", "default": "./dist/families/*.js" }
+  },
+  "scripts": {
+    "build": "node --experimental-strip-types scripts/build.ts",
+    "test": "node --experimental-strip-types scripts/build.ts && node --experimental-strip-types --test tests/*.test.ts",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "24.12.2",
+    "esbuild": "0.28.0",
+    "typescript": "6.0.3"
+  },
+  "engines": {
+    "node": "~24"
+  }
+}

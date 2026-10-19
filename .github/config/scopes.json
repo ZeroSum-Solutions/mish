@@ -141,7 +141,7 @@
     {
       "id": "daemon-sources",
       "match": {
-        "prefixes": ["apps/daemon/", "packages/release/", "packages/contracts/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/genui-catalog/"],
+        "prefixes": ["apps/daemon/", "packages/release/", "packages/contracts/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/publisher/", "packages/genui-catalog/"],
         "exclude": ["match://daemon-core"]
       },
       "effects": ["daemon_tests_required"], "confidence": "medium"
@@ -168,7 +168,7 @@
     },
     {
       "id": "web-sources",
-      "match": { "prefixes": ["apps/web/", "packages/release/", "packages/components/", "packages/contracts/", "packages/host/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/genui-catalog/"] },
+      "match": { "prefixes": ["apps/web/", "packages/release/", "packages/components/", "packages/contracts/", "packages/host/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/publisher/", "packages/genui-catalog/"] },
       "effects": ["web_tests_required"], "confidence": "medium"
     },
     {
@@ -187,7 +187,7 @@
     {
       "id": "agency-fast-lane-tests",
       "match": {
-        "prefixes": ["packages/agency-fast-lane/", "plugins/_official/examples/agency-", "plugins/_official/shared/agency-compiler/"],
+        "prefixes": ["packages/agency-fast-lane/", "packages/publisher/", "plugins/_official/examples/agency-", "plugins/_official/shared/agency-compiler/"],
         "exact": ["scripts/sync-agency-compiler.ts"]
       },
       "effects": ["agency_tests_required"], "confidence": "medium"
@@ -256,7 +256,7 @@
     {
       "id": "ui-p0-surface",
       "match": {
-        "prefixes": ["apps/web/", "apps/daemon/", "packages/release/", "packages/components/", "packages/contracts/", "packages/host/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/genui-catalog/", "e2e/ui/", "e2e/lib/", "e2e/resources/", "e2e/scripts/", ".github/actions/setup-playwright/", ".github/actions/setup-workspace/"],
+        "prefixes": ["apps/web/", "apps/daemon/", "packages/release/", "packages/components/", "packages/contracts/", "packages/host/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/publisher/", "packages/genui-catalog/", "e2e/ui/", "e2e/lib/", "e2e/resources/", "e2e/scripts/", ".github/actions/setup-playwright/", ".github/actions/setup-workspace/"],
         "exact": ["e2e/package.json", "e2e/playwright.config.ts", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", ".github/workflows/ci.yml"],
         "exclude": ["match://daemon-core"]
       },
