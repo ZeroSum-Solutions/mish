@@ -152,6 +152,16 @@ test('booking embed: the scanner reads attributes, not text that looks like one'
   assert.match(after('<div id="&#120"></div><p id="z"></p>'), /<div id="&#120"><\/div><section id="book-online"/);
   assert.match(after('<div id="&#x78"></div><p id="z"></p>'), /<div id="&#x78"><\/div><section id="book-online"/);
   assert.match(after('<div id="&#X0078;"></div><p id="z"></p>'), /<div id="&#X0078;"><\/div><section id="book-online"/);
+  // A named reference the scanner cannot decode may spell an id (`&lowbar;` is `_`, `&fjlig;` is `fj`), so it refuses.
+  const at = (body: string, placement: { after: string } | { before: string }) => spliceBookingEmbeds(page(body), [{ ...iframe, placement }]);
+  for (const placement of [{ after: 'a_b' }, { before: 'a_b' }]) {
+    assert.throws(() => at('<div id="a_b"></div><div id="a&lowbar;b"></div>', placement), /found 2/);
+    assert.throws(() => at('<div id="a&UnderBar;b"></div>', placement), /character reference the slot cannot decode/);
+  }
+  assert.throws(() => at('<div id="&fjlig;x"></div><div id="fjx"></div>', { after: 'fjx' }), /found 2/);
+  assert.throws(() => at('<div id="&fjlig;"></div>', { after: 'x' }), /"book-online" is already used/, 'an id that is only a reference could be any id');
+  assert.match(at('<div id="a&lowbar;c"></div><div id="a_b"></div><p></p>', { after: 'a_b' }), /<div id="a_b"><\/div><section id="book-online"/, 'a reference that cannot fit the anchor does not count');
+  assert.throws(() => spliceBookingEmbeds(page('<main><p id="book&hyphen;online"></p></main>'), [iframe]), /"book-online" is already used/);
   // Ids taken by the page are found the same way.
   assert.throws(() => spliceBookingEmbeds(page('<main><P ID=book-online></P></main>'), [iframe]), /"book-online" is already used/);
   assert.ok(spliceBookingEmbeds(page(`<main><p data-x='id="book-online"'></p></main>`), [iframe]).includes('<section id="book-online"'));
@@ -313,7 +323,7 @@ test('booking embed: the scanner follows HTML tag and comment rules', () => {
 
 test('booking embed: scanning is linear on inputs that are quadratic for a backtracking pattern', { timeout: 10_000 }, () => {
   const n = 200_000;
-  for (const body of ['<!--a'.repeat(n / 5), '<a'.repeat(n / 2), `<a title="${'x'.repeat(n)}`, '<div id="x">'.repeat(n / 12), `<svg>${'<g>'.repeat(n / 3)}${'</svg>'.repeat(n / 6)}`, `<svg>${'<title>'.repeat(n / 7)}`, `<div id="${'&#120'.repeat(n / 5)}">`, '<select><b>'.repeat(n / 11)]) {
+  for (const body of ['<!--a'.repeat(n / 5), '<a'.repeat(n / 2), `<a title="${'x'.repeat(n)}`, '<div id="x">'.repeat(n / 12), `<svg>${'<g>'.repeat(n / 3)}${'</svg>'.repeat(n / 6)}`, `<svg>${'<title>'.repeat(n / 7)}`, `<div id="${'&#120'.repeat(n / 5)}">`, `<div id="${'&a'.repeat(n / 2)}">`, '<select><b>'.repeat(n / 11)]) {
     assert.throws(() => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: 'missing' } }]), BookingEmbedError);
   }
   assert.equal(allowCspSource(`frame-src 'none'${'\t'.repeat(n)}x`, 'script-src', 'https://a.test/embed.js'), `frame-src 'none'${'\t'.repeat(n)}x; script-src https://a.test/embed.js`);

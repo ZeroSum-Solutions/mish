@@ -167,7 +167,9 @@ type BookingEmbed = {
   (`<a>`, `<b>`, `<em>`, …), which HTML's error repair can clone into two, or a `<form>` opened
   inside another form, which a browser discards. Tags, comments (`<!-->`,
   `--!>`), bogus comments (`<!x>`, `<?x>`, `</ x>`), unclosed quotes and character references
-  (`&#120` without `;` too) follow the HTML tokenizer, in one linear pass. Inline `<svg>` and
+  (`&#120` without `;` too; an id with a named reference the scanner does not decode, such as
+  `&lowbar;`, is treated as possibly any id that fits around it, so an anchor or slot id it could
+  spell is refused) follow the HTML tokenizer, in one linear pass. Inline `<svg>` and
   `<math>` are foreign content: nothing inside one is an anchor (the `<svg>` itself can be), and a
   page whose inline SVG or MathML holds a CDATA section, an HTML tag that ends it early (`<p>`,
   `<div>`, …), markup inside `<title>`, `<desc>`, `<foreignObject>` or a MathML text element, or a

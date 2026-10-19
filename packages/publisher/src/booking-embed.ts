@@ -157,7 +157,8 @@ export function renderBookingEmbed(input: BookingEmbed, withStyles = true): stri
   return `<section id="${slot.id}" data-od-id="${slot.id}" class="mish-booking" data-mish-slot="booking-embed" aria-labelledby="${titleId}">${style}<div class="mish-booking__inner"><h2 id="${titleId}" data-od-id="${slot.id}--title">${e(slot.heading)}</h2>${body}${widget}</div></section>`;
 }
 
-type Attribute = { value: string; start: number; end: number; quote: string };
+/** `segments`: for an id holding a named reference the scanner cannot decode, the literal text around each one. */
+type Attribute = { value: string; start: number; end: number; quote: string; segments?: string[] };
 /**
  * `inert`: inside a `<template>`, whose content is not in the document. `foreign`: inside an inline
  * `<svg>` or `<math>`, where a booking section would be an SVG or MathML element and never render.
@@ -201,10 +202,12 @@ const asciiLower = (value: string) => value.replace(/[A-Z]/g, (char) => char.toL
  * Character references in an attribute value, decoded as HTML does: numeric ones with or without
  * `;` (zero, surrogates and out-of-range values become U+FFFD, 0x80–0x9F map to windows-1252), and
  * the basic names (`&amp` `&lt` `&gt` `&quot` also without `;` unless a letter, digit or `=`
- * follows). Any other name is kept as written; it can never match a plain anchor id.
+ * follows). Any other `&name` is kept as written, or replaced by `unknown` when given: HTML has
+ * over two thousand names, and some decode to id characters (`&lowbar;` is `_`, `&fjlig;` is `fj`).
  */
-function decodeAttribute(value: string): string {
-  return value.replace(/&#(?:([0-9]+)|[xX]([0-9a-fA-F]+));?|&(?:(amp|lt|gt|quot)(?:;|(?![=A-Za-z0-9]))|(apos);)/g, (_whole, dec?: string, hex?: string, legacy?: string, apos?: string) => {
+function decodeAttribute(value: string, unknown?: string): string {
+  return value.replace(/&#(?:([0-9]+)|[xX]([0-9a-fA-F]+));?|&(?:(amp|lt|gt|quot)(?:;|(?![=A-Za-z0-9]))|(apos);)|&[A-Za-z][A-Za-z0-9]*;?/g, (whole, dec?: string, hex?: string, legacy?: string, apos?: string) => {
+    if (dec === undefined && hex === undefined && legacy === undefined && apos === undefined) return unknown ?? whole;
     const name = legacy ?? apos;
     if (name) return ENTITIES[name]!;
     const code = Number.parseInt(dec ?? hex!, dec ? 10 : 16);
@@ -286,7 +289,13 @@ function readTag(html: string, start: number): Omit<Tag, 'inert' | 'foreign' | '
   const name = asciiLower(html.slice(nameStart, at));
   const attributes = new Map<string, Attribute>();
   const add = (key: string, raw: string, from: number, quote: string) => {
-    if (!attributes.has(key)) attributes.set(key, { value: decodeAttribute(raw), start: from, end: from + raw.length, quote });
+    if (attributes.has(key)) return;
+    const attribute: Attribute = { value: decodeAttribute(raw), start: from, end: from + raw.length, quote };
+    if (key === 'id') {
+      const segments = decodeAttribute(raw.replaceAll('\0', '\ufffd'), '\0').split('\0');
+      if (segments.length > 1) attribute.segments = segments;
+    }
+    attributes.set(key, attribute);
   };
   let selfClosing = false;
   while (at < html.length) {
@@ -432,7 +441,25 @@ function scanTags(html: string): Tag[] {
   return tags;
 }
 
-const idsOf = (tags: Tag[]) => tags.flatMap((tag) => { const id = tag.attributes.get('id'); return id ? [id.value] : []; });
+/**
+ * Whether the tag's id is, or could be, `id`. An id with a named reference the scanner cannot
+ * decode matches every id that fits around it, so such a page refuses rather than guesses.
+ */
+function hasId(tag: Tag, id: string): boolean {
+  const attribute = tag.attributes.get('id');
+  if (!attribute) return false;
+  const segments = attribute.segments;
+  if (!segments) return attribute.value === id;
+  const first = segments[0]!, last = segments.at(-1)!;
+  if (!id.startsWith(first)) return false;
+  let at = first.length;
+  for (const middle of segments.slice(1, -1)) {
+    const found = id.indexOf(middle, at);
+    if (found < 0) return false;
+    at = found + middle.length;
+  }
+  return id.length - last.length >= at && id.endsWith(last);
+}
 
 /** The offset the slot goes at. Throws when the anchor is missing, repeated or not a container. */
 function insertionOffset(tags: Tag[], placement: BookingEmbedPlacement | undefined): number {
@@ -443,9 +470,10 @@ function insertionOffset(tags: Tag[], placement: BookingEmbedPlacement | undefin
     return end.start;
   }
   const anchor = 'after' in placement ? placement.after : placement.before;
-  const owners = tags.filter((tag) => placeable(tag) && tag.attributes.get('id')?.value === anchor);
+  const owners = tags.filter((tag) => placeable(tag) && hasId(tag, anchor));
   if (owners.length !== 1) return fail(`placement anchor ${JSON.stringify(anchor)} must name exactly one element (found ${owners.length})`);
   const open = owners[0]!;
+  if (open.attributes.get('id')!.segments) return fail(`placement anchor ${JSON.stringify(anchor)} may be an id written with a character reference the slot cannot decode`);
   if (NOT_ANCHORS.has(open.name)) return fail(`placement anchor ${JSON.stringify(anchor)} is a <${open.name}>, which is not a place for the slot`);
   if (open.name === 'form' && discardedForm(tags, open)) return fail(`placement anchor ${JSON.stringify(anchor)} is a <form> inside another form, which a browser discards`);
   if ('before' in placement) return open.start;
@@ -546,9 +574,9 @@ export function spliceBookingEmbeds(html: string, embeds: readonly BookingEmbed[
   if (embeds.length === 0) return html;
   if (html.includes('data-od-output-scope="static-prototype"')) fail('a static prototype page cannot take a booking embed');
   const slots = parseBookingEmbeds(embeds);
-  const used = new Set(idsOf(scanTags(html)));
+  const tags = scanTags(html);
   slots.forEach((slot, index) => {
-    for (const id of [slot.id, `${slot.id}-title`]) if (used.has(id)) fail(`bookingEmbeds[${index}].id ${JSON.stringify(id)} is already used on the page`);
+    for (const id of [slot.id, `${slot.id}-title`]) if (tags.some((tag) => hasId(tag, id))) fail(`bookingEmbeds[${index}].id ${JSON.stringify(id)} is already used on the page`);
   });
   let page = html;
   const lastAfter = new Map<string, string>();
