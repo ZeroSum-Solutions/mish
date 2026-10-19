@@ -163,7 +163,9 @@ type BookingEmbed = {
   option groups, `<hr>`, text and comments (anything else is refused). A `<frameset>` page is
   refused, and so is markup inside `<noscript>`, which a browser without scripting parses as HTML.
   Table parts (`<tr>`, `<td>`, …), `<html>`, `<head>`, `<body>` and head content (`<title>`,
-  `<meta>`, `<style>`, …) are never anchors; a whole `<table>` is. Tags, comments (`<!-->`,
+  `<meta>`, `<style>`, …) are never anchors; a whole `<table>` is. Nor are formatting elements
+  (`<a>`, `<b>`, `<em>`, …), which HTML's error repair can clone into two, or a `<form>` opened
+  inside another form, which a browser discards. Tags, comments (`<!-->`,
   `--!>`), bogus comments (`<!x>`, `<?x>`, `</ x>`), unclosed quotes and character references
   (`&#120` without `;` too) follow the HTML tokenizer, in one linear pass. Inline `<svg>` and
   `<math>` are foreign content: nothing inside one is an anchor (the `<svg>` itself can be), and a

@@ -171,10 +171,22 @@ const placeable = (tag: Tag) => !tag.inert && !tag.foreign && !tag.inSelect;
 const RAW_TEXT = new Set(['iframe', 'noembed', 'noframes', 'noscript', 'plaintext', 'script', 'style', 'textarea', 'title', 'xmp']);
 /**
  * Elements that are never an anchor: table parts (discarded outside a table, and a section next to
- * one is moved out of the table), the document's own structure, and head content, where a section
- * would end the head and push the rest of it, a CSP `<meta>` included, into the body.
+ * one is moved out of the table), the document's own structure, head content, where a section
+ * would end the head and push the rest of it, a CSP `<meta>` included, into the body, and the
+ * formatting elements, which HTML's error repair clones, so one tag can become two elements.
  */
-const NOT_ANCHORS = new Set(['caption', 'col', 'colgroup', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'html', 'head', 'body', 'frameset', 'frame', 'base', 'basefont', 'bgsound', 'link', 'meta', 'noscript', 'script', 'style', 'template', 'title']);
+const NOT_ANCHORS = new Set(['caption', 'col', 'colgroup', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'html', 'head', 'body', 'frameset', 'frame', 'base', 'basefont', 'bgsound', 'link', 'meta', 'noscript', 'script', 'style', 'template', 'title', 'a', 'b', 'big', 'code', 'em', 'font', 'i', 'nobr', 's', 'small', 'strike', 'strong', 'tt', 'u']);
+
+/** A `<form>` start tag while another form is open (HTML's form pointer, unset by any `</form>`) is discarded. */
+function discardedForm(tags: Tag[], form: Tag): boolean {
+  let open = false;
+  for (const tag of tags) {
+    if (tag === form) return open;
+    if (tag.name !== 'form' || !placeable(tag)) continue;
+    open = !tag.close;
+  }
+  return false;
+}
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
 /** HTML start tags that end an inline `<svg>` or `<math>` ("breakout"), and the SVG and MathML elements whose content is HTML or text. */
 const FOREIGN_BREAKOUT = new Set(['b', 'big', 'blockquote', 'body', 'br', 'center', 'code', 'dd', 'div', 'dl', 'dt', 'em', 'embed', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'i', 'img', 'li', 'listing', 'menu', 'meta', 'nobr', 'ol', 'p', 'pre', 'ruby', 's', 'small', 'span', 'strong', 'strike', 'sub', 'sup', 'table', 'tt', 'u', 'ul', 'var']);
@@ -435,6 +447,7 @@ function insertionOffset(tags: Tag[], placement: BookingEmbedPlacement | undefin
   if (owners.length !== 1) return fail(`placement anchor ${JSON.stringify(anchor)} must name exactly one element (found ${owners.length})`);
   const open = owners[0]!;
   if (NOT_ANCHORS.has(open.name)) return fail(`placement anchor ${JSON.stringify(anchor)} is a <${open.name}>, which is not a place for the slot`);
+  if (open.name === 'form' && discardedForm(tags, open)) return fail(`placement anchor ${JSON.stringify(anchor)} is a <form> inside another form, which a browser discards`);
   if ('before' in placement) return open.start;
   if (VOID.has(open.name) || open.selfClosing) return fail(`placement anchor ${JSON.stringify(anchor)} is not a container element`);
   if (RAW_TEXT.has(open.name)) {

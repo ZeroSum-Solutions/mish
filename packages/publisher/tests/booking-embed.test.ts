@@ -129,6 +129,12 @@ test('booking embed: table parts, document structure and head content are never 
   assert.throws(() => at('<main></main>', { before: 'x' }, `<meta id="x" charset="utf-8">${CSP}`), /anchor "x" is a <meta>/);
   assert.throws(() => spliceBookingEmbeds(`<!doctype html><html><head>${CSP}</head><body id="x"></body></html>`, [{ ...iframe, placement: { after: 'x' } }]), /anchor "x" is a <body>/);
   assert.match(at('<table id="x"><tr><td>a</td></tr></table><p></p>', { after: 'x' }), /<\/table><section id="book-online"[^]*<\/section><p>/, 'a whole table is an anchor');
+  // Error repair clones formatting elements, so one <b id> can become two elements: never an anchor.
+  assert.throws(() => at('<b id="x"><p>hello</b></p>', { after: 'x' }), /anchor "x" is a <b>/);
+  // A form inside an open form is discarded; once the first form closes, a form is real.
+  assert.throws(() => at('<form><form id="x"></form></form>', { before: 'x' }), /<form> inside another form/);
+  assert.match(at('<form></form><form id="x"></form><p></p>', { after: 'x' }), /<form id="x"><\/form><section id="book-online"[^]*<\/section><p>/);
+  assert.match(at('<template><form></template><form id="x"></form><p></p>', { after: 'x' }), /<form id="x"><\/form><section id="book-online"/, 'a form in a template does not count');
 });
 
 test('booking embed: the scanner reads attributes, not text that looks like one', () => {
@@ -291,7 +297,7 @@ test('booking embed: inline <svg> and <math> are foreign content, never a place 
 test('booking embed: the scanner follows HTML tag and comment rules', () => {
   const after = (body: string) => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: 'x' } }]);
   // A quote only opens a value after `=`: `"x` and `<div` are attribute names of <a>, so the id is the <a>'s.
-  assert.match(after('<a "x <div id="x"></a>'), /<a "x <div id="x"><\/a><section id="book-online"/);
+  assert.throws(() => after('<a "x <div id="x"></a>'), /anchor "x" is a <a>/);
   // Bogus comments and the doctype end at the first `>`; `--!>` and an abrupt `<!-->` end a comment.
   assert.throws(() => after('<!x <div id="x"></div>'), /found 0/);
   assert.throws(() => after('<?x <div id="x"></div>'), /found 0/);
