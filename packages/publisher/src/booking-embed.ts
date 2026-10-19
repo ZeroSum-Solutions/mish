@@ -118,6 +118,10 @@ export function parseBookingEmbed(input: unknown, label = 'bookingEmbeds[0]'): P
   let scriptUrl: string | undefined;
   if (mode === 'script') {
     scriptUrl = webUrl(input.scriptUrl, `${label}.scriptUrl`);
+    // `script-src` gets this URL as written, and a CSP source path ending in `/` (or the bare
+    // origin) allows every script beneath it. The widget script is `<api>/embed.js`, so only that.
+    const script = new URL(scriptUrl);
+    if (script.pathname !== '/embed.js' || script.search) fail(`${label}.scriptUrl must be the widget script, <api>/embed.js, with no query`);
     // The script frames `<its origin>/book/<key>`; the fallback link must be that same page.
     if (new URL(scriptUrl).origin !== new URL(pageUrl).origin) fail(`${label}.pageUrl and ${label}.scriptUrl must share an origin`);
     if (new URL(pageUrl).pathname !== `/book/${key as string}`) fail(`${label}.pageUrl must be <scriptUrl origin>/book/<key> in script mode, the page the widget frames`);
@@ -157,8 +161,8 @@ type Attribute = { value: string; start: number; end: number; quote: string };
 /** `inert`: inside a `<template>`, whose content is not in the document, so never a place for the slot. */
 type Tag = { name: string; close: boolean; start: number; end: number; selfClosing: boolean; inert: boolean; attributes: Map<string, Attribute> };
 
-/** Elements whose content is text, never markup, so nothing inside one is an anchor. */
-const RAW_TEXT = new Set(['iframe', 'noembed', 'noframes', 'noscript', 'script', 'style', 'textarea', 'title', 'xmp']);
+/** Elements whose content is text, never markup, so nothing inside one is an anchor. `<plaintext>` never ends. */
+const RAW_TEXT = new Set(['iframe', 'noembed', 'noframes', 'noscript', 'plaintext', 'script', 'style', 'textarea', 'title', 'xmp']);
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
 
@@ -189,6 +193,49 @@ function parseAttributes(source: string, offset: number): Map<string, Attribute>
   return attributes;
 }
 
+const isTagEnd = (char: string | undefined) => char !== undefined && /[\t\n\f\r />]/.test(char);
+const startsTag = (html: string, at: number, name: string) => asciiLower(html.slice(at, at + name.length)) === name && isTagEnd(html[at + name.length]);
+
+/**
+ * Where a `<script>` element's text ends: the offset of its `</script`, or `undefined` when it never
+ * closes. Script text has escape states (HTML's "script data escaped" and "double escaped"): after
+ * `<!--`, a `<script` hides the next `</script>`, until `-->`. Follows those states, so a
+ * `</script>` that a browser treats as text never ends the element here either.
+ */
+function scriptTextEnd(html: string, from: number): number | undefined {
+  let state: 'data' | 'escaped' | 'double' = 'data';
+  let dashes = 0;
+  for (let at = from; at < html.length; at += 1) {
+    const char = html[at];
+    if (state === 'data') {
+      if (html.startsWith('<!--', at)) { state = 'escaped'; dashes = 2; at += 3; continue; }
+      if (char === '<' && html[at + 1] === '/' && startsTag(html, at + 2, 'script')) return at;
+      continue;
+    }
+    if (char === '-') { dashes += 1; continue; }
+    if (char === '>' && dashes >= 2) { state = 'data'; dashes = 0; continue; }
+    dashes = 0;
+    if (char !== '<') continue;
+    if (state === 'escaped') {
+      if (html[at + 1] === '/' && startsTag(html, at + 2, 'script')) return at;
+      if (startsTag(html, at + 1, 'script')) { state = 'double'; at += 'script'.length + 1; }
+    } else if (html[at + 1] === '/' && startsTag(html, at + 2, 'script')) {
+      state = 'escaped';
+      at += 'script'.length + 2;
+    }
+  }
+  return undefined;
+}
+
+/** Where a raw-text element's text ends: the offset of its end tag, or `undefined` when it never closes. */
+function rawTextEnd(html: string, name: string, from: number): number | undefined {
+  if (name === 'script') return scriptTextEnd(html, from);
+  if (name === 'plaintext') return undefined;
+  const end = new RegExp(`</${name}(?=[\\s/>])`, 'gi');
+  end.lastIndex = from;
+  return end.exec(html)?.index;
+}
+
 /**
  * Tags outside comments and raw-text elements, with their attributes. Quoted attribute values may
  * hold `>`; names and raw-text ends match ASCII case-insensitively, so offsets always index `html`.
@@ -212,11 +259,9 @@ function scanTags(html: string): Tag[] {
     if (name === 'template' && !close) templates += 1;
     tags.push(tag);
     if (!close && RAW_TEXT.has(name)) {
-      const end = new RegExp(`</${name}(?=[\\s/>])`, 'gi');
-      end.lastIndex = tag.end;
-      const closing = end.exec(html);
-      if (!closing) break;
-      pattern.lastIndex = closing.index;
+      const closing = rawTextEnd(html, name, tag.end);
+      if (closing === undefined) break;
+      pattern.lastIndex = closing;
     }
   }
   return tags;

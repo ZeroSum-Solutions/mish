@@ -78,10 +78,24 @@ const MEDIA_TYPES: Record<string, string> = {
 };
 const isObject = (value: unknown): value is JsonObject => typeof value === 'object' && value !== null && !Array.isArray(value);
 const sha256 = (bytes: Uint8Array | string): string => createHash('sha256').update(bytes).digest('hex');
+const deepFreeze = <T>(value: T): T => {
+  if (typeof value === 'object' && value !== null) for (const child of Object.values(value)) deepFreeze(child);
+  return Object.freeze(value);
+};
 
-/** Whether the compiler copy can render from its supplied resources alone (it ships `resources.ts`). */
+/** A plain object of strings: the only resource table a compiler scope accepts. */
+function isResourceTable(value: unknown): boolean {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
+  const prototype = Object.getPrototypeOf(value);
+  return (prototype === Object.prototype || prototype === null) && Object.values(value).every((text) => typeof text === 'string');
+}
+
+/**
+ * Whether the compiler copy can render from its supplied resources alone: it ships `resources.ts`
+ * and carries a resource table. A copy without a table would read its own files.
+ */
 export function isSealed(compiler: FamilyCompiler): boolean {
-  return typeof compiler.modules.withCompilerResources === 'function';
+  return typeof compiler.modules.withCompilerResources === 'function' && isResourceTable(compiler.resources);
 }
 
 /** Runs `fn` inside the compiler's resource scope, or directly for a copy that predates it. */
@@ -142,7 +156,8 @@ function mediaTypeOf(asset: ApprovedAsset): string {
  */
 export async function compile(input: CompileInput): Promise<CompileResult> {
   const { compiler, spec } = input;
-  if (!isSealed(compiler)) throw new PublisherError('unsealed-compiler', `${compiler.family}: this compiler copy has no resources.ts, so it would read its own files; sync it from plugins/_official/shared/agency-compiler`);
+  if (!isObject(compiler as unknown) || !isObject(compiler.modules as unknown)) throw new PublisherError('unsealed-compiler', 'compiler must be a FamilyCompiler');
+  if (!isSealed(compiler)) throw new PublisherError('unsealed-compiler', `${compiler.family}: this compiler copy has no resources.ts or no resource table, so it would read its own files; sync it from plugins/_official/shared/agency-compiler`);
   if (!isObject(spec as unknown) || !isObject(spec.recipe)) throw new PublisherError('invalid-spec', 'spec.recipe must be a recipe object');
   if (spec.bookingEmbeds !== undefined && !Array.isArray(spec.bookingEmbeds)) throw new PublisherError('invalid-spec', 'spec.bookingEmbeds must be an array');
   const entry = input.entry ?? 'index.html';
@@ -163,8 +178,16 @@ export async function compile(input: CompileInput): Promise<CompileResult> {
     if (!resolve) throw new PublisherError('missing-asset-resolver', `${compiler.family}: the page uses ${rendered.approvedAssets.length} asset(s) but no assets.resolve was given`);
     const verify = compiler.modules.verifyApprovedAssetBytes;
     if (!verify) throw new PublisherError('unsealed-compiler', `${compiler.family}: this compiler copy cannot verify asset bytes (no verifyApprovedAssetBytes)`);
-    for (const asset of rendered.approvedAssets) {
-      const returned = await resolve(asset);
+    // The render's descriptors are snapshotted before any resolver runs: the resolver gets its own
+    // copy, so nothing it does can change what is verified, where a file goes or its media type.
+    const assets = rendered.approvedAssets.map((asset) => deepFreeze(structuredClone(asset)));
+    const paths = new Set([entry]);
+    for (const asset of assets) {
+      if (paths.has(asset.destination)) throw new PublisherError('asset-rejected', `asset ${asset.id}: ${asset.destination} is already a published file`);
+      paths.add(asset.destination);
+    }
+    for (const asset of assets) {
+      const returned = await resolve(structuredClone(asset));
       if (!(returned instanceof Uint8Array)) throw new PublisherError('asset-rejected', `asset ${asset.id}: the resolver must return a Uint8Array`);
       const bytes = new Uint8Array(returned);
       try { verify(asset, bytes); } catch (error) {

@@ -97,11 +97,14 @@ type CompileResult = {
   nor the tokens are changed.
 - **Assets.** `assets.manifest` is the approved roster to render against (default: the
   compiler's own). The resolver is called once per asset the page uses, one at a time, in roster
-  order. The publisher copies the returned bytes, then checks size, file signature, byte count and
-  SHA-256 against the roster with the compiler's own verifier. A page that uses no asset never
+  order. The resolver gets its own copy of each descriptor, so it cannot change what is verified or
+  where a file goes. The publisher copies the returned bytes, then checks size, file signature, byte
+  count and SHA-256 against the roster with the compiler's own verifier. Two files at one path are
+  refused before any resolver runs. A page that uses no asset never
   calls it. None of the public family packages ships image assets today.
 - **Errors** are `PublisherError` with a `code`: `unsealed-compiler` (a compiler copy without
-  `resources.ts`, which would read its own files, or one that cannot verify asset bytes),
+  `resources.ts` or without a resource table of strings, which would read its own files, or one
+  that cannot verify asset bytes),
   `invalid-spec`, `invalid-brand-tokens`, `missing-asset-resolver`, `asset-rejected`. Booking slot
   errors are `BookingEmbedError` (`code: 'invalid-booking-embed'`). Validation errors from the
   family (a bad recipe, an unknown placement) pass through unchanged.
@@ -113,7 +116,7 @@ type CompileResult = {
 | The publisher changes no output: every public family's reference page, three effect plans and the booking cases match recorded digests. The plain pages were recorded on `main` before this package existed. | `tests/golden.test.ts` (`UPDATE_GOLDEN=1` rewrites `tests/golden/pages.json` after an intended change) |
 | Equal inputs give equal bytes: twice, from equal copies, from a bundle or from disk, with any resolver timing. Inputs are not mutated, an edit to a returned effect declaration cannot reach a later compile, and an edited (unfrozen) resource table is never served from a stale cache. | `tests/determinism.test.ts` |
 | No ambient input: with every reading `fs` / `fs/promises` call made to throw, and `process.env` (reads, `in`, key listing, descriptors), the clock (`Date()`, `new Date()`, `Date.now`, `performance.now`, `process.hrtime` and `.bigint`) and randomness (`Math.random`, the `node:crypto` random functions, `crypto.randomUUID`, `crypto.getRandomValues`) watched, every family compiles with zero accesses. A sanity test proves each watch fires. A child process under `node --permission` that may read only `dist/` compiles to the golden bytes. An edited resource table changes the page; a missing resource fails rather than falling back to disk. | `tests/sealed.test.ts` |
-| Assets come only from the resolver and are verified. | `tests/assets.test.ts` |
+| Assets come only from the resolver and are verified; a resolver cannot change a descriptor, and two files never share a path. | `tests/assets.test.ts` |
 | The packed tarball works in another project. | `tests/consumer.test.ts` |
 
 The output carries no timestamps or random ids, so there is no clock or seed to inject.
@@ -133,7 +136,7 @@ type BookingEmbed = {
   key: string;                         // the widget key: "zsb1_" and 64 of A–Z a–z 0–9 _ -
   pageUrl: string;                     // the key's hosted booking page, <api>/book/<key> (script mode: exactly <scriptUrl origin>/book/<key>)
   mode: 'iframe' | 'script';
-  scriptUrl?: string;                  // <api>/embed.js; required in script mode (same origin as pageUrl), refused in iframe mode
+  scriptUrl?: string;                  // exactly <api>/embed.js, no query; required in script mode (same origin as pageUrl), refused in iframe mode
   height?: number;                     // 320–2000 CSS px, default 720
   linkLabel?: string;                  // ≤ 80 characters, default "Open the booking page"
 };
@@ -154,13 +157,15 @@ type BookingEmbed = {
   anchor keep their list order. The page is scanned as HTML: attributes are parsed (quoted `>`,
   any case, character references), and markup inside comments and the raw-text elements
   (`<script>`, `<style>`, `<textarea>`, `<title>`, `<iframe>`, `<noscript>`, `<noembed>`,
-  `<noframes>`, `<xmp>`) is never an anchor. Nor is anything inside a `<template>`, which is not
-  in the document.
+  `<noframes>`, `<xmp>`, `<plaintext>`) is never an anchor. Script text follows HTML's escape
+  states, so a `</script>` hidden by `<!--<script>` does not end it. Nor is anything inside a
+  `<template>`, which is not in the document.
 - **Content-Security-Policy.** Family pages ship a strict CSP `<meta>` (`default-src 'none'`).
   The slot widens it as little as works: `frame-src` gets the booking origin(s), and in script mode
-  `script-src` gets exactly the widget script URL (any effect script hashes stay). A server that
+  `script-src` gets exactly the widget script URL (any effect script hashes stay). That URL must be
+  `<api>/embed.js`: a CSP source ending in `/`, or a bare origin, would allow every script under it. A server that
   sends its own CSP header for the site must allow the same sources.
-- **Refused**: invalid fields; a key not in the widget's format (the widget ignores any other, so
+- **Refused**: invalid fields; a script URL other than `<api>/embed.js`; a key not in the widget's format (the widget ignores any other, so
   it would never mount); a `pageUrl` that is not that key's booking page (so the widget and the
   fallback link always book the same calendar); URLs that are not `https` (plain `http` only for `localhost` and
   `127.0.0.1`), whose host is not a plain DNS name or IPv4 address (so no `*`, `;`, `_` or IPv6
@@ -197,7 +202,8 @@ package and assets directories, and the copy's verified `readApprovedAsset`),
 Every Agency Site compiler copy is synced from `plugins/_official/shared/agency-compiler/scripts/`.
 Its `resources.ts` routes each static read (`catalog/hyperui/<family>.css`,
 `catalog/CATALOG.json`, `families/<family>/catalog.json`, `catalog/components/<id>/…`) through
-`withCompilerResources(table, fn)`. Inside that scope the table is the only source; a table that
+`withCompilerResources(table, fn)`. Inside that scope the table is the only source, and a value
+that is not a plain object of strings is refused rather than read as "no table"; a table that
 is not frozen is copied and frozen for the scope, so parsed caches never outlive an edit. Outside
 it, the copy reads its own files as before (a missing required file raises the native `ENOENT`, and
 only successful reads are kept), so the CLI scripts and the daemon keep working unchanged.

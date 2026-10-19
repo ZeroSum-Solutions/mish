@@ -131,6 +131,15 @@ test('sealed: a resource missing from the table fails instead of falling back to
   await sealedRun(() => assert.rejects(compile({ compiler: { ...compiler, resources: rest }, spec: { recipe: compiler.reference } }), /catalog\/hyperui\/practice\.css/));
 });
 
+test('sealed: a compiler without a valid resource table is refused, never read from disk', async () => {
+  const { compiler } = await loadExample('practice');
+  for (const resources of [undefined, null, [], { 'catalog/hyperui/practice.css': 1 }]) {
+    const broken = { ...compiler, resources } as unknown as FamilyCompiler;
+    await sealedRun(() => assert.rejects(compile({ compiler: broken, spec: { recipe: compiler.reference } }), (error: unknown) => error instanceof PublisherError && error.code === 'unsealed-compiler'));
+    await sealedRun(async () => assert.throws(() => renderPage(broken, compiler.reference, 'index.html'), TypeError));
+  }
+});
+
 test('sealed: compile refuses a compiler copy without resources.ts; renderPage still serves it', async () => {
   const loaded = await loadFamilyCompiler(path.join(PACKAGE_ROOT, '../agency-fast-lane/tests/fixtures/ownedinstitution'), 'ownedinstitution');
   assert.deepEqual(loaded.compiler.resources, {});

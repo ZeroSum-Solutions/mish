@@ -96,8 +96,8 @@
     {
       "path": "plugins/_official/shared/agency-compiler/scripts/resources.ts",
       "file": "compiler/scripts/resources.ts",
-      "bytes": 3596,
-      "sha256": "8e0f6788a6cf036a738d74290ff59be3dcaca81d57c844302c67a38b87f7bc33"
+      "bytes": 4331,
+      "sha256": "c139d406189c3d02fd25a63d045607e65b4d99afe9f1bf41b018f3bfb43dcb40"
     }
   ]
 }

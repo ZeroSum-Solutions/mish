@@ -74,3 +74,14 @@ test('resources: keys are relative resource paths', async (t) => {
     assert.throws(() => resources.readCompilerResource(key), /is not a relative resource path/, key);
   }
 });
+
+test('resources: a table that is not a plain object of strings is refused, never read as the disk', async (t) => {
+  const { dir, resources } = await freshCopy(t);
+  writeFileSync(path.join(dir, 'on-disk.css'), 'disk{}');
+  for (const table of [undefined, null, 'catalog/a.css', [], new Map(), { 'catalog/a.css': 1 }]) {
+    let ran = false;
+    assert.throws(() => resources.withCompilerResources(table as never, () => { ran = true; return resources.readCompilerResource('on-disk.css'); }), TypeError);
+    assert.equal(ran, false, `${String(table)}: the render never runs`);
+  }
+  assert.equal(resources.withCompilerResources(Object.create(null), () => resources.findCompilerResource('on-disk.css')), undefined, 'a null-prototype table is a table');
+});

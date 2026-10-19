@@ -207,11 +207,30 @@ test('booking embed: allowCspSource adds, replaces a lone none, and never duplic
   assert.equal(allowCspSource('FRAME-SRC https://b.test', 'frame-src', 'https://a.test'), 'frame-src https://b.test https://a.test', 'names match case-insensitively');
 });
 
-test('booking embed: a script path with CSP separators is escaped in the policy', () => {
-  const odd = { ...script, scriptUrl: `${API}/w;v=1,2/e'mbed.js?x=1&y=2` };
-  const html = finishBookingEmbeds(spliceBookingEmbeds(page('<main></main>'), [odd]), [odd]);
-  assert.ok(cspOf(html).includes(`script-src ${API}/w%3Bv%3D1%2C2/e%27mbed.js;`));
-  assert.ok(html.includes(`<script src="${API}/w;v=1,2/e&#39;mbed.js?x=1&amp;y=2" async`));
+test('booking embed: the script URL must be exactly the widget script, never a directory or another path', () => {
+  for (const scriptUrl of [`${API}/`, API, `${API}/static/`, `${API}/w;v=1/embed.js`, `${API}/embed.js/`, `${API}/embed.js?v=1`, `${API}/other.js`]) {
+    rejects({ ...script, scriptUrl }, /scriptUrl must be the widget script/);
+  }
+  const html = finishBookingEmbeds(spliceBookingEmbeds(page('<main></main>'), [script]), [script]);
+  assert.ok(cspOf(html).includes(`script-src ${API}/embed.js;`));
+});
+
+test('booking embed: script text follows HTML escape states, so a hidden </script> never ends it', () => {
+  const after = (body: string, anchor: string) => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: anchor } }]);
+  // <!-- then <script hides the next </script>: the div is script text up to the real end tag.
+  const hidden = '<script><!--<script></script><div id="x"></div>--></script><div id="y"></div>';
+  assert.throws(() => after(hidden, 'x'), /found 0/);
+  assert.match(after(hidden, 'y'), /--><\/script><div id="y"><\/div><section id="book-online"/);
+  // Escaped but not double escaped: </script> still ends the element, so the div is real.
+  assert.match(after('<script><!-- </script><div id="x"></div>', 'x'), /<div id="x"><\/div><section id="book-online"/);
+  // --> leaves the escape, and <!--> enters and leaves it at once.
+  assert.match(after('<script><!--> <script></script><div id="x"></div>', 'x'), /<div id="x"><\/div><section id="book-online"/);
+  assert.match(after('<script><!--<script>--></script><div id="x"></div>', 'x'), /<div id="x"><\/div><section id="book-online"/);
+  // Double escaped, </script> returns to escaped, where the next </script> ends the element.
+  assert.match(after('<script><!--<script></script></SCRIPT ><div id="x"></div>', 'x'), /<div id="x"><\/div><section id="book-online"/);
+  // A script that never closes, or <plaintext>, hides the rest of the page.
+  assert.throws(() => after('<script><!--<script></script><div id="x"></div>', 'x'), /found 0/);
+  assert.throws(() => after('<plaintext><div id="x"></div>', 'x'), /found 0/);
 });
 
 test('booking embed: compile places it on a family page, after effects, with effects still applied', async () => {

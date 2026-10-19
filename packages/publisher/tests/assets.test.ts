@@ -59,3 +59,28 @@ test('assets: the entry file name is configurable', async () => {
   assert.equal(result.manifest.entry, 'site-r1.html');
   assert.deepEqual(result.files.map((file) => [file.path, file.mediaType]), [['site-r1.html', 'text/html; charset=utf-8']]);
 });
+
+test('assets: a resolver cannot change what is verified, where a file goes or its media type', async () => {
+  const forged = png(99);
+  const resolve = (asset: Record<string, unknown>) => {
+    delete asset.sha256;
+    delete asset.bytes;
+    asset.destination = 'index.html';
+    asset.mediaType = 'text/html';
+    return forged;
+  };
+  await assert.rejects(compile({ compiler: assetCompiler(), spec: { recipe: {} }, assets: { resolve } }), (error: unknown) => isCode('asset-rejected')(error) && /SHA-256 mismatch|byte size mismatch/.test((error as Error).message));
+  const honest = (asset: Record<string, unknown>) => { const bytes = bytesById.get(asset.id as string)!; asset.destination = 'index.html'; return bytes; };
+  const result = await compile({ compiler: assetCompiler(), spec: { recipe: {} }, assets: { resolve: honest } });
+  assert.deepEqual(result.files.map((file) => file.path), ['assets/a-hero.png', 'assets/b-logo.png', 'assets/c-gallery.png', 'index.html']);
+  assert.ok(result.files.every((file) => file.path === 'index.html' || file.mediaType === 'image/png'));
+});
+
+test('assets: two files at one path are refused before any resolver runs', async () => {
+  const [hero, logo] = ASSETS;
+  for (const assets of [[hero!, { ...logo!, destination: hero!.destination }], [{ ...hero!, destination: 'index.html' }]]) {
+    let calls = 0;
+    await assert.rejects(compile({ compiler: assetCompiler(assets), spec: { recipe: {} }, assets: { resolve: (asset) => { calls += 1; return bytesById.get(asset.id)!; } } }), isCode('asset-rejected'));
+    assert.equal(calls, 0);
+  }
+});

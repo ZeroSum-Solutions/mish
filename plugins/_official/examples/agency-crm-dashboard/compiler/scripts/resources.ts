@@ -41,8 +41,19 @@ function fromDisk(relative: string, required: boolean): string | undefined {
   return text;
 }
 
+/**
+ * A supplied table must be a plain object of strings. Anything else is refused rather than read as
+ * "no table", which would quietly send every read to the disk.
+ */
+function checkTable(resources: unknown): asserts resources is CompilerResources {
+  const prototype = typeof resources === 'object' && resources !== null ? Object.getPrototypeOf(resources) : undefined;
+  if ((prototype !== Object.prototype && prototype !== null) || Array.isArray(resources)) throw new TypeError('compiler resources must be a plain object of strings');
+  for (const value of Object.values(resources as object)) if (typeof value !== 'string') throw new TypeError('compiler resources must be a plain object of strings');
+}
+
 /** Runs `fn` with every resource read served from `resources`; restores the previous source after. */
 export function withCompilerResources<T>(resources: CompilerResources, fn: () => T): T {
+  checkTable(resources);
   const previous = active;
   active = Object.isFrozen(resources) ? resources : Object.freeze({ ...resources });
   try {
