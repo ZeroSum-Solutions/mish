@@ -27,8 +27,7 @@
  * crm-dashboard pattern) so a canvas edit to either is reconcilable.
  */
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { readCompilerResource } from '../../resources.ts';
 import type { AssetRequirement } from '../../assets.ts';
 import { catalogBlock } from '../../catalog-block.ts';
 import { presentSections } from '../../sections.ts';
@@ -42,16 +41,14 @@ import {
   PROOF_SECTION_ID,
 } from './slots.ts';
 
-const HERE = import.meta.dirname;
 // The package-local copy under compiler/scripts/catalog/ (written by
 // packages/genui-catalog/scripts/sync-catalog-assets.ts), so the read resolves inside a packed plugin.
-const HYPERUI_CSS = path.join(HERE, '../../catalog/hyperui/marketing-site.css');
-let hyperuiCss: string | undefined;
+// The path is relative to compiler/scripts/ and read through resources.ts (disk, or a supplied table).
+const HYPERUI_CSS = 'catalog/hyperui/marketing-site.css';
 /** Read once; the compiled Tailwind build for this page kind's six vendored blocks
  * (`plugins/_official/shared/ui-kits/hyperui/css/marketing-site.css`, copied into this package), inlined once per page. */
 function inlinedStyles(): string {
-  hyperuiCss ??= readFileSync(HYPERUI_CSS, 'utf8');
-  return hyperuiCss;
+  return readCompilerResource(HYPERUI_CSS);
 }
 
 export function validateMarketingSiteRecipe(input: unknown): MarketingSiteRecipe {

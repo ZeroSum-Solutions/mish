@@ -26,8 +26,7 @@
  * is reconcilable — `<title>`/`<meta>` content is not addressable by `findCrmDashboardTextSlot`.
  */
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { readCompilerResource } from '../../resources.ts';
 import type { AssetRequirement } from '../../assets.ts';
 import { catalogAsset, catalogBlock } from '../../catalog-block.ts';
 import { presentSections } from '../../sections.ts';
@@ -41,16 +40,14 @@ import {
   PIPELINE_SECTION_ID, SAMPLE_DATA_CAPTION, type CrmDashboardSectionId,
 } from './slots.ts';
 
-const HERE = import.meta.dirname;
 // The package-local copy under compiler/scripts/catalog/ (written by
 // packages/genui-catalog/scripts/sync-catalog-assets.ts), so the read resolves inside a packed plugin.
-const HYPERUI_CSS = path.join(HERE, '../../catalog/hyperui/crm-dashboard.css');
-let hyperuiCss: string | undefined;
+// The path is relative to compiler/scripts/ and read through resources.ts (disk, or a supplied table).
+const HYPERUI_CSS = 'catalog/hyperui/crm-dashboard.css';
 /** Read once; the compiled Tailwind build for this page kind's six vendored blocks
  * (`plugins/_official/shared/ui-kits/hyperui/css/crm-dashboard.css`, copied into this package), inlined once per page. */
 function inlinedStyles(): string {
-  hyperuiCss ??= readFileSync(HYPERUI_CSS, 'utf8');
-  return hyperuiCss;
+  return readCompilerResource(HYPERUI_CSS);
 }
 
 export function validateCrmDashboardRecipe(input: unknown): CrmDashboardRecipe {

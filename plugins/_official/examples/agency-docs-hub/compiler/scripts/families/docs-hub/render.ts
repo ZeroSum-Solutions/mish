@@ -16,8 +16,7 @@
  * Every text slot sits in an element carrying `data-od-id`, emitted in `SECTIONS` order.
  */
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { readCompilerResource } from '../../resources.ts';
 import type { AssetRequirement } from '../../assets.ts';
 import { presentSections } from '../../sections.ts';
 import { EMAIL, parseDocsHubRecipe, type DocsHubRecipe, type DocsHubSection } from './contract.ts';
@@ -26,13 +25,11 @@ import {
   GUIDES_SECTION_ID, HEADER_SECTION_ID, HERO_SECTION_ID, QUICKSTART_SECTION_ID,
 } from './slots.ts';
 
-const HERE = import.meta.dirname;
-const HYPERUI_CSS = path.join(HERE, '../../catalog/hyperui/docs-hub.css');
-let hyperuiCss: string | undefined;
+/** Relative to `compiler/scripts/`, read through `resources.ts` (disk, or a supplied table). */
+const HYPERUI_CSS = 'catalog/hyperui/docs-hub.css';
 /** The compiled Tailwind build for this page kind's blocks, read once and inlined once per page. */
 function inlinedStyles(): string {
-  hyperuiCss ??= readFileSync(HYPERUI_CSS, 'utf8');
-  return hyperuiCss;
+  return readCompilerResource(HYPERUI_CSS);
 }
 
 export function validateDocsHubRecipe(input: unknown): DocsHubRecipe {

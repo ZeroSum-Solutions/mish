@@ -111,16 +111,17 @@ Approved media travels separately and is never bundled into the frozen skill.
 - `scripts/styles.ts`
 - `scripts/catalog-block.ts`
 - `scripts/effects.ts`
+- `scripts/resources.ts`
 - `scripts/fixtures/service.json`
 
 Not listed above (unused by `compose.ts`/`render.ts`/`family.ts`; loaded in-process instead by
 `packages/agency-fast-lane/src/section-overlay.ts` from the canonical shared-compiler path):
 `section-adapter.ts`, `direction-tokens.ts` and the three generated
 `section-adapter-{ctas-1,feature-grids-1,sections-1}.ts` files (section selection/composition —
-Sol design §2/§3) — measured (NIT 7, delta re-audit): this list already carries 30 side-file
-references against the frozen-package `MAX_SIDE_FILE_COUNT` of 32
-(`apps/daemon/src/strategies/od-next/frozen-skill-package.ts`), and listing all five would push
-that to 35, over the cap, failing every test in `apps/daemon/tests/agency-reference-skills.test.ts`
+Sol design §2/§3) — measured (NIT 7, delta re-audit): this list now carries 31 side-file
+references (`resources.ts` added for the publisher library) against the frozen-package
+`MAX_SIDE_FILE_COUNT` of 32 (`apps/daemon/src/strategies/od-next/frozen-skill-package.ts`), and
+listing all five would push that to 36, over the cap, failing every test in `apps/daemon/tests/agency-reference-skills.test.ts`
 with "references too many side files".
 - `scripts/families/emmpo/render.ts`
 - `scripts/families/emmpo/contract.ts`
