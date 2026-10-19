@@ -215,7 +215,7 @@ test('booking embed: the script URL must be exactly the widget script, never a d
   assert.ok(cspOf(html).includes(`script-src ${API}/embed.js;`));
 });
 
-test('booking embed: script text follows HTML escape states, so a hidden </script> never ends it', () => {
+test('booking embed: script text follows HTML escape states and tags end only at ASCII whitespace', () => {
   const after = (body: string, anchor: string) => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: anchor } }]);
   // <!-- then <script hides the next </script>: the div is script text up to the real end tag.
   const hidden = '<script><!--<script></script><div id="x"></div>--></script><div id="y"></div>';
@@ -228,6 +228,9 @@ test('booking embed: script text follows HTML escape states, so a hidden </scrip
   assert.match(after('<script><!--<script>--></script><div id="x"></div>', 'x'), /<div id="x"><\/div><section id="book-online"/);
   // Double escaped, </script> returns to escaped, where the next </script> ends the element.
   assert.match(after('<script><!--<script></script></SCRIPT ><div id="x"></div>', 'x'), /<div id="x"><\/div><section id="book-online"/);
+  // Only ASCII whitespace ends a tag name: </textarea\u00a0> is text, so the div inside is too.
+  assert.throws(() => after('<textarea></textarea\u00a0><div id="x"></div></textarea>', 'x'), /found 0/);
+  assert.throws(() => after('<div\u00a0id="x"></div>', 'x'), /found 0/);
   // A script that never closes, or <plaintext>, hides the rest of the page.
   assert.throws(() => after('<script><!--<script></script><div id="x"></div>', 'x'), /found 0/);
   assert.throws(() => after('<plaintext><div id="x"></div>', 'x'), /found 0/);

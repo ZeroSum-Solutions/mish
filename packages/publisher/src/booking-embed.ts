@@ -180,7 +180,7 @@ function decodeAttribute(value: string): string {
 /** A tag's attributes, names ASCII-lowercased; the first of a repeated name wins, as in HTML. */
 function parseAttributes(source: string, offset: number): Map<string, Attribute> {
   const attributes = new Map<string, Attribute>();
-  const pattern = /([^\s"'>\/=][^\s"'>\/=]*)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+  const pattern = /([^\t\n\f\r "'>\/=][^\t\n\f\r "'>\/=]*)(?:[\t\n\f\r ]*=[\t\n\f\r ]*(?:"([^"]*)"|'([^']*)'|([^\t\n\f\r "'=<>`]+)))?/g;
   let match: RegExpExecArray | null;
   while ((match = pattern.exec(source)) !== null) {
     const name = asciiLower(match[1]!);
@@ -231,18 +231,19 @@ function scriptTextEnd(html: string, from: number): number | undefined {
 function rawTextEnd(html: string, name: string, from: number): number | undefined {
   if (name === 'script') return scriptTextEnd(html, from);
   if (name === 'plaintext') return undefined;
-  const end = new RegExp(`</${name}(?=[\\s/>])`, 'gi');
+  const end = new RegExp(`</${name}(?=[\\t\\n\\f\\r />])`, 'gi');
   end.lastIndex = from;
   return end.exec(html)?.index;
 }
 
 /**
- * Tags outside comments and raw-text elements, with their attributes. Quoted attribute values may
+ * Tags outside comments and raw-text elements, with their attributes. Whitespace is HTML's ASCII
+ * whitespace only: a no-break space never ends a tag name or separates attributes. Quoted attribute values may
  * hold `>`; names and raw-text ends match ASCII case-insensitively, so offsets always index `html`.
  */
 function scanTags(html: string): Tag[] {
   const tags: Tag[] = [];
-  const pattern = /<!--(?:[\s\S]*?-->|[\s\S]*$)|<(\/?)([a-zA-Z][a-zA-Z0-9-]*)(?=[\s/>])((?:"[^"]*"|'[^']*'|[^'">])*)>/g;
+  const pattern = /<!--(?:[\s\S]*?-->|[\s\S]*$)|<(\/?)([a-zA-Z][a-zA-Z0-9-]*)(?=[\t\n\f\r />])((?:"[^"]*"|'[^']*'|[^'">])*)>/g;
   let match: RegExpExecArray | null;
   let templates = 0;
   while ((match = pattern.exec(html)) !== null) {
@@ -254,7 +255,7 @@ function scanTags(html: string): Tag[] {
     if (name === 'template' && close) templates = Math.max(0, templates - 1);
     const tag: Tag = {
       name, close, start: match.index, end: match.index + match[0].length,
-      selfClosing: /\/\s*$/.test(rest), inert: templates > 0, attributes: close ? new Map() : parseAttributes(rest, attributesAt),
+      selfClosing: /\/[\t\n\f\r ]*$/.test(rest), inert: templates > 0, attributes: close ? new Map() : parseAttributes(rest, attributesAt),
     };
     if (name === 'template' && !close) templates += 1;
     tags.push(tag);
