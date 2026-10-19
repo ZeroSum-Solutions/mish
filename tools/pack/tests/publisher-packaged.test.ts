@@ -46,7 +46,8 @@ describe("packaged publisher", () => {
   });
 
   // The tarball ships all of `dist/` (`files`, checked above). The publisher's own consumer test
-  // packs it, installs it into another project and reads LICENSE and NOTICE from the install.
+  // packs it, installs it into another project, checks every export target and the notices in the
+  // install, and imports each entry there.
   it.skipIf(!existsSync(join(packageDir, "dist", "index.js")))("builds the runtime entries and the notices into dist", () => {
     for (const file of ["dist/index.js", "dist/index.d.ts", "dist/node.js", "dist/node.d.ts", "dist/LICENSE", "dist/NOTICE"]) {
       expect(existsSync(join(packageDir, file)), file).toBe(true);

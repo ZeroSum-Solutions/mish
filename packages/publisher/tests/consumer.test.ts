@@ -5,7 +5,7 @@
 
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { test } from 'node:test';
@@ -29,18 +29,24 @@ test('consumer: the packed package installs offline and compiles in another proj
     const installed = JSON.parse(readFileSync(path.join(project, 'node_modules/@mish/publisher/package.json'), 'utf8')) as { files: string[] };
     assert.deepEqual(installed.files, ['dist', 'README.md']);
     const shipped = path.join(project, 'node_modules/@mish/publisher/dist');
+    // Every export target ships, declarations included (`files` alone would not catch an ignore rule dropping one).
+    for (const entry of ['index.js', 'index.d.ts', 'node.js', 'node.d.ts', 'families/index.js', 'families/index.d.ts', 'families/practice.js', 'families/practice.d.ts']) {
+      assert.ok(existsSync(path.join(shipped, entry)), `the package ships dist/${entry}`);
+    }
     assert.match(readFileSync(path.join(shipped, 'LICENSE'), 'utf8'), /Apache License/);
     assert.match(readFileSync(path.join(shipped, 'NOTICE'), 'utf8'), /HyperUI[^]*Copyright \(c\) Mark Mead[^]*Permission is hereby granted/);
     writeFileSync(path.join(project, 'consume.mjs'), `
 import { compile } from '@mish/publisher';
 import { BUNDLED_FAMILIES, loadBundledFamily } from '@mish/publisher/families';
 import practice from '@mish/publisher/families/practice';
+import { collectCompilerResources, directoryAssetResolver, loadFamilyCompiler } from '@mish/publisher/node';
 const result = await compile({ compiler: practice, spec: { recipe: practice.reference } });
 const restaurant = await loadBundledFamily('restaurant');
 const second = await compile({ compiler: restaurant, spec: { recipe: restaurant.reference } });
-console.log(JSON.stringify({ families: BUNDLED_FAMILIES.length, practice: result.digest, restaurant: second.digest }));
+const node = [collectCompilerResources, directoryAssetResolver, loadFamilyCompiler].every((fn) => typeof fn === 'function');
+console.log(JSON.stringify({ families: BUNDLED_FAMILIES.length, practice: result.digest, restaurant: second.digest, node }));
 `);
     const out = JSON.parse(execFileSync(process.execPath, ['consume.mjs'], { cwd: project, encoding: 'utf8' }).trim()) as Record<string, unknown>;
-    assert.deepEqual(out, { families: 12, practice: goldens.practice!.digest, restaurant: goldens.restaurant!.digest });
+    assert.deepEqual(out, { families: 12, practice: goldens.practice!.digest, restaurant: goldens.restaurant!.digest, node: true });
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });

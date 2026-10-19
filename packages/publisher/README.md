@@ -159,8 +159,13 @@ type BookingEmbed = {
   (`<script>`, `<style>`, `<textarea>`, `<title>`, `<iframe>`, `<noscript>`, `<noembed>`,
   `<noframes>`, `<xmp>`, `<plaintext>`) is never an anchor. Script text follows HTML's escape
   states, so a `</script>` hidden by `<!--<script>` does not end it. Nor is anything inside a
-  `<template>`, which is not in the document. Tags, comments (`<!-->`, `--!>`), bogus comments
-  (`<!x>`, `<?x>`, `</ x>`) and unclosed quotes follow the HTML tokenizer, in one linear pass.
+  `<template>`, which is not in the document, or inside a `<select>`. Tags, comments (`<!-->`,
+  `--!>`), bogus comments (`<!x>`, `<?x>`, `</ x>`), unclosed quotes and character references
+  (`&#120` without `;` too) follow the HTML tokenizer, in one linear pass. Inline `<svg>` and
+  `<math>` are foreign content: nothing inside one is an anchor (the `<svg>` itself can be), and a
+  page whose inline SVG or MathML holds a CDATA section, an HTML tag that ends it early (`<p>`,
+  `<div>`, …), markup inside `<title>`, `<desc>`, `<foreignObject>` or a MathML text element, or a
+  stray end tag is refused rather than guessed at. Plain icons (`<svg><path/></svg>`) are fine.
 - **Content-Security-Policy.** Family pages ship a strict CSP `<meta>` (`default-src 'none'`).
   The slot widens it as little as works: `frame-src` gets the booking origin(s), and in script mode
   `script-src` gets exactly the widget script URL (any effect script hashes stay). That URL must be

@@ -127,8 +127,11 @@ test('booking embed: the scanner reads attributes, not text that looks like one'
   assert.match(after('<DIV ID=x></DIV><p id="z"></p>'), /<DIV ID=x><\/DIV><section id="book-online"/);
   assert.match(after('<div id="x" id="y"></div><p id="z"></p>'), /<div id="x" id="y"><\/div><section id="book-online"/);
   assert.throws(() => after('<div id="y" id="x"></div>'), /found 0/);
-  // Character references in a value are decoded, as a browser does.
+  // Character references in a value are decoded, as a browser does, with or without `;`.
   assert.match(after('<div id="&#120;"></div><p id="z"></p>'), /<div id="&#120;"><\/div><section id="book-online"/);
+  assert.match(after('<div id="&#120"></div><p id="z"></p>'), /<div id="&#120"><\/div><section id="book-online"/);
+  assert.match(after('<div id="&#x78"></div><p id="z"></p>'), /<div id="&#x78"><\/div><section id="book-online"/);
+  assert.match(after('<div id="&#X0078;"></div><p id="z"></p>'), /<div id="&#X0078;"><\/div><section id="book-online"/);
   // Ids taken by the page are found the same way.
   assert.throws(() => spliceBookingEmbeds(page('<main><P ID=book-online></P></main>'), [iframe]), /"book-online" is already used/);
   assert.ok(spliceBookingEmbeds(page(`<main><p data-x='id="book-online"'></p></main>`), [iframe]).includes('<section id="book-online"'));
@@ -236,6 +239,34 @@ test('booking embed: script text follows HTML escape states and tags end only at
   assert.throws(() => after('<plaintext><div id="x"></div>', 'x'), /found 0/);
 });
 
+test('booking embed: inline <svg> and <math> are foreign content, never a place for the slot', () => {
+  const after = (body: string) => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: 'x' } }]);
+  // An icon: elements inside it are SVG elements, so none is an anchor; the <svg> itself is.
+  assert.throws(() => after('<svg><g id="x"><path d="M0 0"/></g></svg>'), /found 0/);
+  assert.throws(() => after('<math><mrow id="x"></mrow></math>'), /found 0/);
+  assert.match(after('<svg id="x" viewBox="0 0 24 24"><svg><path/></svg><path d="M0 0"/></svg><p></p>'), /<path d="M0 0"\/><\/svg><section id="book-online"[^]*<\/section><p>/);
+  assert.match(after('<div id="x"><svg><g><path/></g></svg></div><p></p>'), /<\/svg><\/div><section id="book-online"[^]*<\/section><p>/);
+  // Text-only <title> and <style>, and an SVG <template>, which is not HTML's inert template.
+  assert.match(after('<svg><title>Close</title><style>.a{fill:red}</style><path/></svg><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
+  assert.match(after('<svg><template></template></svg><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
+  // Default placement ignores a <main> end tag that only an SVG element could have.
+  assert.match(spliceBookingEmbeds(page('<main><svg><g></g></svg></main>'), [iframe]), /<\/svg><section id="book-online"[^]*<\/section><\/main>/);
+  // A <select> drops (or, in newer browsers, keeps in its picker) a section, so nothing in one is an anchor.
+  assert.throws(() => after('<select><b id="x"></b></select>'), /found 0/);
+  assert.match(after('<select><option>a</option></select><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
+  assert.match(after('<select><option>a<input name="q"><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/, 'an <input> ends the <select>');
+  // What the scanner cannot follow exactly is refused, never guessed: CDATA, HTML that breaks out,
+  // markup in a text element, a stray end tag.
+  assert.throws(() => after('<svg><![CDATA[> <div id="x"></div>]]></svg>'), /contains a CDATA section/);
+  assert.throws(() => after('<svg><title><div id="x"></div></title></svg>'), /contains markup inside <title>/);
+  assert.throws(() => after('<svg><foreignObject><textarea></svg><div id="x"></textarea></foreignObject></svg>'), /contains markup inside <foreignobject>/);
+  assert.throws(() => after('<svg><p><div id="x"></div></svg>'), /contains an HTML <p>/);
+  assert.throws(() => after('<svg><font color="red"></font></svg>'), /contains an HTML <font>/);
+  assert.throws(() => after('<div id="x"><svg></div><p></p>'), /contains a stray <\/div>/);
+  // An unclosed <svg> runs on, so the page's own </body> is refused too.
+  assert.throws(() => after('<svg><g id="x"></g>'), /contains a stray <\/body>/);
+});
+
 test('booking embed: the scanner follows HTML tag and comment rules', () => {
   const after = (body: string) => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: 'x' } }]);
   // A quote only opens a value after `=`: `"x` and `<div` are attribute names of <a>, so the id is the <a>'s.
@@ -255,7 +286,7 @@ test('booking embed: the scanner follows HTML tag and comment rules', () => {
 
 test('booking embed: scanning is linear on inputs that are quadratic for a backtracking pattern', { timeout: 10_000 }, () => {
   const n = 200_000;
-  for (const body of ['<!--a'.repeat(n / 5), '<a'.repeat(n / 2), `<a title="${'x'.repeat(n)}`, '<div id="x">'.repeat(n / 12)]) {
+  for (const body of ['<!--a'.repeat(n / 5), '<a'.repeat(n / 2), `<a title="${'x'.repeat(n)}`, '<div id="x">'.repeat(n / 12), `<svg>${'<g>'.repeat(n / 3)}${'</svg>'.repeat(n / 6)}`, `<svg>${'<title>'.repeat(n / 7)}`, `<div id="${'&#120'.repeat(n / 5)}">`, '<select><b>'.repeat(n / 11)]) {
     assert.throws(() => spliceBookingEmbeds(page(body), [{ ...iframe, placement: { after: 'missing' } }]), BookingEmbedError);
   }
   assert.equal(allowCspSource(`frame-src 'none'${'\t'.repeat(n)}x`, 'script-src', 'https://a.test/embed.js'), `frame-src 'none'${'\t'.repeat(n)}x; script-src https://a.test/embed.js`);
@@ -320,6 +351,7 @@ test('booking embed: content inside a <template> is never a placement or the pag
   assert.throws(() => after('<main><template><section id="x"></section></template></main>'), /found 0/);
   assert.match(after('<main><template><section id="x"></section></template><section id="x"></section></main>'), /<\/template><section id="x"><\/section><section id="book-online"/);
   assert.match(after('<main><div id="x"><template><div>t</div></template></div><p></p></main>'), /<\/template><\/div><section id="book-online"[^]*<\/section><p>/, 'same-name tags inside a template still nest');
+  assert.match(after('<main><div id="x"><template></div></template></div><p></p></main>'), /<\/template><\/div><section id="book-online"[^]*<\/section><p>/, 'an end tag inside a template does not close the anchor');
   assert.match(spliceBookingEmbeds(page('<main></main><template><main></main></template>'), [iframe]), /<main><section id="book-online"[^]*<\/section><\/main><template>/, 'default placement ignores a template <main>');
   const inertCsp = spliceBookingEmbeds(page('<main></main>', `${CSP}<template><meta http-equiv="Content-Security-Policy" content="frame-src 'none'"></template>`), [iframe]);
   assert.ok(inertCsp.includes(`<template><meta http-equiv="Content-Security-Policy" content="frame-src 'none'"></template>`));

@@ -158,22 +158,40 @@ export function renderBookingEmbed(input: BookingEmbed, withStyles = true): stri
 }
 
 type Attribute = { value: string; start: number; end: number; quote: string };
-/** `inert`: inside a `<template>`, whose content is not in the document, so never a place for the slot. */
-type Tag = { name: string; close: boolean; start: number; end: number; selfClosing: boolean; inert: boolean; attributes: Map<string, Attribute> };
+/**
+ * `inert`: inside a `<template>`, whose content is not in the document. `foreign`: inside an inline
+ * `<svg>` or `<math>`, where a booking section would be an SVG or MathML element and never render.
+ * `inSelect`: inside a `<select>`, whose parser drops a section's tags (or, in newer browsers, keeps
+ * them inside the picker). None of these is ever a place for the slot.
+ */
+type Tag = { name: string; close: boolean; start: number; end: number; selfClosing: boolean; inert: boolean; foreign: boolean; inSelect: boolean; attributes: Map<string, Attribute> };
+const placeable = (tag: Tag) => !tag.inert && !tag.foreign && !tag.inSelect;
 
 /** Elements whose content is text, never markup, so nothing inside one is an anchor. `<plaintext>` never ends. */
 const RAW_TEXT = new Set(['iframe', 'noembed', 'noframes', 'noscript', 'plaintext', 'script', 'style', 'textarea', 'title', 'xmp']);
 const VOID = new Set(['area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'source', 'track', 'wbr']);
+/** HTML start tags that end an inline `<svg>` or `<math>` ("breakout"), and the SVG and MathML elements whose content is HTML or text. */
+const FOREIGN_BREAKOUT = new Set(['b', 'big', 'blockquote', 'body', 'br', 'center', 'code', 'dd', 'div', 'dl', 'dt', 'em', 'embed', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'head', 'hr', 'i', 'img', 'li', 'listing', 'menu', 'meta', 'nobr', 'ol', 'p', 'pre', 'ruby', 's', 'small', 'span', 'strong', 'strike', 'sub', 'sup', 'table', 'tt', 'u', 'ul', 'var']);
+const FOREIGN_TEXT = new Set(['foreignobject', 'desc', 'title', 'mi', 'mo', 'mn', 'ms', 'mtext', 'annotation-xml']);
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+/** HTML maps these numeric references (0x80–0x9F) to windows-1252 characters. */
+const C1: Record<number, number> = { 0x80: 0x20ac, 0x82: 0x201a, 0x83: 0x192, 0x84: 0x201e, 0x85: 0x2026, 0x86: 0x2020, 0x87: 0x2021, 0x88: 0x2c6, 0x89: 0x2030, 0x8a: 0x160, 0x8b: 0x2039, 0x8c: 0x152, 0x8e: 0x17d, 0x91: 0x2018, 0x92: 0x2019, 0x93: 0x201c, 0x94: 0x201d, 0x95: 0x2022, 0x96: 0x2013, 0x97: 0x2014, 0x98: 0x2dc, 0x99: 0x2122, 0x9a: 0x161, 0x9b: 0x203a, 0x9c: 0x153, 0x9e: 0x17e, 0x9f: 0x178 };
 
 const asciiLower = (value: string) => value.replace(/[A-Z]/g, (char) => char.toLowerCase());
 
-/** Character references in an attribute value: numeric ones and the five basic names; any other is kept as written. */
+/**
+ * Character references in an attribute value, decoded as HTML does: numeric ones with or without
+ * `;` (zero, surrogates and out-of-range values become U+FFFD, 0x80–0x9F map to windows-1252), and
+ * the basic names (`&amp` `&lt` `&gt` `&quot` also without `;` unless a letter, digit or `=`
+ * follows). Any other name is kept as written; it can never match a plain anchor id.
+ */
 function decodeAttribute(value: string): string {
-  return value.replace(/&(?:#(\d{1,7})|#[xX]([0-9a-fA-F]{1,6})|(amp|lt|gt|quot|apos));/g, (whole, dec?: string, hex?: string, name?: string) => {
+  return value.replace(/&#(?:([0-9]+)|[xX]([0-9a-fA-F]+));?|&(?:(amp|lt|gt|quot)(?:;|(?![=A-Za-z0-9]))|(apos);)/g, (_whole, dec?: string, hex?: string, legacy?: string, apos?: string) => {
+    const name = legacy ?? apos;
     if (name) return ENTITIES[name]!;
     const code = Number.parseInt(dec ?? hex!, dec ? 10 : 16);
-    return code > 0 && code <= 0x10ffff && !(code >= 0xd800 && code <= 0xdfff) ? String.fromCodePoint(code) : whole;
+    if (code === 0 || code > 0x10ffff || (code >= 0xd800 && code <= 0xdfff)) return '\ufffd';
+    return String.fromCodePoint(C1[code] ?? code);
   });
 }
 
@@ -242,7 +260,7 @@ function commentEnd(html: string, from: number): number | undefined {
  * ends inside the tag, which drops it, as in HTML. Attribute names are ASCII-lowercased and the
  * first of a repeated name wins.
  */
-function readTag(html: string, start: number): Omit<Tag, 'inert'> | undefined {
+function readTag(html: string, start: number): Omit<Tag, 'inert' | 'foreign' | 'inSelect'> | undefined {
   const close = html[start + 1] === '/';
   let at = start + (close ? 2 : 1);
   const nameStart = at;
@@ -284,16 +302,32 @@ function readTag(html: string, start: number): Omit<Tag, 'inert'> | undefined {
   return undefined;
 }
 
+/** `<` here opens markup (a tag, end tag, comment, doctype or bogus comment), not text. */
+const opensMarkup = (html: string, at: number) => isAsciiAlpha(html[at + 1]) || html[at + 1] === '/' || html[at + 1] === '!' || html[at + 1] === '?';
+
+/**
+ * Inline `<svg>` and `<math>` are foreign content, which HTML parses by other rules: no raw text,
+ * CDATA sections, HTML tags that end the element early, and text elements (`<title>`, `<desc>`,
+ * `<foreignObject>`, MathML's token elements) whose content is HTML. The scanner follows only the
+ * plain case, foreign elements and comments, which is what icons are, and refuses the rest rather
+ * than guess where the element ends.
+ */
+const foreignFail = (what: string) => fail(`the page's inline <svg> or <math> contains ${what}, which the booking slot cannot place around safely`);
+
 /**
  * Tags outside comments and raw-text elements, with their attributes, read in one linear pass with
  * HTML's tokenizer rules: comments (including abrupt `<!-->` and `--!>`), bogus comments and the
  * doctype (`<!…>`, `<?…>`, `</` and a non-letter) skip to their end, and whitespace is HTML's ASCII
  * whitespace only, so a no-break space never ends a tag name or separates attributes. Names and
- * raw-text ends match ASCII case-insensitively, so offsets always index `html`.
+ * raw-text ends match ASCII case-insensitively, so offsets always index `html`. Tags inside an
+ * inline `<svg>` or `<math>` are marked `foreign`; the `<svg>` or `<math>` tags themselves are not.
  */
 function scanTags(html: string): Tag[] {
   const tags: Tag[] = [];
   let templates = 0;
+  /** Open foreign elements, outermost first; empty in HTML content. */
+  const foreign: string[] = [];
+  let select = false;
   let at = 0;
   while (at < html.length) {
     const open = html.indexOf('<', at);
@@ -305,6 +339,8 @@ function scanTags(html: string): Tag[] {
         const end = commentEnd(html, open + 4);
         if (end === undefined) break;
         at = end;
+      } else if (foreign.length > 0 && html.startsWith('<![CDATA[', open)) {
+        return foreignFail('a CDATA section');
       } else if (next === '!' || next === '?' || (next === '/' && open + 2 < html.length)) {
         if (next === '/' && html[open + 2] === '>') { at = open + 3; continue; }
         const end = html.indexOf('>', open + 2);
@@ -317,12 +353,40 @@ function scanTags(html: string): Tag[] {
     }
     const read = readTag(html, open);
     if (!read) break;
-    if (read.name === 'template' && read.close) templates = Math.max(0, templates - 1);
-    const tag: Tag = { ...read, inert: templates > 0 };
-    if (read.name === 'template' && !read.close) templates += 1;
+    const inForeign = foreign.length > 0;
+    let tag: Tag;
+    if (!inForeign) {
+      if (read.name === 'template' && read.close) templates = Math.max(0, templates - 1);
+      // <select> ends at </select>, or at an <input>, <textarea> or <select> start tag.
+      const endsSelect = select && (read.close ? read.name === 'select' : read.name === 'input' || read.name === 'textarea' || read.name === 'select');
+      if (endsSelect) select = false;
+      tag = { ...read, inert: templates > 0, foreign: false, inSelect: select };
+      if (read.name === 'select' && !read.close && !endsSelect) select = true;
+      if (read.name === 'template' && !read.close) templates += 1;
+      if (!read.close && !read.selfClosing && (read.name === 'svg' || read.name === 'math')) foreign.push(read.name);
+    } else if (read.close) {
+      const index = foreign.lastIndexOf(read.name);
+      if (index < 0) return foreignFail(`a stray </${read.name}>`);
+      foreign.length = index;
+      // The end tag that closes the outermost <svg> or <math> sits in HTML content again.
+      tag = { ...read, inert: templates > 0, foreign: foreign.length > 0, inSelect: select };
+    } else {
+      const font = read.name === 'font' && ['color', 'face', 'size'].some((key) => read.attributes.has(key));
+      if (FOREIGN_BREAKOUT.has(read.name) || font) return foreignFail(`an HTML <${read.name}>`);
+      tag = { ...read, inert: templates > 0, foreign: true, inSelect: select };
+      if (!read.selfClosing) {
+        foreign.push(read.name);
+        if (FOREIGN_TEXT.has(read.name)) {
+          // Text only: the next markup must be this element's own end tag.
+          let markup = html.indexOf('<', read.end);
+          while (markup >= 0 && !opensMarkup(html, markup)) markup = html.indexOf('<', markup + 1);
+          if (markup >= 0 && !(html[markup + 1] === '/' && startsTag(html, markup + 2, read.name))) return foreignFail(`markup inside <${read.name}>`);
+        }
+      }
+    }
     tags.push(tag);
     at = tag.end;
-    if (!tag.close && RAW_TEXT.has(tag.name)) {
+    if (!inForeign && !tag.close && RAW_TEXT.has(tag.name)) {
       const closing = rawTextEnd(html, tag.name, tag.end);
       if (closing === undefined) break;
       at = closing;
@@ -336,13 +400,13 @@ const idsOf = (tags: Tag[]) => tags.flatMap((tag) => { const id = tag.attributes
 /** The offset the slot goes at. Throws when the anchor is missing, repeated or not a container. */
 function insertionOffset(tags: Tag[], placement: BookingEmbedPlacement | undefined): number {
   if (!placement) {
-    const last = (name: string, close: boolean) => tags.filter((tag) => !tag.inert && tag.close === close && tag.name === name).at(-1);
+    const last = (name: string, close: boolean) => tags.filter((tag) => placeable(tag) && tag.close === close && tag.name === name).at(-1);
     const end = last('main', true) ?? last('footer', false) ?? last('body', true);
     if (!end) return fail('the page has no <main>, <footer> or <body> to place the slot in; give a placement');
     return end.start;
   }
   const anchor = 'after' in placement ? placement.after : placement.before;
-  const owners = tags.filter((tag) => !tag.inert && tag.attributes.get('id')?.value === anchor);
+  const owners = tags.filter((tag) => placeable(tag) && tag.attributes.get('id')?.value === anchor);
   if (owners.length !== 1) return fail(`placement anchor ${JSON.stringify(anchor)} must name exactly one element (found ${owners.length})`);
   const open = owners[0]!;
   if ('before' in placement) return open.start;
@@ -353,7 +417,8 @@ function insertionOffset(tags: Tag[], placement: BookingEmbedPlacement | undefin
   }
   let depth = 0;
   for (const tag of tags) {
-    if (tag.start < open.start || tag.name !== open.name || (!tag.close && tag.selfClosing)) continue;
+    // Tags in a <template>, an <svg> or a <select> never close the anchor: a browser ignores them there.
+    if (tag.start < open.start || !placeable(tag) || tag.name !== open.name || (!tag.close && tag.selfClosing)) continue;
     depth += tag.close ? -1 : 1;
     if (depth === 0) return tag.end;
   }
@@ -364,7 +429,7 @@ function insertionOffset(tags: Tag[], placement: BookingEmbedPlacement | undefin
 function cspMetas(tags: Tag[]): Attribute[] {
   const metas: Attribute[] = [];
   for (const tag of tags) {
-    if (tag.close || tag.inert || tag.name !== 'meta' || asciiLower(tag.attributes.get('http-equiv')?.value.trim() ?? '') !== 'content-security-policy') continue;
+    if (tag.close || tag.inert || tag.foreign || tag.name !== 'meta' || asciiLower(tag.attributes.get('http-equiv')?.value.trim() ?? '') !== 'content-security-policy') continue;
     const content = tag.attributes.get('content');
     if (!content || content.quote !== '"') return fail('the page\'s Content-Security-Policy must quote its content with "');
     metas.push(content);
