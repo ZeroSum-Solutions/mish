@@ -312,6 +312,13 @@ const opensMarkup = (html: string, at: number) => isAsciiAlpha(html[at + 1]) || 
  * plain case, foreign elements and comments, which is what icons are, and refuses the rest rather
  * than guess where the element ends.
  */
+/**
+ * A `<select>` is parsed by rules of its own, and newer browsers parse it differently again, so the
+ * scanner accepts only what every parser reads the same way inside one: options, option groups,
+ * `<hr>`, text and comments. Anything else is refused.
+ */
+const SELECT_CONTENT = new Set(['option', 'optgroup', 'hr']);
+const selectFail = (what: string) => fail(`the page's <select> contains ${what}, which the booking slot cannot place around safely`);
 const foreignFail = (what: string) => fail(`the page's inline <svg> or <math> contains ${what}, which the booking slot cannot place around safely`);
 
 /**
@@ -328,6 +335,8 @@ function scanTags(html: string): Tag[] {
   /** Open foreign elements, outermost first; empty in HTML content. */
   const foreign: string[] = [];
   let select = false;
+  /** The select opened inside a template, so that template's end tag also ends the select. */
+  let selectInTemplate = false;
   let at = 0;
   while (at < html.length) {
     const open = html.indexOf('<', at);
@@ -355,25 +364,29 @@ function scanTags(html: string): Tag[] {
     if (!read) break;
     const inForeign = foreign.length > 0;
     let tag: Tag;
-    if (!inForeign) {
-      if (read.name === 'template' && read.close) templates = Math.max(0, templates - 1);
-      // <select> ends at </select>, or at an <input>, <textarea> or <select> start tag.
-      const endsSelect = select && (read.close ? read.name === 'select' : read.name === 'input' || read.name === 'textarea' || read.name === 'select');
-      if (endsSelect) select = false;
+    if (select) {
+      const ends = read.close && (read.name === 'select' || (read.name === 'template' && selectInTemplate));
+      if (!ends && !(read.close ? read.name === 'option' || read.name === 'optgroup' : SELECT_CONTENT.has(read.name))) return selectFail(`<${read.close ? '/' : ''}${read.name}>`);
+      if (ends) select = false;
+      if (ends && read.name === 'template') templates -= 1;
       tag = { ...read, inert: templates > 0, foreign: false, inSelect: select };
-      if (read.name === 'select' && !read.close && !endsSelect) select = true;
+    } else if (!inForeign) {
+      if (!read.close && read.name === 'frameset' && templates === 0) return fail('a <frameset> page cannot take a booking embed: its frames replace the body');
+      if (read.name === 'template' && read.close) templates = Math.max(0, templates - 1);
+      tag = { ...read, inert: templates > 0, foreign: false, inSelect: false };
       if (read.name === 'template' && !read.close) templates += 1;
+      if (read.name === 'select' && !read.close) { select = true; selectInTemplate = templates > 0; }
       if (!read.close && !read.selfClosing && (read.name === 'svg' || read.name === 'math')) foreign.push(read.name);
     } else if (read.close) {
       const index = foreign.lastIndexOf(read.name);
       if (index < 0) return foreignFail(`a stray </${read.name}>`);
       foreign.length = index;
       // The end tag that closes the outermost <svg> or <math> sits in HTML content again.
-      tag = { ...read, inert: templates > 0, foreign: foreign.length > 0, inSelect: select };
+      tag = { ...read, inert: templates > 0, foreign: foreign.length > 0, inSelect: false };
     } else {
       const font = read.name === 'font' && ['color', 'face', 'size'].some((key) => read.attributes.has(key));
       if (FOREIGN_BREAKOUT.has(read.name) || font) return foreignFail(`an HTML <${read.name}>`);
-      tag = { ...read, inert: templates > 0, foreign: true, inSelect: select };
+      tag = { ...read, inert: templates > 0, foreign: true, inSelect: false };
       if (!read.selfClosing) {
         foreign.push(read.name);
         if (FOREIGN_TEXT.has(read.name)) {
@@ -386,7 +399,7 @@ function scanTags(html: string): Tag[] {
     }
     tags.push(tag);
     at = tag.end;
-    if (!inForeign && !tag.close && RAW_TEXT.has(tag.name)) {
+    if (!inForeign && !tag.inSelect && !tag.close && RAW_TEXT.has(tag.name)) {
       const closing = rawTextEnd(html, tag.name, tag.end);
       if (closing === undefined) break;
       at = closing;

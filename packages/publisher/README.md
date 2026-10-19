@@ -159,7 +159,9 @@ type BookingEmbed = {
   (`<script>`, `<style>`, `<textarea>`, `<title>`, `<iframe>`, `<noscript>`, `<noembed>`,
   `<noframes>`, `<xmp>`, `<plaintext>`) is never an anchor. Script text follows HTML's escape
   states, so a `</script>` hidden by `<!--<script>` does not end it. Nor is anything inside a
-  `<template>`, which is not in the document, or inside a `<select>`. Tags, comments (`<!-->`,
+  `<template>`, which is not in the document, or inside a `<select>`, which accepts only options,
+  option groups, `<hr>`, text and comments (anything else is refused). A `<frameset>` page is
+  refused. Tags, comments (`<!-->`,
   `--!>`), bogus comments (`<!x>`, `<?x>`, `</ x>`), unclosed quotes and character references
   (`&#120` without `;` too) follow the HTML tokenizer, in one linear pass. Inline `<svg>` and
   `<math>` are foreign content: nothing inside one is an anchor (the `<svg>` itself can be), and a

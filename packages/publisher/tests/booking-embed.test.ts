@@ -251,10 +251,17 @@ test('booking embed: inline <svg> and <math> are foreign content, never a place 
   assert.match(after('<svg><template></template></svg><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
   // Default placement ignores a <main> end tag that only an SVG element could have.
   assert.match(spliceBookingEmbeds(page('<main><svg><g></g></svg></main>'), [iframe]), /<\/svg><section id="book-online"[^]*<\/section><\/main>/);
-  // A <select> drops (or, in newer browsers, keeps in its picker) a section, so nothing in one is an anchor.
-  assert.throws(() => after('<select><b id="x"></b></select>'), /found 0/);
-  assert.match(after('<select><option>a</option></select><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
-  assert.match(after('<select><option>a<input name="q"><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/, 'an <input> ends the <select>');
+  // A <select> drops (or, in newer browsers, keeps in its picker) a section, so nothing in one is an
+  // anchor, and only options, groups, <hr>, text and comments are accepted inside one.
+  assert.throws(() => after('<select><option id="x">a</option></select>'), /found 0/);
+  assert.match(after('<select><optgroup label="g"><option>a<option>b</optgroup><hr><!-- c --></select><div id="x"></div>'), /<div id="x"><\/div><section id="book-online"/);
+  for (const inner of ['<b id="x"></b>', '<input>', '<style></style>', '<template></template>', '<textarea></textarea>', '<select>', '</div>']) {
+    assert.throws(() => after(`<select>${inner}</select><div id="x"></div>`), /the page's <select> contains/, inner);
+  }
+  assert.throws(() => after('<select><style><textarea></style><input><div id="x"></div></textarea>'), /<select> contains <style>/);
+  // A select inside a template ends with the template.
+  assert.match(spliceBookingEmbeds(page('<main><div id="x"><template><select></template></div><p></p></main>'), [{ ...iframe, placement: { after: 'x' } }]), /<\/template><\/div><section id="book-online"[^]*<\/section><p>/);
+  assert.throws(() => spliceBookingEmbeds(page('<frameset id="x"></frameset>'), [{ ...iframe, placement: { after: 'x' } }]), /<frameset> page/);
   // What the scanner cannot follow exactly is refused, never guessed: CDATA, HTML that breaks out,
   // markup in a text element, a stray end tag.
   assert.throws(() => after('<svg><![CDATA[> <div id="x"></div>]]></svg>'), /contains a CDATA section/);
