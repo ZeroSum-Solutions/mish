@@ -35,6 +35,7 @@ const PACKAGE_DIRS = [
   "packages/dsh-runtime",
   "packages/cult-ui-catalog",
   "packages/21st-catalog",
+  "packages/publisher",
   "packages/agency-fast-lane",
   "packages/genui-catalog",
   "packages/section-catalog",
@@ -73,6 +74,10 @@ const OUTPUT_FILES = [
   "packages/diagnostics/dist/index.d.ts",
   "packages/dsh-runtime/dist/index.js",
   "packages/dsh-runtime/dist/types/index.d.ts",
+  "packages/publisher/dist/index.js",
+  "packages/publisher/dist/index.d.ts",
+  "packages/publisher/dist/node.js",
+  "packages/publisher/dist/node.d.ts",
   "packages/agency-fast-lane/dist/route.js",
   "packages/agency-fast-lane/dist/route.d.ts",
   "packages/agency-fast-lane/dist/build.js",
@@ -508,6 +513,31 @@ describe("createWorkspaceBuildCacheKey", () => {
       expect(packageManagerKey).not.toBe(lockKey);
       expect(await createWorkspaceBuildCacheKey({ ...config, webOutputMode: "server" })).not.toBe(packageManagerKey);
       expect(await createWorkspaceBuildCacheKey({ ...config, platform: "mac" })).not.toBe(packageManagerKey);
+    } finally {
+      await rm(root, { force: true, recursive: true });
+    }
+  });
+
+  it("witnesses the publisher's inputs outside its package: the Agency family packages and the LICENSE", async () => {
+    const root = await mkdtemp(join(tmpdir(), "mish-workspace-key-"));
+    const config = createConfig(root, join(root, ".cache"));
+
+    try {
+      await writeWorkspace(root);
+      const baseline = await createWorkspaceBuildCacheKey(config);
+      const family = join(root, "plugins/_official/examples/agency-practice/compiler/scripts");
+      await mkdir(family, { recursive: true });
+      await writeFile(join(family, "render.ts"), "export const css = 1;\n", "utf8");
+      const withFamily = await createWorkspaceBuildCacheKey(config);
+      expect(withFamily).not.toBe(baseline);
+      await writeFile(join(family, "render.ts"), "export const css = 2;\n", "utf8");
+      const editedFamily = await createWorkspaceBuildCacheKey(config);
+      expect(editedFamily).not.toBe(withFamily);
+      await mkdir(join(root, "plugins/_official/examples/web-clone"), { recursive: true });
+      await writeFile(join(root, "plugins/_official/examples/web-clone/README.md"), "not bundled\n", "utf8");
+      expect(await createWorkspaceBuildCacheKey(config), "a non-Agency example is not a publisher input").toBe(editedFamily);
+      await writeFile(join(root, "LICENSE"), "Apache-2.0\n", "utf8");
+      expect(await createWorkspaceBuildCacheKey(config)).not.toBe(editedFamily);
     } finally {
       await rm(root, { force: true, recursive: true });
     }

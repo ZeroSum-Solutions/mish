@@ -18,6 +18,7 @@ export const INTERNAL_PACKAGES = [
   { directory: "packages/diagnostics", name: "@mish/diagnostics" },
   { directory: "packages/cult-ui-catalog", name: "@mish/cult-ui-catalog" },
   { directory: "packages/21st-catalog", name: "@mish/21st-catalog" },
+  { directory: "packages/publisher", name: "@mish/publisher" },
   { directory: "packages/agency-fast-lane", name: "@mish/agency-fast-lane" },
   { directory: "packages/genui-catalog", name: "@mish/genui-catalog" },
   { directory: "packages/section-catalog", name: "@mish/section-catalog" },

@@ -1,0 +1,176 @@
+{
+  "app-shell": {
+    "bytes": 30626,
+    "sha256": "945320f6b2807f835232d36ea669a2730153d53cc99aa6e1e81b2c93ef1e240e",
+    "manifest": "272e39814d20e02ada9a8cafd341dc8ab564b2aba7893a0168f6056b0ff0b5d4",
+    "digest": "6dd7ff8a8874a345e2c492c52964ace58601e3eecc3f4cdb4b1cc4e2b695d728"
+  },
+  "community": {
+    "bytes": 51096,
+    "sha256": "a0e466006ad39a08ac37b7a4914858021bcf7227f63eb5ce6d4039aac4312f2c",
+    "manifest": "9dcd4da99b57be3bfc7eb6fac655de413ea6b75baf8d1194884082f864da4ab1",
+    "digest": "a8ffbc65a0376199ea959235411bc2018a5f9a584177e03632567c71d12c83a9"
+  },
+  "crm-dashboard": {
+    "bytes": 38469,
+    "sha256": "857abde4838c62cd91124e04e1666046d3ef1c8e435d4e84edcdfb3ccde564e5",
+    "manifest": "7fe84149c25dbff520ab054b7f9841c914d24138ef74a5782bc21020ccc22721",
+    "digest": "c092ab22bd87038a5f6453d5cd8e540217dee1cfe554f37044eb864c4e5a1bf3"
+  },
+  "docs-hub": {
+    "bytes": 32927,
+    "sha256": "6733b57ea7ac996e1b6da7ddd0a6ba5da2994827ba31675263bf64c0d4545436",
+    "manifest": "12e7b7a436049751bd8b5c2a935362a37490a8918d45ebface13b90e95e6ff89",
+    "digest": "aa76de26c208648674b4c6bb3b7bd116397deb02e40f6dc163503802d9615730"
+  },
+  "guide": {
+    "bytes": 39578,
+    "sha256": "4995b3b0cf347f7a8d6c80177f95acc109044cf3fd77877aa1320ce61dacf83d",
+    "manifest": "a2b702c420dd3629f439b5f3d83da102850180865df24bd1ed862c4b3614f665",
+    "digest": "7acf9bb5c8442e1faf013d05b5b9a5f0dd0ca99efbe543c2b8f693d6f68765ee"
+  },
+  "listings": {
+    "bytes": 43228,
+    "sha256": "511220f3b8ee27e8820120585a853097b97c046459618508f5a8945d0b9b7fb8",
+    "manifest": "c5a66423ae526681b15b0549845373f5bc02e3e986027446de1d4164661f650b",
+    "digest": "9affcfea410ac8e71597b84fa55d1b002269452fe89c5ee773f32ad4bcedcbda"
+  },
+  "marketing-site": {
+    "bytes": 37835,
+    "sha256": "5d99d4d0b3a654ccb71a59a4d58ac9fe09160085812e52bdee701e8f4888c4da",
+    "manifest": "62ad3ca087ac1adbbc8a669e0b7cd566d4eff1046d8f5e21e87a54addf7f9796",
+    "digest": "f1bb5842ff8f6bb8108bb0b485817903a06a6b6e997b1fa11182446e796ae80c"
+  },
+  "marketing-site+effects": {
+    "bytes": 49308,
+    "sha256": "b265d24f5824f557f3a2bc84c13ee8335ac8b646001fc0dd3992faf8c6f0dcf9",
+    "manifest": "62ad3ca087ac1adbbc8a669e0b7cd566d4eff1046d8f5e21e87a54addf7f9796",
+    "digest": "3e3b5d0495d02225e8dbb786b7630b8f308e98fea76572736924615683ce9318",
+    "effects": {
+      "applied": [
+        {
+          "placement": "section-reveal",
+          "componentId": "scroll-reveal",
+          "kind": "js",
+          "source": "jev"
+        },
+        {
+          "placement": "hero-title",
+          "componentId": "masked-heading",
+          "kind": "js",
+          "source": "hint"
+        }
+      ],
+      "skipped": [],
+      "bytesAdded": 11473
+    }
+  },
+  "nonprofit": {
+    "bytes": 38914,
+    "sha256": "13c54f987c4acde86b46a7bc4a2c2a37fcac95f0e37368290321fbef2efe7534",
+    "manifest": "b60219b333e9855996647029d55a8b0f4dfbbaab808c0dd449b9c72b7dc4d096",
+    "digest": "249991d7ccfbd36a8647937fb75f76c29246b314f19722a5f7634f2fcd685d6b"
+  },
+  "practice": {
+    "bytes": 52835,
+    "sha256": "3131996a791f3218e43b189020a33cb99067d2c7ebecf8e131324784ecdf0b6f",
+    "manifest": "981133b2cc4020d774d4fab3086bfa4cc26253be4c43d21d9a5513833db81ff8",
+    "digest": "e3a13962b1717841e104518949e5648484532a320e9cfa5935422ae00d1ec462"
+  },
+  "practice+booking-iframe": {
+    "bytes": 54476,
+    "sha256": "6740705b838e8f62d56e67cbf154e6486e42fcfa1e9dc59e0f50efb78e71ceff",
+    "manifest": "981133b2cc4020d774d4fab3086bfa4cc26253be4c43d21d9a5513833db81ff8",
+    "digest": "193c8c7247b4bbc8964d2e4e552a205da9845d0a35f0ee4eea61f07c16c8e73e"
+  },
+  "practice+brand-tokens": {
+    "bytes": 52693,
+    "sha256": "58e15b5cf4fc4bc66450d5af0c31d6f2df182ffc3f78d359fbd6a811c5fb8e57",
+    "manifest": "a7f3f5343e0d7d896cdf45eb7edd5f340628abc21debbc8d912c760d91da62b7",
+    "digest": "fe61121e941c8f0398f684113bd06f13283a25709fd84ffccd5e98642aca1c30"
+  },
+  "practice+effects": {
+    "bytes": 58562,
+    "sha256": "4feb1c8630d2d8d082c8cae9a7027818bc7651c49872ddc764ddca7de7f96d2b",
+    "manifest": "981133b2cc4020d774d4fab3086bfa4cc26253be4c43d21d9a5513833db81ff8",
+    "digest": "5b0a5f2fc79821184cd979e954bb8e75dd018c73cefdbaeb6e49ff564d1ea82c",
+    "effects": {
+      "applied": [
+        {
+          "placement": "hero-title",
+          "componentId": "split-text",
+          "kind": "js",
+          "source": "hint"
+        }
+      ],
+      "skipped": [],
+      "bytesAdded": 5727
+    }
+  },
+  "publication": {
+    "bytes": 39378,
+    "sha256": "da14b0df50d33b052814dcafac5c8b64079b51291d91033f2d95d38de617bb8a",
+    "manifest": "bcc367a3890441f7a9cb84a2ff6ebcd35b5cfe5f45722140c4f1e4322e39f79f",
+    "digest": "7b6b7ee377e978ef4b2b41efb01f25183f887a7ac903973cd85bb69915ee2594"
+  },
+  "restaurant": {
+    "bytes": 32207,
+    "sha256": "1b60ada7fb08e67af7cd564cd5c3e63ce1ae64f9ebabe861e6f84cea4ff0535f",
+    "manifest": "6d4b3f4aa435000418666cb33992a4d2c94f8470f5c4eb51b99c13d70bc5c9ed",
+    "digest": "d8370e46570986b82a300c7de9838f7368ec280d3befbc760e6ffa18873977a7"
+  },
+  "restaurant+booking-script+effects": {
+    "bytes": 40841,
+    "sha256": "44dc0fa77b9833847a786e45eecc9fe16998184df9e96eb692ff2d43c9fdbec8",
+    "manifest": "6d4b3f4aa435000418666cb33992a4d2c94f8470f5c4eb51b99c13d70bc5c9ed",
+    "digest": "61a4a4febeaebb50aadc47d2add9f80884e785f9e794326ed11ad45fe5c0042c",
+    "effects": {
+      "applied": [
+        {
+          "placement": "hero-title",
+          "componentId": "split-text",
+          "kind": "js",
+          "source": "hint"
+        },
+        {
+          "placement": "cta",
+          "componentId": "glare-hover",
+          "kind": "css-only",
+          "source": "hint"
+        }
+      ],
+      "skipped": [],
+      "bytesAdded": 7256
+    }
+  },
+  "restaurant+effects": {
+    "bytes": 39463,
+    "sha256": "ce31933973920205b48a3eadb57c81b7008d21875ee16e7c8dc337a3d8ee745d",
+    "manifest": "6d4b3f4aa435000418666cb33992a4d2c94f8470f5c4eb51b99c13d70bc5c9ed",
+    "digest": "416364391ab2b273fa3db37657da9d28063f16616bb6be9709cd0eb4b69ea29d",
+    "effects": {
+      "applied": [
+        {
+          "placement": "hero-title",
+          "componentId": "split-text",
+          "kind": "js",
+          "source": "hint"
+        },
+        {
+          "placement": "cta",
+          "componentId": "glare-hover",
+          "kind": "css-only",
+          "source": "hint"
+        }
+      ],
+      "skipped": [],
+      "bytesAdded": 7256
+    }
+  },
+  "storefront": {
+    "bytes": 39107,
+    "sha256": "4b60201f8b13ec9c3d9b6fb6a62a8eecd4d9f9e911fd0dbe90b6aea403369a99",
+    "manifest": "6e69d53055d804660a07c8804b9359385b428cbb482b8d6058eeb283a5435b02",
+    "digest": "00471ad08435a762fdbd4664c62a6abf5fa45c1c7042fba3fd01db4b4e2509e2"
+  }
+}

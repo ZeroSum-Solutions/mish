@@ -116,9 +116,10 @@ describe("workflow scope planner", () => {
     });
   });
 
-  test("routes the fast lane and the agency family packages to the agency tests workload", () => {
+  test("routes the fast lane, the publisher and the agency family packages to the agency tests workload", () => {
     for (const file of [
       "packages/agency-fast-lane/src/run.ts",
+      "packages/publisher/src/compile.ts",
       "plugins/_official/examples/agency-wrenfield/compiler/scripts/families/wrenfield/render.ts",
       "plugins/_official/shared/agency-compiler/scripts/sections.ts",
       "scripts/sync-agency-compiler.ts",

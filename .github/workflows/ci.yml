@@ -270,6 +270,7 @@ jobs:
           pnpm --filter @mish/sidecar test
           pnpm --filter @mish/sidecar-proto test
           pnpm --filter @mish/agui-adapter test
+          pnpm --filter @mish/publisher test
           pnpm --filter @mish/agency-fast-lane test
           pnpm --filter @mish/genui-catalog test
           pnpm --filter @mish/section-catalog test
@@ -362,10 +363,10 @@ jobs:
     name: Agency fast-lane and family package tests
     needs: [plan, runners]
     # agency_tests_required is its own scopes.json effect (packages/agency-fast-lane/,
-    # the agency-* family packages, the shared agency compiler and its sync script, and
-    # packages/cult-ui-catalog/, whose generated adapters the fast lane's overlay loads):
-    # the fast lane's node:test suite, the family packages' own render tests and the Cult
-    # render check run nowhere else in this workflow.
+    # packages/publisher/, the agency-* family packages, the shared agency compiler and its
+    # sync script, and packages/cult-ui-catalog/, whose generated adapters the fast lane's
+    # overlay loads): the publisher's and the fast lane's node:test suites, the family
+    # packages' own render tests and the Cult render check run nowhere else in this workflow.
     if: ${{ fromJSON(needs.plan.outputs.run).agency_tests }}
     runs-on: ${{ fromJSON(needs.runners.outputs.runs_on).workspace_unit }}
     timeout-minutes: 15
@@ -378,6 +379,9 @@ jobs:
         uses: ./.github/actions/setup-workspace
         with:
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).workspace_unit) }}
+
+      - name: Run publisher tests
+        run: pnpm --filter @mish/publisher test
 
       - name: Run agency fast-lane tests
         run: pnpm --filter @mish/agency-fast-lane test
