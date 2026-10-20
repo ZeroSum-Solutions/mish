@@ -1,7 +1,7 @@
 // Mish packs: the bounded extractor. Zips are built in the test from invented bytes; nothing here is
 // licensed content.
 
-import { promises as fsp, rmSync, type Dirent } from 'node:fs';
+import { existsSync, promises as fsp, rmSync, type Dirent } from 'node:fs';
 import path from 'node:path';
 
 import JSZip from 'jszip';
@@ -117,11 +117,17 @@ describe('extractMishPackZip folder collisions', () => {
 
 describe('copyMishPackFolder collisions', () => {
   /**
-   * A case- or normalisation-insensitive volume (macOS, Windows) cannot hold two names that differ
-   * only that way, so there the directory listing is made to return the twin as well; the twin
-   * resolves to the real entry, which is exactly how a stricter volume would hand it over.
+   * Puts `twin` beside the first entry of `parent`. A strict volume (Linux) holds both names, so
+   * the twin is written for real. A case- or normalisation-insensitive volume (macOS, Windows)
+   * cannot, so there the directory listing is made to return the twin as well; the twin resolves
+   * to the real entry, which is exactly how a stricter volume would hand it over.
    */
-  function listTwin(parent: string, twin: string): () => void {
+  async function addTwin(parent: string, twin: string): Promise<() => void> {
+    if (!existsSync(path.join(parent, twin))) {
+      const [original] = await fsp.readdir(parent);
+      await fsp.cp(path.join(parent, original!), path.join(parent, twin), { recursive: true });
+      return () => {};
+    }
     const real = fsp.readdir.bind(fsp) as (...args: unknown[]) => Promise<unknown>;
     const spy = vi.spyOn(fsp, 'readdir').mockImplementation((async (dir: unknown, options: unknown) => {
       const listing = (await real(dir, options)) as Dirent[];
@@ -136,7 +142,7 @@ describe('copyMishPackFolder collisions', () => {
   it('refuses sibling folders that differ only by letter case', async () => {
     const source = tempDir('mish-src-');
     writeFile(source, 'skills/Foo/a.md', '1');
-    const restore = listTwin(path.join(source, 'skills'), 'foo');
+    const restore = await addTwin(path.join(source, 'skills'), 'foo');
     try {
       await expect(copyMishPackFolder(source, tempDir('mish-stage-'))).rejects.toMatchObject({ code: 'INVALID_ARCHIVE', message: expect.stringMatching(/letter case/) });
     } finally {
@@ -147,7 +153,7 @@ describe('copyMishPackFolder collisions', () => {
   it('refuses sibling files that differ only by Unicode form', async () => {
     const source = tempDir('mish-src-');
     writeFile(source, 'caf\u00e9.txt', '1');
-    const restore = listTwin(source, 'cafe\u0301.txt');
+    const restore = await addTwin(source, 'cafe\u0301.txt');
     try {
       await expect(copyMishPackFolder(source, tempDir('mish-stage-'))).rejects.toMatchObject({ code: 'INVALID_ARCHIVE', message: expect.stringMatching(/Unicode form/) });
     } finally {
