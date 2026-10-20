@@ -6,8 +6,9 @@
 //   - a zip entry path is checked segment by segment (no absolute path, no `\`, no empty, `.` or
 //     `..` segment, no drive letter, no control character) and written with O_EXCL;
 //   - links, devices and every other non-regular entry are refused;
-//   - two entries that differ only by letter case are refused (they would collide on macOS and
-//     Windows);
+//   - two entries, or two folders on an entry's path, that differ only by letter case or Unicode
+//     form are refused (they would collide on macOS and Windows, or make twin folders elsewhere);
+//   - a zip entry's bytes are checked against the CRC-32 in the central directory as they stream;
 //   - macOS metadata (`__MACOSX/`, `.DS_Store`, `._*`) and `.git` folders are skipped.
 //
 // A .zip is read as a stream: the central directory first (ZIP64 included), then one entry at a
@@ -19,7 +20,7 @@ import type { FileHandle } from 'node:fs/promises';
 import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { Readable, Transform, type TransformCallback } from 'node:stream';
-import { createInflateRaw } from 'node:zlib';
+import { crc32, createInflateRaw } from 'node:zlib';
 
 import yauzl from 'yauzl';
 
@@ -92,12 +93,17 @@ class ByteBudget {
     if (this.count > this.limits.maxEntries) throw new MishPackError('TOO_LARGE', 'the pack has too many files');
   }
 
-  /** Counts one file's bytes against the budget. With `expected`, a different final size is refused. */
-  counter(name: string, expected?: number): Transform {
+  /**
+   * Counts one file's bytes against the budget. With `expected`, a different final size is refused;
+   * with `expectedCrc32`, so are bytes whose CRC-32 differs (checked incrementally, never buffered).
+   */
+  counter(name: string, expected?: number, expectedCrc32?: number): Transform {
     let file = 0;
+    let crc = 0;
     return new Transform({
       transform: (chunk: Buffer, _encoding, callback: TransformCallback) => {
         file += chunk.length;
+        if (expectedCrc32 !== undefined) crc = crc32(chunk, crc);
         this.total += chunk.length;
         if (file > this.limits.fileMaxBytes) return callback(new MishPackError('TOO_LARGE', `the pack file ${describePackPath(name)} is larger than the per-file limit`));
         if (this.total > this.limits.extractedMaxBytes) return callback(new MishPackError('TOO_LARGE', 'the pack expands beyond the size limit'));
@@ -106,9 +112,44 @@ class ByteBudget {
       },
       flush: (callback: TransformCallback) => {
         if (expected !== undefined && file !== expected) return callback(new MishPackError('INVALID_ARCHIVE', `the pack entry ${describePackPath(name)} is damaged`));
+        if (expectedCrc32 !== undefined && crc !== expectedCrc32) return callback(new MishPackError('INVALID_ARCHIVE', `the pack entry ${describePackPath(name)} is damaged (checksum mismatch)`));
         callback();
       },
     });
+  }
+}
+
+/**
+ * Names claimed so far. Every folder on an entry's path counts as a claim, so `skills/Foo/a.md`
+ * and `skills/foo/b.md` collide on their folders even though the full paths differ. A folder may be
+ * claimed again with the same spelling (many files share it); a different spelling, or a name used
+ * both as a file and as a folder, is refused.
+ */
+class PathClaims {
+  private readonly claimed = new Map<string, { spelling: string; folder: boolean }>();
+
+  /** `name` is a checked, POSIX, slash-free-at-the-end path. `folder` says whether the entry itself is a folder. */
+  claim(name: string, folder: boolean): void {
+    const segments = name.split('/');
+    for (let depth = 1; depth <= segments.length; depth += 1) {
+      const spelling = segments.slice(0, depth).join('/');
+      this.claimOne(name, spelling, depth < segments.length || folder);
+    }
+  }
+
+  private claimOne(name: string, spelling: string, folder: boolean): void {
+    const key = spelling.normalize('NFC').toLowerCase();
+    const existing = this.claimed.get(key);
+    if (!existing) {
+      this.claimed.set(key, { spelling, folder });
+      return;
+    }
+    if (existing.spelling !== spelling) {
+      throw new MishPackError('INVALID_ARCHIVE', `the pack has two entries that differ only by letter case or Unicode form: ${describePackPath(name)}`);
+    }
+    if (!existing.folder || !folder) {
+      throw new MishPackError('INVALID_ARCHIVE', `the pack has two entries with the same name: ${describePackPath(name)}`);
+    }
   }
 }
 
@@ -215,7 +256,7 @@ export async function extractMishPackZip(zipFile: string, stagingDir: string, li
   try {
     if (zip.entryCount > limits.maxEntries) throw new MishPackError('TOO_LARGE', 'the pack has too many files');
     const budget = new ByteBudget(limits);
-    const seen = new Set<string>();
+    const claims = new PathClaims();
     const root = path.resolve(stagingDir);
     for await (const entry of zipEntries(zip)) {
       const rawName = entryName(entry);
@@ -229,18 +270,25 @@ export async function extractMishPackZip(zipFile: string, stagingDir: string, li
         throw new MishPackError('INVALID_ARCHIVE', `the pack entry ${describePackPath(rawName)} is a link or special file`);
       }
       if (entry.isEncrypted()) throw new MishPackError('INVALID_ARCHIVE', `the pack entry ${describePackPath(rawName)} is encrypted`);
-      const folded = name.normalize('NFC').toLowerCase();
-      if (seen.has(folded)) throw new MishPackError('INVALID_ARCHIVE', `the pack has two entries that differ only by letter case: ${describePackPath(rawName)}`);
-      seen.add(folded);
+      const isFolder = rawName.endsWith('/') || unixMode === S_IFDIR;
+      claims.claim(name, isFolder);
       const dest = path.resolve(root, ...name.split('/'));
       if (!within(root, dest)) throw unsafe(rawName);
-      if (rawName.endsWith('/') || unixMode === S_IFDIR) {
+      if (isFolder) {
         await fsp.mkdir(dest, { recursive: true });
         continue;
       }
       // The declared size is checked up front; the counter still enforces the real bytes.
       if (entry.uncompressedSize > limits.fileMaxBytes) throw new MishPackError('TOO_LARGE', `the pack file ${describePackPath(name)} is larger than the per-file limit`);
-      await writeNew(dest, await entryStreams(zipFile, handle, stat.size, entry, name), budget.counter(name, entry.uncompressedSize));
+      try {
+        await writeNew(dest, await entryStreams(zipFile, handle, stat.size, entry, name), budget.counter(name, entry.uncompressedSize, entry.crc32));
+      } catch (error) {
+        // A damaged deflate stream fails inside zlib; report it like any other damaged entry.
+        if (typeof (error as NodeJS.ErrnoException | undefined)?.code === 'string' && (error as NodeJS.ErrnoException).code?.startsWith('Z_')) {
+          throw new MishPackError('INVALID_ARCHIVE', `the pack entry ${describePackPath(name)} is damaged`);
+        }
+        throw error;
+      }
     }
   } finally {
     await handle.close();
@@ -251,6 +299,7 @@ export async function extractMishPackZip(zipFile: string, stagingDir: string, li
 /** Copies a folder tree into `stagingDir`, refusing links and special files. */
 export async function copyMishPackFolder(source: string, stagingDir: string, limits: MishPackLimits = DEFAULT_MISH_PACK_LIMITS): Promise<void> {
   const budget = new ByteBudget(limits);
+  const claims = new PathClaims();
   const root = path.resolve(stagingDir);
   const walk = async (dir: string, relative: string): Promise<void> => {
     const entries = await fsp.readdir(dir, { withFileTypes: true });
@@ -262,6 +311,7 @@ export async function copyMishPackFolder(source: string, stagingDir: string, lim
       const info = await fsp.lstat(abs);
       if (info.isSymbolicLink()) throw new MishPackError('INVALID_ARCHIVE', `the pack entry ${describePackPath(rel)} is a link`);
       budget.entry();
+      claims.claim(checked, info.isDirectory());
       const dest = path.resolve(root, ...checked.split('/'));
       if (!within(root, dest)) throw unsafe(rel);
       if (info.isDirectory()) {
