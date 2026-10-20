@@ -235,9 +235,15 @@ function dropWarnings(receipt: Receipt, drop: (text: string) => boolean): void {
   receipt.warnings = receipt.warnings.filter((text) => !drop(text));
 }
 
-/** The module a pack or receipt belongs to: its `module`, or its own id. */
-function familyOf(entry: { id: string; module?: string | undefined }): string {
-  return entry.module ?? entry.id;
+/**
+ * The split module a pack or receipt is a part of, or null. A `module` counts only when the id is
+ * the module's own (`kit`) or one of its numbered parts (`kit-2`), as `build-pack --split` names
+ * them, so a pack cannot claim another pack's copies by naming it as its module.
+ */
+function familyOf(entry: { id: string; module?: string | undefined }): string | null {
+  const module = entry.module;
+  if (!module) return null;
+  return entry.id === module || new RegExp(`^${module}-[1-9][0-9]*$`, 'u').test(entry.id) ? module : null;
 }
 
 export function isMishPackId(value: string): boolean {
@@ -524,6 +530,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   /** The other parts of the module `receipt` belongs to (see `manifest.module`). */
   async function siblingReceipts(receipt: { id: string; module?: string | undefined }): Promise<Receipt[]> {
     const family = familyOf(receipt);
+    if (family === null) return [];
     return (await allReceipts()).filter((other) => other.id !== receipt.id && familyOf(other) === family);
   }
 

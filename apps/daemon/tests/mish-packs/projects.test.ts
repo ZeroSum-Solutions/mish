@@ -740,6 +740,18 @@ describe('audit round 2', () => {
     expect(readFileSync(path.join(skillsRoot, 'moving-skill', 'SKILL.md'), 'utf8')).toContain('whole module');
   });
 
+  it('does not let a pack claim another pack\'s copies by naming it as its module', async () => {
+    const owner = tempDir('mish-src-');
+    writePart(owner, 'kit-1', '1.0.0', { 'owned-skill': 'the owner' }, []);
+    await makeStore().install(owner);
+    const crafted = tempDir('mish-src-');
+    writePart(crafted, 'other-pack', '1.0.0', { 'owned-skill': 'taken over' }, []);
+    const { pack } = await makeStore().install(crafted);
+    expect(pack.warnings.join('\n')).toMatch(/owned-skill already exists and was left as it is/);
+    expect(readFileSync(path.join(skillsRoot, 'owned-skill', 'SKILL.md'), 'utf8')).toContain('the owner');
+    expect(receiptOf('kit-1').copied.skills).toEqual(['owned-skill']);
+  });
+
   it('brings a new version found at start fully in: removed copies go, MCP changes apply, a study cannot replace a design system', async () => {
     const external = tempDir('mish-external-');
     const packDir = path.join(external, 'team-kit');
