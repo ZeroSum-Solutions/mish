@@ -254,6 +254,11 @@ function fold(name: string): string {
   return name.normalize('NFC').toLowerCase();
 }
 
+/** Whether `list` has `name`, compared as the file system may (see `fold`). */
+function hasName(list: readonly string[], name: string): boolean {
+  return list.some((entry) => fold(entry) === fold(name));
+}
+
 /** The time in a `<id>-<stamp>` folder name, or null. */
 function stampTime(name: string): number | null {
   const match = STAMP_RE.exec(name);
@@ -262,7 +267,17 @@ function stampTime(name: string): number | null {
   return Number.isNaN(time) ? null : time;
 }
 
-/** A copy left alone because it is in the way, named in a warning; the pack places it once it is free. */
+/**
+ * A copy left alone because it is in the way, named in a warning; the pack places it once it is
+ * free. `label` is `<bucket>/<name>`, so a study and a design system of one name share it. The
+ * receipt's earlier warning about that name goes first, so it never names an owner twice or one
+ * that is gone.
+ */
+function noteCollision(receipt: Receipt, label: string, owner: string | null): void {
+  dropCollision(receipt, [label]);
+  receipt.warnings.push(collisionWarning(label, owner));
+}
+
 function collisionWarning(label: string, owner: string | null): string {
   return owner
     ? `${label} is provided by the pack ${owner} too, which placed it first; it was left as it is`
@@ -557,14 +572,14 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
 
   /** The id of another pack whose receipt lists `bucket/name`, if one does. Read only. */
   async function otherOwner(packId: string, bucket: CopyBucket, name: string): Promise<string | null> {
-    const owner = (await allReceipts()).find((other) => other.id !== packId && isNameList(other.copied[bucket]) && other.copied[bucket].includes(name));
+    const owner = (await allReceipts()).find((other) => other.id !== packId && isNameList(other.copied[bucket]) && hasName(other.copied[bucket], name));
     return owner?.id ?? null;
   }
 
   /** Adds `bucket/name` to the pack's receipt on disk, when it has one. */
   async function recordPlacement(packId: string, bucket: CopyBucket, name: string): Promise<void> {
     const onDisk = await readReceipt(packId);
-    if (!onDisk || !isNameList(onDisk.copied[bucket]) || onDisk.copied[bucket].includes(name)) return;
+    if (!onDisk || !isNameList(onDisk.copied[bucket]) || hasName(onDisk.copied[bucket], name)) return;
     onDisk.copied[bucket] = [...onDisk.copied[bucket], name];
     await writeReceipt(onDisk);
   }
@@ -676,10 +691,10 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         }
         provided.add(`${bucket}/${fold(child)}`);
         const dest = path.join(destRoot, child);
-        const mine = list.includes(child);
+        const mine = hasName(list, child);
         if (await exists(dest)) {
           if (!mine) {
-            receipt.warnings.push(collisionWarning(`${key}/${child}`, await otherOwner(receipt.id, bucket, child)));
+            noteCollision(receipt, `${bucket}/${child}`, await otherOwner(receipt.id, bucket, child));
             continue;
           }
           // Already copied by this pack at this version: a restart does not copy it again.
@@ -1064,7 +1079,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     for (const staged of receipt.copiesApplied ? [] : journal.stagedCopies) {
       const dest = path.join(bucketRoot(staged.bucket), staged.name);
       const list = receipt.copied[staged.bucket];
-      if (list.includes(staged.name)) continue;
+      if (hasName(list, staged.name)) continue;
       if (!(await exists(staged.path))) {
         // Placed by an earlier attempt that stopped before the receipt was written.
         if (await exists(dest)) {
@@ -1077,8 +1092,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       if (await exists(dest)) {
         // The old generation's copy is replaced; anything else is another pack's or the person's.
         const owner = await otherOwner(receipt.id, staged.bucket, staged.name);
-        if (!old?.copied[staged.bucket].includes(staged.name) || owner) {
-          receipt.warnings.push(collisionWarning(`${staged.bucket}/${staged.name}`, owner));
+        if (!old || !hasName(old.copied[staged.bucket], staged.name) || owner) {
+          noteCollision(receipt, `${staged.bucket}/${staged.name}`, owner);
           continue;
         }
         keep(await retireCopy(old, staged.bucket, staged.name, stamp));

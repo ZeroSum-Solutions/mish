@@ -751,6 +751,18 @@ describe('audit round 2', () => {
     expect(getProject(db, 'proj-moving')).not.toBeNull();
   });
 
+  it('names only the current owner when a copy passes from one pack to another', async () => {
+    for (const id of ['kit-1', 'kit-2', 'kit-3']) {
+      const source = tempDir('mish-src-');
+      writePart(source, id, '1.0.0', { 'shared-skill': id }, []);
+      await makeStore().install(source);
+    }
+    await makeStore().remove('kit-1');
+    expect(readFileSync(path.join(skillsRoot, 'shared-skill', 'SKILL.md'), 'utf8')).toContain('kit-2');
+    const warnings = (await makeStore().list()).packs.find((entry) => entry.id === 'kit-3')!.warnings.filter((text) => text.includes('shared-skill'));
+    expect(warnings).toEqual(['skills/shared-skill is provided by the pack kit-2 too, which placed it first; it was left as it is']);
+  });
+
   it('does not bring back a project the person deleted when another pack now provides it', async () => {
     const first = tempDir('mish-src-');
     writePart(first, 'kit-1', '1.0.0', { 'one-skill': 'one' }, ['proj-moving']);
