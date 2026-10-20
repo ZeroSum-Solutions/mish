@@ -409,9 +409,10 @@ describe('large files', () => {
 
 describe('zip writer: a streamed file that changes between its two passes', () => {
   type Writer = { addFile(name: string, file: string): Promise<void>; addBuffer(name: string, data: Buffer): Promise<void>; finish(): Promise<void>; abort(): void };
-  async function newWriter(file: string, options: { streamAbove: number; afterCrcPass?: (name: string, absolutePath: string) => Promise<void> }): Promise<Writer> {
+  type WriterOptions = { streamAbove: number; afterCrcPass?: (name: string, absolutePath: string) => Promise<void> };
+  async function newWriter(file: string, options: WriterOptions): Promise<Writer> {
     const writerModule = await import(pathToFileURL(path.join(repoRoot, 'scripts', 'lib', 'zip-writer.mjs')).href) as {
-      ZipWriter: new (file: string, options: typeof options) => Writer;
+      ZipWriter: new (file: string, options: WriterOptions) => Writer;
     };
     return new writerModule.ZipWriter(file, options);
   }
