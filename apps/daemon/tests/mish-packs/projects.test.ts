@@ -9,9 +9,12 @@ import path from 'node:path';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { MishPackManifest } from '@mish/contracts';
+
 import { closeDatabase, getProject, insertConversation, insertProject, openDatabase } from '../../src/db.js';
 import { readMcpConfig } from '../../src/mcp-config.js';
 import { isMishPackError } from '../../src/mish-packs/errors.js';
+import { packServerToConfig } from '../../src/mish-packs/mcp.js';
 import { resetMishPacksForTests } from '../../src/mish-packs/overlay.js';
 import { createMishPackStore, type MishPackInstallStep, type MishPackStore, type MishPackStoreOptions } from '../../src/mish-packs/store.js';
 import { cleanupDirs, tempDir, writeFile, writeFixturePack } from './pack-fixture.js';
@@ -691,11 +694,11 @@ function writePart(root: string, id: string, version: string, skills: Record<str
     projects: projects.map((projectId) => ({ id: projectId, name: projectId, createdAt: 1, updatedAt: 1 })),
   }));
   for (const projectId of projects) writeFile(root, `projects/${projectId}/index.html`, `<h1>${projectId}</h1>`);
-  writeFile(root, 'mish-pack.json', JSON.stringify({ schemaVersion: 1, id, name: id, version, module: 'kit', provides: { skills: 'skills', projects: 'projects' } }));
+  writeFile(root, 'mish-pack.json', JSON.stringify({ schemaVersion: 1, id, name: id, version, provides: { skills: 'skills', projects: 'projects' } }));
 }
 
 describe('audit round 2', () => {
-  it('deletes an unchanged copy only at the next start, and keeps one an editor saved into meanwhile', async () => {
+  it('deletes an unchanged copy only at a start a day later, and keeps one an editor saved into meanwhile', async () => {
     const source = tempDir('mish-src-');
     writeProjectsPack(source);
     await makeStore().install(source);
@@ -706,6 +709,10 @@ describe('audit round 2', () => {
     expect(existsSync(path.join(skillsRoot, 'pack-skill-a'))).toBe(false);
     // An editor that still had the file open saves after the comparison.
     await fsp.writeFile(path.join(retired, 'pack-skill-a', 'SKILL.md'), 'saved late');
+    // A start within a day leaves it alone.
+    resetMishPacksForTests();
+    await makeStore({ now: () => new Date('2026-10-12T20:00:00.000Z') }).start();
+    expect(existsSync(path.join(retired, 'pack-skill-b', 'SKILL.md'))).toBe(true);
     resetMishPacksForTests();
     await makeStore().start();
     const kept = path.join(skillsRoot, '.mish-pack-backups', 'team-kit-2026-10-12T10-00-00-000Z', 'pack-skill-a', 'SKILL.md');
@@ -714,42 +721,77 @@ describe('audit round 2', () => {
     expect(existsSync(path.join(skillsRoot, '.mish-pack-backups', 'team-kit-2026-10-12T10-00-00-000Z', 'pack-skill-b'))).toBe(false);
   });
 
-  it('lets a part of a split module take over a copy or project another part placed', async () => {
+  it('leaves a copy to the pack that placed it, and places it once that pack lets it go', async () => {
     const first = tempDir('mish-src-');
-    writePart(first, 'kit-1', '1.0.0', { 'moving-skill': 'from part one', 'stay-skill': 'stays' }, ['proj-moving']);
+    writePart(first, 'kit-1', '1.0.0', { 'moving-skill': 'from part one', 'shared-skill': 'part one', 'stay-skill': 'stays' }, ['proj-moving']);
     await makeStore().install(first);
+    // A new build moved two folders and a project to the second part.
     const second = tempDir('mish-src-');
-    writePart(second, 'kit-2', '2.0.0', { 'moving-skill': 'from part two' }, ['proj-moving']);
+    writePart(second, 'kit-2', '2.0.0', { 'moving-skill': 'from part two', 'shared-skill': 'part two' }, ['proj-moving']);
     const { pack } = await makeStore().install(second);
-    expect(pack.warnings.join('\n')).not.toMatch(/already exist/);
-    expect(readFileSync(path.join(skillsRoot, 'moving-skill', 'SKILL.md'), 'utf8')).toContain('from part two');
-    expect(receiptOf('kit-1').copied.skills).toEqual(['stay-skill']);
-    // Removing the earlier part leaves what the later one took over.
-    await makeStore().remove('kit-1');
-    expect(existsSync(path.join(skillsRoot, 'moving-skill', 'SKILL.md'))).toBe(true);
-    expect(existsSync(path.join(skillsRoot, 'stay-skill'))).toBe(false);
-    expect(getProject(db, 'proj-moving')).not.toBeNull();
-
-    // A module that shrinks back to one pack takes over from its old part.
-    const whole = tempDir('mish-src-');
-    writePart(whole, 'kit', '3.0.0', { 'moving-skill': 'whole module' }, ['proj-moving']);
-    const merged = await makeStore().install(whole);
-    expect(merged.pack.warnings.join('\n')).not.toMatch(/already exist/);
+    expect(pack.warnings.join('\n')).toMatch(/skills\/moving-skill is provided by the pack kit-1 too/);
+    expect(readFileSync(path.join(skillsRoot, 'moving-skill', 'SKILL.md'), 'utf8')).toContain('from part one');
+    expect(receiptOf('kit-1').copied.skills.sort()).toEqual(['moving-skill', 'shared-skill', 'stay-skill']);
     expect(receiptOf('kit-2').copied.skills).toEqual([]);
-    await makeStore().remove('kit-2');
-    expect(readFileSync(path.join(skillsRoot, 'moving-skill', 'SKILL.md'), 'utf8')).toContain('whole module');
+
+    // The first part's new version no longer has moving-skill: the second part places its own.
+    const firstV2 = tempDir('mish-src-');
+    writePart(firstV2, 'kit-1', '2.0.0', { 'shared-skill': 'part one', 'stay-skill': 'stays' }, []);
+    await makeStore().install(firstV2);
+    expect(readFileSync(path.join(skillsRoot, 'moving-skill', 'SKILL.md'), 'utf8')).toContain('from part two');
+    expect(receiptOf('kit-2').copied.skills).toEqual(['moving-skill']);
+
+    // Removing the first part: its copies go, and the second part places the one it shares.
+    await makeStore().remove('kit-1');
+    expect(existsSync(path.join(skillsRoot, 'stay-skill'))).toBe(false);
+    expect(readFileSync(path.join(skillsRoot, 'shared-skill', 'SKILL.md'), 'utf8')).toContain('part two');
+    expect(receiptOf('kit-2').copied.skills.sort()).toEqual(['moving-skill', 'shared-skill']);
+    const warnings = (await makeStore().list()).packs.find((entry) => entry.id === 'kit-2')!.warnings.join('\n');
+    expect(warnings).not.toMatch(/left as it is/);
+    expect(getProject(db, 'proj-moving')).not.toBeNull();
   });
 
-  it('does not let a pack claim another pack\'s copies by naming it as its module', async () => {
-    const owner = tempDir('mish-src-');
-    writePart(owner, 'kit-1', '1.0.0', { 'owned-skill': 'the owner' }, []);
-    await makeStore().install(owner);
-    const crafted = tempDir('mish-src-');
-    writePart(crafted, 'other-pack', '1.0.0', { 'owned-skill': 'taken over' }, []);
-    const { pack } = await makeStore().install(crafted);
-    expect(pack.warnings.join('\n')).toMatch(/owned-skill already exists and was left as it is/);
-    expect(readFileSync(path.join(skillsRoot, 'owned-skill', 'SKILL.md'), 'utf8')).toContain('the owner');
-    expect(receiptOf('kit-1').copied.skills).toEqual(['owned-skill']);
+  it('does not bring back a project the person deleted when another pack now provides it', async () => {
+    const first = tempDir('mish-src-');
+    writePart(first, 'kit-1', '1.0.0', { 'one-skill': 'one' }, ['proj-moving']);
+    await makeStore().install(first);
+    db.prepare('DELETE FROM projects WHERE id = ?').run('proj-moving');
+    await fsp.rm(path.join(projectsDir, 'proj-moving'), { recursive: true, force: true });
+    const second = tempDir('mish-src-');
+    writePart(second, 'kit-2', '2.0.0', { 'two-skill': 'two' }, ['proj-moving']);
+    await makeStore().install(second);
+    expect(getProject(db, 'proj-moving')).toBeNull();
+    // Still known once the pack that imported it is gone.
+    await makeStore().remove('kit-1');
+    const later = tempDir('mish-src-');
+    writePart(later, 'kit-2', '3.0.0', { 'two-skill': 'two' }, ['proj-moving']);
+    await makeStore().install(later);
+    expect(getProject(db, 'proj-moving')).toBeNull();
+  });
+
+  it('claims MCP entries an in-place update wrote before it was cut short', async () => {
+    const external = tempDir('mish-external-');
+    const packDir = path.join(external, 'team-kit');
+    writeProjectsPack(packDir);
+    resetMishPacksForTests();
+    await makeStore({ externalDir: external }).start();
+    // What a start leaves when it stops after writing v2's MCP entries, before the receipt: the
+    // person's ids written down, v2's entries in the settings, the receipt still at v1.
+    const theirs = (await readMcpConfig(dataDir)).servers.filter((server) => !server.id.startsWith('pack-'));
+    writeVersionTwo(packDir);
+    const v2 = JSON.parse(readFileSync(path.join(packDir, 'mish-pack.json'), 'utf8')) as MishPackManifest;
+    const intentDir = path.join(dataDir, 'mish-packs', '.mcp-intent');
+    await fsp.mkdir(intentDir, { recursive: true });
+    await fsp.writeFile(path.join(intentDir, 'team-kit.json'), JSON.stringify(theirs.map((server) => server.id)));
+    const written = (v2.provides.mcpServers ?? []).map((server) => packServerToConfig(server)!);
+    await fsp.writeFile(path.join(dataDir, 'mcp-config.json'), JSON.stringify({ servers: [...theirs, ...written] }), { mode: 0o600 });
+
+    resetMishPacksForTests();
+    const store = makeStore({ externalDir: external });
+    await store.start();
+    expect(receiptOf().seededMcp.map((entry) => entry.id).sort()).toEqual(['pack-http', 'pack-new', 'pack-stdio']);
+    expect((await store.list()).packs[0]!.warnings.join('\n')).not.toMatch(/MCP server .* already exists/);
+    expect(existsSync(intentDir)).toBe(false);
   });
 
   it('brings a new version found at start fully in: removed copies go, MCP changes apply, a study cannot replace a design system', async () => {

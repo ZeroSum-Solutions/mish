@@ -6,6 +6,7 @@
 //   .journal/<token>.json    an install that has not finished (see "Installing" below)
 //   .incoming/<token>/       the new pack tree of that install
 //   .previous/<token>/       the old pack tree a committed install is about to delete
+//   .mcp-intent/<id>.json    MCP ids the person had before an in-place update (see `reseedMcp`)
 //   .staging/, .trash/       work areas; leftovers are removed on the next start
 //
 // Resources the daemon reads in place (catalogues, kits, assets, design profiles) are not copied:
@@ -15,13 +16,14 @@
 // version, a copy is first moved, in one rename, to `<user root>/.mish-pack-retiring/<id>-<time>/`
 // and only then compared with that digest: a changed one (the user edited it) is moved to
 // `<user root>/.mish-pack-backups/<id>-<time>/<name>` and the result names it; an unchanged one
-// waits in `<user root>/.mish-pack-retired/` and is compared again and deleted at the next start.
-// Nothing is hashed and then deleted at once. A receipt without digests (written before they
-// existed) backs up every copy.
+// waits in `<user root>/.mish-pack-retired/` and is compared again, and deleted, at the first start
+// a day or more later. Nothing is hashed and then deleted at once. A receipt without digests
+// (written before they existed) backs up every copy.
 //
-// A split module (`manifest.module`) is installed as several packs. Its parts share ownership: a
-// copy or project one part placed is taken over, not refused, when another part of that module
-// provides it, so units can move between parts across versions.
+// A pack never takes over a copy another pack placed: that copy is left to its owner and the
+// warning names it. After an install or a removal the other packs are activated again, and a pack
+// that provides a folder nobody has now places it. So when the parts of a split module
+// (`build-pack --split`) trade folders between versions, nothing one part still provides is lost.
 //
 // Saved projects are imported once and never deleted by the pack (see `projects.ts`). Remove and
 // replace leave them in place; the receipt forgets them and the result lists them as kept.
@@ -113,8 +115,6 @@ type CopyBucket = 'skills' | 'designSystems';
 
 interface Receipt {
   id: string;
-  /** The module a split pack is a part of (`manifest.module`). Parts of one module share ownership. */
-  module?: string;
   version: string;
   installedAt: string;
   copied: Record<CopyBucket, string[]>;
@@ -224,6 +224,10 @@ const RETIRING_DIRNAME = '.mish-pack-retiring';
 const RETIRED_DIRNAME = '.mish-pack-retired';
 /** In each `.mish-pack-retired/<id>-<stamp>/`: the digest each folder there had when it was set aside. */
 const RETIRED_DIGESTS = '.digests.json';
+/** How long an unchanged retired copy waits before it is deleted, so a late editor save lands in it first. */
+const RETIRED_GRACE_MS = 24 * 60 * 60 * 1000;
+/** `backupStamp` at the end of a `<id>-<stamp>` folder name, with the `-<n>` a taken name gets. */
+const STAMP_RE = /(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-(\d{3})Z(?:-\d+)?$/u;
 
 // Warnings about a step that is retried. Each is taken away once that step succeeds.
 const WARN_MCP_RETRY = 'MCP servers were not added because the MCP settings file could not be updated; the earlier ones were kept, and the app tries again when it starts';
@@ -235,15 +239,24 @@ function dropWarnings(receipt: Receipt, drop: (text: string) => boolean): void {
   receipt.warnings = receipt.warnings.filter((text) => !drop(text));
 }
 
-/**
- * The split module a pack or receipt is a part of, or null. A `module` counts only when the id is
- * the module's own (`kit`) or one of its numbered parts (`kit-2`), as `build-pack --split` names
- * them, so a pack cannot claim another pack's copies by naming it as its module.
- */
-function familyOf(entry: { id: string; module?: string | undefined }): string | null {
-  const module = entry.module;
-  if (!module) return null;
-  return entry.id === module || new RegExp(`^${module}-[1-9][0-9]*$`, 'u').test(entry.id) ? module : null;
+/** The time in a `<id>-<stamp>` folder name, or null. */
+function stampTime(name: string): number | null {
+  const match = STAMP_RE.exec(name);
+  if (!match) return null;
+  const time = Date.parse(`${match[1]}T${match[2]}:${match[3]}:${match[4]}.${match[5]}Z`);
+  return Number.isNaN(time) ? null : time;
+}
+
+/** A copy left alone because it is in the way, named in a warning; the pack places it once it is free. */
+function collisionWarning(label: string, owner: string | null): string {
+  return owner
+    ? `${label} is provided by the pack ${owner} too, which placed it first; it was left as it is`
+    : `${label} already exists and was left as it is`;
+}
+
+/** Drops the collision warnings about `name` once the pack has placed it. */
+function dropCollision(receipt: Receipt, labels: readonly string[]): void {
+  dropWarnings(receipt, (text) => text.endsWith('left as it is') && labels.some((label) => text.startsWith(`${label} `)));
 }
 
 export function isMishPackId(value: string): boolean {
@@ -403,7 +416,6 @@ async function verifyProvides(root: string, manifest: MishPackManifest): Promise
 function emptyReceipt(pack: { id: string; manifest: MishPackManifest }, now: Date): Receipt {
   return {
     id: pack.id,
-    ...(pack.manifest.module ? { module: pack.manifest.module } : {}),
     version: pack.manifest.version,
     installedAt: now.toISOString(),
     copied: { skills: [], designSystems: [] },
@@ -436,6 +448,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   const journalRoot = path.join(root, '.journal');
   const incomingRoot = path.join(root, '.incoming');
   const previousRoot = path.join(root, '.previous');
+  const mcpIntentRoot = path.join(root, '.mcp-intent');
   const step = async (name: MishPackInstallStep, packId: string) => options.onInstallStep?.(name, packId);
   let busy = false;
 
@@ -527,33 +540,30 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     return out;
   }
 
-  /** The other parts of the module `receipt` belongs to (see `manifest.module`). */
-  async function siblingReceipts(receipt: { id: string; module?: string | undefined }): Promise<Receipt[]> {
-    const family = familyOf(receipt);
-    if (family === null) return [];
-    return (await allReceipts()).filter((other) => other.id !== receipt.id && familyOf(other) === family);
+  /** The id of another pack whose receipt lists `bucket/name`, if one does. Read only. */
+  async function otherOwner(packId: string, bucket: CopyBucket, name: string): Promise<string | null> {
+    const owner = (await allReceipts()).find((other) => other.id !== packId && isNameList(other.copied[bucket]) && other.copied[bucket].includes(name));
+    return owner?.id ?? null;
   }
 
-  /** The other part of the same module that placed `bucket/name`, if one did. */
-  async function siblingOwning(receipt: Receipt, bucket: CopyBucket, name: string): Promise<Receipt | null> {
-    return (await siblingReceipts(receipt)).find((other) => isNameList(other.copied[bucket]) && other.copied[bucket].includes(name)) ?? null;
-  }
-
-  /**
-   * A copy that moved from one part of a module to another now belongs to the part that placed it
-   * last: the others forget it, so removing them does not take it away. Idempotent.
-   */
-  async function releaseFromSiblings(receipt: Receipt, bucket: CopyBucket, name: string): Promise<void> {
-    for (const other of await siblingReceipts(receipt)) {
-      if (!other.copied[bucket].includes(name)) continue;
-      other.copied[bucket] = other.copied[bucket].filter((entry) => entry !== name);
-      if (other.digests?.[bucket]) {
-        const rest = { ...other.digests[bucket] };
-        delete rest[name];
-        other.digests = { ...other.digests, [bucket]: rest };
-      }
-      await writeReceipt(other);
+  /** Ids of packs with an install journal: those are left to that install. */
+  async function journalPackIds(): Promise<Set<string>> {
+    const ids = new Set<string>();
+    let names: string[];
+    try {
+      names = (await fsp.readdir(journalRoot)).filter((name) => name.endsWith('.json'));
+    } catch {
+      return ids;
     }
+    for (const name of names) {
+      try {
+        const journal = JSON.parse(await fsp.readFile(path.join(journalRoot, name), 'utf8')) as unknown;
+        if (validJournal(journal)) ids.add(journal.packId);
+      } catch {
+        // an unreadable journal names no pack
+      }
+    }
+    return ids;
   }
 
   /** A free path `intoDir/<name>` (or `<name>-2`, ...), creating `intoDir`. */
@@ -646,19 +656,12 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         const mine = list.includes(child);
         if (await exists(dest)) {
           if (!mine) {
-            const owner = await siblingOwning(receipt, bucket, child);
-            // Another part of the same module placed it: a new version takes it over, a restart leaves it.
-            if (owner && !refresh) continue;
-            if (!owner) {
-              receipt.warnings.push(`${key}/${child} already exists and was left as it is`);
-              continue;
-            }
-            keep(await retireCopy(owner, bucket, child, stamp));
-          } else {
-            // Already copied by this pack at this version: a restart does not copy it again.
-            if (!refresh) continue;
-            keep(await retireCopy(receipt, bucket, child, stamp));
+            receipt.warnings.push(collisionWarning(`${key}/${child}`, await otherOwner(receipt.id, bucket, child)));
+            continue;
           }
+          // Already copied by this pack at this version: a restart does not copy it again.
+          if (!refresh) continue;
+          keep(await retireCopy(receipt, bucket, child, stamp));
         }
         // Built in the staging folder, which the scanners do not read, then renamed into place.
         const tmpDir = path.join(destRoot, STAGING_DIRNAME, `copy-${randomUUID()}`);
@@ -674,7 +677,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         }
         if (!mine) list.push(child);
         if (digest !== null) recordDigest(receipt, bucket, child, digest);
-        await releaseFromSiblings(receipt, bucket, child);
+        dropCollision(receipt, [`${key}/${child}`, `${bucket}/${child}`]);
       }
     }
     if (!refresh) return;
@@ -710,8 +713,10 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     // This attempt says again what still has to wait.
     dropWarnings(receipt, (text) => text === WARN_DB_CLOSED || PROJECT_RETRY_RE.test(text));
     const mine = new Set(receiptProjects(receipt));
-    // A project another part of the same module imported is the module's, not the person's.
-    const siblings = new Set((await siblingReceipts(receipt)).flatMap((other) => receiptProjects(other)));
+    // A project another pack imported is known already (the parts of a split module trade
+    // projects between versions). It is listed here too, which is harmless because packs never
+    // delete projects, so one the person deleted stays deleted whichever pack is removed first.
+    const others = new Set((await allReceipts()).filter((other) => other.id !== receipt.id).flatMap((other) => receiptProjects(other)));
     const existing: string[] = [];
     // A project keeps its design system only when this pack placed that design system.
     const packDesignSystems = new Set(receipt.copied.designSystems);
@@ -721,8 +726,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     await fsp.mkdir(projectsDir, { recursive: true });
     for (const packRow of await readPackProjectRows(source)) {
       if (mine.has(packRow.id)) continue;
-      // Shared with that part, so it stays known once that part is removed.
-      if (siblings.has(packRow.id)) {
+      if (others.has(packRow.id)) {
         mine.add(packRow.id);
         continue;
       }
@@ -793,17 +797,61 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   }
 
   /**
+   * Of the entries `seedPackMcpServers` skipped because the id was taken, the ones an earlier
+   * attempt of this change wrote but did not record: exactly the planned config, under an id the
+   * person did not have before (`theirs`; null when that is unknown, and nothing is claimed). The
+   * others are named in a warning.
+   */
+  async function claimSkipped(skipped: readonly string[], planned: readonly McpServerConfig[], theirs: readonly string[] | null, receipt: Receipt): Promise<SeededMcpServer[]> {
+    const before = theirs ? new Set(theirs) : null;
+    const current = skipped.length > 0 ? (await readMcpConfig(options.dataDir)).servers : [];
+    const claimed: SeededMcpServer[] = [];
+    for (const id of skipped) {
+      const config = planned.find((entry) => entry.id === id);
+      const present = current.find((server) => server.id === id);
+      if (config && present && before && !before.has(id) && JSON.stringify(config) === JSON.stringify(present)) claimed.push({ id, config });
+      else receipt.warnings.push(`MCP server ${id} already exists and was left as it is`);
+    }
+    return claimed;
+  }
+
+  /** Ids the person had in the MCP settings before an in-place update started (see `reseedMcp`). */
+  const mcpIntentFile = (packId: string) => path.join(mcpIntentRoot, `${packId}.json`);
+
+  async function readMcpIntent(packId: string): Promise<string[] | null> {
+    try {
+      const parsed = JSON.parse(await fsp.readFile(mcpIntentFile(packId), 'utf8')) as unknown;
+      return Array.isArray(parsed) && parsed.every((id) => typeof id === 'string') ? parsed : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function clearMcpIntent(packId: string): Promise<void> {
+    await fsp.rm(mcpIntentFile(packId), { force: true });
+    await fsp.rmdir(mcpIntentRoot).catch(() => undefined);
+  }
+
+  /**
    * A new version of a pack activated in place: the earlier version's entries (the unchanged ones)
-   * go and the new version's are added, so a changed config is updated. A failure puts back what
-   * this call took away and keeps the earlier entries recorded as the pack's.
+   * go and the new version's are added, so a changed config is updated. The ids the person had
+   * before are written down first, so an attempt cut short after writing the settings is claimed
+   * by the next one instead of lost. A failure puts back what this call took away and keeps the
+   * earlier entries recorded as the pack's.
    */
   async function reseedMcp(pack: ActiveMishPack, receipt: Receipt, previous: readonly SeededMcpServer[]): Promise<void> {
     let removed: string[] = [];
     try {
+      let theirs = await readMcpIntent(pack.id);
+      if (theirs === null) {
+        theirs = (await mcpOwnership(previous)).theirs;
+        if (theirs !== null) await writeJson(mcpIntentFile(pack.id), theirs);
+      }
       removed = await unseedPackMcpServers(options.dataDir, previous);
-      const { seeded, skipped } = await seedPackMcpServers(options.dataDir, pack.manifest.provides.mcpServers ?? []);
-      receipt.seededMcp = seeded;
-      for (const id of skipped) receipt.warnings.push(`MCP server ${id} already exists and was left as it is`);
+      const servers = pack.manifest.provides.mcpServers ?? [];
+      const { seeded, skipped } = await seedPackMcpServers(options.dataDir, servers);
+      const planned = servers.map((server) => packServerToConfig(server)).filter((config): config is McpServerConfig => config !== null);
+      receipt.seededMcp = [...seeded, ...(await claimSkipped(skipped, planned, theirs, receipt))];
     } catch {
       // An unreadable MCP file must not undo the rest of the install; say so and carry on.
       const taken = new Set(removed);
@@ -830,14 +878,31 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
           projects: receiptProjects(previous),
         };
     const isNewVersion = !previous || previous.version !== pack.manifest.version;
-    if (pack.manifest.module) receipt.module = pack.manifest.module;
     const backups: MishPackBackup[] = [];
     await copyIntoUserRoots(pack, receipt, isNewVersion, backups);
     const previousMcp = previous?.seededMcp ?? [];
     if (isNewVersion && ((pack.manifest.provides.mcpServers?.length ?? 0) > 0 || previousMcp.length > 0)) await reseedMcp(pack, receipt, previousMcp);
     if (isNewVersion || receipt.projectsPending || receipt.importing) await importProjects(pack, receipt);
     await writeReceipt(receipt);
+    await clearMcpIntent(pack.id);
     return { receipt, backups };
+  }
+
+  /**
+   * After an install or a removal, the other packs are activated again, so one that provides a
+   * folder nobody has now places it (see the top of this file). A failure is logged; the next
+   * start tries again.
+   */
+  async function reactivateOthers(packId: string): Promise<void> {
+    const pending = await journalPackIds();
+    for (const pack of activeMishPacks()) {
+      if (pack.id === packId || pending.has(pack.id)) continue;
+      try {
+        await activate(pack);
+      } catch (error) {
+        console.warn(`[mish-packs] ${pack.id}: activation failed (${(error as { code?: string }).code ?? 'error'})`);
+      }
+    }
   }
 
   /**
@@ -862,6 +927,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       }
     }
     await fsp.rm(receiptFile(id), { force: true });
+    await clearMcpIntent(id);
     return { backups, keptProjects: receiptProjects(receipt) };
   }
 
@@ -949,36 +1015,29 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     for (const staged of receipt.copiesApplied ? [] : journal.stagedCopies) {
       const dest = path.join(bucketRoot(staged.bucket), staged.name);
       const list = receipt.copied[staged.bucket];
-      if (list.includes(staged.name)) {
-        await releaseFromSiblings(receipt, staged.bucket, staged.name);
-        continue;
-      }
+      if (list.includes(staged.name)) continue;
       if (!(await exists(staged.path))) {
         // Placed by an earlier attempt that stopped before the receipt was written.
         if (await exists(dest)) {
           list.push(staged.name);
           if (staged.digest !== null) recordDigest(receipt, staged.bucket, staged.name, staged.digest);
           await writeReceipt(receipt);
-          await releaseFromSiblings(receipt, staged.bucket, staged.name);
         }
         continue;
       }
       if (await exists(dest)) {
-        // The old generation's copy, or one another part of the same module placed (a split
-        // module whose parts changed), is replaced; anything else is the person's.
-        const owner = old?.copied[staged.bucket].includes(staged.name) ? old : await siblingOwning(receipt, staged.bucket, staged.name);
-        if (!owner) {
-          receipt.warnings.push(`${staged.bucket}/${staged.name} already exists and was left as it is`);
+        // The old generation's copy is replaced; anything else is another pack's or the person's.
+        if (!old?.copied[staged.bucket].includes(staged.name)) {
+          receipt.warnings.push(collisionWarning(`${staged.bucket}/${staged.name}`, await otherOwner(receipt.id, staged.bucket, staged.name)));
           continue;
         }
-        keep(await retireCopy(owner, staged.bucket, staged.name, stamp));
+        keep(await retireCopy(old, staged.bucket, staged.name, stamp));
       }
       await fsp.mkdir(path.dirname(dest), { recursive: true });
       await fsp.rename(staged.path, dest);
       list.push(staged.name);
       if (staged.digest !== null) recordDigest(receipt, staged.bucket, staged.name, staged.digest);
       await writeReceipt(receipt);
-      await releaseFromSiblings(receipt, staged.bucket, staged.name);
     }
     // Old copies the new generation no longer has.
     if (old && !receipt.copiesApplied) {
@@ -1010,18 +1069,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         await step('mcp-unseeded', journal.packId);
         const { seeded, skipped } = servers.length > 0 ? await seedPackMcpServers(options.dataDir, servers) : { seeded: [], skipped: [] };
         await step('mcp-written', journal.packId);
-        // An entry an earlier attempt wrote but did not record is still this pack's: it is exactly
-        // the planned config, and the person did not have that id before the install.
-        const theirs = journal.mcpTheirs ? new Set(journal.mcpTheirs) : null;
-        const current = skipped.length > 0 ? (await readMcpConfig(options.dataDir)).servers : [];
-        const claimed: SeededMcpServer[] = [];
-        for (const id of skipped) {
-          const planned = intent.add.find((config) => config.id === id);
-          const present = current.find((server) => server.id === id);
-          if (planned && present && theirs && !theirs.has(id) && JSON.stringify(planned) === JSON.stringify(present)) claimed.push({ id, config: planned });
-          else receipt.warnings.push(`MCP server ${id} already exists and was left as it is`);
-        }
-        receipt.seededMcp = [...seeded, ...claimed];
+        receipt.seededMcp = [...seeded, ...(await claimSkipped(skipped, intent.add, journal.mcpTheirs ?? null, receipt))];
         receipt.mcpApplied = true;
         dropWarnings(receipt, (text) => text === WARN_MCP_RETRY);
         await writeReceipt(receipt);
@@ -1136,8 +1184,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   }
 
   /**
-   * Deletes the unchanged copies an update or removal set aside in `.mish-pack-retired`, each after
-   * comparing it again with the digest it had then. One that changed since (an editor that still
+   * Deletes the unchanged copies an update or removal set aside in `.mish-pack-retired` a day or
+   * more ago, each after comparing it again with the digest it had then. One that changed since (an editor that still
    * had it open saved into it) or has no digest is moved to `.mish-pack-backups` and named in its
    * pack's warnings.
    */
@@ -1152,6 +1200,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         continue;
       }
       for (const hold of holds) {
+        const setAside = stampTime(hold);
+        if (setAside !== null && now().getTime() - setAside < RETIRED_GRACE_MS) continue;
         const holdDir = path.join(retired, hold);
         const digestsFile = path.join(holdDir, RETIRED_DIGESTS);
         const digests = await readRetiredDigests(digestsFile);
@@ -1340,10 +1390,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
 
   /** Brings the staged pack in: prepare, commit, finish (see the top of this file). */
   async function installStaged(packRoot: string, manifest: MishPackManifest): Promise<MishPackStoreInstallResult> {
-    // A committed install of the same pack, or of another part of its module, that has not
-    // finished goes first: this install may take copies over from that part.
     await finishPending(manifest.id);
-    for (const sibling of await siblingReceipts({ id: manifest.id, module: manifest.module })) await finishPending(sibling.id);
     const token = randomUUID();
     const final = path.join(root, manifest.id);
     const replaced = await exists(final);
@@ -1389,6 +1436,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       throw new MishPackError('INTERNAL_ERROR', 'the pack is installed but did not finish activating; it finishes when the app starts again');
     }
     const { pack, receipt } = finished;
+    await reactivateOthers(manifest.id);
     return { pack: await summarize(pack, receipt), replaced, backups };
   }
 
@@ -1476,6 +1524,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         const { backups, keptProjects } = await deactivate(id);
         await fsp.rm(trashed, { recursive: true, force: true });
         await fsp.rmdir(trashRoot).catch(() => undefined);
+        await reactivateOthers(id);
         return { removed: id, backups, ...(keptProjects.length > 0 ? { keptProjects } : {}) };
       });
     },

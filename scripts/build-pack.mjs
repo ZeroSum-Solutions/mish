@@ -944,7 +944,7 @@ async function main() {
           mcpServers: withExtras && first ? mcpServers : null,
         });
         const description = module.description ?? map.pack?.description;
-        const manifest = { schemaVersion: 1, id, name, version, ...(description ? { description } : {}), module: module.id, provides: assembled.provides };
+        const manifest = { schemaVersion: 1, id, name, version, ...(description ? { description } : {}), provides: assembled.provides };
         const entries = finalizeManifest(contracts, manifest, assembled.entries, plan);
         packs.push({ id, module: module.id, name, version, file: `${id}-${version}.zip`, entries, resources: assembled.resources, files: entries.length, bytes: entries.reduce((sum, entry) => sum + entry.size, 0) });
       });
