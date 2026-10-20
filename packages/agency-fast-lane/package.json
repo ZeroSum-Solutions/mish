@@ -38,7 +38,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@mish/cult-ui-catalog": "workspace:*"
+    "@mish/cult-ui-catalog": "workspace:*",
+    "@mish/publisher": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "24.12.2",

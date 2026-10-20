@@ -18,8 +18,7 @@
  * the atom is null; `address` stays plain text, like every other page-kind family's address atom.
  */
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { readCompilerResource } from '../../resources.ts';
 import type { AssetRequirement } from '../../assets.ts';
 import { presentSections, sectionOfType } from '../../sections.ts';
 import { parseRestaurantRecipe, type RestaurantRecipe, type RestaurantSection } from './contract.ts';
@@ -39,13 +38,11 @@ import {
  */
 export const NAV_TARGET_ORDER = [MENU_SECTION_ID, HOURS_LOCATION_SECTION_ID, RESERVATIONS_SECTION_ID, STORY_SECTION_ID, GALLERY_SECTION_ID, REVIEWS_SECTION_ID];
 
-const HERE = import.meta.dirname;
-const HYPERUI_CSS = path.join(HERE, '../../catalog/hyperui/restaurant.css');
-let hyperuiCss: string | undefined;
+/** Relative to `compiler/scripts/`, read through `resources.ts` (disk, or a supplied table). */
+const HYPERUI_CSS = 'catalog/hyperui/restaurant.css';
 /** The compiled Tailwind build for this page kind's blocks, read once and inlined once per page. */
 function inlinedStyles(): string {
-  hyperuiCss ??= readFileSync(HYPERUI_CSS, 'utf8');
-  return hyperuiCss;
+  return readCompilerResource(HYPERUI_CSS);
 }
 
 export function validateRestaurantRecipe(input: unknown): RestaurantRecipe {

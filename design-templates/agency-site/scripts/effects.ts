@@ -1,7 +1,6 @@
 import { createHash } from 'node:crypto';
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
 import { catalogAsset } from './catalog-block.ts';
+import { compilerResourceSource, findCompilerResource } from './resources.ts';
 
 // Reviewed GenUI effect placements: a family's `catalog.json` `effects` declaration and the
 // deterministic decoration of a rendered page. Shared: edit plugins/_official/shared/agency-compiler,
@@ -49,7 +48,6 @@ export class PageByteLimitError extends Error {
   }
 }
 
-const SCRIPTS_DIR = import.meta.dirname;
 const FAMILY = /^[a-z][a-z0-9-]{0,63}$/;
 const COMPONENT = /^[a-z][a-z0-9-]{0,63}$/;
 const HOST_VALUE = /^[A-Za-z][A-Za-z0-9_.:-]{0,127}$/;
@@ -58,18 +56,22 @@ const isPlacement = (value: unknown): value is EffectPlacementId => (EFFECT_PLAC
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null && !Array.isArray(value);
 const utf8 = (text: string): number => Buffer.byteLength(text, 'utf8');
 
-let kinds: Map<string, EffectKind> | undefined;
+/** Parsed per resource source (`resources.ts`), so a supplied table never reuses the disk's parse. */
+const kindsBySource = new WeakMap<object, Map<string, EffectKind>>();
 /** A component's kind, from this copy's generated `catalog/CATALOG.json`. */
 export function componentKind(id: string): EffectKind {
+  const source = compilerResourceSource();
+  let kinds = kindsBySource.get(source);
   if (!kinds) {
-    const file = path.join(SCRIPTS_DIR, 'catalog/CATALOG.json');
-    const parsed: unknown = existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {};
+    const text = findCompilerResource('catalog/CATALOG.json');
+    const parsed: unknown = text === undefined ? {} : JSON.parse(text);
     const components = isRecord(parsed) && isRecord(parsed.components) ? parsed.components : {};
     kinds = new Map();
     for (const [key, value] of Object.entries(components)) {
       const kind = isRecord(value) ? value.kind : undefined;
       if (kind === 'css-only' || kind === 'js') kinds.set(key, kind);
     }
+    kindsBySource.set(source, kinds);
   }
   const kind = kinds.get(id);
   if (!kind) throw new Error(`catalog component ${JSON.stringify(id)}: no kind in this compiler copy's catalog/CATALOG.json`);
@@ -114,15 +116,18 @@ export function parseFamilyEffectDeclaration(value: unknown, catalogComponents: 
   return { scriptPolicy, maxEffects: maxEffects as number, placements };
 }
 
-const declarations = new Map<string, FamilyEffectDeclaration | null>();
+const declarationsBySource = new WeakMap<object, Map<string, FamilyEffectDeclaration | null>>();
 /** The validated `effects` of `families/<family>/catalog.json` in this copy, or null when it declares none. */
 export function readFamilyEffectDeclaration(family: string): FamilyEffectDeclaration | null {
   if (!FAMILY.test(family)) throw new Error(`family id: ${JSON.stringify(family)} is not a family id`);
+  const source = compilerResourceSource();
+  let declarations = declarationsBySource.get(source);
+  if (!declarations) declarationsBySource.set(source, declarations = new Map());
   if (declarations.has(family)) return declarations.get(family)!;
-  const file = path.join(SCRIPTS_DIR, 'families', family, 'catalog.json');
+  const text = findCompilerResource(`families/${family}/catalog.json`);
   let declaration: FamilyEffectDeclaration | null = null;
-  if (existsSync(file)) {
-    const parsed: unknown = JSON.parse(readFileSync(file, 'utf8'));
+  if (text !== undefined) {
+    const parsed: unknown = JSON.parse(text);
     if (isRecord(parsed) && parsed.effects !== undefined) {
       const components = Array.isArray(parsed.catalogComponents) ? parsed.catalogComponents.filter((id): id is string => typeof id === 'string') : [];
       declaration = parseFamilyEffectDeclaration(parsed.effects, components, `families/${family}/catalog.json`);

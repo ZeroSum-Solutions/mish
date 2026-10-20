@@ -60,7 +60,7 @@ function gate(needs: Record<string, unknown>) {
 }
 
 const cases = [
-  { name: "PR", eventName: "pull_request", event: { pull_request: { number: 42, draft: false } }, response: "README.md\n", threshold: "medium", endpoint: "pulls/42/files" },
+  { name: "PR", eventName: "pull_request", event: { pull_request: { number: 42, draft: false } }, response: "F\tREADME.md\n", threshold: "medium", endpoint: "pulls/42/files" },
   { name: "manual full", eventName: "workflow_dispatch", event: { inputs: { ci_mode: "full" } }, response: "", threshold: "none", endpoint: "" },
   { name: "manual hot", eventName: "workflow_dispatch", event: { inputs: { ci_mode: "hot" } }, response: "apps/web/src/app/page.tsx\n", threshold: "medium", endpoint: "compare/main..." + "a".repeat(40) },
   { name: "merge group", eventName: "merge_group", event: { merge_group: { base_sha: "b".repeat(40), head_sha: "a".repeat(40) } }, response: JSON.stringify({ files: [{ filename: "docs/architecture.md" }] }), threshold: "certain", endpoint: "compare/" + "b".repeat(40) + "..." + "a".repeat(40) },
@@ -68,13 +68,17 @@ const cases = [
 
 describe("public CI planning and gate", () => {
   test("keeps one read-only CI workflow with hosted runners and no storage reuse", () => {
-    expect(readdirSync(path.join(root, ".github/workflows")).sort()).toEqual(["ci.yml", "release-mac.yml"]);
+    expect(readdirSync(path.join(root, ".github/workflows")).sort()).toEqual(["cache-seed.yml", "ci.yml", "release-mac.yml"]);
     expect(workflowText).toContain("merge_group:");
     expect(workflowText).toContain("run: $" + "{{ steps.scopes.outputs.run }}");
     expect(workflowText).not.toMatch(/secrets\.|vars\.|pull_request_target|self-hosted|convergence|WORKLOAD_RESULTS/);
     const release = readFileSync(path.join(root, ".github/workflows/release-mac.yml"), "utf8");
     expect(release).not.toMatch(/secrets\.|vars\.|pull_request(_target)?:|self-hosted/);
     expect(release).toMatch(/^permissions:\n  contents: read$/m);
+    const seed = readFileSync(path.join(root, ".github/workflows/cache-seed.yml"), "utf8");
+    expect(seed).not.toMatch(/secrets\.|vars\.|pull_request(_target)?:|self-hosted/);
+    expect(seed).toMatch(/^permissions:\n  contents: read$/m);
+    expect(seed).toContain("save-pnpm-cache: 'true'");
     for (const name of readdirSync(path.join(root, ".github/config")).filter((name) => name.endsWith(".json"))) {
       const config = readFileSync(path.join(root, ".github/config", name), "utf8");
       for (const match of config.matchAll(/"(\.github\/workflows\/[^"\n]+)"/g)) {
@@ -120,6 +124,24 @@ describe("public CI planning and gate", () => {
       expect(result.stdout).toContain("Invalid workload plan");
     },
   );
+
+  test("skips the broad floor for an inert-only PR only when GitHub's file count proves the list complete", () => {
+    const docs = "F\tREADME.md\nF\tapps/web/AGENTS.md\n";
+    const pr = (changed: unknown) => planEvent("pull_request", { pull_request: { number: 42, draft: false, changed_files: changed } }, docs).plan;
+    expect(pr(2)).toMatchObject({ enabled: { workspace_unit_tests: false }, scopes: { run_preflight_typecheck: false } });
+    // A count the returned records do not match, the 3,000-file cap, or no count: keep the floor.
+    for (const changed of [1, 3, 3000, 4200, undefined, "2"]) {
+      expect(pr(changed), String(changed)).toMatchObject({ enabled: { workspace_unit_tests: true }, scopes: { run_preflight_typecheck: true } });
+    }
+    // A rename's previous path is not a record; an untagged line leaves the list unverified.
+    const renamed = planEvent("pull_request", { pull_request: { number: 42, draft: false, changed_files: 1 } }, "F\tREADME.md\nP\tPRIVACY.md\n").plan;
+    expect(renamed).toMatchObject({ enabled: { workspace_unit_tests: false } });
+    const untagged = planEvent("pull_request", { pull_request: { number: 42, draft: false, changed_files: 1 } }, "README.md\n").plan;
+    expect(untagged).toMatchObject({ enabled: { workspace_unit_tests: true } });
+    // The comparison API behind manual-hot runs caps at 300 files with no count: never complete.
+    const hot = planEvent("workflow_dispatch", { inputs: { ci_mode: "hot" } }, docs).plan;
+    expect(hot).toMatchObject({ enabled: { workspace_unit_tests: true }, scopes: { run_preflight_typecheck: true } });
+   }, 60_000);
 
   test("rejects non-boolean workload flags", () => {
     const { plan } = planEvent("workflow_dispatch", { inputs: { ci_mode: "full" } }, "");

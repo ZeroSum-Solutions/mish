@@ -89,8 +89,20 @@ export async function readApprovedAsset(root: string, asset: ApprovedAsset): Pro
   };
   await verifyLocation();
   const bytes = await readRegularFile(path.join(pinnedRoot, asset.file), LIMIT, verifyLocation);
+  verifyApprovedAssetBytes(asset, bytes);
+  return bytes;
+}
+
+/**
+ * The checks every approved asset's bytes pass, wherever they came from: within the size limit,
+ * a file signature that matches the suffix, and the descriptor's byte size and SHA-256 when it
+ * names them. `readApprovedAsset` runs it on a file; the publisher library runs it on the bytes a
+ * caller's asset resolver returns. Throws on the first failure.
+ */
+export function verifyApprovedAssetBytes(asset: ApprovedAsset, input: Uint8Array): void {
+  const bytes = Buffer.isBuffer(input) ? input : Buffer.from(input.buffer, input.byteOffset, input.byteLength);
+  if (bytes.length > LIMIT) throw new Error(`Asset ${asset.id} exceeds ${LIMIT} bytes`);
   if (!matchesSignature(bytes, path.extname(asset.file).slice(1))) throw new Error(`Asset ${asset.id} bytes do not match its media type`);
   if (asset.bytes !== undefined && asset.bytes !== bytes.length) throw new Error(`Asset ${asset.id} byte size mismatch`);
   if (asset.sha256 !== undefined && createHash('sha256').update(bytes).digest('hex') !== asset.sha256) throw new Error(`Asset ${asset.id} SHA-256 mismatch`);
-  return bytes;
 }

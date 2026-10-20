@@ -27,8 +27,7 @@
  * button-shaped link — see `planAVisitIsMeaningful`.
  */
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { readCompilerResource } from '../../resources.ts';
 import type { AssetRequirement } from '../../assets.ts';
 import { linkTo, presentSections, sectionOfType } from '../../sections.ts';
 import { parseGuideRecipe, type GuideItem, type GuideRecipe, type GuideSection } from './contract.ts';
@@ -39,13 +38,11 @@ import {
   PRACTICAL_FACTS_SECTION_ID,
 } from './slots.ts';
 
-const HERE = import.meta.dirname;
-const HYPERUI_CSS = path.join(HERE, '../../catalog/hyperui/guide.css');
-let hyperuiCss: string | undefined;
+/** Relative to `compiler/scripts/`, read through `resources.ts` (disk, or a supplied table). */
+const HYPERUI_CSS = 'catalog/hyperui/guide.css';
 /** The compiled Tailwind build for this page kind's blocks, read once and inlined once per page. */
 function inlinedStyles(): string {
-  hyperuiCss ??= readFileSync(HYPERUI_CSS, 'utf8');
-  return hyperuiCss;
+  return readCompilerResource(HYPERUI_CSS);
 }
 
 export function validateGuideRecipe(input: unknown): GuideRecipe {

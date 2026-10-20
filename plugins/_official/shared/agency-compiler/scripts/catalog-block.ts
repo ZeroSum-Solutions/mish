@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { compilerResourceSource, findCompilerResource } from './resources.ts';
 
 /**
  * Embed one owned GenUI catalog component (packages/genui-catalog) in a family page.
@@ -7,8 +6,8 @@ import path from 'node:path';
  * A family declares the components it uses in `families/<family>/catalog.json`
  * (`{"catalogComponents": ["<id>", ...]}`). `packages/genui-catalog/scripts/sync-catalog-assets.ts`
  * then copies exactly those components' built files into `catalog/components/<id>/` next to this
- * file, in every compiler copy that carries the family, so the read below resolves inside a packed
- * plugin and inside the Agency Site template. A component the family did not declare is not on
+ * file, in every compiler copy that carries the family, so the read below (through `resources.ts`)
+ * resolves inside a packed plugin and inside the Agency Site template. A component the family did not declare is not on
  * disk, and `catalogBlock` fails loudly rather than emitting a bare class hook.
  *
  * `catalogBlock(id, markup, opts)` returns the component's host element around `markup` (trusted,
@@ -40,10 +39,10 @@ export interface CatalogBlockOptions {
   emitted?: Set<string>;
 }
 
-const COMPONENTS_DIR = path.join(import.meta.dirname, 'catalog/components');
 const ID = /^[a-z][a-z0-9-]{0,63}$/;
 const NAME = /^[a-z][a-z0-9-]*$/;
-const cache = new Map<string, string>();
+/** Checked text per resource source (`resources.ts`), so a supplied table never reuses the disk's. */
+const cacheBySource = new WeakMap<object, Map<string, string>>();
 
 function escapeAttr(value: string): string {
   return value.replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]!));
@@ -53,13 +52,13 @@ function escapeAttr(value: string): string {
 export function catalogAsset(id: string, file: CatalogFile): string {
   if (!ID.test(id)) throw new Error(`catalog component id: expected lowercase letters, digits and hyphens, got ${JSON.stringify(id)}`);
   const key = `${id}/${file}`;
+  const source = compilerResourceSource();
+  let cache = cacheBySource.get(source);
+  if (!cache) cacheBySource.set(source, cache = new Map());
   const hit = cache.get(key);
   if (hit !== undefined) return hit;
-  const source = path.join(COMPONENTS_DIR, id, file);
-  let text: string;
-  try {
-    text = readFileSync(source, 'utf8');
-  } catch {
+  const text = findCompilerResource(`catalog/components/${key}`);
+  if (text === undefined) {
     throw new Error(`catalog component ${id}: ${file} is not in this compiler copy — declare "${id}" in the family's catalog.json and run the genui-catalog sync-assets script`);
   }
   // The text is inlined into a <style> or <script> element, so it must not be able to close it.

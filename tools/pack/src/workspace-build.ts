@@ -25,6 +25,7 @@ export const WORKSPACE_BUILD_PACKAGES = [
   { directory: "packages/dsh-runtime", name: "@mish/dsh-runtime" },
   { directory: "packages/cult-ui-catalog", name: "@mish/cult-ui-catalog" },
   { directory: "packages/21st-catalog", name: "@mish/21st-catalog" },
+  { directory: "packages/publisher", name: "@mish/publisher" },
   { directory: "packages/agency-fast-lane", name: "@mish/agency-fast-lane" },
   { directory: "packages/genui-catalog", name: "@mish/genui-catalog" },
   { directory: "packages/section-catalog", name: "@mish/section-catalog" },
@@ -52,7 +53,7 @@ export const WORKSPACE_BUILD_COMMANDS = [
   { args: ["--filter", "@mish/packaged", "run", "build"] },
 ] as const;
 
-export const WORKSPACE_BUILD_CACHE_SCHEMA_VERSION = 11;
+export const WORKSPACE_BUILD_CACHE_SCHEMA_VERSION = 12;
 
 export type WorkspaceBuildCacheKeyInputs = {
   buildCommands: unknown;
@@ -115,11 +116,32 @@ async function readPackageManager(workspaceRoot: string): Promise<unknown> {
   return rootPackageJson.packageManager;
 }
 
+/**
+ * Inputs a workspace package's build reads from outside its own directory. `@mish/publisher`
+ * bundles every Agency family package and copies the repository LICENSE into its `dist/`, so a
+ * change there must miss the cache even though the package's own sources did not change.
+ */
+async function hashExternalBuildInputs(workspaceRoot: string): Promise<Record<string, string>> {
+  const hashes: Record<string, string> = {};
+  const examples = join(workspaceRoot, "plugins", "_official", "examples");
+  const families = (await readdir(examples, { withFileTypes: true }).catch(() => []))
+    .filter((entry) => entry.isDirectory() && entry.name.startsWith("agency-"))
+    .map((entry) => entry.name)
+    .sort();
+  for (const family of families) {
+    hashes[`@mish/publisher:plugins/_official/examples/${family}`] = await hashPackageSourcePath(join(examples, family));
+  }
+  const license = join(workspaceRoot, "LICENSE");
+  hashes["@mish/publisher:LICENSE"] = (await pathExists(license)) ? await hashPath(license) : "absent";
+  return hashes;
+}
+
 export async function createWorkspaceBuildCacheKey(config: ToolPackConfig): Promise<string> {
   const packageHashes: Record<string, string> = {};
   for (const packageInfo of WORKSPACE_BUILD_PACKAGES) {
     packageHashes[packageInfo.name] = await hashPackageSourcePath(join(config.workspaceRoot, packageInfo.directory));
   }
+  Object.assign(packageHashes, await hashExternalBuildInputs(config.workspaceRoot));
   const nodeId = `${config.platform}.workspace-build`;
 
   return createWorkspaceBuildCacheKeyFromInputs({
@@ -197,6 +219,10 @@ function workspaceBuildOutputFiles(config: ToolPackConfig): string[] {
     "packages/diagnostics/dist/index.d.ts",
     "packages/dsh-runtime/dist/index.js",
     "packages/dsh-runtime/dist/types/index.d.ts",
+    "packages/publisher/dist/index.js",
+    "packages/publisher/dist/index.d.ts",
+    "packages/publisher/dist/node.js",
+    "packages/publisher/dist/node.d.ts",
     "packages/agency-fast-lane/dist/route.js",
     "packages/agency-fast-lane/dist/route.d.ts",
     "packages/agency-fast-lane/dist/build.js",
@@ -236,6 +262,7 @@ function workspaceBuildArtifacts(config: ToolPackConfig): WorkspaceBuildArtifact
     "packages/plugin-runtime/dist",
     "packages/diagnostics/dist",
     "packages/dsh-runtime/dist",
+    "packages/publisher/dist",
     "packages/agency-fast-lane/dist",
     "packages/genui-catalog/dist",
     "apps/daemon/dist",

@@ -270,6 +270,7 @@ jobs:
           pnpm --filter @mish/sidecar test
           pnpm --filter @mish/sidecar-proto test
           pnpm --filter @mish/agui-adapter test
+          pnpm --filter @mish/publisher test
           pnpm --filter @mish/agency-fast-lane test
           pnpm --filter @mish/genui-catalog test
           pnpm --filter @mish/section-catalog test
@@ -287,10 +288,22 @@ jobs:
               pnpm --filter @mish/e2e test tests/packaged-launcher-update-loop.test.ts
             fi
           fi
+          # Focused E2E Vitest files run here instead of arming the whole E2E Vitest lane:
+          # agent tooling (scripts/agents/) and the public setup docs.
+          if [ "${{ fromJSON(needs.plan.outputs.scopes).agent_scripts_tests_required }}" = "true" ]; then
+            for script in scripts/agents/*.sh; do sh -n "$script"; done
+            if [ "${{ fromJSON(needs.plan.outputs.run).e2e_vitest }}" != "true" ]; then
+              pnpm --filter @mish/e2e test tests/scripts/agent-writer-slot.test.ts tests/scripts/agent-tools.test.ts
+            fi
+          fi
+          if [ "${{ fromJSON(needs.plan.outputs.scopes).public_docs_tests_required }}" = "true" ] &&
+             [ "${{ fromJSON(needs.plan.outputs.run).e2e_vitest }}" != "true" ]; then
+            pnpm --filter @mish/e2e test tests/public-docs-consistency.test.ts
+          fi
 
 
   daemon_unit_tests:
-    name: Daemon tests (${{ matrix.shard }}/4)
+    name: Daemon tests (${{ matrix.shard }}/6)
     needs: [plan, runners]
     if: ${{ fromJSON(needs.plan.outputs.run).daemon_unit_tests }}
     runs-on: ${{ fromJSON(needs.runners.outputs.runs_on).workspace_unit }}
@@ -300,7 +313,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
+        # Six shards: four left the slowest at 13-19 minutes, the critical path of every
+        # daemon-touching PR. Hosted runners are free for this public repository.
+        shard: [1, 2, 3, 4, 5, 6]
 
     steps:
       - name: Checkout
@@ -317,7 +332,7 @@ jobs:
       - name: Run daemon test shard
         env:
           OD_WATCHER_TEST_DEBUG: "1"
-        run: pnpm --filter @mish/daemon test --shard=${{ matrix.shard }}/4
+        run: pnpm --filter @mish/daemon test --shard=${{ matrix.shard }}/6
 
   render_tests:
     name: Design-templates render tests
@@ -348,10 +363,10 @@ jobs:
     name: Agency fast-lane and family package tests
     needs: [plan, runners]
     # agency_tests_required is its own scopes.json effect (packages/agency-fast-lane/,
-    # the agency-* family packages, the shared agency compiler and its sync script, and
-    # packages/cult-ui-catalog/, whose generated adapters the fast lane's overlay loads):
-    # the fast lane's node:test suite, the family packages' own render tests and the Cult
-    # render check run nowhere else in this workflow.
+    # packages/publisher/, the agency-* family packages, the shared agency compiler and its
+    # sync script, and packages/cult-ui-catalog/, whose generated adapters the fast lane's
+    # overlay loads): the publisher's and the fast lane's node:test suites, the family
+    # packages' own render tests and the Cult render check run nowhere else in this workflow.
     if: ${{ fromJSON(needs.plan.outputs.run).agency_tests }}
     runs-on: ${{ fromJSON(needs.runners.outputs.runs_on).workspace_unit }}
     timeout-minutes: 15
@@ -364,6 +379,9 @@ jobs:
         uses: ./.github/actions/setup-workspace
         with:
           runner-labels: ${{ toJSON(fromJSON(needs.runners.outputs.runs_on).workspace_unit) }}
+
+      - name: Run publisher tests
+        run: pnpm --filter @mish/publisher test
 
       - name: Run agency fast-lane tests
         run: pnpm --filter @mish/agency-fast-lane test

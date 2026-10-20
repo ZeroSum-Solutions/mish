@@ -1,16 +1,18 @@
 # Agency Site shared compiler
 
 `scripts/` holds the one canonical copy of the Agency Site compiler files that every copy of the
-compiler shares: `assets.ts`, `compose.ts`, `effects.ts`, `family.ts`, `output-scope.ts`, `render.ts`,
-`schema.ts`, `sections.ts` and `styles.ts`. `sections.ts` holds the optional-section helpers every family module uses to
-render a dropped section (`null` in its slot) as nothing at all.
+compiler shares: every file in that folder (`assets.ts`, `catalog-block.ts`, `compose.ts`,
+`direction-tokens.ts`, `effects.ts`, `family.ts`, `output-scope.ts`, `render.ts`, `resources.ts`,
+`schema.ts`, the `section-adapter*.ts` files, `sections.ts` and `styles.ts`). `sections.ts` holds
+the optional-section helpers every family module uses to render a dropped section (`null` in its
+slot) as nothing at all.
 
 **Edit them here, never in a copy.** `node --experimental-strip-types scripts/sync-agency-compiler.ts`
-copies them byte for byte into all seventeen copies and refreshes the matching entries in each one's
+copies them byte for byte into all thirteen copies and refreshes the matching entries in each one's
 `compiler/COMMIT.json`. CI runs the same script with `--check`, which fails on any copy that has
 drifted. A fix applied to a copy is overwritten by the next sync run.
 
-The seventeen copies are the sixteen family packages under `plugins/_official/examples/agency-*/` and
+The thirteen copies are the twelve family packages under `plugins/_official/examples/agency-*/` and
 `design-templates/agency-site/`, the production "New Project → Prototype → Agency Site" template
 the daemon loads at runtime (`apps/daemon/src/artifacts/agency-recipe.ts`, `docs/agency-site.md`).
 
@@ -27,25 +29,9 @@ the daemon loads at runtime (`apps/daemon/src/artifacts/agency-recipe.ts`, `docs
    builders) is that carrier's own authoring surface and is left alone; a file a carrier's copy
    holds that the owner does not ship is reported by `--check`, never deleted.
 
-   The template's mirrors are `TEMPLATE_MIRRORS`: `families/emmpo/**` from `agency-emmpo`,
-   `families/watson/**` from `agency-watson`. Every example package's mirrors are
-   `PACKAGE_MIRRORS`:
-
-   | Package | Carries (not owned) |
-   |---|---|
-   | `agency-app-shell` | — |
-   | `agency-crm-dashboard` | — |
-   | `agency-emmpo` | `watson` |
-   | `agency-fervor` | `emmpo`, `watson`, `wrenfield` |
-   | `agency-halcyon` | `emmpo`, `watson`, `wrenfield` |
-   | `agency-listings` | — |
-   | `agency-maben` | — |
-   | `agency-maren` | `emmpo`, `watson`, `wrenfield` |
-   | `agency-marketing-site` | — |
-   | `agency-nonprofit` | — |
-   | `agency-publication` | — |
-   | `agency-watson` | `emmpo` |
-   | `agency-wrenfield` | `emmpo`, `watson` |
+   The template's mirrors are `TEMPLATE_MIRRORS` and every example package's mirrors are
+   `PACKAGE_MIRRORS`, both in the sync script. In this repository both are empty: each of the
+   twelve packages carries only its own family module.
 
    Neither table is inferred from directory names. A directory named `families/<family>/` in a
    package that does not own `<family>` is mirrored only because that package appears in
@@ -76,6 +62,24 @@ table; it is never an import specifier, a filesystem path, or any other value th
 A family module exports `validate<Family>Recipe(input: unknown)` (a typed recipe with an integer
 `revision` and `brand.name`), `get<Family>AssetRequirements(recipe)` (`AssetRequirement[]`) and
 `render<Family>(recipe, resolvedAssetPaths, options)` (an HTML string).
+
+## Resources
+
+A compiler copy renders with a few static files beside its code: the family's vendored HyperUI
+CSS (`catalog/hyperui/<family>.css`), the catalog kinds (`catalog/CATALOG.json`), the family's
+effect declaration (`families/<family>/catalog.json`) and catalog component code
+(`catalog/components/<id>/styles.css`, `auto.js`). Every such read goes through `resources.ts`
+(`readCompilerResource` / `findCompilerResource`, keys relative to `scripts/`).
+
+By default those reads hit the copy's own files, as before, so the CLI scripts, the daemon and the
+template work unchanged: a successful read is kept for the process, a missing optional file is
+checked again next time, and a missing required file raises the native `ENOENT`.
+`withCompilerResources(table, fn)` runs `fn` with the table as the only source: a key the table
+lacks is missing, never read from disk. Values derived from a resource (the catalog kinds, effect
+declarations, component assets) are cached per source, so one table never sees another's data; a
+table that is not frozen is copied and frozen for each scope, so an edit is never served stale.
+`tests/resources.test.ts` pins this. `@mish/publisher` (`packages/publisher`) seals each copy this way to
+compile headless, with no filesystem access; see its README.
 
 ## Output scope
 

@@ -11,9 +11,29 @@
     "visual_validation_required",
     "workspace_validation_required",
     "render_tests_required",
-    "agency_tests_required"
+    "agency_tests_required",
+    "agent_scripts_tests_required",
+    "public_docs_tests_required"
   ],
+  "inert": "agent-docs",
   "matches": {
+    "agent-docs": {
+      "prefixes": [".claude/", "assets/readme/"],
+      "exact": ["README.md", "TRANSLATIONS.md", "PRIVACY.md"],
+      "regexes": ["(^|/)(AGENTS|CLAUDE)\\.md$"]
+    },
+    "public-docs": {
+      "exact": [
+        "QUICKSTART.md", "CONTRIBUTING.md", "docs/install-guide.md", "docs/deployment/docker.md",
+        "docs/deployment/cloud/aliyun.md", "docs/deployment/workspace-team-rollout.md", "docs/wsl-setup.md",
+        "docs/skills-contributing.md", "docs/windows-troubleshooting.md", "docs/whats-new.md", "docs/notebooklm.md",
+        "e2e/tests/public-docs-consistency.test.ts"
+      ]
+    },
+    "agent-scripts": {
+      "prefixes": ["scripts/agents/"],
+      "exact": ["e2e/tests/scripts/agent-writer-slot.test.ts", "e2e/tests/scripts/agent-tools.test.ts"]
+    },
     "daemon-runtime-definition": {
       "prefixes": ["apps/daemon/src/runtimes/defs/"],
       "exact": [
@@ -87,7 +107,7 @@
       "include": ["match://certain-exempt", "match://packaged-leaf", "match://daemon-core"]
     },
     "workspace-exempt": {
-      "include": ["match://certain-exempt", "match://medium-exempt", "match://packaged-leaf", "match://daemon-core", "match://terminal-exact"]
+      "include": ["match://agent-scripts", "match://certain-exempt", "match://medium-exempt", "match://packaged-leaf", "match://daemon-core", "match://terminal-exact"]
     },
     "catalog-data": {
       "prefixes": ["packages/cult-ui-catalog/"]
@@ -100,7 +120,7 @@
       "prefixes": ["packages/21st-catalog/"]
     },
     "ui-critical-exempt": {
-      "include": ["match://certain-exempt", "match://medium-exempt", "match://daemon-core", "match://terminal-exact", "match://catalog-data", "match://twenty-first-catalog-data"],
+      "include": ["match://agent-scripts", "match://certain-exempt", "match://medium-exempt", "match://daemon-core", "match://terminal-exact", "match://catalog-data", "match://twenty-first-catalog-data"],
       "prefixes": ["apps/desktop/", "apps/packaged/", "tools/pack/"]
     }
   },
@@ -121,7 +141,7 @@
     {
       "id": "daemon-sources",
       "match": {
-        "prefixes": ["apps/daemon/", "packages/release/", "packages/contracts/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/genui-catalog/"],
+        "prefixes": ["apps/daemon/", "packages/release/", "packages/contracts/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/publisher/", "packages/genui-catalog/"],
         "exclude": ["match://daemon-core"]
       },
       "effects": ["daemon_tests_required"], "confidence": "medium"
@@ -148,12 +168,15 @@
     },
     {
       "id": "web-sources",
-      "match": { "prefixes": ["apps/web/", "packages/release/", "packages/components/", "packages/contracts/", "packages/host/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/genui-catalog/"] },
+      "match": { "prefixes": ["apps/web/", "packages/release/", "packages/components/", "packages/contracts/", "packages/host/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/publisher/", "packages/genui-catalog/"] },
       "effects": ["web_tests_required"], "confidence": "medium"
     },
     {
       "id": "runtime-content",
-      "match": { "prefixes": ["scripts/", "assets/", "skills/", "prompt-templates/", "design-systems/", "design-templates/", "craft/"] },
+      "match": {
+        "prefixes": ["scripts/", "assets/", "skills/", "prompt-templates/", "design-systems/", "design-templates/", "craft/"],
+        "exclude": ["match://agent-scripts"]
+      },
       "effects": ["daemon_tests_required", "web_tests_required"], "confidence": "medium"
     },
     {
@@ -164,7 +187,7 @@
     {
       "id": "agency-fast-lane-tests",
       "match": {
-        "prefixes": ["packages/agency-fast-lane/", "plugins/_official/examples/agency-", "plugins/_official/shared/agency-compiler/"],
+        "prefixes": ["packages/agency-fast-lane/", "packages/publisher/", "plugins/_official/examples/agency-", "plugins/_official/shared/agency-compiler/"],
         "exact": ["scripts/sync-agency-compiler.ts"]
       },
       "effects": ["agency_tests_required"], "confidence": "medium"
@@ -175,8 +198,16 @@
       "effects": ["web_tests_required"], "confidence": "medium"
     },
     {
-      "id": "script-contract-tests", "match": { "prefixes": ["e2e/tests/scripts/"] },
+      "id": "script-contract-tests", "match": { "prefixes": ["e2e/tests/scripts/"], "exclude": ["match://agent-scripts"] },
       "effects": ["daemon_tests_required", "web_tests_required"], "confidence": "medium"
+    },
+    {
+      "id": "public-docs-tests", "match": { "include": ["match://public-docs"] },
+      "effects": ["public_docs_tests_required"], "confidence": "certain"
+    },
+    {
+      "id": "agent-scripts-tests", "match": { "include": ["match://agent-scripts"] },
+      "effects": ["agent_scripts_tests_required"], "confidence": "medium"
     },
     {
       "id": "tools-dev-sources",
@@ -225,7 +256,7 @@
     {
       "id": "ui-p0-surface",
       "match": {
-        "prefixes": ["apps/web/", "apps/daemon/", "packages/release/", "packages/components/", "packages/contracts/", "packages/host/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/genui-catalog/", "e2e/ui/", "e2e/lib/", "e2e/resources/", "e2e/scripts/", ".github/actions/setup-playwright/", ".github/actions/setup-workspace/"],
+        "prefixes": ["apps/web/", "apps/daemon/", "packages/release/", "packages/components/", "packages/contracts/", "packages/host/", "packages/platform/", "packages/sidecar/", "packages/sidecar-proto/", "packages/agency-fast-lane/", "packages/publisher/", "packages/genui-catalog/", "e2e/ui/", "e2e/lib/", "e2e/resources/", "e2e/scripts/", ".github/actions/setup-playwright/", ".github/actions/setup-workspace/"],
         "exact": ["e2e/package.json", "e2e/playwright.config.ts", "package.json", "pnpm-lock.yaml", "pnpm-workspace.yaml", ".github/workflows/ci.yml"],
         "exclude": ["match://daemon-core"]
       },
