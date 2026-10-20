@@ -631,7 +631,7 @@ function splitUnits(units, sizes, maxBytes, plan, moduleId) {
     if (size > maxBytes) plan.warn(`${moduleId}: ${unit} alone is ${(size / 1048576).toFixed(1)} MiB, more than --max-bytes`);
     parts[count === 1 ? 0 : createHash('sha256').update(unit).digest().readUInt32BE(0) % count].push(unit);
   }
-  if (count > 1) plan.warn(`${moduleId}: split into ${count} parts by unit name; install every part of a module together, and remove the older parts first when the part count changes`);
+  if (count > 1) plan.warn(`${moduleId}: split into ${count} parts by unit name; install every part of a module together`);
   return parts;
 }
 
@@ -815,7 +815,7 @@ async function main() {
           mcpServers: withExtras && first ? mcpServers : null,
         });
         const description = module.description ?? map.pack?.description;
-        const manifest = { schemaVersion: 1, id, name, version, ...(description ? { description } : {}), provides: assembled.provides };
+        const manifest = { schemaVersion: 1, id, name, version, ...(description ? { description } : {}), module: module.id, provides: assembled.provides };
         const entries = finalizeManifest(contracts, manifest, assembled.entries, plan);
         packs.push({ id, module: module.id, name, version, file: `${id}-${version}.zip`, entries, resources: assembled.resources, files: entries.length, bytes: entries.reduce((sum, entry) => sum + entry.size, 0) });
       });

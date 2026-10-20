@@ -223,9 +223,12 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packs --split
   counted before compression, so each file fits a GitHub release asset) is cut
   into numbered parts (`team-projects-1`, `team-projects-2`, ...) along whole
   design systems and projects. A folder's part depends on its name and the
-  part count, so it stays in its part while the count stays the same. Install
-  every part of a module together; when the count changes, remove the older
-  parts first. `--version` may only use letters, digits and `. + _ -`. The output folder gets `<id>-<version>.zip` for
+  part count, so it stays in its part while the count stays the same. Every
+  pack records its module in `module`, and parts of one module share
+  ownership: when a folder or project moves to another part (the count
+  changed), the part installed later takes it over instead of reporting a
+  collision. Install every part of a module together, and remove a part that
+  the new build no longer has. `--version` may only use letters, digits and `. + _ -`. The output folder gets `<id>-<version>.zip` for
   each pack, `SHA256SUMS` (check with `shasum -a 256 -c SHA256SUMS`) and
   `inventory.json` (`mish-pack-inventory/1`: id, module, version, file, bytes,
   sha256, resources).
