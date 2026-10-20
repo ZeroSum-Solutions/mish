@@ -214,9 +214,18 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packs --split
   `optional: false` makes a missing source an error.
 - `projects` takes the projects folder (`from`) and the app database
   (`database`). Each project folder with a database row is packed with its row.
-  The database is copied to a temporary folder and opened read-only there, so
-  nothing is written next to the checkout. A project whose files live outside
-  the checkout is left out and reported.
+  The database and its write-ahead log are copied to a temporary folder and
+  opened read-only there, so nothing is written next to the checkout (SQLite
+  would create `-shm` and `-wal` files there if the builder opened it in place).
+  The builder looks at the source before and after the copy and copies again
+  when a checkpoint or a log restart happened in between, so no committed row is
+  lost; it stops with a message if the database never holds still (stop the app
+  that uses it, then build again). A project whose files live outside the
+  checkout is left out and reported.
+- `children` merges several source folders under one `to`. When two child
+  folders have the same name once case is ignored, the first (in `sources`
+  order) is packed; the other is left out and named in a warning, because the
+  daemon refuses a pack with two such entries.
 - `--split` builds one pack per `module` of the map (each resource names its
   module; `modules` lists them, and the module marked `env` / `mcpServers`
   carries those). A module larger than `--max-bytes` (1.5 GiB by default,
@@ -236,16 +245,26 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packs --split
 - Keep a map with real private names outside this repository and pass it with
   `--map`. The committed map is a template.
 - The builder leaves out links, `node_modules`, credential-looking files
-  (`.env`, `mcp-tokens.json`, `.mcp.json` and other MCP client configs with
-  their temporary and backup copies such as `.mcp.json.<hex>.tmp`,
+  (`.env`, `mcp-tokens.json`, MCP and agent client configs such as `.mcp.json`,
+  `mcp.json`, `mcp_config.json`, `mcp-config.json`, `mcp_settings.json`,
+  `cline_mcp_settings.json` and `claude_desktop_config.json`, with their
+  temporary and backup copies such as `.mcp.json.<hex>.tmp`,
   `settings.local.json`, `auth.json`, key files) and names the daemon would
   refuse, and prints what it left out. It validates the manifest with the
   daemon's schema before it writes anything, never writes inside the checkout
   or this repository, and builds the same bytes from the same input.
-- Text files that contain something shaped like a credential (a bearer token,
-  a JWT, an `sk-` or `ghp_` key) are packed but named in the report. Captured
-  pages carry look-alikes, so the builder does not drop them; check each one
-  before you share the pack.
+- Text that contains something shaped like a credential (a bearer token, a JWT,
+  a key with a known prefix such as `sk-`, `ghp_`, `github_pat_`, `glpat-`,
+  `npm_`, `AIza` or `xapp-`, or a long value of 20 or more characters, hex
+  included, under a key such as `api_key`, `token`, `secret`, `password` or
+  `authorization`) is packed but named in the report. A plain hash with no such
+  key is not flagged. The builder reads every file of any size and extension
+  (a file with a NUL byte in its first 8 KiB counts as binary), every project
+  row, the generated catalogue and demo entries, `projects.json` and the
+  manifest, and reports once the packs are assembled. Binary files cannot be
+  read, so the report names them in a separate warning. Captured pages carry
+  look-alikes, so the builder does not drop flagged text; check each one before
+  you share the pack.
 - Give the `.zip` to the team over a private channel. Do not commit it.
 
 ### What a Mish pack does not do

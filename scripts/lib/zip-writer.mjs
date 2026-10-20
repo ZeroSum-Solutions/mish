@@ -1,7 +1,8 @@
 // A small streaming .zip writer for `scripts/build-pack.mjs`. It writes straight to a file, one
 // entry at a time, so a multi-gigabyte pack never sits in memory. A file up to STREAM_ABOVE bytes
 // is read whole and deflated; a larger one (the pack format allows 2 GiB per file) is read twice
-// as a stream, once for its CRC and once to copy it, and stored as is. It writes ZIP64 records
+// as a stream, once for its CRC and once to copy it, and stored as is. The copy pass computes the
+// CRC again, and the build fails when the two differ (the file changed in between). It writes ZIP64 records
 // when the entry count or an offset passes the classic limits, and fixed timestamps and sorted
 // input make the output reproducible.
 
@@ -40,8 +41,13 @@ export class ZipWriter {
   #offset = 0;
   #entries = [];
   #names = new Set();
+  #streamAbove;
+  #afterCrcPass;
 
-  constructor(file) {
+  /** `streamAbove` and `afterCrcPass` exist for tests: a lower threshold, and a hook between the two passes. */
+  constructor(file, { streamAbove = STREAM_ABOVE, afterCrcPass = null } = {}) {
+    this.#streamAbove = streamAbove;
+    this.#afterCrcPass = afterCrcPass;
     this.#stream = createWriteStream(file, { flags: 'wx', mode: 0o644 });
   }
 
@@ -57,7 +63,7 @@ export class ZipWriter {
   /** Adds a file whose bytes are on disk. */
   async addFile(name, absolutePath) {
     const { size } = await stat(absolutePath);
-    if (size <= STREAM_ABOVE) return this.addBuffer(name, await readFile(absolutePath));
+    if (size <= this.#streamAbove) return this.addBuffer(name, await readFile(absolutePath));
     this.#claim(name, size);
     let crc = 0;
     let seen = 0;
@@ -66,15 +72,19 @@ export class ZipWriter {
       seen += chunk.length;
     }
     if (seen !== size) throw new Error(`file changed while it was packed: ${JSON.stringify(name)}`);
+    await this.#afterCrcPass?.(name, absolutePath);
     const nameBytes = Buffer.from(name, 'utf8');
     const offset = this.#offset;
     await this.#write(this.#localHeader(nameBytes, 0, crc, size, size));
+    // The header already holds the first pass's CRC, so the bytes that follow must hash to it.
     let copied = 0;
+    let copyCrc = 0;
     for await (const chunk of createReadStream(absolutePath)) {
       copied += chunk.length;
+      copyCrc = crc32(chunk, copyCrc);
       await this.#write(chunk);
     }
-    if (copied !== size) throw new Error(`file changed while it was packed: ${JSON.stringify(name)}`);
+    if (copied !== size || copyCrc !== crc) throw new Error(`file changed while it was packed: ${JSON.stringify(name)}`);
     this.#entries.push({ nameBytes, method: 0, crc, compressed: size, size, offset });
   }
 
@@ -82,8 +92,10 @@ export class ZipWriter {
     if (!/^[^/\\\0][^\\\0]*$/.test(name) || name.split('/').some((part) => part === '' || part === '.' || part === '..')) {
       throw new Error(`unsafe zip entry name: ${JSON.stringify(name)}`);
     }
-    if (this.#names.has(name.toLowerCase())) throw new Error(`duplicate zip entry: ${JSON.stringify(name)}`);
-    this.#names.add(name.toLowerCase());
+    // The daemon compares names without case and in one Unicode form, so this does too.
+    const folded = name.normalize('NFC').toLowerCase();
+    if (this.#names.has(folded)) throw new Error(`duplicate zip entry: ${JSON.stringify(name)}`);
+    this.#names.add(folded);
     if (size > MAX_ENTRY_BYTES) throw new Error(`zip entry too large: ${JSON.stringify(name)}`);
   }
 

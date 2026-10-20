@@ -215,6 +215,26 @@ describe('build-pack: saved projects', () => {
     expect(warnings).not.toContain('proj-big-b (project row)');
   });
 
+  it('flags a project row whose settings hold a hexadecimal key, in the projects.json that is packed', async () => {
+    const source = tempDir('mish-private-');
+    const live = writeCheckout(source);
+    const hex = 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678';
+    live.prepare('UPDATE projects SET metadata_json = ? WHERE id = ?').run(JSON.stringify({ kind: 'other', deploy: { apiKey: hex } }), 'proj-big-b');
+    const map = path.join(tempDir('mish-map-'), 'map.json');
+    writeMap(map);
+    const out = path.join(tempDir('mish-out-'), 'packet.zip');
+    const result = build([source, out, '--map', map, '--json']);
+    live.close();
+    expect(result.status, result.stderr).toBe(0);
+    const warnings = (JSON.parse(result.stdout) as { warnings: string[] }).warnings.join(' ');
+    expect(warnings).toContain('projects/proj-big-b (project row)');
+    expect(warnings).not.toContain('projects/projects.json');
+    // The report comes after assembly: the row it names is in the packed file.
+    const staging = tempDir('mish-extract-');
+    await extractMishPackZip(out, staging);
+    expect(readFileSync(path.join(staging, 'projects', 'projects.json'), 'utf8')).toContain(hex);
+  });
+
   it('keeps each unit in the same part when the module changes, and warns that parts install together', async () => {
     async function partsOf(outDir: string): Promise<Record<string, string>> {
       const parts: Record<string, string> = {};
@@ -287,6 +307,79 @@ describe('build-pack: saved projects', () => {
   });
 });
 
+describe('build-pack: a consistent copy of the database', () => {
+  async function snapshotModule() {
+    return await import(pathToFileURL(script).href) as {
+      snapshotDatabase(database: string, copy: string, between?: ((attempt: number) => Promise<void> | void) | null): Promise<void>;
+    };
+  }
+  function liveDatabase(dir: string): Database.Database {
+    const live = new Database(path.join(dir, 'app.sqlite'));
+    live.pragma('journal_mode = WAL');
+    live.pragma('wal_autocheckpoint = 0');
+    live.exec('CREATE TABLE t (n INTEGER)');
+    live.exec('INSERT INTO t VALUES (1)');
+    live.pragma('wal_checkpoint(TRUNCATE)');
+    live.exec('INSERT INTO t VALUES (2)');
+    return live;
+  }
+  const rowsOf = (file: string): number[] => {
+    const db = new Database(file, { readonly: true, fileMustExist: true });
+    try {
+      return (db.prepare('SELECT n FROM t ORDER BY n').all() as Array<{ n: number }>).map((row) => row.n);
+    } finally {
+      db.close();
+    }
+  };
+
+  it('copies again when a checkpoint lands between the database copy and the log copy', async () => {
+    const { snapshotDatabase } = await snapshotModule();
+    const dir = tempDir('mish-snap-src-');
+    const live = liveDatabase(dir);
+    const copy = path.join(tempDir('mish-snap-copy-'), 'app.sqlite');
+    const attempts: number[] = [];
+    await snapshotDatabase(path.join(dir, 'app.sqlite'), copy, (attempt) => {
+      attempts.push(attempt);
+      if (attempt !== 1) return;
+      // Row 3 is committed, folded into the database file, and the log restarted with row 4.
+      live.exec('INSERT INTO t VALUES (3)');
+      live.pragma('wal_checkpoint(TRUNCATE)');
+      live.exec('INSERT INTO t VALUES (4)');
+    });
+    live.close();
+    expect(attempts).toEqual([1, 2]);
+    expect(rowsOf(copy)).toEqual([1, 2, 3, 4]);
+  });
+
+  it('gives up with a clear message when the source never holds still', async () => {
+    const { snapshotDatabase } = await snapshotModule();
+    const dir = tempDir('mish-snap-src-');
+    const live = liveDatabase(dir);
+    const copy = path.join(tempDir('mish-snap-copy-'), 'app.sqlite');
+    let next = 10;
+    await expect(snapshotDatabase(path.join(dir, 'app.sqlite'), copy, () => {
+      live.exec(`INSERT INTO t VALUES (${next += 1})`);
+      live.pragma('wal_checkpoint(TRUNCATE)');
+    })).rejects.toThrow(/kept changing while it was copied/);
+    live.close();
+  });
+
+  it('copies a log that only grew during the copy without starting over', async () => {
+    const { snapshotDatabase } = await snapshotModule();
+    const dir = tempDir('mish-snap-src-');
+    const live = liveDatabase(dir);
+    const copy = path.join(tempDir('mish-snap-copy-'), 'app.sqlite');
+    const attempts: number[] = [];
+    await snapshotDatabase(path.join(dir, 'app.sqlite'), copy, (attempt) => {
+      attempts.push(attempt);
+      live.exec('INSERT INTO t VALUES (3)');
+    });
+    live.close();
+    expect(attempts).toEqual([1]);
+    expect(rowsOf(copy)).toEqual([1, 2, 3]);
+  });
+});
+
 describe('large files', () => {
   it('streams a file above the in-memory threshold into the zip and back out', async () => {
     const dir = tempDir('mish-large-');
@@ -311,5 +404,41 @@ describe('large files', () => {
     // The per-file limit holds for a streamed entry too.
     const small = tempDir('mish-extract-');
     await expect(extractMishPackZip(zipFile, small, { ...DEFAULT_MISH_PACK_LIMITS, fileMaxBytes: 64 * 1024 * 1024 })).rejects.toMatchObject({ code: 'TOO_LARGE' });
+  });
+});
+
+describe('zip writer: a streamed file that changes between its two passes', () => {
+  type Writer = { addFile(name: string, file: string): Promise<void>; addBuffer(name: string, data: Buffer): Promise<void>; finish(): Promise<void>; abort(): void };
+  async function newWriter(file: string, options: { streamAbove: number; afterCrcPass?: (name: string, absolutePath: string) => Promise<void> }): Promise<Writer> {
+    const writerModule = await import(pathToFileURL(path.join(repoRoot, 'scripts', 'lib', 'zip-writer.mjs')).href) as {
+      ZipWriter: new (file: string, options: typeof options) => Writer;
+    };
+    return new writerModule.ZipWriter(file, options);
+  }
+
+  it('fails the build when the bytes change but the length does not', async () => {
+    const dir = tempDir('mish-crc-');
+    const big = path.join(dir, 'big.bin');
+    await fsp.writeFile(big, Buffer.alloc(4096, 1));
+    const zip = await newWriter(path.join(dir, 'a.zip'), {
+      streamAbove: 1024,
+      afterCrcPass: async (_name, absolutePath) => { await fsp.writeFile(absolutePath, Buffer.alloc(4096, 2)); },
+    });
+    await expect(zip.addFile('assets/big.bin', big)).rejects.toThrow(/file changed while it was packed/);
+    zip.abort();
+  });
+
+  it('streams an unchanged file above the lowered threshold', async () => {
+    const dir = tempDir('mish-crc-');
+    const big = path.join(dir, 'big.bin');
+    await fsp.writeFile(big, randomBytes(8192));
+    const zipFile = path.join(dir, 'ok.zip');
+    const zip = await newWriter(zipFile, { streamAbove: 1024 });
+    await zip.addBuffer('mish-pack.json', Buffer.from('{}'));
+    await zip.addFile('assets/big.bin', big);
+    await zip.finish();
+    const staging = tempDir('mish-extract-');
+    await extractMishPackZip(zipFile, staging);
+    expect(sha256(path.join(staging, 'assets', 'big.bin'))).toBe(sha256(big));
   });
 });
