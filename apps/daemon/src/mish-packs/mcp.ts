@@ -73,8 +73,8 @@ export async function unseedPackMcpServers(dataDir: string, seeded: readonly See
   const removed: string[] = [];
   await changeMcpConfig(dataDir, (previous) => {
     const keep = previous.servers.filter((server) => {
-      const mine = seeded.find((entry) => entry.id === server.id);
-      if (mine && sameConfig(mine.config, server)) {
+      // One id can be listed with more than one config (an earlier version's and an update's).
+      if (seeded.some((entry) => entry.id === server.id && sameConfig(entry.config, server))) {
         removed.push(server.id);
         return false;
       }

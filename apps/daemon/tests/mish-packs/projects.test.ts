@@ -782,8 +782,8 @@ describe('audit round 2', () => {
     const v2 = JSON.parse(readFileSync(path.join(packDir, 'mish-pack.json'), 'utf8')) as MishPackManifest;
     const intentDir = path.join(dataDir, 'mish-packs', '.mcp-intent');
     await fsp.mkdir(intentDir, { recursive: true });
-    await fsp.writeFile(path.join(intentDir, 'team-kit.json'), JSON.stringify(theirs.map((server) => server.id)));
     const written = (v2.provides.mcpServers ?? []).map((server) => packServerToConfig(server)!);
+    await fsp.writeFile(path.join(intentDir, 'team-kit.json'), JSON.stringify({ to: '2.0.0', theirs: theirs.map((server) => server.id), add: written }));
     await fsp.writeFile(path.join(dataDir, 'mcp-config.json'), JSON.stringify({ servers: [...theirs, ...written] }), { mode: 0o600 });
 
     resetMishPacksForTests();
@@ -792,6 +792,109 @@ describe('audit round 2', () => {
     expect(receiptOf().seededMcp.map((entry) => entry.id).sort()).toEqual(['pack-http', 'pack-new', 'pack-stdio']);
     expect((await store.list()).packs[0]!.warnings.join('\n')).not.toMatch(/MCP server .* already exists/);
     expect(existsSync(intentDir)).toBe(false);
+  });
+
+  it('does not use an MCP intent left over from an update that finished', async () => {
+    const external = tempDir('mish-external-');
+    const packDir = path.join(external, 'team-kit');
+    writeProjectsPack(packDir);
+    resetMishPacksForTests();
+    await makeStore({ externalDir: external }).start();
+    // v1's update finished but its intent stayed; the person then added a server of their own.
+    const mine = { id: 'mine', transport: 'http', url: 'https://mine.example.test/mcp' };
+    const config = await readMcpConfig(dataDir);
+    await fsp.writeFile(path.join(dataDir, 'mcp-config.json'), JSON.stringify({ servers: [...config.servers, mine] }), { mode: 0o600 });
+    const stored = (await readMcpConfig(dataDir)).servers.find((server) => server.id === 'mine')!;
+    const intentDir = path.join(dataDir, 'mish-packs', '.mcp-intent');
+    await fsp.mkdir(intentDir, { recursive: true });
+    await fsp.writeFile(path.join(intentDir, 'team-kit.json'), JSON.stringify({ to: '1.0.0', theirs: [], add: [stored] }));
+
+    writeVersionTwo(packDir);
+    resetMishPacksForTests();
+    await makeStore({ externalDir: external }).start();
+    expect(await serverIds()).toContain('mine');
+    expect(receiptOf().seededMcp.map((entry) => entry.id)).not.toContain('mine');
+  });
+
+  it('takes away what a cut-short update wrote when the pack has moved on to a newer version', async () => {
+    const external = tempDir('mish-external-');
+    const packDir = path.join(external, 'team-kit');
+    writeProjectsPack(packDir);
+    resetMishPacksForTests();
+    await makeStore({ externalDir: external }).start();
+    // An update to 1.5.0 wrote its own server and stopped before its receipt.
+    const theirs = (await readMcpConfig(dataDir)).servers.filter((server) => !server.id.startsWith('pack-'));
+    const halfway = packServerToConfig({ id: 'pack-halfway', transport: 'http', url: 'https://halfway.example.test/mcp', authMode: 'oauth', enabled: true })!;
+    const config = await readMcpConfig(dataDir);
+    await fsp.writeFile(path.join(dataDir, 'mcp-config.json'), JSON.stringify({ servers: [...config.servers, halfway] }), { mode: 0o600 });
+    const intentDir = path.join(dataDir, 'mish-packs', '.mcp-intent');
+    await fsp.mkdir(intentDir, { recursive: true });
+    await fsp.writeFile(path.join(intentDir, 'team-kit.json'), JSON.stringify({ to: '1.5.0', theirs: theirs.map((server) => server.id), add: [halfway] }));
+
+    writeVersionTwo(packDir);
+    resetMishPacksForTests();
+    await makeStore({ externalDir: external }).start();
+    expect(await serverIds()).toEqual(['pack-http', 'pack-new', 'pack-stdio']);
+  });
+
+  it('retries an in-place MCP update that failed at the next start', async () => {
+    const external = tempDir('mish-external-');
+    const packDir = path.join(external, 'team-kit');
+    writeProjectsPack(packDir);
+    resetMishPacksForTests();
+    await makeStore({ externalDir: external }).start();
+    writeVersionTwo(packDir);
+    // The settings file is a link, which the store never writes through.
+    await fsp.rm(path.join(dataDir, 'mcp-config.json'));
+    const { target } = await linkMcpConfig();
+    resetMishPacksForTests();
+    await makeStore({ externalDir: external }).start();
+    expect(receiptOf().version).toBe('2.0.0');
+    await fsp.rm(path.join(dataDir, 'mcp-config.json'));
+    await fsp.rm(target);
+    resetMishPacksForTests();
+    const store = makeStore({ externalDir: external });
+    await store.start();
+    const servers = (await readMcpConfig(dataDir)).servers;
+    expect(servers.map((server) => server.id).sort()).toEqual(['pack-http', 'pack-new', 'pack-stdio']);
+    expect(servers.find((server) => server.id === 'pack-http')).toMatchObject({ url: 'https://mcp-v2.example.test/mcp' });
+    expect((await store.list()).packs[0]!.warnings.join(' ')).not.toMatch(/tries again/);
+  });
+
+  it('finishes another pack\'s interrupted install before installing or removing anything', async () => {
+    const first = tempDir('mish-src-');
+    writePart(first, 'kit-1', '1.0.0', { 'one-skill': 'one' }, []);
+    void makeStore({ onInstallStep: at('mcp-unseeded', 'crash') }).install(first);
+    await vi.waitFor(() => expect(readdirSync(path.join(dataDir, 'mish-packs', '.journal')).length).toBe(1));
+    const second = tempDir('mish-src-');
+    writePart(second, 'kit-2', '1.0.0', { 'two-skill': 'two' }, []);
+    await makeStore().install(second);
+    expect(existsSync(path.join(dataDir, 'mish-packs', '.journal'))).toBe(false);
+    expect(receiptOf('kit-1').copied.skills).toEqual(['one-skill']);
+  });
+
+  it('keeps the design-system link of a project whose design system another pack placed first', async () => {
+    const first = tempDir('mish-src-');
+    writePart(first, 'kit-1', '1.0.0', { 'one-skill': 'one' }, []);
+    writeFile(first, 'design-systems/shared-ds/DESIGN.md', '# Shared\n');
+    const manifest1 = JSON.parse(readFileSync(path.join(first, 'mish-pack.json'), 'utf8')) as { provides: Record<string, string> };
+    manifest1.provides.designSystems = 'design-systems';
+    writeFile(first, 'mish-pack.json', JSON.stringify(manifest1));
+    await makeStore().install(first);
+
+    const second = tempDir('mish-src-');
+    writePart(second, 'kit-2', '1.0.0', { 'two-skill': 'two' }, []);
+    writeFile(second, 'design-systems/shared-ds/DESIGN.md', '# Shared\n');
+    writeFile(second, 'projects/projects.json', JSON.stringify({
+      schema: 'mish-pack-projects/1',
+      projects: [{ id: 'proj-linked', name: 'Linked', designSystemId: 'user:shared-ds', createdAt: 1, updatedAt: 1 }],
+    }));
+    writeFile(second, 'projects/proj-linked/index.html', '<h1>Linked</h1>');
+    const manifest2 = JSON.parse(readFileSync(path.join(second, 'mish-pack.json'), 'utf8')) as { provides: Record<string, string> };
+    manifest2.provides.designSystems = 'design-systems';
+    writeFile(second, 'mish-pack.json', JSON.stringify(manifest2));
+    await makeStore().install(second);
+    expect(getProject(db, 'proj-linked')).toMatchObject({ designSystemId: 'user:shared-ds' });
   });
 
   it('brings a new version found at start fully in: removed copies go, MCP changes apply, a study cannot replace a design system', async () => {
