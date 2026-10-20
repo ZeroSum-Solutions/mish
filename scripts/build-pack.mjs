@@ -25,17 +25,20 @@
 //     and reported;
 //   - names the daemon would refuse at install time are left out and reported;
 //   - a database the map names is copied to a temporary folder and opened read-only there, so not
-//     even SQLite's own index files are written next to the checkout;
+//     even SQLite's own index files are written next to the checkout; the copy of the database and
+//     its write-ahead log is taken again when either changed while it was made;
+//   - every file and every generated entry that goes into a pack is read for credential shapes (a
+//     binary file cannot be, and is named in a warning);
 //   - the finished manifest is validated with the same schema the daemon uses (when
 //     `packages/contracts` is built), so a pack that would be refused is not written.
 
 import { createReadStream, existsSync, lstatSync, realpathSync } from 'node:fs';
-import { copyFile, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, lstat, mkdir, mkdtemp, open, readFile, readdir, realpath, rm, stat, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 import { ZipWriter } from './lib/zip-writer.mjs';
 
@@ -43,16 +46,19 @@ const repoRoot = path.resolve(import.meta.dirname, '..');
 const DEFAULT_MAP = path.join(import.meta.dirname, 'pack-map.json');
 
 const SKIP_NAMES = new Set(['.git', 'node_modules', '.DS_Store', 'Thumbs.db', '__MACOSX']);
-const SECRET_NAME = [
+export const SECRET_NAME = [
   /^\.env(\..*)?$/i,
   /^\.npmrc$/i,
   /^\.netrc$/i,
   /^(mcp-tokens|mcp-oauth-clients|credentials?|secrets?)(\..*)?$/i,
-  // MCP client configs. The app writes `.mcp.json` into a project for each agent run, with the
-  // live Authorization headers of the connected servers in it; the next run writes it again.
-  // The name may carry a prefix (`agent.mcp.json`) and a suffix: the app writes the file through
-  // `.mcp.json.<hex>.tmp`, and editors leave `.bak` and `~` copies.
-  /(^|\.)mcp(-config)?\.json([.~].*)?$/i,
+  // MCP and agent client configs. The app writes `.mcp.json` into a project for each agent run, with
+  // the live Authorization headers of the connected servers in it; the next run writes it again.
+  // Other clients keep the same secrets in `mcp_config.json`, `mcp-config.json`, `mcp_settings.json`,
+  // `cline_mcp_settings.json` or `claude_desktop_config.json`. The name may carry a prefix
+  // (`agent.mcp.json`, `cline_mcp_settings.json`) and a suffix: the app writes the file through
+  // `.mcp.json.<hex>.tmp`, and editors leave `.bak`, `~` and `-old` copies.
+  /(^|[._-])mcp([._-](config|settings))?\.json([.~_-].*)?$/i,
+  /(^|[._-])claude[._-]desktop[._-]config\.json([.~_-].*)?$/i,
   // Per-machine agent settings (`.claude/settings.local.json` can hold an `env` block) and auth stores.
   /^settings\.local\.json([.~].*)?$/i,
   /^auth\.json([.~].*)?$/i,
@@ -61,7 +67,7 @@ const SECRET_NAME = [
 ];
 const CHILD_NAME = /^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$/u;
 /**
- * Credential shapes looked for inside small text files. A match is reported, not left out: captured
+ * Credential shapes looked for inside packed text. A match is reported, not left out: captured
  * pages and docs carry look-alikes, and dropping them would break the content. Names that mark a
  * credential file are left out above.
  */
@@ -70,11 +76,22 @@ const CREDENTIAL_SHAPES = [
   /\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\./u,
   /\bsk-[A-Za-z0-9_-]{20,}/u,
   /\bgh[pousr]_[A-Za-z0-9]{20,}/u,
+  /\bgithub_pat_[A-Za-z0-9_]{20,}/u,
+  /\bglpat-[A-Za-z0-9_-]{20,}/u,
+  /\bnpm_[A-Za-z0-9]{20,}/u,
+  /\bAIza[0-9A-Za-z_-]{30,}/u,
   /\bxox[abprs]-[A-Za-z0-9-]{10,}/u,
+  /\bxapp-[A-Za-z0-9-]{10,}/u,
   /\bAKIA[0-9A-Z]{16}\b/u,
+  // A long secret-looking value under a key that names a credential (`"apiKey": "9f2c..."`,
+  // `API_TOKEN=...`), hex included. A plain hash with no such key is not a credential.
+  /(?:api[_-]?key|access[_-]?key|auth[_-]?token|access[_-]?token|private[_-]?key|secret|token|passw(?:or)?d|authorization)[\\"']{0,2}\s*[:=]\s*[\\"']{0,2}(?:(?:Bearer|Basic|Token)\s+)?[A-Za-z0-9._~+/=-]{20,}/iu,
 ];
-const SCANNED_TEXT = /\.(json|jsonl|md|txt|html?|m?[jt]sx?|cjs|ya?ml|toml|ini|cfg|conf|sh|env\w*|tmp|temp|bak|old|orig|log)$/iu;
-const SCAN_MAX_BYTES = 2 * 1024 * 1024;
+/** A file is read in chunks of this size; a binary file is told by a NUL byte in its first 8 KiB. */
+const SCAN_CHUNK_BYTES = 256 * 1024;
+const BINARY_PROBE_BYTES = 8 * 1024;
+/** The end of one chunk is checked again with the next, so a credential cut by a chunk edge is still found. */
+const SCAN_OVERLAP_CHARS = 2048;
 /** The daemon refuses an entry path longer than this. */
 const MAX_ENTRY_PATH = 1024;
 const GIB = 1024 * 1024 * 1024;
@@ -171,6 +188,12 @@ class Plan {
 
   /** Paths of packed files that contain a credential shape (reported, still packed). */
   flagged = [];
+  /** Paths of packed files that could not be read for credential shapes (binary, or unreadable). */
+  unscanned = [];
+
+  flag(label) {
+    if (!this.flagged.includes(label)) this.flagged.push(label);
+  }
 
   skip(reason, name) {
     const list = this.skipped.get(reason) ?? [];
@@ -190,6 +213,31 @@ class Plan {
   addBuffer(zipPath, buffer, resource, unit = resource) {
     this.entries.push({ zipPath, buffer, size: buffer.length, resource, unit });
   }
+}
+
+export function hasCredentialShape(text) {
+  return CREDENTIAL_SHAPES.some((shape) => shape.test(text));
+}
+
+/**
+ * Reads a file of any size, a chunk at a time, for credential shapes: 'flagged', 'clean', 'binary'
+ * (a NUL byte in the first 8 KiB, so it is not text and was not read) or 'unreadable'.
+ */
+export async function scanFile(file) {
+  let tail = '';
+  let first = true;
+  try {
+    for await (const chunk of createReadStream(file, { highWaterMark: SCAN_CHUNK_BYTES })) {
+      if (first && chunk.subarray(0, BINARY_PROBE_BYTES).includes(0)) return 'binary';
+      first = false;
+      const text = tail + chunk.toString('latin1');
+      if (hasCredentialShape(text)) return 'flagged';
+      tail = text.slice(-SCAN_OVERLAP_CHARS);
+    }
+  } catch {
+    return 'unreadable';
+  }
+  return 'clean';
 }
 
 /**
@@ -230,10 +278,9 @@ async function planPath(plan, root, absolute, zipPrefix, resource, unit = resour
     if (zipPrefix.length > MAX_ENTRY_PATH) return plan.skip('path longer than the daemon accepts', zipPrefix.slice(0, 120));
     const problem = await containmentProblem(plan, root, absolute);
     if (problem) return plan.skip(problem, zipPrefix);
-    if (info.size <= SCAN_MAX_BYTES && SCANNED_TEXT.test(name)) {
-      const text = await readFile(absolute, 'latin1');
-      if (CREDENTIAL_SHAPES.some((shape) => shape.test(text))) plan.flagged.push(zipPrefix);
-    }
+    const scanned = await scanFile(absolute);
+    if (scanned === 'flagged') plan.flag(zipPrefix);
+    else if (scanned !== 'clean') plan.unscanned.push(zipPrefix);
     return plan.addFile(zipPrefix, absolute, info.size, resource, unit);
   }
   if (!info.isDirectory()) return plan.skip('not a regular file', zipPrefix);
@@ -306,6 +353,8 @@ const handlers = {
   /** Child folders of one or more folders, picked by name patterns, merged under `to`. */
   async children(ctx, resource) {
     let any = false;
+    /** Folded child name -> the folder that claimed it first, across all sources of this resource. */
+    const taken = new Map();
     for (const source of resource.sources ?? []) {
       const base = sourcePath(ctx.source, requireString(source.from, `"from" in ${resource.provides}`), resource.provides);
       if (!(await exists(base))) {
@@ -321,6 +370,15 @@ const handlers = {
           ctx.plan.skip('folder name the daemon refuses to copy', `${source.from}/${entry.name}`);
           continue;
         }
+        // The daemon refuses a pack with two entries whose names differ only by case or Unicode form.
+        const folded = entry.name.normalize('NFC').toLowerCase();
+        const kept = taken.get(folded);
+        if (kept) {
+          ctx.plan.skip('folder name that clashes with an earlier folder', `${source.from}/${entry.name}`);
+          ctx.plan.warn(`${resource.provides}: ${source.from}/${entry.name} has the same name as ${kept} once case is ignored; the first one is packed, this one is left out`);
+          continue;
+        }
+        taken.set(folded, `${source.from}/${entry.name}`);
         await planPath(ctx.plan, ctx.source, path.join(base, entry.name), `${resource.to}/${entry.name}`, resource.provides, `${resource.provides}/${entry.name}`);
         any = true;
       }
@@ -409,10 +467,71 @@ const handlers = {
   },
 };
 
+/** A copy of the database is taken again at most this many times when the source changes under it. */
+const SNAPSHOT_ATTEMPTS = 5;
+const SQLITE_HEADER_BYTES = 100;
+
+/** Size, change time and header of the database, and the same for its log: what a checkpoint or a log restart changes. */
+async function databaseState(database) {
+  const read = async (file, bytes) => {
+    let handle;
+    try {
+      handle = await open(file, 'r');
+      const { size, mtimeMs } = await handle.stat();
+      const head = Buffer.alloc(bytes);
+      const { bytesRead } = await handle.read(head, 0, bytes, 0);
+      return { size, mtimeMs, head: head.subarray(0, bytesRead).toString('hex') };
+    } catch (error) {
+      if (error.code === 'ENOENT') return null;
+      throw error;
+    } finally {
+      await handle?.close();
+    }
+  };
+  return { db: await read(database, SQLITE_HEADER_BYTES), wal: await read(`${database}-wal`, 32) };
+}
+
 /**
- * The `projects` rows of an app database, by id. The database (and its write-ahead log) is copied
- * to a temporary folder and opened read-only there; the checkout's own files are never opened by
- * SQLite.
+ * True when nothing happened to the source while a copy of it was made. The database file may not
+ * have been touched (a checkpoint rewrites pages in it), and the log may only have grown: a new log
+ * header (a log restart) or a shorter log (a truncate) means the two copies no longer fit together.
+ */
+function sameDatabaseState(before, after) {
+  const same = (a, b) => a.size === b.size && a.mtimeMs === b.mtimeMs && a.head === b.head;
+  if (!before.db || !after.db || !same(before.db, after.db)) return false;
+  if (!before.wal || !after.wal) return before.wal === after.wal;
+  return before.wal.head === after.wal.head && after.wal.size >= before.wal.size;
+}
+
+/**
+ * Copies the database and its write-ahead log to `copy` and `copy-wal` so that together they hold
+ * one committed state, without ever opening the source with SQLite (which would write `-shm` and
+ * `-wal` files next to the checkout). A checkpoint or log restart between the two copies would lose
+ * committed rows, so the source is looked at before and after, and the copy is made again when it
+ * changed. `between` runs after the database is copied and before the log is (for tests).
+ */
+export async function snapshotDatabase(database, copy, between = null) {
+  const wal = `${database}-wal`;
+  for (let attempt = 1; attempt <= SNAPSHOT_ATTEMPTS; attempt += 1) {
+    const before = await databaseState(database);
+    await rm(`${copy}-wal`, { force: true });
+    await copyFile(database, copy);
+    await between?.(attempt);
+    try {
+      if (before.wal) await copyFile(wal, `${copy}-wal`);
+    } catch (error) {
+      if (error.code !== 'ENOENT') throw error;
+      continue;
+    }
+    if (sameDatabaseState(before, await databaseState(database))) return;
+  }
+  return fail(`${database} kept changing while it was copied; stop the app that uses it and build again`);
+}
+
+/**
+ * The `projects` rows of an app database, by id. The database and its write-ahead log are copied
+ * (see snapshotDatabase) to a temporary folder and opened read-only there; the checkout's own files
+ * are never opened by SQLite.
  */
 async function readProjectRows(ctx, database, label) {
   let Database;
@@ -424,12 +543,8 @@ async function readProjectRows(ctx, database, label) {
   const snapshot = await mkdtemp(path.join(tmpdir(), 'mish-pack-db-'));
   ctx.cleanup.push(() => rm(snapshot, { recursive: true, force: true }));
   const copy = path.join(snapshot, 'app.sqlite');
-  await copyFile(database, copy);
-  const wal = `${database}-wal`;
-  if (await exists(wal)) {
-    if (await ctx.uncontained(wal, `${label}-wal`)) return fail(`${label}-wal may not be read`);
-    await copyFile(wal, `${copy}-wal`);
-  }
+  if (await exists(`${database}-wal`) && (await ctx.uncontained(`${database}-wal`, `${label}-wal`))) return fail(`${label}-wal may not be read`);
+  await snapshotDatabase(database, copy);
   const db = new Database(copy, { readonly: true, fileMustExist: true });
   try {
     const columns = new Set(db.prepare('PRAGMA table_info(projects)').all().map((column) => column.name));
@@ -513,10 +628,6 @@ handlers.projects = async function projects(ctx, resource) {
       row.metadata = rest;
       unlinked += 1;
     }
-    // Project rows are packed too: scan their text like a packed file.
-    if (CREDENTIAL_SHAPES.some((shape) => shape.test(JSON.stringify([row.name, row.pendingPrompt, row.customInstructions, row.metadata])))) {
-      ctx.plan.flagged.push(`${resource.to}/${entry.name} (project row)`);
-    }
     const unit = `${resource.provides}/${entry.name}`;
     const before = ctx.plan.entries.length;
     await planPath(ctx.plan, ctx.source, path.join(base, entry.name), `${resource.to}/${entry.name}`, resource.provides, unit);
@@ -580,6 +691,17 @@ function assemblePack(plan, units, resourceTo, extras) {
   return { entries, provides, resources };
 }
 
+/**
+ * Reads a generated entry (the manifest, a catalogue, a demo, `projects.json`) for credential
+ * shapes. For `projects.json` the rows are read one by one, so the report names the project.
+ */
+function scanPackedBuffer(plan, entry) {
+  if (!hasCredentialShape(entry.buffer.toString('latin1'))) return;
+  const rows = entry.projectsFile?.projects.filter((row) => hasCredentialShape(JSON.stringify(row))) ?? [];
+  if (rows.length === 0) plan.flag(entry.zipPath);
+  for (const row of rows) plan.flag(`${path.posix.dirname(entry.zipPath)}/${row.id} (project row)`);
+}
+
 /** Refuses a pack the daemon would refuse; returns every entry, the manifest included, in zip order. */
 function finalizeManifest(contracts, manifest, entries, plan) {
   if (contracts) {
@@ -594,7 +716,10 @@ function finalizeManifest(contracts, manifest, entries, plan) {
     plan.warn('packages/contracts is not built, so the manifest was not validated here (the daemon validates at install)');
   }
   const all = [...entries, { zipPath: 'mish-pack.json', buffer: Buffer.from(`${JSON.stringify(manifest, null, 2)}\n`), resource: 'manifest' }];
-  for (const entry of all) entry.size = entry.size ?? entry.buffer.length;
+  for (const entry of all) {
+    entry.size = entry.size ?? entry.buffer.length;
+    if (entry.buffer) scanPackedBuffer(plan, entry);
+  }
   return all.sort((a, b) => (a.zipPath < b.zipPath ? -1 : a.zipPath > b.zipPath ? 1 : 0));
 }
 
@@ -665,11 +790,15 @@ function printPack(pack, dryRun) {
   console.log(`${dryRun ? 'Would pack' : 'Packed'} ${pack.files} files (${size}) as ${pack.id} ${pack.version}${pack.resources ? `: ${pack.resources.join(', ')}` : ''}`);
 }
 
-/** Adds the credential-shape report to the warnings once planning is done. */
+/** Adds the credential-shape report to the warnings. Call it once every pack is assembled, so generated entries are in it. */
 function noteFlagged(plan) {
-  if (plan.flagged.length === 0) return;
-  const shown = plan.flagged.slice(0, 10).join(', ');
-  plan.warn(`${plan.flagged.length} packed file(s) contain text shaped like a credential; check them before you share the pack: ${shown}${plan.flagged.length > 10 ? ', ...' : ''}`);
+  const list = (names) => `${names.slice(0, 10).join(', ')}${names.length > 10 ? ', ...' : ''}`;
+  if (plan.flagged.length > 0) {
+    plan.warn(`${plan.flagged.length} packed file(s) contain text shaped like a credential; check them before you share the pack: ${list(plan.flagged)}`);
+  }
+  if (plan.unscanned.length > 0) {
+    plan.warn(`${plan.unscanned.length} packed file(s) are binary or could not be read, so they were not checked for credentials: ${list(plan.unscanned)}`);
+  }
 }
 
 function printReport(report, plan) {
@@ -735,7 +864,6 @@ async function main() {
       await handler(ctx, resource);
     }
 
-    noteFlagged(plan);
     const today = new Date().toISOString().slice(0, 10).replaceAll('-', '.');
     const version = args.version ?? map.pack?.version ?? today;
     // The version becomes part of a file name, so it may not carry a path.
@@ -758,6 +886,7 @@ async function main() {
         provides: assembled.provides,
       };
       const entries = finalizeManifest(contracts, manifest, assembled.entries, plan);
+      noteFlagged(plan);
       const totalBytes = entries.reduce((sum, entry) => sum + entry.size, 0);
       const summary = {
         out: args.dryRun ? null : out,
@@ -821,6 +950,7 @@ async function main() {
       });
     }
 
+    noteFlagged(plan);
     if (!args.dryRun) {
       await mkdir(out, { recursive: true });
       for (const pack of packs) {
@@ -866,7 +996,10 @@ async function main() {
   }
 }
 
-main().catch((error) => {
-  console.error(`build-pack: ${error instanceof Error ? error.message : String(error)}`);
-  process.exit(1);
-});
+// Runs only when started as a script, so tests can import the helpers above.
+if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
+  main().catch((error) => {
+    console.error(`build-pack: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  });
+}

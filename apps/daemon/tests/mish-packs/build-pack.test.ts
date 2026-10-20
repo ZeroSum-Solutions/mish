@@ -4,6 +4,7 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { existsSync, promises as fsp, symlinkSync } from 'node:fs';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 import JSZip from 'jszip';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -239,5 +240,108 @@ describe('build-pack', () => {
 
   it('prints usage', () => {
     expect(execFileSync(process.execPath, [script, '--help'], { encoding: 'utf8' })).toContain('Usage: node scripts/build-pack.mjs');
+  });
+});
+
+/** The builder's own helpers: importing the script does not run it. */
+async function builderModule() {
+  return await import(pathToFileURL(script).href) as {
+    SECRET_NAME: RegExp[];
+    hasCredentialShape(text: string): boolean;
+    scanFile(file: string): Promise<'flagged' | 'clean' | 'binary' | 'unreadable'>;
+  };
+}
+
+describe('build-pack: credential files and shapes', () => {
+  it('leaves out every common agent and MCP client config name, with temporary and backup copies', async () => {
+    const { SECRET_NAME } = await builderModule();
+    const left = (name: string) => SECRET_NAME.some((pattern) => pattern.test(name));
+    for (const name of [
+      'mcp.json', '.mcp.json', 'mcp_config.json', 'mcp-config.json', 'mcp_settings.json', 'cline_mcp_settings.json',
+      'claude_desktop_config.json', 'agent.mcp.json', '.mcp.json.9f2c41d0.tmp', 'mcp_config.json.bak', 'mcp.json~',
+      'claude_desktop_config.json.bak', 'MCP_CONFIG.JSON', 'mcp_settings.json-old',
+    ]) expect(left(name), name).toBe(true);
+    for (const name of ['mcp.md', 'mcp-server.json', 'config.json', 'package.json', 'README.md', 'settings.json']) expect(left(name), name).toBe(false);
+  });
+
+  it('flags a long hexadecimal value under a credential key, and no plain hash', async () => {
+    const { hasCredentialShape } = await builderModule();
+    const hex = 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678';
+    expect(hasCredentialShape(`{"apiKey": "${hex}"}`)).toBe(true);
+    expect(hasCredentialShape(`API_KEY=${hex}`)).toBe(true);
+    expect(hasCredentialShape(`{"client_secret":"${hex}"}`)).toBe(true);
+    expect(hasCredentialShape(`password: ${hex}`)).toBe(true);
+    expect(hasCredentialShape(JSON.stringify({ note: `{"token": "${hex}"}` }))).toBe(true);
+    expect(hasCredentialShape(`{"sha": "${hex}", "integrity": "${hex}"}`)).toBe(false);
+    expect(hasCredentialShape(`commit ${hex}`)).toBe(false);
+    expect(hasCredentialShape('{"apiKey": "${OPENAI_API_KEY}", "token": "short"}')).toBe(false);
+    for (const value of [
+      `github_pat_${'A1b2C3d4E5'.repeat(3)}`, `glpat-${'abcDEF123_'.repeat(3)}`, `npm_${'a1B2c3D4e5'.repeat(3)}`,
+      `AIza${'SyA1b2C3d4'.repeat(4)}`, `xapp-1-A0123456789-${'b'.repeat(12)}`,
+    ]) expect(hasCredentialShape(`value ${value}`), value).toBe(true);
+  });
+
+  it('reads a file of any size, with any extension, and tells binary files apart', async () => {
+    const { scanFile } = await builderModule();
+    const dir = tempDir('mish-scan-');
+    const hex = 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678';
+    const filler = 'x'.repeat(1024 * 1024);
+    // Past the old 2 MiB limit, no known text extension, the credential in the last chunk.
+    await fsp.writeFile(path.join(dir, 'big.data'), `${filler}${filler}${filler}\napi_key = ${hex}\n`);
+    await fsp.writeFile(path.join(dir, 'clean.data'), `${filler}${filler}${filler}\n`);
+    // A credential cut by a chunk edge (chunks are 256 KiB).
+    const edge = 256 * 1024 - 8;
+    await fsp.writeFile(path.join(dir, 'edge.css'), `${'y'.repeat(edge)}apiKey: "${hex}"`);
+    await fsp.writeFile(path.join(dir, 'pic.png'), Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0, 0]), Buffer.from(`apiKey: ${hex}`)]));
+    expect(await scanFile(path.join(dir, 'big.data'))).toBe('flagged');
+    expect(await scanFile(path.join(dir, 'clean.data'))).toBe('clean');
+    expect(await scanFile(path.join(dir, 'edge.css'))).toBe('flagged');
+    expect(await scanFile(path.join(dir, 'pic.png'))).toBe('binary');
+    expect(await scanFile(path.join(dir, 'missing.txt'))).toBe('unreadable');
+  });
+
+  it('reports generated entries, large files and unreadable binaries after the whole pack is assembled', async () => {
+    const hex = 'a1b2c3d4e5f60718293a4b5c6d7e8f9012345678';
+    writeFile(source, '.od/skills/team-skill/mcp_config.json', JSON.stringify({ mcpServers: { x: { env: { API_KEY: hex } } } }));
+    writeFile(source, '.od/skills/team-skill/cline_mcp_settings.json', '{}');
+    writeFile(source, '.od/skills/team-skill/config.json', JSON.stringify({ apiKey: hex }));
+    writeFile(source, '.od/skills/team-skill/lock.json', JSON.stringify({ sha: hex }));
+    await fsp.writeFile(path.join(source, '.od', 'skills', 'team-skill', 'dump.data'), `${'z'.repeat(3 * 1024 * 1024)}\nsecret=${hex}\n`);
+    await fsp.writeFile(path.join(source, '.od', 'skills', 'team-skill', 'logo.png'), Buffer.from([0x89, 0x50, 0, 1, 2]));
+    // Generated entries: a catalogue row of the licensed source and a catalogue delta.
+    writeFile(source, 'packages/genui-catalog/catalog.json', JSON.stringify({ components: [{ id: 'pack-card', name: 'Pack card', source: { name: 'cult-ui-pro' }, note: `{"authToken": "${hex}"}` }] }));
+    writeFile(source, 'packages/section-catalog/catalog.json', JSON.stringify({ entries: [{ id: 'pack-only-section', title: `password=${hex}` }] }));
+    const out = path.join(tempDir('mish-out-'), 'packet.zip');
+    const result = build([source, out, '--map', mapFile, '--json']);
+    expect(result.status, result.stderr).toBe(0);
+    const summary = JSON.parse(result.stdout) as { skipped: Record<string, string[]>; warnings: string[] };
+    expect(summary.skipped['looks like a credential file']).toEqual(expect.arrayContaining(['skills/team-skill/mcp_config.json', 'skills/team-skill/cline_mcp_settings.json']));
+    const names = Object.keys((await JSZip.loadAsync(await fsp.readFile(out))).files);
+    expect(names).not.toContain('skills/team-skill/mcp_config.json');
+    const flagged = summary.warnings.find((warning) => warning.includes('contain text shaped like a credential')) ?? '';
+    for (const file of ['skills/team-skill/config.json', 'skills/team-skill/dump.data', 'catalogs/genui/overlay.json', 'catalogs/sections.json']) expect(flagged, file).toContain(file);
+    expect(flagged).not.toContain('lock.json');
+    expect(summary.warnings.join(' ')).toMatch(/binary or could not be read, so they were not checked for credentials: .*skills\/team-skill\/logo\.png/);
+  });
+
+  it('keeps the first of two child folders whose names differ only by case, and says so', async () => {
+    writeFile(source, '.od/design-systems/Atlas-Two/DESIGN.md', 'first');
+    writeFile(source, 'skills/atlas-two/DESIGN.md', 'second');
+    const file = path.join(tempDir('mish-map-'), 'map.json');
+    await fsp.writeFile(file, JSON.stringify({
+      schemaVersion: 1,
+      resources: [{ provides: 'designSystems', type: 'children', to: 'design-systems', sources: [
+        { from: '.od/design-systems', include: ['Atlas-*'] }, { from: 'skills', include: ['atlas-*'] },
+      ] }],
+    }));
+    const out = path.join(tempDir('mish-out-'), 'p.zip');
+    const result = build([source, out, '--map', file, '--json']);
+    expect(result.status, result.stderr).toBe(0);
+    const summary = JSON.parse(result.stdout) as { skipped: Record<string, string[]>; warnings: string[] };
+    expect(summary.skipped['folder name that clashes with an earlier folder']).toEqual(['skills/atlas-two']);
+    expect(summary.warnings.join(' ')).toMatch(/skills\/atlas-two has the same name as \.od\/design-systems\/Atlas-Two/);
+    const zip = await JSZip.loadAsync(await fsp.readFile(out));
+    expect(Object.keys(zip.files).filter((name) => name.startsWith('design-systems/'))).toEqual(['design-systems/Atlas-Two/DESIGN.md']);
+    expect(await zip.file('design-systems/Atlas-Two/DESIGN.md')!.async('string')).toBe('first');
   });
 });
