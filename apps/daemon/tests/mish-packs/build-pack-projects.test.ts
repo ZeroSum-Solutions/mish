@@ -417,6 +417,16 @@ describe('zip writer: a streamed file that changes between its two passes', () =
     return new writerModule.ZipWriter(file, options);
   }
 
+  it('refuses paths the daemon would refuse: parent folders that differ by case, a file named like a folder', async () => {
+    const dir = tempDir('mish-names-');
+    const zip = await newWriter(path.join(dir, 'a.zip'), { streamAbove: 1024 });
+    await zip.addBuffer('skills/kit/Foo/a.md', Buffer.from('a'));
+    await expect(zip.addBuffer('skills/kit/foo/b.md', Buffer.from('b'))).rejects.toThrow(/differ only by letter case/);
+    await expect(zip.addBuffer('skills/kit/Foo', Buffer.from('c'))).rejects.toThrow(/duplicate zip entry/);
+    await zip.addBuffer('skills/kit/Foo/b.md', Buffer.from('b'));
+    await zip.finish();
+  });
+
   it('fails the build when the bytes change but the length does not', async () => {
     const dir = tempDir('mish-crc-');
     const big = path.join(dir, 'big.bin');

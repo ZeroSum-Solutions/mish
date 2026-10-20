@@ -40,7 +40,8 @@ export class ZipWriter {
   #stream;
   #offset = 0;
   #entries = [];
-  #names = new Set();
+  /** Each path and parent folder written, by its folded form: its spelling and whether it is a folder. */
+  #names = new Map();
   #streamAbove;
   #afterCrcPass;
 
@@ -92,10 +93,21 @@ export class ZipWriter {
     if (!/^[^/\\\0][^\\\0]*$/.test(name) || name.split('/').some((part) => part === '' || part === '.' || part === '..')) {
       throw new Error(`unsafe zip entry name: ${JSON.stringify(name)}`);
     }
-    // The daemon compares names without case and in one Unicode form, so this does too.
-    const folded = name.normalize('NFC').toLowerCase();
-    if (this.#names.has(folded)) throw new Error(`duplicate zip entry: ${JSON.stringify(name)}`);
-    this.#names.add(folded);
+    // The daemon compares every path and parent folder without case and in one Unicode form, and
+    // refuses a file and a folder of one name, so this does too.
+    const parts = name.split('/');
+    for (let depth = 1; depth <= parts.length; depth += 1) {
+      const spelling = parts.slice(0, depth).join('/');
+      const folder = depth < parts.length;
+      const folded = spelling.normalize('NFC').toLowerCase();
+      const existing = this.#names.get(folded);
+      if (!existing) {
+        this.#names.set(folded, { spelling, folder });
+        continue;
+      }
+      if (existing.spelling !== spelling) throw new Error(`zip entries differ only by letter case or Unicode form: ${JSON.stringify(name)}`);
+      if (!existing.folder || !folder) throw new Error(`duplicate zip entry: ${JSON.stringify(name)}`);
+    }
     if (size > MAX_ENTRY_BYTES) throw new Error(`zip entry too large: ${JSON.stringify(name)}`);
   }
 
@@ -159,6 +171,8 @@ export class ZipWriter {
   }
 
   abort() {
+    // A write still in flight fails once the stream is gone; the file is being given up anyway.
+    this.#stream.on('error', () => {});
     this.#stream.destroy();
   }
 }

@@ -187,11 +187,6 @@ export const mishPackManifestSchema = z.object({
   name: z.string().min(1).max(120),
   version: z.string().min(1).max(64).regex(/^[0-9A-Za-z][0-9A-Za-z.+_-]*$/u),
   description: z.string().max(1000).optional(),
-  /**
-   * The module this pack is a part of, when `build-pack --split` cut one module into several packs.
-   * Parts of one module share ownership of what they place, so a unit can move between parts.
-   */
-  module: z.string().regex(new RegExp(MISH_PACK_ID_PATTERN)).optional(),
   provides: z.object({
     catalogs: catalogsSchema.optional(),
     /** Folder of design-system packages. Each child folder is copied into the user design-systems root. */
