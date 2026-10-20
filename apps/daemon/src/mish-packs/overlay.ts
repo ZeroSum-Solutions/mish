@@ -337,7 +337,7 @@ export function packDesignIndexProfiles(): unknown[] {
   const out: unknown[] = [];
   for (const dir of packResourcePaths('designIndex')) {
     const value = readPackJson(path.join(dir, 'index.json'));
-    if (isRecord(value) && Array.isArray(value.profiles)) out.push(...value.profiles);
+    if (isRecord(value) && Array.isArray(value.profiles)) for (const profile of value.profiles) out.push(profile);
     else if (value !== null) warnOnce(`shape:${dir}:index.json`, 'index.json in the pack is not a design index and is ignored');
   }
   return out;

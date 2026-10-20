@@ -179,8 +179,11 @@ interface Journal {
   stagedCopies: StagedCopy[];
   /** The receipt of the generation being replaced; null on a first install. */
   oldReceipt: Receipt | null;
-  /** `mcp-config.json` as it was before the install (null when absent or unreadable). */
-  mcpBefore: string | null;
+  /**
+   * Ids the person had in the MCP settings before the install, other than the old generation's own
+   * entries (null when the file could not be read: nothing is then claimed). Ids only, no values.
+   */
+  mcpTheirs?: string[] | null;
   /**
    * The MCP change this install makes, written before the MCP settings are touched: the entries
    * the old generation owns (removed) and the ones the new generation will own (added). A retry
@@ -370,12 +373,10 @@ function carriedDigests(previous: Receipt | null): Pick<Receipt, 'digests'> {
   return previous.digests ? { digests: previous.digests } : {};
 }
 
-function isJournal(value: unknown): value is Journal {
-  const journal = value as Partial<Journal> | null;
-  return !!journal && typeof journal.token === 'string' && typeof journal.packId === 'string'
-    && (journal.phase === 'preparing' || journal.phase === 'committed')
-    && typeof journal.incomingTree === 'string' && typeof journal.previousTree === 'string'
-    && Array.isArray(journal.stagingDirs) && Array.isArray(journal.stagedCopies) && Array.isArray(journal.warnings);
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
+
+function isNameList(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every((name) => typeof name === 'string' && CHILD_RE.test(name));
 }
 
 export function createMishPackStore(options: MishPackStoreOptions): MishPackStore {
@@ -394,9 +395,34 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
 
   const receiptFile = (id: string) => path.join(receiptsRoot, `${id}.json`);
   const journalFile = (token: string) => path.join(journalRoot, `${token}.json`);
-  const projectDb = () => (options.projectsDir ? options.db?.() ?? null : null);
   const bucketRoot = (bucket: CopyBucket) => (bucket === 'skills' ? options.userRoots.skills : options.userRoots.designSystems);
+  const projectDb = () => (options.projectsDir ? options.db?.() ?? null : null);
   const userRoots = () => [...new Set([options.userRoots.skills, options.userRoots.designSystems])];
+
+  /**
+   * A journal is only trusted when every path in it is the one this build would derive from its id
+   * and token: recovery deletes and renames those paths, so a damaged or planted journal must not
+   * be able to name anything else.
+   */
+  function validJournal(value: unknown): value is Journal {
+    const journal = value as Partial<Journal> | null;
+    if (!journal || typeof journal.token !== 'string' || typeof journal.packId !== 'string') return false;
+    if (journal.phase !== 'preparing' && journal.phase !== 'committed') return false;
+    if (!UUID_RE.test(journal.token) || !ID_RE.test(journal.packId)) return false;
+    if (journal.incomingTree !== path.join(incomingRoot, journal.token) || journal.previousTree !== path.join(previousRoot, journal.token)) return false;
+    const stagingDirs = userRoots().map((userRoot) => path.join(userRoot, STAGING_DIRNAME, journal.token as string));
+    if (!Array.isArray(journal.stagingDirs) || journal.stagingDirs.join('\n') !== stagingDirs.join('\n')) return false;
+    if (!Array.isArray(journal.warnings) || !Array.isArray(journal.stagedCopies)) return false;
+    for (const staged of journal.stagedCopies as Array<Partial<StagedCopy> | null>) {
+      if (!staged || (staged.bucket !== 'skills' && staged.bucket !== 'designSystems')) return false;
+      if (typeof staged.name !== 'string' || !CHILD_RE.test(staged.name)) return false;
+      if (staged.path !== path.join(bucketRoot(staged.bucket), STAGING_DIRNAME, journal.token, staged.name)) return false;
+    }
+    const old = journal.oldReceipt as Partial<Receipt> | null | undefined;
+    if (old === null || old === undefined) return true;
+    return old.id === journal.packId && Array.isArray(old.seededMcp) && !!old.copied
+      && isNameList(old.copied.skills) && isNameList(old.copied.designSystems);
+  }
 
   async function readReceipt(id: string): Promise<Receipt | null> {
     try {
@@ -418,9 +444,13 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   const writeReceipt = (receipt: Receipt) => writeJson(receiptFile(receipt.id), receipt);
   const writeJournal = (journal: Journal) => writeJson(journalFile(journal.token), journal);
 
-  async function readMcpText(): Promise<string | null> {
+  /** Ids in the MCP settings that are the person's own: not the old generation's unchanged entries. Null when unreadable. */
+  async function personsMcpIds(oldOwned: readonly SeededMcpServer[]): Promise<string[] | null> {
     try {
-      return await fsp.readFile(path.join(options.dataDir, 'mcp-config.json'), 'utf8');
+      const servers = (await readMcpConfig(options.dataDir)).servers;
+      return servers
+        .filter((server) => !oldOwned.some((entry) => entry.id === server.id && JSON.stringify(entry.config) === JSON.stringify(server)))
+        .map((server) => server.id);
     } catch {
       return null;
     }
@@ -462,24 +492,6 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     return backup;
   }
 
-  /** Ids the person had in the MCP settings before an install, other than the old generation's own entries. */
-  function personsMcpIds(before: string | null, oldOwned: readonly SeededMcpServer[]): Set<string> | null {
-    if (before === null) return new Set();
-    try {
-      const parsed = JSON.parse(before) as { servers?: unknown };
-      if (!Array.isArray(parsed.servers)) return null;
-      const ids = new Set<string>();
-      for (const server of parsed.servers as Array<{ id?: unknown }>) {
-        if (typeof server?.id !== 'string') continue;
-        const owned = oldOwned.find((entry) => entry.id === server.id && JSON.stringify(entry.config) === JSON.stringify(server));
-        if (!owned) ids.add(server.id);
-      }
-      return ids;
-    } catch {
-      return null;
-    }
-  }
-
   /** Copies the pack's skill, design-system and study folders into the user roots. Idempotent. */
   async function copyIntoUserRoots(pack: ActiveMishPack, receipt: Receipt, refresh: boolean, backups: MishPackBackup[]): Promise<void> {
     const stamp = backupStamp(now());
@@ -506,15 +518,17 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
             receipt.warnings.push(backupWarning(backup));
           }
         }
-        const tmp = path.join(destRoot, `.mish-pack-${randomUUID()}`);
+        // Built in the staging folder, which the scanners do not read, then renamed into place.
+        const tmpDir = path.join(destRoot, STAGING_DIRNAME, `copy-${randomUUID()}`);
+        const tmp = path.join(tmpDir, child);
         let digest: string | null;
         try {
           await copyTreeNoLinks(path.join(source, child), tmp);
           digest = await folderDigest(tmp);
           await fsp.rename(tmp, dest);
-        } catch (error) {
-          await fsp.rm(tmp, { recursive: true, force: true });
-          throw error;
+        } finally {
+          await fsp.rm(tmpDir, { recursive: true, force: true });
+          await fsp.rmdir(path.join(destRoot, STAGING_DIRNAME)).catch(() => undefined);
         }
         if (!mine) list.push(child);
         if (digest !== null) recordDigest(receipt, bucket, child, digest);
@@ -543,11 +557,15 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     const projectsDir = options.projectsDir;
     const mine = new Set(receiptProjects(receipt));
     const existing: string[] = [];
+    // A project keeps its design system only when this pack placed that design system.
+    const packDesignSystems = new Set(receipt.copied.designSystems);
     let droppedLinks = 0;
+    let droppedOther = 0;
+    let failedInserts = 0;
     await fsp.mkdir(projectsDir, { recursive: true });
     for (const packRow of await readPackProjectRows(source)) {
       if (mine.has(packRow.id)) continue;
-      const prepared = prepareProjectRow(packRow);
+      const prepared = prepareProjectRow(packRow, packDesignSystems);
       if ('skip' in prepared) {
         receipt.warnings.push(`projects/${packRow.id} was not added because ${prepared.skip}`);
         continue;
@@ -567,7 +585,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       }
       receipt.importing = row.id;
       await writeReceipt(receipt);
-      let created = false;
+      // A resumed import owns the folder it staged before the crash.
+      let created = resuming;
       if (!(await exists(dest))) {
         const tmp = path.join(projectsDir, `.mish-pack-${randomUUID()}`);
         try {
@@ -585,14 +604,18 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         try {
           insertPackProjectRow(db, row);
         } catch {
-          if (created) await fsp.rm(dest, { recursive: true, force: true });
+          // The folder goes only when no row names it: a row that exists owns its folder.
+          if (created && !projectRowExists(db, row.id)) await fsp.rm(dest, { recursive: true, force: true });
           receipt.importing = null;
-          receipt.warnings.push(`projects/${row.id} could not be added to the project list`);
+          receipt.projectsPending = true;
+          failedInserts += 1;
+          receipt.warnings.push(`projects/${row.id} could not be added to the project list; it is tried again when the app starts`);
           await writeReceipt(receipt);
           continue;
         }
       }
-      if (prepared.dropped.length > 0) droppedLinks += 1;
+      if (prepared.dropped.includes('linkedDirs')) droppedLinks += 1;
+      if (prepared.dropped.some((key) => key !== 'linkedDirs')) droppedOther += 1;
       mine.add(row.id);
       receipt.projects = [...mine];
       receipt.importing = null;
@@ -603,7 +626,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       receipt.warnings.push(`${existing.length} saved project(s) already exist and were left as they are: ${shown}${existing.length > 5 ? ', ...' : ''}`);
     }
     if (droppedLinks > 0) receipt.warnings.push(`${droppedLinks} saved project(s) linked folders on another computer; those links were left out`);
-    receipt.projectsPending = false;
+    if (droppedOther > 0) receipt.warnings.push(`${droppedOther} saved project(s) were added without settings tied to the computer they came from (design system, picker or workspace links)`);
+    receipt.projectsPending = failedInserts > 0;
   }
 
   async function seedMcp(pack: ActiveMishPack, receipt: Receipt): Promise<void> {
@@ -625,7 +649,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   async function activate(pack: ActiveMishPack): Promise<{ receipt: Receipt; backups: MishPackBackup[] }> {
     const previous = await readReceipt(pack.id);
     const receipt: Receipt = previous && previous.version === pack.manifest.version
-      ? { ...previous, warnings: [] }
+      ? { ...previous }
       : {
           ...emptyReceipt(pack, now()),
           installedAt: previous?.installedAt ?? now().toISOString(),
@@ -639,6 +663,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     await copyIntoUserRoots(pack, receipt, isNewVersion, backups);
     if (isNewVersion && (pack.manifest.provides.mcpServers?.length ?? 0) > 0) await seedMcp(pack, receipt);
     if (isNewVersion || receipt.projectsPending || receipt.importing) await importProjects(pack, receipt);
+    receipt.warnings = [...new Set(receipt.warnings)];
     await writeReceipt(receipt);
     return { receipt, backups };
   }
@@ -650,7 +675,11 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   async function deactivate(id: string): Promise<{ backups: MishPackBackup[]; keptProjects: string[] }> {
     const receipt = await readReceipt(id);
     if (!receipt) return { backups: [], keptProjects: [] };
-    await unseedPackMcpServers(options.dataDir, receipt.seededMcp);
+    try {
+      await unseedPackMcpServers(options.dataDir, receipt.seededMcp);
+    } catch {
+      console.warn(`[mish-packs] ${id}: its MCP servers were left in the MCP settings because that file could not be updated`);
+    }
     const stamp = backupStamp(now());
     const backups: MishPackBackup[] = [];
     for (const bucket of ['skills', 'designSystems'] as const) {
@@ -803,7 +832,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
         await step('mcp-written', journal.packId);
         // An entry an earlier attempt wrote but did not record is still this pack's: it is exactly
         // the planned config, and the person did not have that id before the install.
-        const theirs = personsMcpIds(journal.mcpBefore, intent.remove);
+        const theirs = journal.mcpTheirs ? new Set(journal.mcpTheirs) : null;
         const current = skipped.length > 0 ? (await readMcpConfig(options.dataDir)).servers : [];
         const claimed: SeededMcpServer[] = [];
         for (const id of skipped) {
@@ -861,7 +890,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       } catch {
         journal = null;
       }
-      if (!isJournal(journal)) {
+      if (!validJournal(journal)) {
         console.warn(`[mish-packs] an unreadable install journal was left in place: ${name}`);
         continue;
       }
@@ -880,6 +909,67 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       }
     }
     return unfinished;
+  }
+
+  /**
+   * A copy still in `.mish-pack-retiring` was moved out of its place by an update or removal that
+   * stopped before it was compared. It may hold the person's edits, so it is not compared or
+   * deleted: it is moved to `.mish-pack-backups` and named in its pack's warnings.
+   */
+  async function backUpHeldCopies(): Promise<void> {
+    let ids: string[] = [];
+    try {
+      ids = (await fsp.readdir(receiptsRoot)).filter((name) => name.endsWith('.json')).map((name) => name.slice(0, -'.json'.length));
+    } catch {
+      // no receipts
+    }
+    for (const userRoot of userRoots()) {
+      const retiring = path.join(userRoot, RETIRING_DIRNAME);
+      let holds: string[];
+      try {
+        holds = await fsp.readdir(retiring);
+      } catch {
+        continue;
+      }
+      for (const hold of holds) {
+        const holdDir = path.join(retiring, hold);
+        const kept: string[] = [];
+        try {
+          for (const name of await fsp.readdir(holdDir)) kept.push(await moveInto(path.join(holdDir, name), path.join(userRoot, BACKUP_DIRNAME, hold), name));
+          await fsp.rmdir(holdDir);
+        } catch {
+          console.warn(`[mish-packs] a copy set aside by an interrupted update could not be moved to the backups yet: ${holdDir}`);
+          continue;
+        }
+        const packId = ids.filter((id) => hold.startsWith(`${id}-`)).sort((a, b) => b.length - a.length)[0];
+        const receipt = packId ? await readReceipt(packId) : null;
+        for (const target of kept) {
+          console.warn(`[mish-packs] a copy set aside by an interrupted update was kept at ${target}`);
+          if (receipt) receipt.warnings.push(`a copy set aside by an interrupted update was kept at ${target}`);
+        }
+        if (receipt && kept.length > 0) await writeReceipt(receipt);
+      }
+      await fsp.rmdir(retiring).catch(() => undefined);
+    }
+  }
+
+  /** A removal that stopped after the tree reached the trash: its copies and MCP entries go now. */
+  async function finishRemovals(): Promise<void> {
+    let names: string[];
+    try {
+      names = await fsp.readdir(trashRoot);
+    } catch {
+      return;
+    }
+    for (const name of names) {
+      try {
+        if (ID_RE.test(name) && !(await exists(path.join(root, name)))) await deactivate(name);
+        await fsp.rm(path.join(trashRoot, name), { recursive: true, force: true });
+      } catch {
+        console.warn(`[mish-packs] ${name}: an interrupted removal could not be finished yet; it is retried at the next start`);
+      }
+    }
+    await fsp.rmdir(trashRoot).catch(() => undefined);
   }
 
   /**
@@ -908,6 +998,32 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
   }
 
   /**
+   * Ends an install that only has MCP or cleanup work left, so one failing step cannot block the
+   * pack for good. The MCP entries stay as they are (the old generation's stay recorded as owned),
+   * the receipt says so, and the journal goes. Refused while the new tree is not in place yet.
+   */
+  async function forceSettle(journal: Journal): Promise<boolean> {
+    try {
+      if (await exists(journal.incomingTree)) return false;
+      const receipt = await readReceipt(journal.packId);
+      if (!receipt || receipt.token !== journal.token || !receipt.copiesApplied) return false;
+      if (!receipt.mcpApplied) {
+        receipt.seededMcp = journal.mcpIntent?.remove ?? receipt.seededMcp;
+        receipt.mcpApplied = true;
+        receipt.warnings.push('the MCP servers of this version were not added because the MCP settings file could not be updated');
+      }
+      await writeReceipt(receipt);
+      await fsp.rm(journal.previousTree, { recursive: true, force: true });
+      for (const dir of journal.stagingDirs) await fsp.rm(dir, { recursive: true, force: true });
+      await fsp.rm(journalFile(journal.token), { force: true });
+      await removeEmptyWorkDirs();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
    * An install of `packId` that is not fully settled (committed but unfinished, or finished with a
    * cleanup or MCP step still to retry): settled now, or the new operation is refused, so an older
    * journal can never be replayed over a newer install.
@@ -926,7 +1042,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       } catch {
         continue;
       }
-      if (!isJournal(journal) || journal.packId !== packId) continue;
+      if (!validJournal(journal) || journal.packId !== packId) continue;
       if (journal.phase === 'preparing') {
         await discardPrepared(journal);
         continue;
@@ -937,8 +1053,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       } catch {
         settled = false;
       }
-      if (!settled) {
-        throw new MishPackError('BUSY', 'an earlier install of this pack has not finished yet; check its warnings (for example an MCP settings file that cannot be updated), or restart the app, then try again');
+      if (!settled && !(await forceSettle(journal))) {
+        throw new MishPackError('BUSY', 'an earlier install of this pack could not be completed; restart the app and try again');
       }
     }
   }
@@ -993,6 +1109,7 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
     const token = randomUUID();
     const final = path.join(root, manifest.id);
     const replaced = await exists(final);
+    const oldReceipt = replaced ? await readReceipt(manifest.id) : null;
     const journal: Journal = {
       token,
       packId: manifest.id,
@@ -1002,8 +1119,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       previousTree: path.join(previousRoot, token),
       stagingDirs: userRoots().map((userRoot) => path.join(userRoot, STAGING_DIRNAME, token)),
       stagedCopies: [],
-      oldReceipt: replaced ? await readReceipt(manifest.id) : null,
-      mcpBefore: await readMcpText(),
+      oldReceipt,
+      mcpTheirs: await personsMcpIds(oldReceipt?.seededMcp ?? []),
       warnings: [],
     };
     await writeJournal(journal);
@@ -1043,7 +1160,8 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
       configureMishPacks({ dataDir: options.dataDir, externalDir: options.externalDir ?? null });
       const unfinished = await recoverInterrupted();
       await fsp.rm(stagingRoot, { recursive: true, force: true });
-      await fsp.rm(trashRoot, { recursive: true, force: true });
+      await backUpHeldCopies();
+      await finishRemovals();
       await reportStrayWorkDirs();
       const packs = reload();
       for (const pack of packs) {
@@ -1106,11 +1224,16 @@ export function createMishPackStore(options: MishPackStoreOptions): MishPackStor
           if (external) throw new MishPackError('READ_ONLY', 'this pack comes from MISH_PACKS_DIR; remove it from that folder');
           throw new MishPackError('NOT_FOUND', 'no installed pack has that id');
         }
-        const { backups, keptProjects } = await deactivate(id);
+        // The tree goes to the trash first and the receipt is deleted last. A crash in between is
+        // finished at the next start (see `finishRemovals`) and the pack is never re-activated.
+        const trashed = path.join(trashRoot, id);
         await fsp.mkdir(trashRoot, { recursive: true });
-        await fsp.rename(final, path.join(trashRoot, randomUUID()));
-        await fsp.rm(trashRoot, { recursive: true, force: true });
+        await fsp.rm(trashed, { recursive: true, force: true });
+        await fsp.rename(final, trashed);
         reload();
+        const { backups, keptProjects } = await deactivate(id);
+        await fsp.rm(trashed, { recursive: true, force: true });
+        await fsp.rmdir(trashRoot).catch(() => undefined);
         return { removed: id, backups, ...(keptProjects.length > 0 ? { keptProjects } : {}) };
       });
     },

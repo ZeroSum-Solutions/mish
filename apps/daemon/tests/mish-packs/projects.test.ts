@@ -273,8 +273,6 @@ describe('replacing a pack', () => {
     expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toContain('Version two');
     expect(receiptOf().mcpApplied).toBeFalsy();
     expect(leftovers()).toContain('.journal');
-    // Not settled: a removal waits for it.
-    await expectPackError(store.remove('team-kit'), 'BUSY');
 
     await fsp.rmdir(path.join(dataDir, 'mcp-config.json'));
     resetMishPacksForTests();
@@ -381,7 +379,6 @@ describe('replacing a pack', () => {
     expect((await activeState()).servers).toEqual(before.servers);
     expect(receiptOf().mcpApplied).toBeFalsy();
     expect(leftovers()).toContain('.journal');
-    await expectPackError(store.remove('team-kit'), 'BUSY');
 
     resetMishPacksForTests();
     await makeStore().start();
@@ -409,22 +406,18 @@ describe('replacing a pack', () => {
     expect(await serverIds()).toEqual([]);
   });
 
-  it('refuses a new install while an earlier one is not settled, so it is never replayed over the newer one', async () => {
+  it('settles an earlier install that only has cleanup left, so a new install is never blocked or replayed', async () => {
     await installVersionOne();
     const failingCleanup = makeStore({ onInstallStep: at('cleanup', 'fail') });
     const v2 = tempDir('mish-src-');
     writeVersionTwo(v2);
     await failingCleanup.install(v2);
+    expect(readdirSync(path.join(dataDir, 'mish-packs', '.journal'))).toHaveLength(1);
     const v3 = tempDir('mish-src-');
     writeVersionThree(v3);
-    // The version 2 journal still cannot settle: version 3 waits.
-    await expectPackError(failingCleanup.install(v3), 'BUSY');
-    expect(receiptOf().version).toBe('2.0.0');
-    expect(existsSync(path.join(skillsRoot, 'pack-skill-d'))).toBe(false);
-
-    // Once it settles, version 3 goes in, and a restart does not bring version 2 back.
-    const store = makeStore();
-    expect((await store.install(v3)).pack.version).toBe('3.0.0');
+    // Version 2's cleanup is finished first, then version 3 goes in.
+    expect((await makeStore().install(v3)).pack.version).toBe('3.0.0');
+    expect(leftovers()).toEqual([]);
     resetMishPacksForTests();
     const restarted = makeStore();
     await restarted.start();
@@ -481,7 +474,6 @@ describe('start', () => {
     writeFile(packs, '.previous/old-token.json', '{"token":"old-token"}');
     writeFile(packs, '.incoming/stray/mish-pack.json', '{}');
     writeFile(skillsRoot, '.mish-pack-staging/stray/pack-skill-a/SKILL.md', 'staged');
-    writeFile(skillsRoot, '.mish-pack-retiring/team-kit-x/pack-skill-a/SKILL.md', 'held');
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     try {
       resetMishPacksForTests();
@@ -491,7 +483,6 @@ describe('start', () => {
         path.join(packs, '.previous', 'old-token.json'),
         path.join(packs, '.incoming', 'stray', 'mish-pack.json'),
         path.join(skillsRoot, '.mish-pack-staging', 'stray', 'pack-skill-a', 'SKILL.md'),
-        path.join(skillsRoot, '.mish-pack-retiring', 'team-kit-x', 'pack-skill-a', 'SKILL.md'),
       ]) expect(existsSync(file), file).toBe(true);
       const logged = warn.mock.calls.map((call) => String(call[0])).join('\n');
       expect(logged).toMatch(/left in place, not matched to an install/);
@@ -499,5 +490,195 @@ describe('start', () => {
     } finally {
       warn.mockRestore();
     }
+  });
+});
+
+/** Replaces `mcp-config.json` with a link, the shape the MCP code refuses to read or replace. */
+async function linkMcpConfig(): Promise<{ target: string; text: string }> {
+  const target = path.join(tempDir('mish-elsewhere-'), 'mcp.json');
+  const text = JSON.stringify({ servers: [{ id: 'mine', transport: 'http', url: 'https://mine.example.test/mcp', authMode: 'none' }] });
+  await fsp.writeFile(target, text, { mode: 0o600 });
+  await fsp.symlink(target, path.join(dataDir, 'mcp-config.json'));
+  return { target, text };
+}
+
+describe('audit round 1', () => {
+  it('never replaces an unsafe MCP settings file, and does not block the pack', async () => {
+    const { target, text } = await linkMcpConfig();
+    const source = tempDir('mish-src-');
+    writeProjectsPack(source);
+    const store = makeStore();
+    const { pack } = await store.install(source);
+    expect(pack.warnings.join(' ')).toMatch(/MCP servers were not added/);
+    expect(readFileSync(target, 'utf8')).toBe(text);
+    expect((await fsp.lstat(path.join(dataDir, 'mcp-config.json'))).isSymbolicLink()).toBe(true);
+    // The install is not settled, yet removal is not blocked by it.
+    await store.remove('team-kit');
+    expect((await store.list()).packs).toEqual([]);
+    expect(readFileSync(target, 'utf8')).toBe(text);
+    expect(leftovers()).toEqual([]);
+  });
+
+  it('finishes a removal that stopped after the tree left, without bringing projects back', async () => {
+    const source = tempDir('mish-src-');
+    writeProjectsPack(source);
+    await makeStore().install(source);
+    db.prepare('DELETE FROM projects WHERE id = ?').run('proj-one');
+    const dying = makeStore({
+      now: () => new Date('2026-10-12T10:00:00.000Z'),
+      onRetireHeld: (_held, original) => {
+        if (path.basename(original) === 'pack-skill-a') throw new Error('process died');
+      },
+    });
+    await expect(dying.remove('team-kit')).rejects.toThrow('process died');
+    expect(existsSync(path.join(dataDir, 'mish-packs', 'team-kit'))).toBe(false);
+    expect(existsSync(path.join(dataDir, 'mish-packs', '.receipts', 'team-kit.json'))).toBe(true);
+
+    resetMishPacksForTests();
+    const restarted = makeStore();
+    await restarted.start();
+    expect((await restarted.list()).packs).toEqual([]);
+    expect(existsSync(path.join(dataDir, 'mish-packs', '.receipts', 'team-kit.json'))).toBe(false);
+    expect(existsSync(path.join(dataDir, 'mish-packs', '.trash'))).toBe(false);
+    expect(await serverIds()).toEqual([]);
+    expect(existsSync(path.join(skillsRoot, 'pack-skill-b'))).toBe(false);
+    // The copy that was set aside is kept, not lost.
+    const kept = path.join(skillsRoot, '.mish-pack-backups', 'team-kit-2026-10-12T10-00-00-000Z', 'pack-skill-a', 'SKILL.md');
+    expect(existsSync(kept)).toBe(true);
+    expect(existsSync(path.join(skillsRoot, '.mish-pack-retiring'))).toBe(false);
+    // The deleted project did not come back; the others stay.
+    expect(getProject(db, 'proj-one')).toBeNull();
+    expect(getProject(db, 'proj-empty')).not.toBeNull();
+  });
+
+  it('keeps a copy an interrupted update set aside, and names it in the pack warnings', async () => {
+    const v1 = tempDir('mish-src-');
+    writeProjectsPack(v1);
+    await makeStore().install(v1);
+    const v2 = tempDir('mish-src-');
+    writeVersionTwo(v2);
+    const dying = makeStore({
+      now: () => new Date('2026-10-12T10:00:00.000Z'),
+      onRetireHeld: (_held, original) => {
+        if (path.basename(original) === 'pack-skill-a') throw new Error('process died');
+      },
+    });
+    await expect(dying.install(v2)).rejects.toMatchObject({ code: 'INTERNAL_ERROR' });
+    resetMishPacksForTests();
+    const restarted = makeStore();
+    await restarted.start();
+    const kept = path.join(skillsRoot, '.mish-pack-backups', 'team-kit-2026-10-12T10-00-00-000Z', 'pack-skill-a');
+    expect(existsSync(path.join(kept, 'SKILL.md'))).toBe(true);
+    expect(receiptOf()).toMatchObject({ version: '2.0.0' });
+    expect(readFileSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'utf8')).toContain('Version two');
+    const warnings = (await restarted.list()).packs[0]!.warnings.join('\n');
+    expect(warnings).toContain(`an interrupted update was kept at ${kept}`);
+    expect(existsSync(path.join(skillsRoot, '.mish-pack-retiring'))).toBe(false);
+  });
+
+  it('keeps the backup warnings across restarts', async () => {
+    const v1 = tempDir('mish-src-');
+    writeProjectsPack(v1);
+    await makeStore().install(v1);
+    await fsp.writeFile(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'), 'my edit');
+    const v2 = tempDir('mish-src-');
+    writeVersionTwo(v2);
+    await makeStore().install(v2);
+    for (let round = 0; round < 2; round += 1) {
+      resetMishPacksForTests();
+      const restarted = makeStore();
+      await restarted.start();
+      const warnings = (await restarted.list()).packs[0]!.warnings;
+      expect(warnings.filter((text) => text.includes('had changed since the pack added it'))).toHaveLength(1);
+    }
+  });
+
+  it('builds a copy it re-places at start outside the scanned roots', async () => {
+    const source = tempDir('mish-src-');
+    writeProjectsPack(source);
+    await makeStore().install(source);
+    await fsp.rm(path.join(skillsRoot, 'pack-skill-a'), { recursive: true });
+    const sources: string[] = [];
+    const rename = fsp.rename.bind(fsp);
+    const spy = vi.spyOn(fsp, 'rename').mockImplementation(async (from, to) => {
+      if (path.dirname(String(to)) === skillsRoot) sources.push(String(from));
+      return rename(from, to);
+    });
+    try {
+      resetMishPacksForTests();
+      await makeStore().start();
+    } finally {
+      spy.mockRestore();
+    }
+    expect(existsSync(path.join(skillsRoot, 'pack-skill-a', 'SKILL.md'))).toBe(true);
+    expect(sources).toHaveLength(1);
+    expect(path.dirname(path.dirname(sources[0]!))).toBe(path.join(skillsRoot, '.mish-pack-staging'));
+    expect(readdirSync(skillsRoot).filter((name) => name.startsWith('.mish-pack-') && name !== '.mish-pack-backups')).toEqual([]);
+  });
+
+  it('does not act on a journal whose paths are not the ones its token derives', async () => {
+    const outside = tempDir('mish-outside-');
+    writeFile(outside, 'precious.txt', 'keep me');
+    const journalDir = path.join(dataDir, 'mish-packs', '.journal');
+    const token = '11111111-2222-4333-8444-555555555555';
+    const base = {
+      token, packId: 'team-kit', version: '1.0.0', phase: 'preparing', incomingTree: path.join(dataDir, 'mish-packs', '.incoming', token),
+      previousTree: path.join(dataDir, 'mish-packs', '.previous', token),
+      stagingDirs: [path.join(skillsRoot, '.mish-pack-staging', token), path.join(dsRoot, '.mish-pack-staging', token)],
+      stagedCopies: [], oldReceipt: null, warnings: [],
+    };
+    writeFile(journalDir, `${token}.json`, JSON.stringify({ ...base, incomingTree: outside }));
+    const other = '22222222-2222-4333-8444-555555555555';
+    writeFile(journalDir, `${other}.json`, JSON.stringify({
+      ...base, token: other, phase: 'committed', incomingTree: path.join(dataDir, 'mish-packs', '.incoming', other), previousTree: path.join(dataDir, 'mish-packs', '.previous', other),
+      stagingDirs: [path.join(skillsRoot, '.mish-pack-staging', other), path.join(dsRoot, '.mish-pack-staging', other)],
+      stagedCopies: [{ bucket: 'skills', name: '../escape', path: path.join(outside, 'x'), digest: null }],
+    }));
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    try {
+      resetMishPacksForTests();
+      await makeStore().start();
+    } finally {
+      warn.mockRestore();
+    }
+    expect(readFileSync(path.join(outside, 'precious.txt'), 'utf8')).toBe('keep me');
+    expect(existsSync(path.join(journalDir, `${token}.json`))).toBe(true);
+    expect(existsSync(path.join(journalDir, `${other}.json`))).toBe(true);
+  });
+
+  it('adds saved projects without settings only the daemon sets, and refuses over-long instructions', async () => {
+    const source = tempDir('mish-src-');
+    writeFixturePack(source, { provides: { projects: 'projects' } });
+    const row = {
+      id: 'proj-meta', name: 'Meta', designSystemId: 'user:elsewhere', createdAt: 1, updatedAt: 1,
+      metadata: { kind: 'prototype', localCatalogScopes: { skill: 'workspace:other' }, fromTrustedPicker: true, orchestratorWorkspace: '/etc', importedFrom: 'folder', keep: 'yes' },
+    };
+    writeFile(source, 'projects/projects.json', JSON.stringify({ schema: 'mish-pack-projects/1', projects: [row] }));
+    await makeStore().install(source);
+    expect(getProject(db, 'proj-meta')).toMatchObject({ designSystemId: null, metadata: { kind: 'prototype', keep: 'yes' } });
+    const imported = getProject(db, 'proj-meta') as unknown as { metadata: Record<string, unknown> };
+    for (const key of ['localCatalogScopes', 'fromTrustedPicker', 'orchestratorWorkspace', 'importedFrom']) expect(imported.metadata[key], key).toBeUndefined();
+
+    const long = tempDir('mish-src-');
+    writeFixturePack(long, { id: 'long-kit', provides: { projects: 'projects' } });
+    writeFile(long, 'projects/projects.json', JSON.stringify({ schema: 'mish-pack-projects/1', projects: [{ ...row, id: 'proj-long', customInstructions: 'x'.repeat(5001) }] }));
+    await expectPackError(makeStore().install(long), 'INVALID_MANIFEST');
+    expect(getProject(db, 'proj-long')).toBeNull();
+  });
+
+  it('tries a project again at the next start when its row could not be added', async () => {
+    db.exec("CREATE TRIGGER block_one BEFORE INSERT ON projects WHEN NEW.id = 'proj-one' BEGIN SELECT RAISE(ABORT, 'blocked'); END");
+    const source = tempDir('mish-src-');
+    writeProjectsPack(source);
+    const { pack } = await makeStore().install(source);
+    expect(pack.warnings.join(' ')).toMatch(/projects\/proj-one could not be added/);
+    expect(getProject(db, 'proj-one')).toBeNull();
+    expect(existsSync(path.join(projectsDir, 'proj-one'))).toBe(false);
+    expect(getProject(db, 'proj-empty')).not.toBeNull();
+    db.exec('DROP TRIGGER block_one');
+    resetMishPacksForTests();
+    await makeStore().start();
+    expect(getProject(db, 'proj-one')).toMatchObject({ name: 'Project one' });
+    expect(existsSync(path.join(projectsDir, 'proj-one', 'index.html'))).toBe(true);
   });
 });

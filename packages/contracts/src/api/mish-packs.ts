@@ -299,7 +299,7 @@ const projectRowSchema = z.object({
   pendingPrompt: z.string().max(1_000_000).nullable().optional(),
   /** The project's metadata object. A pack may not point a project at a folder outside it (`baseDir`). */
   metadata: z.record(z.string(), z.unknown()).nullable().optional(),
-  customInstructions: z.string().max(1_000_000).nullable().optional(),
+  customInstructions: z.string().max(5000).nullable().optional(),
   createdAt: z.number().int().nonnegative(),
   updatedAt: z.number().int().nonnegative(),
 }).strict();

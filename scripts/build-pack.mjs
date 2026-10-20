@@ -29,7 +29,7 @@
 //   - the finished manifest is validated with the same schema the daemon uses (when
 //     `packages/contracts` is built), so a pack that would be refused is not written.
 
-import { createReadStream, existsSync, realpathSync } from 'node:fs';
+import { createReadStream, existsSync, lstatSync, realpathSync } from 'node:fs';
 import { copyFile, lstat, mkdir, mkdtemp, readFile, readdir, realpath, rm, stat, writeFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
@@ -513,6 +513,10 @@ handlers.projects = async function projects(ctx, resource) {
       row.metadata = rest;
       unlinked += 1;
     }
+    // Project rows are packed too: scan their text like a packed file.
+    if (CREDENTIAL_SHAPES.some((shape) => shape.test(JSON.stringify([row.name, row.pendingPrompt, row.customInstructions, row.metadata])))) {
+      ctx.plan.flagged.push(`${resource.to}/${entry.name} (project row)`);
+    }
     const unit = `${resource.provides}/${entry.name}`;
     const before = ctx.plan.entries.length;
     await planPath(ctx.plan, ctx.source, path.join(base, entry.name), `${resource.to}/${entry.name}`, resource.provides, unit);
@@ -595,6 +599,8 @@ function finalizeManifest(contracts, manifest, entries, plan) {
 }
 
 async function writeZip(outZip, entries) {
+  // Only a file this run creates is ever removed again on failure.
+  if (existsSync(outZip)) throw new Error(`${outZip} already exists`);
   const zip = new ZipWriter(outZip);
   try {
     for (const entry of entries) {
@@ -611,26 +617,22 @@ async function writeZip(outZip, entries) {
 }
 
 /**
- * Cuts a module's units into packs of at most `maxBytes` (counted before compression), in the
- * map's order. A unit bigger than the limit on its own gets a pack of its own and a warning.
+ * Splits a module's units into parts. A unit's part depends only on its name and the part count, so
+ * a unit stays in the same part when the module changes, unlike a split by running size. Parts are
+ * sized for 80% of `maxBytes` on average because names spread units unevenly. A module that fits in
+ * one pack stays one pack. A unit bigger than the limit on its own gets a warning.
  */
-function binUnits(units, sizes, maxBytes, plan, moduleId) {
-  const bins = [];
-  let current = [];
-  let total = 0;
+function splitUnits(units, sizes, maxBytes, plan, moduleId) {
+  const total = units.reduce((sum, unit) => sum + (sizes.get(unit) ?? 0), 0);
+  const count = total <= maxBytes ? 1 : Math.ceil(total / (maxBytes * 0.8));
+  const parts = Array.from({ length: count }, () => []);
   for (const unit of units) {
     const size = sizes.get(unit) ?? 0;
     if (size > maxBytes) plan.warn(`${moduleId}: ${unit} alone is ${(size / 1048576).toFixed(1)} MiB, more than --max-bytes`);
-    if (current.length > 0 && total + size > maxBytes) {
-      bins.push(current);
-      current = [];
-      total = 0;
-    }
-    current.push(unit);
-    total += size;
+    parts[count === 1 ? 0 : createHash('sha256').update(unit).digest().readUInt32BE(0) % count].push(unit);
   }
-  if (current.length > 0) bins.push(current);
-  return bins;
+  if (count > 1) plan.warn(`${moduleId}: split into ${count} parts by unit name; install every part of a module together, and remove the older parts first when the part count changes`);
+  return parts;
 }
 
 /** Resolves the output path through real folders, so a symlinked checkout cannot hide an output inside it. */
@@ -683,6 +685,11 @@ async function main() {
   if (!existsSync(args.positional[0])) return fail(`no such folder: ${args.positional[0]}`);
   const source = realpathSync(path.resolve(args.positional[0]));
   const out = realOutput(args.positional[1]);
+  try {
+    if (lstatSync(out).isSymbolicLink()) return fail('the output may not be a symbolic link');
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error;
+  }
   if (isInside(source, out) || out === source) return fail('the output must be outside the source checkout, which is only read');
   if (isInside(realpathSync(repoRoot), out) && !args.dryRun) return fail('write the pack outside this repository: it never holds pack content');
   if (!args.dryRun && existsSync(out)) {
@@ -731,6 +738,8 @@ async function main() {
     noteFlagged(plan);
     const today = new Date().toISOString().slice(0, 10).replaceAll('-', '.');
     const version = args.version ?? map.pack?.version ?? today;
+    // The version becomes part of a file name, so it may not carry a path.
+    if (typeof version !== 'string' || !/^[0-9A-Za-z][0-9A-Za-z.+_-]{0,63}$/u.test(version)) return fail(`the version ${JSON.stringify(version)} may only use letters, digits and . + _ -`);
     const env = map.env && Object.keys(map.env).length > 0 ? map.env : null;
     const mcpServers = Array.isArray(map.mcpServers) && map.mcpServers.length > 0 ? map.mcpServers : null;
     const contracts = await loadContracts();
@@ -793,11 +802,14 @@ async function main() {
         report.push({ resource: `module ${module.id}`, status: 'skipped', detail: 'nothing to pack' });
         continue;
       }
-      const bins = units.length === 0 ? [[]] : binUnits(units, unitSizes, maxBytes, plan, module.id);
+      const bins = units.length === 0 ? [[]] : splitUnits(units, unitSizes, maxBytes, plan, module.id);
+      const firstFilled = Math.max(0, bins.findIndex((bin) => bin.length > 0));
       bins.forEach((bin, index) => {
+        if (bin.length === 0 && units.length > 0) return;
         const id = bins.length === 1 ? module.id : `${module.id}-${index + 1}`;
+        if (id !== module.id && modules.some((other) => other.id === id)) fail(`part id ${id} is also a module id; rename the module`);
         const name = bins.length === 1 ? module.name : `${module.name} (${index + 1} of ${bins.length})`;
-        const first = index === 0;
+        const first = index === firstFilled;
         const assembled = assemblePack(plan, new Set(bin), resourceTo, {
           env: withExtras && first ? env : null,
           mcpServers: withExtras && first ? mcpServers : null,
@@ -805,7 +817,7 @@ async function main() {
         const description = module.description ?? map.pack?.description;
         const manifest = { schemaVersion: 1, id, name, version, ...(description ? { description } : {}), provides: assembled.provides };
         const entries = finalizeManifest(contracts, manifest, assembled.entries, plan);
-        packs.push({ id, name, version, file: `${id}-${version}.zip`, entries, resources: assembled.resources, files: entries.length, bytes: entries.reduce((sum, entry) => sum + entry.size, 0) });
+        packs.push({ id, module: module.id, name, version, file: `${id}-${version}.zip`, entries, resources: assembled.resources, files: entries.length, bytes: entries.reduce((sum, entry) => sum + entry.size, 0) });
       });
     }
 
@@ -820,7 +832,7 @@ async function main() {
       const inventory = {
         schema: 'mish-pack-inventory/1',
         version,
-        packs: packs.map((pack) => ({ id: pack.id, name: pack.name, version: pack.version, file: pack.file, bytes: pack.zipBytes, sha256: pack.sha256, files: pack.files, resources: pack.resources })),
+        packs: packs.map((pack) => ({ id: pack.id, module: pack.module, name: pack.name, version: pack.version, file: pack.file, bytes: pack.zipBytes, sha256: pack.sha256, files: pack.files, resources: pack.resources })),
       };
       await writeFile(path.join(out, 'inventory.json'), `${JSON.stringify(inventory, null, 2)}\n`);
       const sums = [...packs].sort((a, b) => (a.file < b.file ? -1 : 1)).map((pack) => `${pack.sha256}  ${pack.file}\n`).join('');

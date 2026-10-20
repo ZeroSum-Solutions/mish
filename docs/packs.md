@@ -222,10 +222,13 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packs --split
   carries those). A module larger than `--max-bytes` (1.5 GiB by default,
   counted before compression, so each file fits a GitHub release asset) is cut
   into numbered parts (`team-projects-1`, `team-projects-2`, ...) along whole
-  design systems and projects. The output folder gets `<id>-<version>.zip` for
+  design systems and projects. A folder's part depends on its name and the
+  part count, so it stays in its part while the count stays the same. Install
+  every part of a module together; when the count changes, remove the older
+  parts first. `--version` may only use letters, digits and `. + _ -`. The output folder gets `<id>-<version>.zip` for
   each pack, `SHA256SUMS` (check with `shasum -a 256 -c SHA256SUMS`) and
-  `inventory.json` (`mish-pack-inventory/1`: id, version, file, bytes, sha256,
-  resources).
+  `inventory.json` (`mish-pack-inventory/1`: id, module, version, file, bytes,
+  sha256, resources).
 - `bundle` compiles a TypeScript adapter registry into the prebuilt module a
   pack carries. `genui-overlay` takes the catalogue rows of one licensed source
   and the demo documents. `catalog-delta` keeps the rows the public catalogue

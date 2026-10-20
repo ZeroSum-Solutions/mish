@@ -199,6 +199,80 @@ describe('build-pack: saved projects', () => {
     expect(manifests.map((manifest) => manifest.provides.mcpServers?.length ?? 0)).toEqual([0, 1, 0]);
   });
 
+  it('flags project rows that carry text shaped like a credential', async () => {
+    const source = tempDir('mish-private-');
+    const live = writeCheckout(source);
+    live.prepare('UPDATE projects SET custom_instructions = ? WHERE id = ?').run(`Use Bearer ${'y'.repeat(40)} for the API`, 'proj-big-a');
+    live.prepare('UPDATE projects SET pending_prompt = ? WHERE id = ?').run('Nothing secret here', 'proj-big-b');
+    const map = path.join(tempDir('mish-map-'), 'map.json');
+    writeMap(map);
+    const result = build([source, path.join(tempDir('mish-out-'), 'packet.zip'), '--map', map, '--json']);
+    live.close();
+    expect(result.status, result.stderr).toBe(0);
+    const warnings = (JSON.parse(result.stdout) as { warnings: string[] }).warnings.join(' ');
+    expect(warnings).toMatch(/3 packed file\(s\) contain text shaped like a credential/);
+    expect(warnings).toContain('projects/proj-big-a (project row)');
+    expect(warnings).not.toContain('proj-big-b (project row)');
+  });
+
+  it('keeps each unit in the same part when the module changes, and warns that parts install together', async () => {
+    async function partsOf(outDir: string): Promise<Record<string, string>> {
+      const parts: Record<string, string> = {};
+      const inventory = JSON.parse(readFileSync(path.join(outDir, 'inventory.json'), 'utf8')) as { packs: Array<{ id: string; file: string }> };
+      for (const entry of inventory.packs) {
+        const staging = tempDir('mish-extract-');
+        await extractMishPackZip(path.join(outDir, entry.file), staging);
+        const file = path.join(staging, 'projects', 'projects.json');
+        if (!existsSync(file)) continue;
+        for (const row of (JSON.parse(readFileSync(file, 'utf8')) as { projects: Array<{ id: string }> }).projects) parts[row.id] = entry.id;
+      }
+      return parts;
+    }
+    const source = tempDir('mish-private-');
+    const live = writeCheckout(source, 700 * 1024);
+    const map = path.join(tempDir('mish-map-'), 'map.json');
+    writeMap(map);
+    const first = path.join(tempDir('mish-out-'), 'packs');
+    const run1 = build([source, first, '--map', map, '--split', '--max-bytes', '1MiB', '--json']);
+    expect(run1.status, run1.stderr).toBe(0);
+    expect((JSON.parse(run1.stdout) as { warnings: string[] }).warnings.join(' ')).toMatch(/mod-projects: split into \d+ parts by unit name; install every part of a module together/);
+    const before = await partsOf(first);
+    expect(Object.keys(before).sort()).toEqual(['ds-atlas-one', 'proj-big-a', 'proj-big-b', 'proj-empty', 'proj-wal']);
+
+    // A new project that keeps the part count changes the sizes, not where the others go.
+    writeFile(source, '.od/projects/proj-big-c/blob.bin', randomBytes(20 * 1024));
+    live.prepare('INSERT INTO projects (id, name, created_at, updated_at) VALUES (?, ?, ?, ?)').run('proj-big-c', 'Big C', 10, 20);
+    const second = path.join(tempDir('mish-out-'), 'packs');
+    const run2 = build([source, second, '--map', map, '--split', '--max-bytes', '1MiB', '--json']);
+    live.close();
+    expect(run2.status, run2.stderr).toBe(0);
+    const after = await partsOf(second);
+    expect(after['proj-big-c']).toBeDefined();
+    expect(new Set(Object.values(after)).size).toBe(new Set(Object.values(before)).size);
+    for (const [id, part] of Object.entries(before)) expect(after[id], id).toBe(part);
+  });
+
+  it('refuses a version that is not a plain name, and an output that is a symbolic link', async () => {
+    const source = tempDir('mish-private-');
+    writeCheckout(source).close();
+    const map = path.join(tempDir('mish-map-'), 'map.json');
+    writeMap(map);
+    const out = tempDir('mish-out-');
+    const escaped = build([source, path.join(out, 'packs'), '--map', map, '--split', '--version', '../../escape']);
+    expect(escaped.status).not.toBe(0);
+    expect(escaped.stderr).toMatch(/may only use letters, digits/);
+    expect(readdirSync(out)).toEqual([]);
+
+    const victim = path.join(tempDir('mish-victim-'), 'precious.zip');
+    await fsp.writeFile(victim, 'keep me');
+    const link = path.join(out, 'link.zip');
+    await fsp.symlink(victim, link);
+    const linked = build([source, link, '--map', map]);
+    expect(linked.status).not.toBe(0);
+    expect(linked.stderr).toMatch(/symbolic link/);
+    expect(readFileSync(victim, 'utf8')).toBe('keep me');
+  });
+
   it('refuses --split when a resource names no module, and an output folder that is not empty', async () => {
     const source = tempDir('mish-private-');
     writeCheckout(source).close();

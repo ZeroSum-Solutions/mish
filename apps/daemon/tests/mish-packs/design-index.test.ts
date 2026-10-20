@@ -99,4 +99,12 @@ describe('design index profiles from a pack', () => {
     writeFile(source, 'design-index/readme.txt', 'no index here');
     await expect(store.install(source)).rejects.toMatchObject({ code: 'MISSING_RESOURCE' });
   });
+
+  it('reads an index with a very large profile list without overflowing the stack', async () => {
+    const source = tempDir('mish-src-');
+    writeFixturePack(source, { provides: { designIndex: 'design-index' } });
+    writeFile(source, 'design-index/index.json', `{"schema":"design-index/1","profiles":[${Array.from({ length: 150_000 }, () => '0').join(',')}]}`);
+    await store.install(source);
+    expect(packDesignIndexProfiles()).toHaveLength(150_000);
+  });
 });

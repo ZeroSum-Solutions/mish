@@ -23,6 +23,16 @@ export function packServerToConfig(server: MishPackMcpServer): McpServerConfig |
   return sanitizeMcpServer({ ...server });
 }
 
+/**
+ * Changes the MCP settings. The file is read first and any read error (a symlinked or foreign-owned
+ * file, bad JSON) stops the change: `writeMcpConfig` would otherwise treat an unsafe file as empty
+ * and replace it, wiping the person's servers.
+ */
+async function changeMcpConfig(dataDir: string, change: (previous: McpConfig) => McpConfig): Promise<void> {
+  await readMcpConfig(dataDir);
+  await writeMcpConfig(dataDir, { servers: [] }, (_next, previous) => change(previous));
+}
+
 function sameConfig(a: McpServerConfig, b: McpServerConfig): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
@@ -35,7 +45,7 @@ export async function seedPackMcpServers(
   const seeded: SeededMcpServer[] = [];
   const skipped: string[] = [];
   if (servers.length === 0) return { seeded, skipped };
-  await writeMcpConfig(dataDir, { servers: [] }, (_next, previous) => {
+  await changeMcpConfig(dataDir, (previous) => {
     const taken = new Set(previous.servers.map((server) => server.id));
     const merged = [...previous.servers];
     for (const server of servers) {
@@ -61,7 +71,7 @@ export async function seedPackMcpServers(
 export async function unseedPackMcpServers(dataDir: string, seeded: readonly SeededMcpServer[]): Promise<string[]> {
   if (seeded.length === 0) return [];
   const removed: string[] = [];
-  await writeMcpConfig(dataDir, { servers: [] }, (_next, previous) => {
+  await changeMcpConfig(dataDir, (previous) => {
     const keep = previous.servers.filter((server) => {
       const mine = seeded.find((entry) => entry.id === server.id);
       if (mine && sameConfig(mine.config, server)) {
@@ -82,7 +92,7 @@ export async function unseedPackMcpServers(dataDir: string, seeded: readonly See
 export async function restorePackMcpServers(dataDir: string, configs: readonly McpServerConfig[]): Promise<string[]> {
   if (configs.length === 0) return [];
   const restored: string[] = [];
-  await writeMcpConfig(dataDir, { servers: [] }, (_next, previous) => {
+  await changeMcpConfig(dataDir, (previous) => {
     const taken = new Set(previous.servers.map((server) => server.id));
     const merged = [...previous.servers];
     for (const config of configs) {

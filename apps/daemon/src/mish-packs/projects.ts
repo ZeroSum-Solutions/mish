@@ -22,6 +22,9 @@ import {
 import { getProject, insertProject } from '../db.js';
 import { MishPackError } from './errors.js';
 
+/** Largest `projects.json` read: rows are small, so a bigger file is not a project list. */
+const MAX_PROJECTS_FILE_BYTES = 64 * 1024 * 1024;
+
 export type ProjectDb = Database.Database;
 
 /** Reads and checks `projects.json` in a pack's projects folder. Throws MISSING_RESOURCE or INVALID_MANIFEST. */
@@ -31,6 +34,7 @@ export async function readPackProjectRows(dir: string): Promise<MishPackProjectR
   try {
     const info = await fsp.stat(file);
     if (!info.isFile()) throw new Error('not a file');
+    if (info.size > MAX_PROJECTS_FILE_BYTES) throw new Error('too large');
     text = await fsp.readFile(file, 'utf8');
   } catch {
     throw new MishPackError('MISSING_RESOURCE', `projects must contain ${MISH_PACK_PROJECTS_FILENAME}`);
@@ -66,17 +70,38 @@ export async function verifyPackProjects(dir: string): Promise<void> {
   }
 }
 
+/** Metadata the daemon sets itself on a project: a pack may not carry it (the create route refuses it too). */
+const DAEMON_OWNED_METADATA = ['linkedDirs', 'localCatalogScopes', 'fromTrustedPicker', 'orchestratorWorkspace', 'importedFrom', 'originalBaseDir'] as const;
+
 /**
  * The row to insert, or why the row is skipped. A pack may not point a project at a folder outside
- * it (`baseDir`), and folders it links (`linkedDirs`) name another computer's paths, so they are
- * dropped.
+ * it (`baseDir`). Fields that name another computer or that only the daemon sets are dropped
+ * (`dropped` lists them): linked folders, catalogue scopes, picker and workspace markers, and a
+ * design system id other than `user:<name>` for a design system this pack placed
+ * (`packDesignSystems`), so a project is never tied to one the pack did not install.
  */
-export function prepareProjectRow(row: MishPackProjectRow): { row: MishPackProjectRow; dropped: string[] } | { skip: string } {
+export function prepareProjectRow(
+  row: MishPackProjectRow,
+  packDesignSystems: ReadonlySet<string> = new Set(),
+): { row: MishPackProjectRow; dropped: string[] } | { skip: string } {
   const metadata = row.metadata ?? null;
   if (metadata && Object.hasOwn(metadata, 'baseDir')) return { skip: 'its files live in a folder outside the pack' };
-  if (!metadata || !Object.hasOwn(metadata, 'linkedDirs')) return { row, dropped: [] };
-  const { linkedDirs: _linked, ...rest } = metadata;
-  return { row: { ...row, metadata: rest }, dropped: ['linkedDirs'] };
+  const dropped: string[] = [];
+  let clean = metadata;
+  if (metadata) {
+    const rest = { ...metadata };
+    for (const key of DAEMON_OWNED_METADATA) {
+      if (!Object.hasOwn(rest, key)) continue;
+      delete rest[key];
+      dropped.push(key);
+    }
+    clean = rest;
+  }
+  const designSystemId = row.designSystemId?.startsWith('user:') && packDesignSystems.has(row.designSystemId.slice('user:'.length))
+    ? row.designSystemId
+    : null;
+  if (row.designSystemId && designSystemId === null) dropped.push('designSystemId');
+  return { row: { ...row, metadata: clean, designSystemId }, dropped };
 }
 
 export function projectRowExists(db: ProjectDb, id: string): boolean {
