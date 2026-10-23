@@ -23,6 +23,16 @@ export function packServerToConfig(server: MishPackMcpServer): McpServerConfig |
   return sanitizeMcpServer({ ...server });
 }
 
+/**
+ * Changes the MCP settings. The file is read first and any read error (a symlinked or foreign-owned
+ * file, bad JSON) stops the change: `writeMcpConfig` would otherwise treat an unsafe file as empty
+ * and replace it, wiping the person's servers.
+ */
+async function changeMcpConfig(dataDir: string, change: (previous: McpConfig) => McpConfig): Promise<void> {
+  await readMcpConfig(dataDir);
+  await writeMcpConfig(dataDir, { servers: [] }, (_next, previous) => change(previous));
+}
+
 function sameConfig(a: McpServerConfig, b: McpServerConfig): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
@@ -35,7 +45,7 @@ export async function seedPackMcpServers(
   const seeded: SeededMcpServer[] = [];
   const skipped: string[] = [];
   if (servers.length === 0) return { seeded, skipped };
-  await writeMcpConfig(dataDir, { servers: [] }, (_next, previous) => {
+  await changeMcpConfig(dataDir, (previous) => {
     const taken = new Set(previous.servers.map((server) => server.id));
     const merged = [...previous.servers];
     for (const server of servers) {
@@ -61,10 +71,10 @@ export async function seedPackMcpServers(
 export async function unseedPackMcpServers(dataDir: string, seeded: readonly SeededMcpServer[]): Promise<string[]> {
   if (seeded.length === 0) return [];
   const removed: string[] = [];
-  await writeMcpConfig(dataDir, { servers: [] }, (_next, previous) => {
+  await changeMcpConfig(dataDir, (previous) => {
     const keep = previous.servers.filter((server) => {
-      const mine = seeded.find((entry) => entry.id === server.id);
-      if (mine && sameConfig(mine.config, server)) {
+      // One id can be listed with more than one config (an earlier version's and an update's).
+      if (seeded.some((entry) => entry.id === server.id && sameConfig(entry.config, server))) {
         removed.push(server.id);
         return false;
       }
@@ -73,6 +83,27 @@ export async function unseedPackMcpServers(dataDir: string, seeded: readonly See
     return { servers: keep };
   });
   return removed;
+}
+
+/**
+ * Puts back entries a failed update took away, each only when its id is still free. Returns the
+ * ids restored.
+ */
+export async function restorePackMcpServers(dataDir: string, configs: readonly McpServerConfig[]): Promise<string[]> {
+  if (configs.length === 0) return [];
+  const restored: string[] = [];
+  await changeMcpConfig(dataDir, (previous) => {
+    const taken = new Set(previous.servers.map((server) => server.id));
+    const merged = [...previous.servers];
+    for (const config of configs) {
+      if (taken.has(config.id)) continue;
+      taken.add(config.id);
+      merged.push(config);
+      restored.push(config.id);
+    }
+    return { servers: merged };
+  });
+  return restored;
 }
 
 /** `${NAME}` references in one server, as variable names. */

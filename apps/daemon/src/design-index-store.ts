@@ -97,7 +97,17 @@ function sanitizeIndex(index: DesignIndex): DesignIndex {
   return { ...index, profiles };
 }
 
-export function createDesignIndexStore(file: string): DesignIndexStore {
+export interface DesignIndexStoreOptions {
+  /**
+   * Read-only profiles from outside the person's own index (an installed Mish pack). They are
+   * parsed like stored ones and served by `list`, `find` and `get` after the person's own; a
+   * profile whose digest the person's index already has is left out. `add` and `remove` never
+   * write them into the file, and `remove` cannot take one away.
+   */
+  extraProfiles?: () => unknown[];
+}
+
+export function createDesignIndexStore(file: string, options: DesignIndexStoreOptions = {}): DesignIndexStore {
   let chain: Promise<unknown> = Promise.resolve();
 
   function serialize<T>(work: () => Promise<T>): Promise<T> {
@@ -113,6 +123,21 @@ export function createDesignIndexStore(file: string): DesignIndexStore {
   }
 
   const read = async () => sanitizeIndex(await loadDesignIndex(file));
+
+  /** The person's own profiles, then the read-only extra ones whose digest is not already there. */
+  const readMerged = async (): Promise<DesignIndex> => {
+    const own = await read();
+    const extra = options.extraProfiles?.() ?? [];
+    if (extra.length === 0) return own;
+    const digests = new Set(own.profiles.map((profile) => profile.source.digest));
+    const profiles = [...own.profiles];
+    for (const entry of sanitizeIndex({ schema: 'design-index/1', profiles: extra as DesignProfile[] }).profiles) {
+      if (digests.has(entry.source.digest)) continue;
+      digests.add(entry.source.digest);
+      profiles.push(entry);
+    }
+    return { ...own, profiles };
+  };
 
   function byDigest(index: DesignIndex, digest: string): DesignProfile | undefined {
     return index.profiles.find((profile) => profile.source.digest === digest);
@@ -144,7 +169,7 @@ export function createDesignIndexStore(file: string): DesignIndexStore {
 
     find(query, taxonomy, limit) {
       return serialize(async () => {
-        const index = await read();
+        const index = await readMerged();
         // `findProfiles` applies its own `limit` after ranking, so ask it for everything and cut
         // the page here: `matched` has to report the size of the full match set, not the page.
         const ranked = findProfiles(index.profiles, { ...query, limit: index.profiles.length }, taxonomy);
@@ -154,7 +179,7 @@ export function createDesignIndexStore(file: string): DesignIndexStore {
 
     list(limit) {
       return serialize(async () => {
-        const index = await read();
+        const index = await readMerged();
         // Newest first by the profile's own `at`, which is when Jev produced it — the index file
         // itself is append-ordered, and an entry replaced in place keeps its old position.
         const ordered = [...index.profiles].sort((a, b) => b.at.localeCompare(a.at));
@@ -163,7 +188,7 @@ export function createDesignIndexStore(file: string): DesignIndexStore {
     },
 
     get(digest) {
-      return serialize(async () => byDigest(await read(), digest));
+      return serialize(async () => byDigest(await readMerged(), digest));
     },
 
     remove(digest) {

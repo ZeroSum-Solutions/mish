@@ -1,11 +1,13 @@
 // A small streaming .zip writer for `scripts/build-pack.mjs`. It writes straight to a file, one
-// entry at a time, so a multi-gigabyte pack never sits in memory (each entry is read whole, so an
-// entry must fit in memory: the pack format caps one file at 512 MiB). It writes ZIP64 records
+// entry at a time, so a multi-gigabyte pack never sits in memory. A file up to STREAM_ABOVE bytes
+// is read whole and deflated; a larger one (the pack format allows 2 GiB per file) is read twice
+// as a stream, once for its CRC and once to copy it, and stored as is. The copy pass computes the
+// CRC again, and the build fails when the two differ (the file changed in between). It writes ZIP64 records
 // when the entry count or an offset passes the classic limits, and fixed timestamps and sorted
 // input make the output reproducible.
 
-import { createWriteStream } from 'node:fs';
-import { readFile } from 'node:fs/promises';
+import { createReadStream, createWriteStream } from 'node:fs';
+import { readFile, stat } from 'node:fs/promises';
 import { once } from 'node:events';
 import { crc32, deflateRawSync } from 'node:zlib';
 
@@ -14,7 +16,9 @@ const DOS_TIME = 0;
 const DOS_DATE = ((2000 - 1980) << 9) | (1 << 5) | 1;
 const UINT32_MAX = 0xffffffff;
 const UINT16_MAX = 0xffff;
-const MAX_ENTRY_BYTES = 512 * 1024 * 1024;
+const MAX_ENTRY_BYTES = 2 * 1024 * 1024 * 1024;
+/** Files above this size are streamed and stored rather than read whole and deflated. */
+const STREAM_ABOVE = 64 * 1024 * 1024;
 
 function u16(value) {
   const buffer = Buffer.alloc(2);
@@ -36,9 +40,15 @@ export class ZipWriter {
   #stream;
   #offset = 0;
   #entries = [];
-  #names = new Set();
+  /** Each path and parent folder written, by its folded form: its spelling and whether it is a folder. */
+  #names = new Map();
+  #streamAbove;
+  #afterCrcPass;
 
-  constructor(file) {
+  /** `streamAbove` and `afterCrcPass` exist for tests: a lower threshold, and a hook between the two passes. */
+  constructor(file, { streamAbove = STREAM_ABOVE, afterCrcPass = null } = {}) {
+    this.#streamAbove = streamAbove;
+    this.#afterCrcPass = afterCrcPass;
     this.#stream = createWriteStream(file, { flags: 'wx', mode: 0o644 });
   }
 
@@ -53,17 +63,64 @@ export class ZipWriter {
 
   /** Adds a file whose bytes are on disk. */
   async addFile(name, absolutePath) {
-    await this.addBuffer(name, await readFile(absolutePath));
+    const { size } = await stat(absolutePath);
+    if (size <= this.#streamAbove) return this.addBuffer(name, await readFile(absolutePath));
+    this.#claim(name, size);
+    let crc = 0;
+    let seen = 0;
+    for await (const chunk of createReadStream(absolutePath)) {
+      crc = crc32(chunk, crc);
+      seen += chunk.length;
+    }
+    if (seen !== size) throw new Error(`file changed while it was packed: ${JSON.stringify(name)}`);
+    await this.#afterCrcPass?.(name, absolutePath);
+    const nameBytes = Buffer.from(name, 'utf8');
+    const offset = this.#offset;
+    await this.#write(this.#localHeader(nameBytes, 0, crc, size, size));
+    // The header already holds the first pass's CRC, so the bytes that follow must hash to it.
+    let copied = 0;
+    let copyCrc = 0;
+    for await (const chunk of createReadStream(absolutePath)) {
+      copied += chunk.length;
+      copyCrc = crc32(chunk, copyCrc);
+      await this.#write(chunk);
+    }
+    if (copied !== size || copyCrc !== crc) throw new Error(`file changed while it was packed: ${JSON.stringify(name)}`);
+    this.#entries.push({ nameBytes, method: 0, crc, compressed: size, size, offset });
+  }
+
+  #claim(name, size) {
+    if (!/^[^/\\\0][^\\\0]*$/.test(name) || name.split('/').some((part) => part === '' || part === '.' || part === '..')) {
+      throw new Error(`unsafe zip entry name: ${JSON.stringify(name)}`);
+    }
+    // The daemon compares every path and parent folder without case and in one Unicode form, and
+    // refuses a file and a folder of one name, so this does too.
+    const parts = name.split('/');
+    for (let depth = 1; depth <= parts.length; depth += 1) {
+      const spelling = parts.slice(0, depth).join('/');
+      const folder = depth < parts.length;
+      const folded = spelling.normalize('NFC').toLowerCase();
+      const existing = this.#names.get(folded);
+      if (!existing) {
+        this.#names.set(folded, { spelling, folder });
+        continue;
+      }
+      if (existing.spelling !== spelling) throw new Error(`zip entries differ only by letter case or Unicode form: ${JSON.stringify(name)}`);
+      if (!existing.folder || !folder) throw new Error(`duplicate zip entry: ${JSON.stringify(name)}`);
+    }
+    if (size > MAX_ENTRY_BYTES) throw new Error(`zip entry too large: ${JSON.stringify(name)}`);
+  }
+
+  #localHeader(nameBytes, method, crc, compressed, size) {
+    return Buffer.concat([
+      u32(0x04034b50), u16(20), u16(0x0800), u16(method), u16(DOS_TIME), u16(DOS_DATE),
+      u32(crc), u32(compressed), u32(size), u16(nameBytes.length), u16(0), nameBytes,
+    ]);
   }
 
   /** Adds an entry from memory. */
   async addBuffer(name, data) {
-    if (!/^[^/\\\0][^\\\0]*$/.test(name) || name.split('/').some((part) => part === '' || part === '.' || part === '..')) {
-      throw new Error(`unsafe zip entry name: ${JSON.stringify(name)}`);
-    }
-    if (this.#names.has(name.toLowerCase())) throw new Error(`duplicate zip entry: ${JSON.stringify(name)}`);
-    this.#names.add(name.toLowerCase());
-    if (data.length > MAX_ENTRY_BYTES) throw new Error(`zip entry too large: ${JSON.stringify(name)}`);
+    this.#claim(name, data.length);
     const nameBytes = Buffer.from(name, 'utf8');
     const extension = name.slice(name.lastIndexOf('.')).toLowerCase();
     let method = 0;
@@ -77,11 +134,7 @@ export class ZipWriter {
     }
     const crc = crc32(data);
     const offset = this.#offset;
-    const header = Buffer.concat([
-      u32(0x04034b50), u16(20), u16(0x0800), u16(method), u16(DOS_TIME), u16(DOS_DATE),
-      u32(crc), u32(body.length), u32(data.length), u16(nameBytes.length), u16(0), nameBytes,
-    ]);
-    await this.#write(header);
+    await this.#write(this.#localHeader(nameBytes, method, crc, body.length, data.length));
     await this.#write(body);
     this.#entries.push({ nameBytes, method, crc, compressed: body.length, size: data.length, offset });
   }
@@ -118,6 +171,8 @@ export class ZipWriter {
   }
 
   abort() {
+    // A write still in flight fails once the stream is gone; the file is being given up anyway.
+    this.#stream.on('error', () => {});
     this.#stream.destroy();
   }
 }
