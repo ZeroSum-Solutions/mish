@@ -32,6 +32,17 @@ describe('resolveDaemonProxyTarget', () => {
     expect(target?.href).toBe('http://127.0.0.1:7456/api/latest/meta-data?token=1');
   });
 
+  it('does not let a path that normalizes to `//host` replace the daemon origin', () => {
+    // `/x/..//evil.example/api/y` normalizes to the pathname `//evil.example/api/y`,
+    // which a naive `new URL(pathname, origin)` resolves as a scheme-relative URL.
+    expect(
+      resolveDaemonProxyTarget('http://127.0.0.1:7456', '/x/..//evil.example/api/latest?token=1'),
+    ).toBeNull();
+    expect(
+      resolveDaemonProxyTarget('http://127.0.0.1:7456', '/api/..//169.254.169.254/api/latest'),
+    ).toBeNull();
+  });
+
   it('rejects non-daemon paths', () => {
     expect(resolveDaemonProxyTarget('http://127.0.0.1:7456', '/settings')).toBeNull();
   });

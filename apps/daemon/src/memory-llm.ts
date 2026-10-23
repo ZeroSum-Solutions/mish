@@ -794,6 +794,9 @@ async function callAnthropic(provider, system, user) {
         messages: [{ role: 'user', content: user }],
       }),
       signal: withTimeout(FETCH_TIMEOUT_MS),
+      // A provider API never redirects; following one would replay the key and
+      // body to a host the SSRF guard never checked.
+      redirect: 'error',
     });
   } catch (err) {
     throw new Error(describeFetchError(err));
@@ -838,6 +841,9 @@ async function callOpenAI(provider, system, user) {
           ],
         }),
         signal: withTimeout(FETCH_TIMEOUT_MS),
+        // A provider API never redirects; following one would replay the key and
+        // body to a host the SSRF guard never checked.
+        redirect: 'error',
       },
     );
   } catch (err) {
@@ -878,6 +884,9 @@ async function callAzure(provider, system, user) {
         ],
       }),
       signal: withTimeout(FETCH_TIMEOUT_MS),
+      // A provider API never redirects; following one would replay the key and
+      // body to a host the SSRF guard never checked.
+      redirect: 'error',
     });
   } catch (err) {
     throw new Error(describeFetchError(err));
@@ -909,6 +918,9 @@ async function callGoogle(provider, system, user) {
         generationConfig: { responseMimeType: 'application/json' },
       }),
       signal: withTimeout(FETCH_TIMEOUT_MS),
+      // A provider API never redirects; following one would replay the key and
+      // body to a host the SSRF guard never checked.
+      redirect: 'error',
     });
   } catch (err) {
     throw new Error(describeFetchError(err));
