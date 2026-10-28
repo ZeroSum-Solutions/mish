@@ -70,6 +70,14 @@ function resolveWorkspaceRoot(): string {
 }
 
 const WORKSPACE_ROOT = resolveWorkspaceRoot();
+
+// Next 16.4 checks `distDir` against its own root detection, not the
+// `outputFileTracingRoot` below. That detection stops at a directory that
+// contains $HOME, so a sandboxed run whose HOME sits under the repo (the e2e
+// harness puts it in `.tmp/e2e/<ns>/scratch/home`) resolved the root to
+// `apps/web` and rejected the namespace-scoped distDir under `.tmp/` with
+// InvalidDistDirError. Hand Next the root we already resolved.
+process.env.NEXT_PRIVATE_OUTPUT_TRACE_ROOT ??= WORKSPACE_ROOT;
 const toPosixPath = (value: string) => value.replaceAll('\\', '/');
 
 function resolveDistDir(defaultValue: string) {
