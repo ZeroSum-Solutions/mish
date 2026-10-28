@@ -1,5 +1,5 @@
-import type { RequestHandler } from 'express';
-import { rateLimit } from 'express-rate-limit';
+import type { Request, RequestHandler } from 'express';
+import { ipKeyGenerator, rateLimit } from 'express-rate-limit';
 
 import { sendApiError } from './api-errors.js';
 import { isLoopbackPeerAddress } from './local-daemon-request.js';
@@ -23,8 +23,38 @@ export function apiRateLimitMaxFromEnv(env: NodeJS.ProcessEnv = process.env): nu
 }
 
 // Unauthenticated liveness probes stay open so monitors never see 429 from a
-// busy peer; they carry no secrets and do no work.
+// busy peer. Only a bodyless GET or HEAD without credentials qualifies: a probe
+// path must not become a free lane for body parsing or token guessing. The
+// match follows Express's own routing (case-insensitive, optional trailing
+// slash) so the aliases a probe can reach are exempt together.
 const OPEN_PROBE_PATHS = new Set(['/api/health', '/api/ready', '/api/version']);
+
+function isOpenProbeRequest(req: Request): boolean {
+  if (req.method !== 'GET' && req.method !== 'HEAD') return false;
+  if (req.headers.authorization !== undefined) return false;
+  const length = req.headers['content-length'];
+  if ((length !== undefined && length !== '0') || req.headers['transfer-encoding'] !== undefined) {
+    return false;
+  }
+  return OPEN_PROBE_PATHS.has(req.path.toLowerCase().replace(/\/+$/, ''));
+}
+
+// The peer is the socket address. The web sidecar and a same-host reverse proxy
+// reach the daemon from 127.0.0.1 and put the real client in X-Forwarded-For
+// (the sidecar appends the socket address of its own peer last), so a loopback
+// peer that names a different client is counted as that client. A non-loopback
+// peer is never trusted to name anyone else: its forwarding headers are ignored,
+// so it cannot pick its own bucket.
+function clientAddress(req: Request): string {
+  const peer = req.socket?.remoteAddress ?? '';
+  if (!isLoopbackPeerAddress(peer)) return peer || 'unknown';
+  const forwarded = req.headers['x-forwarded-for'];
+  const chain = (Array.isArray(forwarded) ? forwarded.join(',') : (forwarded ?? ''))
+    .split(',')
+    .map((entry) => entry.trim())
+    .filter((entry) => entry.length > 0);
+  return chain.length > 0 ? chain[chain.length - 1]! : peer;
+}
 
 export function createApiRateLimiter(
   options: { max?: number; windowMs?: number } = {},
@@ -34,8 +64,11 @@ export function createApiRateLimiter(
     limit: options.max ?? apiRateLimitMaxFromEnv(),
     standardHeaders: 'draft-7',
     legacyHeaders: false,
-    skip: (req) =>
-      OPEN_PROBE_PATHS.has(req.path) || isLoopbackPeerAddress(req.socket?.remoteAddress),
+    // Keyed on the socket peer on purpose (see clientAddress), so the library's
+    // trust-proxy and forwarded-header sanity checks do not apply.
+    validate: { trustProxy: false, xForwardedForHeader: false, forwardedHeader: false },
+    keyGenerator: (req) => ipKeyGenerator(clientAddress(req)),
+    skip: (req) => isOpenProbeRequest(req) || isLoopbackPeerAddress(clientAddress(req)),
     handler: (_req, res) =>
       sendApiError(res, 429, 'RATE_LIMITED', 'too many requests; retry after the Retry-After interval', {
         retryable: true,

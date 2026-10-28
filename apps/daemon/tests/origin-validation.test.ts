@@ -934,4 +934,17 @@ describe('requestHostRefusal (DNS rebinding)', () => {
       { OD_ALLOWED_DEV_ORIGINS: 'http://dev.mish.test:17573, *.local-origin.dev, plainhost' },
     ).sort()).toEqual(['*.local-origin.dev', 'dev.mish.test', 'mish.example.com', 'plainhost']);
   });
+  it('refuses a Host that smuggles userinfo, a path or a list behind a safe-looking name', () => {
+    for (const host of ['attacker.example@127.0.0.1', '127.0.0.1:7456/x', '127.0.0.1, attacker.example', '127.0.0.1?x']) {
+      expect(requestHostRefusal({ host }, '127.0.0.1', []), host).toBe('host');
+    }
+    expect(requestHostRefusal({ host: '127.0.0.1', 'x-forwarded-host': 'attacker.example@127.0.0.1' }, '127.0.0.1', []))
+      .toBe('x-forwarded-host');
+  });
+
+  it('allows the web sidecar bind host from OD_HOST', () => {
+    expect(rebindingAllowedHosts([], { OD_HOST: 'devbox' })).toEqual(['devbox']);
+    expect(requestHostRefusal({ host: '127.0.0.1', 'x-od-client-host': 'devbox:3000' }, '127.0.0.1', ['devbox']))
+      .toBeNull();
+  });
 });

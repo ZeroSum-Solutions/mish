@@ -68,6 +68,7 @@ import { spawn } from 'node:child_process';
 import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { createCommandInvocation } from '@mish/platform';
+import { validateUserProviderBaseUrl } from './connectionTest.js';
 import {
   applyAgentLaunchEnv,
   getAgentDef,
@@ -777,6 +778,21 @@ function describeFetchError(err) {
   return detail ? `${head} (${detail})` : head;
 }
 
+// The provider API key goes to this base URL, and the URL can come from the
+// stored Memory config, a request's `chatProvider`, or a chat turn. Checking it
+// here, next to the fetch, covers every route and background path that reaches
+// the extractor instead of only the ones that remembered to validate it. Same
+// guard as the BYOK chat proxy: private, link-local and metadata addresses are
+// refused; loopback and OD_ALLOWED_INTERNAL_HOSTS stay allowed.
+async function assertProviderBaseUrlAllowed(provider) {
+  const baseUrl = String(provider?.baseUrl ?? '').trim();
+  if (!baseUrl) return;
+  const validated = await validateUserProviderBaseUrl(baseUrl);
+  if (validated.error) {
+    throw new Error(`provider base URL refused: ${validated.error}`);
+  }
+}
+
 async function callAnthropic(provider, system, user) {
   let resp;
   try {
@@ -1331,15 +1347,19 @@ async function collectProposedEntries(dataDir, input, options) {
         localCliRunner: options?.localCliRunner,
       });
     } else if (provider.kind === 'anthropic') {
+      await assertProviderBaseUrlAllowed(provider);
       raw = await callAnthropic(provider, systemPrompt, userPayload);
     } else if (provider.kind === 'azure') {
+      await assertProviderBaseUrlAllowed(provider);
       raw = await callAzure(provider, systemPrompt, userPayload);
     } else if (provider.kind === 'google') {
+      await assertProviderBaseUrlAllowed(provider);
       raw = await callGoogle(provider, systemPrompt, userPayload);
     } else {
       // openai or ollama — both speak the OpenAI chat-completions
       // wire shape, so callOpenAI handles them with just a different
       // base URL.
+      await assertProviderBaseUrlAllowed(provider);
       raw = await callOpenAI(provider, systemPrompt, userPayload);
     }
   } catch (err) {

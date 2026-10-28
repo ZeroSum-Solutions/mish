@@ -52,4 +52,29 @@ describe('memory-llm provider calls refuse redirects', () => {
     expect(inits.length).toBeGreaterThan(0);
     for (const init of inits) expect(init.redirect).toBe('error');
   });
+  it.each(['anthropic', 'openai', 'azure', 'google', 'ollama'] as const)(
+    '%s: refuses a metadata base URL before any request, whichever route supplied it',
+    async (provider) => {
+      const fetchMock = vi.fn(async () => new Response('{}', { status: 200 }));
+      globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+      await extractWithLLM(
+        dataDir,
+        { userMessage: 'Remember I ship on Fridays.', assistantMessage: 'Noted.' },
+        {
+          projectRoot: process.cwd(),
+          conversationId: `conv-ssrf-${provider}`,
+          chatProvider: {
+            provider,
+            apiKey: 'sk-test',
+            baseUrl: 'http://169.254.169.254/latest',
+            model: 'test-model',
+            apiVersion: '',
+          },
+        },
+      );
+
+      expect(fetchMock).not.toHaveBeenCalled();
+    },
+  );
 });

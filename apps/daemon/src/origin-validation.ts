@@ -406,6 +406,10 @@ export function isRebindingSafeHost(
   bindHost: string,
   allowedHosts: string[],
 ): boolean {
+  // A Host value is `name[:port]`. WHATWG URL parsing would also accept userinfo,
+  // a path or a list (`a@127.0.0.1`, `127.0.0.1/x, evil.example`) and then read
+  // only one part, so refuse anything that is not a bare authority first.
+  if (/[\s/\\@?#,]/.test(String(headerValue(hostHeader) ?? '').trim())) return false;
   const parsed = parseHostHeader(hostHeader);
   if (!parsed) return false;
   const hostname = parsed.hostname.toLowerCase().replace(/\.$/, '');
@@ -427,7 +431,12 @@ export function rebindingAllowedHosts(
       const parsed = parseHostHeader(host);
       return parsed ? [parsed.hostname.toLowerCase()] : [];
     });
-  return [...new Set([...originHosts, ...configuredAllowedDevHosts(env)])];
+  // The web sidecar's own bind host (OD_HOST) is a name the operator chose; the
+  // sidecar relays it to the daemon as X-OD-Client-Host.
+  const webBindHost = parseHostHeader(env.OD_HOST)?.hostname.toLowerCase();
+  return [
+    ...new Set([...originHosts, ...configuredAllowedDevHosts(env), ...(webBindHost ? [webBindHost] : [])]),
+  ];
 }
 
 /**

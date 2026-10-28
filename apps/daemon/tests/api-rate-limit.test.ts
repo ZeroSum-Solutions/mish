@@ -9,9 +9,13 @@ import {
 } from '../src/http/api-rate-limit.js';
 import { startServer } from '../src/server.js';
 
-function get(port: number, path: string): Promise<{ status: number; headers: http.IncomingHttpHeaders; body: string }> {
+function get(
+  port: number,
+  path: string,
+  options: { method?: string; headers?: Record<string, string>; body?: string } = {},
+): Promise<{ status: number; headers: http.IncomingHttpHeaders; body: string }> {
   return new Promise((resolve, reject) => {
-    const req = http.request({ host: '127.0.0.1', port, path }, (res) => {
+    const req = http.request({ host: '127.0.0.1', port, path, method: options.method, headers: options.headers }, (res) => {
       const chunks: Buffer[] = [];
       res.on('data', (c: Buffer) => chunks.push(c));
       res.on('end', () =>
@@ -19,7 +23,7 @@ function get(port: number, path: string): Promise<{ status: number; headers: htt
       );
     });
     req.on('error', reject);
-    req.end();
+    req.end(options.body);
   });
 }
 
@@ -87,6 +91,40 @@ describe('createApiRateLimiter', () => {
 
   it('does not count loopback peers (desktop UI)', async () => {
     for (let i = 0; i < 10; i += 1) expect((await get(loopbackPort, '/api/ping')).status).toBe(200);
+  });
+
+  it('counts a client the loopback web sidecar forwards, per forwarded address', async () => {
+    const forwarded = { 'x-forwarded-for': '198.51.100.7' };
+    for (let i = 0; i < 3; i += 1) expect((await get(loopbackPort, '/api/ping', { headers: forwarded })).status).toBe(200);
+    expect((await get(loopbackPort, '/api/ping', { headers: forwarded })).status).toBe(429);
+    // another forwarded client has its own budget, and a forwarded loopback client is exempt
+    expect((await get(loopbackPort, '/api/ping', { headers: { 'x-forwarded-for': '198.51.100.8' } })).status).toBe(200);
+    for (let i = 0; i < 6; i += 1) {
+      expect((await get(loopbackPort, '/api/ping', { headers: { 'x-forwarded-for': '127.0.0.1' } })).status).toBe(200);
+    }
+  });
+
+  it('ignores X-Forwarded-For from a non-loopback peer (it cannot pick its own bucket)', async () => {
+    const other = await build(true);
+    const statuses: number[] = [];
+    for (let i = 0; i < 5; i += 1) {
+      statuses.push((await get(other[1], '/api/ping', { headers: { 'x-forwarded-for': `192.0.2.${i}` } })).status);
+    }
+    expect(statuses).toEqual([200, 200, 200, 429, 429]);
+    other[0].close();
+  });
+
+  it('exempts only bodyless, credential-free GET/HEAD probes, with the route aliases', async () => {
+    const other = await build(true);
+    for (let i = 0; i < 3; i += 1) expect((await get(other[1], '/api/ping')).status).toBe(200);
+    expect((await get(other[1], '/api/ping')).status).toBe(429);
+    for (const path of ['/api/health', '/api/health/', '/API/HEALTH']) {
+      expect((await get(other[1], path)).status, path).toBe(200);
+    }
+    expect((await get(other[1], '/api/health', { headers: { authorization: 'Bearer guess' } })).status).toBe(429);
+    expect((await get(other[1], '/api/health', { method: 'POST', body: '{}', headers: { 'content-type': 'application/json' } })).status).toBe(429);
+    expect((await get(other[1], '/api/health', { body: '{}', headers: { 'content-length': '2' } })).status).toBe(429);
+    other[0].close();
   });
 });
 
