@@ -1,4 +1,5 @@
-import { sendInternalError } from '../http/api-errors.js';
+import { sendApiError, sendInternalError } from '../http/api-errors.js';
+import { validateUserProviderBaseUrl } from '../connectionTest.js';
 import type { Express } from 'express';
 import { MEMORY_TYPES } from '@mish/contracts';
 import type { RouteDeps } from '../server-context.js';
@@ -587,6 +588,21 @@ export function registerMemoryRoutes(app: Express, ctx: RegisterMemoryRoutesDeps
               typeof chatConfig.apiVersion === 'string' ? chatConfig.apiVersion : '',
             model: typeof chatConfig.model === 'string' ? chatConfig.model : '',
           };
+          // The extractor sends the API key to this base URL, so it must pass
+          // the same SSRF guard the BYOK chat proxy applies to it (private,
+          // link-local and metadata addresses refused; loopback and
+          // OD_ALLOWED_INTERNAL_HOSTS allowed).
+          if (chatProvider.baseUrl.trim()) {
+            const validated = await validateUserProviderBaseUrl(chatProvider.baseUrl.trim());
+            if (validated.error) {
+              return sendApiError(
+                res,
+                validated.forbidden ? 403 : 400,
+                validated.forbidden ? 'FORBIDDEN' : 'BAD_REQUEST',
+                validated.error,
+              );
+            }
+          }
         }
       }
       const chatModel =

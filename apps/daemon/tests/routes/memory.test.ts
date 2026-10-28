@@ -387,6 +387,48 @@ describe('memory routes', () => {
     expect(json.changed).toEqual([]);
   });
 
+  it('refuses a BYOK chat provider base URL that points at private or metadata addresses', async () => {
+    await fetch(`${baseUrl}/api/memory/config`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ chatExtractionEnabled: true }),
+    });
+    for (const blocked of [
+      'http://169.254.169.254/latest/meta-data',
+      'http://10.0.0.5:8080/v1',
+      'http://[fe80::1]/v1',
+    ]) {
+      const res = await fetch(`${baseUrl}/api/memory/extract`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          userMessage: 'Remember that I prefer dark mode for demos.',
+          assistantMessage: 'I will keep future demos darker and quieter.',
+          chatProvider: {
+            provider: 'openai',
+            apiKey: 'sk-test',
+            baseUrl: blocked,
+            model: 'gpt-5-mini',
+          },
+        }),
+      });
+      expect(res.status, blocked).toBe(403);
+      const json = await res.json() as { error?: { code?: string } };
+      expect(json.error?.code).toBe('FORBIDDEN');
+    }
+
+    const invalid = await fetch(`${baseUrl}/api/memory/extract`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        userMessage: 'Remember that I prefer dark mode for demos.',
+        assistantMessage: 'I will keep future demos darker and quieter.',
+        chatProvider: { provider: 'openai', apiKey: 'sk-test', baseUrl: 'file:///etc/passwd' },
+      }),
+    });
+    expect(invalid.status).toBe(400);
+  });
+
   it('returns the composed system prompt body from indexed memory entries', async () => {
     await fetch(`${baseUrl}/api/memory`, {
       method: 'POST',
