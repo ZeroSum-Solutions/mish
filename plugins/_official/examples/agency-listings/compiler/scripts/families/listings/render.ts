@@ -24,8 +24,7 @@
  * sample card, row or value.
  */
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { readCompilerResource } from '../../resources.ts';
 import type { AssetRequirement } from '../../assets.ts';
 import { presentSections } from '../../sections.ts';
 import { parseListingsRecipe, type ListingsRecipe, type ListingsSection } from './contract.ts';
@@ -45,13 +44,11 @@ export const NAV_LABELS: Record<string, string> = {
   [COMPARE_SECTION_ID]: 'Compare', [FEATURED_SECTION_ID]: 'Featured', [REVIEWS_SECTION_ID]: 'Reviews',
 };
 
-const HERE = import.meta.dirname;
-const HYPERUI_CSS = path.join(HERE, '../../catalog/hyperui/listings.css');
-let hyperuiCss: string | undefined;
+/** Relative to `compiler/scripts/`, read through `resources.ts` (disk, or a supplied table). */
+const HYPERUI_CSS = 'catalog/hyperui/listings.css';
 /** The compiled Tailwind build for this page kind's blocks, read once and inlined once per page. */
 function inlinedStyles(): string {
-  hyperuiCss ??= readFileSync(HYPERUI_CSS, 'utf8');
-  return hyperuiCss;
+  return readCompilerResource(HYPERUI_CSS);
 }
 
 export function validateListingsRecipe(input: unknown): ListingsRecipe {

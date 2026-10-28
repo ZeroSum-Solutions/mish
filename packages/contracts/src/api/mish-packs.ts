@@ -15,12 +15,18 @@ export const MISH_PACK_MANIFEST_FILENAME = 'mish-pack.json';
 export const MISH_PACK_SCHEMA_VERSION = 1;
 export const MISH_PACK_ID_PATTERN = '^[a-z0-9][a-z0-9-]{0,62}$';
 
-/** Archive and extraction budgets. They hold while bytes are written, not afterwards. */
+const GIB = 1024 * 1024 * 1024;
+
+/**
+ * Archive and extraction budgets. They hold while bytes are written, not afterwards. A team packet
+ * that carries saved projects runs to several gigabytes, so a .zip is read as a stream (never
+ * loaded whole) and every file is written as it is read.
+ */
 export const MISH_PACK_LIMITS = Object.freeze({
-  archiveMaxBytes: 2 * 1024 * 1024 * 1024,
-  extractedMaxBytes: 6 * 1024 * 1024 * 1024,
+  archiveMaxBytes: 12 * GIB,
+  extractedMaxBytes: 24 * GIB,
   maxEntries: 200_000,
-  fileMaxBytes: 512 * 1024 * 1024,
+  fileMaxBytes: 2 * GIB,
   manifestMaxBytes: 256 * 1024,
 });
 
@@ -190,6 +196,14 @@ export const mishPackManifestSchema = z.object({
     /** Folder of study design-system packages, copied into the user design-systems root. */
     studies: relativePath.optional(),
     assets: assetsSchema.optional(),
+    /**
+     * Folder of saved projects: `projects.json` (the project rows, see `mishPackProjectsFileSchema`)
+     * and one `<id>/` folder per row. Each is copied into the projects folder under its own id; an
+     * id the person already has is left alone.
+     */
+    projects: relativePath.optional(),
+    /** Folder with `index.json` (`design-index/1`): stored design profiles, read next to the person's own. */
+    designIndex: relativePath.optional(),
     /** Allow-listed environment keys (see `MISH_PACK_ENV_ALLOWLIST`). */
     env: z.record(z.string(), z.string().max(4096)).optional(),
     mcpServers: z.array(mcpServerSchema).max(64).optional(),
@@ -260,13 +274,49 @@ export type MishPackResourceKey =
   | 'studies'
   | 'pets'
   | 'promptTemplates'
-  | 'styleCatalog';
+  | 'styleCatalog'
+  | 'projects'
+  | 'designIndex';
 
 export interface MishPackProvided {
   resource: MishPackResourceKey;
-  /** Child folders copied into a user root (design systems, skills, studies); null for the others. */
+  /** Child folders copied into a user root (design systems, skills, studies, projects); null for the others. */
   items: number | null;
 }
+
+/** File inside the `projects` folder that lists the project rows. */
+export const MISH_PACK_PROJECTS_FILENAME = 'projects.json';
+export const MISH_PACK_PROJECTS_SCHEMA = 'mish-pack-projects/1';
+
+/** A project id as the daemon accepts it, which is also a folder name the pack may carry. */
+export const MISH_PACK_PROJECT_ID_PATTERN = '^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$';
+
+const projectRowSchema = z.object({
+  id: z.string().regex(new RegExp(MISH_PACK_PROJECT_ID_PATTERN, 'u')),
+  name: z.string().min(1).max(1000),
+  skillId: z.string().max(256).nullable().optional(),
+  designSystemId: z.string().max(256).nullable().optional(),
+  pendingPrompt: z.string().max(1_000_000).nullable().optional(),
+  /** The project's metadata object. A pack may not point a project at a folder outside it (`baseDir`). */
+  metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+  customInstructions: z.string().max(5000).nullable().optional(),
+  createdAt: z.number().int().nonnegative(),
+  updatedAt: z.number().int().nonnegative(),
+}).strict();
+export type MishPackProjectRow = z.infer<typeof projectRowSchema>;
+
+/** `projects/projects.json`: one row per project folder the pack carries. Ids are unique. */
+export const mishPackProjectsFileSchema = z.object({
+  schema: z.literal(MISH_PACK_PROJECTS_SCHEMA),
+  projects: z.array(projectRowSchema).max(20_000),
+}).strict().superRefine((file, ctx) => {
+  const ids = new Set<string>();
+  for (const [index, row] of file.projects.entries()) {
+    if (ids.has(row.id.toLowerCase())) ctx.addIssue({ code: 'custom', path: ['projects', index, 'id'], message: 'duplicate project id' });
+    ids.add(row.id.toLowerCase());
+  }
+});
+export type MishPackProjectsFile = z.infer<typeof mishPackProjectsFileSchema>;
 
 export interface MishPackSummary {
   id: string;
@@ -304,6 +354,11 @@ export interface MishPackInstallResponse {
 
 export interface MishPackRemoveResponse {
   removed: string;
+  /**
+   * Ids of the saved projects the pack had imported. A pack never deletes a project: they stay in
+   * the project list as the person's own. Absent when the pack imported none.
+   */
+  keptProjects?: string[];
 }
 
 export interface MishPackRuntimeResponse {

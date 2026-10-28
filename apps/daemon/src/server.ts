@@ -1617,10 +1617,15 @@ const MISH_PACKS_EXTERNAL_DIR = (() => {
   }
   return raw;
 })();
+// Saved projects a pack carries need the project database, which opens inside startServer; the
+// store reads it through `mishPackDb`, and `start()` runs only after it is set.
+let mishPackDb = null;
 const mishPackStore = createMishPackStore({
   dataDir: RUNTIME_DATA_DIR,
   externalDir: MISH_PACKS_EXTERNAL_DIR,
   userRoots: { skills: USER_SKILLS_DIR, designSystems: USER_DESIGN_SYSTEMS_DIR },
+  projectsDir: PROJECTS_DIR,
+  db: () => mishPackDb,
 });
 fs.mkdirSync(PROJECTS_DIR, { recursive: true });
 for (const dir of [USER_SKILLS_DIR, USER_DESIGN_SYSTEMS_DIR, BRANDS_DIR, USER_DESIGN_TEMPLATES_DIR, PLUGIN_REGISTRY_ROOTS.userPluginsRoot, LIBRARY_DIR, DESIGN_INDEX_DIR, AGENCY_BUILDS_DIR]) {
@@ -3491,14 +3496,6 @@ export async function startServer({
   } catch (error) {
     console.warn('[packs] startup reconciliation failed', String((error as { code?: unknown })?.code ?? 'unknown'));
   }
-  // Mish packs: scan, copy skill and design-system folders into the user roots, apply the
-  // allow-listed environment. A failure leaves the app running without the pack content.
-  try {
-    await mishPackStore.start();
-  } catch (error) {
-    console.warn('[mish-packs] startup failed', String((error as { code?: unknown })?.code ?? 'unknown'));
-  }
-
   const app = express();
   installRouteRegistrationGuard(app);
   // First in the chain, so the body parsers, the API-token and SPA Basic-auth
@@ -3856,6 +3853,15 @@ export async function startServer({
   assertPlacementOwnedBeforeDatabase(resolvedPlacementBootstrap, RUNTIME_DATA_DIR);
   const db = openDatabase(PROJECT_ROOT, { dataDir: RUNTIME_DATA_DIR });
   packPluginsDb = db;
+  mishPackDb = db;
+  // Mish packs: finish an interrupted replacement, copy skill and design-system folders into the
+  // user roots, place saved projects, apply the allow-listed environment. It runs once the database
+  // is open because projects need it. A failure leaves the app running without the pack content.
+  try {
+    await mishPackStore.start();
+  } catch (error) {
+    console.warn('[mish-packs] startup failed', String((error as { code?: unknown })?.code ?? 'unknown'));
+  }
   // B4-1 adoption executor: the process opt-in is consumed here so agent
   // children never inherit it; the Labs switch is read per request. The helper
   // and work root derive from RUNTIME_DATA_DIR and are verified only in

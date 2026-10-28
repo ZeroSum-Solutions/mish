@@ -28,8 +28,7 @@
  * plain text, never a "#" link or any other fake or dead destination.
  */
 
-import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { readCompilerResource } from '../../resources.ts';
 import type { AssetRequirement } from '../../assets.ts';
 import { presentSections, sectionOfType } from '../../sections.ts';
 import { parseStorefrontRecipe, type StorefrontRecipe, type StorefrontSection } from './contract.ts';
@@ -39,13 +38,11 @@ import {
   SHIPPING_RETURNS_SECTION_ID, STORY_ABOUT_SECTION_ID,
 } from './slots.ts';
 
-const HERE = import.meta.dirname;
-const HYPERUI_CSS = path.join(HERE, '../../catalog/hyperui/storefront.css');
-let hyperuiCss: string | undefined;
+/** Relative to `compiler/scripts/`, read through `resources.ts` (disk, or a supplied table). */
+const HYPERUI_CSS = 'catalog/hyperui/storefront.css';
 /** The compiled Tailwind build for this page kind's blocks, read once and inlined once per page. */
 function inlinedStyles(): string {
-  hyperuiCss ??= readFileSync(HYPERUI_CSS, 'utf8');
-  return hyperuiCss;
+  return readCompilerResource(HYPERUI_CSS);
 }
 
 export function validateStorefrontRecipe(input: unknown): StorefrontRecipe {

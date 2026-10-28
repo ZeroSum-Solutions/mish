@@ -9,6 +9,10 @@ verified the whole page, then publishes it in one batch — see "Faithfulness ga
 The tool never changes the daemon. It uses the public project file API, and the daemon's own
 project watcher reloads the canvas after every save.
 
+Every render goes through `@mish/publisher` (`packages/publisher`): `src/family.ts` loads the
+family package with its Node loader and renders with `renderPage`, so a fast-lane draft and a
+headless `compile` of the same recipe are the same page.
+
 ## Run
 
 ```sh

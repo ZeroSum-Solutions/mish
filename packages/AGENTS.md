@@ -5,6 +5,7 @@ Follow the root `AGENTS.md` first. This file only records module-level boundarie
 ## Package responsibilities
 
 - `packages/genui-catalog`: the owned GenUI component catalog. Clean-room, dependency-free effect components (`components/<id>/`, plain ESM + CSS, `mount(el, opts) => { destroy() }`, `.genui-<id>` classes), the generated and schema-validated `catalog.json`, and `./data` literals for the daemon and web. Built component assets reach the Agency family packages only through `scripts/sync-catalog-assets.ts`; start a new component from `components/_template/`.
+- `packages/publisher`: the headless Agency Site publisher. `compile({ compiler, spec, brandTokens, assets })` turns typed section JSON into deterministic static files with no filesystem, environment or clock access; owns the booking embed slot, the Node loader for family packages (`./node`, the only filesystem code) and the prebuilt family bundles (`./families/*`). It wraps the synced compiler copies and never forks them: compiler changes go in `plugins/_official/shared/agency-compiler`. The fast lane renders through it, so it builds first.
 - `packages/agui-adapter`: pure TypeScript adapter between persisted Mishh Mashh agent/GenUI/plugin-pipeline events and the AG-UI event protocol. Keep transport and filesystem concerns out; daemon producers and web/CopilotKit consumers share this conversion boundary.
 - `packages/contracts`: web/daemon app contract layer. Keep it pure TypeScript; it must not depend on Next.js, Express, Node filesystem/process APIs, browser APIs, SQLite, daemon internals, or the sidecar control-plane protocol.
 - `packages/components`: shared React UI primitives and primitive CSS. It may depend on React types/runtime only; keep product workflows and app-specific layout/styling in the apps.
@@ -64,4 +65,6 @@ pnpm --filter @mish/sidecar typecheck
 pnpm --filter @mish/sidecar test
 pnpm --filter @mish/platform typecheck
 pnpm --filter @mish/platform test
+pnpm --filter @mish/publisher typecheck
+pnpm --filter @mish/publisher test
 ```

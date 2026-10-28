@@ -26,6 +26,7 @@ const buildTargets = [
   "packages/dsh-runtime",
   "packages/genui-catalog",
   "packages/section-catalog",
+  "packages/publisher",
   "packages/agency-fast-lane",
   "apps/daemon",
   "tools/dev",

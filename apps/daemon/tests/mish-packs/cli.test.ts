@@ -77,7 +77,11 @@ describe('od packs', () => {
     const ok = fakeFetch(() => ({ body: { removed: 'team-kit' } }));
     const removed = await runMishPacksCli(['remove', 'team-kit'], opts(ok.fn));
     expect(removed.stdout).toContain('Removed pack team-kit');
+    expect(removed.stdout).not.toContain('Kept');
     expect(ok.calls[0]!.init?.method).toBe('DELETE');
+    const withProjects = fakeFetch(() => ({ body: { removed: 'team-projects', keptProjects: ['ds-one', 'proj-two'] } }));
+    const kept = await runMishPacksCli(['remove', 'team-projects'], opts(withProjects.fn));
+    expect(kept.stdout).toContain('Kept the 2 saved project(s) it added; they stay in your project list: ds-one, proj-two');
     const refused = fakeFetch(() => ({ status: 404, body: { error: { code: 'NOT_FOUND', message: 'no installed pack has that id' } } }));
     const result = await runMishPacksCli(['remove', 'nope'], opts(refused.fn));
     expect(result.code).toBe(1);

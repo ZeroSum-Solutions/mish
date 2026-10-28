@@ -5,9 +5,18 @@
     "name": "Team packet",
     "description": "Private content and connections for the team build."
   },
+  "modules": [
+    { "id": "team-catalogs", "name": "Team catalogs", "description": "Component kit, catalogues, adapters, assets and MCP connections for the team build.", "env": true, "mcpServers": true },
+    { "id": "team-design-systems", "name": "Team design systems", "description": "Design systems for the team build." },
+    { "id": "team-studies", "name": "Team studies", "description": "Study design systems for the team build." },
+    { "id": "team-skills", "name": "Team skills", "description": "Skills for the team build." },
+    { "id": "team-projects", "name": "Team projects", "description": "Saved projects, including the design-system previews." },
+    { "id": "team-index", "name": "Team design index", "description": "Stored design-index profiles." }
+  ],
   "resources": [
     {
       "provides": "catalogs.cultKit",
+      "module": "team-catalogs",
       "type": "dir",
       "from": "data/component-kits/cult-ui-pro",
       "to": "catalogs/cult-kit",
@@ -15,6 +24,7 @@
     },
     {
       "provides": "catalogs.cultCatalog",
+      "module": "team-catalogs",
       "type": "files",
       "to": "catalogs/cult-catalog",
       "files": [
@@ -30,12 +40,14 @@
     },
     {
       "provides": "catalogs.cultAdapters",
+      "module": "team-catalogs",
       "type": "bundle",
       "entry": "packages/cult-ui-catalog/generated/index.ts",
       "to": "catalogs/cult-adapters/index.mjs"
     },
     {
       "provides": "catalogs.genui",
+      "module": "team-catalogs",
       "type": "genui-overlay",
       "catalog": "packages/genui-catalog/catalog.json",
       "sourceName": "cult-ui-pro",
@@ -44,6 +56,7 @@
     },
     {
       "provides": "catalogs.sections",
+      "module": "team-catalogs",
       "type": "catalog-delta",
       "from": "packages/section-catalog/catalog.json",
       "againstPublic": "packages/section-catalog/catalog.json",
@@ -51,6 +64,7 @@
     },
     {
       "provides": "catalogs.twentyFirst",
+      "module": "team-catalogs",
       "type": "files",
       "to": "catalogs/twenty-first",
       "files": [
@@ -60,18 +74,21 @@
     },
     {
       "provides": "designSystems",
+      "module": "team-design-systems",
       "type": "children",
       "to": "design-systems",
       "sources": [{ "from": ".od/design-systems", "include": ["atlas-*"] }]
     },
     {
       "provides": "studies",
+      "module": "team-studies",
       "type": "children",
       "to": "studies",
       "sources": [{ "from": ".od/design-systems", "include": ["study-*"] }]
     },
     {
       "provides": "skills",
+      "module": "team-skills",
       "type": "children",
       "to": "skills",
       "sources": [
@@ -81,15 +98,32 @@
     },
     {
       "provides": "assets.pets",
+      "module": "team-catalogs",
       "type": "dir",
       "from": "assets/community-pets",
       "to": "assets/pets"
     },
     {
       "provides": "assets.promptTemplates",
+      "module": "team-catalogs",
       "type": "dir",
       "from": "prompt-templates",
       "to": "assets/prompt-templates"
+    },
+    {
+      "provides": "projects",
+      "module": "team-projects",
+      "type": "projects",
+      "from": ".od/projects",
+      "database": ".od/app.sqlite",
+      "to": "projects"
+    },
+    {
+      "provides": "designIndex",
+      "module": "team-index",
+      "type": "files",
+      "to": "design-index",
+      "files": [{ "from": ".od/design-index/index.json", "to": "index.json" }]
     }
   ],
   "env": {},
@@ -99,7 +133,8 @@
       "label": "Refero",
       "transport": "http",
       "url": "https://api.refero.design/mcp",
-      "authMode": "oauth",
+      "authMode": "none",
+      "headers": { "Authorization": "Bearer ${REFERO_MCP_TOKEN}" },
       "enabled": true
     },
     {
@@ -117,7 +152,7 @@
       "url": "https://21st.dev/api/mcp",
       "authMode": "none",
       "headers": { "x-api-key": "${TWENTY_FIRST_API_KEY}" },
-      "enabled": false
+      "enabled": true
     },
     {
       "id": "shadcn",

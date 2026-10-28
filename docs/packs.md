@@ -14,9 +14,13 @@ a pack and shows the features that need one as unavailable.
 
 ## Mish packs: a team packet
 
-A Mish pack is one private `.zip` you give your team. They install it once and
+A Mish pack is a private `.zip` you give your team. They install it once and
 the app behaves like the private build. Remove it and the app goes back to the
 public build. While no pack is installed, nothing changes.
+
+A team packet can be one pack, or several smaller packs built with `--split`
+(catalogues, design systems, studies, skills, saved projects, design index).
+Each installs and removes on its own.
 
 ### What a pack looks like
 
@@ -33,6 +37,9 @@ team-packet/
   design-systems/<id>/        design system packages
   studies/<id>/               study packages
   skills/<id>/SKILL.md        skills
+  projects/projects.json      saved project rows
+  projects/<id>/              saved project folders
+  design-index/index.json     stored design-index profiles
   assets/pets/<id>/           pets
   assets/prompt-templates/    image/ and video/ prompt templates
   assets/style-catalog/       style picker preview images
@@ -59,6 +66,8 @@ the pack root:
     "designSystems": "design-systems",
     "skills": "skills",
     "studies": "studies",
+    "projects": "projects",
+    "designIndex": "design-index",
     "assets": { "pets": "assets/pets", "promptTemplates": "assets/prompt-templates", "styleCatalog": "assets/style-catalog" },
     "env": { "MISH_AMR_CONSOLE_URL": "https://console.example.test" },
     "mcpServers": [
@@ -86,13 +95,27 @@ nothing is installed. The schema is `mishPackManifestSchema` in
 | `catalogs.sections` | A file with `entries`. Rows are added to the section catalogue; a bundled row is never replaced. |
 | `catalogs.twentyFirst` | `21st-thumbnails.json` and `21st-thumbnails/`. Fills thumbnails the bundle lacks. |
 | `designSystems`, `studies`, `skills` | Each child folder is copied into the user design-systems or skills folder of the data directory. A folder you already have is left as it is and reported. |
+| `projects` | `projects.json` lists project rows (`mish-pack-projects/1`: id, name, skill, design system, prompt, metadata, instructions, times) and `<id>/` holds each project's files. Each is copied into the projects folder under its own id and added to the project list, once. A project id you already have is left as it is and reported. The pack never deletes a project (below). A row may have no folder: it is a project with no files. A row that points at a folder outside the pack (`baseDir`) is not added; links to folders on another computer (`linkedDirs`) are dropped. |
+| `designIndex` | A folder with `index.json` (`design-index/1`). Its profiles are listed in the Design index and on Home next to your own, read from the pack; your own profile wins when both have the same digest. They are never written into your index and cannot be deleted from it. |
 | `assets.pets`, `assets.promptTemplates` | Scanned next to the bundled pets and prompt templates. |
 | `assets.styleCatalog` | Images served for the style picker at `/api/mish-packs/assets/style-catalog/v1/`. |
 | `env` | Sets allow-listed service settings (below). |
 | `mcpServers` | Merged into the MCP server list (below). |
 
-Everything except the copied folders is read from the pack in place, per
-request. An install or removal takes effect without a restart.
+Everything except the copied folders and projects is read from the pack in
+place, per request. An install or removal takes effect without a restart.
+
+### Saved projects
+
+The design-system previews on the Design systems page are projects too: a
+design system names its preview project (`ds-<slug>`), so a pack keeps every
+project's original id.
+
+A pack imports each project once and never deletes one. Removing the pack, or
+installing a new version, leaves every project it imported in your project
+list as your own, with its files, conversations and deployments; the result
+lists them (`keptProjects`). A new version imports only the projects you do not
+have yet, and does not bring back a project you deleted.
 
 ### Install
 
@@ -108,6 +131,23 @@ which environment variables its MCP servers still need.
 
 Installing a pack with the same id replaces it. The install is staged and
 checked first; a pack that fails a check installs nothing.
+
+An install has a commit point. Before it, the new version waits in work
+folders and nothing the installed version owns is touched: a failure, or the
+app stopping, only deletes those work folders, and the installed version stays
+as it was. At the commit the new version becomes the installed one. After it
+the install only moves forward (the pack folders are swapped, copies and MCP
+entries replaced, projects imported, the old version deleted); if something
+fails or the app stops there, the next start finishes it. The journal that
+drives this is written before each change.
+
+#### Large packets
+
+A `.zip` is read as a stream, one file at a time, so a packet of several
+gigabytes never sits in memory. To skip the extra copy, unzip the packet and
+install the folder instead: `od packs install ~/Downloads/team-projects-1`, or
+enter that folder's path in Settings -> Packs. For a packet of several
+gigabytes, enter the path; do not upload it through the file picker.
 
 To load packs without installing them, set `MISH_PACKS_DIR` to a folder that
 holds pack folders (or one pack folder) before the app starts. They load at
@@ -145,8 +185,9 @@ and removing the pack takes its values away again.
 
 ### Limits and safety
 
-- Archive up to 2 GiB, 6 GiB extracted, 200,000 files, 512 MiB per file. They are
-  enforced while bytes are written.
+- Archive up to 12 GiB, 24 GiB extracted, 200,000 files, 2 GiB per file. They
+  are enforced while bytes are written, and each file must have the size its
+  archive entry declares.
 - Links, devices and every non-regular entry are refused. So are absolute
   paths, `..`, backslashes, drive letters, control characters and two names that
   differ only by letter case. `__MACOSX`, `.DS_Store` and `.git` are skipped.
@@ -164,12 +205,43 @@ reads the checkout. What goes in is decided by a mapping file:
 ```bash
 node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packet.zip --dry-run
 node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packet.zip --version 2026.10.12
+node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packs --split
 ```
 
 - Each map resource names a `provides` key, a `type` (`dir`, `files`,
-  `children`, `bundle`, `genui-overlay` or `catalog-delta`), where it lands in
-  the pack (`to`), and where it comes from in the checkout. `optional: false`
-  makes a missing source an error.
+  `children`, `bundle`, `genui-overlay`, `catalog-delta` or `projects`), where
+  it lands in the pack (`to`), and where it comes from in the checkout.
+  `optional: false` makes a missing source an error.
+- `projects` takes the projects folder (`from`) and the app database
+  (`database`). Each project folder with a database row is packed with its row.
+  The database and its write-ahead log are copied to a temporary folder and
+  opened read-only there, so nothing is written next to the checkout (SQLite
+  would create `-shm` and `-wal` files there if the builder opened it in place).
+  The builder looks at the source before and after the copy and copies again
+  when a checkpoint or a log restart happened in between, so no committed row is
+  lost; it stops with a message if the database never holds still (stop the app
+  that uses it, then build again). A project whose files live outside the
+  checkout is left out and reported.
+- `children` merges several source folders under one `to`. When two child
+  folders have the same name once case is ignored, the first (in `sources`
+  order) is packed; the other is left out and named in a warning, because the
+  daemon refuses a pack with two such entries.
+- `--split` builds one pack per `module` of the map (each resource names its
+  module; `modules` lists them, and the module marked `env` / `mcpServers`
+  carries those). A module larger than `--max-bytes` (1.5 GiB by default,
+  counted before compression, so each file fits a GitHub release asset) is cut
+  into numbered parts (`team-projects-1`, `team-projects-2`, ...) along whole
+  design systems and projects. A folder's part depends on its name and the
+  part count, so it stays in its part while the count stays the same. When the
+  count changes, folders move between parts. A pack never takes over a folder
+  another pack placed: it leaves it and names that pack in a warning. Once the
+  owner is updated or removed, the other packs are activated again and the one
+  that provides the folder now places it, so nothing a part still provides is
+  lost. Install every part of a module together, and remove a part that the new
+  build no longer has. `--version` may only use letters, digits and `. + _ -`. The output folder gets `<id>-<version>.zip` for
+  each pack, `SHA256SUMS` (check with `shasum -a 256 -c SHA256SUMS`) and
+  `inventory.json` (`mish-pack-inventory/1`: id, module, version, file, bytes,
+  sha256, resources).
 - `bundle` compiles a TypeScript adapter registry into the prebuilt module a
   pack carries. `genui-overlay` takes the catalogue rows of one licensed source
   and the demo documents. `catalog-delta` keeps the rows the public catalogue
@@ -177,10 +249,26 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packet.zip --vers
 - Keep a map with real private names outside this repository and pass it with
   `--map`. The committed map is a template.
 - The builder leaves out links, `node_modules`, credential-looking files
-  (`.env`, `mcp-tokens.json`, key files) and names the daemon would refuse, and
-  prints what it left out. It validates the manifest with the daemon's schema
-  before it writes anything, never writes inside the checkout or this
-  repository, and builds the same bytes from the same input.
+  (`.env`, `mcp-tokens.json`, MCP and agent client configs such as `.mcp.json`,
+  `mcp.json`, `mcp_config.json`, `mcp-config.json`, `mcp_settings.json`,
+  `cline_mcp_settings.json` and `claude_desktop_config.json`, with their
+  temporary and backup copies such as `.mcp.json.<hex>.tmp`,
+  `settings.local.json`, `auth.json`, key files) and names the daemon would
+  refuse, and prints what it left out. It validates the manifest with the
+  daemon's schema before it writes anything, never writes inside the checkout
+  or this repository, and builds the same bytes from the same input.
+- Text that contains something shaped like a credential (a bearer token, a JWT,
+  a key with a known prefix such as `sk-`, `ghp_`, `github_pat_`, `glpat-`,
+  `npm_`, `AIza` or `xapp-`, or a long value of 20 or more characters, hex
+  included, under a key such as `api_key`, `token`, `secret`, `password` or
+  `authorization`) is packed but named in the report. A plain hash with no such
+  key is not flagged. The builder reads every file of any size and extension
+  (a file with a NUL byte in its first 8 KiB counts as binary), every project
+  row, the generated catalogue and demo entries, `projects.json` and the
+  manifest, and reports once the packs are assembled. Binary files cannot be
+  read, so the report names them in a separate warning. Captured pages carry
+  look-alikes, so the builder does not drop flagged text; check each one before
+  you share the pack.
 - Give the `.zip` to the team over a private channel. Do not commit it.
 
 ### What a Mish pack does not do
@@ -189,6 +277,10 @@ node scripts/build-pack.mjs ../private-checkout ~/Desktop/team-packet.zip --vers
   (`plugins` content, below).
 - It does not carry OAuth tokens or API keys. Teammates sign in and set their
   own variables.
+- It does not carry conversations. A saved project arrives with its files and
+  settings, without its chat history.
+- It does not install plugins, so agency family generators (the website cards
+  on Home) are not restored by a Mish pack.
 
 ## Licensed packs
 

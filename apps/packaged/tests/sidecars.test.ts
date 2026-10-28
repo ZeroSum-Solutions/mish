@@ -291,6 +291,30 @@ describe('packaged child Vite+ environment forwarding', () => {
     expect(env.RANDOM_INTERNAL_FLAG).toBeUndefined();
   });
 
+  it('forwards provider keys whose names do not end in _API_KEY or _TOKEN only with provider secrets', () => {
+    const source = {
+      FAL_KEY: 'fal-from-shell',
+      OD_FAL_KEY: 'fal-override',
+      OPENAI_API_KEY: 'openai-from-shell',
+      REPLICATE_API_TOKEN: 'replicate-from-shell',
+      HOME: '/Users/tester',
+      SOME_OTHER_KEY: 'drop-me',
+    };
+    const withSecrets = resolvePackagedChildBaseEnv(source, true, {}, false);
+    expect(withSecrets).toMatchObject({
+      FAL_KEY: 'fal-from-shell',
+      OD_FAL_KEY: 'fal-override',
+      OPENAI_API_KEY: 'openai-from-shell',
+      REPLICATE_API_TOKEN: 'replicate-from-shell',
+    });
+    expect(withSecrets.SOME_OTHER_KEY).toBeUndefined();
+
+    const withoutSecrets = resolvePackagedChildBaseEnv(source, false, {}, false);
+    expect(withoutSecrets.FAL_KEY).toBeUndefined();
+    expect(withoutSecrets.OD_FAL_KEY).toBeUndefined();
+    expect(withoutSecrets.OPENAI_API_KEY).toBeUndefined();
+  });
+
   it('forwards standard Node proxy variables to packaged sidecars', () => {
     const env = resolvePackagedChildBaseEnv({
       ALL_PROXY: 'socks5://127.0.0.1:1080',
