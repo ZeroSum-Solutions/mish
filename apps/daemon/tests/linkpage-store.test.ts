@@ -45,6 +45,25 @@ describe('link page store', () => {
     expect((await store.list()).map((p) => p.slug)).toEqual(['b', 'a']);
   });
 
+  it('skips a page.json whose spec has no usable profile instead of breaking the list', async () => {
+    const store = createLinkPageStore(dir);
+    await store.put({ spec: spec('good') });
+    const record = { slug: 'x', updatedAt: '2026-10-30T00:00:00.000Z', spec: spec('x') };
+    for (const [slug, mutate] of [
+      ['noprofile', (r: any) => { delete r.spec.profile; }],
+      ['nullprofile', (r: any) => { r.spec.profile = null; }],
+      ['numname', (r: any) => { r.spec.profile.name = 7; }],
+      ['badheadline', (r: any) => { r.spec.profile.headline = {}; }],
+    ] as const) {
+      const r = JSON.parse(JSON.stringify({ ...record, slug })) as any;
+      mutate(r);
+      await mkdir(path.join(dir, 'linkpages', slug), { recursive: true });
+      await writeFile(path.join(dir, 'linkpages', slug, 'page.json'), JSON.stringify(r));
+      expect(await store.get(slug)).toBeNull();
+    }
+    expect((await store.list()).map((p) => p.slug)).toEqual(['good']);
+  });
+
   it('returns an empty list before any page exists', async () => {
     expect(await createLinkPageStore(dir).list()).toEqual([]);
   });

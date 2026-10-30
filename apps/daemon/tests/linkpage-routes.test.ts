@@ -138,8 +138,23 @@ describe('POST /api/linkpages/build', () => {
     expect(proxied[0]!.endpoint).toMatch(/^https:\/\/graph\.instagram\.com\//);
     expect(body.needs).toEqual([]);
     expect(body.spec.profile.name).toBe('Studio Real');
+    // The id stays on disk for the next build; the browser-facing record never carries it.
+    const stored = JSON.parse(await readFile(path.join(dataDir, 'linkpages', 'studio', 'page.json'), 'utf8'));
+    expect(stored.connectedAccounts).toEqual({ instagram: 'ca_test123' });
     const got = (await (await fetch(`${baseUrl}/api/linkpages/studio`)).json()) as any;
-    expect(got.page.connectedAccounts).toEqual({ instagram: 'ca_test123' });
+    expect(got.page).not.toHaveProperty('connectedAccounts');
+    expect(JSON.stringify(got)).not.toContain('ca_test123');
+  });
+
+  it('does not let a PUT set or change connected accounts, and a PUT keeps the stored ones', async () => {
+    await build({ sources: [{ connector: 'instagram', ref: '@studio' }], connectedAccounts: { instagram: 'ca_test123' } });
+    const got = (await (await fetch(`${baseUrl}/api/linkpages/studio`)).json()) as any;
+    expect((await post('/api/linkpages/studio', { spec: got.page.spec, connectedAccounts: { instagram: 'ca_evil' } }, 'PUT')).status).toBe(400);
+    const put = await post('/api/linkpages/studio', { spec: got.page.spec }, 'PUT');
+    expect(put.status).toBe(200);
+    expect(JSON.stringify(await put.json())).not.toContain('ca_');
+    const stored = JSON.parse(await readFile(path.join(dataDir, 'linkpages', 'studio', 'page.json'), 'utf8'));
+    expect(stored.connectedAccounts).toEqual({ instagram: 'ca_test123' });
   });
 
   it('reads as a visitor and asks for a login when no account is connected', async () => {
@@ -196,7 +211,7 @@ describe('render and export', () => {
     const html = await res.text();
     expect(html).toContain('Studio Name');
     expect(html).toContain('llms.txt');
-    expect(html).toContain('https://links.example.com/studio');
+    expect(html).toContain('<link rel="canonical" href="https://links.example.com/">');
   });
 
   it('refuses a render origin that is not an http(s) address', async () => {
@@ -225,6 +240,7 @@ describe('render and export', () => {
     expect(byPath['index.html'].content).toMatch(/^<!doctype html>/i);
     expect(JSON.parse(byPath['links.json'].content).name).toBe('Studio Name');
     expect(byPath['llms.txt'].content).toContain('Studio Name');
+    expect(byPath['llms.txt'].content).not.toMatch(/mcp/i);
     expect(byPath['assets/avatar.png']).toMatchObject({ encoding: 'base64', contentType: 'image/png', content: 'AQID' });
   });
 

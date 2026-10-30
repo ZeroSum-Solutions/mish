@@ -46,8 +46,16 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+const isText = (value: unknown): boolean => typeof value === 'string';
+
+/**
+ * A record the daemon wrote, or a hand edit that still has the fields the list and the editor read.
+ * A page.json that fails this is treated as missing, so one bad file cannot break `list()`.
+ */
 function isRecordShape(value: unknown): value is LinkPageRecord {
-  return isRecord(value) && typeof value.slug === 'string' && isRecord(value.spec) && typeof value.updatedAt === 'string';
+  if (!isRecord(value) || typeof value.slug !== 'string' || !isRecord(value.spec) || typeof value.updatedAt !== 'string') return false;
+  const profile = value.spec.profile;
+  return isRecord(profile) && typeof profile.name === 'string' && ['headline', 'bio'].every((k) => isText(profile[k]));
 }
 
 export function createLinkPageStore(dataRoot: string): LinkPageStore {

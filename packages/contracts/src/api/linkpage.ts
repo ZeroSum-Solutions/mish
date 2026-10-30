@@ -165,13 +165,20 @@ export interface LinkPageListResponse {
   pages: LinkPageSummary[];
 }
 
+/**
+ * A saved page as the browser sees it: the stored record without its connected-account ids. Those ids
+ * stay in the daemon (they are what a build reads a creator's login with); `od linkpage build` can name
+ * them, a page edit cannot change them.
+ */
+export type LinkPagePublicRecord = Omit<LinkPageRecord, 'connectedAccounts'>;
+
 export interface LinkPageGetResponse {
-  page: LinkPageRecord;
+  page: LinkPagePublicRecord;
 }
 
+/** `PUT /api/linkpages/:slug` body. Connected accounts are not part of an edit and are refused. */
 export interface LinkPagePutRequest {
   spec: LinkPageSpec;
-  connectedAccounts?: LinkPageConnectedAccounts;
 }
 
 export interface LinkPageDeleteResponse {
@@ -433,7 +440,7 @@ function parseFont(value: unknown, at: string): string | null {
   if (!isRecord(value)) return `${at} must be an object`;
   if (typeof value.family !== 'string' || !FONT_FAMILY.test(value.family)) return `${at}.family has characters a font name does not use`;
   if (!['serif', 'sans', 'mono', 'display'].includes(value.kind as string)) return `${at}.kind must be serif, sans, mono or display`;
-  if (typeof value.stack !== 'string' || !FONT_STACK.test(value.stack) || (value.stack.match(/"/g)?.length ?? 0) % 2 !== 0) {
+  if (typeof value.stack !== 'string' || !FONT_STACK.test(value.stack) || (value.stack.match(/"/g)?.length ?? 0) % 2 !== 0 || (value.stack.match(/'/g)?.length ?? 0) % 2 !== 0) {
     return `${at}.stack has characters a font stack does not use`;
   }
   if (typeof value.google !== 'boolean') return `${at}.google must be true or false`;
@@ -491,12 +498,8 @@ export function parseLinkPagePutRequest(value: unknown): LinkPageParse<LinkPageP
   if (!isRecord(value)) return fail('the request must be an object');
   const spec = parseLinkPageSpec(value.spec);
   if (!spec.ok) return spec;
-  const accounts = parseLinkPageConnectedAccounts(value.connectedAccounts);
-  if (!accounts.ok) return accounts;
-  return {
-    ok: true,
-    value: { spec: spec.value, ...(hasOwn(value, 'connectedAccounts') ? { connectedAccounts: accounts.value } : {}) },
-  };
+  if (hasOwn(value, 'connectedAccounts')) return fail('connectedAccounts cannot be changed by editing a page; connect the account in Mish or name it in a build request');
+  return { ok: true, value: { spec: spec.value } };
 }
 
 export function isLinkPageAssetName(value: unknown): value is string {

@@ -82,6 +82,12 @@ describe('asset upload', () => {
     expect((await putAsset('x.png', PNG, 'image/png', 'Bad_Slug')).status).toBe(400);
   });
 
+  it('refuses a picture for a page that does not exist, and leaves nothing on disk', async () => {
+    expect((await putAsset('avatar.png', PNG, 'image/png', 'nope')).status).toBe(404);
+    expect((await fetch(`${baseUrl}/api/linkpages/nope/assets/avatar.png`)).status).toBe(404);
+    await expect(readFile(path.join(dataDir, 'linkpages', 'nope', 'assets', 'avatar.png'))).rejects.toThrow();
+  });
+
   it('refuses a picture over 2 MB with 413', async () => {
     const big = Buffer.concat([PNG, Buffer.alloc(2 * 1024 * 1024)]);
     expect((await putAsset('big.png', big)).status).toBe(413);
@@ -100,7 +106,7 @@ describe('publish', () => {
     expect(await res.json()).toEqual({
       slug: 'studio',
       published: false,
-      url: 'https://links.example.com/studio',
+      url: 'https://links.example.com/',
       files: ['index.html', 'llms.txt', 'links.json', 'spec.json', 'assets/avatar.png'],
       publishedAt: '2026-10-30T12:00:00.000Z',
     });
@@ -174,6 +180,35 @@ describe('connected accounts resolved by Mish', () => {
     await service.build({ slug, sources: [{ connector: 'instagram', ref: '@studio' }], ...(connectedAccounts ? { connectedAccounts } : {}) }).catch(() => undefined);
     return { proxied, record: await service.get(slug).catch(() => null) };
   };
+
+  it('prefers the live account over a stored one, and keeps the stored one only when nothing resolves', async () => {
+    const stored = async (resolve: (c: string) => string | undefined) => {
+      const proxied: string[] = [];
+      const store = createLinkPageStore(dataDir);
+      const slug = `st-${n++}`;
+      const font = { family: 'Inter', kind: 'sans' as const, stack: 'Arial, sans-serif', google: false };
+      await store.put({
+        connectedAccounts: { instagram: 'ca_old' },
+        spec: {
+          version: 1, slug, blocks: [],
+          profile: { name: 'S', headline: '', bio: '', about: '', themes: [], avatar_url: '', site_url: '' },
+          theme: { mood: 'modern', radius: 12, background: 'mesh', palette: { bg: '#ffffff', surface: '#f0f0f0', text: '#111111', muted: '#555555', accent: '#2255aa', accentText: '#ffffff', dark: false }, fonts: { heading: font, body: font } },
+        },
+      });
+      const service = createLinkPageService({
+        store, fetch: (async () => new Response('missing', { status: 404 })) as typeof fetch, resolveLlm: () => undefined,
+        login: { getDefinition: async (id) => ({ id } as never), proxyRequest: async (_d, account) => { proxied.push(account); return { status: 200, data: { username: 'studio', name: 'Studio Real' } }; } },
+        resolveConnectedAccount: resolve as never,
+      });
+      await service.build({ slug, sources: [{ connector: 'instagram', ref: '@studio' }] }).catch(() => undefined);
+      return { proxied, record: await service.get(slug) };
+    };
+    const live = await stored(() => 'ca_live');
+    expect(live.proxied[0]).toBe('ca_live');
+    expect(live.record.connectedAccounts).toEqual({ instagram: 'ca_live' });
+    expect((await stored(() => undefined)).proxied[0]).toBe('ca_old');
+    expect((await stored(() => 'bad id!')).proxied[0]).toBe('ca_old');
+  });
 
   it('uses the account connected in Mish when the request names none', async () => {
     const { proxied, record } = await build(() => 'ca_auto');

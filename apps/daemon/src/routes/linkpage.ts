@@ -32,6 +32,7 @@ import type {
   LinkPageDeleteResponse,
   LinkPageGetResponse,
   LinkPageListResponse,
+  LinkPageRecord,
 } from '@mish/contracts';
 import { LinkPageError } from '../linkpage/service.js';
 import type { LinkPageService } from '../linkpage/service.js';
@@ -51,6 +52,11 @@ function originOf(value: unknown): string | null {
   } catch {
     return null;
   }
+}
+
+/** The record the browser gets: no connected-account ids (they stay in the daemon). */
+function publicRecord({ connectedAccounts: _accounts, ...record }: LinkPageRecord): LinkPageGetResponse['page'] {
+  return record;
 }
 
 export function registerLinkPageRoutes(app: Express, ctx: RegisterLinkPageRoutesDeps): void {
@@ -84,7 +90,7 @@ export function registerLinkPageRoutes(app: Express, ctx: RegisterLinkPageRoutes
   app.get('/api/linkpages/:slug', async (req, res) => {
     if (!isLinkPageSlug(req.params.slug)) return sendApiError(res, 400, 'BAD_REQUEST', 'slug must be lowercase letters, numbers and dashes');
     try {
-      const body: LinkPageGetResponse = { page: await linkpage.get(req.params.slug) };
+      const body: LinkPageGetResponse = { page: publicRecord(await linkpage.get(req.params.slug)) };
       return res.json(body);
     } catch (error) {
       return fail(res, error);
@@ -96,7 +102,7 @@ export function registerLinkPageRoutes(app: Express, ctx: RegisterLinkPageRoutes
     const parsed = parseLinkPagePutRequest(req.body);
     if (!parsed.ok) return sendApiError(res, 400, 'BAD_REQUEST', parsed.error);
     try {
-      const body: LinkPageGetResponse = { page: await linkpage.put(req.params.slug, parsed.value) };
+      const body: LinkPageGetResponse = { page: publicRecord(await linkpage.put(req.params.slug, parsed.value)) };
       return res.json(body);
     } catch (error) {
       return fail(res, error);

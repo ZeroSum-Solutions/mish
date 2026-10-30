@@ -752,15 +752,15 @@ export class ComposioConnectorProvider {
     }
   }
 
-  private async getValidatedConnectedAccount(definition: ConnectorCatalogDefinition, providerConnectionId: string, expectedAuthConfigId: string | undefined, signal?: AbortSignal): Promise<ComposioConnectedAccountResponse> {
+  private async getValidatedConnectedAccount(definition: ConnectorCatalogDefinition, providerConnectionId: string, expectedAuthConfigId: string | undefined, signal?: AbortSignal, options: { requireOwner?: boolean } = {}): Promise<ComposioConnectedAccountResponse> {
     const connectorId = definition.id;
     const response = await this.requestJson<ComposioConnectedAccountResponse>(`/api/v3/connected_accounts/${encodeURIComponent(providerConnectionId)}`, {
       method: 'GET',
       ...(signal === undefined ? {} : { signal }),
     });
     const providerUserId = getString(response.user_id) ?? getString(response.userId);
-    if (providerUserId && providerUserId !== this.getUserId()) {
-      throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', 'Composio account belongs to a different user', 403, { connectorId });
+    if ((providerUserId && providerUserId !== this.getUserId()) || (options.requireOwner && !providerUserId)) {
+      throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', providerUserId ? 'Composio account belongs to a different user' : 'Composio account has no confirmed user', 403, { connectorId });
     }
     const providerAuthConfigId = getString(response.auth_config?.id);
     if (expectedAuthConfigId && providerAuthConfigId && expectedAuthConfigId !== providerAuthConfigId) {
@@ -828,7 +828,7 @@ export class ComposioConnectorProvider {
     request: { endpoint: string; method: string; headers?: Record<string, string>; body?: unknown },
     signal?: AbortSignal,
   ): Promise<{ status: number; data: unknown }> {
-    await this.getValidatedConnectedAccount(definition, providerConnectionId, await this.getAuthConfigId(definition, signal), signal);
+    await this.getValidatedConnectedAccount(definition, providerConnectionId, await this.getAuthConfigId(definition, signal), signal, { requireOwner: true });
     const parameters = Object.entries(request.headers ?? {}).map(([name, value]) => ({ name, value, type: 'header' }));
     const response = await this.requestJson<{ status?: unknown; data?: unknown; successful?: unknown; error?: unknown }>('/api/v3/tools/execute/proxy', {
       method: 'POST',

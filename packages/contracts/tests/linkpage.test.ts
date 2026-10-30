@@ -112,10 +112,18 @@ describe('parseLinkPageSpec and parseLinkPageTheme', () => {
     expect(parseLinkPageSpec(input).ok).toBe(false);
   });
 
-  it('parses a put request with accounts', () => {
-    const got = parseLinkPagePutRequest({ spec, connectedAccounts: { tiktok: 'ca_9' } });
-    expect(got.ok && got.value.connectedAccounts).toEqual({ tiktok: 'ca_9' });
+  it('parses a put request, and refuses connected accounts on it', () => {
+    const got = parseLinkPagePutRequest({ spec });
+    expect(got.ok && got.value.spec.slug).toBe(spec.slug);
+    expect(parseLinkPagePutRequest({ spec, connectedAccounts: { tiktok: 'ca_9' } }).ok).toBe(false);
     expect(parseLinkPagePutRequest({ spec: 1 }).ok).toBe(false);
+  });
+
+  it('refuses a font stack with an odd number of either kind of quote', () => {
+    for (const stack of ["'Inter, serif", 'Inter", serif', `"Inter", 'x, serif`]) {
+      expect(parseLinkPageTheme({ ...theme, fonts: { heading: { ...font, stack }, body: font } }).ok, stack).toBe(false);
+    }
+    expect(parseLinkPageTheme({ ...theme, fonts: { heading: { ...font, stack: `"Inter", 'x', serif` }, body: font } }).ok).toBe(true);
   });
 });
 

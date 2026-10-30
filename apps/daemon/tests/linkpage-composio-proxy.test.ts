@@ -40,7 +40,7 @@ afterEach(async () => {
 
 describe('proxyRequest', () => {
   it('checks the account, then sends the request as that account', async () => {
-    stubComposio({ id: 'ca_1', auth_config: { id: 'ac_ig' }, toolkit: { slug: 'instagram' } });
+    stubComposio({ id: 'ca_1', user_id: 'mish-local-user', auth_config: { id: 'ac_ig' }, toolkit: { slug: 'instagram' } });
     const result = await composioConnectorProvider.proxyRequest(
       definition('instagram', 'instagram'), 'ca_1',
       { endpoint: 'https://graph.instagram.com/me', method: 'get', headers: { accept: 'application/json' } },
@@ -55,10 +55,24 @@ describe('proxyRequest', () => {
   });
 
   it('refuses an account that belongs to another toolkit, without sending the request', async () => {
-    stubComposio({ id: 'ca_1', auth_config: { id: 'ac_ig' }, toolkit: { slug: 'github' } });
+    stubComposio({ id: 'ca_1', user_id: 'mish-local-user', auth_config: { id: 'ac_ig' }, toolkit: { slug: 'github' } });
     await expect(composioConnectorProvider.proxyRequest(
       definition('instagram', 'instagram'), 'ca_1', { endpoint: 'https://graph.instagram.com/me', method: 'GET' },
     )).rejects.toThrow(/different toolkit/);
     expect(calls.some((c) => c.path.endsWith('/proxy'))).toBe(false);
+  });
+
+  it('refuses an account whose owner cannot be confirmed, or is someone else, without sending the request', async () => {
+    for (const account of [
+      { id: 'ca_1', auth_config: { id: 'ac_ig' }, toolkit: { slug: 'instagram' } },
+      { id: 'ca_1', user_id: 'someone-else', auth_config: { id: 'ac_ig' }, toolkit: { slug: 'instagram' } },
+    ]) {
+      calls.length = 0;
+      stubComposio(account);
+      await expect(composioConnectorProvider.proxyRequest(
+        definition('instagram', 'instagram'), 'ca_1', { endpoint: 'https://graph.instagram.com/me', method: 'GET' },
+      )).rejects.toThrow(/user/);
+      expect(calls.some((c) => c.path.endsWith('/proxy'))).toBe(false);
+    }
   });
 });

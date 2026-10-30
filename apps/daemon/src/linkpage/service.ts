@@ -122,10 +122,12 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
     async build(request) {
       const existing = await store.get(request.slug);
       const connectedAccounts: LinkPageConnectedAccounts = { ...(request.connectedAccounts ?? existing?.connectedAccounts ?? {}) };
-      // A build that names no accounts uses the logins already connected in Mish; `{}` opts out.
+      // A build that names no accounts uses the logins connected in Mish right now, over an id saved with the
+      // page (which may be a login since replaced or revoked); the saved id stays only when none resolves.
+      // `{}` opts out.
       if (request.connectedAccounts === undefined && deps.resolveConnectedAccount) {
         for (const connector of LINKPAGE_LOGIN_CONNECTORS) {
-          if (connectedAccounts[connector] || !request.sources.some((source) => source.connector === connector)) continue;
+          if (!request.sources.some((source) => source.connector === connector)) continue;
           const found = parseLinkPageConnectedAccounts({ [connector]: deps.resolveConnectedAccount(connector) });
           if (found.ok && found.value[connector]) connectedAccounts[connector] = found.value[connector]!;
         }
@@ -159,7 +161,8 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
 
     async put(slug, request) {
       if (request.spec.slug !== slug) throw new LinkPageError('BAD_REQUEST', 400, 'spec.slug must match the address');
-      return store.put({ spec: cleanSpec(request.spec), ...(request.connectedAccounts ? { connectedAccounts: request.connectedAccounts } : {}) });
+      // An edit never touches the connected accounts: the store keeps what the page already has.
+      return store.put({ spec: cleanSpec(request.spec) });
     },
 
     async delete(slug) {
@@ -173,11 +176,12 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
     async export(slug, options = {}) {
       const spec = specOf(await must(slug));
       const origin = options.origin ?? '';
+      const trackBase = options.trackBase ?? '';
       const file = (path: string, contentType: string, content: string): LinkPageExportFile => ({ path, contentType, encoding: 'utf8', content });
       const files: LinkPageExportFile[] = [
-        file('index.html', 'text/html; charset=utf-8', renderPage(spec, { machine: true, origin, trackBase: options.trackBase ?? '' })),
-        file('llms.txt', TEXT, llmsTxt(spec, { origin })),
-        file('links.json', 'application/json', `${JSON.stringify(linksJson(spec, { origin }), null, 2)}\n`),
+        file('index.html', 'text/html; charset=utf-8', renderPage(spec, { machine: true, origin, trackBase })),
+        file('llms.txt', TEXT, llmsTxt(spec, { origin, trackBase })),
+        file('links.json', 'application/json', `${JSON.stringify(linksJson(spec, { origin, trackBase }), null, 2)}\n`),
         file('spec.json', 'application/json', `${JSON.stringify(spec, null, 2)}\n`),
       ];
       for (const asset of await store.assets(slug)) {
@@ -192,13 +196,15 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
         slug,
         // No host yet: this is the file list that would be deployed, not a deployment.
         published: false,
-        ...(request.origin ? { url: `${request.origin}/${slug}` } : {}),
+        // The site is served at its own root (one subdomain or domain per creator), so the address has no slug.
+        ...(request.origin ? { url: `${request.origin}/` } : {}),
         files: exported.files.map((f) => f.path),
         publishedAt: (deps.now ?? (() => new Date().toISOString()))(),
       };
     },
 
     async putAsset(slug, name, bytes, contentType) {
+      await must(slug);
       if (!isLinkPageAssetName(name)) throw new LinkPageError('BAD_REQUEST', 400, 'the file name must be letters, numbers, dashes or underscores, ending .png, .jpg, .webp or .gif');
       if (bytes.length === 0) throw new LinkPageError('BAD_REQUEST', 400, 'the picture is empty');
       if (bytes.length > LINKPAGE_ASSET_MAX_BYTES) throw new LinkPageError('BAD_REQUEST', 413, `the picture is larger than ${LINKPAGE_ASSET_MAX_BYTES / 1024 / 1024} MB`);
