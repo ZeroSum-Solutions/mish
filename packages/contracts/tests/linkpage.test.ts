@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  isLinkPageAssetName,
   isLinkPageSlug,
   parseLinkPageBuildRequest,
   parseLinkPageConnectedAccounts,
   parseLinkPageEvent,
+  parseLinkPagePublishRequest,
   parseLinkPagePutRequest,
   parseLinkPageSpec,
   parseLinkPageTheme,
