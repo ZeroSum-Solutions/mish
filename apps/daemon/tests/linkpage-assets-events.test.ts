@@ -153,8 +153,10 @@ describe('recordLinkPageEvent', () => {
 });
 
 describe('connected accounts resolved by Mish', () => {
+  let n = 0;
   const build = async (resolve: (c: string) => string | undefined, connectedAccounts?: Record<string, string>) => {
     const proxied: string[] = [];
+    const slug = `ig-${n++}`;
     const service = createLinkPageService({
       store: createLinkPageStore(dataDir),
       fetch: (async () => new Response('missing', { status: 404 })) as typeof fetch,
@@ -169,8 +171,8 @@ describe('connected accounts resolved by Mish', () => {
       resolveConnectedAccount: resolve as never,
     });
     // With no login the fake network has nothing to read, so the build is refused; that is the point.
-    await service.build({ slug: 'ig', sources: [{ connector: 'instagram', ref: '@studio' }], ...(connectedAccounts ? { connectedAccounts } : {}) }).catch(() => undefined);
-    return { proxied, record: await service.get('ig').catch(() => null) };
+    await service.build({ slug, sources: [{ connector: 'instagram', ref: '@studio' }], ...(connectedAccounts ? { connectedAccounts } : {}) }).catch(() => undefined);
+    return { proxied, record: await service.get(slug).catch(() => null) };
   };
 
   it('uses the account connected in Mish when the request names none', async () => {
