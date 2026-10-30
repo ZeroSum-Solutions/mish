@@ -19,6 +19,7 @@ import type { LinkPageFetch } from './safe-fetch.js';
 export const LINKPAGE_OPENROUTER_MODEL = 'anthropic/claude-sonnet-5.5';
 
 const KEY_TIMEOUT_MS = 5_000;
+const OPENROUTER_TIMEOUT_MS = 60_000;
 
 export interface ResolveLlmDeps {
   /** The daemon key store's OpenRouter lookup. Rejecting means no key. Never logged here. */
@@ -28,7 +29,19 @@ export interface ResolveLlmDeps {
   keyTimeoutMs?: number;
   /** Test seams: build each lane's client. */
   makeOpenRouter?: (apiKey: string) => Llm;
-  makeClaude?: () => Llm;
+  /** Gets the resolved path of the `claude` program, so the lane runs the one that was found. */
+  makeClaude?: (executable: string) => Llm;
+  /** The fetch under the OpenRouter client (default: global fetch) and its time limit. */
+  openRouterFetch?: typeof globalThis.fetch;
+  openRouterTimeoutMs?: number;
+}
+
+/** A fetch that gives up after `ms`, so a stalled provider falls back instead of hanging the build. */
+export function fetchWithTimeout(base: typeof globalThis.fetch, ms: number): typeof globalThis.fetch {
+  return ((input: Parameters<typeof fetch>[0], init: RequestInit = {}) => {
+    const timeout = AbortSignal.timeout(ms);
+    return base(input, { ...init, signal: init.signal ? AbortSignal.any([init.signal, timeout]) : timeout });
+  }) as typeof globalThis.fetch;
 }
 
 /** The key, or undefined when there is none or the lookup stalls past its deadline. */
@@ -65,10 +78,12 @@ function withFallback(primary: Llm, fallback: Llm): Llm {
 
 export async function resolveLinkPageLlm(deps: ResolveLlmDeps): Promise<Llm | undefined> {
   const { fetch, findClaude = () => resolveOnPath('claude'), keyTimeoutMs = KEY_TIMEOUT_MS } = deps;
-  const makeOpenRouter = deps.makeOpenRouter ?? ((apiKey: string) => createLlm({ apiKey, model: LINKPAGE_OPENROUTER_MODEL }));
-  const makeClaude = deps.makeClaude ?? (() => createClaudeCliLlm({ fetch }));
+  const timed = fetchWithTimeout(deps.openRouterFetch ?? globalThis.fetch, deps.openRouterTimeoutMs ?? OPENROUTER_TIMEOUT_MS);
+  const makeOpenRouter = deps.makeOpenRouter ?? ((apiKey: string) => createLlm({ apiKey, model: LINKPAGE_OPENROUTER_MODEL, fetch: timed }));
+  const makeClaude = deps.makeClaude ?? ((executable: string) => createClaudeCliLlm({ fetch, executable }));
   const apiKey = await boundedKey(deps.resolveKey, keyTimeoutMs);
-  const claude = findClaude() ? makeClaude() : undefined;
+  const claudePath = findClaude();
+  const claude = claudePath ? makeClaude(claudePath) : undefined;
   if (apiKey) {
     const openrouter = makeOpenRouter(apiKey);
     return claude ? withFallback(openrouter, claude) : openrouter;

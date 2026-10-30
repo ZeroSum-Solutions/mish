@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createLinkPageFetch, LINKPAGE_FETCH_MAX_BYTES } from '../src/linkpage/safe-fetch.js';
 import type { Llm } from '@mish/linkpage';
-import { LINKPAGE_OPENROUTER_MODEL, resolveLinkPageLlm } from '../src/linkpage/llm.js';
+import { LINKPAGE_OPENROUTER_MODEL, fetchWithTimeout, resolveLinkPageLlm } from '../src/linkpage/llm.js';
 
 describe('link page fetch', () => {
   it('refuses loopback, private and metadata addresses before any request is made', async () => {
@@ -75,6 +75,27 @@ describe('link page model choice', () => {
 
   it('does not wait on a stalled key lookup', async () => {
     const llm = await resolveLinkPageLlm({ ...base, resolveKey: () => new Promise<string>(() => {}), findClaude: () => '/bin/claude', keyTimeoutMs: 20 });
+    expect(await llm!.json(request)).toBe('claude');
+  });
+
+  it('hands the resolved claude path to the claude client', async () => {
+    const seen: string[] = [];
+    await resolveLinkPageLlm({ ...base, resolveKey: async () => '', findClaude: () => '/opt/bin/claude', makeClaude: (executable) => { seen.push(executable); return ok('claude'); } });
+    expect(seen).toEqual(['/opt/bin/claude']);
+  });
+
+  it('gives the OpenRouter call a time limit, and a timeout falls back to claude like any failure', async () => {
+    const stalled = ((_url: unknown, init?: RequestInit) => new Promise<Response>((_resolve, reject) => {
+      init?.signal?.addEventListener('abort', () => reject(init.signal!.reason));
+    })) as typeof globalThis.fetch;
+    const bounded = fetchWithTimeout(stalled, 20);
+    const started = Date.now();
+    await expect(bounded('https://openrouter.ai/x')).rejects.toThrow();
+    expect(Date.now() - started).toBeLessThan(2000);
+    const llm = await resolveLinkPageLlm({
+      fetch, makeClaude: () => ok('claude'), resolveKey: async () => 'k', findClaude: () => '/bin/claude',
+      openRouterFetch: stalled, openRouterTimeoutMs: 20,
+    });
     expect(await llm!.json(request)).toBe('claude');
   });
 });
