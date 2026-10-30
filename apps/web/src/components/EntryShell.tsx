@@ -99,6 +99,7 @@ import { CenteredLoader } from './Loading';
 import { DesignsTab } from './DesignsTab';
 import { DesignSystemsTab } from './DesignSystemsTab';
 import { BrandsTab } from './BrandsTab';
+import { LinkPageView } from './LinkPageView';
 import { EntryNavRail, type EntryView as EntryViewKind } from './EntryNavRail';
 import {
   buildProjectSearchCatalog,
@@ -1855,6 +1856,9 @@ export function EntryShell({
             </div>
             <div data-testid="entry-view-catalog" data-active={view === 'catalog' ? 'true' : 'false'} {...inactiveViewProps(view === 'catalog')}>
               <CatalogView isActive={view === 'catalog'} />
+            </div>
+            <div data-testid="entry-view-link-pages" data-active={view === 'link-pages' ? 'true' : 'false'} {...inactiveViewProps(view === 'link-pages')}>
+              <LinkPageView isActive={view === 'link-pages'} />
             </div>
             <div data-testid="entry-view-plugins" data-active={view === 'plugins' ? 'true' : 'false'} {...inactiveViewProps(view === 'plugins')}>
               <ExtensionsMarketplace
