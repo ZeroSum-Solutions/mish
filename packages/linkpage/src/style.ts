@@ -35,6 +35,16 @@ export function classifyFont(family: string): FontKind {
   return 'sans';
 }
 
+/**
+ * A scraped font name the contract (and a stylesheet) can carry: accents folded to ASCII, then letters, digits,
+ * spaces, dots, dashes and underscores only. Anything else (a clamp() from WordPress, a size, a name in another
+ * script) is not a usable name and gives null, so the page falls back to a system stack.
+ */
+export function usableFamily(raw: string): string | null {
+  const name = raw.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+  return /^[A-Za-z][A-Za-z0-9 ._-]{0,79}$/.test(name) ? name : null;
+}
+
 function fontChoice(family: string, kind: FontKind): FontChoice {
   const google = GOOGLE.find((g) => g.toLowerCase() === family.toLowerCase());
   return { family: google || family, kind, stack: `${google ? `"${google}", ` : ''}${STACKS[kind]}`, google: Boolean(google) };
@@ -53,7 +63,7 @@ function tally<T extends object>(signals: Signal[], field: 'colors' | 'fonts', k
 }
 
 function pickFonts(signals: Signal[]): { heading: FontChoice; body: FontChoice } {
-  const ranked = tally<{ family?: string }>(signals, 'fonts', (f) => f.family?.replace(/["']/g, '').trim() || null);
+  const ranked = tally<{ family?: string }>(signals, 'fonts', (f) => usableFamily(f.family?.replace(/["']/g, '') || ''));
   // A font we can load, or can stand in for, beats one named only in a licence we cannot use.
   const choices = ranked.map(([family, weight]) => ({ ...fontChoice(family, classifyFont(family)), weight }));
   const heading = choices.find((c) => c.kind === 'serif' || c.kind === 'display') || choices[0] || fontChoice('Inter', 'sans');

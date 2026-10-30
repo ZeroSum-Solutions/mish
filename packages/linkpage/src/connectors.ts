@@ -62,16 +62,23 @@ export function colorsFromCss(css: string): ColorSignal[] {
   return count(hexes).map(([hex, weight]) => ({ hex: hex.length === 4 ? '#' + [...hex.slice(1)].map((c) => c + c).join('') : hex, weight }));
 }
 
+// Not a font name: a function (clamp(...), calc(...)) or a number or size (13px, 700).
+const NOT_A_NAME = /[()]|^[-+.]?\d/;
+// Variables that hold sizes, weights and spacing rather than a family, though "font" is in their name.
+const NOT_A_FAMILY_VAR = /font-(?:size|weight|style|stretch|variant|feature|kerning)|line-height|letter-spacing|text-/i;
+
 export function fontsFromCss(css: string): FontSignal[] {
   const families: string[] = [];
+  const firstName = (list: string): string | undefined => list.split(',').map((f) => f.replace(/\s*!important/i, '').replace(/["']/g, '').trim()).find((f) => f && !GENERIC.test(f) && !NOT_A_NAME.test(f));
   for (const [, list] of css.matchAll(/font-family\s*:\s*([^;}]+)/gi)) {
     if (list.includes('var(')) continue;
-    const first = list.split(',').map((f) => f.replace(/\s*!important/i, '').replace(/["']/g, '').trim()).find((f) => f && !GENERIC.test(f));
+    const first = firstName(list);
     if (first) families.push(first);
   }
   // A font declared once with a variable, like --serif, still counts.
-  for (const [, list] of css.matchAll(/--[a-z-]*(?:serif|sans|font|display|mono)[a-z-]*\s*:\s*([^;}]+)/gi)) {
-    const first = list.split(',').map((f) => f.replace(/["']/g, '').trim()).find((f) => f && !GENERIC.test(f));
+  for (const [, name, list] of css.matchAll(/(--[a-z0-9-]*(?:serif|sans|font|display|mono)[a-z0-9-]*)\s*:\s*([^;}]+)/gi)) {
+    if (NOT_A_FAMILY_VAR.test(name as string)) continue;
+    const first = firstName(list as string);
     if (first) families.push(first);
   }
   return count(families).map(([family, weight]) => ({ family, weight }));
