@@ -6491,6 +6491,7 @@ export interface Dict {
   'linkPage.options.avatar': string;
   'linkPage.options.avatarChoose': string;
   'linkPage.options.avatarHint': string;
+  'linkPage.options.avatarNeedsPage': string;
   'linkPage.options.avatarUploading': string;
   'linkPage.options.avatarFailed': string;
   'linkPage.options.avatarRemove': string;

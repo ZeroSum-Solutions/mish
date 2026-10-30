@@ -9,7 +9,7 @@ import type {
   LinkPageGetResponse,
   LinkPageListResponse,
   LinkPagePutRequest,
-  LinkPageRecord,
+  LinkPagePublicRecord,
   LinkPageSummary,
 } from '@mish/contracts';
 
@@ -36,7 +36,7 @@ export async function listLinkPages(): Promise<LinkPageSummary[]> {
   return (await json<LinkPageListResponse>(await fetch('/api/linkpages'))).pages;
 }
 
-export async function getLinkPage(slug: string): Promise<LinkPageRecord> {
+export async function getLinkPage(slug: string): Promise<LinkPagePublicRecord> {
   return (await json<LinkPageGetResponse>(await fetch(base(slug)))).page;
 }
 
@@ -50,7 +50,7 @@ export async function buildLinkPage(request: LinkPageBuildRequest): Promise<Link
   );
 }
 
-export async function putLinkPage(slug: string, request: LinkPagePutRequest): Promise<LinkPageRecord> {
+export async function putLinkPage(slug: string, request: LinkPagePutRequest): Promise<LinkPagePublicRecord> {
   return (
     await json<LinkPageGetResponse>(
       await fetch(base(slug), {

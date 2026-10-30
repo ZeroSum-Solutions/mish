@@ -13,6 +13,7 @@ const { spec, warnings, needs } = await buildPage({
   llm: createLlm({ apiKey }), // optional: reads the person and their images
   fetch,
 });
+// origin is the address the whole site is served at (its own root); nothing in the site carries the slug.
 const html = renderPage(spec, { origin: 'https://links.example.com', machine: true });
 const text = llmsTxt(spec, { origin: 'https://links.example.com' });
 const json = linksJson(spec, { origin: 'https://links.example.com' });
@@ -28,7 +29,7 @@ const json = linksJson(spec, { origin: 'https://links.example.com' });
 | `checkPage` | Cleans a page spec and throws a plain message on the first problem. |
 | `renderPage` | One self-contained HTML page. |
 | `llmsTxt`, `linksJson` | The page for language models and for scripts. |
-| `handleMcp` | A JSON-RPC handler for a small MCP server (read profile and links, latest posts, subscribe). |
+| `handleMcp` | A JSON-RPC handler for a small MCP server (read profile and links, latest posts, subscribe). Nothing serves it yet, so `llms.txt` does not advertise it. |
 | `createLlm` | An OpenRouter client with `json({ system, user, images })`. |
 
 ## In the app

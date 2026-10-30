@@ -39,7 +39,7 @@ import {
   putLinkPage,
   uploadLinkPageAsset,
 } from '../state/linkpages';
-import { buildZip } from '../utils/store-zip';
+import { buildZip } from '../runtime/zip';
 import { listenForConnectorsChanged, notifyConnectorsChanged } from './connectors-events';
 import styles from './LinkPageView.module.css';
 
@@ -93,6 +93,9 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
   const [paletteOn, setPaletteOn] = useState(false);
   const [palette, setPalette] = useState({ bg: '#ffffff', text: '#1a1a1a', accent: '#2255aa' });
   const [background, setBackground] = useState<LinkPageBackground | ''>('');
+  // Fields the person has edited since the page was built or opened. Save sends only these (an empty one
+  // clears the field); the rest keep what the page has, such as a headline the builder wrote.
+  const [touched, setTouched] = useState<{ headline?: true; bio?: true; avatar?: true }>({});
 
   const [spec, setSpec] = useState<LinkPageSpec | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
@@ -180,6 +183,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
       // The daemon uses the Instagram / TikTok login already connected in Mish; no id travels here.
       const result = await buildLinkPage(request.value);
       setSpec(result.spec);
+      setTouched({});
       setWarnings(result.warnings);
       setNeeds(result.needs);
       setVersion((v) => v + 1);
@@ -203,14 +207,15 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
         profile: {
           ...spec.profile,
           ...(name.trim() ? { name: name.trim() } : {}),
-          ...(headline.trim() ? { headline: headline.trim() } : {}),
-          ...(bio.trim() ? { bio: bio.trim() } : {}),
-          ...(avatar ? { avatar_url: avatar } : {}),
+          ...(touched.headline ? { headline: headline.trim() } : {}),
+          ...(touched.bio ? { bio: bio.trim() } : {}),
+          ...(touched.avatar ? { avatar_url: avatar } : {}),
         },
         theme: { ...spec.theme, ...(background ? { background } : {}) },
       };
       const record = await putLinkPage(spec.slug, { spec: next });
       setSpec(record.spec);
+      setTouched({});
       setVersion((v) => v + 1);
       setNotice(t('linkPage.save.done'));
       void refreshSaved();
@@ -228,16 +233,15 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
     setBusy('export');
     try {
       const exported = await exportLinkPage(spec.slug);
-      const encoder = new TextEncoder();
       const zip = buildZip(
         exported.files.map((file) => ({
           path: file.path,
-          bytes: file.encoding === 'base64'
+          content: file.encoding === 'base64'
             ? Uint8Array.from(atob(file.content), (char) => char.charCodeAt(0))
-            : encoder.encode(file.content),
+            : file.content,
         })),
       );
-      const url = URL.createObjectURL(new Blob([zip as BlobPart], { type: 'application/zip' }));
+      const url = URL.createObjectURL(zip);
       const link = document.createElement('a');
       link.href = url;
       link.download = `${spec.slug}.zip`;
@@ -255,13 +259,15 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
   const onAvatar = async (file: File | undefined) => {
     if (!file) return;
     setError(null);
-    if (!slugOk) return setError(t('linkPage.slug.invalid'));
+    // The picture belongs to the saved page, whose address is spec.slug; the address field may say anything.
+    if (!spec) return setError(t('linkPage.options.avatarNeedsPage'));
     const ext = IMAGE_EXTENSIONS[file.type];
     if (!ext) return setError(t('linkPage.options.avatarFailed', { message: t('linkPage.options.avatarHint') }));
     setBusy('avatar');
     try {
-      const asset = await uploadLinkPageAsset(slug, `avatar.${ext}`, file);
+      const asset = await uploadLinkPageAsset(spec.slug, `avatar.${ext}`, file);
       setAvatar(asset.path);
+      setTouched((x) => ({ ...x, avatar: true }));
       setVersion((v) => v + 1);
     } catch (cause) {
       setError(t('linkPage.options.avatarFailed', { message: messageOf(cause) }));
@@ -279,6 +285,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
       setSpec(record.spec);
       setWarnings(record.warnings);
       setNeeds([]);
+      setTouched({});
       setName(record.spec.profile.name);
       setHeadline(record.spec.profile.headline);
       setBio(record.spec.profile.bio);
@@ -300,6 +307,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
     setPaletteOn(false);
     setBackground('');
     setSpec(null);
+    setTouched({});
     setWarnings([]);
     setNeeds([]);
     setError(null);
@@ -424,20 +432,20 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
             </div>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="link-page-headline">{t('linkPage.options.headline')}</label>
-              <Input id="link-page-headline" value={headline} maxLength={90} onChange={(e) => setHeadline(e.target.value)} />
+              <Input id="link-page-headline" value={headline} maxLength={90} onChange={(e) => { setHeadline(e.target.value); setTouched((x) => ({ ...x, headline: true })); }} />
             </div>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="link-page-bio">{t('linkPage.options.bio')}</label>
-              <Textarea id="link-page-bio" value={bio} rows={3} maxLength={400} onChange={(e) => setBio(e.target.value)} />
+              <Textarea id="link-page-bio" value={bio} rows={3} maxLength={400} onChange={(e) => { setBio(e.target.value); setTouched((x) => ({ ...x, bio: true })); }} />
             </div>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="link-page-avatar">{t('linkPage.options.avatar')}</label>
               <div className={styles.avatarRow}>
-                {avatar && slugOk ? <img className={styles.avatar} src={linkPageAssetUrl(slug, avatar, version)} alt="" /> : null}
-                <input id="link-page-avatar" className={styles.fileInput} type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={busy === 'avatar'} onChange={(e) => { void onAvatar(e.target.files?.[0]); e.target.value = ''; }} />
-                {avatar ? <Button size="sm" variant="ghost" onClick={() => setAvatar('')}>{t('linkPage.options.avatarRemove')}</Button> : null}
+                {avatar && spec ? <img className={styles.avatar} src={linkPageAssetUrl(spec.slug, avatar, version)} alt="" /> : null}
+                <input id="link-page-avatar" className={styles.fileInput} type="file" accept="image/png,image/jpeg,image/webp,image/gif" disabled={busy === 'avatar' || !spec} onChange={(e) => { void onAvatar(e.target.files?.[0]); e.target.value = ''; }} />
+                {avatar ? <Button size="sm" variant="ghost" onClick={() => { setAvatar(''); setTouched((x) => ({ ...x, avatar: true })); }}>{t('linkPage.options.avatarRemove')}</Button> : null}
               </div>
-              <p className={styles.hint}>{busy === 'avatar' ? t('linkPage.options.avatarUploading') : t('linkPage.options.avatarHint')}</p>
+              <p className={styles.hint}>{busy === 'avatar' ? t('linkPage.options.avatarUploading') : spec ? t('linkPage.options.avatarHint') : t('linkPage.options.avatarNeedsPage')}</p>
             </div>
             <div className={styles.field}>
               <span className={styles.label}>{t('linkPage.options.palette')}</span>

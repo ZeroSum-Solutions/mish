@@ -6238,6 +6238,7 @@ export const en: Dict = {
   'linkPage.options.avatar': 'Photo',
   'linkPage.options.avatarChoose': 'Choose a picture',
   'linkPage.options.avatarHint': 'PNG, JPEG, WebP or GIF, up to 2 MB.',
+  'linkPage.options.avatarNeedsPage': 'Build the page first, then add a photo.',
   'linkPage.options.avatarUploading': 'Uploading…',
   'linkPage.options.avatarFailed': 'The picture was not uploaded: {message}',
   'linkPage.options.avatarRemove': 'Remove picture',

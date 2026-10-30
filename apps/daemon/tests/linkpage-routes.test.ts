@@ -183,6 +183,15 @@ describe('saved pages', () => {
     expect((await fetch(`${baseUrl}/api/linkpages/studio`, { method: 'DELETE' })).status).toBe(404);
   });
 
+  it('accepts an edit that clears the headline, bio and picture', async () => {
+    await build({ options: { headline: 'Potter', bio: 'Pots', avatar: 'https://cdn.example.com/a.jpg' } });
+    const got = (await (await fetch(`${baseUrl}/api/linkpages/studio`)).json()) as any;
+    expect(got.page.spec.profile).toMatchObject({ headline: 'Potter', bio: 'Pots', avatar_url: 'https://cdn.example.com/a.jpg' });
+    const spec = { ...got.page.spec, profile: { ...got.page.spec.profile, headline: '', bio: '', avatar_url: '' } };
+    const put = (await (await post('/api/linkpages/studio', { spec }, 'PUT')).json()) as any;
+    expect(put.page.spec.profile).toMatchObject({ headline: '', bio: '', avatar_url: '' });
+  });
+
   it('refuses a spec whose slug differs from the address, and a theme that could escape the stylesheet', async () => {
     await build();
     const got = (await (await fetch(`${baseUrl}/api/linkpages/studio`)).json()) as any;
