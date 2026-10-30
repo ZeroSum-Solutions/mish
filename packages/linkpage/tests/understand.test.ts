@@ -152,7 +152,17 @@ test('with a login TikTok uses the Display API (a POST for videos) and reports n
   assert.equal(s.posts?.[0]?.title, 'Wheel day');
   assert.equal(s.posts?.[0]?.image_url, 'https://cdn/c.jpg');
   assert.equal(s.needs_login, undefined);
-  await assert.rejects(connectors.tiktok({ login: async () => new Response('', { status: 401 }) }).read('x'), /401/);
+});
+
+test('when the login read fails, the connector falls back to the public page and says so', async () => {
+  const fetch = net({ 'https://www.tiktok.com/@x': IG, 'https://www.instagram.com/x/': IG });
+  const login: FetchFn = async () => new Response('', { status: 401 });
+  const tt = await connectors.tiktok({ fetch, login }).read('x');
+  assert.equal(tt.needs_login?.platform, 'tiktok');
+  assert.match(tt.warnings?.[0] as string, /login.*401/i);
+  assert.match(tt.warnings?.[0] as string, /public page/);
+  // If the public page fails as well, the connector fails.
+  await assert.rejects(connectors.instagram({ fetch: net({}), login }).read('x'), /404/);
 });
 
 test('the website connector returns https images: the share image first, small and non-https ones left out', async () => {

@@ -55,6 +55,8 @@ export interface Signal {
   stats?: string;
   images?: string[];
   needs_login?: NeedsLogin;
+  /** Things that went wrong but did not stop the read (for example a login that failed). */
+  warnings?: string[];
   mood?: string;
   imagery?: string;
   notes?: string;

@@ -247,7 +247,15 @@ function socialMeta(kind: string, profileUrl: (handle: string) => string, withLo
     name: kind,
     async read(handle: string): Promise<Signal> {
       const clean = String(handle || '').replace(/^@/, '');
-      if (login) return withLogin(login, clean);
+      let warning = '';
+      if (login) {
+        try {
+          return await withLogin(login, clean);
+        } catch (err) {
+          // A login that fails (revoked, rate limited) should not lose the page: read it as a visitor and say so.
+          warning = `the ${kind} login could not be read (${(err as Error).message}); used the public page instead`;
+        }
+      }
       const url = profileUrl(clean);
       const html = await get(fetch, url);
       const title = meta(html, 'og:title');
@@ -258,6 +266,7 @@ function socialMeta(kind: string, profileUrl: (handle: string) => string, withLo
         stats: meta(html, 'og:description'),
         links: [{ url, kind, label: cap(kind), handle: '@' + clean }],
         needs_login: { platform: kind, why: WHY[kind] },
+        ...(warning ? { warnings: [warning] } : {}),
       };
     },
   });

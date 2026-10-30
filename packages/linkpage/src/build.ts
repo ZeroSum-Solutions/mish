@@ -1,3 +1,4 @@
+import { url as checkUrl } from './blocks.ts';
 import { connectors as defaults, loginNeeds } from './connectors.ts';
 import { checkPage } from './spec.ts';
 import { deriveTheme } from './style.ts';
@@ -55,7 +56,9 @@ export async function buildPage({ sources, options = {}, connectors = defaults, 
     try {
       const make = connectors[connector];
       if (!make) throw new Error('no such connector');
-      return await make({ fetch, login: logins[connector] }).read(ref);
+      const signal = await make({ fetch, login: logins[connector] }).read(ref);
+      for (const w of signal.warnings || []) warnings.push(`${connector}: ${w}`);
+      return signal;
     } catch (err) {
       warnings.push(`${connector}: ${(err as Error).message}`);
       return null;
@@ -83,15 +86,37 @@ export async function buildPage({ sources, options = {}, connectors = defaults, 
     }
   }
 
+  // Addresses come from other people's pages. One that is not a web address is dropped, not allowed to fail the build.
+  const good = (value: unknown): string | null => {
+    try { return checkUrl(value, 'an address'); } catch { return null; }
+  };
+  const dropped = { link: 0, social: 0, post: 0 };
+  const warnDropped = (): void => {
+    for (const [what, n] of Object.entries(dropped)) if (n) warnings.push(`${n} ${what} item${n === 1 ? '' : 's'} with an address that is not a web address ${n === 1 ? 'was' : 'were'} dropped`);
+  };
+
   const social = new Map<string, NonNullable<Signal['links']>[number]>();
-  for (const s of signals) for (const l of s.links || []) if (l.kind !== 'link' && !social.has(l.kind)) social.set(l.kind, l);
+  for (const s of signals) {
+    for (const l of s.links || []) {
+      if (l.kind === 'link' || social.has(l.kind)) continue;
+      if (good(l.url)) social.set(l.kind, l); else dropped.social++;
+    }
+  }
 
   const list: RawBlock[] = [];
-  for (const l of options.links || []) list.push({ type: 'link', ...l });
+  for (const l of options.links || []) {
+    if (good(l.url)) list.push({ type: 'link', ...l }); else dropped.link++;
+  }
   if (options.signup?.endpoint) list.push({ type: 'email', ...options.signup });
-  const posts = signals.flatMap((s) => s.posts || []).slice(0, 3);
+  const posts = signals.flatMap((s) => s.posts || []).filter((p) => {
+    if (good(p.url)) return true;
+    dropped.post++;
+    return false;
+  }).slice(0, 3).map((p) => (p.image_url && !good(p.image_url) ? { ...p, image_url: '' } : p));
   if (posts.length) list.push({ type: 'posts', heading: 'From the journal', items: posts });
   if (social.size) list.push({ type: 'social', items: [...social.values()].map((l) => ({ kind: l.kind, url: l.url, handle: l.handle || '' })) });
+
+  warnDropped();
 
   // A thin read of the person is not trusted over what the creator's own pages say.
   const trusted = person && person.confidence !== 'low' ? person : null;

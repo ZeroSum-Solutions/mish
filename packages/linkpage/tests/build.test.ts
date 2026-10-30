@@ -92,3 +92,22 @@ test('rendering escapes creator text, can route clicks through a tracker, and sh
   assert.match(html, /name="website"[^>]*class="trap"/);
   assert.match(renderPage(spec, { trackBase: 'https://m.example.com/l' }), /href="https:\/\/m\.example\.com\/l\/a\/link-1\/0"/);
 });
+
+test('a bad post or social address is dropped with a warning instead of failing the build', async () => {
+  const manual = { connector: 'manual', ref: {
+    name: 'Sam', bio: 'Potter.',
+    posts: [{ title: 'ok', url: 'https://sam.example.com/p/1', image_url: 'not a url' }, { title: 'relative', url: '/p/2' }, { title: 'js', url: 'javascript:alert(1)' }],
+    links: [{ url: 'mailto:sam@example.com', kind: 'link' }, { url: 'https://instagram.com/sam', kind: 'instagram' }, { url: '/x', kind: 'x' }],
+  } };
+  const out = await buildPage({ sources: [manual as never], options: { slug: 'sam', links: [{ label: 'Shop', url: '/shop' }, { label: 'Real', url: 'https://sam.example.com/' }] } });
+  const posts = out.spec.blocks.find((b) => b.type === 'posts');
+  assert.deepEqual(posts?.type === 'posts' && posts.items.map((i) => [i.title, i.image_url]), [['ok', '']]);
+  const social = out.spec.blocks.find((b) => b.type === 'social');
+  assert.deepEqual(social?.type === 'social' && social.items.map((i) => i.kind), ['instagram']);
+  assert.deepEqual(out.spec.blocks.filter((b) => b.type === 'link').map((b) => b.type === 'link' && b.label), ['Real']);
+  assert.ok(out.warnings.some((w) => /post/.test(w) && /dropped/.test(w)), out.warnings.join('|'));
+  assert.ok(out.warnings.some((w) => /link/.test(w) && /dropped/.test(w)));
+  // A page whose only posts are bad has no posts block at all.
+  const none = await buildPage({ sources: [{ connector: 'manual', ref: { name: 'Sam', posts: [{ title: 'x', url: '/p' }] } } as never], options: { slug: 'sam' } });
+  assert.ok(!none.spec.blocks.some((b) => b.type === 'posts'));
+});
