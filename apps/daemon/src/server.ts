@@ -8645,7 +8645,7 @@ export async function startServer({
     linkpage: createLinkPageService({
       store: createLinkPageStore(RUNTIME_DATA_DIR),
       fetch: linkPageFetch,
-      resolveLlm: () => resolveLinkPageLlm({ env: process.env, fetch: linkPageFetch }),
+      resolveLlm: () => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), fetch: linkPageFetch }),
       login: composioConnectorProvider,
       resolveConnectedAccount: (connector) => {
         const credentials = connectorService.getCredential(connector)?.credentials;

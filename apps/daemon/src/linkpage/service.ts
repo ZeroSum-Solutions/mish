@@ -44,7 +44,7 @@ export interface LinkPageServiceDeps {
   store: LinkPageStore;
   fetch: LinkPageFetch;
   /** Called per build, so a model that appears (a key set, `claude` installed) is picked up. */
-  resolveLlm: () => Llm | undefined;
+  resolveLlm: () => Llm | undefined | Promise<Llm | undefined>;
   login?: LinkPageLoginProvider | undefined;
   /**
    * The Composio connected-account id of a connector the creator already connected in Mish (Settings or
@@ -132,7 +132,7 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
       }
       const loginWarnings: string[] = [];
       const logins = createLoginFetches(deps.login, connectedAccounts, loginWarnings);
-      const llm = deps.resolveLlm();
+      const llm = await deps.resolveLlm();
       let result;
       try {
         result = await buildPage({
@@ -147,7 +147,7 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
       }
       const spec = cleanSpec(result.spec);
       const warnings = [...loginWarnings, ...result.warnings];
-      if (!llm) warnings.push('no model is available (install the claude command or set OPENROUTER_API_KEY): the page was built from plain signals');
+      if (!llm) warnings.push('no model is available (add an OpenRouter key with `od agency config set --provider openrouter --key-stdin`, or install the claude command): the page was built from plain signals');
       const save = request.save !== false;
       if (save) await store.put({ spec, connectedAccounts, warnings });
       return { spec, warnings, needs: result.needs, saved: save };

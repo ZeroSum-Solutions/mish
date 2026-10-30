@@ -51,6 +51,20 @@ not upload anything (see hosting below).
 Pages live under the daemon's data folder (`linkpages/<slug>/page.json`, `assets/`, `events.jsonl`),
 never in the repository.
 
+## Model
+
+The builder reads people with a model in two lanes ([`linkpage/llm.ts`](../apps/daemon/src/linkpage/llm.ts)):
+
+1. **OpenRouter first.** The key comes from the daemon key store, the same one the brief generator
+   uses: `OPENROUTER_API_KEY`, then a key saved with `od agency config set --provider openrouter --key-stdin`,
+   then the vault. The lookup is bounded (5 s) and the key is never logged. The model is pinned to
+   `anthropic/claude-sonnet-5.5`: it reads pictures (the style-from-photos step sends image URLs, which
+   the text-only fast-lane caller cannot), answers JSON mode cleanly, and matches the model the second
+   lane runs.
+2. **The `claude` command** (the owner's subscription) when there is no key, or when an OpenRouter
+   call fails. A cancelled call is not retried.
+3. **No model**: the page is built from plain signals and the build warns.
+
 ## Instagram and TikTok
 
 Both platforms show little without the creator's login, and only a **business or creator account**
