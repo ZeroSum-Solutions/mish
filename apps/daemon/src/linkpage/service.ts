@@ -6,7 +6,7 @@
 import { buildPage, linksJson, llmsTxt, renderPage } from '@mish/linkpage';
 import type { BuildOptions, Llm, PageSpec } from '@mish/linkpage';
 import { checkPage } from '@mish/linkpage';
-import { LINKPAGE_ASSET_MAX_BYTES, LINKPAGE_ASSET_TYPES, isLinkPageAssetName, parseLinkPageSpec } from '@mish/contracts';
+import { LINKPAGE_ASSET_MAX_BYTES, LINKPAGE_ASSET_TYPES, LINKPAGE_LOGIN_CONNECTORS, isLinkPageAssetName, parseLinkPageConnectedAccounts, parseLinkPageSpec } from '@mish/contracts';
 import type {
   LinkPageBuildRequest,
   LinkPageAssetResponse,
@@ -14,7 +14,9 @@ import type {
   LinkPageEventResponse,
   LinkPagePublishRequest,
   LinkPagePublishResult,
+  LinkPageConnectedAccounts,
   LinkPageExportFile,
+  LinkPageLoginConnectorId,
   LinkPageExportResponse,
   LinkPageRecord,
   LinkPageSpec,
@@ -44,6 +46,11 @@ export interface LinkPageServiceDeps {
   /** Called per build, so a model that appears (a key set, `claude` installed) is picked up. */
   resolveLlm: () => Llm | undefined;
   login?: LinkPageLoginProvider | undefined;
+  /**
+   * The Composio connected-account id of a connector the creator already connected in Mish (Settings or
+   * the Connect step), so a build that names no account still reads through the login. Ids only.
+   */
+  resolveConnectedAccount?: (connector: LinkPageLoginConnectorId) => string | undefined;
   now?: () => string;
 }
 
@@ -114,7 +121,15 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
   return {
     async build(request) {
       const existing = await store.get(request.slug);
-      const connectedAccounts = request.connectedAccounts ?? existing?.connectedAccounts ?? {};
+      const connectedAccounts: LinkPageConnectedAccounts = { ...(request.connectedAccounts ?? existing?.connectedAccounts ?? {}) };
+      // A build that names no accounts uses the logins already connected in Mish; `{}` opts out.
+      if (request.connectedAccounts === undefined && deps.resolveConnectedAccount) {
+        for (const connector of LINKPAGE_LOGIN_CONNECTORS) {
+          if (connectedAccounts[connector] || !request.sources.some((source) => source.connector === connector)) continue;
+          const found = parseLinkPageConnectedAccounts({ [connector]: deps.resolveConnectedAccount(connector) });
+          if (found.ok && found.value[connector]) connectedAccounts[connector] = found.value[connector]!;
+        }
+      }
       const loginWarnings: string[] = [];
       const logins = createLoginFetches(deps.login, connectedAccounts, loginWarnings);
       const llm = deps.resolveLlm();

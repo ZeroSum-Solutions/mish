@@ -151,3 +151,37 @@ describe('recordLinkPageEvent', () => {
     expect(await recordLinkPageEvent(store, 'studio', { kind: 'view' })).toEqual({ ok: true, response: { ok: true, stored: false } });
   });
 });
+
+describe('connected accounts resolved by Mish', () => {
+  const build = async (resolve: (c: string) => string | undefined, connectedAccounts?: Record<string, string>) => {
+    const proxied: string[] = [];
+    const service = createLinkPageService({
+      store: createLinkPageStore(dataDir),
+      fetch: (async () => new Response('missing', { status: 404 })) as typeof fetch,
+      resolveLlm: () => undefined,
+      login: {
+        getDefinition: async (id) => ({ id } as never),
+        proxyRequest: async (_d, account) => {
+          proxied.push(account);
+          return { status: 200, data: { username: 'studio', name: 'Studio Real', biography: 'Pots' } };
+        },
+      },
+      resolveConnectedAccount: resolve as never,
+    });
+    // With no login the fake network has nothing to read, so the build is refused; that is the point.
+    await service.build({ slug: 'ig', sources: [{ connector: 'instagram', ref: '@studio' }], ...(connectedAccounts ? { connectedAccounts } : {}) }).catch(() => undefined);
+    return { proxied, record: await service.get('ig').catch(() => null) };
+  };
+
+  it('uses the account connected in Mish when the request names none', async () => {
+    const { proxied, record } = await build(() => 'ca_auto');
+    expect(proxied[0]).toBe('ca_auto');
+    expect(record?.connectedAccounts).toEqual({ instagram: 'ca_auto' });
+  });
+
+  it('does not use it when the request opts out with {} or names its own, and ignores an id that is not an id', async () => {
+    expect((await build(() => 'ca_auto', {})).proxied).toEqual([]);
+    expect((await build(() => 'ca_auto', { instagram: 'ca_own' })).proxied[0]).toBe('ca_own');
+    expect((await build(() => 'bad id!')).proxied).toEqual([]);
+  });
+});

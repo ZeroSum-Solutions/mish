@@ -8647,6 +8647,12 @@ export async function startServer({
       fetch: linkPageFetch,
       resolveLlm: () => resolveLinkPageLlm({ env: process.env, fetch: linkPageFetch }),
       login: composioConnectorProvider,
+      resolveConnectedAccount: (connector) => {
+        const credentials = connectorService.getCredential(connector)?.credentials;
+        return credentials?.provider === 'composio' && typeof credentials.providerConnectionId === 'string'
+          ? credentials.providerConnectionId
+          : undefined;
+      },
     }),
   });
 
