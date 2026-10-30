@@ -31,6 +31,15 @@ const json = linksJson(spec, { origin: 'https://links.example.com' });
 | `handleMcp` | A JSON-RPC handler for a small MCP server (read profile and links, latest posts, subscribe). |
 | `createLlm` | An OpenRouter client with `json({ system, user, images })`. |
 
+## In the app
+
+The engine is wired into the daemon and the web app (`docs/link-pages.md`). The daemon keeps pages
+under its data folder, serves `/api/linkpages*`, and `od linkpage …` calls the same endpoints.
+Pictures are uploaded with `PUT /api/linkpages/:slug/assets/:name` (png, jpeg, webp or gif, at most
+2 MB, checked by content) and referenced as `assets/<name>`. The signup form and click counting post
+to the page's own endpoint: pass `signup: { endpoint }` when building and `trackBase` when rendering.
+`POST /api/linkpages/:slug/events` accepts those events for local preview and writes a local log.
+
 ## Node-only
 
 `@mish/linkpage/node` exports `createClaudeCliLlm`, the same `json(...)` answered by the local
