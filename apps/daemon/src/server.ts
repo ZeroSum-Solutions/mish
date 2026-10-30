@@ -975,6 +975,11 @@ import { createTerminalService } from './terminals.js';
 import { createBrowserSessionService } from './browser-sessions.js';
 import { registerSocialShareRoutes } from './routes/social-share.js';
 import { registerMishPublicMetadataRoutes } from './routes/mish-public-metadata.js';
+import { registerLinkPageRoutes } from './routes/linkpage.js';
+import { createLinkPageService } from './linkpage/service.js';
+import { createLinkPageStore } from './linkpage/store.js';
+import { createLinkPageFetch } from './linkpage/safe-fetch.js';
+import { resolveLinkPageLlm } from './linkpage/llm.js';
 import { registerWhatsNewRoutes } from './routes/whats-new.js';
 import { registerGenuiCatalogRoutes } from './routes/genui-catalog.js';
 import { registerWorkbenchIntakeRoutes } from './routes/workbench-intake.js';
@@ -8632,6 +8637,17 @@ export async function startServer({
   registerMishPublicMetadataRoutes(app, {
     http: httpDeps,
     mishPublicMetadata,
+  });
+
+  const linkPageFetch = createLinkPageFetch();
+  registerLinkPageRoutes(app, {
+    http: httpDeps,
+    linkpage: createLinkPageService({
+      store: createLinkPageStore(RUNTIME_DATA_DIR),
+      fetch: linkPageFetch,
+      resolveLlm: () => resolveLinkPageLlm({ env: process.env, fetch: linkPageFetch }),
+      login: composioConnectorProvider,
+    }),
   });
 
   registerWhatsNewRoutes(app, {
