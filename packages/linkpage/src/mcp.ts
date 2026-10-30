@@ -75,7 +75,7 @@ async function one(ctx: McpContext, input: unknown): Promise<JsonRpcResponse | n
   const tools = TOOLS.filter((t) => t.name !== 'subscribe' || (ctx.subscribe && signupOf(ctx.spec)));
   if (method === 'initialize') {
     const v = VERSIONS.includes(params.protocolVersion as string) ? params.protocolVersion : '2025-06-18';
-    return ok(id as JsonRpcId, { protocolVersion: v, capabilities: { tools: {} }, serverInfo: { name: 'mishmash-linkpage', version: '1' }, instructions: `Tools for ${ctx.spec.profile.name}'s link page: read the profile and links, see the latest posts${tools.length === 4 ? ', or subscribe an email address' : ''}.` });
+    return ok(id as JsonRpcId, { protocolVersion: v, capabilities: { tools: {} }, serverInfo: { name: 'mish-linkpage', version: '1' }, instructions: `Tools for ${ctx.spec.profile.name}'s link page: read the profile and links, see the latest posts${tools.length === 4 ? ', or subscribe an email address' : ''}.` });
   }
   if (method === 'ping') return ok(id as JsonRpcId, {});
   if (method === 'tools/list') return ok(id as JsonRpcId, { tools });

@@ -7,7 +7,7 @@ import type { ColorSignal, Connector, ConnectorFactory, ConnectorOptions, FetchF
 //     colors: [{ hex, weight }], fonts: [{ family, weight }], stats, images: [url], needs_login: { platform, why } }
 // Every field is optional. Add a platform by adding one entry to `connectors`; nothing else changes.
 
-const UA = 'Mozilla/5.0 (compatible; MishmashLinkPage/1)';
+const UA = 'Mozilla/5.0 (compatible; MishLinkPage/1)';
 
 const KINDS = [
   ['instagram.com', 'instagram'], ['tiktok.com', 'tiktok'], ['youtube.com', 'youtube'], ['youtu.be', 'youtube'],

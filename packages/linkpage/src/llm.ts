@@ -33,7 +33,7 @@ export function createLlm({ apiKey, model = 'anthropic/claude-sonnet-5.5', fetch
       const content = [{ type: 'text', text: user }, ...images.map((url) => ({ type: 'image_url', image_url: { url } }))];
       const res = await fetch(URL_, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'X-Title': 'Mishmash link page' },
+        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'X-Title': 'Mish link page' },
         body: JSON.stringify({
           model,
           response_format: { type: 'json_object' },

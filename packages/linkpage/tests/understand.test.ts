@@ -17,7 +17,7 @@ test('the llm client sends images after the text and parses fenced JSON', async 
   const got = defined(sent, 'the request');
   assert.equal(got.url, 'https://openrouter.ai/api/v1/chat/completions');
   assert.equal(got.init.headers.Authorization, 'Bearer k');
-  assert.equal(got.init.headers['X-Title'], 'Mishmash link page');
+  assert.equal(got.init.headers['X-Title'], 'Mish link page');
   assert.deepEqual(got.body.response_format, { type: 'json_object' });
   assert.equal(got.body.model, 'anthropic/claude-sonnet-5.5');
   assert.deepEqual(got.body.messages[1].content, [{ type: 'text', text: 'u' }, { type: 'image_url', image_url: { url: 'https://x.example.com/a.png' } }]);

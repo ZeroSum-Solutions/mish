@@ -56,7 +56,7 @@ test('links.json lists profile, links by kind and the signup; trackBase adds tra
   assert.equal(j.links[0]?.url, 'https://studio.example.com/shop');
   assert.ok(!('tracked_url' in (j.links[0] as object)));
   assert.deepEqual(j.subscribe, { endpoint: 'https://links.example.com/api/signup', method: 'POST', fields: ['email'], kind: 'signup' });
-  assert.equal(j.generated_from, 'mishmash-linkpage');
+  assert.equal(j.generated_from, 'mish-linkpage');
   assert.equal(j.version, 1);
   const t = linksJson(spec, { origin: ORIGIN, trackBase: 'https://links.example.com/go/' });
   assert.equal(t.links[0]?.tracked_url, `https://links.example.com/go/studio/${spec.blocks[0]?.id}/0`);
@@ -69,7 +69,7 @@ test('MCP initialize echoes a known protocol version, falls back otherwise, and 
   const a = await resultOf<Init>(ctx, rpc('initialize', { protocolVersion: '2024-11-05' }));
   assert.equal(a.protocolVersion, '2024-11-05');
   assert.deepEqual(a.capabilities, { tools: {} });
-  assert.deepEqual(a.serverInfo, { name: 'mishmash-linkpage', version: '1' });
+  assert.deepEqual(a.serverInfo, { name: 'mish-linkpage', version: '1' });
   assert.equal(typeof a.instructions, 'string');
   assert.equal((await resultOf<Init>(ctx, rpc('initialize', { protocolVersion: '1999-01-01' }))).protocolVersion, '2025-06-18');
   assert.equal(await handleMcp(ctx, { jsonrpc: '2.0', method: 'notifications/initialized' }), null);

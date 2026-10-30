@@ -111,6 +111,9 @@ importers:
       '@mish/launcher-proto':
         specifier: workspace:*
         version: link:../../packages/launcher-proto
+      '@mish/linkpage':
+        specifier: workspace:*
+        version: link:../../packages/linkpage
       '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform

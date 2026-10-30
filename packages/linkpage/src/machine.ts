@@ -54,7 +54,7 @@ export interface LinksJson {
   page_url: string;
   links: (Omit<PageItem, 'block' | 'index'> & { tracked_url?: string })[];
   subscribe: Signup | null;
-  generated_from: 'mishmash-linkpage';
+  generated_from: 'mish-linkpage';
   version: 1;
 }
 
@@ -68,7 +68,7 @@ export function linksJson(spec: PageSpec, { origin = '', trackBase = '' }: Machi
     page_url: `${base(origin)}/${spec.slug}`,
     links: pageItems(spec).map((i) => ({ id: i.id, kind: i.kind, label: i.label, url: i.url, description: i.description, ...track(i) })),
     subscribe: signupOf(spec),
-    generated_from: 'mishmash-linkpage',
+    generated_from: 'mish-linkpage',
     version: 1,
   };
 }

@@ -2,7 +2,7 @@ import type { FetchFn, Llm, Signal } from './types.ts';
 
 // Works out who a creator is from what they have published: their site, their posts and their bios.
 
-const UA = 'Mozilla/5.0 (compatible; MishmashLinkPage/1)';
+const UA = 'Mozilla/5.0 (compatible; MishLinkPage/1)';
 const PAGE_CAP = 4000;
 const PICK = /about|studio|info|story|contact|who|bio|press/i;
 

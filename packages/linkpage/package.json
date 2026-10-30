@@ -5,12 +5,22 @@
   "type": "module",
   "description": "Headless link-page engine: read a creator's platforms into signals, derive a theme, check a page spec and render the page, llms.txt, links.json and an MCP handler. No filesystem, environment or clock access; fetch, llm and login are injected.",
   "license": "Apache-2.0",
-  "files": ["src", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "exports": {
-    ".": "./src/index.ts",
-    "./node": "./src/node.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./node": {
+      "types": "./dist/node.d.ts",
+      "default": "./dist/node.js"
+    }
   },
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "test": "node --experimental-strip-types --test tests/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
