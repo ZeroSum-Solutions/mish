@@ -10,14 +10,22 @@
  *   DELETE /api/linkpages/:slug           delete a page
  *   GET    /api/linkpages/:slug/render    the page as HTML
  *   GET    /api/linkpages/:slug/export    index.html, llms.txt, links.json, spec.json, assets
+ *   POST   /api/linkpages/:slug/publish   the file list ready to deploy (no host yet: published is false)
+ *   PUT    /api/linkpages/:slug/assets/:name   a picture (raw body, png/jpeg/webp/gif, at most 2 MB)
+ *   GET    /api/linkpages/:slug/assets/:name   the picture, so a preview resolves `assets/<name>`
+ *   POST   /api/linkpages/:slug/events    a view, click or signup from local preview (local log)
  *
  * Input is checked at this boundary (slug pattern, request shape, origin); reads of other sites go
  * through the SSRF guard in `../linkpage/safe-fetch.ts`.
  */
+import express from 'express';
 import type { Express } from 'express';
 import {
+  LINKPAGE_ASSET_MAX_BYTES,
+  isLinkPageAssetName,
   isLinkPageSlug,
   parseLinkPageBuildRequest,
+  parseLinkPagePublishRequest,
   parseLinkPagePutRequest,
 } from '@mish/contracts';
 import type {
@@ -127,6 +135,59 @@ export function registerLinkPageRoutes(app: Express, ctx: RegisterLinkPageRoutes
     if (origin === null) return sendApiError(res, 400, 'BAD_REQUEST', 'origin must be an http(s) address');
     try {
       return res.json(await linkpage.export(req.params.slug, { origin }));
+    } catch (error) {
+      return fail(res, error);
+    }
+  });
+
+  app.post('/api/linkpages/:slug/publish', async (req, res) => {
+    if (!isLinkPageSlug(req.params.slug)) return sendApiError(res, 400, 'BAD_REQUEST', 'slug must be lowercase letters, numbers and dashes');
+    const parsed = parseLinkPagePublishRequest(req.body && Object.keys(req.body).length ? req.body : undefined);
+    if (!parsed.ok) return sendApiError(res, 400, 'BAD_REQUEST', parsed.error);
+    try {
+      return res.json(await linkpage.publish(req.params.slug, parsed.value));
+    } catch (error) {
+      return fail(res, error);
+    }
+  });
+
+  const rawImage = express.raw({ type: () => true, limit: LINKPAGE_ASSET_MAX_BYTES });
+  app.put(
+    '/api/linkpages/:slug/assets/:name',
+    (req, res, next) => {
+      if (!isLinkPageSlug(req.params.slug)) return sendApiError(res, 400, 'BAD_REQUEST', 'slug must be lowercase letters, numbers and dashes');
+      if (!isLinkPageAssetName(req.params.name)) return sendApiError(res, 400, 'BAD_REQUEST', 'the file name must end .png, .jpg, .webp or .gif');
+      return rawImage(req, res, (error?: unknown) => {
+        if ((error as { type?: string } | undefined)?.type === 'entity.too.large') return sendApiError(res, 413, 'BAD_REQUEST', 'the picture is too large');
+        return error ? next(error) : next();
+      });
+    },
+    async (req, res) => {
+      const bytes = Buffer.isBuffer(req.body) ? req.body : Buffer.alloc(0);
+      try {
+        return res.json(await linkpage.putAsset(req.params.slug!, req.params.name!, bytes, req.header('content-type') ?? ''));
+      } catch (error) {
+        return fail(res, error);
+      }
+    },
+  );
+
+  app.get('/api/linkpages/:slug/assets/:name', async (req, res) => {
+    if (!isLinkPageSlug(req.params.slug)) return sendApiError(res, 400, 'BAD_REQUEST', 'slug must be lowercase letters, numbers and dashes');
+    try {
+      const asset = await linkpage.asset(req.params.slug, req.params.name);
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      res.setHeader('Content-Security-Policy', "default-src 'none'; sandbox");
+      return res.type(asset.contentType).send(asset.bytes);
+    } catch (error) {
+      return fail(res, error);
+    }
+  });
+
+  app.post('/api/linkpages/:slug/events', async (req, res) => {
+    if (!isLinkPageSlug(req.params.slug)) return sendApiError(res, 400, 'BAD_REQUEST', 'slug must be lowercase letters, numbers and dashes');
+    try {
+      return res.json(await linkpage.recordEvent(req.params.slug, req.body));
     } catch (error) {
       return fail(res, error);
     }

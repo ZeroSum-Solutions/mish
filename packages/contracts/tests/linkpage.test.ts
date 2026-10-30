@@ -133,3 +133,18 @@ describe('parseLinkPageEvent', () => {
     expect(parseLinkPageEvent({ kind: 'click', slug: 'sam', block: 'b', index: -1 }, now).ok).toBe(false);
   });
 });
+
+describe('asset names and publish requests', () => {
+  it('accepts plain picture names and refuses paths, hidden files and other types', () => {
+    for (const ok of ['avatar.png', 'My_photo-2.JPG', 'a.webp', 'b.gif']) expect(isLinkPageAssetName(ok)).toBe(true);
+    for (const bad of ['../a.png', 'a/b.png', '.hidden.png', 'a.svg', 'a.png.exe', 'a', '']) expect(isLinkPageAssetName(bad)).toBe(false);
+  });
+
+  it('keeps only the origin of the public address and checks the track base', () => {
+    expect(parseLinkPagePublishRequest(undefined)).toEqual({ ok: true, value: {} });
+    const got = parseLinkPagePublishRequest({ origin: 'https://links.example.com/x?y=1', trackBase: 'https://t.example.com/go' });
+    expect(got.ok && got.value).toEqual({ origin: 'https://links.example.com', trackBase: 'https://t.example.com/go' });
+    expect(parseLinkPagePublishRequest({ origin: 'javascript:alert(1)' }).ok).toBe(false);
+    expect(parseLinkPagePublishRequest([]).ok).toBe(false);
+  });
+});

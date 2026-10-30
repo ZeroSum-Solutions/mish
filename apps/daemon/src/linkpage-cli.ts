@@ -5,6 +5,8 @@
 //   od linkpage list [--json]
 //   od linkpage get <slug> [--json]
 //   od linkpage render <slug> --out <dir> [--origin <url>] [--json]
+//   od linkpage asset <slug> <file> [--name <name>] [--json]
+//   od linkpage publish <slug> [--origin <url>] [--track-base <url>] [--json]
 //   od linkpage delete <slug> [--json]
 //
 // Kept in its own module so it is testable without importing cli.ts (whose SUBCOMMAND_MAP dispatches
@@ -12,15 +14,19 @@
 
 import path from 'node:path';
 import {
+  isLinkPageAssetName,
   isLinkPageSlug,
   parseLinkPageBuildRequest,
+  parseLinkPagePublishRequest,
 } from '@mish/contracts';
 import type {
+  LinkPageAssetResponse,
   LinkPageBuildResponse,
   LinkPageDeleteResponse,
   LinkPageExportResponse,
   LinkPageGetResponse,
   LinkPageListResponse,
+  LinkPagePublishResult,
 } from '@mish/contracts';
 import { isLoopbackHostname } from './http/local-daemon-request.js';
 
@@ -29,6 +35,8 @@ export const LINKPAGE_USAGE = [
   '       od linkpage list [--json]',
   '       od linkpage get <slug> [--json]',
   '       od linkpage render <slug> --out <dir> [--origin <url>] [--json]',
+  '       od linkpage asset <slug> <file> [--name <name>] [--json]',
+  '       od linkpage publish <slug> [--origin <url>] [--track-base <url>] [--json]',
   '       od linkpage delete <slug> [--json]',
 ].join('\n');
 
@@ -44,6 +52,10 @@ Build a creator's link page from the places they already have online, then keep,
   list     List saved pages.
   get      Print one saved page.
   render   Write the site (index.html, llms.txt, links.json, spec.json, assets/) into --out.
+  asset    Upload a picture (png, jpeg, webp or gif, at most 2 MB) that ships with the page; use
+           the printed path (assets/<name>) as options.avatar or in the spec.
+  publish  List the files ready to deploy, with --origin (the public address) and --track-base.
+           Hosting is a later step: nothing is uploaded and 'published' is false.
   delete   Delete a saved page.
 
 Options:
@@ -55,6 +67,8 @@ export interface LinkpageCliOptions {
   fetchImpl?: typeof fetch;
   /** Reads a file, or stdin for `-`. */
   readConfig: (source: string) => Promise<string>;
+  /** Reads a binary file (for `asset`). */
+  readBinary?: (file: string) => Promise<Buffer>;
   /** Writes `bytes` to `<dir>/<relativePath>`, creating folders. */
   writeFile: (dir: string, relativePath: string, bytes: Buffer) => Promise<void>;
 }
@@ -72,10 +86,14 @@ interface Parsed {
   config?: string;
   out?: string;
   origin?: string;
+  trackBase?: string;
+  name?: string;
   daemonUrl?: string;
 }
 
-const VALUE_FLAGS = new Set(['--config', '--out', '--origin', '--daemon-url']);
+const ASSET_TYPES: Record<string, string> = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif' };
+
+const VALUE_FLAGS = new Set(['--config', '--out', '--origin', '--track-base', '--name', '--daemon-url']);
 
 function parseArgs(args: string[]): Parsed | string {
   const parsed: Parsed = { command: args[0] ?? '', positional: [], json: false };
@@ -88,6 +106,8 @@ function parseArgs(args: string[]): Parsed | string {
       if (arg === '--config') parsed.config = value;
       else if (arg === '--out') parsed.out = value;
       else if (arg === '--origin') parsed.origin = value;
+      else if (arg === '--track-base') parsed.trackBase = value;
+      else if (arg === '--name') parsed.name = value;
       else parsed.daemonUrl = value;
     } else if (arg.startsWith('-') && arg !== '-') return `unknown option ${arg}`;
     else parsed.positional.push(arg);
@@ -110,7 +130,7 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
   const { command, positional, json } = parsed;
 
   const needSlug = (): string | null => (positional.length === 1 && isLinkPageSlug(positional[0]) ? positional[0]! : null);
-  let request: { method: string; path: string; body?: unknown };
+  let request: { method: string; path: string; body?: unknown; raw?: { bytes: Buffer; contentType: string } };
   let slug: string | null = null;
   switch (command) {
     case 'build': {
@@ -148,6 +168,30 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
         : { method: command === 'get' ? 'GET' : 'DELETE', path: `/api/linkpages/${slug}` };
       break;
     }
+    case 'asset': {
+      if (positional.length !== 2 || !isLinkPageSlug(positional[0])) return usage('asset needs a slug and a picture file');
+      slug = positional[0]!;
+      const file = positional[1]!;
+      const name = parsed.name ?? path.basename(file);
+      const type = ASSET_TYPES[path.extname(name).toLowerCase()];
+      if (!isLinkPageAssetName(name) || !type) return usage('the picture name must be letters, numbers, dashes or underscores, ending .png, .jpg, .webp or .gif');
+      let bytes: Buffer;
+      try {
+        bytes = await (options.readBinary ?? (async () => { throw new Error('reading files is not available'); }))(file);
+      } catch (error) {
+        return out(1, '', `Could not read the picture: ${error instanceof Error ? error.message : String(error)}\n`);
+      }
+      request = { method: 'PUT', path: `/api/linkpages/${slug}/assets/${encodeURIComponent(name)}`, raw: { bytes, contentType: type } };
+      break;
+    }
+    case 'publish': {
+      slug = needSlug();
+      if (!slug) return usage('publish needs one slug (lowercase letters, numbers and dashes)');
+      const checked = parseLinkPagePublishRequest({ ...(parsed.origin ? { origin: parsed.origin } : {}), ...(parsed.trackBase ? { trackBase: parsed.trackBase } : {}) });
+      if (!checked.ok) return usage(checked.error);
+      request = { method: 'POST', path: `/api/linkpages/${slug}/publish`, body: checked.value };
+      break;
+    }
     default:
       return usage(`unknown command "${command}"`);
   }
@@ -162,7 +206,9 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
       method: request.method,
       redirect: 'error',
       signal: AbortSignal.timeout(command === 'build' ? 300_000 : 30_000),
-      ...(request.body === undefined ? {} : { headers: { 'content-type': 'application/json' }, body: JSON.stringify(request.body) }),
+      ...(request.raw
+        ? { headers: { 'content-type': request.raw.contentType }, body: new Uint8Array(request.raw.bytes) }
+        : request.body === undefined ? {} : { headers: { 'content-type': 'application/json' }, body: JSON.stringify(request.body) }),
     });
     const body: unknown = await response.json().catch(() => null);
     if (!response.ok) {
@@ -198,6 +244,14 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
       case 'get': {
         const { page } = body as LinkPageGetResponse;
         return out(0, `${page.slug}: ${page.spec.profile.name}\n${page.spec.profile.headline ? `${page.spec.profile.headline}\n` : ''}${page.spec.blocks.length} blocks, updated ${page.updatedAt}\n`);
+      }
+      case 'asset': {
+        const asset = body as LinkPageAssetResponse;
+        return out(0, `Uploaded ${asset.name} (${asset.bytes} bytes). Use "${asset.path}" as the avatar or in the spec.\n`);
+      }
+      case 'publish': {
+        const result = body as LinkPagePublishResult;
+        return out(0, `${result.files.length} files ready to deploy${result.url ? ` at ${result.url}` : ''} (not published: no host is connected yet)\n${result.files.map((f) => `  ${f}`).join('\n')}\n`);
       }
       default: {
         const { slug: gone } = body as LinkPageDeleteResponse;

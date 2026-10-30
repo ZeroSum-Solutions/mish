@@ -6,10 +6,14 @@
 import { buildPage, linksJson, llmsTxt, renderPage } from '@mish/linkpage';
 import type { BuildOptions, Llm, PageSpec } from '@mish/linkpage';
 import { checkPage } from '@mish/linkpage';
-import { parseLinkPageSpec } from '@mish/contracts';
+import { LINKPAGE_ASSET_MAX_BYTES, LINKPAGE_ASSET_TYPES, isLinkPageAssetName, parseLinkPageSpec } from '@mish/contracts';
 import type {
   LinkPageBuildRequest,
+  LinkPageAssetResponse,
   LinkPageBuildResponse,
+  LinkPageEventResponse,
+  LinkPagePublishRequest,
+  LinkPagePublishResult,
   LinkPageExportFile,
   LinkPageExportResponse,
   LinkPageRecord,
@@ -17,6 +21,7 @@ import type {
   LinkPageSummary,
   LinkPagePutRequest,
 } from '@mish/contracts';
+import { recordLinkPageEvent } from './events.js';
 import { createLoginFetches } from './login.js';
 import type { LinkPageLoginProvider } from './login.js';
 import type { LinkPageFetch } from './safe-fetch.js';
@@ -39,6 +44,7 @@ export interface LinkPageServiceDeps {
   /** Called per build, so a model that appears (a key set, `claude` installed) is picked up. */
   resolveLlm: () => Llm | undefined;
   login?: LinkPageLoginProvider | undefined;
+  now?: () => string;
 }
 
 export interface LinkPageService {
@@ -47,8 +53,21 @@ export interface LinkPageService {
   get(slug: string): Promise<LinkPageRecord>;
   put(slug: string, request: LinkPagePutRequest): Promise<LinkPageRecord>;
   delete(slug: string): Promise<void>;
-  render(slug: string, options?: { origin?: string }): Promise<string>;
-  export(slug: string, options?: { origin?: string }): Promise<LinkPageExportResponse>;
+  render(slug: string, options?: { origin?: string; trackBase?: string }): Promise<string>;
+  export(slug: string, options?: { origin?: string; trackBase?: string }): Promise<LinkPageExportResponse>;
+  publish(slug: string, request?: LinkPagePublishRequest): Promise<LinkPagePublishResult>;
+  putAsset(slug: string, name: string, bytes: Buffer, contentType: string): Promise<LinkPageAssetResponse>;
+  asset(slug: string, name: string): Promise<{ bytes: Buffer; contentType: string }>;
+  recordEvent(slug: string, body: unknown): Promise<LinkPageEventResponse>;
+}
+
+/** The picture formats we accept, told apart by their first bytes rather than the header alone. */
+export function sniffImageType(bytes: Buffer): (typeof LINKPAGE_ASSET_TYPES)[number] | null {
+  if (bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'image/png';
+  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+  if (bytes.length >= 12 && bytes.toString('latin1', 0, 4) === 'RIFF' && bytes.toString('latin1', 8, 12) === 'WEBP') return 'image/webp';
+  if (bytes.length >= 6 && ['GIF87a', 'GIF89a'].includes(bytes.toString('latin1', 0, 6))) return 'image/gif';
+  return null;
 }
 
 /** A spec from outside (a PUT, a hand-edited file) is shape-checked, then cleaned by the engine. */
@@ -133,7 +152,7 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
     },
 
     async render(slug, options = {}) {
-      return renderPage(specOf(await must(slug)), { machine: true, origin: options.origin ?? '' });
+      return renderPage(specOf(await must(slug)), { machine: true, origin: options.origin ?? '', trackBase: options.trackBase ?? '' });
     },
 
     async export(slug, options = {}) {
@@ -141,7 +160,7 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
       const origin = options.origin ?? '';
       const file = (path: string, contentType: string, content: string): LinkPageExportFile => ({ path, contentType, encoding: 'utf8', content });
       const files: LinkPageExportFile[] = [
-        file('index.html', 'text/html; charset=utf-8', renderPage(spec, { machine: true, origin })),
+        file('index.html', 'text/html; charset=utf-8', renderPage(spec, { machine: true, origin, trackBase: options.trackBase ?? '' })),
         file('llms.txt', TEXT, llmsTxt(spec, { origin })),
         file('links.json', 'application/json', `${JSON.stringify(linksJson(spec, { origin }), null, 2)}\n`),
         file('spec.json', 'application/json', `${JSON.stringify(spec, null, 2)}\n`),
@@ -150,6 +169,44 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
         files.push({ path: `assets/${asset.name}`, contentType: assetType(asset.name), encoding: 'base64', content: asset.bytes.toString('base64') });
       }
       return { slug, files };
+    },
+
+    async publish(slug, request = {}) {
+      const exported = await this.export(slug, request);
+      return {
+        slug,
+        // No host yet: this is the file list that would be deployed, not a deployment.
+        published: false,
+        ...(request.origin ? { url: `${request.origin}/${slug}` } : {}),
+        files: exported.files.map((f) => f.path),
+        publishedAt: (deps.now ?? (() => new Date().toISOString()))(),
+      };
+    },
+
+    async putAsset(slug, name, bytes, contentType) {
+      if (!isLinkPageAssetName(name)) throw new LinkPageError('BAD_REQUEST', 400, 'the file name must be letters, numbers, dashes or underscores, ending .png, .jpg, .webp or .gif');
+      if (bytes.length === 0) throw new LinkPageError('BAD_REQUEST', 400, 'the picture is empty');
+      if (bytes.length > LINKPAGE_ASSET_MAX_BYTES) throw new LinkPageError('BAD_REQUEST', 413, `the picture is larger than ${LINKPAGE_ASSET_MAX_BYTES / 1024 / 1024} MB`);
+      const sniffed = sniffImageType(bytes);
+      if (!sniffed || !(LINKPAGE_ASSET_TYPES as readonly string[]).includes(contentType.split(';')[0]!.trim().toLowerCase()) || sniffed !== contentType.split(';')[0]!.trim().toLowerCase()) {
+        throw new LinkPageError('BAD_REQUEST', 415, 'only png, jpeg, webp and gif pictures are accepted, and the type must match the file');
+      }
+      if (assetType(name) !== sniffed) throw new LinkPageError('BAD_REQUEST', 400, 'the file extension must match the picture type');
+      await store.putAsset(slug, name, bytes);
+      return { slug, name, path: `assets/${name}`, contentType: sniffed, bytes: bytes.length };
+    },
+
+    async asset(slug, name) {
+      const found = isLinkPageAssetName(name) ? await store.asset(slug, name) : null;
+      if (!found) throw new LinkPageError('NOT_FOUND', 404, `no picture "${name}"`);
+      return { bytes: found.bytes, contentType: assetType(name) };
+    },
+
+    async recordEvent(slug, body) {
+      await must(slug);
+      const outcome = await recordLinkPageEvent(store, slug, body, deps.now);
+      if (!outcome.ok) throw new LinkPageError('BAD_REQUEST', 400, outcome.error);
+      return outcome.response;
     },
   };
 }

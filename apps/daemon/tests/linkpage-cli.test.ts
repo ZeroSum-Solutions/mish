@@ -9,13 +9,14 @@ import { describe, expect, it } from 'vitest';
 
 import { runLinkpageCli } from '../src/linkpage-cli.js';
 
-interface Call { method: string; url: string; body: unknown }
+interface Call { method: string; url: string; body: unknown; contentType?: string }
 
 function harness(answers: Array<{ status: number; body: unknown }>, config = '') {
   const calls: Call[] = [];
   const written: Array<{ dir: string; rel: string; text: string }> = [];
   const fetchImpl = (async (url: URL, init: RequestInit) => {
-    calls.push({ method: String(init.method), url: url.href, body: init.body ? JSON.parse(String(init.body)) : undefined });
+    const contentType = (init.headers as Record<string, string> | undefined)?.['content-type'];
+    calls.push({ method: String(init.method), url: url.href, body: init.body instanceof Uint8Array ? init.body : init.body ? JSON.parse(String(init.body)) : undefined, ...(contentType ? { contentType } : {}) });
     const answer = answers.shift()!;
     return new Response(JSON.stringify(answer.body), { status: answer.status });
   }) as unknown as typeof fetch;
@@ -25,6 +26,10 @@ function harness(answers: Array<{ status: number; body: unknown }>, config = '')
     readConfig: async (source: string) => {
       if (source === 'missing.json') throw new Error('ENOENT');
       return config;
+    },
+    readBinary: async (file: string) => {
+      if (file === 'missing.png') throw new Error('ENOENT');
+      return Buffer.from([0x89, 0x50, 0x4e, 0x47]);
     },
     writeFile: async (dir: string, rel: string, bytes: Buffer) => { written.push({ dir, rel, text: bytes.toString('utf8') }); },
   };
@@ -111,6 +116,32 @@ describe('od linkpage', () => {
     const res = await h.run(['render', 'sam', '--out', 'site']);
     expect(res.code).toBe(1);
     expect(h.written).toEqual([]);
+  });
+
+  it('asset sends the picture as a raw body with its type and prints the path to use', async () => {
+    const h = harness([{ status: 200, body: { slug: 'sam', name: 'me.png', path: 'assets/me.png', contentType: 'image/png', bytes: 4 } }]);
+    const res = await h.run(['asset', 'sam', '/tmp/photos/me.png']);
+    expect(res.code).toBe(0);
+    expect(res.stdout).toMatch(/assets\/me\.png/);
+    expect(h.calls[0]).toMatchObject({ method: 'PUT', url: 'http://127.0.0.1:7456/api/linkpages/sam/assets/me.png', contentType: 'image/png' });
+    expect(Buffer.from(h.calls[0]!.body as Uint8Array)).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
+  });
+
+  it('asset refuses a missing file, a non-picture and a name that is not safe', async () => {
+    const h = harness([]);
+    expect((await h.run(['asset', 'sam', 'missing.png'])).code).toBe(1);
+    expect((await h.run(['asset', 'sam', 'notes.txt'])).code).toBe(2);
+    expect((await h.run(['asset', 'sam', 'a.png', '--name', '../x.png'])).code).toBe(2);
+    expect((await h.run(['asset', 'sam'])).code).toBe(2);
+    expect(h.calls).toEqual([]);
+  });
+
+  it('publish posts origin and track base and lists the files', async () => {
+    const h = harness([{ status: 200, body: { slug: 'sam', published: false, url: 'https://links.example.com/sam', files: ['index.html', 'llms.txt'], publishedAt: 'now' } }]);
+    const res = await h.run(['publish', 'sam', '--origin', 'https://links.example.com/x', '--track-base', 'https://t.example.com/go']);
+    expect(res.stdout).toMatch(/2 files ready to deploy at https:\/\/links\.example\.com\/sam \(not published/);
+    expect(h.calls[0]).toMatchObject({ method: 'POST', body: { origin: 'https://links.example.com', trackBase: 'https://t.example.com/go' } });
+    expect((await h.run(['publish', 'sam', '--origin', 'javascript:x'])).code).toBe(2);
   });
 
   it('only talks to a local daemon', async () => {

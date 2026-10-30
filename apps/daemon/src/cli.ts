@@ -1190,10 +1190,11 @@ function printRootHelp() {
       Install and manage Mish packs: a private folder or .zip that restores
       catalogues, kits, skills, design systems and MCP servers (Settings → Packs).
 
-  od linkpage <build|list|get|render|delete> [args]
+  od linkpage <build|list|get|render|asset|publish|delete> [args]
       Build a creator's link page from the places they already have online,
       keep it, and write it out as a site (index.html, llms.txt, links.json).
       'od linkpage build --config <file|->' takes the request as JSON.
+      'od linkpage asset <slug> <file>' uploads a picture; 'publish' lists the deploy files.
 
   od automation <list|get|create|update|run|runs|pause|resume|delete> [args]
       Drive the Automations surface headlessly. Same store as the UI's
@@ -13006,6 +13007,7 @@ async function runLinkpage(args) {
         process.stdin.on('error', reject);
       });
     },
+    readBinary: (file) => readFile(file),
     writeFile: async (dir, relativePath, bytes) => {
       const target = nodePath.resolve(dir, relativePath);
       await mkdir(nodePath.dirname(target), { recursive: true });

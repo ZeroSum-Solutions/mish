@@ -192,13 +192,46 @@ export interface LinkPageExportResponse {
   files: LinkPageExportFile[];
 }
 
-/** The result of publishing a page to a host. Reserved for the publish step; no route returns it yet. */
+/**
+ * `POST /api/linkpages/:slug/publish` body. Both fields are optional.
+ * `origin` is the public address the page will live at; `trackBase` sends each link click through
+ * `<trackBase>/<slug>/<block>/<index>` so a host can count it.
+ */
+export interface LinkPagePublishRequest {
+  origin?: string;
+  trackBase?: string;
+}
+
+/**
+ * The result of publishing a page. Hosting is a later step, so today `published` is false and `files`
+ * is the list of paths ready to deploy; `url` is the address the page will have under `origin`.
+ */
 export interface LinkPagePublishResult {
   slug: string;
   published: boolean;
   url?: string;
   files: string[];
   publishedAt: string;
+}
+
+/** `PUT /api/linkpages/:slug/assets/:name`: a picture that ships with the page. */
+export const LINKPAGE_ASSET_TYPES = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'] as const;
+export const LINKPAGE_ASSET_MAX_BYTES = 2 * 1024 * 1024;
+export const LINKPAGE_ASSET_NAME_PATTERN = /^[A-Za-z0-9][\w-]{0,60}\.(?:png|jpe?g|webp|gif)$/i;
+
+export interface LinkPageAssetResponse {
+  slug: string;
+  name: string;
+  /** What to put in the spec: `assets/<name>`. */
+  path: string;
+  contentType: string;
+  bytes: number;
+}
+
+/** `POST /api/linkpages/:slug/events` answer. `stored` is false for a dropped bot post. */
+export interface LinkPageEventResponse {
+  ok: true;
+  stored: boolean;
 }
 
 // Events -------------------------------------------------------------------------------------------
@@ -464,6 +497,23 @@ export function parseLinkPagePutRequest(value: unknown): LinkPageParse<LinkPageP
     ok: true,
     value: { spec: spec.value, ...(hasOwn(value, 'connectedAccounts') ? { connectedAccounts: accounts.value } : {}) },
   };
+}
+
+export function isLinkPageAssetName(value: unknown): value is string {
+  return typeof value === 'string' && LINKPAGE_ASSET_NAME_PATTERN.test(value);
+}
+
+export function parseLinkPagePublishRequest(value: unknown): LinkPageParse<LinkPagePublishRequest> {
+  if (value === undefined || value === null) return { ok: true, value: {} };
+  if (!isRecord(value)) return fail('the request must be an object');
+  const out: LinkPagePublishRequest = {};
+  for (const key of ['origin', 'trackBase'] as const) {
+    if (value[key] === undefined || value[key] === '') continue;
+    const url = httpUrl(value[key]);
+    if (!url) return fail(`${key} must be a web address starting with http or https`);
+    out[key] = key === 'origin' ? new URL(url).origin : url;
+  }
+  return { ok: true, value: out };
 }
 
 /** Checks an event a page sends home. Signup keeps only a plausible address. */
