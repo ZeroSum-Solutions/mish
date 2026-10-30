@@ -90,6 +90,7 @@ test('rendering escapes creator text, can route clicks through a tracker, and sh
   assert.ok(!html.includes('<script>1</script>') && !html.includes('<b>Al</b>'));
   assert.match(html, /href="https:\/\/x\.example\.com\/\?a=1&amp;b=2"/);
   assert.match(html, /name="website"[^>]*class="trap"/);
+  assert.match(renderPage(spec, { origin: 'https://sam.links.example.com' }), /<link rel="canonical" href="https:\/\/sam\.links\.example\.com\/">/);
   assert.match(renderPage(spec, { trackBase: 'https://m.example.com/l' }), /href="https:\/\/m\.example\.com\/l\/a\/link-1\/0"/);
 });
 
@@ -110,4 +111,16 @@ test('a bad post or social address is dropped with a warning instead of failing 
   // A page whose only posts are bad has no posts block at all.
   const none = await buildPage({ sources: [{ connector: 'manual', ref: { name: 'Sam', posts: [{ title: 'x', url: '/p' }] } } as never], options: { slug: 'sam' } });
   assert.ok(!none.spec.blocks.some((b) => b.type === 'posts'));
+});
+
+test('checkPage drops fields it does not know, on blocks and on the theme', () => {
+  const theme = { ...deriveTheme([]), evil: '<script>', palette: { ...deriveTheme([]).palette, x: 1 } } as never;
+  const spec = checkPage({ slug: 'a', profile: { name: 'A' }, theme, blocks: [
+    { type: 'link', label: 'L', url: 'https://x.example.com/', onclick: 'bad()', extra: { a: 1 } },
+    { type: 'text', body: 'hi', style: 'x' },
+  ] } as never);
+  assert.deepEqual(Object.keys(spec.blocks[0] as object).sort(), ['description', 'featured', 'id', 'image_url', 'label', 'type', 'url']);
+  assert.deepEqual(Object.keys(spec.blocks[1] as object).sort(), ['body', 'id', 'type']);
+  assert.ok(!('evil' in spec.theme) && !('x' in spec.theme.palette));
+  assert.deepEqual(Object.keys(spec.theme.fonts.heading).sort(), ['family', 'google', 'kind', 'stack']);
 });

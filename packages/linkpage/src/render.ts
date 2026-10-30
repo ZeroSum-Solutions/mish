@@ -1,5 +1,6 @@
 import { backgroundCss, backgroundHtml, backgroundJs } from './background.ts';
 import { esc, renderBlock } from './blocks.ts';
+import { trackedUrl } from './machine.ts';
 import type { PageSpec, Theme } from './types.ts';
 
 const fontLinks = (theme: Theme): string => {
@@ -43,7 +44,7 @@ b.disabled=true;fetch(f.action,{method:'POST',headers:{'Content-Type':'applicati
 .then(function(r){if(!r.ok)throw 0;f.hidden=true;s.hidden=false;s.textContent='Thank you, you are on the list.'},function(){b.disabled=false;s.hidden=false;s.textContent='Not saved. Please try again.'})})})`;
 
 // opts.trackBase: send each click through `${trackBase}/${slug}/${blockId}/${index}` so it can be counted.
-// opts.origin: the page's public address, used for the canonical link.
+// opts.origin: the address the whole site is served at (its own root, not a path under a shared host), used for the canonical link.
 // opts.machine: the page ships llms.txt and links.json beside it, so say so in the head for agents and crawlers.
 export interface RenderOptions {
   trackBase?: string;
@@ -52,7 +53,7 @@ export interface RenderOptions {
 }
 
 export function renderPage(spec: PageSpec, { trackBase = '', origin = '', machine = false }: RenderOptions = {}): string {
-  const href = (id: string, index: number, target: string): string => (trackBase ? `${trackBase.replace(/\/$/, '')}/${spec.slug}/${id}/${index}` : target);
+  const href = (id: string, index: number, target: string): string => (trackBase ? trackedUrl(trackBase, spec.slug, id, index) : target);
   const { profile, theme } = spec;
   const sameAs = spec.blocks.flatMap((b) => (b.type === 'social' ? b.items.map((i) => i.url) : []));
   const ld = { '@context': 'https://schema.org', '@type': 'ProfilePage', mainEntity: { '@type': 'Person', name: profile.name, description: profile.bio || undefined, image: profile.avatar_url || undefined, url: profile.site_url || undefined, jobTitle: profile.headline || undefined, knowsAbout: profile.themes?.length ? profile.themes : undefined, sameAs } };
@@ -62,7 +63,7 @@ export function renderPage(spec: PageSpec, { trackBase = '', origin = '', machin
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>${esc(profile.name)}</title><meta name="description" content="${esc(profile.bio)}">
-<meta name="theme-color" content="${esc(theme.palette.bg)}">${origin ? `<link rel="canonical" href="${esc(origin)}/${esc(spec.slug)}">` : ''}
+<meta name="theme-color" content="${esc(theme.palette.bg)}">${origin ? `<link rel="canonical" href="${esc(origin.replace(/\/$/, ''))}/">` : ''}
 <meta property="og:title" content="${esc(profile.name)}"><meta property="og:description" content="${esc(profile.bio)}">${profile.avatar_url ? `<meta property="og:image" content="${esc(profile.avatar_url)}">` : ''}
 ${machine ? '<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt"><link rel="alternate" type="application/json" href="links.json" title="Links as JSON">' : ''}
 ${fontLinks(theme)}<style>${css(theme)}${backgroundCss}</style>

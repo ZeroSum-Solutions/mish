@@ -41,6 +41,10 @@ export function signupOf(spec: PageSpec): Signup | null {
   return b ? { endpoint: b.endpoint, method: 'POST', fields: ['email'], kind: 'signup' } : null;
 }
 
+// A path segment in a tracked address: block ids are free text, so they are encoded.
+const seg = (s: string): string => encodeURIComponent(s);
+export const trackedUrl = (trackBase: string, slug: string, block: string, index: number): string => `${trackBase.replace(/\/$/, '')}/${seg(slug)}/${seg(block)}/${index}`;
+
 export interface MachineOptions {
   origin?: string;
   trackBase?: string;
@@ -59,13 +63,13 @@ export interface LinksJson {
 }
 
 export function linksJson(spec: PageSpec, { origin = '', trackBase = '' }: MachineOptions = {}): LinksJson {
-  const track = (i: PageItem): { tracked_url?: string } => (trackBase ? { tracked_url: `${trackBase.replace(/\/$/, '')}/${spec.slug}/${i.block}/${i.index}` } : {});
+  const track = (i: PageItem): { tracked_url?: string } => (trackBase ? { tracked_url: trackedUrl(trackBase, spec.slug, i.block, i.index) } : {});
   return {
     name: spec.profile.name,
     bio: spec.profile.bio,
     avatar_url: spec.profile.avatar_url,
     site_url: spec.profile.site_url,
-    page_url: `${base(origin)}/${spec.slug}`,
+    page_url: `${base(origin)}/`,
     links: pageItems(spec).map((i) => ({ id: i.id, kind: i.kind, label: i.label, url: i.url, description: i.description, ...track(i) })),
     subscribe: signupOf(spec),
     generated_from: 'mish-linkpage',
@@ -73,16 +77,17 @@ export function linksJson(spec: PageSpec, { origin = '', trackBase = '' }: Machi
   };
 }
 
-export function llmsTxt(spec: PageSpec, { origin = '' }: Pick<MachineOptions, 'origin'> = {}): string {
+// The site is served at its own root (one subdomain or domain per creator), so `origin` is the whole site and
+// no address carries the slug. With `trackBase`, each link goes through the click counter like the page's own.
+export function llmsTxt(spec: PageSpec, { origin = '', trackBase = '' }: MachineOptions = {}): string {
   const o = base(origin);
   const lines = [`# ${spec.profile.name}`, ''];
   if (spec.profile.bio) lines.push(`> ${spec.profile.bio.replace(/\s+/g, ' ')}`, '');
   lines.push('## Links', '');
-  for (const i of pageItems(spec)) lines.push(`- [${i.label.replace(/[[\]]/g, '')}](${i.url})${i.description ? `: ${i.description.replace(/\s+/g, ' ')}` : ''}`);
+  for (const i of pageItems(spec)) lines.push(`- [${i.label.replace(/[[\]]/g, '')}](${trackBase ? trackedUrl(trackBase, spec.slug, i.block, i.index) : i.url})${i.description ? `: ${i.description.replace(/\s+/g, ' ')}` : ''}`);
   lines.push('', '## For agents', '');
-  lines.push(`- JSON: ${o}/${spec.slug}/links.json lists every link as structured data.`);
-  lines.push(`- MCP: ${o}/${spec.slug}/mcp is a Model Context Protocol endpoint (streamable HTTP) with tools to read the profile and links.`);
+  lines.push(`- JSON: ${o}/links.json lists every link as structured data.`);
   const sub = signupOf(spec);
-  if (sub) lines.push(`- Subscribe: POST {"email": "..."} to ${sub.endpoint}, or call the subscribe tool on the MCP endpoint, to join the email list.`);
+  if (sub) lines.push(`- Subscribe: POST {"email": "..."} to ${sub.endpoint} to join the email list.`);
   return `${lines.join('\n')}\n`;
 }

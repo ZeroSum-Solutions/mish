@@ -41,8 +41,11 @@ test('llms.txt has the title, the bio, every link and the agent endpoints, with 
   assert.ok(t.includes('- [Shop](https://studio.example.com/shop): New mugs every Friday'));
   for (const u of ['https://instagram.com/studio', 'https://studio.substack.com/p/first', 'https://studio.substack.com/p/second']) assert.ok(t.includes(u), u);
   assert.ok(t.includes('## For agents'));
-  assert.ok(t.includes(`${ORIGIN}/studio/links.json`));
-  assert.ok(t.includes(`${ORIGIN}/studio/mcp`));
+  // The site is served at its own root (one subdomain per creator), so nothing carries the slug.
+  assert.ok(t.includes(`${ORIGIN}/links.json`));
+  assert.doesNotMatch(t, /\/studio\//);
+  // No route serves MCP yet, so the file must not advertise one.
+  assert.doesNotMatch(t, /mcp/i);
   assert.ok(t.includes('https://links.example.com/api/signup'));
   assert.doesNotMatch(t, /<[a-z]/);
   assert.doesNotMatch(llmsTxt(bare, { origin: ORIGIN }), /Subscribe/);
@@ -51,7 +54,7 @@ test('llms.txt has the title, the bio, every link and the agent endpoints, with 
 test('links.json lists profile, links by kind and the signup; trackBase adds tracked addresses', () => {
   const j = linksJson(spec, { origin: ORIGIN });
   assert.equal(j.name, 'Studio Name');
-  assert.equal(j.page_url, `${ORIGIN}/studio`);
+  assert.equal(j.page_url, `${ORIGIN}/`);
   assert.deepEqual(j.links.map((l) => l.kind), ['link', 'social', 'post', 'post']);
   assert.equal(j.links[0]?.url, 'https://studio.example.com/shop');
   assert.ok(!('tracked_url' in (j.links[0] as object)));
@@ -62,6 +65,17 @@ test('links.json lists profile, links by kind and the signup; trackBase adds tra
   assert.equal(t.links[0]?.tracked_url, `https://links.example.com/go/studio/${spec.blocks[0]?.id}/0`);
   assert.equal(t.links[3]?.tracked_url, `https://links.example.com/go/studio/${spec.blocks[2]?.id}/1`);
   assert.equal(linksJson(bare, { origin: ORIGIN }).subscribe, null);
+});
+
+test('with a trackBase, llms.txt links go through the counter as links.json does', () => {
+  const t = llmsTxt(spec, { origin: ORIGIN, trackBase: 'https://links.example.com/go/' });
+  assert.ok(t.includes(`- [Shop](https://links.example.com/go/studio/${spec.blocks[0]?.id}/0)`));
+  assert.ok(!t.includes('](https://studio.example.com/shop)'));
+});
+
+test('tracked paths encode block ids', () => {
+  const odd = { ...spec, blocks: [{ type: 'link' as const, id: 'a b/c?', label: 'L', url: 'https://x.example.com/', description: '', image_url: '', featured: false }] };
+  assert.equal(linksJson(odd, { trackBase: 'https://t.example.com/go' }).links[0]?.tracked_url, 'https://t.example.com/go/studio/a%20b%2Fc%3F/0');
 });
 
 test('MCP initialize echoes a known protocol version, falls back otherwise, and notifications return null', async () => {
