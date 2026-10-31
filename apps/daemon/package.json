@@ -31,7 +31,7 @@
     "start": "pnpm run build && node dist/cli.js",
     "pretest": "pnpm --filter '@mish/daemon^...' --workspace-concurrency=4 --if-present run build",
     "test": "vitest run -c vitest.config.ts",
-    "typecheck": "pnpm --filter @mish/contracts build && pnpm --filter @mish/registry-protocol build && pnpm --filter @mish/agency-fast-lane build && pnpm --filter @mish/genui-catalog build && pnpm --filter @mish/section-catalog build && tsc -p tsconfig.json --noEmit && node --max-old-space-size=4096 node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit"
+    "typecheck": "pnpm --filter @mish/contracts build && pnpm --filter @mish/registry-protocol build && pnpm --filter @mish/agency-fast-lane build && pnpm --filter @mish/genui-catalog build && pnpm --filter @mish/section-catalog build && pnpm --filter @mish/linkpage build && tsc -p tsconfig.json --noEmit && node --max-old-space-size=4096 node_modules/typescript/bin/tsc -p tsconfig.tests.json --noEmit"
   },
   "dependencies": {
     "@babel/parser": "7.29.3",
@@ -46,6 +46,7 @@
     "@mish/diagnostics": "workspace:*",
     "@mish/genui-catalog": "workspace:*",
     "@mish/launcher-proto": "workspace:*",
+    "@mish/linkpage": "workspace:*",
     "@mish/platform": "workspace:*",
     "@mish/plugin-runtime": "workspace:*",
     "@mish/registry-protocol": "workspace:*",

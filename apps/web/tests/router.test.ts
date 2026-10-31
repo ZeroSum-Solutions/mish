@@ -32,6 +32,13 @@ describe('parseRoute / buildPath (issue #1505)', () => {
     expect(parseRoute('/settings/library')).toEqual({ kind: 'home', view: 'settings' });
   });
 
+  it('round-trips the link pages view', () => {
+    const route = { kind: 'home', view: 'link-pages' } as const;
+    expect(buildPath(route)).toBe('/link-pages');
+    expect(roundTrip(route)).toEqual(route);
+    expect(parseRoute('/link-pages/x')).not.toEqual(route);
+  });
+
   it('parses the home route' , () => {
     expect(parseRoute('/')).toEqual({ kind: 'home', view: 'home' });
     expect(parseRoute('')).toEqual({ kind: 'home', view: 'home' });

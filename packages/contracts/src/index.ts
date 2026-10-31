@@ -12,6 +12,7 @@ export * from './api/attribution.js';
 export * from './api/amrWallet.js';
 export * from './api/amr-auth.js';
 export * from './api/automations.js';
+export * from './api/linkpage.js';
 export * from './api/artifacts.js';
 export * from './api/artifact-lint.js';
 export * from './api/deliverable-syntax.js';

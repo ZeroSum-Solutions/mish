@@ -752,15 +752,15 @@ export class ComposioConnectorProvider {
     }
   }
 
-  private async getValidatedConnectedAccount(definition: ConnectorCatalogDefinition, providerConnectionId: string, expectedAuthConfigId: string | undefined, signal?: AbortSignal): Promise<ComposioConnectedAccountResponse> {
+  private async getValidatedConnectedAccount(definition: ConnectorCatalogDefinition, providerConnectionId: string, expectedAuthConfigId: string | undefined, signal?: AbortSignal, options: { requireOwner?: boolean } = {}): Promise<ComposioConnectedAccountResponse> {
     const connectorId = definition.id;
     const response = await this.requestJson<ComposioConnectedAccountResponse>(`/api/v3/connected_accounts/${encodeURIComponent(providerConnectionId)}`, {
       method: 'GET',
       ...(signal === undefined ? {} : { signal }),
     });
     const providerUserId = getString(response.user_id) ?? getString(response.userId);
-    if (providerUserId && providerUserId !== this.getUserId()) {
-      throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', 'Composio account belongs to a different user', 403, { connectorId });
+    if ((providerUserId && providerUserId !== this.getUserId()) || (options.requireOwner && !providerUserId)) {
+      throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', providerUserId ? 'Composio account belongs to a different user' : 'Composio account has no confirmed user', 403, { connectorId });
     }
     const providerAuthConfigId = getString(response.auth_config?.id);
     if (expectedAuthConfigId && providerAuthConfigId && expectedAuthConfigId !== providerAuthConfigId) {
@@ -813,6 +813,36 @@ export class ComposioConnectorProvider {
       ...(getString(response.log_id) ?? getString(response.logId) ? { providerExecutionId: (getString(response.log_id) ?? getString(response.logId))! } : {}),
       ...(toBoundedJsonValue(response.session_info ?? response.sessionInfo) !== null ? { sessionInfo: toBoundedJsonValue(response.session_info ?? response.sessionInfo) } : {}),
     };
+  }
+
+  /**
+   * Sends one HTTP request to the connector's own API as the connected account (Composio's proxy
+   * endpoint), so a caller can read what the account's login allows without holding its token. The
+   * account is checked against the connector first: same user, same auth config, same toolkit.
+   * Written against Composio's documented `POST /api/v3/tools/execute/proxy`; not yet run against a
+   * live account.
+   */
+  async proxyRequest(
+    definition: ConnectorCatalogDefinition,
+    providerConnectionId: string,
+    request: { endpoint: string; method: string; headers?: Record<string, string>; body?: unknown },
+    signal?: AbortSignal,
+  ): Promise<{ status: number; data: unknown }> {
+    await this.getValidatedConnectedAccount(definition, providerConnectionId, await this.getAuthConfigId(definition, signal), signal, { requireOwner: true });
+    const parameters = Object.entries(request.headers ?? {}).map(([name, value]) => ({ name, value, type: 'header' }));
+    const response = await this.requestJson<{ status?: unknown; data?: unknown; successful?: unknown; error?: unknown }>('/api/v3/tools/execute/proxy', {
+      method: 'POST',
+      body: JSON.stringify({
+        endpoint: request.endpoint,
+        method: request.method.toUpperCase(),
+        connected_account_id: providerConnectionId,
+        ...(parameters.length ? { parameters } : {}),
+        ...(request.body === undefined ? {} : { body: request.body }),
+      }),
+      ...(signal === undefined ? {} : { signal }),
+    });
+    const status = typeof response.status === 'number' ? response.status : response.successful === false ? 502 : 200;
+    return { status, data: response.data ?? null };
   }
 
   private async getAuthConfigId(definition: ConnectorCatalogDefinition, signal?: AbortSignal): Promise<string | undefined> {

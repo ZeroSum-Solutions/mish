@@ -2051,6 +2051,15 @@ export function EntryNavRail({
               <Icon name="sparkles" size={16} />
             </NavButton>
             <NavButton
+              active={view === 'link-pages'}
+              ariaLabel={t('entry.navLinkPages')}
+              label={t('entry.navLinkPages')}
+              onClick={() => selectView('link-pages')}
+              testId="entry-nav-link-pages"
+            >
+              <Icon name="link" size={16} />
+            </NavButton>
+            <NavButton
               active={view === 'plugins'}
               ariaLabel={t('entry.navPlugins')}
               label={t('entry.navPlugins')}
@@ -2122,6 +2131,15 @@ export function EntryNavRail({
               testId="entry-nav-catalog"
             >
               <Icon name="sparkles" size={16} />
+            </NavButton>
+            <NavButton
+              active={view === 'link-pages'}
+              ariaLabel={t('entry.navLinkPages')}
+              label={t('entry.navLinkPages')}
+              onClick={() => selectView('link-pages')}
+              testId="entry-nav-link-pages"
+            >
+              <Icon name="link" size={16} />
             </NavButton>
             <NavButton
               active={view === 'plugins'}

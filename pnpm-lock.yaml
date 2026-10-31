@@ -126,6 +126,9 @@ importers:
       '@mish/launcher-proto':
         specifier: workspace:*
         version: link:../../packages/launcher-proto
+      '@mish/linkpage':
+        specifier: workspace:*
+        version: link:../../packages/linkpage
       '@mish/platform':
         specifier: workspace:*
         version: link:../../packages/platform
@@ -816,6 +819,15 @@ importers:
       vitest:
         specifier: 4.1.12
         version: 4.1.12(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(jsdom@29.1.1(@noble/hashes@1.8.0))(vite@7.3.7(@types/node@24.12.2)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.22.3)(yaml@2.9.0))
+
+  packages/linkpage:
+    devDependencies:
+      '@types/node':
+        specifier: 24.12.2
+        version: 24.12.2
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   packages/metatool:
     dependencies:

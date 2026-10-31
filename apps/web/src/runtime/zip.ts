@@ -5,7 +5,8 @@
 
 export interface ZipEntry {
   path: string;
-  content: string;
+  /** Text (written as UTF-8) or raw bytes, such as a picture. */
+  content: string | Uint8Array;
 }
 
 const CRC_TABLE: number[] = (() => {
@@ -51,7 +52,7 @@ export function buildZip(entries: ZipEntry[]): Blob {
 
   for (const entry of entries) {
     const nameBytes = enc.encode(entry.path);
-    const dataBytes = enc.encode(entry.content);
+    const dataBytes = typeof entry.content === 'string' ? enc.encode(entry.content) : entry.content;
     const crc = crc32(dataBytes);
     const size = dataBytes.length;
     // General-purpose bit 11 (0x0800) signals UTF-8 filenames so readers

@@ -40,6 +40,7 @@ import { IMAGE_MODELS } from './media/models.js';
 import { runAgencyConfigCli } from './agency-config-cli.js';
 import { runCultAddCli, runCultShowCli } from './cult-add-cli.js';
 import { runCultPreviewCli } from './cult-preview-cli.js';
+import { runLinkpageCli } from './linkpage-cli.js';
 import { COMPONENTS_SEARCH_HELP, COMPONENTS_USAGE, runComponentsCli, runComponentsSearchCli } from './components-cli.js';
 import { runPackCli } from './packs/pack-cli.js';
 import { runMishPacksCli } from './mish-packs/cli.js';
@@ -504,6 +505,7 @@ const SUBCOMMAND_MAP = {
   workspace: runWorkspace,
   automation: runAutomation,
   automations: runAutomation,
+  linkpage: runLinkpage,
   agency: runAgency,
   'build-on-brand': runBuildOnBrand,
   'design-index': runDesignIndex,
@@ -1187,6 +1189,12 @@ function printRootHelp() {
   od packs <install|list|remove> [args]
       Install and manage Mish packs: a private folder or .zip that restores
       catalogues, kits, skills, design systems and MCP servers (Settings → Packs).
+
+  od linkpage <build|list|get|render|asset|publish|delete> [args]
+      Build a creator's link page from the places they already have online,
+      keep it, and write it out as a site (index.html, llms.txt, links.json).
+      'od linkpage build --config <file|->' takes the request as JSON.
+      'od linkpage asset <slug> <file>' uploads a picture; 'publish' lists the deploy files.
 
   od automation <list|get|create|update|run|runs|pause|resume|delete> [args]
       Drive the Automations surface headlessly. Same store as the UI's
@@ -12981,6 +12989,36 @@ async function runCultAdd(args, run = runCultAddCli) {
  * without importing this file); this wrapper owns only the process effects.
  * Function declaration so the top-of-file SUBCOMMAND_MAP dispatch can reach it.
  */
+/**
+ * `od linkpage …` — thin adapter over `linkpage-cli.ts`: process effects only (stdin, files, exit).
+ */
+async function runLinkpage(args) {
+  const { mkdir, readFile, writeFile } = await import('node:fs/promises');
+  const nodePath = await import('node:path');
+  const result = await runLinkpageCli(args, {
+    resolveBaseUrl: (daemonUrl) => cliDaemonBaseUrl(daemonUrl ? { 'daemon-url': daemonUrl } : {}),
+    readConfig: async (source) => {
+      if (source !== '-') return await readFile(source, 'utf8');
+      return await new Promise((resolve, reject) => {
+        let buf = '';
+        process.stdin.setEncoding('utf8');
+        process.stdin.on('data', (chunk) => { buf += chunk; });
+        process.stdin.on('end', () => resolve(buf));
+        process.stdin.on('error', reject);
+      });
+    },
+    readBinary: (file) => readFile(file),
+    writeFile: async (dir, relativePath, bytes) => {
+      const target = nodePath.resolve(dir, relativePath);
+      await mkdir(nodePath.dirname(target), { recursive: true });
+      await writeFile(target, bytes);
+    },
+  });
+  if (result.stdout) process.stdout.write(result.stdout);
+  if (result.stderr) process.stderr.write(result.stderr);
+  process.exitCode = result.code;
+}
+
 async function runComponents(args) {
   // One `od components` command: rank|list is the kit-aware search (D17), ledger is R13.1.
   if (!args.length || args[0] === 'help' || (args.length === 1 && (args[0] === '--help' || args[0] === '-h'))) {

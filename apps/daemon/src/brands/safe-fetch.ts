@@ -170,11 +170,13 @@ export async function fetchExternalBrandAsset(
     // SSRF stop is the pinned dispatcher below; this is a cheap URL-level
     // pre-check (protocol, literal private IPs, redirect target).
     await assertPublicBrandUrl(target);
+    // `dispatcher` is undici's extension of RequestInit; packages that typecheck this file
+    // without undici's global types (e2e) do not declare it, so the init is typed as a plain one.
     const res = await fetch(target, {
       ...init,
       redirect: 'manual',
-      dispatcher: brandAssetDispatcher as unknown as NonNullable<RequestInit['dispatcher']>,
-    });
+      dispatcher: brandAssetDispatcher,
+    } as unknown as RequestInit);
     const location =
       res.status >= 300 && res.status < 400 ? res.headers.get('location') : null;
     if (!location) return res;

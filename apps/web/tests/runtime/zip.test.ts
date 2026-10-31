@@ -127,4 +127,14 @@ describe('buildZip', () => {
     expect(view.getUint32(12, true)).toBe(0);
     expect(view.getUint32(16, true)).toBe(0);
   });
+
+  it('stores binary entries byte for byte, so a picture survives', async () => {
+    const png = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0, 255, 128, 1]);
+    const bytes = await readBytes(buildZip([{ path: 'assets/a.png', content: png }, { path: 'b.txt', content: 'é' }]));
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+    expect(view.getUint32(14, true)).toBe(crc32(png));
+    expect(view.getUint32(18, true)).toBe(png.length);
+    const dataStart = 30 + 'assets/a.png'.length;
+    expect(Array.from(bytes.slice(dataStart, dataStart + png.length))).toEqual(Array.from(png));
+  });
 });
