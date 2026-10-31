@@ -26,14 +26,40 @@ function secretsMatch(actual: string, expected: string): boolean {
   return actualBytes.length === expectedBytes.length && timingSafeEqual(actualBytes, expectedBytes);
 }
 
-function decodeBasicCredentials(value: string): { username: string; password: string } | null {
-  const match =
-    /^Basic[\t ]+((?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?)[\t ]*$/i.exec(
-      value,
-    );
-  if (!match?.[1]) return null;
+const BASE64_PAYLOAD_RE = /^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/;
 
-  const encoded = match[1];
+function isBlank(code: number): boolean {
+  return code === 0x20 || code === 0x09;
+}
+
+/**
+ * Split `<scheme><SP|HTAB>+<token><SP|HTAB>*` in one pass. The previous
+ * regex let CodeQL flag the blank runs around the token as polynomial
+ * (js/polynomial-redos) because adjacent quantifiers could split a run of
+ * blanks in many ways; scanning by index is linear by construction. The
+ * scheme match is case-insensitive and the token must be non-empty with no
+ * whitespace inside.
+ */
+function splitAuthorization(value: string, scheme: string): string | null {
+  const n = value.length;
+  if (n <= scheme.length || value.slice(0, scheme.length).toLowerCase() !== scheme) return null;
+
+  let start = scheme.length;
+  if (!isBlank(value.charCodeAt(start))) return null;
+  while (start < n && isBlank(value.charCodeAt(start))) start += 1;
+
+  let end = n;
+  while (end > start && isBlank(value.charCodeAt(end - 1))) end -= 1;
+  if (end === start) return null;
+
+  const token = value.slice(start, end);
+  return /\s/.test(token) ? null : token;
+}
+
+function decodeBasicCredentials(value: string): { username: string; password: string } | null {
+  const encoded = splitAuthorization(value, 'basic');
+  if (!encoded || !BASE64_PAYLOAD_RE.test(encoded)) return null;
+
   const bytes = Buffer.from(encoded, 'base64');
   if (bytes.toString('base64') !== encoded) return null;
 
@@ -51,8 +77,8 @@ function decodeBasicCredentials(value: string): { username: string; password: st
 export function apiTokenAuthorizationMatches(value: unknown, apiToken: string): boolean {
   if (typeof value !== 'string' || apiToken.length === 0) return false;
 
-  const bearer = /^Bearer[\t ]+(\S+)[\t ]*$/i.exec(value);
-  if (bearer?.[1]) return secretsMatch(bearer[1], apiToken);
+  const bearer = splitAuthorization(value, 'bearer');
+  if (bearer) return secretsMatch(bearer, apiToken);
 
   const basic = decodeBasicCredentials(value);
   return basic !== null

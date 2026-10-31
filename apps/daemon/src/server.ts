@@ -121,6 +121,7 @@ export {
   isStaticSpaFallbackRequest,
   resolveStaticSpaFallbackPath,
 } from './static-spa.js';
+import { createApiRateLimiter } from './http/api-rate-limit.js';
 import {
   createCompatApiError,
   createCompatApiErrorResponse,
@@ -1308,6 +1309,8 @@ import {
   isSandboxDesignSystemFontRead,
   isSandboxPluginFontRead,
   isZeroConfigClipperLibraryRequest,
+  rebindingAllowedHosts,
+  requestHostRefusal,
 } from './origin-validation.js';
 import { registerLibraryRoutes } from './routes/library.js';
 import {
@@ -3500,6 +3503,27 @@ export async function startServer({
   }
   const app = express();
   installRouteRegistrationGuard(app);
+  // First in the chain, so the body parsers, the API-token and SPA Basic-auth
+  // checks and the host guards below all sit behind the per-peer request
+  // budget (js/missing-rate-limiting).
+  app.use(createApiRateLimiter());
+  // DNS-rebinding guard: every request must name the daemon by a host an
+  // attacker's DNS cannot answer for (see requestHostRefusal). A request that
+  // already carries the API token is authenticated and skips it. It sits before
+  // the body parsers so a refused request never gets its body buffered.
+  const rebindingSafeHosts = rebindingAllowedHosts(extraAllowedOrigins);
+  app.use(['/api', '/artifacts'], (req, res, next) => {
+    if (isApiTokenAuthorization(req.get('authorization'))) return next();
+    const refused = requestHostRefusal(req.headers, host, rebindingSafeHosts);
+    if (!refused) return next();
+    return sendApiError(
+      res,
+      403,
+      'FORBIDDEN',
+      'request host is not allowed; add it to OD_ALLOWED_ORIGINS to reach the daemon by that name',
+      { details: { header: refused } },
+    );
+  });
   // Clipper page captures are self-contained HTML with inlined images plus a
   // Figma IR, which for an image-heavy site (The Economist, news front pages)
   // runs to tens of MB — far past a normal JSON body. Give the ingest route a

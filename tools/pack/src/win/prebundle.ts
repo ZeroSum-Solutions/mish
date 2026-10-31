@@ -30,7 +30,7 @@ export const WIN_PREBUNDLE_RUNTIME_DEPENDENCIES = {
   "gsap": "3.15.0",
   "hyperframes": "0.8.1",
   "node-pty": "1.1.0",
-  "sharp": "0.35.3",
+  "sharp": "0.35.5",
 } as const;
 
 export const WIN_STANDALONE_PREBUNDLE_EXCLUDED_INTERNAL_PACKAGES = [

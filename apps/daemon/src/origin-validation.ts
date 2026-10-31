@@ -362,3 +362,106 @@ export function isZeroConfigClipperLibraryRequest(
     (origin.startsWith('chrome-extension://') || origin.startsWith('moz-extension://'))
   );
 }
+
+/** Headers that can name the host a client asked for (see `requestHostRefusal`). */
+export interface RequestHostHeaders {
+  host?: unknown;
+  'x-od-client-host'?: unknown;
+  'x-forwarded-host'?: unknown;
+}
+
+/**
+ * Hostnames from `OD_ALLOWED_DEV_ORIGINS` (exact names or `*.suffix`
+ * wildcards), the list the web sidecar and Next dev server already accept for
+ * custom development hosts. Malformed entries are skipped.
+ */
+export function configuredAllowedDevHosts(env: NodeJS.ProcessEnv = process.env): string[] {
+  return (env.OD_ALLOWED_DEV_ORIGINS ?? '')
+    .split(',')
+    .map((entry) => entry.trim().toLowerCase())
+    .filter(Boolean)
+    .flatMap((entry) => {
+      if (entry.startsWith('*.')) return [entry];
+      const parsed = parseHostHeader(entry.replace(/^[a-z][a-z0-9+.-]*:\/\//, '').split('/')[0]);
+      return parsed ? [parsed.hostname.toLowerCase()] : [];
+    });
+}
+
+function matchesAllowedHost(hostname: string, allowed: string): boolean {
+  if (!allowed.startsWith('*.')) return hostname === allowed;
+  const suffix = allowed.slice(1);
+  return hostname.endsWith(suffix) && hostname.length > suffix.length;
+}
+
+/**
+ * True when `hostHeader` names this daemon by a host that an attacker's DNS
+ * cannot answer for: an IP literal, `localhost` / `*.localhost` (browsers
+ * resolve those to loopback themselves), the configured bind host, or a host
+ * the operator listed in `OD_ALLOWED_ORIGINS` / `OD_ALLOWED_DEV_ORIGINS`. The
+ * port is ignored on purpose: rebinding is defeated by the name, and daemon and
+ * web ports differ between dev, desktop and packaged runs.
+ */
+export function isRebindingSafeHost(
+  hostHeader: unknown,
+  bindHost: string,
+  allowedHosts: string[],
+): boolean {
+  // A Host value is `name[:port]`. WHATWG URL parsing would also accept userinfo,
+  // a path or a list (`a@127.0.0.1`, `127.0.0.1/x, evil.example`) and then read
+  // only one part, so refuse anything that is not a bare authority first.
+  if (/[\s/\\@?#,]/.test(String(headerValue(hostHeader) ?? '').trim())) return false;
+  const parsed = parseHostHeader(hostHeader);
+  if (!parsed) return false;
+  const hostname = parsed.hostname.toLowerCase().replace(/\.$/, '');
+  if (!hostname) return false;
+  if (hostname === 'localhost' || hostname.endsWith('.localhost')) return true;
+  if (isIpLiteralHostname(hostname)) return true;
+  const bind = parseHostHeader(bindHost)?.hostname.toLowerCase().replace(/\.$/, '');
+  if (bind && hostname === bind) return true;
+  return allowedHosts.some((allowed) => matchesAllowedHost(hostname, allowed));
+}
+
+/** Hostnames the operator allowed through `OD_ALLOWED_ORIGINS` and `OD_ALLOWED_DEV_ORIGINS`. */
+export function rebindingAllowedHosts(
+  extraAllowedOrigins: string[],
+  env: NodeJS.ProcessEnv = process.env,
+): string[] {
+  const originHosts = configuredAllowedHosts(extraAllowedOrigins.filter((origin) => /^https?:\/\//i.test(origin)))
+    .flatMap((host) => {
+      const parsed = parseHostHeader(host);
+      return parsed ? [parsed.hostname.toLowerCase()] : [];
+    });
+  // The web sidecar's own bind host (OD_HOST) is a name the operator chose; the
+  // sidecar relays it to the daemon as X-OD-Client-Host.
+  const webBindHost = parseHostHeader(env.OD_HOST)?.hostname.toLowerCase();
+  return [
+    ...new Set([...originHosts, ...configuredAllowedDevHosts(env), ...(webBindHost ? [webBindHost] : [])]),
+  ];
+}
+
+/**
+ * DNS-rebinding guard. A page on `attacker.example` whose name re-resolves to
+ * 127.0.0.1 is same-origin with itself, so its GETs reach the daemon with no
+ * Origin header and, over plain http, no fetch metadata either; they pass the
+ * Origin check. Its Host header (or, through the web sidecar or a dev rewrite
+ * proxy, `X-OD-Client-Host` / `X-Forwarded-Host`) still carries the foreign
+ * name, so every request must name the daemon by a rebinding-safe host.
+ * Returns the refused header's name, or null when the request may proceed.
+ */
+export function requestHostRefusal(
+  headers: RequestHostHeaders,
+  bindHost: string,
+  allowedHosts: string[],
+): string | null {
+  if (!isRebindingSafeHost(headers.host, bindHost, allowedHosts)) return 'host';
+  for (const name of ['x-od-client-host', 'x-forwarded-host'] as const) {
+    const raw = headers[name];
+    if (raw == null) continue;
+    const values = (Array.isArray(raw) ? raw : [raw]).flatMap((value) => String(value).split(','));
+    if (values.some((value) => !isRebindingSafeHost(value.trim(), bindHost, allowedHosts))) {
+      return name;
+    }
+  }
+  return null;
+}
+

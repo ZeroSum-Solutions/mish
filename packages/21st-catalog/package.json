@@ -25,7 +25,7 @@
   "devDependencies": {
     "@mish/contracts": "workspace:*",
     "@types/node": "24.12.2",
-    "sharp": "0.35.3",
+    "sharp": "0.35.5",
     "typescript": "5.9.3"
   },
   "engines": {
