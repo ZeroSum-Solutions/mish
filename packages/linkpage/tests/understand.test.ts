@@ -70,7 +70,7 @@ test('understandPerson trims to the limits, keeps only real offering URLs, and i
     confidence: 'certain',
   });
   const r = defined(await understandPerson({ signals: [], corpus: { pages: [{ url: 'https://s.example.com/', text: 'Potter' }], posts: ['First'], bios: ['Hand made.'] }, llm }));
-  assert.equal(r.headline.length, 70);
+  assert.ok(r.headline.length <= 70 && r.headline.endsWith('…'));
   assert.equal(r.bio.length, 220);
   assert.equal(r.about.length, 600);
   assert.equal(r.themes.length, 6);

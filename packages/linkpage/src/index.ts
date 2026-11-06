@@ -18,3 +18,4 @@ export { styleFromImages } from './vision.ts';
 export { loginNeeds } from './connectors.ts';
 export { EFFECTS } from './background.ts';
 export type * from './types.ts';
+export { clip, captionTitle } from './trim.ts';

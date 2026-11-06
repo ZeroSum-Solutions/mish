@@ -1,3 +1,4 @@
+import { clip } from './trim.ts';
 import type { FetchFn, Llm, Signal } from './types.ts';
 
 // Works out who a creator is from what they have published: their site, their posts and their bios.
@@ -68,11 +69,11 @@ Use ONLY the material in the corpus. Never invent facts, places, dates, awards, 
 If the corpus is thin or unclear, say less and set confidence to "low". Use "high" only when several sources agree.
 Describe the whole person: who they are and what they make or say, not just their newest product.
 Answer with JSON only:
-{"headline":"max 70 chars, who they are","bio":"max 220 chars, plain, avoid first person, about the whole person and what they make or say",
+{"headline":"max 60 chars, who they are, a complete phrase that reads whole","bio":"max 220 chars, plain, avoid first person, about the whole person and what they make or say",
 "about":"max 600 chars","themes":["up to 6 short strings"],"voice":"tone in at most 20 words",
 "offerings":[{"label":"...","url":"optional, only a URL that appears in the corpus"}],"confidence":"high|medium|low"}`;
 
-const text = (v: unknown, max: number): string => String(v ?? '').replace(/\s+/g, ' ').trim().slice(0, max);
+const text = (v: unknown, max: number): string => clip(String(v ?? '').replace(/\s+/g, ' '), max);
 
 export interface Person {
   headline: string;

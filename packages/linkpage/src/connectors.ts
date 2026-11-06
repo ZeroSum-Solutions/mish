@@ -1,3 +1,4 @@
+import { captionTitle } from './trim.ts';
 import type { ColorSignal, Connector, ConnectorFactory, ConnectorOptions, FetchFn, FontSignal, LoginFetch, NeedsLogin, Signal, SignalLink } from './types.ts';
 
 // Profile connectors read what a creator already has online and report it as signals.
@@ -210,7 +211,7 @@ async function instagramApi(login: LoginFetch, handle: string): Promise<Signal> 
     stats: followers(me.followers_count),
     links: [{ url, kind: 'instagram', label: 'Instagram', handle: '@' + user }],
     posts: (media.data || []).map((m: Json) => ({
-      title: String(m.caption || '').split('\n')[0].trim(),
+      title: captionTitle(m.caption),
       url: m.permalink || '',
       image_url: m.thumbnail_url || m.media_url || '',
       published: m.timestamp || '',
@@ -234,7 +235,7 @@ async function tiktokApi(login: LoginFetch, handle: string): Promise<Signal> {
     stats: followers(u.follower_count),
     links: [{ url: u.profile_deep_link || `https://www.tiktok.com/@${handle}`, kind: 'tiktok', label: 'TikTok', handle: '@' + handle }],
     posts: (list.data?.videos || []).map((v: Json) => ({
-      title: String(v.title || '').split('\n')[0].trim(),
+      title: captionTitle(v.title),
       url: v.share_url || '',
       image_url: v.cover_image_url || '',
       published: v.create_time ? new Date(v.create_time * 1000).toISOString() : '',

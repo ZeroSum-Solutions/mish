@@ -1,7 +1,8 @@
+import { clip } from './trim.ts';
 import { blocks, url } from './blocks.ts';
 import type { Block, BlockType, PageSpec, RawBlock, RawPageSpec, Theme } from './types.ts';
 
-const str = (v: unknown, max: number): string => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+const str = (v: unknown, max: number): string => (typeof v === 'string' ? clip(v, max) : '');
 
 // The fields each block type keeps. Anything else on a stored or hand-edited spec is dropped here.
 const BLOCK_KEYS: Record<string, string[]> = {

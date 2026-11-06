@@ -1,12 +1,13 @@
 // The blocks a page is made of. Each type has `check` (returns the cleaned block or throws) and `html`.
 // A new kind of block (a product, a booking, an embed) is one more entry here.
+import { clip } from './trim.ts';
 import type { Block, BlockContext, EmailBlock, LinkBlock, PostsBlock, RawBlock, SocialBlock, TextBlock } from './types.ts';
 
 const ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
 
 export const esc = (s: unknown): string => String(s ?? '').replace(/[&<>"']/g, (c) => ESCAPES[c] as string);
 
-const str = (v: unknown, max = 300): string => (typeof v === 'string' ? v.trim().slice(0, max) : '');
+const str = (v: unknown, max = 300): string => (typeof v === 'string' ? clip(v, max) : '');
 
 type Raw = Record<string, unknown>;
 const rows = (v: unknown): Raw[] => (v || []) as Raw[];
