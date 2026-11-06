@@ -836,6 +836,7 @@ export class ComposioConnectorProvider {
         endpoint: request.endpoint,
         method: request.method.toUpperCase(),
         connected_account_id: providerConnectionId,
+        user_id: this.getUserId(),
         ...(parameters.length ? { parameters } : {}),
         ...(request.body === undefined ? {} : { body: request.body }),
       }),

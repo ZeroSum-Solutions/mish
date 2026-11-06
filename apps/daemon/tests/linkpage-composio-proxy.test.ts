@@ -50,6 +50,8 @@ describe('proxyRequest', () => {
     expect(sent.map((c) => `${c.method} ${c.path}`)).toEqual(['GET /api/v3/connected_accounts/ca_1', 'POST /api/v3/tools/execute/proxy']);
     expect(sent[1]!.body).toEqual({
       endpoint: 'https://graph.instagram.com/me', method: 'GET', connected_account_id: 'ca_1',
+      // Projects with extra account protection reject a proxy call that names no user.
+      user_id: 'mish-local-user',
       parameters: [{ name: 'accept', value: 'application/json', type: 'header' }],
     });
   });
