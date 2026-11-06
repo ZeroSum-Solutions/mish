@@ -15,6 +15,7 @@
 import path from 'node:path';
 import {
   isLinkPageAssetName,
+  isLinkPageModelLaneChoice,
   isLinkPageSlug,
   parseLinkPageBuildRequest,
   parseLinkPagePublishRequest,
@@ -32,7 +33,7 @@ import type {
 import { isLoopbackHostname } from './http/local-daemon-request.js';
 
 export const LINKPAGE_USAGE = [
-  'Usage: od linkpage build --config <file|-> [--json] [--daemon-url <url>]',
+  'Usage: od linkpage build --config <file|-> [--model-lane <auto|claude-cli|openrouter>] [--json] [--daemon-url <url>]',
   '       od linkpage list [--json]',
   '       od linkpage get <slug> [--json]',
   '       od linkpage render <slug> --out <dir> [--origin <url>] [--json]',
@@ -47,7 +48,7 @@ Build a creator's link page from the places they already have online, then keep,
 
   build    Read --config (a JSON file, or - for stdin) and build the page. The config is
            { "slug": "sam", "sources": [{ "connector": "website", "ref": "https://example.com" }],
-             "options": { "name", "headline", "bio", "avatar", "theme", "links", "signup" },
+             "options": { "name", "headline", "bio", "avatar", "theme", "links", "signup", "modelLane" },
              "connectedAccounts": { "instagram": "<Composio connected-account id>" }, "save": true }.
            Connectors: website, substack, instagram, tiktok, manual.
   list     List saved pages.
@@ -60,6 +61,9 @@ Build a creator's link page from the places they already have online, then keep,
   delete   Delete a saved page.
 
 Options:
+  --model-lane <lane>   Which model reads the creator: auto (default: OpenRouter if a key is saved,
+                        else the Claude CLI), claude-cli (the signed-in claude command only; no key
+                        is read), or openrouter (no CLI fallback). Overrides options.modelLane.
   --json                Print the daemon response as JSON.
   --daemon-url <url>    Override the local daemon address.`;
 
@@ -90,11 +94,12 @@ interface Parsed {
   trackBase?: string;
   name?: string;
   daemonUrl?: string;
+  modelLane?: string;
 }
 
 const ASSET_TYPES: Record<string, string> = { '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp', '.gif': 'image/gif' };
 
-const VALUE_FLAGS = new Set(['--config', '--out', '--origin', '--track-base', '--name', '--daemon-url']);
+const VALUE_FLAGS = new Set(['--config', '--out', '--origin', '--track-base', '--name', '--daemon-url', '--model-lane']);
 
 function parseArgs(args: string[]): Parsed | string {
   const parsed: Parsed = { command: args[0] ?? '', positional: [], json: false };
@@ -109,6 +114,7 @@ function parseArgs(args: string[]): Parsed | string {
       else if (arg === '--origin') parsed.origin = value;
       else if (arg === '--track-base') parsed.trackBase = value;
       else if (arg === '--name') parsed.name = value;
+      else if (arg === '--model-lane') parsed.modelLane = value;
       else parsed.daemonUrl = value;
     } else if (arg.startsWith('-') && arg !== '-') return `unknown option ${arg}`;
     else parsed.positional.push(arg);
@@ -147,6 +153,13 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
         raw = JSON.parse(text);
       } catch {
         return out(2, '', 'The config is not valid JSON.\n');
+      }
+      if (parsed.modelLane !== undefined) {
+        if (!isLinkPageModelLaneChoice(parsed.modelLane)) return usage('--model-lane must be auto, claude-cli or openrouter');
+        if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return out(2, '', 'The config is not valid: the request must be an object\n');
+        const body = raw as Record<string, unknown>;
+        const base = typeof body.options === 'object' && body.options !== null && !Array.isArray(body.options) ? body.options : {};
+        raw = { ...body, options: { ...base, modelLane: parsed.modelLane } };
       }
       const checked = parseLinkPageBuildRequest(raw);
       if (!checked.ok) return out(2, '', `The config is not valid: ${checked.error}\n`);

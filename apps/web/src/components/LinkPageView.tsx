@@ -17,6 +17,7 @@ import {
 } from '@mish/contracts';
 import type {
   LinkPageModelInfo,
+  LinkPageModelLaneChoice,
   LinkPageBackground,
   LinkPageBuildOptions,
   LinkPageConnectorId,
@@ -94,6 +95,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
   const [paletteOn, setPaletteOn] = useState(false);
   const [palette, setPalette] = useState({ bg: '#ffffff', text: '#1a1a1a', accent: '#2255aa' });
   const [background, setBackground] = useState<LinkPageBackground | ''>('');
+  const [modelLane, setModelLane] = useState<LinkPageModelLaneChoice>('auto');
   // Fields the person has edited since the page was built or opened. Save sends only these (an empty one
   // clears the field); the rest keep what the page has, such as a headline the builder wrote.
   const [touched, setTouched] = useState<{ headline?: true; bio?: true; avatar?: true }>({});
@@ -160,6 +162,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
     if (headline.trim()) options.headline = headline.trim();
     if (bio.trim()) options.bio = bio.trim();
     if (avatar) options.avatar = avatar;
+    if (modelLane !== 'auto') options.modelLane = modelLane;
     if (paletteOn || background) {
       options.theme = {
         ...(paletteOn ? { palette } : {}),
@@ -167,7 +170,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
       };
     }
     return options;
-  }, [name, headline, bio, avatar, paletteOn, palette, background]);
+  }, [name, headline, bio, avatar, modelLane, paletteOn, palette, background]);
 
   const onBuild = async () => {
     setError(null);
@@ -432,6 +435,15 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
           <div className={styles.section} aria-labelledby="link-page-options">
             <h2 id="link-page-options" className={styles.sectionTitle}>{t('linkPage.options.heading')}</h2>
             <p className={styles.hint}>{t('linkPage.options.autoHint')}</p>
+            <div className={styles.field}>
+              <label className={styles.label} htmlFor="link-page-model-lane">{t('linkPage.options.modelLane')}</label>
+              <Select id="link-page-model-lane" value={modelLane} onChange={(e) => setModelLane(e.target.value as LinkPageModelLaneChoice)}>
+                <option value="auto">{t('linkPage.options.modelLane.auto')}</option>
+                <option value="claude-cli">{t('linkPage.options.modelLane.claudeCli')}</option>
+                <option value="openrouter">{t('linkPage.options.modelLane.openrouter')}</option>
+              </Select>
+              <p className={styles.hint}>{t('linkPage.options.modelLaneHint')}</p>
+            </div>
             <div className={styles.field}>
               <label className={styles.label} htmlFor="link-page-name">{t('linkPage.options.name')}</label>
               <Input id="link-page-name" value={name} maxLength={120} onChange={(e) => setName(e.target.value)} />

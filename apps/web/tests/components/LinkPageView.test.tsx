@@ -133,6 +133,16 @@ describe('LinkPageView', () => {
     expect(screen.getByTestId('link-page-warnings').textContent).toContain('OpenRouter is out of credits; used the Claude CLI');
   });
 
+  it('sends the chosen model lane with the build, and nothing extra when it is Automatic', async () => {
+    answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'claude-cli', calls: 1 }, needs: [], saved: true });
+    render(<LinkPageView />);
+    const select = screen.getByLabelText('Model') as HTMLSelectElement;
+    expect(select.value).toBe('auto');
+    expect(Array.from(select.options).map((o) => o.textContent)).toEqual(['Automatic', 'Claude CLI', 'OpenRouter']);
+    await fillAndBuild(() => { fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'claude-cli' } }); });
+    expect((calls.find((c) => c.method === 'POST')!.body as { options: unknown }).options).toEqual({ modelLane: 'claude-cli' });
+  });
+
   it('names the OpenRouter model, and says when no model was used', async () => {
     answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'openrouter', model: 'anthropic/claude-sonnet-5.5', calls: 3 }, needs: [], saved: true });
     render(<LinkPageView />);

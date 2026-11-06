@@ -980,7 +980,7 @@ import { registerLinkPageRoutes } from './routes/linkpage.js';
 import { createLinkPageService } from './linkpage/service.js';
 import { createLinkPageStore } from './linkpage/store.js';
 import { createLinkPageFetch } from './linkpage/safe-fetch.js';
-import { resolveLinkPageLlm } from './linkpage/llm.js';
+import { linkPageLaneFromEnv, resolveLinkPageLlm } from './linkpage/llm.js';
 import { registerWhatsNewRoutes } from './routes/whats-new.js';
 import { registerGenuiCatalogRoutes } from './routes/genui-catalog.js';
 import { registerWorkbenchIntakeRoutes } from './routes/workbench-intake.js';
@@ -8669,7 +8669,7 @@ export async function startServer({
     linkpage: createLinkPageService({
       store: createLinkPageStore(RUNTIME_DATA_DIR),
       fetch: linkPageFetch,
-      resolveLlm: () => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), fetch: linkPageFetch }),
+      resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
       login: composioConnectorProvider,
       resolveConnectedAccount: (connector) => {
         const credentials = connectorService.getCredential(connector)?.credentials;

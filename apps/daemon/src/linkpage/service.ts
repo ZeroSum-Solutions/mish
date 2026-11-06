@@ -12,6 +12,7 @@ import type {
   LinkPageAssetResponse,
   LinkPageBuildResponse,
   LinkPageModelInfo,
+  LinkPageModelLaneChoice,
   LinkPageEventResponse,
   LinkPagePublishRequest,
   LinkPagePublishResult,
@@ -45,7 +46,7 @@ export interface LinkPageServiceDeps {
   store: LinkPageStore;
   fetch: LinkPageFetch;
   /** Called per build, so a model that appears (a key set, `claude` installed) is picked up. */
-  resolveLlm: () => (Llm & { report?: () => LinkPageModelInfo }) | undefined | Promise<(Llm & { report?: () => LinkPageModelInfo }) | undefined>;
+  resolveLlm: (lane?: LinkPageModelLaneChoice) => (Llm & { report?: () => LinkPageModelInfo }) | undefined | Promise<(Llm & { report?: () => LinkPageModelInfo }) | undefined>;
   login?: LinkPageLoginProvider | undefined;
   /**
    * The Composio connected-account id of a connector the creator already connected in Mish (Settings or
@@ -115,6 +116,18 @@ export function fallbackWarning(info: LinkPageModelInfo): string | undefined {
   }
 }
 
+/** The line for a build that ran with no model at all, per the lane the owner picked. */
+export function noModelWarning(lane: LinkPageModelLaneChoice | undefined): string {
+  if (lane === 'claude-cli') return 'The Claude CLI lane was chosen but no claude command was found (install and sign in to claude): the page was built from plain signals';
+  if (lane === 'openrouter') return 'The OpenRouter lane was chosen but no OpenRouter key is set (`od agency config set --provider openrouter --key-stdin`): the page was built from plain signals';
+  return 'no model is available (add an OpenRouter key with `od agency config set --provider openrouter --key-stdin`, or install the claude command): the page was built from plain signals';
+}
+
+/** A forced OpenRouter lane that failed: no fallback, so the page came from plain signals. */
+export function failedWarning(info: LinkPageModelInfo): string | undefined {
+  return info.failed ? `OpenRouter failed (${info.failed.reason}); the OpenRouter lane was chosen, so the page was built from plain signals` : undefined;
+}
+
 const TEXT = 'text/plain; charset=utf-8';
 
 export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageService {
@@ -147,7 +160,8 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
       }
       const loginWarnings: string[] = [];
       const logins = createLoginFetches(deps.login, connectedAccounts, loginWarnings);
-      const llm = await deps.resolveLlm();
+      const lane = request.options?.modelLane;
+      const llm = await deps.resolveLlm(lane);
       let result;
       try {
         result = await buildPage({
@@ -162,9 +176,9 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
       }
       const spec = cleanSpec(result.spec);
       const warnings = [...loginWarnings, ...result.warnings];
-      if (!llm) warnings.push('no model is available (add an OpenRouter key with `od agency config set --provider openrouter --key-stdin`, or install the claude command): the page was built from plain signals');
       const model: LinkPageModelInfo = !llm ? { lane: 'none', calls: 0 } : (llm.report?.() ?? { lane: 'none', calls: 0 });
-      const fallback = fallbackWarning(model);
+      if (!llm) warnings.push(noModelWarning(lane));
+      const fallback = fallbackWarning(model) ?? failedWarning(model);
       if (fallback) warnings.push(fallback);
       const save = request.save !== false;
       if (save) await store.put({ spec, connectedAccounts, warnings });

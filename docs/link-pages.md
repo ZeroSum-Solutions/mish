@@ -32,7 +32,8 @@ od linkpage publish sam --origin https://links.example.com --track-base https://
 od linkpage delete sam
 ```
 
-`--json` prints the daemon's response. `publish` lists the files that would be deployed; it does
+`--json` prints the daemon's response. `--model-lane <auto|claude-cli|openrouter>` picks the model lane for
+a build and overrides `options.modelLane` in the config (see Model). `publish` lists the files that would be deployed; it does
 not upload anything (see hosting below).
 
 ## Endpoints
@@ -68,6 +69,24 @@ The builder reads people with a model in two lanes ([`linkpage/llm.ts`](../apps/
    settings, hooks or CLAUDE.md), `--disable-slash-commands`, `--permission-mode dontAsk`, the prompt on
    stdin, and a temporary folder that is deleted afterwards.
 3. **No model**: the page is built from plain signals and the build warns.
+
+### Choosing the lane
+
+`options.modelLane` on the build request (`auto`, `claude-cli` or `openrouter`; default `auto`) picks the lane
+for that build. The web view has a Model select in the page details, and `od linkpage build --model-lane`
+overrides the config file.
+
+- `auto`: the order above (OpenRouter first, the Claude CLI as the fallback).
+- `claude-cli`: only the `claude` command. The key store and OpenRouter are never touched, so a saved key
+  stays saved and is not read. If no `claude` is found, the build continues with no model and a warning.
+- `openrouter`: only OpenRouter, never the CLI. With no key, or when a call fails, the model step fails with
+  the reason-coded warning (`model.failed` carries the code) and the page is built from plain signals.
+
+The daemon default is `OD_LINKPAGE_MODEL_LANE` (`auto`, `claude-cli` or `openrouter`; anything else means
+`auto`). A lane in the request wins over it.
+
+The CLI lane works only on a machine with a signed-in `claude`. A hosted builder has no such login, so it needs
+OpenRouter (or another server-side lane).
 
 ### Which lane answered
 

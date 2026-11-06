@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { createLinkPageFetch, LINKPAGE_FETCH_MAX_BYTES } from '../src/linkpage/safe-fetch.js';
 import type { Llm } from '@mish/linkpage';
 import { LlmError } from '@mish/linkpage';
-import { LINKPAGE_OPENROUTER_MODEL, fetchWithTimeout, resolveLinkPageLlm } from '../src/linkpage/llm.js';
+import { LINKPAGE_OPENROUTER_MODEL, fetchWithTimeout, linkPageLaneFromEnv, resolveLinkPageLlm } from '../src/linkpage/llm.js';
 
 describe('link page fetch', () => {
   it('refuses loopback, private and metadata addresses before any request is made', async () => {
@@ -106,6 +106,7 @@ describe('link page model report', () => {
   const ok = (name: string): Llm => ({ json: async () => name });
   const failing = (error: Error): Llm => ({ json: async () => { throw error; } });
   const request = { system: 's', user: 'u' };
+  const base = { fetch, makeOpenRouter: () => ok('openrouter'), makeClaude: () => ok('claude') };
   const deps = { fetch, makeClaude: () => ok('claude'), resolveKey: async () => 'k', findClaude: () => '/bin/claude' };
 
   it('names OpenRouter and its model after a successful call, counting calls', async () => {
@@ -137,5 +138,38 @@ describe('link page model report', () => {
     expect(llm!.report()).toEqual({ lane: 'claude-cli', calls: 1, fellBackFrom: { lane: 'openrouter', reason: 'no-key' } });
     const alone = await resolveLinkPageLlm({ ...deps, findClaude: () => null, makeOpenRouter: () => failing(new LlmError('out-of-credits', 'OpenRouter is out of credits', 402)) });
     await expect(alone!.json(request)).rejects.toThrow('out of credits');
+  });
+
+  describe('forced lanes', () => {
+    const noKeyLookup = async () => { throw new Error('the key store must not be read'); };
+
+    it('claude-cli never calls resolveKey or builds OpenRouter, and reports the lane without a fallback', async () => {
+      let made = 0;
+      const llm = await resolveLinkPageLlm({ ...base, lane: 'claude-cli', resolveKey: noKeyLookup, findClaude: () => '/bin/claude', makeOpenRouter: () => { made += 1; return ok('openrouter'); } });
+      expect(await llm!.json(request)).toBe('claude');
+      expect(llm!.report()).toEqual({ lane: 'claude-cli', calls: 1 });
+      expect(made).toBe(0);
+    });
+
+    it('claude-cli with no claude found gives no model, still without reading the key', async () => {
+      expect(await resolveLinkPageLlm({ ...base, lane: 'claude-cli', resolveKey: noKeyLookup, findClaude: () => null })).toBeUndefined();
+    });
+
+    it('openrouter never falls back to the CLI: no key means no model, a failure rejects with a coded report', async () => {
+      expect(await resolveLinkPageLlm({ ...base, lane: 'openrouter', resolveKey: async () => '', findClaude: () => '/bin/claude' })).toBeUndefined();
+      const llm = await resolveLinkPageLlm({ ...base, lane: 'openrouter', resolveKey: async () => 'k', findClaude: () => '/bin/claude', makeOpenRouter: () => failing(new LlmError('out-of-credits', 'x', 402)) });
+      await expect(llm!.json(request)).rejects.toThrow();
+      expect(llm!.report()).toEqual({ lane: 'none', calls: 0, failed: { lane: 'openrouter', reason: 'out-of-credits' } });
+      const good = await resolveLinkPageLlm({ ...base, lane: 'openrouter', resolveKey: async () => 'k', findClaude: () => '/bin/claude' });
+      await good!.json(request);
+      expect(good!.report()).toEqual({ lane: 'openrouter', model: LINKPAGE_OPENROUTER_MODEL, calls: 1 });
+    });
+
+    it('reads the env default and ignores unknown values', () => {
+      expect(linkPageLaneFromEnv({ OD_LINKPAGE_MODEL_LANE: ' Claude-CLI ' })).toBe('claude-cli');
+      expect(linkPageLaneFromEnv({ OD_LINKPAGE_MODEL_LANE: 'openrouter' })).toBe('openrouter');
+      expect(linkPageLaneFromEnv({ OD_LINKPAGE_MODEL_LANE: 'nope' })).toBe('auto');
+      expect(linkPageLaneFromEnv({})).toBe('auto');
+    });
   });
 });

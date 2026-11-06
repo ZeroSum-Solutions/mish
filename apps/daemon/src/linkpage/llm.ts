@@ -5,7 +5,8 @@
  * A failed OpenRouter call falls back to `claude`, a cancelled one does not.
  */
 import { LlmError, createLlm } from '@mish/linkpage';
-import type { LinkPageModelFallbackReason, LinkPageModelInfo } from '@mish/contracts';
+import { isLinkPageModelLaneChoice } from '@mish/contracts';
+import type { LinkPageModelFallbackReason, LinkPageModelInfo, LinkPageModelLaneChoice } from '@mish/contracts';
 import type { Llm, LlmRequest } from '@mish/linkpage';
 import { createClaudeCliLlm } from '@mish/linkpage/node';
 import { resolveOnPath } from '../runtimes/executables.js';
@@ -28,6 +29,8 @@ export interface ResolveLlmDeps {
   fetch: LinkPageFetch;
   findClaude?: () => string | null;
   keyTimeoutMs?: number;
+  /** The owner's pick. 'claude-cli' never calls resolveKey; 'openrouter' never uses the CLI. Default 'auto'. */
+  lane?: LinkPageModelLaneChoice;
   /** Test seams: build each lane's client. */
   makeOpenRouter?: (apiKey: string) => Llm;
   /** Gets the resolved path of the `claude` program, so the lane runs the one that was found. */
@@ -76,10 +79,11 @@ export function fallbackReason(error: unknown): LinkPageModelFallbackReason {
 }
 
 /** The lane of every answered call is counted; one fallback is remembered (the first reason). */
-function track(lanes: { openrouter?: Llm; claude?: Llm }, noKey: boolean): ReportingLlm {
+function track(lanes: { openrouter?: Llm; claude?: Llm }, noKey: boolean, forced = false): ReportingLlm {
   let calls = 0;
+  let failed: LinkPageModelFallbackReason | undefined;
   let last: 'openrouter' | 'claude-cli' | undefined;
-  let reason: LinkPageModelFallbackReason | undefined = noKey ? 'no-key' : undefined;
+  let reason: LinkPageModelFallbackReason | undefined = noKey && !forced ? 'no-key' : undefined;
   const answered = (lane: 'openrouter' | 'claude-cli') => { calls += 1; last = lane; };
   return {
     async json(request: LlmRequest) {
@@ -90,7 +94,10 @@ function track(lanes: { openrouter?: Llm; claude?: Llm }, noKey: boolean): Repor
           return value;
         } catch (error) {
           // A cancel, or a failure with nothing to fall back to, goes to the caller.
-          if (cancelled(error) || !lanes.claude) throw error;
+          if (cancelled(error) || !lanes.claude) {
+            if (!cancelled(error) && forced) failed ??= fallbackReason(error);
+            throw error;
+          }
           reason ??= fallbackReason(error);
         }
       }
@@ -99,6 +106,12 @@ function track(lanes: { openrouter?: Llm; claude?: Llm }, noKey: boolean): Repor
       return value;
     },
     report() {
+      if (forced && lanes.openrouter && !lanes.claude) {
+        return calls > 0
+          ? { lane: 'openrouter', model: LINKPAGE_OPENROUTER_MODEL, calls }
+          : { lane: 'none', calls: 0, ...(failed ? { failed: { lane: 'openrouter' as const, reason: failed } } : {}) };
+      }
+      if (forced) return { lane: 'claude-cli', calls };
       const lane = last ?? (lanes.openrouter && !reason ? 'openrouter' : 'claude-cli');
       return {
         lane,
@@ -115,9 +128,22 @@ export async function resolveLinkPageLlm(deps: ResolveLlmDeps): Promise<Reportin
   const timed = fetchWithTimeout(deps.openRouterFetch ?? globalThis.fetch, deps.openRouterTimeoutMs ?? OPENROUTER_TIMEOUT_MS);
   const makeOpenRouter = deps.makeOpenRouter ?? ((apiKey: string) => createLlm({ apiKey, model: LINKPAGE_OPENROUTER_MODEL, fetch: timed }));
   const makeClaude = deps.makeClaude ?? ((executable: string) => createClaudeCliLlm({ fetch, executable }));
+  const lane = deps.lane ?? 'auto';
+  if (lane === 'claude-cli') {
+    // Never touches the key store or OpenRouter.
+    const only = findClaude();
+    return only ? track({ claude: makeClaude(only) }, false, true) : undefined;
+  }
   const apiKey = await boundedKey(deps.resolveKey, keyTimeoutMs);
+  if (lane === 'openrouter') return apiKey ? track({ openrouter: makeOpenRouter(apiKey) }, false, true) : undefined;
   const claudePath = findClaude();
   const claude = claudePath ? makeClaude(claudePath) : undefined;
   if (!apiKey && !claude) return undefined;
   return track({ ...(apiKey ? { openrouter: makeOpenRouter(apiKey) } : {}), ...(claude ? { claude } : {}) }, !apiKey);
+}
+
+/** The daemon's default lane from OD_LINKPAGE_MODEL_LANE; anything unrecognised means 'auto'. */
+export function linkPageLaneFromEnv(env: Record<string, string | undefined>): LinkPageModelLaneChoice {
+  const value = env.OD_LINKPAGE_MODEL_LANE?.trim().toLowerCase();
+  return isLinkPageModelLaneChoice(value) ? value : 'auto';
 }

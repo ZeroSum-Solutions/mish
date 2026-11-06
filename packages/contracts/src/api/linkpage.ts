@@ -48,7 +48,17 @@ export interface LinkPageLinkInput {
   featured?: boolean;
 }
 
+/** Which model lane a build may use. 'auto': OpenRouter first, the Claude CLI as the fallback. */
+export type LinkPageModelLaneChoice = 'auto' | 'claude-cli' | 'openrouter';
+export const LINKPAGE_MODEL_LANE_CHOICES: readonly LinkPageModelLaneChoice[] = ['auto', 'claude-cli', 'openrouter'];
+
+export function isLinkPageModelLaneChoice(value: unknown): value is LinkPageModelLaneChoice {
+  return typeof value === 'string' && (LINKPAGE_MODEL_LANE_CHOICES as readonly string[]).includes(value);
+}
+
 export interface LinkPageBuildOptions {
+  /** Default 'auto'. Not a page setting: it only steers this build. */
+  modelLane?: LinkPageModelLaneChoice;
   name?: string;
   headline?: string;
   bio?: string;
@@ -151,6 +161,8 @@ export interface LinkPageModelInfo {
   calls: number;
   /** Set when OpenRouter was tried first (or had no key) and the Claude CLI answered instead. */
   fellBackFrom?: { lane: 'openrouter'; reason: LinkPageModelFallbackReason };
+  /** Set when OpenRouter was forced, had no fallback, and its call failed. */
+  failed?: { lane: 'openrouter'; reason: LinkPageModelFallbackReason };
 }
 
 export interface LinkPageBuildResponse {
@@ -361,6 +373,10 @@ function parseOptions(value: unknown): LinkPageParse<LinkPageBuildOptions | unde
   if (value === undefined) return { ok: true, value: undefined };
   if (!isRecord(value)) return fail('options must be an object');
   const out: LinkPageBuildOptions = {};
+  if (value.modelLane !== undefined) {
+    if (!isLinkPageModelLaneChoice(value.modelLane)) return fail(`options.modelLane must be one of ${LINKPAGE_MODEL_LANE_CHOICES.join(', ')}`);
+    out.modelLane = value.modelLane;
+  }
   for (const [key, max] of [['name', 120], ['headline', 90], ['bio', 400]] as const) {
     const text = optionalText(value, key, max);
     if (!text.ok) return text;

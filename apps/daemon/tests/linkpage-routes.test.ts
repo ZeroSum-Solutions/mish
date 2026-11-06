@@ -275,6 +275,19 @@ describe('build reports the model lane', () => {
   });
   const request = { ...BUILD, save: false } as never;
 
+  it('passes the chosen lane to the resolver and warns plainly when a forced lane has no model', async () => {
+    const seen: unknown[] = [];
+    const svc = createLinkPageService({ store: createLinkPageStore(dataDir), fetch: fakeFetch, resolveLlm: (lane) => { seen.push(lane); return undefined; } });
+    const cli = await svc.build({ ...(request as object), options: { modelLane: 'claude-cli' } } as never);
+    expect(seen).toEqual(['claude-cli']);
+    expect(cli.model).toEqual({ lane: 'none', calls: 0 });
+    expect(cli.warnings.join(' ')).toMatch(/Claude CLI lane was chosen but no claude command was found/);
+    const or = await svc.build({ ...(request as object), options: { modelLane: 'openrouter' } } as never);
+    expect(or.warnings.join(' ')).toMatch(/OpenRouter lane was chosen but no OpenRouter key/);
+    await svc.build(request);
+    expect(seen).toEqual(['claude-cli', 'openrouter', undefined]);
+  });
+
   it('says none when no model is available', async () => {
     const res = await createLinkPageService({ store: createLinkPageStore(dataDir), fetch: fakeFetch, resolveLlm: () => undefined }).build(request);
     expect(res.model).toEqual({ lane: 'none', calls: 0 });

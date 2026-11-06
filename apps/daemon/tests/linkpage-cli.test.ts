@@ -70,6 +70,21 @@ describe('od linkpage', () => {
     expect(h.calls[0]).toMatchObject({ method: 'POST', url: 'http://127.0.0.1:7456/api/linkpages/build', body: { slug: 'sam' } });
   });
 
+  it('--model-lane overrides the config value, is validated, and is in --help', async () => {
+    const cfg = JSON.stringify({ slug: 'sam', sources: [{ connector: 'website', ref: 'https://example.com' }], options: { name: 'Sam', modelLane: 'openrouter' } });
+    const h = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], needs: [] } }], cfg);
+    expect((await h.run(['build', '--config', 'c.json', '--model-lane', 'claude-cli'])).code).toBe(0);
+    expect(h.calls[0]!.body).toMatchObject({ options: { name: 'Sam', modelLane: 'claude-cli' } });
+    const plain = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], needs: [] } }], REQUEST);
+    await plain.run(['build', '--config', 'c.json', '--model-lane', 'auto']);
+    expect(plain.calls[0]!.body).toMatchObject({ options: { modelLane: 'auto' } });
+    const bad = await plain.run(['build', '--config', 'c.json', '--model-lane', 'gpt']);
+    expect(bad.code).toBe(2);
+    expect(bad.stderr).toMatch(/--model-lane must be auto, claude-cli or openrouter/);
+    expect(plain.calls).toHaveLength(1);
+    expect((await plain.run(['--help'])).stdout).toMatch(/--model-lane <lane>/);
+  });
+
   it('build reads the config from stdin with - and prints JSON with --json', async () => {
     const h = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], needs: [] } }], REQUEST);
     const res = await h.run(['build', '--config', '-', '--json']);

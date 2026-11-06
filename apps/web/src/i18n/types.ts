@@ -6496,6 +6496,11 @@ export interface Dict {
   'linkPage.options.avatarFailed': string;
   'linkPage.options.avatarRemove': string;
   'linkPage.options.autoHint': string;
+  'linkPage.options.modelLane': string;
+  'linkPage.options.modelLane.auto': string;
+  'linkPage.options.modelLane.claudeCli': string;
+  'linkPage.options.modelLane.openrouter': string;
+  'linkPage.options.modelLaneHint': string;
   'linkPage.options.palette': string;
   'linkPage.options.paletteOverride': string;
   'linkPage.options.paletteHint': string;
