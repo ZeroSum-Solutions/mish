@@ -441,6 +441,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
                 <option value="auto">{t('linkPage.options.modelLane.auto')}</option>
                 <option value="claude-cli">{t('linkPage.options.modelLane.claudeCli')}</option>
                 <option value="openrouter">{t('linkPage.options.modelLane.openrouter')}</option>
+                <option value="deepseek">{t('linkPage.options.modelLane.deepseek')}</option>
               </Select>
               <p className={styles.hint}>{t('linkPage.options.modelLaneHint')}</p>
             </div>
@@ -512,7 +513,9 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
                 ? t('linkPage.model.none')
                 : model.lane === 'openrouter'
                   ? t('linkPage.model.openrouter', { model: model.model ?? '', calls: String(model.calls) })
-                  : t('linkPage.model.claudeCli', { calls: String(model.calls) })}
+                  : model.lane === 'deepseek'
+                    ? t('linkPage.model.deepseek', { model: model.model ?? '', calls: String(model.calls) })
+                    : t('linkPage.model.claudeCli', { calls: String(model.calls) })}
             </p>
           ) : null}
           {warnings.length > 0 ? (

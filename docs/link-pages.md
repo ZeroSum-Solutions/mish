@@ -32,7 +32,7 @@ od linkpage publish sam --origin https://links.example.com --track-base https://
 od linkpage delete sam
 ```
 
-`--json` prints the daemon's response. `--model-lane <auto|claude-cli|openrouter>` picks the model lane for
+`--json` prints the daemon's response. `--model-lane <auto|claude-cli|openrouter|deepseek>` picks the model lane for
 a build and overrides `options.modelLane` in the config (see Model). `publish` lists the files that would be deployed; it does
 not upload anything (see hosting below).
 
@@ -54,7 +54,7 @@ never in the repository.
 
 ## Model
 
-The builder reads people with a model in two lanes ([`linkpage/llm.ts`](../apps/daemon/src/linkpage/llm.ts)):
+The builder reads people with a model in three lanes ([`linkpage/llm.ts`](../apps/daemon/src/linkpage/llm.ts)):
 
 1. **OpenRouter first.** The key comes from the daemon key store, the same one the brief generator
    uses: `OPENROUTER_API_KEY`, then a key saved with `od agency config set --provider openrouter --key-stdin`,
@@ -62,27 +62,36 @@ The builder reads people with a model in two lanes ([`linkpage/llm.ts`](../apps/
    `anthropic/claude-sonnet-5.5`: it reads pictures (the style-from-photos step sends image URLs, which
    the text-only fast-lane caller cannot), answers JSON mode cleanly, and matches the model the second
    lane runs.
-2. **The `claude` command** (the owner's subscription) when there is no key, or when an OpenRouter
-   call fails or runs past 60 s. A cancelled call is not retried. It runs the executable the daemon found
+2. **DeepSeek, text only**, when there is no OpenRouter key (its key is not read when OpenRouter has one).
+   The key comes from the same store (`DEEPSEEK_API_KEY`, a saved key, then the vault; lookup bounded to 5 s).
+   It runs the fast lane's `createModelCaller` with its default model (`deepseek-flash`, in JSON mode, 60 s
+   limit, one retry). DeepSeek has no vision here, so the style-from-photos step goes to the next lane that can see
+   (the Claude CLI) or, when there is none, is skipped with the warning `vision: DeepSeek reads text only; photo
+   style was skipped`. DeepSeek is metered and sends the scraped page text to DeepSeek.
+3. **The `claude` command** (the owner's subscription) when there is no key, or when an OpenRouter or DeepSeek
+   call fails or runs past its limit. A cancelled call is not retried. It runs the executable the daemon found
    on `PATH`, and because it reads text scraped from other people's sites it is locked down:
    `--tools Read` (the only tool), `--strict-mcp-config`, `--setting-sources ""` (no user or project
    settings, hooks or CLAUDE.md), `--disable-slash-commands`, `--permission-mode dontAsk`, the prompt on
    stdin, and a temporary folder that is deleted afterwards.
-3. **No model**: the page is built from plain signals and the build warns.
+4. **No model**: the page is built from plain signals and the build warns.
 
 ### Choosing the lane
 
-`options.modelLane` on the build request (`auto`, `claude-cli` or `openrouter`; default `auto`) picks the lane
+`options.modelLane` on the build request (`auto`, `claude-cli`, `openrouter` or `deepseek`; default `auto`) picks the lane
 for that build. The web view has a Model select in the page details, and `od linkpage build --model-lane`
 overrides the config file.
 
-- `auto`: the order above (OpenRouter first, the Claude CLI as the fallback).
+- `auto`: the order above: OpenRouter; with no OpenRouter key, DeepSeek for text; the Claude CLI as the fallback
+  (and the only photo reader without OpenRouter).
 - `claude-cli`: only the `claude` command. The key store and OpenRouter are never touched, so a saved key
   stays saved and is not read. If no `claude` is found, the build continues with no model and a warning.
 - `openrouter`: only OpenRouter, never the CLI. With no key, or when a call fails, the model step fails with
   the reason-coded warning (`model.failed` carries the code) and the page is built from plain signals.
+- `deepseek`: only DeepSeek, text only, never the CLI. The OpenRouter key is not read. Photo style is skipped
+  with the warning above. With no key, or when a call fails, the same reason-coded warning applies.
 
-The daemon default is `OD_LINKPAGE_MODEL_LANE` (`auto`, `claude-cli` or `openrouter`; anything else means
+The daemon default is `OD_LINKPAGE_MODEL_LANE` (`auto`, `claude-cli`, `openrouter` or `deepseek`; anything else means
 `auto`). A lane in the request wins over it.
 
 The CLI lane works only on a machine with a signed-in `claude`. A hosted builder has no such login, so it needs
@@ -96,15 +105,15 @@ Every build response (`POST /api/linkpages/build`, `od linkpage build --json`) c
 { "lane": "claude-cli", "calls": 2, "fellBackFrom": { "lane": "openrouter", "reason": "out-of-credits" } }
 ```
 
-- `lane` is `openrouter`, `claude-cli` or `none` (the lane that answered the last model call).
-- `model` is the OpenRouter model id, present only when `lane` is `openrouter`.
+- `lane` is `openrouter`, `deepseek`, `claude-cli` or `none` (the lane that answered the last model call).
+- `model` is the model id, present only when `lane` is `openrouter` or `deepseek`.
 - `calls` is how many model calls were answered.
-- `fellBackFrom` is set when OpenRouter did not answer and the Claude CLI did. `reason` is one of
+- `fellBackFrom` is set when the first lane (`openrouter`, or `deepseek` when it ran first) did not answer and another did. `reason` is one of
   `no-key`, `out-of-credits` (HTTP 402), `bad-key` (HTTP 401), `timeout`, `http-error`,
   `invalid-output`. These are fixed codes: no error body, key or URL is ever put in the field or the
   warning.
 
-A fallback adds a plain warning, for example "OpenRouter is out of credits; used the Claude CLI",
+A fallback adds a plain warning (DeepSeek's read the same, with its own name), for example "OpenRouter is out of credits; used the Claude CLI",
 "OpenRouter rejected the key; used the Claude CLI" or "OpenRouter failed (timeout); used the Claude CLI".
 A 402 or 401 falls back like any other failure and does not abort the build. `od linkpage build`
 prints a `model:` line, and the web view shows the lane under the build result. If OpenRouter fails

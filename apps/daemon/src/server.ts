@@ -8669,7 +8669,7 @@ export async function startServer({
     linkpage: createLinkPageService({
       store: createLinkPageStore(RUNTIME_DATA_DIR),
       fetch: linkPageFetch,
-      resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
+      resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), resolveDeepSeekKey: () => jevKeyStore.resolveModelKey('deepseek'), fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
       login: composioConnectorProvider,
       resolveConnectedAccount: (connector) => {
         const credentials = connectorService.getCredential(connector)?.credentials;

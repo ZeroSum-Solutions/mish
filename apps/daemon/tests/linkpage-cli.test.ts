@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { promisify } from 'node:util';
 import { describe, expect, it } from 'vitest';
 
-import { runLinkpageCli } from '../src/linkpage-cli.js';
+import { describeModel, runLinkpageCli } from '../src/linkpage-cli.js';
 
 interface Call { method: string; url: string; body: unknown; contentType?: string }
 
@@ -44,6 +44,7 @@ describe('od linkpage', () => {
     const model = { lane: 'claude-cli', calls: 2, fellBackFrom: { lane: 'openrouter', reason: 'out-of-credits' } };
     const h = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: ['OpenRouter is out of credits; used the Claude CLI'], model, needs: [] } }], REQUEST);
     expect((await h.run(['build', '--config', 'c.json'])).stdout).toBe('Built sam: Sam (saved)\n  model: Claude CLI, 2 calls\n  warning: OpenRouter is out of credits; used the Claude CLI\n');
+    expect(describeModel({ lane: 'deepseek', model: 'deepseek-flash', calls: 1 })).toBe('DeepSeek (deepseek-flash), 1 call');
     const or = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], model: { lane: 'openrouter', model: 'anthropic/claude-sonnet-5.5', calls: 1 }, needs: [] } }], REQUEST);
     expect((await or.run(['build', '--config', 'c.json'])).stdout).toContain('model: OpenRouter (anthropic/claude-sonnet-5.5), 1 call\n');
     const none = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], model: { lane: 'none', calls: 0 }, needs: [] } }], REQUEST);
@@ -80,7 +81,7 @@ describe('od linkpage', () => {
     expect(plain.calls[0]!.body).toMatchObject({ options: { modelLane: 'auto' } });
     const bad = await plain.run(['build', '--config', 'c.json', '--model-lane', 'gpt']);
     expect(bad.code).toBe(2);
-    expect(bad.stderr).toMatch(/--model-lane must be auto, claude-cli or openrouter/);
+    expect(bad.stderr).toMatch(/--model-lane must be auto, claude-cli, openrouter or deepseek/);
     expect(plain.calls).toHaveLength(1);
     expect((await plain.run(['--help'])).stdout).toMatch(/--model-lane <lane>/);
   });

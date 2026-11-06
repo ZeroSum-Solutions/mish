@@ -138,7 +138,7 @@ describe('LinkPageView', () => {
     render(<LinkPageView />);
     const select = screen.getByLabelText('Model') as HTMLSelectElement;
     expect(select.value).toBe('auto');
-    expect(Array.from(select.options).map((o) => o.textContent)).toEqual(['Automatic', 'Claude CLI', 'OpenRouter']);
+    expect(Array.from(select.options).map((o) => o.textContent)).toEqual(['Automatic', 'Claude CLI', 'OpenRouter', 'DeepSeek (text only)']);
     await fillAndBuild(() => { fireEvent.change(screen.getByLabelText('Model'), { target: { value: 'claude-cli' } }); });
     expect((calls.find((c) => c.method === 'POST')!.body as { options: unknown }).options).toEqual({ modelLane: 'claude-cli' });
   });
@@ -151,6 +151,9 @@ describe('LinkPageView', () => {
     answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'none', calls: 0 }, needs: [], saved: true });
     fireEvent.click(screen.getByRole('button', { name: 'Build page' }));
     await waitFor(() => expect(screen.getByTestId('link-page-model').textContent).toContain('No model was used'));
+    answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'deepseek', model: 'deepseek-flash', calls: 1 }, needs: [], saved: true });
+    fireEvent.click(screen.getByRole('button', { name: 'Build page' }));
+    await waitFor(() => expect(screen.getByTestId('link-page-model').textContent).toBe('Read by DeepSeek (deepseek-flash, text only). Model calls: 1.'));
   });
 
   it('builds with the form options and shows warnings, needs and a sandboxed preview', async () => {

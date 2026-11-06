@@ -6500,6 +6500,7 @@ export interface Dict {
   'linkPage.options.modelLane.auto': string;
   'linkPage.options.modelLane.claudeCli': string;
   'linkPage.options.modelLane.openrouter': string;
+  'linkPage.options.modelLane.deepseek': string;
   'linkPage.options.modelLaneHint': string;
   'linkPage.options.palette': string;
   'linkPage.options.paletteOverride': string;
@@ -6530,6 +6531,7 @@ export interface Dict {
   'linkPage.preview.note': string;
   'linkPage.model.none': string;
   'linkPage.model.openrouter': string;
+  'linkPage.model.deepseek': string;
   'linkPage.model.claudeCli': string;
   'linkPage.warnings.heading': string;
   'linkPage.needs.heading': string;

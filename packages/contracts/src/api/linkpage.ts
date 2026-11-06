@@ -48,9 +48,9 @@ export interface LinkPageLinkInput {
   featured?: boolean;
 }
 
-/** Which model lane a build may use. 'auto': OpenRouter first, the Claude CLI as the fallback. */
-export type LinkPageModelLaneChoice = 'auto' | 'claude-cli' | 'openrouter';
-export const LINKPAGE_MODEL_LANE_CHOICES: readonly LinkPageModelLaneChoice[] = ['auto', 'claude-cli', 'openrouter'];
+/** Which model lane a build may use. 'auto': OpenRouter, else DeepSeek (text only), with the Claude CLI as the fallback. */
+export type LinkPageModelLaneChoice = 'auto' | 'claude-cli' | 'openrouter' | 'deepseek';
+export const LINKPAGE_MODEL_LANE_CHOICES: readonly LinkPageModelLaneChoice[] = ['auto', 'claude-cli', 'openrouter', 'deepseek'];
 
 export function isLinkPageModelLaneChoice(value: unknown): value is LinkPageModelLaneChoice {
   return typeof value === 'string' && (LINKPAGE_MODEL_LANE_CHOICES as readonly string[]).includes(value);
@@ -148,21 +148,21 @@ export interface LinkPageLoginNeed {
 // Response -----------------------------------------------------------------------------------------
 
 /** Which model answered a build's model calls. */
-export type LinkPageModelLane = 'openrouter' | 'claude-cli' | 'none';
+export type LinkPageModelLane = 'openrouter' | 'deepseek' | 'claude-cli' | 'none';
 
-/** Fixed codes for why OpenRouter did not answer. Never an error body, a key or a URL. */
+/** Fixed codes for why a metered lane (OpenRouter or DeepSeek) did not answer. Never an error body, a key or a URL. */
 export type LinkPageModelFallbackReason = 'no-key' | 'out-of-credits' | 'bad-key' | 'timeout' | 'http-error' | 'invalid-output';
 
 export interface LinkPageModelInfo {
   lane: LinkPageModelLane;
-  /** The OpenRouter model id, when that lane answered. */
+  /** The model id, when the OpenRouter or DeepSeek lane answered. */
   model?: string;
   /** How many model calls the build made and had answered. */
   calls: number;
-  /** Set when OpenRouter was tried first (or had no key) and the Claude CLI answered instead. */
-  fellBackFrom?: { lane: 'openrouter'; reason: LinkPageModelFallbackReason };
-  /** Set when OpenRouter was forced, had no fallback, and its call failed. */
-  failed?: { lane: 'openrouter'; reason: LinkPageModelFallbackReason };
+  /** Set when OpenRouter was tried first (or had no key) and another lane answered instead. */
+  fellBackFrom?: { lane: 'openrouter' | 'deepseek'; reason: LinkPageModelFallbackReason };
+  /** Set when a metered lane was forced, had no fallback, and its call failed. */
+  failed?: { lane: 'openrouter' | 'deepseek'; reason: LinkPageModelFallbackReason };
 }
 
 export interface LinkPageBuildResponse {
