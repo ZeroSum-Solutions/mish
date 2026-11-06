@@ -16,6 +16,7 @@ import {
   parseLinkPageBuildRequest,
 } from '@mish/contracts';
 import type {
+  LinkPageModelInfo,
   LinkPageBackground,
   LinkPageBuildOptions,
   LinkPageConnectorId,
@@ -99,6 +100,8 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
 
   const [spec, setSpec] = useState<LinkPageSpec | null>(null);
   const [warnings, setWarnings] = useState<string[]>([]);
+  // Which model answered the last build; unknown for a page that was opened, not built.
+  const [model, setModel] = useState<LinkPageModelInfo | null>(null);
   const [needs, setNeeds] = useState<LinkPageLoginNeed[]>([]);
   const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState<Busy>(null);
@@ -185,6 +188,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
       setSpec(result.spec);
       setTouched({});
       setWarnings(result.warnings);
+      setModel(result.model ?? null);
       setNeeds(result.needs);
       setVersion((v) => v + 1);
       void refreshSaved();
@@ -284,6 +288,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
       setSlug(record.slug);
       setSpec(record.spec);
       setWarnings(record.warnings);
+      setModel(null);
       setNeeds([]);
       setTouched({});
       setName(record.spec.profile.name);
@@ -309,6 +314,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
     setSpec(null);
     setTouched({});
     setWarnings([]);
+    setModel(null);
     setNeeds([]);
     setError(null);
     setNotice(null);
@@ -488,6 +494,15 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
           {error ? <p className={styles.error} role="alert">{error}</p> : null}
           {notice ? <p className={styles.status} role="status">{notice}</p> : null}
 
+          {model ? (
+            <p className={styles.status} data-testid="link-page-model">
+              {model.lane === 'none'
+                ? t('linkPage.model.none')
+                : model.lane === 'openrouter'
+                  ? t('linkPage.model.openrouter', { model: model.model ?? '', calls: String(model.calls) })
+                  : t('linkPage.model.claudeCli', { calls: String(model.calls) })}
+            </p>
+          ) : null}
           {warnings.length > 0 ? (
             <div className={styles.section} data-testid="link-page-warnings">
               <h2 className={styles.sectionTitle}>{t('linkPage.warnings.heading')}</h2>

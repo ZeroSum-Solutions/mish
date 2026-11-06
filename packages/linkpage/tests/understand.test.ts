@@ -26,9 +26,11 @@ test('the llm client sends images after the text and parses fenced JSON', async 
 test('the llm client fails on no key, an error in a 200 reply, an HTTP error and non-JSON', async () => {
   assert.throws(() => createLlm({}), /apiKey/);
   const call = (fetch: FetchFn) => createLlm({ apiKey: 'k', fetch }).json({ system: 's', user: 'u' });
-  await assert.rejects(call(async () => new Response(JSON.stringify({ error: { message: 'out of credit' } }), { status: 200 })), /out of credit/);
-  await assert.rejects(call(async () => new Response(JSON.stringify({ error: { message: 'bad key' } }), { status: 401 })), /401.*bad key/);
-  await assert.rejects(call(reply('sorry, no')), /valid JSON/);
+  await assert.rejects(call(async () => new Response(JSON.stringify({ error: { message: 'out of credit' } }), { status: 200 })), /reported an error/);
+  await assert.rejects(call(async () => new Response(JSON.stringify({ error: { message: 'bad key sk-secret' } }), { status: 401 })), (e: Error & { code?: string; status?: number }) => e.code === 'bad-key' && e.status === 401 && !/sk-secret|bad key/.test(e.message));
+  await assert.rejects(call(async () => new Response(JSON.stringify({ error: { message: 'no credit left' } }), { status: 402 })), (e: Error & { code?: string; status?: number }) => e.code === 'out-of-credits' && e.status === 402 && !/no credit left/.test(e.message));
+  await assert.rejects(call(async () => new Response('boom body', { status: 500 })), (e: Error & { code?: string }) => e.code === 'http-error' && !/boom/.test(e.message));
+  await assert.rejects(call(reply('sorry, no')), (e: Error & { code?: string }) => e.code === 'invalid-output' && /valid JSON/.test(e.message));
 });
 
 const HOME = '<html><body><a href="/about-the-studio">About</a><a href="/shop">Shop</a><a href="/contact">Say hi</a><a href="https://other.example.com/about">About</a><p>Home</p></body></html>';

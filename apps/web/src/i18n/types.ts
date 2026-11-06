@@ -6523,6 +6523,9 @@ export interface Dict {
   'linkPage.preview.title': string;
   'linkPage.preview.empty': string;
   'linkPage.preview.note': string;
+  'linkPage.model.none': string;
+  'linkPage.model.openrouter': string;
+  'linkPage.model.claudeCli': string;
   'linkPage.warnings.heading': string;
   'linkPage.needs.heading': string;
   'linkPage.needs.item': string;

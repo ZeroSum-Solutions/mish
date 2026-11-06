@@ -4,7 +4,8 @@
  * command on the owner's subscription second, else none (the page is then built from plain signals).
  * A failed OpenRouter call falls back to `claude`, a cancelled one does not.
  */
-import { createLlm } from '@mish/linkpage';
+import { LlmError, createLlm } from '@mish/linkpage';
+import type { LinkPageModelFallbackReason, LinkPageModelInfo } from '@mish/contracts';
 import type { Llm, LlmRequest } from '@mish/linkpage';
 import { createClaudeCliLlm } from '@mish/linkpage/node';
 import { resolveOnPath } from '../runtimes/executables.js';
@@ -62,21 +63,54 @@ async function boundedKey(lookup: () => Promise<string>, ms: number): Promise<st
 
 const cancelled = (error: unknown): boolean => error instanceof Error && error.name === 'AbortError';
 
-/** OpenRouter first, `claude` when it fails (never on a cancel). */
-function withFallback(primary: Llm, fallback: Llm): Llm {
+/** An Llm that can say, after a build, which lane answered its calls. */
+export interface ReportingLlm extends Llm {
+  report: () => LinkPageModelInfo;
+}
+
+/** A fixed reason code for a failed OpenRouter call; the error text itself is never kept. */
+export function fallbackReason(error: unknown): LinkPageModelFallbackReason {
+  if (error instanceof LlmError) return error.code;
+  if (error instanceof Error && error.name === 'TimeoutError') return 'timeout';
+  return 'http-error';
+}
+
+/** The lane of every answered call is counted; one fallback is remembered (the first reason). */
+function track(lanes: { openrouter?: Llm; claude?: Llm }, noKey: boolean): ReportingLlm {
+  let calls = 0;
+  let last: 'openrouter' | 'claude-cli' | undefined;
+  let reason: LinkPageModelFallbackReason | undefined = noKey ? 'no-key' : undefined;
+  const answered = (lane: 'openrouter' | 'claude-cli') => { calls += 1; last = lane; };
   return {
     async json(request: LlmRequest) {
-      try {
-        return await primary.json(request);
-      } catch (error) {
-        if (cancelled(error)) throw error;
-        return fallback.json(request);
+      if (lanes.openrouter) {
+        try {
+          const value = await lanes.openrouter.json(request);
+          answered('openrouter');
+          return value;
+        } catch (error) {
+          // A cancel, or a failure with nothing to fall back to, goes to the caller.
+          if (cancelled(error) || !lanes.claude) throw error;
+          reason ??= fallbackReason(error);
+        }
       }
+      const value = await lanes.claude!.json(request);
+      answered('claude-cli');
+      return value;
+    },
+    report() {
+      const lane = last ?? (lanes.openrouter && !reason ? 'openrouter' : 'claude-cli');
+      return {
+        lane,
+        ...(lane === 'openrouter' ? { model: LINKPAGE_OPENROUTER_MODEL } : {}),
+        calls,
+        ...(reason ? { fellBackFrom: { lane: 'openrouter' as const, reason } } : {}),
+      };
     },
   };
 }
 
-export async function resolveLinkPageLlm(deps: ResolveLlmDeps): Promise<Llm | undefined> {
+export async function resolveLinkPageLlm(deps: ResolveLlmDeps): Promise<ReportingLlm | undefined> {
   const { fetch, findClaude = () => resolveOnPath('claude'), keyTimeoutMs = KEY_TIMEOUT_MS } = deps;
   const timed = fetchWithTimeout(deps.openRouterFetch ?? globalThis.fetch, deps.openRouterTimeoutMs ?? OPENROUTER_TIMEOUT_MS);
   const makeOpenRouter = deps.makeOpenRouter ?? ((apiKey: string) => createLlm({ apiKey, model: LINKPAGE_OPENROUTER_MODEL, fetch: timed }));
@@ -84,9 +118,6 @@ export async function resolveLinkPageLlm(deps: ResolveLlmDeps): Promise<Llm | un
   const apiKey = await boundedKey(deps.resolveKey, keyTimeoutMs);
   const claudePath = findClaude();
   const claude = claudePath ? makeClaude(claudePath) : undefined;
-  if (apiKey) {
-    const openrouter = makeOpenRouter(apiKey);
-    return claude ? withFallback(openrouter, claude) : openrouter;
-  }
-  return claude;
+  if (!apiKey && !claude) return undefined;
+  return track({ ...(apiKey ? { openrouter: makeOpenRouter(apiKey) } : {}), ...(claude ? { claude } : {}) }, !apiKey);
 }

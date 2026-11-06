@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { createLinkPageFetch, LINKPAGE_FETCH_MAX_BYTES } from '../src/linkpage/safe-fetch.js';
 import type { Llm } from '@mish/linkpage';
+import { LlmError } from '@mish/linkpage';
 import { LINKPAGE_OPENROUTER_MODEL, fetchWithTimeout, resolveLinkPageLlm } from '../src/linkpage/llm.js';
 
 describe('link page fetch', () => {
@@ -97,5 +98,44 @@ describe('link page model choice', () => {
       openRouterFetch: stalled, openRouterTimeoutMs: 20,
     });
     expect(await llm!.json(request)).toBe('claude');
+  });
+});
+
+describe('link page model report', () => {
+  const fetch = (async () => new Response('{}')) as typeof globalThis.fetch;
+  const ok = (name: string): Llm => ({ json: async () => name });
+  const failing = (error: Error): Llm => ({ json: async () => { throw error; } });
+  const request = { system: 's', user: 'u' };
+  const deps = { fetch, makeClaude: () => ok('claude'), resolveKey: async () => 'k', findClaude: () => '/bin/claude' };
+
+  it('names OpenRouter and its model after a successful call, counting calls', async () => {
+    const llm = await resolveLinkPageLlm({ ...deps, makeOpenRouter: () => ok('openrouter') });
+    expect(llm!.report()).toEqual({ lane: 'openrouter', model: LINKPAGE_OPENROUTER_MODEL, calls: 0 });
+    await llm!.json(request);
+    await llm!.json(request);
+    expect(llm!.report()).toEqual({ lane: 'openrouter', model: LINKPAGE_OPENROUTER_MODEL, calls: 2 });
+  });
+
+  it.each([
+    ['402', new LlmError('out-of-credits', 'x', 402), 'out-of-credits'],
+    ['401', new LlmError('bad-key', 'x', 401), 'bad-key'],
+    ['500', new LlmError('http-error', 'x', 500), 'http-error'],
+    ['invalid output', new LlmError('invalid-output', 'x'), 'invalid-output'],
+    ['timeout', Object.assign(new Error('t'), { name: 'TimeoutError' }), 'timeout'],
+    ['network error', new Error('ECONNRESET https://openrouter.ai sk-secret'), 'http-error'],
+  ])('falls back to the claude lane on %s with a fixed reason', async (_name, error, reason) => {
+    const llm = await resolveLinkPageLlm({ ...deps, makeOpenRouter: () => failing(error as Error) });
+    expect(await llm!.json(request)).toBe('claude');
+    const report = llm!.report();
+    expect(report).toEqual({ lane: 'claude-cli', calls: 1, fellBackFrom: { lane: 'openrouter', reason } });
+    expect(JSON.stringify(report)).not.toMatch(/sk-secret|https?:/);
+  });
+
+  it('reports no-key when claude answers without a key, and a failure with no claude still throws', async () => {
+    const llm = await resolveLinkPageLlm({ ...deps, resolveKey: async () => '' });
+    await llm!.json(request);
+    expect(llm!.report()).toEqual({ lane: 'claude-cli', calls: 1, fellBackFrom: { lane: 'openrouter', reason: 'no-key' } });
+    const alone = await resolveLinkPageLlm({ ...deps, findClaude: () => null, makeOpenRouter: () => failing(new LlmError('out-of-credits', 'OpenRouter is out of credits', 402)) });
+    await expect(alone!.json(request)).rejects.toThrow('out of credits');
   });
 });

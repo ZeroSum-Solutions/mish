@@ -11,6 +11,7 @@ import type {
   LinkPageBuildRequest,
   LinkPageAssetResponse,
   LinkPageBuildResponse,
+  LinkPageModelInfo,
   LinkPageEventResponse,
   LinkPagePublishRequest,
   LinkPagePublishResult,
@@ -44,7 +45,7 @@ export interface LinkPageServiceDeps {
   store: LinkPageStore;
   fetch: LinkPageFetch;
   /** Called per build, so a model that appears (a key set, `claude` installed) is picked up. */
-  resolveLlm: () => Llm | undefined | Promise<Llm | undefined>;
+  resolveLlm: () => (Llm & { report?: () => LinkPageModelInfo }) | undefined | Promise<(Llm & { report?: () => LinkPageModelInfo }) | undefined>;
   login?: LinkPageLoginProvider | undefined;
   /**
    * The Composio connected-account id of a connector the creator already connected in Mish (Settings or
@@ -102,6 +103,18 @@ function buildOptions(request: LinkPageBuildRequest): BuildOptions {
   };
 }
 
+/** A plain line for a fallback. Fixed wording per reason code: nothing from an error body, key or URL. */
+export function fallbackWarning(info: LinkPageModelInfo): string | undefined {
+  const from = info.fellBackFrom;
+  if (!from) return undefined;
+  switch (from.reason) {
+    case 'no-key': return 'No OpenRouter key is set; used the Claude CLI';
+    case 'out-of-credits': return 'OpenRouter is out of credits; used the Claude CLI';
+    case 'bad-key': return 'OpenRouter rejected the key; used the Claude CLI';
+    default: return `OpenRouter failed (${from.reason}); used the Claude CLI`;
+  }
+}
+
 const TEXT = 'text/plain; charset=utf-8';
 
 export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageService {
@@ -150,9 +163,12 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
       const spec = cleanSpec(result.spec);
       const warnings = [...loginWarnings, ...result.warnings];
       if (!llm) warnings.push('no model is available (add an OpenRouter key with `od agency config set --provider openrouter --key-stdin`, or install the claude command): the page was built from plain signals');
+      const model: LinkPageModelInfo = !llm ? { lane: 'none', calls: 0 } : (llm.report?.() ?? { lane: 'none', calls: 0 });
+      const fallback = fallbackWarning(model);
+      if (fallback) warnings.push(fallback);
       const save = request.save !== false;
       if (save) await store.put({ spec, connectedAccounts, warnings });
-      return { spec, warnings, needs: result.needs, saved: save };
+      return { spec, warnings, model, needs: result.needs, saved: save };
     },
 
     list: () => store.list(),

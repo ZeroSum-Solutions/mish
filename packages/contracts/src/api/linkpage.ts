@@ -137,9 +137,26 @@ export interface LinkPageLoginNeed {
 
 // Response -----------------------------------------------------------------------------------------
 
+/** Which model answered a build's model calls. */
+export type LinkPageModelLane = 'openrouter' | 'claude-cli' | 'none';
+
+/** Fixed codes for why OpenRouter did not answer. Never an error body, a key or a URL. */
+export type LinkPageModelFallbackReason = 'no-key' | 'out-of-credits' | 'bad-key' | 'timeout' | 'http-error' | 'invalid-output';
+
+export interface LinkPageModelInfo {
+  lane: LinkPageModelLane;
+  /** The OpenRouter model id, when that lane answered. */
+  model?: string;
+  /** How many model calls the build made and had answered. */
+  calls: number;
+  /** Set when OpenRouter was tried first (or had no key) and the Claude CLI answered instead. */
+  fellBackFrom?: { lane: 'openrouter'; reason: LinkPageModelFallbackReason };
+}
+
 export interface LinkPageBuildResponse {
   spec: LinkPageSpec;
   warnings: string[];
+  model: LinkPageModelInfo;
   needs: LinkPageLoginNeed[];
   /** True when the page was written to the store. */
   saved: boolean;

@@ -11,9 +11,10 @@ import express from 'express';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { LinkPageSpec } from '@mish/contracts';
-import type { PageSpec } from '@mish/linkpage';
+import type { Llm, PageSpec } from '@mish/linkpage';
 import { sendApiError } from '../src/http/api-errors.js';
 import type { LinkPageLoginProvider } from '../src/linkpage/login.js';
+import { resolveLinkPageLlm } from '../src/linkpage/llm.js';
 import { createLinkPageService } from '../src/linkpage/service.js';
 import { createLinkPageStore } from '../src/linkpage/store.js';
 import { registerLinkPageRoutes } from '../src/routes/linkpage.js';
@@ -256,5 +257,60 @@ describe('render and export', () => {
   it('answers 404 for a page that does not exist', async () => {
     expect((await fetch(`${baseUrl}/api/linkpages/nope/render`)).status).toBe(404);
     expect((await fetch(`${baseUrl}/api/linkpages/nope/export`)).status).toBe(404);
+  });
+});
+
+describe('build reports the model lane', () => {
+  const claude: Llm = { json: async () => ({}) };
+  const via = (openrouter: Llm | null) => createLinkPageService({
+    store: createLinkPageStore(dataDir),
+    fetch: fakeFetch,
+    resolveLlm: () => resolveLinkPageLlm({
+      fetch: fakeFetch,
+      resolveKey: async () => (openrouter ? 'key' : ''),
+      findClaude: () => '/bin/claude',
+      ...(openrouter ? { makeOpenRouter: () => openrouter } : {}),
+      makeClaude: () => claude,
+    }),
+  });
+  const request = { ...BUILD, save: false } as never;
+
+  it('says none when no model is available', async () => {
+    const res = await createLinkPageService({ store: createLinkPageStore(dataDir), fetch: fakeFetch, resolveLlm: () => undefined }).build(request);
+    expect(res.model).toEqual({ lane: 'none', calls: 0 });
+  });
+
+  it('names OpenRouter and the model with no fallback warning', async () => {
+    const res = await via({ json: async () => ({}) }).build(request);
+    expect(res.model.lane).toBe('openrouter');
+    expect(res.model.model).toBe('anthropic/claude-sonnet-5.5');
+    expect(res.model.calls).toBeGreaterThan(0);
+    expect(res.warnings.join(' ')).not.toMatch(/used the Claude CLI/);
+  });
+
+  it.each([
+    [402, 'out-of-credits', 'OpenRouter is out of credits; used the Claude CLI'],
+    [401, 'bad-key', 'OpenRouter rejected the key; used the Claude CLI'],
+  ])('falls back on HTTP %i with a plain warning and does not abort', async (status, reason, warning) => {
+    const { createLlm } = await import('@mish/linkpage');
+    const llm = createLlm({ apiKey: 'sk-secret', fetch: (async () => new Response(JSON.stringify({ error: { message: 'body sk-secret' } }), { status })) as never });
+    const res = await via(llm).build(request);
+    expect(res.model).toMatchObject({ lane: 'claude-cli', fellBackFrom: { lane: 'openrouter', reason } });
+    expect(res.warnings).toContain(warning);
+    expect(JSON.stringify(res)).not.toMatch(/sk-secret/);
+  });
+
+  it('falls back on a timeout and on invalid output with a code in the warning', async () => {
+    const timeout = await via({ json: async () => { throw Object.assign(new Error('slow'), { name: 'TimeoutError' }); } }).build(request);
+    expect(timeout.warnings).toContain('OpenRouter failed (timeout); used the Claude CLI');
+    const { LlmError } = await import('@mish/linkpage');
+    const bad = await via({ json: async () => { throw new LlmError('invalid-output', 'x'); } }).build(request);
+    expect(bad.warnings).toContain('OpenRouter failed (invalid-output); used the Claude CLI');
+  });
+
+  it('says why when there is no OpenRouter key', async () => {
+    const res = await via(null).build(request);
+    expect(res.model).toMatchObject({ lane: 'claude-cli', fellBackFrom: { reason: 'no-key' } });
+    expect(res.warnings).toContain('No OpenRouter key is set; used the Claude CLI');
   });
 });

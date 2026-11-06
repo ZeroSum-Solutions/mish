@@ -40,6 +40,18 @@ const REQUEST = JSON.stringify({ slug: 'sam', sources: [{ connector: 'website', 
 const SPEC = { slug: 'sam', profile: { name: 'Sam', headline: 'Potter' }, blocks: [{}] };
 
 describe('od linkpage', () => {
+  it('prints the model lane in the human build output', async () => {
+    const model = { lane: 'claude-cli', calls: 2, fellBackFrom: { lane: 'openrouter', reason: 'out-of-credits' } };
+    const h = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: ['OpenRouter is out of credits; used the Claude CLI'], model, needs: [] } }], REQUEST);
+    expect((await h.run(['build', '--config', 'c.json'])).stdout).toBe('Built sam: Sam (saved)\n  model: Claude CLI, 2 calls\n  warning: OpenRouter is out of credits; used the Claude CLI\n');
+    const or = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], model: { lane: 'openrouter', model: 'anthropic/claude-sonnet-5.5', calls: 1 }, needs: [] } }], REQUEST);
+    expect((await or.run(['build', '--config', 'c.json'])).stdout).toContain('model: OpenRouter (anthropic/claude-sonnet-5.5), 1 call\n');
+    const none = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], model: { lane: 'none', calls: 0 }, needs: [] } }], REQUEST);
+    expect((await none.run(['build', '--config', 'c.json'])).stdout).toContain('model: none');
+    const json = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], model, needs: [] } }], REQUEST);
+    expect(JSON.parse((await json.run(['build', '--config', 'c.json', '--json'])).stdout).model).toEqual(model);
+  });
+
   it('prints help and usage', async () => {
     const h = harness([]);
     expect((await h.run([])).stdout).toMatch(/od linkpage build --config/);

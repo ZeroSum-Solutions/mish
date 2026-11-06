@@ -22,6 +22,7 @@ import {
 import type {
   LinkPageAssetResponse,
   LinkPageBuildResponse,
+  LinkPageModelInfo,
   LinkPageDeleteResponse,
   LinkPageExportResponse,
   LinkPageGetResponse,
@@ -233,6 +234,7 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
       case 'build': {
         const built = body as LinkPageBuildResponse;
         const lines = [`Built ${built.spec.slug}: ${built.spec.profile.name}${built.saved ? ' (saved)' : ' (not saved)'}`];
+        if (built.model) lines.push(`  model: ${describeModel(built.model)}`);
         for (const warning of built.warnings) lines.push(`  warning: ${warning}`);
         for (const need of built.needs) lines.push(`  login: ${need.platform}: ${need.why}`);
         return out(0, `${lines.join('\n')}\n`);
@@ -261,4 +263,11 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
   } catch (error) {
     return out(1, '', `od linkpage ${command} failed: ${error instanceof Error ? error.message : String(error)}\n`);
   }
+}
+
+/** One plain line: which lane answered, and the OpenRouter model id when that lane did. */
+export function describeModel(model: LinkPageModelInfo): string {
+  if (model.lane === 'none') return 'none (built from plain signals)';
+  const name = model.lane === 'openrouter' ? `OpenRouter${model.model ? ` (${model.model})` : ''}` : 'Claude CLI';
+  return `${name}, ${model.calls} ${model.calls === 1 ? 'call' : 'calls'}`;
 }

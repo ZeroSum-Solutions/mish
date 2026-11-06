@@ -69,6 +69,29 @@ The builder reads people with a model in two lanes ([`linkpage/llm.ts`](../apps/
    stdin, and a temporary folder that is deleted afterwards.
 3. **No model**: the page is built from plain signals and the build warns.
 
+### Which lane answered
+
+Every build response (`POST /api/linkpages/build`, `od linkpage build --json`) carries a `model` field:
+
+```json
+{ "lane": "claude-cli", "calls": 2, "fellBackFrom": { "lane": "openrouter", "reason": "out-of-credits" } }
+```
+
+- `lane` is `openrouter`, `claude-cli` or `none` (the lane that answered the last model call).
+- `model` is the OpenRouter model id, present only when `lane` is `openrouter`.
+- `calls` is how many model calls were answered.
+- `fellBackFrom` is set when OpenRouter did not answer and the Claude CLI did. `reason` is one of
+  `no-key`, `out-of-credits` (HTTP 402), `bad-key` (HTTP 401), `timeout`, `http-error`,
+  `invalid-output`. These are fixed codes: no error body, key or URL is ever put in the field or the
+  warning.
+
+A fallback adds a plain warning, for example "OpenRouter is out of credits; used the Claude CLI",
+"OpenRouter rejected the key; used the Claude CLI" or "OpenRouter failed (timeout); used the Claude CLI".
+A 402 or 401 falls back like any other failure and does not abort the build. `od linkpage build`
+prints a `model:` line, and the web view shows the lane under the build result. If OpenRouter fails
+and the `claude` command is not installed, the build keeps the error as a warning (without the reply
+body) and the page is built from plain signals.
+
 ## Instagram and TikTok
 
 Both platforms show little without the creator's login, and only a **business or creator account**

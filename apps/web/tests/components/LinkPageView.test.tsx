@@ -119,6 +119,30 @@ describe('LinkPageView', () => {
     expect(calls).toEqual([]);
   });
 
+  it('shows which model lane answered the build', async () => {
+    answers['POST /api/linkpages/build'] = () => json({
+      spec: SPEC,
+      warnings: ['OpenRouter is out of credits; used the Claude CLI'],
+      model: { lane: 'claude-cli', calls: 2, fellBackFrom: { lane: 'openrouter', reason: 'out-of-credits' } },
+      needs: [],
+      saved: true,
+    });
+    render(<LinkPageView />);
+    await fillAndBuild(() => {});
+    expect((await screen.findByTestId('link-page-model')).textContent).toBe('Read by the Claude CLI. Model calls: 2.');
+    expect(screen.getByTestId('link-page-warnings').textContent).toContain('OpenRouter is out of credits; used the Claude CLI');
+  });
+
+  it('names the OpenRouter model, and says when no model was used', async () => {
+    answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'openrouter', model: 'anthropic/claude-sonnet-5.5', calls: 3 }, needs: [], saved: true });
+    render(<LinkPageView />);
+    await fillAndBuild(() => {});
+    expect((await screen.findByTestId('link-page-model')).textContent).toBe('Read by OpenRouter (anthropic/claude-sonnet-5.5). Model calls: 3.');
+    answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'none', calls: 0 }, needs: [], saved: true });
+    fireEvent.click(screen.getByRole('button', { name: 'Build page' }));
+    await waitFor(() => expect(screen.getByTestId('link-page-model').textContent).toContain('No model was used'));
+  });
+
   it('builds with the form options and shows warnings, needs and a sandboxed preview', async () => {
     answers['POST /api/linkpages/build'] = () => json({
       spec: SPEC,
