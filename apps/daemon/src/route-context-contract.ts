@@ -11,6 +11,7 @@ import type { RegisterGenuiRoutesDeps } from './routes/genui.js';
 import type { RegisterHandoffRoutesDeps } from './routes/handoff.js';
 import type { RegisterHostToolsRoutesDeps } from './routes/host-tools.js';
 import type { RegisterLiveArtifactRoutesDeps } from './routes/live-artifact.js';
+import type { RegisterLinkPageRoutesDeps } from './routes/linkpage.js';
 import type { RegisterMcpRoutesDeps } from './mcp-routes.js';
 import type { RegisterMediaRoutesDeps } from './routes/media.js';
 import type { RegisterMemoryRoutesDeps } from './routes/memory.js';
@@ -39,6 +40,7 @@ type AllRegisteredRouteDeps =
   & RegisterHostToolsRoutesDeps
   & RegisterImportRoutesDeps
   & RegisterLiveArtifactRoutesDeps
+  & RegisterLinkPageRoutesDeps
   & RegisterMcpRoutesDeps
   & RegisterMediaRoutesDeps
   & RegisterMemoryRoutesDeps

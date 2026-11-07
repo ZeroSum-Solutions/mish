@@ -1,0 +1,220 @@
+# Link pages
+
+**Parent:** [`architecture.md`](architecture.md) · **Engine:** [`packages/linkpage`](../packages/linkpage/README.md) · **Contract:** [`packages/contracts/src/api/linkpage.ts`](../packages/contracts/src/api/linkpage.ts)
+
+A link page is one tidy page for a creator, built from the places they already have online: a
+website, a Substack, an Instagram or TikTok handle. The engine reads those places, derives a look
+from them, and renders a static site (`index.html`, `llms.txt`, `links.json`, `spec.json`, pictures).
+
+Link pages are not projects and not skills. They have their own store, so the web surface is an
+entry view (Link pages in the left rail, `/link-pages`) and not a New Project tab
+([`modes.md`](modes.md)).
+
+## Three ways in
+
+| Surface | Where |
+|---|---|
+| Web | Link pages view: [`LinkPageView.tsx`](../apps/web/src/components/LinkPageView.tsx) |
+| CLI | `od linkpage …` ([`linkpage-cli.ts`](../apps/daemon/src/linkpage-cli.ts)) |
+| HTTP | `/api/linkpages*` ([`routes/linkpage.ts`](../apps/daemon/src/routes/linkpage.ts)) |
+
+All three use the validators in the contract package, so a bad request reads the same everywhere.
+
+## `od` commands
+
+```bash
+od linkpage build --config sam.json      # { slug, sources, options, connectedAccounts?, save? }; '-' reads stdin
+od linkpage list
+od linkpage get sam
+od linkpage asset sam ./me.png           # prints the path to use: assets/me.png
+od linkpage render sam --out ./site --origin https://links.example.com
+od linkpage publish sam --origin https://links.example.com --track-base https://links.example.com/go
+od linkpage delete sam
+```
+
+`--json` prints the daemon's response. `--model-lane <auto|claude-cli|openrouter|deepseek|baseten>` picks the model lane for
+a build and overrides `options.modelLane` in the config (see Model). `publish` lists the files that would be deployed; it does
+not upload anything (see hosting below).
+
+## Endpoints
+
+| Method and path | What |
+|---|---|
+| `POST /api/linkpages/build` | Build (and by default save) a page |
+| `GET /api/linkpages`, `GET/PUT/DELETE /api/linkpages/:slug` | List, read, replace, delete. `GET` and `PUT` answer without `connectedAccounts`, and a `PUT` that sends them is refused (400); an edit never changes which login a page uses |
+| `GET /api/linkpages/:slug/render?origin=` | The page as HTML, in a CSP sandbox, for the preview frame |
+| `GET /api/linkpages/:slug/export?origin=` | The site files |
+| `POST /api/linkpages/:slug/publish` | `{ origin?, trackBase? }` returns a `LinkPagePublishResult`: the file list ready to deploy (`url` is `<origin>/`). `published` is false until a host exists |
+| `PUT /api/linkpages/:slug/assets/:name` | A picture, raw body, for a page that already exists (404 otherwise). Images only (png, jpeg, webp, gif), at most 2 MB, type checked against the bytes. No SVG |
+| `GET /api/linkpages/:slug/assets/:name` | The picture, so the preview resolves `assets/<name>` |
+| `POST /api/linkpages/:slug/events` | A view, click or signup from local preview. Validated with the contract, a filled `website` honeypot field is dropped silently, appended to `linkpages/<slug>/events.jsonl` (capped at 5 MB) |
+
+Pages live under the daemon's data folder (`linkpages/<slug>/page.json`, `assets/`, `events.jsonl`),
+never in the repository.
+
+## Model
+
+The builder reads people with a model in three lanes ([`linkpage/llm.ts`](../apps/daemon/src/linkpage/llm.ts)):
+
+1. **OpenRouter first.** The key comes from the daemon key store, the same one the brief generator
+   uses: `OPENROUTER_API_KEY`, then a key saved with `od agency config set --provider openrouter --key-stdin`,
+   then the vault. The lookup is bounded (5 s) and the key is never logged. The models come from the lane table
+   below, per job.
+2. **DeepSeek, text only**, when there is no OpenRouter key (its key is not read when OpenRouter has one).
+   The key comes from the same store (`DEEPSEEK_API_KEY`, a saved key, then the vault; lookup bounded to 5 s).
+   It runs the fast lane's `createModelCaller` with its default model (`deepseek-flash`, in JSON mode, 60 s
+   limit, one retry). DeepSeek has no vision here, so the style-from-photos step goes to the next lane that can see
+   (the Claude CLI) or, when there is none, is skipped with the warning `vision: DeepSeek reads text only; photo
+   style was skipped`. DeepSeek is metered and sends the scraped page text to DeepSeek.
+3. **The `claude` command** (the owner's subscription) when there is no key, or when an OpenRouter or DeepSeek
+   call fails or runs past its limit. A cancelled call is not retried. It runs the executable the daemon found
+   on `PATH`, and because it reads text scraped from other people's sites it is locked down:
+   `--tools Read` (the only tool), `--strict-mcp-config`, `--setting-sources ""` (no user or project
+   settings, hooks or CLAUDE.md), `--disable-slash-commands`, `--permission-mode dontAsk`, the prompt on
+   stdin, and a temporary folder that is deleted afterwards.
+4. **No model**: the page is built from plain signals and the build warns.
+
+### The lane table (which OpenRouter model per job)
+
+[`linkpage/model-lanes.ts`](../apps/daemon/src/linkpage/model-lanes.ts) holds one table, job to an ordered list of
+OpenRouter model ids. It is the only place that names these models; to change one (say after checking
+artificialanalysis.ai for a better or cheaper model), edit an id or reorder a list there and change nothing else.
+
+| Job | Models, in order |
+|---|---|
+| `understand` (read the person from text) | `anthropic/claude-sonnet-5.5` |
+| `vision` (style from photos) | `deepseek/deepseek-v4.1-flash`, then `anthropic/claude-sonnet-5.5` |
+
+A call tries the models in order. It moves to the next id when a model fails (HTTP error, timeout, an error inside a
+200) or when its reply is not usable (not JSON, or JSON with no colour, font or mood for the photo step). A cancel,
+`402` (out of credits) and `401` (bad key) stop at once, because the next model would fail the same way. If every
+model fails, the lane fails with the last fixed reason code and `auto` goes on to the Claude CLI. `model` in the
+build response is the model that answered the last call. `OD_LINKPAGE_VISION_MODEL` puts one id first for the photo
+step (for example `anthropic/claude-sonnet-5.5` to prefer Sonnet); the table's ids stay behind it as fallbacks.
+
+### Choosing the lane
+
+`options.modelLane` on the build request (`auto`, `claude-cli`, `openrouter`, `deepseek` or `baseten`; default `auto`) picks the lane
+for that build. The web view has a Model select in the page details, and `od linkpage build --model-lane`
+overrides the config file.
+
+- `auto`: the order above: OpenRouter; with no OpenRouter key, DeepSeek for text; the Claude CLI as the fallback
+  (and the only photo reader without OpenRouter).
+- `claude-cli`: only the `claude` command. The key store and OpenRouter are never touched, so a saved key
+  stays saved and is not read. If no `claude` is found, the build continues with no model and a warning.
+- `openrouter`: only OpenRouter, never the CLI. With no key, or when a call fails, the model step fails with
+  the reason-coded warning (`model.failed` carries the code) and the page is built from plain signals.
+- `deepseek`: only DeepSeek, text only, never the CLI. The OpenRouter key is not read. Photo style is skipped
+  with the warning above. With no key, or when a call fails, the same reason-coded warning applies.
+- `baseten`: only Baseten's OpenAI-compatible chat completions (`https://inference.baseten.co/v1`, override with
+  `OD_BASETEN_BASE_URL`), never the CLI and never auto. The key comes from the key store (`OD_BASETEN_API_KEY` or
+  `BASETEN_API_KEY`, then `od agency config set --provider baseten --key-stdin`, then the vault entry
+  `baseten_api_key`). The model id is `OD_BASETEN_MODEL`; no default id is verified, so with it unset the lane
+  fails with the reason code `model-not-set` and makes no request. Pictures go as `image_url` parts. JSON mode is
+  not requested (not every Baseten model accepts it); the reply is parsed like the others.
+
+The daemon default is `OD_LINKPAGE_MODEL_LANE` (`auto`, `claude-cli`, `openrouter` or `deepseek`; anything else means
+`auto`). A lane in the request wins over it.
+
+The CLI lane works only on a machine with a signed-in `claude`. A hosted builder has no such login, so it needs
+OpenRouter (or another server-side lane).
+
+### Which lane answered
+
+Every build response (`POST /api/linkpages/build`, `od linkpage build --json`) carries a `model` field:
+
+```json
+{ "lane": "claude-cli", "calls": 2, "fellBackFrom": { "lane": "openrouter", "reason": "out-of-credits" } }
+```
+
+- `lane` is `openrouter`, `deepseek`, `claude-cli` or `none` (the lane that answered the last model call).
+- `model` is the model id, present only when `lane` is `openrouter` or `deepseek`.
+- `calls` is how many model calls were answered.
+- `fellBackFrom` is set when the first lane (`openrouter`, or `deepseek` when it ran first) did not answer and another did. `reason` is one of
+  `no-key`, `out-of-credits` (HTTP 402), `bad-key` (HTTP 401), `timeout`, `http-error`,
+  `invalid-output`. These are fixed codes: no error body, key or URL is ever put in the field or the
+  warning.
+
+A fallback adds a plain warning (DeepSeek's read the same, with its own name), for example "OpenRouter is out of credits; used the Claude CLI",
+"OpenRouter rejected the key; used the Claude CLI" or "OpenRouter failed (timeout); used the Claude CLI".
+A 402 or 401 falls back like any other failure and does not abort the build. `od linkpage build`
+prints a `model:` line, and the web view shows the lane under the build result. If OpenRouter fails
+and the `claude` command is not installed, the build keeps the error as a warning (without the reply
+body) and the page is built from plain signals.
+
+### The Jev quality gate
+
+After a build the daemon asks TypeSafe Jev (`api.typesafe.ai/v1/systemone`, `jev-latest`, the key from the key store:
+`TYPESAFE_API_KEY`, a saved key, then the vault) typed yes/no ("noul") questions in one request, with the creator's
+gathered facts (name, bios, site title, platforms, stats, the start of the pages that were read) as state:
+
+1. Are the bio and headline together sufficient and specific to this person? Under `GATE_SUFFICIENCY_THRESHOLD` (0.4)
+   the build reports `gate.insufficient` with the reason. The page is still built and saved.
+2. For each extracted item (the headline, each theme, each post or video title shown): how likely is it that a person
+   with this profile and industry would have this content? Under `GATE_ITEM_THRESHOLD` (0.2) the item is taken off the
+   page and listed in `gate.dropped` with its kind, text and probability. An emptied posts block is removed.
+
+Both constants are in [`linkpage/gate.ts`](../apps/daemon/src/linkpage/gate.ts). A headline or bio the creator typed
+(`options.headline`, `options.bio`) is never judged. The gate only removes or rejects: it never writes or adds text.
+It fails open: no Jev key, a network error, a bad status or an unreadable answer gives `gate.ran: false` with
+`skipped` (`no-key` or `unavailable`) and leaves the page as built; a build is never blocked.
+
+On the `auto` lane, an insufficient read gets one more read on the next lane (OpenRouter or DeepSeek to the Claude CLI;
+`LINKPAGE_RETRY_LANE` in `model-lanes.ts`). The retry is kept only when its sufficiency is higher; `gate.retried`
+says which read was kept. A lane named in the request, or set as the daemon default, never retries. The web view shows
+a Quality check box under the model line, and `od linkpage build` prints `gate:` lines.
+
+## Instagram and TikTok
+
+Both platforms show little without the creator's login, and only a **business or creator account**
+can be read through their official APIs. The web view has a Connect step for them that says so and
+uses the existing Composio connectors state (`connectConnector`, connector statuses). A build that
+names no connected accounts uses the login connected in Mish right now (a saved id is used only when
+none resolves); the browser never handles a connected-account id: it is not returned by `GET`/`PUT`
+and a `PUT` cannot set it. Only `od linkpage build` (and a raw `POST /build`) can name one, and the
+Composio proxy refuses an account whose owner it cannot confirm. Without a login, or when the login
+read fails, the page is built from what any visitor can see (a failed login adds a warning) and the
+response lists `needs`.
+
+## The built site
+
+A site is served at **its own root**, one subdomain (or domain) per creator, so everything in it is
+relative to `/`: `assets/avatar.png`, `llms.txt`, `links.json`. `origin` is that root with no slug
+path: the canonical link is `<origin>/`, `links.json` has `page_url: "<origin>/"` and `publish`
+returns `url: "<origin>/"`. With `trackBase`, links in `index.html`, `links.json` (`tracked_url`) and
+`llms.txt` go through `<trackBase>/<slug>/<block>/<index>` (ids URL-encoded). `llms.txt` does not
+advertise an MCP endpoint: `handleMcp` exists in the engine but no route serves it yet.
+
+Builds are forgiving about what they scrape: a font name that is not ASCII is folded to ASCII and one
+that is not a name (a `clamp()` or size from a WordPress variable) is dropped for a system stack; a
+post, social or link item with an address that is not a web address is dropped with a warning. Spec
+checking (`checkPage`) also strips fields it does not know from blocks and the theme.
+
+## Hosting plan (not built yet)
+
+- **Static export on a subdomain.** `render` and `export` already produce a complete static site.
+  Each creator's site is served from a subdomain of ours (for example `<slug>.links.example`), or
+  from their own domain pointed at the same host. `origin` gives the canonical address and
+  `trackBase` routes link clicks through a counter.
+- **Public events.** The page posts signups and clicks to a small public endpoint on that host. The
+  event module the daemon uses for local preview
+  ([`linkpage/events.ts`](../apps/daemon/src/linkpage/events.ts)) is the pure part to reuse there.
+  The daemon's own `/api` is loopback-only and rejects sandboxed-origin posts, so a preview frame
+  cannot sign up; it works once the page is hosted.
+- **Composio platform account.** One Composio platform account holds the app credentials; each
+  creator gets their own connected account for Instagram and TikTok. Mish stores only the
+  connected-account id, never a token. The proxy call in `connectors/composio.ts` is written
+  against Composio's documented proxy endpoint and has not been run against a live account.
+
+## Known gaps
+
+Reviewed and left for later; none blocks the draft.
+
+- N2, N5, N6, N7, N9, N10, N11: minor review notes (wording, small refactors, extra test cases) that
+  were judged not worth the churn in this PR.
+- `handleMcp` is not served by any route, so the hosted site has no MCP endpoint yet.
+- The Instagram and TikTok request formats follow the platforms' documentation and have not been run
+  against live accounts; the Composio proxy call is likewise untested live.
+- The avatar picture needs a built page first (it is stored under the page's slug).
+
+TikTok logins can now come from Mish's own OAuth provider instead of Composio: see [native-oauth.md](native-oauth.md).

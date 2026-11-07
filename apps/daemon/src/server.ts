@@ -933,11 +933,11 @@ import { createScopedKitLister } from './routes/agency-build-kit.js';
 import { jevKeyResolver, registerDesignIndexRoutes } from './routes/design-index.js';
 import { provisionBundledTeamAccess } from './services/team-access.js';
 import { configureDeployDataDir } from './deploy.js';
-import { createAgencyJevKeyStore, freshPerGeneration } from './storage/agency-config.js';
+import { createAgencyJevKeyStore, freshPerGeneration, modelVaultKeyId } from './storage/agency-config.js';
 import { buildSite, createJevEffectJudge, createJevSectionJudge } from '@mish/agency-fast-lane/build';
 import { createJevBlockPlanner } from '@mish/agency-fast-lane/block-plan';
 import { designTaxonomy, familyRegistry as designFamilyRegistry, shapeAtlas as designAtlas } from '@mish/agency-fast-lane/data';
-import { PROVIDERS, createModelCaller, vaultSecret } from '@mish/agency-fast-lane/deepseek';
+import { createModelCaller, vaultSecret } from '@mish/agency-fast-lane/deepseek';
 import { loadFamilyPackage } from '@mish/agency-fast-lane/family';
 import { genuiCatalog } from '@mish/genui-catalog/data';
 import { createJevChecker } from '@mish/agency-fast-lane/jev';
@@ -976,6 +976,12 @@ import { createTerminalService } from './terminals.js';
 import { createBrowserSessionService } from './browser-sessions.js';
 import { registerSocialShareRoutes } from './routes/social-share.js';
 import { registerMishPublicMetadataRoutes } from './routes/mish-public-metadata.js';
+import { registerLinkPageRoutes } from './routes/linkpage.js';
+import { createJevGate } from './linkpage/gate.js';
+import { createLinkPageService } from './linkpage/service.js';
+import { createLinkPageStore } from './linkpage/store.js';
+import { createLinkPageFetch } from './linkpage/safe-fetch.js';
+import { linkPageLaneFromEnv, resolveLinkPageLlm } from './linkpage/llm.js';
 import { registerWhatsNewRoutes } from './routes/whats-new.js';
 import { registerGenuiCatalogRoutes } from './routes/genui-catalog.js';
 import { registerWorkbenchIntakeRoutes } from './routes/workbench-intake.js';
@@ -1261,7 +1267,11 @@ import { createPluginInstallationHelpers, normalizeProjectPluginFolderPath, reso
 import { createPluginShareTaskStore } from './services/plugin-share-tasks.js';
 import { getRouteRegistrationInventory, installRouteRegistrationGuard } from './route-registration-guard.js';
 import { assertServerContextSatisfiesRoutes } from './route-context-contract.js';
-import { configureConnectorCredentialStore, connectorService, FileConnectorCredentialStore } from './connectors/service.js';
+import { configureConnectorCredentialStore, configureNativeOAuth, connectorService, FileConnectorCredentialStore } from './connectors/service.js';
+import { createNativeOAuthService } from './connectors/native-oauth.js';
+import { resolveKeyring, type Keyring } from './connectors/native/key-source.js';
+import { EncryptedTokenStore } from './connectors/native/token-store.js';
+import { createNativeAwareLoginProvider } from './linkpage/login.js';
 import { composioConnectorProvider } from './connectors/composio.js';
 import { configureComposioConfigStore } from './connectors/composio-config.js';
 import {
@@ -3946,6 +3956,14 @@ export async function startServer({
     try { return getProject(db, id)?.metadata ?? null; } catch { return null; }
   };
   configureConnectorCredentialStore(new FileConnectorCredentialStore(RUNTIME_DATA_DIR));
+  // Mish's own OAuth provider (TikTok). The token key is resolved lazily and only a success is cached,
+  // so a key added later is picked up; with no key, connecting fails closed (nothing is stored in plaintext).
+  let tokenKeyring: Keyring | undefined;
+  configureNativeOAuth(createNativeOAuthService({
+    store: new EncryptedTokenStore(RUNTIME_DATA_DIR, async () => (tokenKeyring ??= await resolveKeyring({ env: process.env, readVaultSecret: vaultSecret }))),
+    env: process.env,
+    readVaultSecret: vaultSecret,
+  }));
   configureComposioConfigStore(RUNTIME_DATA_DIR);
   composioConnectorProvider.configureCatalogCache(RUNTIME_DATA_DIR);
   composioConnectorProvider.startCatalogRefreshLoop();
@@ -8658,6 +8676,27 @@ export async function startServer({
     mishPublicMetadata,
   });
 
+  const linkPageFetch = createLinkPageFetch();
+  registerLinkPageRoutes(app, {
+    http: httpDeps,
+    linkpage: createLinkPageService({
+      store: createLinkPageStore(RUNTIME_DATA_DIR),
+      fetch: linkPageFetch,
+      gate: createJevGate({ resolveKey: () => jevKeyStore.resolveKey() }),
+      defaultLane: () => linkPageLaneFromEnv(process.env),
+      resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), resolveDeepSeekKey: () => jevKeyStore.resolveModelKey('deepseek'), visionModel: process.env.OD_LINKPAGE_VISION_MODEL, resolveBasetenKey: () => jevKeyStore.resolveModelKey('baseten'), basetenModel: process.env.OD_BASETEN_MODEL, basetenBaseUrl: process.env.OD_BASETEN_BASE_URL, fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
+      login: createNativeAwareLoginProvider(composioConnectorProvider, () => connectorService.getNativeOAuth()),
+      resolveConnectedAccount: (connector) => {
+        const credentials = connectorService.getCredential(connector)?.credentials;
+        // A native login (Mish's own OAuth) is picked when connected; Composio's stays the fallback.
+        if (credentials?.provider === 'native' && typeof credentials.accountId === 'string') return credentials.accountId;
+        return credentials?.provider === 'composio' && typeof credentials.providerConnectionId === 'string'
+          ? credentials.providerConnectionId
+          : undefined;
+      },
+    }),
+  });
+
   registerWhatsNewRoutes(app, {
     whatsNew: createWhatsNewService(),
   });
@@ -9628,7 +9667,7 @@ export async function startServer({
     dataDir: RUNTIME_DATA_DIR,
     readVaultSecret: () => vaultSecret('typesafe_api_key'),
     // The fill-model keys use the same file and order: env, stored, then this vault entry.
-    readModelVaultSecret: (provider) => vaultSecret(provider === 'openrouter' ? 'openrouter_api_key' : PROVIDERS[provider].vaultKeyId),
+    readModelVaultSecret: (provider) => vaultSecret(modelVaultKeyId(provider)),
   });
   const jevApiKey = jevKeyResolver(() => jevKeyStore.resolveKey());
   // The fast lane caches a resolved key for the life of the router it was given to, so a key

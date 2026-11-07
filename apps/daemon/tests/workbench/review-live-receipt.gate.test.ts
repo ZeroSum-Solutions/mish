@@ -12,10 +12,10 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { PROVIDERS, vaultSecret } from '@mish/agency-fast-lane/deepseek';
+import { vaultSecret } from '@mish/agency-fast-lane/deepseek';
 import { WORKBENCH_REVIEWER_ROLES, type ProjectRubric, type ReviewerRole } from '@mish/contracts';
 import { jevKeyResolver } from '../../src/routes/design-index.js';
-import { createAgencyJevKeyStore } from '../../src/storage/agency-config.js';
+import { createAgencyJevKeyStore, modelVaultKeyId } from '../../src/storage/agency-config.js';
 import { createProductionReviewRuns } from '../../src/workbench/review/production.js';
 import { createWorkbenchReviewService } from '../../src/workbench/review/service.js';
 import { knownGoodCapture, portFrom } from './review-capture-fixture.js';
@@ -39,7 +39,7 @@ describe.skipIf(roles.length === 0)('AC-R03.4 live review receipts (gate only)',
         dataDir: data, projectInputs,
         ...(process.env.OD_REVIEW_LIVE_BROWSER === '1' ? {} : { createPort: () => portFrom(width => knownGoodCapture(width, item => { item.served = [{ path: 'index.html', sha256: sha256(html) }]; item.screenshotPng = png; })) }),
       });
-      const keys = createAgencyJevKeyStore({ dataDir: data, readVaultSecret: () => vaultSecret('typesafe_api_key'), readModelVaultSecret: provider => vaultSecret(provider === 'openrouter' ? 'openrouter_api_key' : PROVIDERS[provider].vaultKeyId) });
+      const keys = createAgencyJevKeyStore({ dataDir: data, readVaultSecret: () => vaultSecret('typesafe_api_key'), readModelVaultSecret: provider => vaultSecret(modelVaultKeyId(provider)) });
       const runs = createProductionReviewRuns({
         dataDir: data, projectsRoot: data, mechanical, projectInputs,
         project: () => ({ root, metadata: {} }),

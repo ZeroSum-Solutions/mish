@@ -74,8 +74,19 @@ export interface ConnectorDetail {
   auth?: ConnectorAuthDetail;
 }
 
+/**
+ * How a connector authenticates. `composio` goes through Composio's hosted OAuth; `native` is Mish's
+ * own OAuth provider (tokens held encrypted by the daemon, never sent to the browser).
+ */
+export const CONNECTOR_AUTH_PROVIDERS = ['local', 'none', 'oauth', 'composio', 'native'] as const;
+export type ConnectorAuthProvider = (typeof CONNECTOR_AUTH_PROVIDERS)[number];
+
+export function isConnectorAuthProvider(value: unknown): value is ConnectorAuthProvider {
+  return typeof value === 'string' && (CONNECTOR_AUTH_PROVIDERS as readonly string[]).includes(value);
+}
+
 export interface ConnectorAuthDetail {
-  provider: 'local' | 'none' | 'oauth' | 'composio';
+  provider: ConnectorAuthProvider;
   configured: boolean;
 }
 
@@ -168,4 +179,25 @@ export interface ConnectorExecuteResponse {
   outputSummary?: string;
   providerExecutionId?: string;
   metadata?: BoundedJsonObject;
+}
+
+/** The `state` a native OAuth flow sends out and expects back: 32 random bytes, base64url. */
+export const NATIVE_OAUTH_STATE_PATTERN = /^[A-Za-z0-9_-]{32,128}$/u;
+const NATIVE_OAUTH_CODE_MAX_CHARS = 2048;
+
+export type NativeOAuthCallbackQuery =
+  | { ok: true; state: string; code: string }
+  | { ok: false; reason: 'denied'; state: string }
+  | { ok: false; reason: 'invalid' };
+
+/**
+ * Reads the redirect query of a native OAuth flow. Anything that is not exactly one well-formed
+ * `state` plus one `code` (or a provider `error` for that state) is `invalid`.
+ */
+export function parseNativeOAuthCallbackQuery(query: Record<string, unknown>): NativeOAuthCallbackQuery {
+  const { state, code, error } = query;
+  if (typeof state !== 'string' || !NATIVE_OAUTH_STATE_PATTERN.test(state)) return { ok: false, reason: 'invalid' };
+  if (typeof error === 'string' && error.length > 0) return { ok: false, reason: 'denied', state };
+  if (typeof code !== 'string' || code.length === 0 || code.length > NATIVE_OAUTH_CODE_MAX_CHARS) return { ok: false, reason: 'invalid' };
+  return { ok: true, state, code };
 }

@@ -1,5 +1,5 @@
 // `od agency config <status|set|clear|repair>` — the CLI surface for the daemon's own TypeSafe (Jev)
-// credential and, with `--provider deepseek|cerebras|openrouter`, the fast lane's fill-model keys. Per AGENTS.md "Capability exposure (UI/CLI dual-track)" it drives exactly the
+// credential and, with `--provider deepseek|cerebras|openrouter|baseten`, the fast lane's fill-model keys. Per AGENTS.md "Capability exposure (UI/CLI dual-track)" it drives exactly the
 // endpoints the Settings card drives: `GET` and `PUT /api/agency/config`, and
 // `POST /api/agency/config/repair` for `repair --confirm`, which sets an unreadable key file aside
 // (renamed to `agency-config.json.corrupt-<timestamp>`, never deleted) so the next save starts
@@ -35,9 +35,9 @@ export interface AgencyConfigCliOptions {
 }
 
 const SUBCOMMANDS = ['status', 'set', 'clear', 'repair'] as const;
-const USAGE = 'Usage: od agency config <status|set|clear> [--provider deepseek|cerebras|openrouter] [--json] | od agency config repair --confirm [--json]';
+const USAGE = 'Usage: od agency config <status|set|clear> [--provider deepseek|cerebras|openrouter|baseten] [--json] | od agency config repair --confirm [--json]';
 const REPAIR_USAGE = 'Usage: od agency config repair --confirm   (renames an unreadable key file aside; never deletes it)';
-const SET_USAGE = 'Usage: od agency config set [--provider deepseek|cerebras|openrouter] --key-stdin   (the key is read from stdin)';
+const SET_USAGE = 'Usage: od agency config set [--provider deepseek|cerebras|openrouter|baseten] --key-stdin   (the key is read from stdin)';
 
 interface ParsedFlags {
   json: boolean;
@@ -48,7 +48,7 @@ interface ParsedFlags {
   provider?: AgencyModelProvider;
 }
 
-const PROVIDER_LABEL: Record<AgencyModelProvider, string> = { deepseek: 'DeepSeek', cerebras: 'Cerebras', openrouter: 'OpenRouter' };
+const PROVIDER_LABEL: Record<AgencyModelProvider, string> = { deepseek: 'DeepSeek', cerebras: 'Cerebras', openrouter: 'OpenRouter', baseten: 'Baseten' };
 
 /**
  * A deliberately small parser: three flags, and `--key` recognised purely to refuse it. Bringing
@@ -77,7 +77,7 @@ function parseFlags(args: string[]): ParsedFlags | { error: string[] } {
     else if (name === '--provider') {
       const value = inlineValue ?? args[i + 1];
       if (!(AGENCY_MODEL_PROVIDERS as string[]).includes(value ?? '')) {
-        return { error: ['--provider must be deepseek, cerebras or openrouter', USAGE] };
+        return { error: ['--provider must be deepseek, cerebras, openrouter or baseten', USAGE] };
       }
       flags.provider = value as AgencyModelProvider;
       if (inlineValue === undefined) i += 1;

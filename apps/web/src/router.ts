@@ -24,6 +24,8 @@ export type EntryHomeView =
   | 'design-index'
   // GenUI catalog: the owned effect components with live, sandboxed demos.
   | 'catalog'
+  // Link pages: build a creator's link page from the places they already have online.
+  | 'link-pages'
   | 'brands'
   | 'integrations'
   // Team-edition navigation-shell destinations. These are team-workspace slots
@@ -142,6 +144,9 @@ export function parseRoute(pathname: string): Route {
   if (parts[0] === 'catalog' && !parts[1]) {
     return { kind: 'home', view: 'catalog' };
   }
+  if (parts[0] === 'link-pages' && !parts[1]) {
+    return { kind: 'home', view: 'link-pages' };
+  }
   if (parts[0] === 'plugins' && !parts[1]) {
     return { kind: 'home', view: 'plugins' };
   }
@@ -196,6 +201,7 @@ export function buildPath(route: Route): string {
     if (route.view === 'design-systems') return '/design-systems';
     if (route.view === 'design-index') return '/design-index';
     if (route.view === 'catalog') return '/catalog';
+    if (route.view === 'link-pages') return '/link-pages';
     if (route.view === 'library') return LIBRARY_UI_VISIBLE ? '/library' : '/';
     if (route.view === 'brands') {
       return route.brandId ? `/brands/${encodeURIComponent(route.brandId)}` : '/brands';

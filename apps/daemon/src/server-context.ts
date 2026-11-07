@@ -5,6 +5,7 @@ import type { DesignSystemSummary } from './design-systems/index.js';
 import type { DesignSystemSelectabilityResult } from './design-systems/selectability.js';
 import type { RoutineRoutesService } from './routes/routine.js';
 import type { MishPublicMetadataService } from './services/mish-public-metadata.js';
+import type { LinkPageService } from './linkpage/service.js';
 import type { ResourceHubPrincipal } from './collab/resource-principal.js';
 import type {
   AuthorizeProjectRequest,
@@ -243,6 +244,7 @@ export interface ServerContext {
   agents: any;
   critique: any;
   mishPublicMetadata: MishPublicMetadataService;
+  linkpage: LinkPageService;
   /**
    * C-lane collaboration seam for D's project-visibility routes. After a
    * successful personal→team move (D's move API), D's handler calls

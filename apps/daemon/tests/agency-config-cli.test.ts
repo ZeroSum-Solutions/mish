@@ -37,12 +37,12 @@ function harness(stdin = '') {
 }
 
 describe('od agency config --provider', () => {
-  it('status prints the Jev lines exactly as before, then one row each for DeepSeek, Cerebras and OpenRouter, and no key', async () => {
+  it('status prints the Jev lines exactly as before, then one row each for DeepSeek, Cerebras, OpenRouter and Baseten, and no key', async () => {
     const { run } = harness();
     const result = await run(['status']);
     expect(result).toEqual({
       kind: 'ok',
-      stdout: 'Jev\tconfigured\nSource\tstored\nDeepSeek\tconfigured\tenv\nCerebras\tnot configured\tunset\nOpenRouter\tnot configured\tunset\n',
+      stdout: 'Jev\tconfigured\nSource\tstored\nDeepSeek\tconfigured\tenv\nCerebras\tnot configured\tunset\nOpenRouter\tnot configured\tunset\nBaseten\tnot configured\tunset\n',
     });
     // The pre-model-key output was exactly `Jev\t<status>\nSource\t<source>\n`; it is still the prefix.
     expect(result.kind === 'ok' && result.stdout.startsWith('Jev\tconfigured\nSource\tstored\n')).toBe(true);
