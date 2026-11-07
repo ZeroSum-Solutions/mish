@@ -220,10 +220,16 @@ export interface BlockContext {
 
 // Model ------------------------------------------------------------------------------------------
 
+/** What a model call is for. A client may pick its model by job (see the daemon's lane table). */
+export type LlmJob = 'understand' | 'vision';
+
 export interface LlmRequest {
   system: string;
   user: string;
   images?: string[];
+  job?: LlmJob;
+  /** Says whether a parsed reply is usable. A client with another model to try moves on when it says no. */
+  accept?: (value: unknown) => boolean;
 }
 
 /** Anything that can answer a request with one JSON value. */

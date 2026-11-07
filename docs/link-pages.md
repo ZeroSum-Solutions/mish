@@ -58,10 +58,8 @@ The builder reads people with a model in three lanes ([`linkpage/llm.ts`](../app
 
 1. **OpenRouter first.** The key comes from the daemon key store, the same one the brief generator
    uses: `OPENROUTER_API_KEY`, then a key saved with `od agency config set --provider openrouter --key-stdin`,
-   then the vault. The lookup is bounded (5 s) and the key is never logged. The model is pinned to
-   `anthropic/claude-sonnet-5.5`: it reads pictures (the style-from-photos step sends image URLs, which
-   the text-only fast-lane caller cannot), answers JSON mode cleanly, and matches the model the second
-   lane runs.
+   then the vault. The lookup is bounded (5 s) and the key is never logged. The models come from the lane table
+   below, per job.
 2. **DeepSeek, text only**, when there is no OpenRouter key (its key is not read when OpenRouter has one).
    The key comes from the same store (`DEEPSEEK_API_KEY`, a saved key, then the vault; lookup bounded to 5 s).
    It runs the fast lane's `createModelCaller` with its default model (`deepseek-flash`, in JSON mode, 60 s
@@ -75,6 +73,24 @@ The builder reads people with a model in three lanes ([`linkpage/llm.ts`](../app
    settings, hooks or CLAUDE.md), `--disable-slash-commands`, `--permission-mode dontAsk`, the prompt on
    stdin, and a temporary folder that is deleted afterwards.
 4. **No model**: the page is built from plain signals and the build warns.
+
+### The lane table (which OpenRouter model per job)
+
+[`linkpage/model-lanes.ts`](../apps/daemon/src/linkpage/model-lanes.ts) holds one table, job to an ordered list of
+OpenRouter model ids. It is the only place that names these models; to change one (say after checking
+artificialanalysis.ai for a better or cheaper model), edit an id or reorder a list there and change nothing else.
+
+| Job | Models, in order |
+|---|---|
+| `understand` (read the person from text) | `anthropic/claude-sonnet-5.5` |
+| `vision` (style from photos) | `deepseek/deepseek-v4.1-flash`, then `anthropic/claude-sonnet-5.5` |
+
+A call tries the models in order. It moves to the next id when a model fails (HTTP error, timeout, an error inside a
+200) or when its reply is not usable (not JSON, or JSON with no colour, font or mood for the photo step). A cancel,
+`402` (out of credits) and `401` (bad key) stop at once, because the next model would fail the same way. If every
+model fails, the lane fails with the last fixed reason code and `auto` goes on to the Claude CLI. `model` in the
+build response is the model that answered the last call. `OD_LINKPAGE_VISION_MODEL` puts one id first for the photo
+step (for example `anthropic/claude-sonnet-5.5` to prefer Sonnet); the table's ids stay behind it as fallbacks.
 
 ### Choosing the lane
 

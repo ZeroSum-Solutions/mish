@@ -36,14 +36,8 @@ interface VisionReply {
   imagery?: unknown;
 }
 
-export async function styleFromImages({ images, llm, notes = '' }: VisionOptions = {}): Promise<Signal | null> {
-  const urls = (images || []).filter((u) => typeof u === 'string' && u.startsWith('https://')).slice(0, 6);
-  if (!llm || !urls.length) return null;
-  const r = (await llm.json({
-    system: SYSTEM,
-    user: `Describe the brand style in these ${urls.length} image(s).${notes ? ` Context: ${text(notes, 500)}` : ''}`,
-    images: urls,
-  })) as VisionReply | null | undefined;
+/** Reads a model reply into a style signal's fields. Anything that is not a usable colour, font or mood is dropped. */
+function readStyle(r: VisionReply | null | undefined): { colors: { hex: string; weight: number }[]; fonts: { family: string; weight: number }[]; mood: string; imagery: string } {
   const seen = new Set();
   const colors = (Array.isArray(r?.colors) ? r.colors : [])
     .filter((c) => typeof c?.hex === 'string' && HEX.test(c.hex.trim()))
@@ -54,5 +48,25 @@ export async function styleFromImages({ images, llm, notes = '' }: VisionOptions
     .map((f) => ({ family: text(f?.family, 60), weight: weight(f?.weight) }))
     .filter((f) => f.family)
     .slice(0, 3);
-  return { source: 'vision', colors, fonts, mood: text(r?.mood, 24).toLowerCase(), imagery: text(r?.imagery, 120), notes: text(notes, 500) };
+  return { colors, fonts, mood: text(r?.mood, 24).toLowerCase(), imagery: text(r?.imagery, 120) };
+}
+
+/** A reply is usable when it is an object that gives at least one colour, font or mood. */
+export function visionReplyUsable(value: unknown): boolean {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const style = readStyle(value as VisionReply);
+  return style.colors.length > 0 || style.fonts.length > 0 || style.mood !== '';
+}
+
+export async function styleFromImages({ images, llm, notes = '' }: VisionOptions = {}): Promise<Signal | null> {
+  const urls = (images || []).filter((u) => typeof u === 'string' && u.startsWith('https://')).slice(0, 6);
+  if (!llm || !urls.length) return null;
+  const r = (await llm.json({
+    system: SYSTEM,
+    user: `Describe the brand style in these ${urls.length} image(s).${notes ? ` Context: ${text(notes, 500)}` : ''}`,
+    images: urls,
+    job: 'vision',
+    accept: visionReplyUsable,
+  })) as VisionReply | null | undefined;
+  return { source: 'vision', ...readStyle(r), notes: text(notes, 500) };
 }

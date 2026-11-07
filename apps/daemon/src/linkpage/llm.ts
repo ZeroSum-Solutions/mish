@@ -13,15 +13,17 @@ import type { Llm, LlmRequest } from '@mish/linkpage';
 import { createClaudeCliLlm } from '@mish/linkpage/node';
 import { PROVIDERS, ProviderHttpError, ProviderKeyError, createModelCaller, isCallerTimeout } from '@mish/agency-fast-lane/deepseek';
 import { resolveOnPath } from '../runtimes/executables.js';
+import { LINKPAGE_MODEL_TABLE, modelsForJob } from './model-lanes.js';
 import type { LinkPageFetch } from './safe-fetch.js';
 
 /**
- * Pinned on purpose. The style-from-photos step sends pictures, so the model must read images;
- * `createModelCaller` (the brief lane) is text-only, so @mish/linkpage's own client carries the
- * call. Claude Sonnet 5.5 sees images, answers JSON mode cleanly, and is the model the `claude`
- * lane runs, so both lanes read people alike. The brief's GPT Terra pin was measured on text only.
+ * The model that reads people on OpenRouter (first `understand` id in the lane table, `model-lanes.ts`).
+ * The style-from-photos step sends pictures, so its models must read images; `createModelCaller` (the
+ * brief lane) is text-only, so @mish/linkpage's own client carries the call. Claude Sonnet 5.5 answers
+ * JSON mode cleanly and is the model the `claude` lane runs, so both lanes read people alike. The
+ * photo step tries the table's `vision` list instead (DeepSeek V4.1 Flash, then Sonnet 5.5).
  */
-export const LINKPAGE_OPENROUTER_MODEL = 'anthropic/claude-sonnet-5.5';
+export const LINKPAGE_OPENROUTER_MODEL = LINKPAGE_MODEL_TABLE.understand[0]!;
 
 /** The fast lane's DeepSeek model, so both lanes move together. Text only: DeepSeek has no vision here. */
 export const LINKPAGE_DEEPSEEK_MODEL = PROVIDERS.deepseek.defaultModel;
@@ -56,8 +58,12 @@ export interface ResolveLlmDeps {
   basetenFetch?: typeof globalThis.fetch;
   basetenTimeoutMs?: number;
   makeBaseten?: (apiKey: string) => Llm;
+  /** The owner's pick for the photo step's first model (OD_LINKPAGE_VISION_MODEL). The table's ids follow it as fallbacks. */
+  visionModel?: string | undefined;
   /** Test seams: build each lane's client. */
   makeOpenRouter?: (apiKey: string) => Llm;
+  /** Builds the OpenRouter client for one model id. Used by the default OpenRouter lane. */
+  makeOpenRouterModel?: (apiKey: string, model: string) => Llm;
   makeDeepSeek?: (apiKey: string) => Llm;
   /** The fetch under the DeepSeek client (default: global fetch), its time limit and retry count. */
   deepSeekFetch?: typeof globalThis.fetch;
@@ -136,11 +142,42 @@ function createDeepSeekLlm(options: { apiKey: string; fetchImpl: typeof globalTh
   };
 }
 
+/** Errors that are about the account, not the model: the next model would fail the same way. */
+const accountWide = (error: unknown): boolean => error instanceof LlmError && (error.code === 'out-of-credits' || error.code === 'bad-key');
+
+/**
+ * The OpenRouter lane: one call tries the job's models in table order. A failure, or a reply the step
+ * says it cannot use, moves to the next id; a cancel or an account-wide error (402, 401) stops at once.
+ * The last error is the one thrown, so the reason code is the last model's.
+ */
+function createOpenRouterLlm(options: { apiKey: string; make: (apiKey: string, model: string) => Llm; visionModel?: string | undefined }): Llm & { lastModel: () => string | undefined } {
+  let last: string | undefined;
+  return {
+    lastModel: () => last,
+    async json(request: LlmRequest) {
+      const models = modelsForJob(request.job, request.job === 'vision' ? options.visionModel : undefined);
+      let failure: unknown;
+      for (const model of models) {
+        try {
+          const value = await options.make(options.apiKey, model).json(request);
+          if (request.accept && !request.accept(value)) throw new LlmError('invalid-output', 'the model answered with something the step cannot use');
+          last = model;
+          return value;
+        } catch (error) {
+          if (cancelled(error) || accountWide(error)) throw error;
+          failure = error;
+        }
+      }
+      throw failure;
+    },
+  };
+}
+
 type LaneName = LinkPageMeteredLane | 'claude-cli';
-interface Lane { name: LaneName; llm: Llm; textOnly?: boolean; model?: string }
+interface Lane { name: LaneName; llm: Llm; textOnly?: boolean; model?: string; modelOf?: () => string | undefined }
 
 const laneModel = (lane: Lane): string | undefined =>
-  lane.model ?? (lane.name === 'openrouter' ? LINKPAGE_OPENROUTER_MODEL : lane.name === 'deepseek' ? LINKPAGE_DEEPSEEK_MODEL : undefined);
+  lane.modelOf?.() ?? lane.model ?? (lane.name === 'openrouter' ? LINKPAGE_OPENROUTER_MODEL : lane.name === 'deepseek' ? LINKPAGE_DEEPSEEK_MODEL : undefined);
 
 /** A Baseten lane with no model id: every call fails with a fixed code and no request is made. */
 const modelNotSetLlm: Llm = { json: async () => { throw new LlmError('model-not-set', 'no Baseten model is set'); } };
@@ -198,7 +235,13 @@ function track(chain: Lane[], noKey: boolean, forced = false): ReportingLlm {
 export async function resolveLinkPageLlm(deps: ResolveLlmDeps): Promise<ReportingLlm | undefined> {
   const { fetch, findClaude = () => resolveOnPath('claude'), keyTimeoutMs = KEY_TIMEOUT_MS } = deps;
   const timed = fetchWithTimeout(deps.openRouterFetch ?? globalThis.fetch, deps.openRouterTimeoutMs ?? OPENROUTER_TIMEOUT_MS);
-  const makeOpenRouter = deps.makeOpenRouter ?? ((apiKey: string) => createLlm({ apiKey, model: LINKPAGE_OPENROUTER_MODEL, fetch: timed }));
+  const makeOpenRouterModel = deps.makeOpenRouterModel ?? ((apiKey: string, model: string) => createLlm({ apiKey, model, fetch: timed }));
+  // The default lane tries each job's models in table order; a test seam replaces the whole lane.
+  const openRouterLane = (apiKey: string): Lane => {
+    if (deps.makeOpenRouter) return { name: 'openrouter', llm: deps.makeOpenRouter(apiKey) };
+    const llm = createOpenRouterLlm({ apiKey, make: makeOpenRouterModel, visionModel: deps.visionModel });
+    return { name: 'openrouter', llm, modelOf: llm.lastModel };
+  };
   const makeDeepSeek = deps.makeDeepSeek ?? ((apiKey: string) => createDeepSeekLlm({
     apiKey, fetchImpl: deps.deepSeekFetch ?? globalThis.fetch, timeoutMs: deps.deepSeekTimeoutMs ?? DEEPSEEK_TIMEOUT_MS, maxRetries: deps.deepSeekMaxRetries ?? 1,
   }));
@@ -226,11 +269,11 @@ export async function resolveLinkPageLlm(deps: ResolveLlmDeps): Promise<Reportin
     return key ? track([{ name: 'deepseek', llm: makeDeepSeek(key), textOnly: true }], false, true) : undefined;
   }
   const apiKey = await boundedKey(deps.resolveKey, keyTimeoutMs);
-  if (lane === 'openrouter') return apiKey ? track([{ name: 'openrouter', llm: makeOpenRouter(apiKey) }], false, true) : undefined;
+  if (lane === 'openrouter') return apiKey ? track([openRouterLane(apiKey)], false, true) : undefined;
   // auto: OpenRouter; no OpenRouter key means DeepSeek for text (its key is not read otherwise); Claude CLI last.
   const chain: Lane[] = [];
   if (apiKey) {
-    chain.push({ name: 'openrouter', llm: makeOpenRouter(apiKey) });
+    chain.push(openRouterLane(apiKey));
   } else {
     const deepSeekKey = deps.resolveDeepSeekKey ? await boundedKey(deps.resolveDeepSeekKey, keyTimeoutMs) : undefined;
     if (deepSeekKey) chain.push({ name: 'deepseek', llm: makeDeepSeek(deepSeekKey), textOnly: true });

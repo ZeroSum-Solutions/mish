@@ -103,7 +103,7 @@ export async function understandPerson({ signals = [], corpus, llm }: { signals?
     ...(c.posts.length ? [`POST TITLES: ${c.posts.join(' | ')}`] : []),
     ...c.pages.map((p) => `PAGE ${p.url}\n${p.text}`),
   ].join('\n\n') || '(the corpus is empty)';
-  const r = (await llm.json({ system: SYSTEM, user })) as PersonReply | null | undefined;
+  const r = (await llm.json({ system: SYSTEM, user, job: 'understand' })) as PersonReply | null | undefined;
   const offerings = (Array.isArray(r?.offerings) ? r.offerings : [])
     .map((o) => ({ label: text(o?.label, 60), ...(/^https?:\/\//.test((o?.url as string) || '') ? { url: String(o.url) } : {}) }))
     .filter((o) => o.label)

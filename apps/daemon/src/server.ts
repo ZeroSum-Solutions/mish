@@ -8681,7 +8681,7 @@ export async function startServer({
     linkpage: createLinkPageService({
       store: createLinkPageStore(RUNTIME_DATA_DIR),
       fetch: linkPageFetch,
-      resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), resolveDeepSeekKey: () => jevKeyStore.resolveModelKey('deepseek'), resolveBasetenKey: () => jevKeyStore.resolveModelKey('baseten'), basetenModel: process.env.OD_BASETEN_MODEL, basetenBaseUrl: process.env.OD_BASETEN_BASE_URL, fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
+      resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), resolveDeepSeekKey: () => jevKeyStore.resolveModelKey('deepseek'), visionModel: process.env.OD_LINKPAGE_VISION_MODEL, resolveBasetenKey: () => jevKeyStore.resolveModelKey('baseten'), basetenModel: process.env.OD_BASETEN_MODEL, basetenBaseUrl: process.env.OD_BASETEN_BASE_URL, fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
       login: createNativeAwareLoginProvider(composioConnectorProvider, () => connectorService.getNativeOAuth()),
       resolveConnectedAccount: (connector) => {
         const credentials = connectorService.getCredential(connector)?.credentials;

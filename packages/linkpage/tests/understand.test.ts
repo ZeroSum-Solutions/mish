@@ -207,3 +207,17 @@ test('the llm client can point at another OpenAI-compatible base URL, with its o
   assert.equal(got.headers['X-Title'], undefined);
   await assert.rejects(createLlm({ apiKey: 'k', baseUrl: 'https://inference.example.test/v1', provider: 'Baseten', fetch: async () => new Response('x', { status: 402 }) }).json({ system: 's', user: 'u' }), /Baseten is out of credits/);
 });
+
+test('the two model steps name their job, and the vision step says what a usable reply is', async () => {
+  const vision = fakeLlm({ colors: [{ hex: '#112233', weight: 3 }] });
+  await styleFromImages({ images: ['https://x.example.com/a.png'], llm: vision });
+  assert.equal(vision.calls[0].job, 'vision');
+  const accept = defined(vision.calls[0].accept, 'accept');
+  assert.equal(accept({ colors: [{ hex: '#112233' }] }), true);
+  assert.equal(accept({ mood: 'warm' }), true);
+  assert.equal(accept({ fonts: [{ family: 'Inter' }] }), true);
+  for (const bad of [null, 'text', 7, [], {}, { colors: 'red' }, { colors: [{ hex: 'red' }] }, { colors: [], fonts: [{ family: '' }], mood: '  ' }]) assert.equal(accept(bad), false);
+  const people = fakeLlm({});
+  await understandPerson({ signals: [], corpus: { pages: [], posts: [], bios: ['x'] }, llm: people });
+  assert.equal(people.calls[0].job, 'understand');
+});
