@@ -24,6 +24,24 @@ export type LinkPageLoginConnectorId = (typeof LINKPAGE_LOGIN_CONNECTORS)[number
 export const LINKPAGE_BACKGROUNDS = ['glaze', 'mesh', 'grid', 'bubbles'] as const;
 export type LinkPageBackground = (typeof LINKPAGE_BACKGROUNDS)[number];
 
+/**
+ * Mish catalog components (packages/genui-catalog, status ported, clean-room) a page may inline.
+ * scripts/sync-linkpage-catalog.ts checks these lists against packages/linkpage/src/catalog-assets.ts.
+ */
+export const LINKPAGE_EFFECT_BACKGROUNDS = ['grainient', 'soft-aurora', 'dot-grid', 'waves', 'light-rays'] as const;
+export const LINKPAGE_EFFECT_HOVERS = ['glare-hover', 'spotlight-card', 'magnet', 'star-border'] as const;
+
+/** Catalog component ids for a page's background and its card hover. */
+export interface LinkPageEffects {
+  background?: string;
+  hover?: string;
+}
+
+/** Build option: an allowlisted id, or 'none' to turn that slot off. An unknown id is dropped. */
+function cleanEffectOption(value: unknown, allowed: readonly string[]): string | undefined {
+  return typeof value === 'string' && (value === 'none' || allowed.includes(value)) ? value : undefined;
+}
+
 export const LINKPAGE_MOODS = ['editorial', 'modern', 'raw', 'playful'] as const;
 export type LinkPageMood = (typeof LINKPAGE_MOODS)[number];
 
@@ -67,6 +85,8 @@ export interface LinkPageBuildOptions {
   theme?: {
     palette?: { bg?: string; text?: string; accent?: string };
     background?: LinkPageBackground;
+    /** Catalog component ids; 'none' turns a slot off. Defaults follow the mood. */
+    effects?: LinkPageEffects;
   };
   links?: LinkPageLinkInput[];
   signup?: { endpoint: string };
@@ -110,6 +130,8 @@ export interface LinkPageTheme {
   mood: LinkPageMood;
   radius: number;
   background: string;
+  /** Mish catalog components for the background and card hover. Absent: the canvas background above. */
+  effects?: LinkPageEffects;
   palette: LinkPagePalette;
   fonts: { heading: LinkPageFontChoice; body: LinkPageFontChoice };
 }
@@ -407,6 +429,15 @@ function parseOptions(value: unknown): LinkPageParse<LinkPageBuildOptions | unde
         return fail(`options.theme.background must be one of ${LINKPAGE_BACKGROUNDS.join(', ')}`);
       }
       theme.background = value.theme.background as LinkPageBackground;
+    }
+    if (value.theme.effects !== undefined) {
+      if (!isRecord(value.theme.effects)) return fail('options.theme.effects must be an object');
+      const effects: LinkPageEffects = {};
+      const background = cleanEffectOption(value.theme.effects.background, LINKPAGE_EFFECT_BACKGROUNDS);
+      const hover = cleanEffectOption(value.theme.effects.hover, LINKPAGE_EFFECT_HOVERS);
+      if (background) effects.background = background;
+      if (hover) effects.hover = hover;
+      theme.effects = effects;
     }
     out.theme = theme;
   }

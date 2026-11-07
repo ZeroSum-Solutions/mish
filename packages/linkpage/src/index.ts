@@ -3,7 +3,8 @@ export type { BuildInput, BuildOptions, BuildResult, BuildSource } from './build
 export { checkPage } from './spec.ts';
 export { renderPage } from './render.ts';
 export type { RenderOptions } from './render.ts';
-export { deriveTheme } from './style.ts';
+export { deriveTheme, MOOD_EFFECTS } from './style.ts';
+export { cleanEffects } from './effects.ts';
 export { connectors, kindOfUrl } from './connectors.ts';
 export { blocks } from './blocks.ts';
 export { linksJson, llmsTxt } from './machine.ts';

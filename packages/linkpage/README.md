@@ -25,7 +25,7 @@ const json = linksJson(spec, { origin: 'https://links.example.com' });
 |---|---|
 | `connectors` | `website`, `substack`, `instagram`, `tiktok`, `manual`. Each reads one source into a `Signal`. Pass `logins.instagram` / `logins.tiktok` (a `fetch` that carries the creator's login) to use the platform API. |
 | `buildPage` | Runs the connectors, optionally reads the person and their images with an `llm`, and returns `{ spec, warnings, needs, person }`. A failing connector is skipped and reported. |
-| `deriveTheme` | Signals to a `Theme`: palette (with contrast guards), fonts, mood and background effect (`glaze`, `mesh`, `grid`, `bubbles`). |
+| `deriveTheme` | Signals to a `Theme`: palette (with contrast guards), fonts, mood, and effects: a Mish catalog background and card hover per mood (`MOOD_EFFECTS`, ids from `catalog-assets.ts`), or, when the creator forces a background, our own canvas fallback (`glaze`, `mesh`, `grid`, `bubbles`; these are not Mish Design DNA names). |
 | `checkPage` | Cleans a page spec and throws a plain message on the first problem. |
 | `renderPage` | One self-contained HTML page. |
 | `llmsTxt`, `linksJson` | The page for language models and for scripts. |

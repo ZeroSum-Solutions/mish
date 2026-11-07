@@ -95,10 +95,17 @@ export interface Palette {
   dark: boolean;
 }
 
+/** Mish catalog component ids for the page background and the card hover. */
+export interface Effects {
+  background?: string;
+  hover?: string;
+}
+
 export interface Theme {
   mood: Mood;
   radius: number;
   background: string;
+  effects?: Effects;
   palette: Palette;
   fonts: { heading: FontChoice; body: FontChoice };
 }
@@ -106,6 +113,8 @@ export interface Theme {
 export interface ThemeOptions {
   palette?: { bg?: string; text?: string; accent?: string };
   background?: string;
+  /** Catalog component ids; 'none' turns a slot off. Unknown ids are dropped. */
+  effects?: { background?: string; hover?: string };
 }
 
 // Blocks -----------------------------------------------------------------------------------------

@@ -1,3 +1,4 @@
+import { cleanEffects } from './effects.ts';
 import { clip } from './trim.ts';
 import { blocks, url } from './blocks.ts';
 import type { Block, BlockType, PageSpec, RawBlock, RawPageSpec, Theme } from './types.ts';
@@ -20,8 +21,9 @@ const pick = <T extends object>(from: T, keys: readonly string[]): Record<string
 
 function cleanTheme(theme: Theme): Theme {
   const font = (f: Theme['fonts']['heading']): Theme['fonts']['heading'] => pick(f ?? {}, FONT_KEYS) as never;
+  const effects = cleanEffects(theme.effects);
   return {
-    mood: theme.mood, radius: theme.radius, background: theme.background,
+    mood: theme.mood, radius: theme.radius, background: theme.background, ...(effects ? { effects } : {}),
     palette: pick(theme.palette, PALETTE_KEYS) as never,
     fonts: { heading: font(theme.fonts?.heading), body: font(theme.fonts?.body) },
   };

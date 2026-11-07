@@ -61,6 +61,11 @@ const KIND_KEYS: Record<SourceKind, keyof Dict> = {
   instagram: 'linkPage.sources.kind.instagram',
   tiktok: 'linkPage.sources.kind.tiktok',
 };
+function withCanvasBackground(theme: LinkPageSpec['theme'], background: LinkPageBackground): LinkPageSpec['theme'] {
+  const { effects, ...rest } = theme;
+  return { ...rest, background, ...(effects?.hover ? { effects: { hover: effects.hover } } : {}) };
+}
+
 const BACKGROUND_KEYS: Record<LinkPageBackground, keyof Dict> = {
   glaze: 'linkPage.options.background.glaze',
   mesh: 'linkPage.options.background.mesh',
@@ -218,7 +223,8 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
           ...(touched.bio ? { bio: bio.trim() } : {}),
           ...(touched.avatar ? { avatar_url: avatar } : {}),
         },
-        theme: { ...spec.theme, ...(background ? { background } : {}) },
+        // Picking a canvas background replaces a Mish catalog background; the card hover stays.
+        theme: background ? withCanvasBackground(spec.theme, background) : spec.theme,
       };
       const record = await putLinkPage(spec.slug, { spec: next });
       setSpec(record.spec);

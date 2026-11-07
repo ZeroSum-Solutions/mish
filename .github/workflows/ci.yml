@@ -232,6 +232,7 @@ jobs:
         run: |
           pnpm --filter @mish/genui-catalog check
           pnpm --filter @mish/genui-catalog sync-assets:check
+          node --experimental-strip-types scripts/sync-linkpage-catalog.ts --check
 
 
       # The committed 21st.dev metadata, independently authored alternatives and MIT preview images;

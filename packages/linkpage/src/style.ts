@@ -1,5 +1,6 @@
+import { cleanEffects } from './effects.ts';
 import { contrast, ensureContrast, fromHsl, luminance, mix, parseHex, toHex, toHsl } from './color.ts';
-import type { FontChoice, FontKind, Hsl, Mood, Palette, Rgb, Signal, Theme, ThemeOptions } from './types.ts';
+import type { Effects, FontChoice, FontKind, Hsl, Mood, Palette, Rgb, Signal, Theme, ThemeOptions } from './types.ts';
 
 // Turns what the connectors saw (colours and fonts a creator already uses) into one theme.
 //
@@ -112,13 +113,35 @@ function pickPalette(signals: Signal[], fixed: NonNullable<ThemeOptions['palette
   };
 }
 
+// Mish catalog components per mood: a background and a card hover (ids from catalog-assets.ts).
+export const MOOD_EFFECTS: Record<Mood, Required<Effects>> = {
+  editorial: { background: 'grainient', hover: 'glare-hover' },
+  modern: { background: 'soft-aurora', hover: 'spotlight-card' },
+  raw: { background: 'dot-grid', hover: 'magnet' },
+  playful: { background: 'waves', hover: 'star-border' },
+};
+
+// The effects for a theme. A creator who forces a canvas background gets no mood effects (today's page, exactly);
+// options.effects picks ids, and 'none' turns a slot off. An unknown id is ignored, so the mood's choice stands.
+function pickEffects(mood: Mood, options: ThemeOptions): Effects | undefined {
+  const asked = options.effects ?? {};
+  const given = cleanEffects(asked);
+  const base: Effects = options.background ? {} : { ...MOOD_EFFECTS[mood] };
+  const merged: Effects = { ...base, ...given };
+  if (asked.background === 'none') delete merged.background;
+  if (asked.hover === 'none') delete merged.hover;
+  return merged.background || merged.hover ? merged : undefined;
+}
+
 // options.palette fixes colours the creator has chosen ({ bg, text, accent }); the rest is derived.
-// options.background names the interactive background; it defaults to one that suits the mood.
+// options.background names the canvas background; it defaults to one that suits the mood. options.effects names
+// Mish catalog components and, unless the creator forced a background, defaults to the mood's.
 export function deriveTheme(signals: Signal[], options: ThemeOptions = {}): Theme {
   const fonts = pickFonts(signals);
   const { mood, radius } = MOODS[fonts.heading.kind];
   const background = options.background || BACKGROUNDS[mood];
-  return { mood, radius, background, palette: pickPalette(signals, options.palette || {}), fonts: { heading: fonts.heading, body: fonts.body } };
+  const effects = pickEffects(mood, options);
+  return { mood, radius, background, ...(effects ? { effects } : {}), palette: pickPalette(signals, options.palette || {}), fonts: { heading: fonts.heading, body: fonts.body } };
 }
 
 const BACKGROUNDS: Record<Mood, string> = { editorial: 'glaze', modern: 'mesh', raw: 'grid', playful: 'bubbles' };

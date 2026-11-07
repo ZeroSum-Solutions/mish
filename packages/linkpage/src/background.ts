@@ -1,5 +1,8 @@
 // The page's interactive background: one canvas behind the content, drawn in the page's own two colours.
-// Effects use the names of Mish's Design DNA `visual_effects.background` so a captured style can pick one:
+// These four are our own canvas effects, the fallback when a page has no Mish catalog background.
+// They are not Mish Design DNA names: its background types are gradient-animation | noise-field | mesh-gradient |
+// video-bg | generative-art | none (skills/web-clone/references/design-dna.md). The catalog components in
+// effects.ts are the ones a captured style maps to.
 //   glaze    soft pools of ink that drift and gather toward the pointer, over clay speckle (editorial)
 //   mesh     large blended colour fields that follow the pointer (modern)
 //   grid     a dot grid that bends away from the pointer (raw)

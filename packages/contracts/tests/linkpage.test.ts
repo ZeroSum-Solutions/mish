@@ -92,6 +92,21 @@ describe('parseLinkPageBuildRequest', () => {
   });
 });
 
+describe('theme effects option', () => {
+  const parse = (effects: unknown) => parseLinkPageBuildRequest({ ...request, options: { theme: { effects } } });
+  it('keeps allowlisted catalog ids and none, and drops unknown ones instead of failing', () => {
+    const got = parse({ background: 'grainient', hover: 'none', extra: 'x' });
+    expect(got.ok).toBe(true);
+    if (got.ok) expect(got.value.options?.theme?.effects).toEqual({ background: 'grainient', hover: 'none' });
+    const dropped = parse({ background: 'glare-hover', hover: 'rm -rf' });
+    expect(dropped.ok).toBe(true);
+    if (dropped.ok) expect(dropped.value.options?.theme?.effects).toEqual({});
+  });
+  it('refuses effects that are not an object', () => {
+    expect(parse('grainient').ok).toBe(false);
+  });
+});
+
 describe('parseLinkPageConnectedAccounts', () => {
   it('defaults to an empty map', () => {
     expect(parseLinkPageConnectedAccounts(undefined)).toEqual({ ok: true, value: {} });

@@ -1,4 +1,5 @@
 import { backgroundCss, backgroundHtml, backgroundJs } from './background.ts';
+import { effectsCss, effectsMarkup } from './effects.ts';
 import { esc, renderBlock } from './blocks.ts';
 import { trackedUrl } from './machine.ts';
 import type { PageSpec, Theme } from './types.ts';
@@ -57,8 +58,10 @@ export function renderPage(spec: PageSpec, { trackBase = '', origin = '', machin
   const { profile, theme } = spec;
   const sameAs = spec.blocks.flatMap((b) => (b.type === 'social' ? b.items.map((i) => i.url) : []));
   const ld = { '@context': 'https://schema.org', '@type': 'ProfilePage', mainEntity: { '@type': 'Person', name: profile.name, description: profile.bio || undefined, image: profile.avatar_url || undefined, url: profile.site_url || undefined, jobTitle: profile.headline || undefined, knowsAbout: profile.themes?.length ? profile.themes : undefined, sameAs } };
-  const effect = theme.background;
-  const body = spec.blocks.map((b) => renderBlock(b, { href })).join('\n');
+  // Mish catalog effects replace the canvas when the theme names a background component; otherwise the canvas stays.
+  const fx = theme.effects ? effectsMarkup(theme.effects, theme.palette) : undefined;
+  const effect = fx?.host ? '' : theme.background;
+  const body = (fx ? fx.cards : (html: string) => html)(spec.blocks.map((b) => renderBlock(b, { href })).join('\n'));
   const needsJs = spec.blocks.some((b) => b.type === 'email');
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -66,11 +69,11 @@ export function renderPage(spec: PageSpec, { trackBase = '', origin = '', machin
 <meta name="theme-color" content="${esc(theme.palette.bg)}">${origin ? `<link rel="canonical" href="${esc(origin.replace(/\/$/, ''))}/">` : ''}
 <meta property="og:title" content="${esc(profile.name)}"><meta property="og:description" content="${esc(profile.bio)}">${profile.avatar_url ? `<meta property="og:image" content="${esc(profile.avatar_url)}">` : ''}
 ${machine ? '<link rel="alternate" type="text/plain" href="llms.txt" title="llms.txt"><link rel="alternate" type="application/json" href="links.json" title="Links as JSON">' : ''}
-${fontLinks(theme)}<style>${css(theme)}${backgroundCss}</style>
+${fontLinks(theme)}<style>${css(theme)}${fx?.host ? effectsCss : backgroundCss}${fx?.css ?? ''}</style>
 <script type="application/ld+json">${JSON.stringify(ld).replace(/</g, '\\u003c')}</script></head>
-<body>${backgroundHtml(effect)}<main>
+<body>${fx?.host ?? ''}${backgroundHtml(effect)}<main>
 <header>${profile.avatar_url ? `<img src="${esc(profile.avatar_url)}" alt="${esc(profile.name)}">` : ''}<h1>${esc(profile.name)}</h1>${profile.headline ? `<p class="headline">${esc(profile.headline)}</p>` : ''}${profile.bio ? `<p class="bio">${esc(profile.bio)}</p>` : ''}</header>
 ${body}
-</main>${needsJs ? `<script>${SIGNUP_JS}</script>` : ''}${backgroundHtml(effect) ? `<script>${backgroundJs}</script>` : ''}</body></html>
+</main>${needsJs ? `<script>${SIGNUP_JS}</script>` : ''}${backgroundHtml(effect) ? `<script>${backgroundJs}</script>` : ''}${fx?.js ? `<script>${fx.js}</script>` : ''}</body></html>
 `;
 }

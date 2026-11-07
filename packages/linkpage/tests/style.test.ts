@@ -21,7 +21,7 @@ test('the background follows the mood unless the creator names one', () => {
 
 test('the page draws its background from the theme, ships its own picture, and shows who the person is', () => {
   const spec = checkPage({
-    slug: 'a', theme: deriveTheme(GOLDEN, { palette: { bg: '#f3ece0', text: '#2b170d' } }),
+    slug: 'a', theme: deriveTheme(GOLDEN, { palette: { bg: '#f3ece0', text: '#2b170d' }, background: 'glaze' }),
     profile: { name: 'Sam', headline: 'Potter and writer', bio: 'Makes things.', avatar_url: 'assets/avatar.png', themes: ['clay', 'writing'] }, blocks: [],
   });
   const html = renderPage(spec, { machine: true });
