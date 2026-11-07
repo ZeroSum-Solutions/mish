@@ -8,7 +8,7 @@
  */
 import { LlmError, createLlm } from '@mish/linkpage';
 import { isLinkPageModelLaneChoice } from '@mish/contracts';
-import type { LinkPageModelFallbackReason, LinkPageModelInfo, LinkPageModelLaneChoice } from '@mish/contracts';
+import type { LinkPageMeteredLane, LinkPageModelFallbackReason, LinkPageModelInfo, LinkPageModelLaneChoice } from '@mish/contracts';
 import type { Llm, LlmRequest } from '@mish/linkpage';
 import { createClaudeCliLlm } from '@mish/linkpage/node';
 import { PROVIDERS, ProviderHttpError, ProviderKeyError, createModelCaller, isCallerTimeout } from '@mish/agency-fast-lane/deepseek';
@@ -29,9 +29,13 @@ export const LINKPAGE_DEEPSEEK_MODEL = PROVIDERS.deepseek.defaultModel;
 /** The warning a photo step gets on a lane that cannot see. Fixed text. */
 export const DEEPSEEK_TEXT_ONLY_MESSAGE = 'DeepSeek reads text only; photo style was skipped';
 
+/** Baseten's OpenAI-compatible endpoint. Overridable with OD_BASETEN_BASE_URL. */
+export const LINKPAGE_BASETEN_BASE_URL = 'https://inference.baseten.co/v1';
+
 const KEY_TIMEOUT_MS = 5_000;
 const OPENROUTER_TIMEOUT_MS = 60_000;
 const DEEPSEEK_TIMEOUT_MS = 60_000;
+const BASETEN_TIMEOUT_MS = 60_000;
 
 export interface ResolveLlmDeps {
   /** The daemon key store's OpenRouter lookup. Rejecting means no key. Never logged here. */
@@ -43,6 +47,15 @@ export interface ResolveLlmDeps {
   lane?: LinkPageModelLaneChoice;
   /** The daemon key store's DeepSeek lookup. Rejecting means no key. Never logged here. Absent: no DeepSeek lane. */
   resolveDeepSeekKey?: () => Promise<string>;
+  /** The daemon key store's Baseten lookup. Rejecting means no key. Never logged here. Absent: no Baseten lane. */
+  resolveBasetenKey?: () => Promise<string>;
+  /** The Baseten model id (OD_BASETEN_MODEL). No default is verified, so unset means the lane reports 'model-not-set'. */
+  basetenModel?: string | undefined;
+  /** Default `LINKPAGE_BASETEN_BASE_URL`. */
+  basetenBaseUrl?: string | undefined;
+  basetenFetch?: typeof globalThis.fetch;
+  basetenTimeoutMs?: number;
+  makeBaseten?: (apiKey: string) => Llm;
   /** Test seams: build each lane's client. */
   makeOpenRouter?: (apiKey: string) => Llm;
   makeDeepSeek?: (apiKey: string) => Llm;
@@ -123,11 +136,14 @@ function createDeepSeekLlm(options: { apiKey: string; fetchImpl: typeof globalTh
   };
 }
 
-type LaneName = 'openrouter' | 'deepseek' | 'claude-cli';
-interface Lane { name: LaneName; llm: Llm; textOnly?: boolean }
+type LaneName = LinkPageMeteredLane | 'claude-cli';
+interface Lane { name: LaneName; llm: Llm; textOnly?: boolean; model?: string }
 
-const laneModel = (name: LaneName): string | undefined =>
-  name === 'openrouter' ? LINKPAGE_OPENROUTER_MODEL : name === 'deepseek' ? LINKPAGE_DEEPSEEK_MODEL : undefined;
+const laneModel = (lane: Lane): string | undefined =>
+  lane.model ?? (lane.name === 'openrouter' ? LINKPAGE_OPENROUTER_MODEL : lane.name === 'deepseek' ? LINKPAGE_DEEPSEEK_MODEL : undefined);
+
+/** A Baseten lane with no model id: every call fails with a fixed code and no request is made. */
+const modelNotSetLlm: Llm = { json: async () => { throw new LlmError('model-not-set', 'no Baseten model is set'); } };
 
 /**
  * Calls go down the chain in order. A text-only lane is passed over for calls with pictures; when
@@ -136,8 +152,8 @@ const laneModel = (name: LaneName): string | undefined =>
  */
 function track(chain: Lane[], noKey: boolean, forced = false): ReportingLlm {
   let calls = 0;
-  let failed: { lane: 'openrouter' | 'deepseek'; reason: LinkPageModelFallbackReason } | undefined;
-  let fell: { lane: 'openrouter' | 'deepseek'; reason: LinkPageModelFallbackReason } | undefined;
+  let failed: { lane: LinkPageMeteredLane; reason: LinkPageModelFallbackReason } | undefined;
+  let fell: { lane: LinkPageMeteredLane; reason: LinkPageModelFallbackReason } | undefined;
   let last: LaneName | undefined;
   return {
     async json(request: LlmRequest) {
@@ -154,10 +170,10 @@ function track(chain: Lane[], noKey: boolean, forced = false): ReportingLlm {
           const metered = lane.name !== 'claude-cli';
           // A cancel, or a failure with nothing to fall back to, goes to the caller.
           if (cancelled(error) || index === eligible.length - 1) {
-            if (!cancelled(error) && forced && metered) failed ??= { lane: lane.name as 'openrouter' | 'deepseek', reason: fallbackReason(error) };
+            if (!cancelled(error) && forced && metered) failed ??= { lane: lane.name as LinkPageMeteredLane, reason: fallbackReason(error) };
             throw error;
           }
-          if (metered) fell ??= { lane: lane.name as 'openrouter' | 'deepseek', reason: fallbackReason(error) };
+          if (metered) fell ??= { lane: lane.name as LinkPageMeteredLane, reason: fallbackReason(error) };
         }
       }
       throw new Error('no model lane answered');
@@ -165,14 +181,14 @@ function track(chain: Lane[], noKey: boolean, forced = false): ReportingLlm {
     report() {
       const first = chain[0]!;
       if (forced && first.name !== 'claude-cli') {
-        const model = laneModel(first.name);
+        const model = laneModel(first);
         return calls > 0
           ? { lane: first.name, ...(model ? { model } : {}), calls }
           : { lane: 'none', calls: 0, ...(failed ? { failed } : {}) };
       }
       if (forced) return { lane: 'claude-cli', calls };
       const lane = last ?? first.name;
-      const model = laneModel(lane);
+      const model = laneModel(chain.find((l) => l.name === lane) ?? first);
       const from = fell ?? (noKey ? { lane: 'openrouter' as const, reason: 'no-key' as const } : undefined);
       return { lane, ...(model ? { model } : {}), calls, ...(from ? { fellBackFrom: from } : {}) };
     },
@@ -186,12 +202,24 @@ export async function resolveLinkPageLlm(deps: ResolveLlmDeps): Promise<Reportin
   const makeDeepSeek = deps.makeDeepSeek ?? ((apiKey: string) => createDeepSeekLlm({
     apiKey, fetchImpl: deps.deepSeekFetch ?? globalThis.fetch, timeoutMs: deps.deepSeekTimeoutMs ?? DEEPSEEK_TIMEOUT_MS, maxRetries: deps.deepSeekMaxRetries ?? 1,
   }));
+  const basetenModel = deps.basetenModel?.trim() || undefined;
+  const makeBaseten = deps.makeBaseten ?? ((apiKey: string) => basetenModel
+    ? createLlm({
+      apiKey, model: basetenModel, baseUrl: deps.basetenBaseUrl?.trim() || LINKPAGE_BASETEN_BASE_URL, provider: 'Baseten', jsonMode: false,
+      fetch: fetchWithTimeout(deps.basetenFetch ?? globalThis.fetch, deps.basetenTimeoutMs ?? BASETEN_TIMEOUT_MS),
+    })
+    : modelNotSetLlm);
   const makeClaude = deps.makeClaude ?? ((executable: string) => createClaudeCliLlm({ fetch, executable }));
   const lane = deps.lane ?? 'auto';
   if (lane === 'claude-cli') {
     // Never touches the key store or a metered lane.
     const only = findClaude();
     return only ? track([{ name: 'claude-cli', llm: makeClaude(only) }], false, true) : undefined;
+  }
+  if (lane === 'baseten') {
+    // Only the Baseten key is read. Images go as image_url parts like the OpenRouter client.
+    const key = deps.resolveBasetenKey ? await boundedKey(deps.resolveBasetenKey, keyTimeoutMs) : undefined;
+    return key ? track([{ name: 'baseten', llm: makeBaseten(key), ...(basetenModel ? { model: basetenModel } : {}) }], false, true) : undefined;
   }
   if (lane === 'deepseek') {
     const key = deps.resolveDeepSeekKey ? await boundedKey(deps.resolveDeepSeekKey, keyTimeoutMs) : undefined;

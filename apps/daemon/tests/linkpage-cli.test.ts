@@ -45,6 +45,7 @@ describe('od linkpage', () => {
     const h = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: ['OpenRouter is out of credits; used the Claude CLI'], model, needs: [] } }], REQUEST);
     expect((await h.run(['build', '--config', 'c.json'])).stdout).toBe('Built sam: Sam (saved)\n  model: Claude CLI, 2 calls\n  warning: OpenRouter is out of credits; used the Claude CLI\n');
     expect(describeModel({ lane: 'deepseek', model: 'deepseek-flash', calls: 1 })).toBe('DeepSeek (deepseek-flash), 1 call');
+    expect(describeModel({ lane: 'baseten', model: 'org/some-model', calls: 2 })).toBe('Baseten (org/some-model), 2 calls');
     const or = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], model: { lane: 'openrouter', model: 'anthropic/claude-sonnet-5.5', calls: 1 }, needs: [] } }], REQUEST);
     expect((await or.run(['build', '--config', 'c.json'])).stdout).toContain('model: OpenRouter (anthropic/claude-sonnet-5.5), 1 call\n');
     const none = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], model: { lane: 'none', calls: 0 }, needs: [] } }], REQUEST);
@@ -81,7 +82,7 @@ describe('od linkpage', () => {
     expect(plain.calls[0]!.body).toMatchObject({ options: { modelLane: 'auto' } });
     const bad = await plain.run(['build', '--config', 'c.json', '--model-lane', 'gpt']);
     expect(bad.code).toBe(2);
-    expect(bad.stderr).toMatch(/--model-lane must be auto, claude-cli, openrouter or deepseek/);
+    expect(bad.stderr).toMatch(/--model-lane must be auto, claude-cli, openrouter, deepseek or baseten/);
     expect(plain.calls).toHaveLength(1);
     expect((await plain.run(['--help'])).stdout).toMatch(/--model-lane <lane>/);
   });

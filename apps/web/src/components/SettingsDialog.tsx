@@ -7661,7 +7661,7 @@ function OrbitSection({
 /** Which key a `KeyCard` manages: the Jev key, or one fast-lane fill model's key. */
 type KeyCardTarget = 'jev' | AgencyModelProvider;
 
-const MODEL_PROVIDER_NAME: Record<AgencyModelProvider, string> = { deepseek: 'DeepSeek', cerebras: 'Cerebras', openrouter: 'OpenRouter' };
+const MODEL_PROVIDER_NAME: Record<AgencyModelProvider, string> = { deepseek: 'DeepSeek', cerebras: 'Cerebras', openrouter: 'OpenRouter', baseten: 'Baseten' };
 
 /**
  * "The key file cannot be read" is a fact about the one file all three cards write to, so it is
@@ -7705,6 +7705,7 @@ function AgencyKeyCards() {
       <KeyCard target="deepseek" shared={shared} />
       <KeyCard target="cerebras" shared={shared} />
       <KeyCard target="openrouter" shared={shared} />
+      <KeyCard target="baseten" shared={shared} />
     </>
   );
 }
@@ -7893,7 +7894,7 @@ function KeyCard({ target, shared }: { target: KeyCardTarget; shared: SharedUnre
   };
 
   const vars = { provider: providerName, env: envName };
-  const title = provider ? t(provider === 'deepseek' ? 'settings.modelKeyTitleDeepseek' : provider === 'openrouter' ? 'settings.modelKeyTitleOpenrouter' : 'settings.modelKeyTitleCerebras') : t('settings.jevTitle');
+  const title = provider ? t(provider === 'deepseek' ? 'settings.modelKeyTitleDeepseek' : provider === 'openrouter' ? 'settings.modelKeyTitleOpenrouter' : provider === 'baseten' ? 'settings.modelKeyTitleBaseten' : 'settings.modelKeyTitleCerebras') : t('settings.jevTitle');
   const keyLabel = provider ? t('settings.modelKeyLabel', vars) : t('settings.jevKeyLabel');
   const saveLabel = provider ? t('settings.modelKeySave', vars) : t('settings.jevSave');
   const clearLabel = provider ? t('settings.modelKeyClear', vars) : t('settings.jevClear');
@@ -7913,7 +7914,7 @@ function KeyCard({ target, shared }: { target: KeyCardTarget; shared: SharedUnre
             : status.source === 'vault'
               ? { tone: 'success', label: t('settings.providerStatusFromVault') }
               : { tone: 'success', label: t('settings.providerStatusKeySaved') };
-  const summary = provider ? t(provider === 'openrouter' ? 'settings.modelKeySummaryOpenrouter' : 'settings.modelKeySummary') : t('settings.jevSummary');
+  const summary = provider ? t(provider === 'openrouter' ? 'settings.modelKeySummaryOpenrouter' : provider === 'baseten' ? 'settings.modelKeySummaryBaseten' : 'settings.modelKeySummary') : t('settings.jevSummary');
   const needsKey = status?.source === 'unset';
 
   return (
@@ -7941,7 +7942,7 @@ function KeyCard({ target, shared }: { target: KeyCardTarget; shared: SharedUnre
       onOpenChange={setOpen}
     >
       <div className={settingsStyles.rowDetails}>
-        <p>{provider ? t(provider === 'openrouter' ? 'settings.modelKeyHintOpenrouter' : 'settings.modelKeyHint', vars) : t('settings.jevHint')}</p>
+        <p>{provider ? t(provider === 'openrouter' ? 'settings.modelKeyHintOpenrouter' : provider === 'baseten' ? 'settings.modelKeyHintBaseten' : 'settings.modelKeyHint', vars) : t('settings.jevHint')}</p>
 
         <label className={settingsStyles.rowField}>
           <span className={settingsStyles.rowFieldLabel}>{keyLabel}</span>

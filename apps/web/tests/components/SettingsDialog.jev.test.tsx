@@ -355,6 +355,20 @@ describe('Settings → Media providers → fill-model keys (DeepSeek, Cerebras)'
     expect(button('Save DeepSeek key').disabled).toBe(true);
   });
 
+  it('has a Baseten (link pages) row that saves the key under provider baseten', async () => {
+    const { puts } = stubWithModels({ deepseek: { configured: false, source: 'unset' }, cerebras: { configured: false, source: 'unset' }, baseten: { configured: false, source: 'unset' } });
+    renderAndNavigate();
+    expect(await screen.findByText('Baseten (link pages)')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Baseten (link pages) details' }));
+    const field = screen.getByLabelText('Baseten API key') as HTMLInputElement;
+    expect(field.type).toBe('password');
+    fireEvent.change(field, { target: { value: 'baseten-fake-NEVER-IN-THE-DOM' } });
+    fireEvent.click(button('Save Baseten key'));
+    await waitFor(() => expect(puts).toEqual([{ provider: 'baseten', apiKey: 'baseten-fake-NEVER-IN-THE-DOM' }]));
+    expect(field.value).toBe('');
+    expect(document.body.innerHTML).not.toContain('baseten-fake-NEVER-IN-THE-DOM');
+  });
+
   it('sends the provider with the key, and keeps no copy of it', async () => {
     const { puts } = stubWithModels({ deepseek: { configured: false, source: 'unset' }, cerebras: { configured: false, source: 'unset' } });
     renderAndNavigate();

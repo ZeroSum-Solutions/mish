@@ -1420,6 +1420,9 @@ export interface Dict {
   'settings.jevLoadFailed': string;
   'settings.modelKeyTitleDeepseek': string;
   'settings.modelKeyTitleCerebras': string;
+  'settings.modelKeyTitleBaseten': string;
+  'settings.modelKeySummaryBaseten': string;
+  'settings.modelKeyHintBaseten': string;
   'settings.modelKeyTitleOpenrouter': string;
   'settings.modelKeySummaryOpenrouter': string;
   'settings.modelKeyHintOpenrouter': string;
@@ -6499,6 +6502,7 @@ export interface Dict {
   'linkPage.options.modelLane': string;
   'linkPage.options.modelLane.auto': string;
   'linkPage.options.modelLane.claudeCli': string;
+  'linkPage.options.modelLane.baseten': string;
   'linkPage.options.modelLane.openrouter': string;
   'linkPage.options.modelLane.deepseek': string;
   'linkPage.options.modelLaneHint': string;
@@ -6530,6 +6534,7 @@ export interface Dict {
   'linkPage.preview.empty': string;
   'linkPage.preview.note': string;
   'linkPage.model.none': string;
+  'linkPage.model.baseten': string;
   'linkPage.model.openrouter': string;
   'linkPage.model.deepseek': string;
   'linkPage.model.claudeCli': string;

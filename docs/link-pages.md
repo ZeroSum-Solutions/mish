@@ -32,7 +32,7 @@ od linkpage publish sam --origin https://links.example.com --track-base https://
 od linkpage delete sam
 ```
 
-`--json` prints the daemon's response. `--model-lane <auto|claude-cli|openrouter|deepseek>` picks the model lane for
+`--json` prints the daemon's response. `--model-lane <auto|claude-cli|openrouter|deepseek|baseten>` picks the model lane for
 a build and overrides `options.modelLane` in the config (see Model). `publish` lists the files that would be deployed; it does
 not upload anything (see hosting below).
 
@@ -78,7 +78,7 @@ The builder reads people with a model in three lanes ([`linkpage/llm.ts`](../app
 
 ### Choosing the lane
 
-`options.modelLane` on the build request (`auto`, `claude-cli`, `openrouter` or `deepseek`; default `auto`) picks the lane
+`options.modelLane` on the build request (`auto`, `claude-cli`, `openrouter`, `deepseek` or `baseten`; default `auto`) picks the lane
 for that build. The web view has a Model select in the page details, and `od linkpage build --model-lane`
 overrides the config file.
 
@@ -90,6 +90,12 @@ overrides the config file.
   the reason-coded warning (`model.failed` carries the code) and the page is built from plain signals.
 - `deepseek`: only DeepSeek, text only, never the CLI. The OpenRouter key is not read. Photo style is skipped
   with the warning above. With no key, or when a call fails, the same reason-coded warning applies.
+- `baseten`: only Baseten's OpenAI-compatible chat completions (`https://inference.baseten.co/v1`, override with
+  `OD_BASETEN_BASE_URL`), never the CLI and never auto. The key comes from the key store (`OD_BASETEN_API_KEY` or
+  `BASETEN_API_KEY`, then `od agency config set --provider baseten --key-stdin`, then the vault entry
+  `baseten_api_key`). The model id is `OD_BASETEN_MODEL`; no default id is verified, so with it unset the lane
+  fails with the reason code `model-not-set` and makes no request. Pictures go as `image_url` parts. JSON mode is
+  not requested (not every Baseten model accepts it); the reply is parsed like the others.
 
 The daemon default is `OD_LINKPAGE_MODEL_LANE` (`auto`, `claude-cli`, `openrouter` or `deepseek`; anything else means
 `auto`). A lane in the request wins over it.

@@ -46,7 +46,21 @@ import type {
   AgencyModelProvider,
 } from '@mish/contracts';
 import { AGENCY_JEV_KEY_ENV, AGENCY_JEV_KEY_MAX_CHARS, AGENCY_MODEL_PROVIDERS } from '@mish/contracts';
-import { providerEnvKey } from '@mish/agency-fast-lane/deepseek';
+import { PROVIDERS, providerEnvKey } from '@mish/agency-fast-lane/deepseek';
+
+/** The vault entry a fill-model key falls back to. OpenRouter and Baseten are not fast-lane providers, so they are named here. */
+export function modelVaultKeyId(provider: AgencyModelProvider): string {
+  if (provider === 'openrouter') return 'openrouter_api_key';
+  if (provider === 'baseten') return 'baseten_api_key';
+  return PROVIDERS[provider].vaultKeyId;
+}
+
+/** OpenRouter and Baseten read an `OD_`-prefixed variable before the plain one. */
+function modelEnvKey(provider: AgencyModelProvider): string {
+  if (provider === 'openrouter') return (process.env.OD_OPENROUTER_API_KEY || process.env.OPENROUTER_API_KEY || '').trim();
+  if (provider === 'baseten') return (process.env.OD_BASETEN_API_KEY || process.env.BASETEN_API_KEY || '').trim();
+  return providerEnvKey(process.env, provider);
+}
 
 /** Owner-only, like every other credential file the daemon writes. */
 const FILE_MODE = 0o600;
@@ -169,7 +183,7 @@ export function checkAgencyJevConfigBody(body: unknown): AgencyJevKeyCheck {
   let provider: AgencyModelProvider | undefined;
   let keys = Object.keys(body);
   if (keys.includes('provider')) {
-    if (!isModelProvider(body.provider)) return shape('provider must be deepseek or cerebras');
+    if (!isModelProvider(body.provider)) return shape(`provider must be one of ${AGENCY_MODEL_PROVIDERS.join(', ')}`);
     provider = body.provider;
     keys = keys.filter((key) => key !== 'provider');
   }
@@ -420,7 +434,7 @@ export function createAgencyJevKeyStore(options: AgencyJevKeyStoreOptions): Agen
 
   const resolveModel = async (provider: AgencyModelProvider): Promise<{ key: string; source: AgencyJevConfigSource }> => {
     // The fast lane's own env read, so blank/trim semantics match `createProviderKeyResolver`.
-    const fromEnv = provider === 'openrouter' ? (process.env.OD_OPENROUTER_API_KEY || process.env.OPENROUTER_API_KEY || '').trim() : providerEnvKey(process.env, provider);
+    const fromEnv = modelEnvKey(provider);
     if (fromEnv) return { key: fromEnv, source: 'env' };
     const stored = await readStoredModelKey(provider);
     if (stored) return { key: stored, source: 'stored' };

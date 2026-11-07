@@ -28,6 +28,7 @@ import {
   AgencyModelKeyUnavailableError,
   createAgencyJevKeyStore,
   freshPerGeneration,
+  modelVaultKeyId,
 } from '../src/storage/agency-config.js';
 import { sendApiError } from '../src/http/api-errors.js';
 import { jevKeyResolver, registerDesignIndexRoutes } from '../src/routes/design-index.js';
@@ -584,7 +585,7 @@ describe('the /api/agency/config routes', () => {
 // ---------------------------------------------------------------------------
 
 describe('the fill-model keys', () => {
-  const MODEL_ENV = [...Object.values(AGENCY_MODEL_KEY_ENV), 'OD_OPENROUTER_API_KEY'];
+  const MODEL_ENV = [...Object.values(AGENCY_MODEL_KEY_ENV), 'OD_OPENROUTER_API_KEY', 'OD_BASETEN_API_KEY'];
   const priorModelEnv = Object.fromEntries(MODEL_ENV.map((name) => [name, process.env[name]]));
   let modelVaultReads: string[] = [];
   let modelVaultAnswer: (provider: AgencyModelProvider) => Promise<string>;
@@ -617,7 +618,7 @@ describe('the fill-model keys', () => {
   });
 
   // OpenRouter backs the Gemini design reviewer, not the fast lane, so the fast-lane parity checks skip it.
-  const FAST_LANE_PROVIDERS = AGENCY_MODEL_PROVIDERS.filter((provider): provider is Exclude<typeof provider, 'openrouter'> => provider !== 'openrouter');
+  const FAST_LANE_PROVIDERS = AGENCY_MODEL_PROVIDERS.filter((provider): provider is Exclude<typeof provider, 'openrouter' | 'baseten'> => provider !== 'openrouter' && provider !== 'baseten');
 
   it('names the same env var per provider as the fast lane does', () => {
     for (const provider of FAST_LANE_PROVIDERS) {
@@ -625,6 +626,19 @@ describe('the fill-model keys', () => {
     }
     expect([...FAST_LANE_PROVIDERS].sort()).toEqual(Object.keys(PROVIDERS).sort());
     expect(AGENCY_MODEL_PROVIDERS).toContain('openrouter');
+    expect(AGENCY_MODEL_PROVIDERS).toContain('baseten');
+  });
+
+  it('baseten: OD_BASETEN_API_KEY beats BASETEN_API_KEY, the vault id is baseten_api_key', async () => {
+    process.env.BASETEN_API_KEY = 'plain-baseten-never-logged';
+    process.env.OD_BASETEN_API_KEY = 'od-baseten-never-logged';
+    const store = makeModelStore();
+    expect(await store.resolveModelKey('baseten')).toBe('od-baseten-never-logged');
+    delete process.env.OD_BASETEN_API_KEY;
+    expect(await store.resolveModelKey('baseten')).toBe('plain-baseten-never-logged');
+    expect(modelVaultKeyId('baseten')).toBe('baseten_api_key');
+    expect(modelVaultKeyId('openrouter')).toBe('openrouter_api_key');
+    expect(modelVaultKeyId('deepseek')).toBe(PROVIDERS.deepseek.vaultKeyId);
   });
 
   it.each(AGENCY_MODEL_PROVIDERS)('%s: env wins, and a rejecting vault is read zero times', async (provider) => {
@@ -763,6 +777,7 @@ describe('the fill-model keys', () => {
         deepseek: { configured: true, source: 'env' },
         cerebras: { configured: true, source: 'stored' },
         openrouter: { configured: true, source: 'vault' }, // the test vault answers for every provider
+        baseten: { configured: true, source: 'vault' },
       });
       expect(text).not.toContain('never-logged');
     });

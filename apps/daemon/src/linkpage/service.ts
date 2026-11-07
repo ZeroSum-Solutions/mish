@@ -104,14 +104,14 @@ function buildOptions(request: LinkPageBuildRequest): BuildOptions {
   };
 }
 
-const LANE_NAMES = { openrouter: 'OpenRouter', deepseek: 'DeepSeek' } as const;
+const LANE_NAMES = { openrouter: 'OpenRouter', deepseek: 'DeepSeek', baseten: 'Baseten' } as const;
 
 /** A plain line for a fallback. Fixed wording per reason code: nothing from an error body, key or URL. */
 export function fallbackWarning(info: LinkPageModelInfo): string | undefined {
   const from = info.fellBackFrom;
   if (!from) return undefined;
   const name = LANE_NAMES[from.lane];
-  const to = info.lane === 'deepseek' ? 'DeepSeek (text only)' : 'the Claude CLI';
+  const to = info.lane === 'deepseek' ? 'DeepSeek (text only)' : info.lane === 'baseten' ? 'Baseten' : 'the Claude CLI';
   switch (from.reason) {
     case 'no-key': return `No ${name} key is set; used ${to}`;
     case 'out-of-credits': return `${name} is out of credits; used ${to}`;
@@ -124,6 +124,7 @@ export function fallbackWarning(info: LinkPageModelInfo): string | undefined {
 export function noModelWarning(lane: LinkPageModelLaneChoice | undefined): string {
   if (lane === 'claude-cli') return 'The Claude CLI lane was chosen but no claude command was found (install and sign in to claude): the page was built from plain signals';
   if (lane === 'openrouter') return 'The OpenRouter lane was chosen but no OpenRouter key is set (`od agency config set --provider openrouter --key-stdin`): the page was built from plain signals';
+  if (lane === 'baseten') return 'The Baseten lane was chosen but no Baseten key is set (`od agency config set --provider baseten --key-stdin`): the page was built from plain signals';
   if (lane === 'deepseek') return 'The DeepSeek lane was chosen but no DeepSeek key is set (`od agency config set --provider deepseek --key-stdin`): the page was built from plain signals';
   return 'no model is available (add an OpenRouter or DeepSeek key with `od agency config set --provider openrouter --key-stdin`, or install the claude command): the page was built from plain signals';
 }
@@ -132,6 +133,7 @@ export function noModelWarning(lane: LinkPageModelLaneChoice | undefined): strin
 export function failedWarning(info: LinkPageModelInfo): string | undefined {
   if (!info.failed) return undefined;
   const name = LANE_NAMES[info.failed.lane];
+  if (info.failed.reason === 'model-not-set') return `The ${name} lane was chosen but no model is set (OD_BASETEN_MODEL): the page was built from plain signals`;
   return `${name} failed (${info.failed.reason}); the ${name} lane was chosen, so the page was built from plain signals`;
 }
 

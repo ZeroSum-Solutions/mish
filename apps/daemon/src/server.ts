@@ -933,11 +933,11 @@ import { createScopedKitLister } from './routes/agency-build-kit.js';
 import { jevKeyResolver, registerDesignIndexRoutes } from './routes/design-index.js';
 import { provisionBundledTeamAccess } from './services/team-access.js';
 import { configureDeployDataDir } from './deploy.js';
-import { createAgencyJevKeyStore, freshPerGeneration } from './storage/agency-config.js';
+import { createAgencyJevKeyStore, freshPerGeneration, modelVaultKeyId } from './storage/agency-config.js';
 import { buildSite, createJevEffectJudge, createJevSectionJudge } from '@mish/agency-fast-lane/build';
 import { createJevBlockPlanner } from '@mish/agency-fast-lane/block-plan';
 import { designTaxonomy, familyRegistry as designFamilyRegistry, shapeAtlas as designAtlas } from '@mish/agency-fast-lane/data';
-import { PROVIDERS, createModelCaller, vaultSecret } from '@mish/agency-fast-lane/deepseek';
+import { createModelCaller, vaultSecret } from '@mish/agency-fast-lane/deepseek';
 import { loadFamilyPackage } from '@mish/agency-fast-lane/family';
 import { genuiCatalog } from '@mish/genui-catalog/data';
 import { createJevChecker } from '@mish/agency-fast-lane/jev';
@@ -8681,7 +8681,7 @@ export async function startServer({
     linkpage: createLinkPageService({
       store: createLinkPageStore(RUNTIME_DATA_DIR),
       fetch: linkPageFetch,
-      resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), resolveDeepSeekKey: () => jevKeyStore.resolveModelKey('deepseek'), fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
+      resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), resolveDeepSeekKey: () => jevKeyStore.resolveModelKey('deepseek'), resolveBasetenKey: () => jevKeyStore.resolveModelKey('baseten'), basetenModel: process.env.OD_BASETEN_MODEL, basetenBaseUrl: process.env.OD_BASETEN_BASE_URL, fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
       login: createNativeAwareLoginProvider(composioConnectorProvider, () => connectorService.getNativeOAuth()),
       resolveConnectedAccount: (connector) => {
         const credentials = connectorService.getCredential(connector)?.credentials;
@@ -9664,7 +9664,7 @@ export async function startServer({
     dataDir: RUNTIME_DATA_DIR,
     readVaultSecret: () => vaultSecret('typesafe_api_key'),
     // The fill-model keys use the same file and order: env, stored, then this vault entry.
-    readModelVaultSecret: (provider) => vaultSecret(provider === 'openrouter' ? 'openrouter_api_key' : PROVIDERS[provider].vaultKeyId),
+    readModelVaultSecret: (provider) => vaultSecret(modelVaultKeyId(provider)),
   });
   const jevApiKey = jevKeyResolver(() => jevKeyStore.resolveKey());
   // The fast lane caches a resolved key for the life of the router it was given to, so a key

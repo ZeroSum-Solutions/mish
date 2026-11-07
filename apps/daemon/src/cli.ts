@@ -12058,8 +12058,8 @@ function printAgencyHelp() {
   od cult add <slug...> --into <projectDir> [--dry-run] [--force] [--install] [--json]
   od agency families [--json]
   od agency config status [--json]
-  od agency config set [--provider deepseek|cerebras|openrouter] --key-stdin
-  od agency config clear [--provider deepseek|cerebras|openrouter] [--json]
+  od agency config set [--provider deepseek|cerebras|openrouter|baseten] --key-stdin
+  od agency config clear [--provider deepseek|cerebras|openrouter|baseten] [--json]
   od agency config repair --confirm [--json]
 
 Route a client brief against the Website Shape Atlas with one Jev call: which
@@ -12176,7 +12176,10 @@ With --provider deepseek|cerebras, set and clear act on the fast lane's
 fill-model key instead. It resolves the same way: DEEPSEEK_API_KEY /
 CEREBRAS_API_KEY, then the key stored here, then the local secret store.
 "status" prints the Jev lines first (Jev, then Source, as before), then one
-row each for DeepSeek, Cerebras and OpenRouter. OpenRouter configures the brief
+row each for DeepSeek, Cerebras, OpenRouter and Baseten. Baseten is the
+link-page Baseten lane's key (BASETEN_API_KEY or OD_BASETEN_API_KEY, then the
+stored key, then the vault entry baseten_api_key; the model id is OD_BASETEN_MODEL).
+OpenRouter configures the brief
 writer key with --provider openrouter; it resolves OPENROUTER_API_KEY, then the
 stored key, then the local secret store. A build whose provider answers 429/5xx,
 times out or has no key before any output fails over to the other provider.

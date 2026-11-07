@@ -151,8 +151,8 @@ export interface AgencyConfigRepairResponse extends AgencyJevConfigResponse {
   movedTo: string | null;
 }
 
-/** Environment overrides for the fill-model keys, read from the daemon process. */
-export const AGENCY_MODEL_KEY_ENV = { deepseek: 'DEEPSEEK_API_KEY', cerebras: 'CEREBRAS_API_KEY', openrouter: 'OPENROUTER_API_KEY' } as const;
+/** Environment overrides for the fill-model keys, read from the daemon process. OpenRouter and Baseten also read an `OD_`-prefixed name first (OD_OPENROUTER_API_KEY, OD_BASETEN_API_KEY). */
+export const AGENCY_MODEL_KEY_ENV = { deepseek: 'DEEPSEEK_API_KEY', cerebras: 'CEREBRAS_API_KEY', openrouter: 'OPENROUTER_API_KEY', baseten: 'BASETEN_API_KEY' } as const;
 
 /** A fast-lane fill provider whose key `PUT /api/agency/config` can store. */
 export type AgencyModelProvider = keyof typeof AGENCY_MODEL_KEY_ENV;

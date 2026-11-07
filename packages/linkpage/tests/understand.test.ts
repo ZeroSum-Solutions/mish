@@ -195,3 +195,15 @@ test('the website connector returns https images: the share image first, small a
   const s = await connectors.website({ fetch: net({ 'https://s.example.com/': html }) }).read('https://s.example.com');
   assert.deepEqual(s.images, ['https://s.example.com/og.jpg', 'https://s.example.com/big.jpg', 'https://cdn.other.example.com/y.jpg', 'https://s.example.com/a.jpg', 'https://s.example.com/b.jpg']);
 });
+
+test('the llm client can point at another OpenAI-compatible base URL, with its own name and no JSON-mode flag', async () => {
+  let sent: { url: string; body: Record<string, unknown>; headers: Record<string, string> } | undefined;
+  const fetch: FetchFn = async (url, init) => { sent = { url: String(url), body: JSON.parse(init?.body as string), headers: init?.headers as Record<string, string> }; return reply('{"ok":true}')(url, init); };
+  const out = await createLlm({ apiKey: 'k', model: 'org/m', baseUrl: 'https://inference.example.test/v1/', provider: 'Baseten', jsonMode: false, fetch }).json({ system: 's', user: 'u' });
+  assert.deepEqual(out, { ok: true });
+  const got = defined(sent, 'the request');
+  assert.equal(got.url, 'https://inference.example.test/v1/chat/completions');
+  assert.equal('response_format' in got.body, false);
+  assert.equal(got.headers['X-Title'], undefined);
+  await assert.rejects(createLlm({ apiKey: 'k', baseUrl: 'https://inference.example.test/v1', provider: 'Baseten', fetch: async () => new Response('x', { status: 402 }) }).json({ system: 's', user: 'u' }), /Baseten is out of credits/);
+});

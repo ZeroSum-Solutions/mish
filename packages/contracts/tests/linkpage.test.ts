@@ -38,12 +38,12 @@ describe('link page slugs', () => {
 
 describe('options.modelLane', () => {
   const base = { slug: 'sam', sources: [{ connector: 'website', ref: 'https://example.com' }] };
-  it.each(['auto', 'claude-cli', 'openrouter', 'deepseek'])('accepts %s', (lane) => {
+  it.each(['auto', 'claude-cli', 'openrouter', 'deepseek', 'baseten'])('accepts %s', (lane) => {
     expect(parseLinkPageBuildRequest({ ...base, options: { modelLane: lane } })).toMatchObject({ ok: true, value: { options: { modelLane: lane } } });
   });
   it('rejects anything else', () => {
     for (const bad of ['gpt', '', 1, null]) {
-      expect(parseLinkPageBuildRequest({ ...base, options: { modelLane: bad } })).toEqual({ ok: false, error: 'options.modelLane must be one of auto, claude-cli, openrouter, deepseek' });
+      expect(parseLinkPageBuildRequest({ ...base, options: { modelLane: bad } })).toEqual({ ok: false, error: 'options.modelLane must be one of auto, claude-cli, openrouter, deepseek, baseten' });
     }
   });
 });

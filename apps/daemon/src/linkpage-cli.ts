@@ -33,7 +33,7 @@ import type {
 import { isLoopbackHostname } from './http/local-daemon-request.js';
 
 export const LINKPAGE_USAGE = [
-  'Usage: od linkpage build --config <file|-> [--model-lane <auto|claude-cli|openrouter|deepseek>] [--json] [--daemon-url <url>]',
+  'Usage: od linkpage build --config <file|-> [--model-lane <auto|claude-cli|openrouter|deepseek|baseten>] [--json] [--daemon-url <url>]',
   '       od linkpage list [--json]',
   '       od linkpage get <slug> [--json]',
   '       od linkpage render <slug> --out <dir> [--origin <url>] [--json]',
@@ -64,7 +64,8 @@ Options:
   --model-lane <lane>   Which model reads the creator: auto (default: OpenRouter if a key is saved,
                         else DeepSeek for text if a key is saved, then the Claude CLI), claude-cli
                         (the signed-in claude command only; no key is read), openrouter (no CLI
-                        fallback), or deepseek (text only, no photo style, no CLI fallback).
+                        fallback), deepseek (text only, no photo style, no CLI fallback), or baseten
+                        (needs OD_BASETEN_MODEL on the daemon; no CLI fallback).
                         Overrides options.modelLane.
   --json                Print the daemon response as JSON.
   --daemon-url <url>    Override the local daemon address.`;
@@ -157,7 +158,7 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
         return out(2, '', 'The config is not valid JSON.\n');
       }
       if (parsed.modelLane !== undefined) {
-        if (!isLinkPageModelLaneChoice(parsed.modelLane)) return usage('--model-lane must be auto, claude-cli, openrouter or deepseek');
+        if (!isLinkPageModelLaneChoice(parsed.modelLane)) return usage('--model-lane must be auto, claude-cli, openrouter, deepseek or baseten');
         if (typeof raw !== 'object' || raw === null || Array.isArray(raw)) return out(2, '', 'The config is not valid: the request must be an object\n');
         const body = raw as Record<string, unknown>;
         const base = typeof body.options === 'object' && body.options !== null && !Array.isArray(body.options) ? body.options : {};
@@ -283,7 +284,7 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
 /** One plain line: which lane answered, and the model id when a metered lane did. */
 export function describeModel(model: LinkPageModelInfo): string {
   if (model.lane === 'none') return 'none (built from plain signals)';
-  const label = model.lane === 'openrouter' ? 'OpenRouter' : model.lane === 'deepseek' ? 'DeepSeek' : undefined;
+  const label = model.lane === 'openrouter' ? 'OpenRouter' : model.lane === 'deepseek' ? 'DeepSeek' : model.lane === 'baseten' ? 'Baseten' : undefined;
   const name = label ? `${label}${model.model ? ` (${model.model})` : ''}` : 'Claude CLI';
   return `${name}, ${model.calls} ${model.calls === 1 ? 'call' : 'calls'}`;
 }
