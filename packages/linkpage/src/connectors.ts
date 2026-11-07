@@ -219,26 +219,55 @@ async function instagramApi(login: LoginFetch, handle: string): Promise<Signal> 
   };
 }
 
+// TikTok may reject a field it does not know (or one the app's scopes do not cover) with a 400 or an `error.code`
+// other than "ok". Each request tries the richest field set first and falls back to a smaller one, so a wrong
+// field name costs some detail, never the whole read.
+const TIKTOK_USER_FIELDS = [
+  'open_id,union_id,avatar_url,display_name,bio_description,profile_deep_link,username,follower_count,likes_count,video_count',
+  'open_id,union_id,avatar_url,display_name,bio_description,profile_deep_link,follower_count',
+  'open_id,union_id,avatar_url,display_name',
+];
+const TIKTOK_VIDEO_FIELDS = ['id,title,cover_image_url,create_time', 'id,title'];
+
+async function tiktokTry(login: LoginFetch, make: (fields: string) => [string, RequestInit?], ladder: string[]): Promise<Json> {
+  let failure: unknown;
+  for (const fields of ladder) {
+    try {
+      const [url, init] = make(fields);
+      const body = await api(login, url, init);
+      const code = body?.error?.code;
+      if (code !== undefined && code !== 'ok') throw new Error(`${url} answered ${String(code)}`);
+      return body;
+    } catch (error) {
+      failure = error;
+    }
+  }
+  throw failure;
+}
+
 async function tiktokApi(login: LoginFetch, handle: string): Promise<Signal> {
-  const info = await api(login, 'https://open.tiktokapis.com/v2/user/info/?fields=open_id,display_name,avatar_url,bio_description,profile_deep_link,follower_count');
-  const list = await api(login, 'https://open.tiktokapis.com/v2/video/list/?fields=id,title,cover_image_url,share_url,create_time', {
+  const info = await tiktokTry(login, (fields) => [`https://open.tiktokapis.com/v2/user/info/?fields=${fields}`], TIKTOK_USER_FIELDS);
+  const u = info.data?.user || {};
+  const user = typeof u.username === 'string' && u.username ? u.username : handle;
+  // Videos are a bonus: if TikTok will not list them (scope not granted, field rejected), the profile still builds.
+  const list = await tiktokTry(login, (fields) => [`https://open.tiktokapis.com/v2/video/list/?fields=${fields}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ max_count: 6 }),
-  });
-  const u = info.data?.user || {};
+  }], TIKTOK_VIDEO_FIELDS).catch(() => ({}) as Json);
+  const videos: Json[] = Array.isArray(list.data?.videos) ? list.data.videos : [];
   return {
     source: 'tiktok',
     name: u.display_name || handle,
     bio: u.bio_description || '',
     avatar_url: u.avatar_url || '',
     stats: followers(u.follower_count),
-    links: [{ url: u.profile_deep_link || `https://www.tiktok.com/@${handle}`, kind: 'tiktok', label: 'TikTok', handle: '@' + handle }],
-    posts: (list.data?.videos || []).map((v: Json) => ({
+    links: [{ url: u.profile_deep_link || `https://www.tiktok.com/@${user}`, kind: 'tiktok', label: 'TikTok', handle: '@' + user }],
+    posts: videos.map((v: Json) => ({
       title: captionTitle(v.title),
-      url: v.share_url || '',
+      url: v.share_url || (v.id ? `https://www.tiktok.com/@${user}/video/${v.id}` : ''),
       image_url: v.cover_image_url || '',
-      published: v.create_time ? new Date(v.create_time * 1000).toISOString() : '',
+      published: Number.isFinite(v.create_time) && v.create_time ? new Date(v.create_time * 1000).toISOString() : '',
     })),
   };
 }

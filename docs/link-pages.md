@@ -172,3 +172,5 @@ Reviewed and left for later; none blocks the draft.
 - The Instagram and TikTok request formats follow the platforms' documentation and have not been run
   against live accounts; the Composio proxy call is likewise untested live.
 - The avatar picture needs a built page first (it is stored under the page's slug).
+
+TikTok logins can now come from Mish's own OAuth provider instead of Composio: see [native-oauth.md](native-oauth.md).

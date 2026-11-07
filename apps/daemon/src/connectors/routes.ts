@@ -5,7 +5,7 @@ import type { Express, Request, RequestHandler, Response } from 'express';
 
 import { checkConnectorAccess, type ToolTokenGrant } from '../tool-tokens.js';
 import { serializeJsonForInlineScript } from '../http/oauth-result-page.js';
-import { CONNECTOR_CALLBACK_NONCE_PATTERN } from '@mish/contracts';
+import { CONNECTOR_CALLBACK_NONCE_PATTERN, parseNativeOAuthCallbackQuery } from '@mish/contracts';
 import { validateBoundedJsonObject } from '../live-artifacts/schema.js';
 import { executeConnectorTool, listConnectorTools } from '../tools/connectors.js';
 import { readComposioConfig, readPublicComposioConfig, writeComposioConfig } from './composio-config.js';
@@ -683,6 +683,10 @@ export function registerConnectorRoutes(app: Express, options: RegisterConnector
         options.sendApiError(res, 400, 'VALIDATION_FAILED', 'Composio connector credentials can only be stored through OAuth callback completion');
         return;
       }
+      if (definition?.authentication === 'native' && credentials !== undefined) {
+        options.sendApiError(res, 400, 'VALIDATION_FAILED', 'connector credentials can only be stored through OAuth callback completion');
+        return;
+      }
       const callbackNonce = connectorCallbackNonce(body.callbackNonce);
       const callbackUrl = `${connectorCallbackUrl(req)}/${encodeURIComponent(connectorId)}`
         + (callbackNonce === undefined ? '' : `?od_callback_nonce=${encodeURIComponent(callbackNonce)}`);
@@ -690,6 +694,7 @@ export function registerConnectorRoutes(app: Express, options: RegisterConnector
         ...(await service.connect(connectorId, {
           ...(accountLabel === undefined ? {} : { accountLabel }),
           ...(credentials === undefined ? {} : { credentials }),
+          ...(callbackNonce === undefined ? {} : { callbackNonce }),
           callbackUrl,
         })),
       });
@@ -702,6 +707,18 @@ export function registerConnectorRoutes(app: Express, options: RegisterConnector
     try {
       const connectorId = req.params.connectorId;
       if (!connectorId) return options.sendApiError(res, 400, 'CONNECTOR_NOT_FOUND', 'connectorId is required');
+      if (service.isNativeConnector(connectorId)) {
+        // Mish's own OAuth: the redirect carries `code` + `state`; the nonce for the opener was kept with the state.
+        const parsed = parseNativeOAuthCallbackQuery(req.query as Record<string, unknown>);
+        if (!parsed.ok && parsed.reason === 'invalid') return options.sendApiError(res, 400, 'BAD_REQUEST', 'the authorization response was not valid');
+        const done = await service.completeNativeConnection({
+          connectorId,
+          state: parsed.ok || parsed.reason === 'denied' ? parsed.state : '',
+          ...(parsed.ok ? { code: parsed.code } : { denied: true }),
+        });
+        res.type('html').send(renderConnectorConnectedHtml(connectorId, done.callbackNonce));
+        return;
+      }
       const state = typeof req.query.state === 'string' ? req.query.state : undefined;
       if (!state) return options.sendApiError(res, 400, 'BAD_REQUEST', 'state is required');
       const providerConnectionId = typeof req.query.connected_account_id === 'string'

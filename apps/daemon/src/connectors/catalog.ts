@@ -79,7 +79,7 @@ export interface ConnectorDetail {
 }
 
 export interface ConnectorAuthDetail {
-  provider: 'local' | 'none' | 'oauth' | 'composio';
+  provider: 'local' | 'none' | 'oauth' | 'composio' | 'native';
   configured: boolean;
 }
 
@@ -107,7 +107,7 @@ export interface ConnectorCatalogDefinition {
   toolsNextCursor?: string;
   toolsHasMore?: boolean;
   /** How the connector is made available. `none` and `local` connectors require no user OAuth state. */
-  authentication?: 'local' | 'none' | 'oauth' | 'composio';
+  authentication?: 'local' | 'none' | 'oauth' | 'composio' | 'native';
   /** Provider toolkit slug used by external connector providers such as Composio. */
   providerConnectorId?: string;
   featuredToolNames?: string[];

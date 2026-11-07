@@ -141,12 +141,15 @@ test('with a login TikTok uses the Display API (a POST for videos) and reports n
     const url = String(input);
     calls.push({ url, init });
     const body = url.includes('/video/list/')
-      ? { data: { videos: [{ title: 'Wheel day', share_url: 'https://tiktok.com/v/1', cover_image_url: 'https://cdn/c.jpg', create_time: 1790000000 }] } }
-      : { data: { user: { display_name: 'Studio', bio_description: 'Clay.', avatar_url: 'https://cdn/a.jpg', profile_deep_link: 'https://tiktok.com/@studio', follower_count: 1200 } } };
+      ? { data: { videos: [{ id: '7001', title: 'Wheel day', cover_image_url: 'https://cdn/c.jpg', create_time: 1790000000 }] } }
+      : { data: { user: { display_name: 'Studio', username: 'studio.pots', bio_description: 'Clay.', avatar_url: 'https://cdn/a.jpg', profile_deep_link: 'https://tiktok.com/@studio', follower_count: 1200 } } };
     return new Response(JSON.stringify(body), { status: 200 });
   };
   const s = await connectors.tiktok({ login }).read('@studio');
-  assert.match(calls[0]?.url as string, /^https:\/\/open\.tiktokapis\.com\/v2\/user\/info\/\?fields=open_id,display_name,avatar_url,bio_description,profile_deep_link,follower_count$/);
+  assert.equal(s.posts?.[0]?.url, 'https://www.tiktok.com/@studio.pots/video/7001');
+  assert.equal(s.links?.[0]?.handle, '@studio.pots');
+  assert.match(calls[0]?.url as string, /^https:\/\/open\.tiktokapis\.com\/v2\/user\/info\/\?fields=open_id,union_id,avatar_url,display_name,bio_description,profile_deep_link,username,follower_count,likes_count,video_count$/);
+  assert.match(calls[1]?.url as string, /^https:\/\/open\.tiktokapis\.com\/v2\/video\/list\/\?fields=id,title,cover_image_url,create_time$/);
   assert.equal(calls[1]?.init.method, 'POST');
   assert.deepEqual(JSON.parse(calls[1]?.init.body as string), { max_count: 6 });
   assert.equal(s.bio, 'Clay.');
@@ -154,6 +157,24 @@ test('with a login TikTok uses the Display API (a POST for videos) and reports n
   assert.equal(s.posts?.[0]?.title, 'Wheel day');
   assert.equal(s.posts?.[0]?.image_url, 'https://cdn/c.jpg');
   assert.equal(s.needs_login, undefined);
+});
+
+test('TikTok degrades to the fields that work when it rejects some, and never fails the read for the videos', async () => {
+  const urls: string[] = [];
+  const login: FetchFn = async (input) => {
+    const url = String(input);
+    urls.push(url);
+    if (url.includes('/video/list/')) return new Response(JSON.stringify({ error: { code: 'scope_not_authorized' } }), { status: 403 });
+    if (url.includes('likes_count')) return new Response(JSON.stringify({ error: { code: 'invalid_params' } }), { status: 400 });
+    if (url.includes('profile_deep_link')) return new Response(JSON.stringify({ data: { user: { display_name: 'Studio' } }, error: { code: 'invalid_params' } }), { status: 200 });
+    return new Response(JSON.stringify({ data: { user: { display_name: 'Studio', follower_count: 5 } }, error: { code: 'ok' } }), { status: 200 });
+  };
+  const s = await connectors.tiktok({ login }).read('@studio');
+  assert.equal(s.name, 'Studio');
+  assert.equal(s.stats, '5 followers');
+  assert.deepEqual(s.posts, []);
+  assert.equal(s.needs_login, undefined);
+  assert.ok(urls.filter((u) => u.includes('/user/info/')).length >= 3, 'tried smaller field sets');
 });
 
 test('when the login read fails, the connector falls back to the public page and says so', async () => {

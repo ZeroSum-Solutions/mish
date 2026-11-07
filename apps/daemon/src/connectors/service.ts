@@ -12,6 +12,9 @@ import {
   type ConnectorToolSafety,
   type ConnectorStatus,
 } from './catalog.js';
+import { NativeOAuthError, type NativeOAuthService } from './native-oauth.js';
+import { NATIVE_TIKTOK_DEFINITION, TIKTOK_NATIVE_TOOLS } from './native/definitions.js';
+import { TIKTOK_VIDEO_FIELD_LADDER, TIKTOK_USER_FIELD_LADDER } from './native/tiktok.js';
 import { composioConnectorProvider, getStaticComposioCatalogDefinitions, type ComposioAuthConfigPrepareResult, type ComposioConnectionStart } from './composio.js';
 
 export interface ConnectorExecuteRequest {
@@ -560,7 +563,56 @@ export function protectConnectorOutput(output: BoundedJsonValue): ConnectorOutpu
 export class ConnectorService {
   private readonly runLimits = new Map<string, ConnectorRunLimitState>();
 
+  private native: NativeOAuthService | undefined;
+  private nativeConfigCheckedAt = 0;
+
   constructor(private readonly statusService = new ConnectorStatusService()) {}
+
+  /** Installs Mish's own OAuth provider; its connectors then replace the Composio entry of the same id. */
+  setNativeOAuth(native: NativeOAuthService | undefined): void {
+    this.native = native;
+    this.nativeConfigCheckedAt = 0;
+  }
+
+  getNativeOAuth(): NativeOAuthService | undefined {
+    return this.native;
+  }
+
+  private nativeDefinitions(): ConnectorCatalogDefinition[] {
+    return this.native?.handles(NATIVE_TIKTOK_DEFINITION.id) ? [NATIVE_TIKTOK_DEFINITION] : [];
+  }
+
+  private nativeDefinition(connectorId: string): ConnectorCatalogDefinition | undefined {
+    return this.nativeDefinitions().find((definition) => definition.id === connectorId);
+  }
+
+  private withNative(definitions: ConnectorCatalogDefinition[]): ConnectorCatalogDefinition[] {
+    const native = this.nativeDefinitions();
+    if (native.length === 0) return definitions;
+    const ids = new Set(native.map((definition) => definition.id));
+    return [...definitions.filter((definition) => !ids.has(definition.id)), ...native];
+  }
+
+  isNativeConnector(connectorId: string): boolean {
+    return this.nativeDefinition(connectorId) !== undefined;
+  }
+
+  /** Re-reads whether the native connectors are configured (env or vault), at most every 30 seconds. */
+  private async refreshNativeConfigured(): Promise<void> {
+    if (!this.native || Date.now() - this.nativeConfigCheckedAt < 30_000) return;
+    this.nativeConfigCheckedAt = Date.now();
+    await Promise.all(this.nativeDefinitions().map((definition) => this.native!.status(definition.id).catch(() => undefined)));
+  }
+
+  private nativeAccountId(connectorId: string): string | undefined {
+    const credentials = this.getCredential(connectorId)?.credentials;
+    return credentials?.provider === 'native' && typeof credentials.accountId === 'string' ? credentials.accountId : undefined;
+  }
+
+  /** The id link pages and other in-process callers use to reach a connected native account. */
+  getNativeAccountId(connectorId: string): string | undefined {
+    return this.nativeAccountId(connectorId);
+  }
 
   setCredentialStore(credentialStore: ConnectorCredentialStore): void {
     this.statusService.setCredentialStore(credentialStore);
@@ -571,15 +623,15 @@ export class ConnectorService {
   }
 
   async listDefinitions(signal?: AbortSignal): Promise<ConnectorCatalogDefinition[]> {
-    return composioConnectorProvider.listDefinitions(signal);
+    return this.withNative(await composioConnectorProvider.listDefinitions(signal));
   }
 
   async listHydratedDefinitions(signal?: AbortSignal): Promise<ConnectorCatalogDefinition[]> {
-    return composioConnectorProvider.listDefinitions(signal, { hydrateTools: true });
+    return this.withNative(await composioConnectorProvider.listDefinitions(signal, { hydrateTools: true }));
   }
 
   listFastDefinitions(): ConnectorCatalogDefinition[] {
-    return composioConnectorProvider.getFastDefinitions();
+    return this.withNative(composioConnectorProvider.getFastDefinitions());
   }
 
   getFastDefinition(connectorId: string): ConnectorCatalogDefinition | undefined {
@@ -587,16 +639,16 @@ export class ConnectorService {
   }
 
   async getDefinition(connectorId: string, signal?: AbortSignal): Promise<ConnectorCatalogDefinition | undefined> {
-    return composioConnectorProvider.getDefinition(connectorId, signal);
+    return this.nativeDefinition(connectorId) ?? composioConnectorProvider.getDefinition(connectorId, signal);
   }
 
   async getHydratedDefinition(connectorId: string, signal?: AbortSignal): Promise<ConnectorCatalogDefinition | undefined> {
-    return await composioConnectorProvider.getHydratedDefinition(connectorId, signal)
+    return this.nativeDefinition(connectorId) ?? await composioConnectorProvider.getHydratedDefinition(connectorId, signal)
       ?? await this.getDefinition(connectorId, signal);
   }
 
   async getPreviewDefinition(connectorId: string, options: { toolsLimit: number; toolsCursor?: string; signal?: AbortSignal }): Promise<ConnectorCatalogDefinition | undefined> {
-    return composioConnectorProvider.getPreviewDefinition(connectorId, options);
+    return this.nativeDefinition(connectorId) ?? composioConnectorProvider.getPreviewDefinition(connectorId, options);
   }
 
   getStatus(definition: ConnectorCatalogDefinition): ConnectorConnectionStatus {
@@ -608,6 +660,7 @@ export class ConnectorService {
   }
 
   async listConnectors(signal?: AbortSignal): Promise<ConnectorDetail[]> {
+    await this.refreshNativeConfigured();
     return this.listFastDefinitions().map((definition) => this.toDetail(definition));
   }
 
@@ -635,6 +688,7 @@ export class ConnectorService {
   }
 
   async getConnector(connectorId: string, signal?: AbortSignal): Promise<ConnectorDetail> {
+    await this.refreshNativeConfigured();
     const definition = await this.getDefinition(connectorId, signal);
     if (!definition) {
       throw new ConnectorServiceError('CONNECTOR_NOT_FOUND', 'connector not found', 404);
@@ -678,10 +732,18 @@ export class ConnectorService {
     return { results };
   }
 
-  async connect(connectorId: string, options: { accountLabel?: string; credentials?: ConnectorCredentialMaterial; callbackUrl?: string; signal?: AbortSignal } = {}): Promise<ConnectorConnectResult> {
+  async connect(connectorId: string, options: { accountLabel?: string; credentials?: ConnectorCredentialMaterial; callbackUrl?: string; callbackNonce?: string; signal?: AbortSignal } = {}): Promise<ConnectorConnectResult> {
     const definition = this.getFastDefinition(connectorId) ?? await this.getDefinition(connectorId, options.signal);
     if (!definition) {
       throw new ConnectorServiceError('CONNECTOR_NOT_FOUND', 'connector not found', 404);
+    }
+
+    if (definition.authentication === 'native' && this.native) {
+      if (options.credentials !== undefined) {
+        throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', 'native connector credentials can only be stored through OAuth callback completion', 400, { connectorId });
+      }
+      const started = await this.native.begin(connectorId, options.callbackNonce === undefined ? {} : { callbackNonce: options.callbackNonce }).catch(rethrowNative(connectorId));
+      return { connector: this.toDetail(definition), auth: { kind: 'redirect_required', redirectUrl: started.redirectUrl, expiresAt: started.expiresAt } };
     }
 
     let auth: ComposioConnectionStart | undefined;
@@ -714,6 +776,10 @@ export class ConnectorService {
     if (definition.authentication === 'composio') {
       await composioConnectorProvider.disconnect(this.getCredential(connectorId)?.credentials);
     }
+    if (definition.authentication === 'native' && this.native) {
+      const accountId = this.nativeAccountId(connectorId);
+      if (accountId) await this.native.disconnect(connectorId, accountId).catch(rethrowNative(connectorId));
+    }
     this.statusService.disconnect(definition);
     return this.toDetail(definition);
   }
@@ -727,6 +793,21 @@ export class ConnectorService {
       composioConnectorProvider.cancelPendingConnections(connectorId);
     }
     return this.toDetail(definition);
+  }
+
+  /** Finishes a native OAuth redirect. The state, code and PKCE checks live in the native provider. */
+  async completeNativeConnection(input: { connectorId: string; state: string; code?: string; denied?: boolean }): Promise<{ connector: ConnectorDetail; callbackNonce?: string }> {
+    const definition = this.nativeDefinition(input.connectorId);
+    if (!definition || !this.native) {
+      throw new ConnectorServiceError('CONNECTOR_NOT_FOUND', 'connector not found', 404);
+    }
+    const done = await this.native.complete(input.connectorId, {
+      state: input.state,
+      ...(input.code === undefined ? {} : { code: input.code }),
+      ...(input.denied === undefined ? {} : { denied: input.denied }),
+    }).catch(rethrowNative(input.connectorId));
+    this.statusService.connect(definition, done.accountLabel, { provider: 'native', accountId: done.accountId });
+    return { connector: this.toDetail(definition), ...(done.callbackNonce === undefined ? {} : { callbackNonce: done.callbackNonce }) };
   }
 
   async completeComposioConnection(input: { connectorId: string; state: string; providerConnectionId?: string; status?: string; signal?: AbortSignal }): Promise<ConnectorDetail> {
@@ -851,6 +932,9 @@ export class ConnectorService {
   ): Promise<BoundedJsonObject> {
     const definition = resolvedDefinition ?? await this.getHydratedDefinition(request.connectorId, context.signal);
     const tool = resolvedTool ?? definition?.tools.find((candidate) => candidate.name === request.toolName);
+    if (definition?.authentication === 'native' && tool && this.native) {
+      return this.executeNativeTool(request, tool.name);
+    }
     if (definition?.authentication === 'composio' && tool) {
       return composioConnectorProvider.execute(definition, tool, request.input, this.getCredential(request.connectorId)?.credentials, context.signal);
     }
@@ -858,6 +942,32 @@ export class ConnectorService {
     throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', 'connector provider is not implemented', 501, {
       connectorId: request.connectorId,
       toolName: request.toolName,
+    });
+  }
+
+  private async executeNativeTool(request: ConnectorExecuteRequest, toolName: string): Promise<BoundedJsonObject> {
+    const accountId = this.nativeAccountId(request.connectorId);
+    if (!accountId || !this.native) {
+      throw new ConnectorServiceError('CONNECTOR_NOT_CONNECTED', 'connector is not connected', 403, { connectorId: request.connectorId });
+    }
+    const base = 'https://open.tiktokapis.com/v2';
+    const wanted = request.input.max_count;
+    const maxCount = typeof wanted === 'number' ? Math.min(20, Math.max(1, Math.trunc(wanted))) : 6;
+    const ladder = toolName === TIKTOK_NATIVE_TOOLS.videoList ? TIKTOK_VIDEO_FIELD_LADDER : TIKTOK_USER_FIELD_LADDER;
+    let last: { status: number; data: unknown } | undefined;
+    // A field TikTok rejects (400) degrades to the next, smaller set instead of failing the call.
+    for (const fields of ladder) {
+      const result = await this.native.request(request.connectorId, accountId, toolName === TIKTOK_NATIVE_TOOLS.videoList
+        ? { endpoint: `${base}/video/list/?fields=${fields}`, method: 'POST', headers: { 'content-type': 'application/json' }, body: { max_count: maxCount } }
+        : { endpoint: `${base}/user/info/?fields=${fields}`, method: 'GET' }).catch(rethrowNative(request.connectorId, toolName));
+      last = result;
+      if (result.status >= 200 && result.status < 300) return { toolName, status: result.status, data: (result.data ?? null) as BoundedJsonValue };
+      if (result.status !== 400) break;
+    }
+    throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', `TikTok answered ${last?.status ?? 0}`, 502, {
+      connectorId: request.connectorId,
+      toolName,
+      error: last?.status ?? 0,
     });
   }
 
@@ -909,14 +1019,37 @@ export class ConnectorService {
       ...(detail.auth === undefined ? {} : {
         auth: {
           ...detail.auth,
-          configured: detail.auth.configured || (definition.authentication === 'composio' && composioConnectorProvider.isConfigured(definition)),
+          configured: detail.auth.configured
+            || (definition.authentication === 'composio' && composioConnectorProvider.isConfigured(definition))
+            || (definition.authentication === 'native' && (this.native?.isConfiguredCached(definition.id) ?? false)),
         },
       }),
     };
   }
 }
 
+/** Turns a native OAuth failure into the connector API's error, keeping its message (never a token). */
+function rethrowNative(connectorId: string, toolName?: string): (error: unknown) => never {
+  return (error) => {
+    if (!(error instanceof NativeOAuthError)) throw error;
+    const details: BoundedJsonObject = { connectorId, ...(toolName === undefined ? {} : { toolName }), reason: error.code };
+    if (error.code === 'not_configured' || error.code === 'key_unavailable') {
+      throw new ConnectorServiceError('CONNECTOR_AUTH_CONFIG_REQUIRED', error.message, error.status, details);
+    }
+    if (error.code === 'not_connected') throw new ConnectorServiceError('CONNECTOR_NOT_CONNECTED', error.message, error.status, details);
+    // 401 + the auth-stale signal lets execute() mark the connector as needing a reconnect.
+    if (error.code === 'reconnect_required' && toolName !== undefined) {
+      throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', error.message, error.status, { ...details, error: 401 });
+    }
+    throw new ConnectorServiceError('CONNECTOR_EXECUTION_FAILED', error.message, error.status, details);
+  };
+}
+
 export const connectorService = new ConnectorService();
+
+export function configureNativeOAuth(native: NativeOAuthService | undefined): void {
+  connectorService.setNativeOAuth(native);
+}
 
 export function configureConnectorCredentialStore(credentialStore: ConnectorCredentialStore): void {
   connectorService.setCredentialStore(credentialStore);
