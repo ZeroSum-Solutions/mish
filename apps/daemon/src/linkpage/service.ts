@@ -11,6 +11,7 @@ import type {
   LinkPageBuildRequest,
   LinkPageAssetResponse,
   LinkPageBuildResponse,
+  LinkPageGate,
   LinkPageModelInfo,
   LinkPageModelLaneChoice,
   LinkPageEventResponse,
@@ -26,6 +27,8 @@ import type {
   LinkPagePutRequest,
 } from '@mish/contracts';
 import { recordLinkPageEvent } from './events.js';
+import type { JevGate } from './gate.js';
+import { LINKPAGE_RETRY_LANE } from './model-lanes.js';
 import { createLoginFetches } from './login.js';
 import type { LinkPageLoginProvider } from './login.js';
 import type { LinkPageFetch } from './safe-fetch.js';
@@ -47,6 +50,10 @@ export interface LinkPageServiceDeps {
   fetch: LinkPageFetch;
   /** Called per build, so a model that appears (a key set, `claude` installed) is picked up. */
   resolveLlm: (lane?: LinkPageModelLaneChoice) => (Llm & { report?: () => LinkPageModelInfo }) | undefined | Promise<(Llm & { report?: () => LinkPageModelInfo }) | undefined>;
+  /** The Jev quality gate. Absent: no gate runs and the build response has no `gate`. */
+  gate?: JevGate | undefined;
+  /** The lane a build uses when its request names none (OD_LINKPAGE_MODEL_LANE). Decides whether the auto retry applies. Default 'auto'. */
+  defaultLane?: () => LinkPageModelLaneChoice;
   login?: LinkPageLoginProvider | undefined;
   /**
    * The Composio connected-account id of a connector the creator already connected in Mish (Settings or
@@ -137,6 +144,15 @@ export function failedWarning(info: LinkPageModelInfo): string | undefined {
   return `${name} failed (${info.failed.reason}); the ${name} lane was chosen, so the page was built from plain signals`;
 }
 
+/** One read-and-build, with the gate's verdict when a gate ran. */
+interface Attempt {
+  spec: LinkPageSpec;
+  warnings: string[];
+  model: LinkPageModelInfo;
+  needs: LinkPageBuildResponse['needs'];
+  gate?: LinkPageGate;
+}
+
 const TEXT = 'text/plain; charset=utf-8';
 
 export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageService {
@@ -169,29 +185,50 @@ export function createLinkPageService(deps: LinkPageServiceDeps): LinkPageServic
       }
       const loginWarnings: string[] = [];
       const logins = createLoginFetches(deps.login, connectedAccounts, loginWarnings);
-      const lane = request.options?.modelLane;
-      const llm = await deps.resolveLlm(lane);
-      let result;
-      try {
-        result = await buildPage({
-          sources: request.sources.map(({ connector, ref }) => ({ connector, ref: ref as never })),
-          options: buildOptions(request),
-          logins,
-          fetch: deps.fetch,
-          ...(llm ? { llm } : {}),
-        });
-      } catch (error) {
-        throw new LinkPageError('UPSTREAM_UNAVAILABLE', 502, error instanceof Error ? error.message : 'the page could not be built');
+      const requested = request.options?.modelLane;
+      const fromOptions = { headline: request.options?.headline !== undefined, bio: request.options?.bio !== undefined };
+
+      /** One full read-and-build on a lane, then the quality gate on what it produced. */
+      const attempt = async (lane: LinkPageModelLaneChoice | undefined): Promise<Attempt> => {
+        const llm = await deps.resolveLlm(lane);
+        let result;
+        try {
+          result = await buildPage({
+            sources: request.sources.map(({ connector, ref }) => ({ connector, ref: ref as never })),
+            options: buildOptions(request),
+            logins,
+            fetch: deps.fetch,
+            ...(llm ? { llm } : {}),
+          });
+        } catch (error) {
+          throw new LinkPageError('UPSTREAM_UNAVAILABLE', 502, error instanceof Error ? error.message : 'the page could not be built');
+        }
+        const built = cleanSpec(result.spec);
+        const warnings = [...loginWarnings, ...result.warnings];
+        const model: LinkPageModelInfo = !llm ? { lane: 'none', calls: 0 } : (llm.report?.() ?? { lane: 'none', calls: 0 });
+        if (!llm) warnings.push(noModelWarning(lane));
+        const fallback = fallbackWarning(model) ?? failedWarning(model);
+        if (fallback) warnings.push(fallback);
+        const gated = deps.gate ? await deps.gate.review({ spec: built, facts: result.facts, fromOptions }) : undefined;
+        return { spec: gated?.spec ?? built, warnings, model, needs: result.needs, ...(gated ? { gate: gated.gate } : {}) };
+      };
+
+      let kept = await attempt(requested);
+      // The auto lane gets one more read on the next lane when the bio and headline came out thin. Forced lanes
+      // (in the request or as the daemon default) never move.
+      const effective = requested ?? deps.defaultLane?.() ?? 'auto';
+      const retryLane = effective === 'auto' && kept.gate?.insufficient ? LINKPAGE_RETRY_LANE[kept.model.lane] : undefined;
+      if (retryLane && kept.gate) {
+        const first = kept;
+        const again = await attempt(retryLane);
+        const better = again.gate?.ran === true && (again.gate.sufficiency ?? -1) > (first.gate?.insufficient?.probability ?? 1);
+        kept = better ? again : first;
+        kept.gate = { ...kept.gate!, retried: { lane: retryLane, kept: better ? 'retry' : 'first' } };
       }
-      const spec = cleanSpec(result.spec);
-      const warnings = [...loginWarnings, ...result.warnings];
-      const model: LinkPageModelInfo = !llm ? { lane: 'none', calls: 0 } : (llm.report?.() ?? { lane: 'none', calls: 0 });
-      if (!llm) warnings.push(noModelWarning(lane));
-      const fallback = fallbackWarning(model) ?? failedWarning(model);
-      if (fallback) warnings.push(fallback);
+      const { spec, warnings, model, needs, gate } = kept;
       const save = request.save !== false;
       if (save) await store.put({ spec, connectedAccounts, warnings });
-      return { spec, warnings, model, needs: result.needs, saved: save };
+      return { spec, warnings, model, ...(gate ? { gate } : {}), needs, saved: save };
     },
 
     list: () => store.list(),

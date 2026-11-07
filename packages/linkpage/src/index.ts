@@ -1,5 +1,5 @@
 export { buildPage } from './build.ts';
-export type { BuildInput, BuildOptions, BuildResult, BuildSource } from './build.ts';
+export type { BuildInput, BuildOptions, BuildResult, BuildSource, CreatorFacts } from './build.ts';
 export { checkPage } from './spec.ts';
 export { renderPage } from './render.ts';
 export type { RenderOptions } from './render.ts';

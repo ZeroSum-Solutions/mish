@@ -142,6 +142,28 @@ prints a `model:` line, and the web view shows the lane under the build result. 
 and the `claude` command is not installed, the build keeps the error as a warning (without the reply
 body) and the page is built from plain signals.
 
+### The Jev quality gate
+
+After a build the daemon asks TypeSafe Jev (`api.typesafe.ai/v1/systemone`, `jev-latest`, the key from the key store:
+`TYPESAFE_API_KEY`, a saved key, then the vault) typed yes/no ("noul") questions in one request, with the creator's
+gathered facts (name, bios, site title, platforms, stats, the start of the pages that were read) as state:
+
+1. Are the bio and headline together sufficient and specific to this person? Under `GATE_SUFFICIENCY_THRESHOLD` (0.4)
+   the build reports `gate.insufficient` with the reason. The page is still built and saved.
+2. For each extracted item (the headline, each theme, each post or video title shown): how likely is it that a person
+   with this profile and industry would have this content? Under `GATE_ITEM_THRESHOLD` (0.2) the item is taken off the
+   page and listed in `gate.dropped` with its kind, text and probability. An emptied posts block is removed.
+
+Both constants are in [`linkpage/gate.ts`](../apps/daemon/src/linkpage/gate.ts). A headline or bio the creator typed
+(`options.headline`, `options.bio`) is never judged. The gate only removes or rejects: it never writes or adds text.
+It fails open: no Jev key, a network error, a bad status or an unreadable answer gives `gate.ran: false` with
+`skipped` (`no-key` or `unavailable`) and leaves the page as built; a build is never blocked.
+
+On the `auto` lane, an insufficient read gets one more read on the next lane (OpenRouter or DeepSeek to the Claude CLI;
+`LINKPAGE_RETRY_LANE` in `model-lanes.ts`). The retry is kept only when its sufficiency is higher; `gate.retried`
+says which read was kept. A lane named in the request, or set as the daemon default, never retries. The web view shows
+a Quality check box under the model line, and `od linkpage build` prints `gate:` lines.
+
 ## Instagram and TikTok
 
 Both platforms show little without the creator's login, and only a **business or creator account**

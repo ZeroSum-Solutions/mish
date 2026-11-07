@@ -40,6 +40,12 @@ const REQUEST = JSON.stringify({ slug: 'sam', sources: [{ connector: 'website', 
 const SPEC = { slug: 'sam', profile: { name: 'Sam', headline: 'Potter' }, blocks: [{}] };
 
 describe('od linkpage', () => {
+  it('prints the gate result in the human build output', async () => {
+    const gate = { ran: true, sufficiency: 0.3, dropped: [{ kind: 'theme', text: 'forex', probability: 0.05 }], insufficient: { reason: 'thin', probability: 0.3 }, retried: { lane: 'claude-cli', kept: 'first' } };
+    const h = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: [], model: { lane: 'openrouter', model: 'm', calls: 1 }, gate, needs: [] } }], REQUEST);
+    expect((await h.run(['build', '--config', 'c.json'])).stdout).toBe('Built sam: Sam (saved)\n  model: OpenRouter (m), 1 call\n  gate: insufficient (thin); read again on claude-cli, kept the first read\n  gate: dropped theme "forex" (0.05)\n');
+  });
+
   it('prints the model lane in the human build output', async () => {
     const model = { lane: 'claude-cli', calls: 2, fellBackFrom: { lane: 'openrouter', reason: 'out-of-credits' } };
     const h = harness([{ status: 200, body: { spec: SPEC, saved: true, warnings: ['OpenRouter is out of credits; used the Claude CLI'], model, needs: [] } }], REQUEST);

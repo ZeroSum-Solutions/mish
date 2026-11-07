@@ -193,10 +193,41 @@ export interface LinkPageModelInfo {
   failed?: { lane: LinkPageMeteredLane; reason: LinkPageModelFallbackReason };
 }
 
+/** What the quality gate looked at. 'headline' is the headline line, 'theme' a theme tag, 'post' a post or video title. */
+export type LinkPageGateItemKind = 'headline' | 'theme' | 'post';
+
+/** An item the gate took off the page, and how likely Jev thought it was for this creator (0 to 1). */
+export interface LinkPageGateDrop {
+  kind: LinkPageGateItemKind;
+  /** The item's text, trimmed to 120 characters. */
+  text: string;
+  probability: number;
+}
+
+/**
+ * The Jev quality gate's result for a build. The gate only removes or rejects: it never adds text.
+ * It fails open: with no Jev key, or any failure, `ran` is false, `skipped` says why, and the build is untouched.
+ */
+export interface LinkPageGate {
+  ran: boolean;
+  /** Why the gate did not run: no Jev key, or Jev could not be reached or answered badly. */
+  skipped?: 'no-key' | 'unavailable';
+  /** Jev's probability that the bio and headline are sufficient and specific to this person. */
+  sufficiency?: number;
+  /** Set when `sufficiency` is under the threshold: the build reports 'insufficient' and why. */
+  insufficient?: { reason: string; probability: number };
+  /** Items taken off the page because they scored under the item threshold. */
+  dropped: LinkPageGateDrop[];
+  /** Set when the first read was insufficient and the auto lane read again on the next lane. */
+  retried?: { lane: LinkPageModelLaneChoice; kept: 'retry' | 'first' };
+}
+
 export interface LinkPageBuildResponse {
   spec: LinkPageSpec;
   warnings: string[];
   model: LinkPageModelInfo;
+  /** Absent when the daemon runs no gate. */
+  gate?: LinkPageGate;
   needs: LinkPageLoginNeed[];
   /** True when the page was written to the store. */
   saved: boolean;

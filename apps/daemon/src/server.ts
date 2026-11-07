@@ -977,6 +977,7 @@ import { createBrowserSessionService } from './browser-sessions.js';
 import { registerSocialShareRoutes } from './routes/social-share.js';
 import { registerMishPublicMetadataRoutes } from './routes/mish-public-metadata.js';
 import { registerLinkPageRoutes } from './routes/linkpage.js';
+import { createJevGate } from './linkpage/gate.js';
 import { createLinkPageService } from './linkpage/service.js';
 import { createLinkPageStore } from './linkpage/store.js';
 import { createLinkPageFetch } from './linkpage/safe-fetch.js';
@@ -8681,6 +8682,8 @@ export async function startServer({
     linkpage: createLinkPageService({
       store: createLinkPageStore(RUNTIME_DATA_DIR),
       fetch: linkPageFetch,
+      gate: createJevGate({ resolveKey: () => jevKeyStore.resolveKey() }),
+      defaultLane: () => linkPageLaneFromEnv(process.env),
       resolveLlm: (lane) => resolveLinkPageLlm({ resolveKey: () => jevKeyStore.resolveModelKey('openrouter'), resolveDeepSeekKey: () => jevKeyStore.resolveModelKey('deepseek'), visionModel: process.env.OD_LINKPAGE_VISION_MODEL, resolveBasetenKey: () => jevKeyStore.resolveModelKey('baseten'), basetenModel: process.env.OD_BASETEN_MODEL, basetenBaseUrl: process.env.OD_BASETEN_BASE_URL, fetch: linkPageFetch, lane: lane ?? linkPageLaneFromEnv(process.env) }),
       login: createNativeAwareLoginProvider(composioConnectorProvider, () => connectorService.getNativeOAuth()),
       resolveConnectedAccount: (connector) => {

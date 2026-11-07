@@ -16,6 +16,7 @@ import {
   parseLinkPageBuildRequest,
 } from '@mish/contracts';
 import type {
+  LinkPageGate,
   LinkPageModelInfo,
   LinkPageModelLaneChoice,
   LinkPageBackground,
@@ -109,6 +110,8 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
   const [warnings, setWarnings] = useState<string[]>([]);
   // Which model answered the last build; unknown for a page that was opened, not built.
   const [model, setModel] = useState<LinkPageModelInfo | null>(null);
+  // The Jev quality gate's report for the last build; absent when no gate ran.
+  const [gate, setGate] = useState<LinkPageGate | null>(null);
   const [needs, setNeeds] = useState<LinkPageLoginNeed[]>([]);
   const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState<Busy>(null);
@@ -197,6 +200,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
       setTouched({});
       setWarnings(result.warnings);
       setModel(result.model ?? null);
+      setGate(result.gate ?? null);
       setNeeds(result.needs);
       setVersion((v) => v + 1);
       void refreshSaved();
@@ -298,6 +302,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
       setSpec(record.spec);
       setWarnings(record.warnings);
       setModel(null);
+      setGate(null);
       setNeeds([]);
       setTouched({});
       setName(record.spec.profile.name);
@@ -324,6 +329,7 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
     setTouched({});
     setWarnings([]);
     setModel(null);
+    setGate(null);
     setNeeds([]);
     setError(null);
     setNotice(null);
@@ -526,6 +532,16 @@ export function LinkPageView({ isActive = true }: LinkPageViewProps) {
                       ? t('linkPage.model.baseten', { model: model.model ?? '', calls: String(model.calls) })
                       : t('linkPage.model.claudeCli', { calls: String(model.calls) })}
             </p>
+          ) : null}
+          {gate?.ran && (gate.insufficient || gate.dropped.length > 0) ? (
+            <div className={styles.section} data-testid="link-page-gate">
+              <h2 className={styles.sectionTitle}>{t('linkPage.gate.heading')}</h2>
+              <ul className={styles.list}>
+                {gate.insufficient ? <li>{t('linkPage.gate.insufficient', { reason: gate.insufficient.reason })}</li> : null}
+                {gate.retried ? <li>{t(gate.retried.kept === 'retry' ? 'linkPage.gate.retriedKept' : 'linkPage.gate.retriedFirst', { lane: gate.retried.lane === 'claude-cli' ? 'the Claude CLI' : gate.retried.lane })}</li> : null}
+                {gate.dropped.map((drop) => <li key={`${drop.kind}:${drop.text}`}>{t('linkPage.gate.dropped', { kind: drop.kind, text: drop.text, probability: String(drop.probability) })}</li>)}
+              </ul>
+            </div>
           ) : null}
           {warnings.length > 0 ? (
             <div className={styles.section} data-testid="link-page-warnings">

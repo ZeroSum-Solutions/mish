@@ -133,6 +133,25 @@ describe('LinkPageView', () => {
     expect(screen.getByTestId('link-page-warnings').textContent).toContain('OpenRouter is out of credits; used the Claude CLI');
   });
 
+  it('shows what the quality gate dropped and why a bio was called insufficient, and nothing when it found nothing', async () => {
+    const gate = {
+      ran: true, sufficiency: 0.31, dropped: [{ kind: 'theme', text: 'forex signals', probability: 0.05 }, { kind: 'post', text: 'Poker tips', probability: 0.12 }],
+      insufficient: { reason: 'Jev rates the bio and headline 0.31 for being sufficient and specific to this person, under the 0.4 needed', probability: 0.31 },
+      retried: { lane: 'claude-cli', kept: 'first' },
+    };
+    answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'openrouter', model: 'm', calls: 1 }, gate, needs: [], saved: true });
+    render(<LinkPageView />);
+    await fillAndBuild(() => {});
+    const box = await screen.findByTestId('link-page-gate');
+    expect(box.textContent).toContain('Quality check: the bio and headline look thin. Jev rates the bio and headline 0.31');
+    expect(box.textContent).toContain('Read again on the Claude CLI; kept the first read.');
+    expect(box.textContent).toContain('Left off the page: theme "forex signals" (0.05)');
+    expect(box.textContent).toContain('Left off the page: post "Poker tips" (0.12)');
+    answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'none', calls: 0 }, gate: { ran: true, sufficiency: 0.9, dropped: [] }, needs: [], saved: true });
+    fireEvent.click(screen.getByRole('button', { name: 'Build page' }));
+    await waitFor(() => expect(screen.queryByTestId('link-page-gate')).toBeNull());
+  });
+
   it('sends the chosen model lane with the build, and nothing extra when it is Automatic', async () => {
     answers['POST /api/linkpages/build'] = () => json({ spec: SPEC, warnings: [], model: { lane: 'claude-cli', calls: 1 }, needs: [], saved: true });
     render(<LinkPageView />);

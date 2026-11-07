@@ -43,11 +43,24 @@ export interface BuildInput {
   fetch?: FetchFn;
 }
 
+/** What the build gathered about the creator, in plain words. Used to judge the extracted items; never put on the page. */
+export interface CreatorFacts {
+  name: string;
+  bios: string[];
+  siteTitle: string;
+  siteUrl: string;
+  platforms: string[];
+  stats: string[];
+  /** The start of each page that was read (about, home), so the judge can see what the creator says. */
+  pages: string[];
+}
+
 export interface BuildResult {
   spec: PageSpec;
   warnings: string[];
   needs: NeedsLogin[];
   person: Person | null;
+  facts: CreatorFacts;
 }
 
 export async function buildPage({ sources, options = {}, connectors = defaults, logins = {}, llm, fetch }: BuildInput): Promise<BuildResult> {
@@ -70,10 +83,13 @@ export async function buildPage({ sources, options = {}, connectors = defaults, 
 
   // Understanding the person: read their pages and posts together, then look at their pictures.
   let person: Person | null = null;
+  let corpusPages: string[] = [];
   const styleSignals = [...signals];
   if (llm) {
     try {
-      person = await understandPerson({ signals, corpus: await gatherCorpus({ signals, fetch }), llm });
+      const corpus = await gatherCorpus({ signals, fetch });
+      corpusPages = corpus.pages.map((p) => p.text.slice(0, 600));
+      person = await understandPerson({ signals, corpus, llm });
     } catch (err) {
       warnings.push(`understanding: ${(err as Error).message}`);
     }
@@ -135,5 +151,14 @@ export async function buildPage({ sources, options = {}, connectors = defaults, 
     theme: deriveTheme(styleSignals, options.theme),
     blocks: list,
   });
-  return { spec, warnings, needs: loginNeeds(signals), person };
+  const facts: CreatorFacts = {
+    name: String(spec.profile.name || ''),
+    bios: signals.map((s) => s.bio).filter((b): b is string => Boolean(b)).map((b) => b.slice(0, 500)).slice(0, 4),
+    siteTitle: site?.title || '',
+    siteUrl: site?.url || '',
+    platforms: [...new Set(signals.map((s) => s.source).filter((s): s is string => Boolean(s)))],
+    stats: signals.map((s) => s.stats).filter((s): s is string => Boolean(s)).slice(0, 4),
+    pages: corpusPages.slice(0, 3),
+  };
+  return { spec, warnings, needs: loginNeeds(signals), person, facts };
 }

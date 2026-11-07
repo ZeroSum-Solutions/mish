@@ -6538,6 +6538,11 @@ export interface Dict {
   'linkPage.model.openrouter': string;
   'linkPage.model.deepseek': string;
   'linkPage.model.claudeCli': string;
+  'linkPage.gate.heading': string;
+  'linkPage.gate.insufficient': string;
+  'linkPage.gate.retriedFirst': string;
+  'linkPage.gate.retriedKept': string;
+  'linkPage.gate.dropped': string;
   'linkPage.warnings.heading': string;
   'linkPage.needs.heading': string;
   'linkPage.needs.item': string;

@@ -23,6 +23,7 @@ import {
 import type {
   LinkPageAssetResponse,
   LinkPageBuildResponse,
+  LinkPageGate,
   LinkPageModelInfo,
   LinkPageDeleteResponse,
   LinkPageExportResponse,
@@ -251,6 +252,7 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
         const built = body as LinkPageBuildResponse;
         const lines = [`Built ${built.spec.slug}: ${built.spec.profile.name}${built.saved ? ' (saved)' : ' (not saved)'}`];
         if (built.model) lines.push(`  model: ${describeModel(built.model)}`);
+        for (const line of describeGate(built.gate)) lines.push(`  gate: ${line}`);
         for (const warning of built.warnings) lines.push(`  warning: ${warning}`);
         for (const need of built.needs) lines.push(`  login: ${need.platform}: ${need.why}`);
         return out(0, `${lines.join('\n')}\n`);
@@ -279,6 +281,18 @@ export async function runLinkpageCli(args: string[], options: LinkpageCliOptions
   } catch (error) {
     return out(1, '', `od linkpage ${command} failed: ${error instanceof Error ? error.message : String(error)}\n`);
   }
+}
+
+/** Plain lines for the quality gate: insufficient (and any retry), then each dropped item. Nothing when it found nothing. */
+export function describeGate(gate: LinkPageGate | undefined): string[] {
+  if (!gate?.ran) return [];
+  const lines: string[] = [];
+  if (gate.insufficient) {
+    const retry = gate.retried ? `; read again on ${gate.retried.lane}, kept the ${gate.retried.kept === 'retry' ? 'retry' : 'first read'}` : '';
+    lines.push(`insufficient (${gate.insufficient.reason})${retry}`);
+  }
+  for (const drop of gate.dropped) lines.push(`dropped ${drop.kind} "${drop.text}" (${drop.probability})`);
+  return lines;
 }
 
 /** One plain line: which lane answered, and the model id when a metered lane did. */

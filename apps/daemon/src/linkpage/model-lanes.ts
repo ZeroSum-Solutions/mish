@@ -30,3 +30,12 @@ export function modelsForJob(job: LlmJob | undefined, override?: string): string
   const first = override?.trim();
   return first ? [first, ...table.filter((id) => id !== first)] : [...table];
 }
+
+/**
+ * Where the auto lane goes for its one retry when the quality gate calls the first read insufficient:
+ * the lane after the one that answered. The Claude CLI is last, so it has no retry lane.
+ */
+export const LINKPAGE_RETRY_LANE: Readonly<Record<string, 'claude-cli' | undefined>> = {
+  openrouter: 'claude-cli',
+  deepseek: 'claude-cli',
+};
