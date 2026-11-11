@@ -10,9 +10,10 @@ import { parseRightsAssessment, type ConnectorSearchKind, type RightsAssessment 
  *   JSON with code-point-sorted keys and no whitespace.
  * - The RightsAssessment cites Mobbin Terms of May 16, 2026 clauses 3.2, 3.4
  *   and 3.5 from a crawl4ai capture. Owner decision 2026-10-09 (relayed by the
- *   captain): the repository is private, licences are ignored for now and nothing
- *   waits on a licence answer. Every private operation, including exporting the
- *   user's own built app, is therefore admitted under the
+ *   captain): nothing waits on a licence answer. Each item is an end-user fetch
+ *   through the user's own Mobbin account for the user's own end product; Mish
+ *   ships and redistributes no Mobbin content. Every such operation, including
+ *   exporting the user's own built app, is therefore admitted under the
  *   `owner-accepted-private-use` basis with that dated citation; the clause
  *   readings stay attached as metadata. Public redistribution stays blocked.
  *   Mobbin's terms are account terms, so this choice carries account risk for
@@ -58,10 +59,10 @@ const RECEIPT_REF = 'mobbin-g29-agent-run-receipt';
 export const MOBBIN_OWNER_DECISION_EVIDENCE = 'owner-decision-2026-10-09:private-use';
 export const MOBBIN_OWNER_DECISION = Object.freeze({
   decidedAt: '2026-10-09', decidedBy: 'owner',
-  citation: 'Owner decision 2026-10-09, relayed by the captain: the repository is private, licences are ignored for now and nothing may wait on a licence answer; Mobbin operations are admitted for private use. Mobbin\'s terms are account terms, so this carries account risk for the owner.',
+  citation: 'Owner decision 2026-10-09, relayed by the captain: Mobbin operations are admitted without waiting on a licence answer. Each item is an end-user fetch through the user\'s own Mobbin account for the user\'s own end product; Mish ships and redistributes no Mobbin content. Mobbin\'s terms are account terms, so this carries account risk for the account holder.',
 });
 type Operation = RightsAssessment['operationRights'][number]['operation'];
-const OWNER = 'Allowed for private use under owner decision 2026-10-09 (private repository; licences ignored for now).';
+const OWNER = 'Allowed under owner decision 2026-10-09 (end-user fetch through the user\'s own Mobbin account for an end product; Mish ships and redistributes no Mobbin content).';
 const allowed = (operation: Operation, metadata: string, visibility: 'private' | 'finished-application' = 'private') => ({
   operation, decision: 'allowed' as const, scope: scope(visibility), evidenceRefs: [MOBBIN_OWNER_DECISION_EVIDENCE], obligations: [],
   reason: `${OWNER} Terms metadata: ${metadata}`,
@@ -102,13 +103,13 @@ export const MOBBIN_RIGHTS_ASSESSMENT: RightsAssessment = parseRightsAssessment(
     allowed('derive-from-reference', '3.2.1 forbids derivative works, 3.4.1 AI-made derivatives and 3.4.2 model training or indexing without Mobbin’s written consent; 10.1.2 assigns derivatives to Mobbin.'),
     {
       operation: 'redistribute-unit', decision: 'blocked', scope: scope('reusable-distribution'), evidenceRefs: [MOBBIN_OWNER_DECISION_EVIDENCE, TERMS_REF], obligations: [],
-      reason: 'Public redistribution is outside the private-use owner decision 2026-10-09. Terms metadata: 3.2.5 forbids transferring retrieved content; 3.5.1 and 3.5.3 forbid reselling access or building a substitute content repository.',
+      reason: 'Redistributing a unit is outside owner decision 2026-10-09, which covers end-user fetches through the user\'s own account only; Mish redistributes no Mobbin content. Terms metadata: 3.2.5 forbids transferring retrieved content; 3.5.1 and 3.5.3 forbid reselling access or building a substitute content repository.',
     },
   ],
 });
 
 /** Proxy-facing summary of the assessment above. */
-export const MOBBIN_RIGHTS_SUMMARY = 'Owner decision 2026-10-09: private use allowed while licences are ignored (account risk on the owner\'s Mobbin account); public redistribution blocked. Terms 3.2.1, 3.2.5 and 3.4 kept as metadata.';
+export const MOBBIN_RIGHTS_SUMMARY = 'Owner decision 2026-10-09: end-user fetches through the user\'s own Mobbin account allowed for the user\'s end product (account risk on that account); Mish redistributes no Mobbin content and public redistribution is blocked. Terms 3.2.1, 3.2.5 and 3.4 kept as metadata.';
 export const MOBBIN_ALLOWED_REASON = 'Live attributed view through your own Mobbin binding (3.5): credit Mobbin and the app, store nothing (3.2.5).';
 export const MOBBIN_UNASSESSED_REASON = 'Not covered by the G29 RightsAssessment or the owner decision 2026-10-09.';
 
