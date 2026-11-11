@@ -200,6 +200,27 @@ export function isReviewedLicensedPackStub(
   return stubs.some((stub) => stub.path === file.path && stub.oid === file.oid);
 }
 
+/** Blob id of a file's working-tree bytes, or undefined when it cannot be read. */
+export type ReadWorkingBlobId = (repositoryPath: string) => Promise<string | undefined>;
+
+/**
+ * The stub exemption keys on the index blob id, but the tree a local run
+ * checks is the working tree. Invariant: a stub is exempt only when its
+ * working-tree bytes also hash to the reviewed id, so a stub that was staged
+ * and then overwritten without staging is still flagged. An unreadable file
+ * gets no exemption. Callers with no working tree (unit tests over synthetic
+ * listings) pass no reader and the index id alone decides.
+ */
+export async function isExemptReviewedStub(
+  file: TrackedFile,
+  stubs: readonly ReviewedStub[],
+  readWorkingBlobId: ReadWorkingBlobId | undefined,
+): Promise<boolean> {
+  if (!isReviewedLicensedPackStub(file, stubs)) return false;
+  if (readWorkingBlobId === undefined) return true;
+  return (await readWorkingBlobId(file.path)) === file.oid;
+}
+
 // ── Archive rule ─────────────────────────────────────────────────────────
 
 const TRACKED_ARCHIVE_RULE_ID = "tracked-archive";
@@ -385,6 +406,7 @@ export async function findLicensedPackContentViolations(input: {
   deniedBlobs: ReadonlySet<string>;
   rules?: LicensedPackRuleSwitches;
   reviewedStubs?: readonly ReviewedStub[];
+  readWorkingBlobId?: ReadWorkingBlobId;
 }): Promise<LicensedPackViolation[]> {
   const switches = input.rules ?? LICENSED_PACK_RULE_SWITCHES;
   const reviewedStubs = input.reviewedStubs ?? LICENSED_PACK_REVIEWED_STUBS;
@@ -396,7 +418,7 @@ export async function findLicensedPackContentViolations(input: {
 
   const violations: LicensedPackViolation[] = [];
   for (const file of input.files) {
-    if (isReviewedLicensedPackStub(file, reviewedStubs)) continue;
+    if (await isExemptReviewedStub(file, reviewedStubs, input.readWorkingBlobId)) continue;
     const reasons = [...(pathMatches.get(file.path) ?? [])];
     if (isForbiddenTrackedArchive(file.path)) reasons.push(`path:${TRACKED_ARCHIVE_RULE_ID}`);
     if (input.deniedBlobs.has(file.oid)) reasons.push("blob");
@@ -578,6 +600,13 @@ export async function checkLicensedPackContent(
         return decodeRepositoryText(repositoryPath, await readFile(path.join(context.repoRoot, repositoryPath)));
       } catch (error) {
         unreadable.push(`${repositoryPath} (${error instanceof Error ? error.message : String(error)})`);
+        return undefined;
+      }
+    },
+    readWorkingBlobId: async (repositoryPath) => {
+      try {
+        return gitBlobId(await readFile(path.join(context.repoRoot, repositoryPath)));
+      } catch {
         return undefined;
       }
     },

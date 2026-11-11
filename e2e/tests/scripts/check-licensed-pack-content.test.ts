@@ -825,6 +825,25 @@ describe("licensed pack guard wrapper", () => {
     expect(errors.join("\n")).toContain(`${changedPath} [path:cult-ui-catalog-data]`);
   });
 
+  test("in real git, a reviewed stub overwritten after staging is flagged: the working-tree bytes must match too", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    const errors: string[] = [];
+    vi.spyOn(console, "error").mockImplementation((line: unknown) => {
+      errors.push(String(line));
+    });
+    const repoRoot = path.resolve(import.meta.dirname, "../../..");
+    const stubFiles: Record<string, string> = {};
+    for (const stub of LICENSED_PACK_REVIEWED_STUBS) {
+      stubFiles[stub.path] = await readFile(path.join(repoRoot, stub.path), "utf8");
+    }
+    const root = await scratchRepo({ [LICENSED_PACK_BLOB_LIST_PATH]: `${"e".repeat(40)}\n`, ...stubFiles });
+    // The index still holds the reviewed blob; only the working tree changes.
+    const overwritten = "packages/cult-ui-catalog/catalog.json";
+    await writeFile(path.join(root, overwritten), '{"rows":[{"name":"synthetic licensed row"}]}\n', "utf8");
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
+    expect(errors.join("\n")).toContain(`${overwritten} [path:cult-ui-catalog-data]`);
+  });
+
   test("the check is registered in the public guard entrypoint", () => {
     // `pnpm guard` runs it in enforce mode (scripts/guard.ts); the repository is public.
     const repoRoot = path.resolve(import.meta.dirname, "../../..");
