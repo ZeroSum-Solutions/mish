@@ -466,3 +466,108 @@ describe('importShadcnDesignSystemProject', () => {
     ).rejects.toThrow(/exceeds/i);
   });
 });
+
+// Egress guard: one IP table for the whole daemon, and only the entry URL's own
+// origin may be loopback (a typed loopback registry).
+describe('shadcn import egress guard', () => {
+  let tempRoot: string;
+  let tmpRoot: string;
+  let userDesignSystemsRoot: string;
+  const servers: import('node:http').Server[] = [];
+
+  beforeEach(() => {
+    tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'od-ds-shadcn-egress-'));
+    tmpRoot = path.join(tempRoot, '.tmp');
+    userDesignSystemsRoot = path.join(tempRoot, 'user-design-systems');
+  });
+
+  afterEach(async () => {
+    await Promise.all(servers.splice(0).map((server) => new Promise<void>((resolve) => server.close(() => resolve()))));
+    fs.rmSync(tempRoot, { recursive: true, force: true });
+  });
+
+  it.each([
+    'https://[::ffff:a9fe:a9fe]/r.json',
+    'https://[::ffff:7f00:1]/r.json',
+    'https://[64:ff9b::a9fe:a9fe]/r.json',
+  ])('refuses the IPv6 transition form %s', (ref) => {
+    expect(() => parseShadcnReference(ref)).toThrow(/not allowed|private|refus/i);
+  });
+
+  it('refuses a loopback include declared by a public registry, before fetching it', async () => {
+    const entry = 'https://registry.example.com/r/registry.json';
+    const loopback = 'http://127.0.0.1:9/registry.json';
+    const seen: string[] = [];
+    const routes = fetchStub({
+      [entry]: { include: [loopback] },
+      [loopback]: { items: [{ name: 'button', type: 'registry:theme', cssVars: { light: { primary: '1 2% 3%' } } }] },
+    });
+    await expect(
+      importShadcnDesignSystemProject(`${entry}#button`, tmpRoot, userDesignSystemsRoot, {
+        fetchImpl: async (url, init) => {
+          seen.push(url);
+          return routes(url, init);
+        },
+      }),
+    ).rejects.toThrow(/not allowed|private|refus/i);
+    expect(seen).not.toContain(loopback);
+    expect(seen.length).toBeGreaterThan(0);
+  });
+
+  it('checks a registry host name at connect time and refuses a private DNS answer', async () => {
+    const names: string[] = [];
+    const lookupImpl = ((hostname: string, options: unknown, callback?: unknown) => {
+      const cb = (typeof options === 'function' ? options : callback) as (err: Error | null, address?: unknown, family?: number) => void;
+      const all = typeof options === 'object' && options !== null && (options as { all?: boolean }).all;
+      names.push(hostname);
+      if (all) cb(null, [{ address: '10.0.0.5', family: 4 }]);
+      else cb(null, '10.0.0.5', 4);
+    }) as unknown as typeof import('node:dns').lookup;
+    await expect(
+      importShadcnDesignSystemProject('https://registry.public.test/r/x.json', tmpRoot, userDesignSystemsRoot, {
+        lookupImpl,
+      }),
+    ).rejects.toThrow(/could not fetch|refus/i);
+    expect(names).toContain('registry.public.test');
+  });
+
+  it('still imports a typed loopback registry with a relative include and relative files', async () => {
+    const { createServer } = await import('node:http');
+    const docs: Record<string, string> = {
+      '/r/registry.json': JSON.stringify({ include: ['./sub/registry.json'] }),
+      '/r/sub/registry.json': JSON.stringify({
+        items: [
+          {
+            name: 'loop-theme',
+            type: 'registry:theme',
+            title: 'Loop Theme',
+            cssVars: { light: { primary: '262 83% 58%' } },
+            files: [{ path: 'button.tsx', type: 'registry:component' }],
+          },
+        ],
+      }),
+      '/r/sub/button.tsx': 'export const Button = () => null;\n',
+    };
+    const server = createServer((req, res) => {
+      const body = docs[req.url ?? ''];
+      if (body === undefined) {
+        res.writeHead(404);
+        res.end('not found');
+        return;
+      }
+      res.writeHead(200, { 'content-type': req.url?.endsWith('.json') ? 'application/json' : 'text/plain' });
+      res.end(body);
+    });
+    servers.push(server);
+    server.listen(0, '127.0.0.1');
+    await new Promise<void>((resolve) => server.once('listening', resolve));
+    const port = (server.address() as import('node:net').AddressInfo).port;
+
+    const result = await importShadcnDesignSystemProject(
+      `http://127.0.0.1:${port}/r/registry.json#loop-theme`,
+      tmpRoot,
+      userDesignSystemsRoot,
+    );
+    expect(result.id).toBe('loop-theme');
+  });
+});

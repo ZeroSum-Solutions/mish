@@ -59,7 +59,8 @@ describe('address rules (SSRF floor)', () => {
     '::', '::1', 'fc00::1', 'fd12:3456::1', 'fe80::1', 'ff02::1', '::ffff:127.0.0.1', '::ffff:7f00:1', '::ffff:10.0.0.1', '64:ff9b::a00:1', '2002:a00:1::1', '2001:0:4136::1', 'fe80::1%en0', 'not-an-ip',
   ])('refuses %s', address => { expect(isRefusedAddress(address)).toBe(true); });
 
-  it.each([PUBLIC, PUBLIC_B, '8.8.8.8', '172.32.0.1', '100.128.0.1', '2606:4700::6810:84e5', '2a00:1450:4001::200e'])('allows public %s', address => {
+  // An IPv4-mapped address dials its IPv4, so a mapped public IPv4 is public.
+  it.each([PUBLIC, PUBLIC_B, '8.8.8.8', '172.32.0.1', '100.128.0.1', '2606:4700::6810:84e5', '2a00:1450:4001::200e', '::ffff:93.184.216.34'])('allows public %s', address => {
     expect(isRefusedAddress(address)).toBe(false);
   });
 });

@@ -364,7 +364,8 @@ describe('exchangeCodeForToken / refreshAccessToken', () => {
         sourceBodies.push(body);
         res.writeHead(status, { location: `${destination}/capture` }); res.end();
       }));
-      const common = { tokenEndpoint: `${issuer}/token`, clientId: 'fixture-client', clientSecret: 'fixture-client-secret' };
+      // The loopback token endpoint is the configured server's own origin.
+      const common = { tokenEndpoint: `${issuer}/token`, clientId: 'fixture-client', clientSecret: 'fixture-client-secret', serverOrigin: issuer };
       const request = flow === 'exchange'
         ? exchangeCodeForToken({ ...common, code: 'fixture-authorization-code', codeVerifier: 'fixture-pkce-verifier', redirectUri: 'http://127.0.0.1/callback' })
         : refreshAccessToken({ ...common, refreshToken: 'fixture-refresh-token' });
@@ -644,5 +645,139 @@ describe('beginAuth (end-to-end with mocked discovery + DCR)', () => {
         fetchImpl,
       }),
     ).rejects.toThrow(/could not discover/i);
+  });
+});
+
+// Every URL the OAuth module learns from remote metadata is `public`; only the
+// configured MCP server's own origin may be loopback or an allow-listed host.
+describe('MCP OAuth egress guard', () => {
+  let dataDir: string;
+  const servers: Server[] = [];
+  beforeEach(async () => {
+    dataDir = await mkdtemp(path.join(tmpdir(), 'od-mcp-egress-'));
+  });
+  afterEach(async () => {
+    await Promise.all(servers.splice(0).map((server) => new Promise<void>((resolve) => server.close(() => resolve()))));
+    await rm(dataDir, { recursive: true, force: true });
+  });
+
+  function recordingFetch(routes: Record<string, { status?: number; body: unknown }>) {
+    const calls: Array<{ url: string; method: string }> = [];
+    const impl = (async (input: FetchInput, init?: FetchInit) => {
+      const url = typeof input === 'string' ? input : input.toString();
+      const method = (init?.method ?? 'GET').toUpperCase();
+      calls.push({ url, method });
+      const route = routes[url];
+      if (route) {
+        return new Response(JSON.stringify(route.body), { status: route.status ?? 200, headers: { 'content-type': 'application/json' } });
+      }
+      // Anything else "succeeds", so only the guard can stop the flow.
+      if (method === 'POST') {
+        return new Response(JSON.stringify({ client_id: 'leaked', access_token: 'leaked' }), { status: 201, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response('not found', { status: 404 });
+    }) as typeof fetch;
+    return { impl, calls };
+  }
+
+  async function listen(handler: Parameters<typeof createServer>[1]): Promise<string> {
+    const server = createServer(handler);
+    servers.push(server);
+    server.listen(0, '127.0.0.1');
+    await new Promise<void>((resolve) => server.once('listening', resolve));
+    return `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  }
+
+  it('never contacts an authorization server at the metadata address 169.254.169.254', async () => {
+    const serverUrl = 'https://mcp.example.com/mcp';
+    const { impl, calls } = recordingFetch({
+      'https://mcp.example.com/.well-known/oauth-protected-resource/mcp': {
+        body: { resource: serverUrl, authorization_servers: ['http://169.254.169.254/'] },
+      },
+    });
+    await expect(
+      beginAuth({ serverId: 's', serverUrl, redirectUri: 'https://app.example.com/cb', dataDir, fetchImpl: impl }),
+    ).rejects.toThrow();
+    expect(calls.map((call) => new URL(call.url).hostname)).not.toContain('169.254.169.254');
+  });
+
+  it('sends no registration POST to a private registration_endpoint', async () => {
+    const serverUrl = 'https://mcp.example.com/mcp';
+    const { impl, calls } = recordingFetch({
+      'https://mcp.example.com/.well-known/oauth-protected-resource/mcp': {
+        body: { resource: serverUrl, authorization_servers: ['https://auth.example.com'] },
+      },
+      'https://auth.example.com/.well-known/oauth-authorization-server': {
+        body: {
+          issuer: 'https://auth.example.com',
+          authorization_endpoint: 'https://auth.example.com/authorize',
+          token_endpoint: 'https://auth.example.com/token',
+          registration_endpoint: 'http://10.0.0.5/register',
+        },
+      },
+    });
+    await expect(
+      beginAuth({ serverId: 's', serverUrl, redirectUri: 'https://app.example.com/cb', dataDir, fetchImpl: impl }),
+    ).rejects.toThrow();
+    expect(calls.filter((call) => call.method === 'POST')).toEqual([]);
+  });
+
+  it.each(['refresh', 'exchange'] as const)('%s sends nothing to a stored private token endpoint of a public server', async (flow) => {
+    const { impl, calls } = recordingFetch({});
+    const common = { tokenEndpoint: 'http://10.0.0.5/token', clientId: 'cid', serverOrigin: 'https://mcp.example.com/mcp' };
+    const request = flow === 'refresh'
+      ? refreshAccessToken({ ...common, refreshToken: 'fixture-refresh-token' }, impl)
+      : exchangeCodeForToken({ ...common, code: 'c', codeVerifier: 'v', redirectUri: 'https://app.example.com/cb' }, impl);
+    await expect(request).rejects.toThrow();
+    expect(calls).toEqual([]);
+  });
+
+  it('refuses an authorization server on another loopback origin than the configured server', async () => {
+    const other = await listen((_req, res) => {
+      res.writeHead(404);
+      res.end();
+    });
+    const serverOrigin = await listen((req, res) => {
+      res.writeHead(200, { 'content-type': 'application/json' });
+      res.end(JSON.stringify({ resource: `${serverOrigin}/mcp`, authorization_servers: [other] }));
+    });
+    const seen: string[] = [];
+    const impl = (async (input: FetchInput, init?: FetchInit) => {
+      seen.push(typeof input === 'string' ? input : input.toString());
+      return fetch(input, init);
+    }) as typeof fetch;
+    await expect(
+      beginAuth({ serverId: 's', serverUrl: `${serverOrigin}/mcp`, redirectUri: 'https://app.example.com/cb', dataDir, fetchImpl: impl }),
+    ).rejects.toThrow();
+    expect(seen.filter((url) => url.startsWith(other))).toEqual([]);
+  });
+
+  it('still completes discovery and registration for a same-origin loopback server', async () => {
+    let origin = '';
+    origin = await listen(async (req, res) => {
+      const json = (status: number, body: unknown) => {
+        res.writeHead(status, { 'content-type': 'application/json' });
+        res.end(JSON.stringify(body));
+      };
+      if (req.url === '/.well-known/oauth-protected-resource/mcp') {
+        return json(200, { resource: `${origin}/mcp`, authorization_servers: [origin] });
+      }
+      if (req.url === '/.well-known/oauth-authorization-server') {
+        return json(200, {
+          issuer: origin,
+          authorization_endpoint: `${origin}/authorize`,
+          token_endpoint: `${origin}/token`,
+          registration_endpoint: `${origin}/register`,
+        });
+      }
+      if (req.url === '/register' && req.method === 'POST') {
+        for await (const _chunk of req) { /* drain */ }
+        return json(201, { client_id: 'loopback-client' });
+      }
+      return json(404, {});
+    });
+    const out = await beginAuth({ serverId: 's', serverUrl: `${origin}/mcp`, redirectUri: 'https://app.example.com/cb', dataDir });
+    expect(new URL(out.authorizeUrl).origin).toBe(origin);
+    expect(out.pending.clientId).toBe('loopback-client');
   });
 });

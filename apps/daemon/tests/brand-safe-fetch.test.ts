@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { createValidatingLookup, fetchExternalBrandAsset } from '../src/brands/safe-fetch.js';
+import { assertPublicBrandUrl, createValidatingLookup, fetchExternalBrandAsset } from '../src/brands/safe-fetch.js';
 
 // The brand-extraction fetchers pull a user-supplied site URL and then follow
 // sub-resource URLs (CSS/@font-face/img/favicon) discovered inside the fetched
@@ -113,5 +113,21 @@ describe('createValidatingLookup (DNS-rebinding pin)', () => {
     const pub = await runLookup([{ address: '93.184.216.34', family: 4 }]);
     expect(pub.err).toBeNull();
     expect(pub.address).toEqual([{ address: '93.184.216.34', family: 4 }]);
+  });
+});
+
+// IPv6 forms that embed or translate an IPv4 reach that IPv4 on hosts that
+// route them (compat, NAT64, 6to4). fetch is stubbed to succeed, so only the
+// guard can refuse them, and it must do so before any request.
+describe('brand URL guard refuses IPv6 transition forms of the metadata address', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it.each(['http://[::a9fe:a9fe]/', 'http://[64:ff9b::a9fe:a9fe]/', 'http://[2002:a9fe:a9fe::]/'])('refuses %s', async (url) => {
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response('leak', { status: 200 }));
+    await expect(assertPublicBrandUrl(url)).rejects.toThrow();
+    await expect(fetchExternalBrandAsset(url)).rejects.toThrow();
+    expect(fetchSpy).not.toHaveBeenCalled();
   });
 });
