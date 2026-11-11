@@ -101,6 +101,7 @@ list here.
 
 Craft content is adapted from the MIT-licensed
 [refero_skill](https://github.com/referodesign/refero_skill) project
-(© Refero Design), with edits to fit Mishh Mashh's house style and link
+(Copyright (c) 2026 Refero; licence text in
+[`LICENSE-refero_skill.txt`](LICENSE-refero_skill.txt)), with edits to fit Mishh Mashh's house style and link
 back to OD's design tokens (`var(--accent)` etc.) instead of generic
 Tailwind hex values.

@@ -50,6 +50,11 @@ This product includes third-party components under their own licenses:
   on competing visual animation-authoring tools and separate assessment
   of reusable-source redistribution. React recipes declare @gsap/react
   2.1.2; exported units carry the lane's notices.
+- refero_skill (MIT), Copyright (c) 2026 Refero - see craft/LICENSE-refero_skill.txt.
+  craft/color.md, craft/typography.md and craft/anti-ai-slop.md adapt text from
+  https://github.com/referodesign/refero_skill.
+- Remix Icon (Remix Icon License v1.0), Copyright (c) 2017-2026 Remix Design - see
+  apps/web/public/REMIXICON-LICENSE.txt (covers apps/web/public/remixicon.ttf).
 - The owned MotionSites replacements bundle third-party SIL OFL 1.1 fonts (for example
   Archivo, Bodoni Moda, IBM Plex Mono); each package lists them in RIGHTS.md and ships
   assets/OFL.txt.
