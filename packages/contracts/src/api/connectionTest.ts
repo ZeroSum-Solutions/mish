@@ -4,6 +4,7 @@
 // daemon module for why).
 import type { AgentCliEnvPrefs } from './app-config';
 import type { ReasoningExecutionRequestFields } from './reasoningExecution';
+import { classifyIp, parseIp } from './ip-policy';
 
 export interface BaseUrlValidationResult {
   parsed?: ParsedBaseUrl;
@@ -35,84 +36,45 @@ function normalizeBracketedIpv6(hostname: string): string {
   // FQDN trailing-dot form (RFC 1034) resolves identically to the dotless form,
   // so `localhost.` must normalize to `localhost` before the equality check in
   // isLoopbackApiHost — and `0.0.0.0.`, `10.0.0.1.`, etc. must normalize before
-  // isBlockedIpv4 parses them. Strips one or more trailing dots.
+  // classifyIp parses them. Strips one or more trailing dots.
   return stripped.toLowerCase().replace(/\.+$/, '');
 }
 
-function parseIpv4(hostname: string): [number, number, number, number] | null {
-  const parts = hostname.split('.');
-  if (parts.length !== 4) return null;
-  const parsed = parts.map((part) => {
-    if (!/^\d{1,3}$/.test(part)) return null;
-    const value = Number(part);
-    return value >= 0 && value <= 255 ? value : null;
-  });
-  if (parsed.some((part) => part === null)) return null;
-  return parsed as [number, number, number, number];
-}
-
-function isLoopbackIpv4(hostname: string): boolean {
-  const parts = parseIpv4(hostname);
-  return Boolean(parts && parts[0] === 127);
-}
-
-function isBlockedIpv4(hostname: string): boolean {
-  const parts = parseIpv4(hostname);
-  if (!parts) return false;
-  const [a, b] = parts;
-  return (
-    a === 0 ||
-    (a === 100 && b >= 64 && b <= 127) ||
-    (a === 169 && b === 254) ||
-    a === 10 ||
-    (a === 192 && b === 168) ||
-    (a === 172 && b >= 16 && b <= 31) ||
-    a >= 224
-  );
-}
-
 function ipv4MappedToDotted(hostname: string): string | null {
-  const host = normalizeBracketedIpv6(hostname);
-  const mapped = /^::ffff:(.+)$/i.exec(host)?.[1];
-  if (!mapped) return null;
-  if (parseIpv4(mapped.toLowerCase())) return mapped.toLowerCase();
-  const hexParts = mapped.split(':');
-  if (
-    hexParts.length !== 2 ||
-    !hexParts.every((part) => /^[0-9a-f]{1,4}$/i.test(part))
-  ) {
-    return null;
-  }
-  const hi = hexParts[0];
-  const lo = hexParts[1];
-  if (!hi || !lo) return null;
-  const value =
-    (Number.parseInt(hi, 16) << 16) |
-    Number.parseInt(lo, 16);
-  return [
-    (value >>> 24) & 255,
-    (value >>> 16) & 255,
-    (value >>> 8) & 255,
-    value & 255,
-  ].join('.');
+  const parsed = parseIp(normalizeBracketedIpv6(hostname));
+  if (!parsed || parsed.family !== 6) return null;
+  const [g0, g1, g2, g3, g4, g5, hi = 0, lo = 0] = parsed.groups;
+  if (g0 || g1 || g2 || g3 || g4 || g5 !== 0xffff) return null;
+  return [hi >> 8, hi & 255, lo >> 8, lo & 255].join('.');
 }
 
+// Anything that is shaped like an IP literal but does not parse as one (octal
+// octets, a zone id) is treated as an IP we refuse, never as a DNS name.
+function looksLikeIpLiteral(host: string): boolean {
+  return host.includes(':') || /^[0-9.]+$/.test(host);
+}
+
+/**
+ * True for `localhost` and every loopback IP literal (127/8, ::1, and the
+ * IPv4-mapped form of 127/8), via {@link classifyIp}.
+ */
 export function isLoopbackApiHost(hostname: string): boolean {
   const host = normalizeBracketedIpv6(hostname);
-  if (host === 'localhost' || host === '::1') return true;
-  if (isLoopbackIpv4(host)) return true;
-  const mapped = ipv4MappedToDotted(host);
-  return Boolean(mapped && isLoopbackIpv4(mapped));
+  if (host === 'localhost') return true;
+  return parseIp(host) !== null && classifyIp(host) === 'loopback';
 }
 
+/**
+ * True for an IP literal that {@link classifyIp} refuses (private,
+ * link-local, CGNAT, metadata, reserved, multicast, and every IPv6 form that
+ * embeds or translates an IPv4: compat, NAT64, 6to4, Teredo, SIIT). Loopback
+ * is not "blocked" here; callers decide with {@link isLoopbackApiHost}. A DNS
+ * name is not blocked: callers resolve it and check each answer.
+ */
 export function isBlockedExternalApiHostname(hostname: string): boolean {
   const host = normalizeBracketedIpv6(hostname);
-  if (host === '::') return true;
-  if (isBlockedIpv4(host)) return true;
-  if (/^f[cd][0-9a-f]{2}:/i.test(host)) return true;
-  if (/^fe[89ab][0-9a-f]:/i.test(host)) return true;
-  const mapped = ipv4MappedToDotted(host);
-  return Boolean(mapped && isBlockedIpv4(mapped));
+  if (parseIp(host) === null) return looksLikeIpLiteral(host);
+  return classifyIp(host) === 'refused';
 }
 
 // Normalized forms a hostname can be matched under: the bracket-stripped,

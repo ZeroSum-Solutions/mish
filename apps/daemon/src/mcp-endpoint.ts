@@ -10,7 +10,14 @@ export function mcpTokenMatchesEndpoint(token: { endpointFingerprint?: string | 
   return Boolean(endpoint && token.endpointFingerprint === mcpEndpointFingerprint(endpoint));
 }
 
-/** A resource is shared with the authorization server and browser. Never send credentials. */
+/**
+ * A resource is shared with the authorization server and browser. Never send credentials.
+ *
+ * "Public" here means safe to disclose as an RFC 8707 audience: http(s), no
+ * userinfo, no query and no hash. It does NOT check the host and is not an
+ * SSRF guard; outbound OAuth URLs are checked by `assertOAuthUrl` in
+ * `mcp-oauth.ts` through the daemon egress guard.
+ */
 export function isPublicMcpResource(resource: string): boolean {
   try {
     const url = new URL(resource);

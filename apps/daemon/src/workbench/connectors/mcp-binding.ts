@@ -78,6 +78,7 @@ async function refreshStored(dataDir: string, serverId: string, url: string, sto
       ...(current.clientSecret !== undefined ? { clientSecret: current.clientSecret } : {}),
       ...(current.scope !== undefined ? { scope: current.scope } : {}),
       ...(current.resourceUrl !== undefined ? { resource: current.resourceUrl } : {}),
+      serverOrigin: url,
     }, (input, init) => fetchImpl(input, { ...init, redirect: 'error' })));
   } catch {
     throw new DaemonBindingError('connector-needs-sign-in', 'refresh-failed');

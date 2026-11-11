@@ -22,28 +22,27 @@
 // connection-time `lookup` (see `createValidatingLookup`) that rejects the
 // socket if the resolved address is non-public, so the address we validate IS
 // the address we connect to — no separate pre-validation lookup to rebind
-// around. Same pattern as `plugins/plugin-asset-cache.ts`.
+// around. Both the per-hop check and the lookup come from the shared egress
+// guard (`src/http/egress-guard.ts`, policy `public`).
 
 import { promises as dnsPromises, lookup as dnsLookupCb } from 'node:dns';
 import type { LookupFunction } from 'node:net';
 
-import { Agent } from 'undici';
+import { classifyIp, parseIp } from '@mish/contracts/api/ip-policy';
 
-import {
-  isBlockedExternalApiHostname,
-  isLoopbackApiHost,
-} from '@mish/contracts/api/connectionTest';
+import { createGuardedLookup, guardedFetch } from '../http/egress-guard.js';
 
+/**
+ * Invariant: a brand host is public only when `classifyIp` says so for an IP
+ * literal; `localhost` and `*.localhost` are never public. A DNS name is not an
+ * IP, so it is not "non-public" here; callers check its answers.
+ */
 function isNonPublicHost(host: string): boolean {
-  const h = host.toLowerCase();
-  // IPv6 multicast (ff00::/8) — not covered by isBlockedExternalApiHostname,
-  // which only special-cases `::`, ULA and link-local IPv6.
-  if (/^ff[0-9a-f]{2}:/.test(h)) return true;
-  // isLoopbackApiHost → 127.0.0.0/8, ::1, localhost.
-  // isBlockedExternalApiHostname → 0.0.0.0/0.x, RFC1918, CGNAT (100.64/10),
-  //   IPv4 link-local/metadata (169.254), IPv4 multicast (>=224), `::`,
-  //   IPv6 link-local (fe80::/10) and ULA (fc00::/7).
-  return isLoopbackApiHost(h) || isBlockedExternalApiHostname(h);
+  const h = host.toLowerCase().replace(/\.$/, '');
+  if (h === 'localhost' || h.endsWith('.localhost')) return true;
+  if (parseIp(h)) return classifyIp(h) !== 'public';
+  // Shaped like an IP literal but unparseable (zone id, octal): refuse.
+  return h.includes(':') || /^[0-9.]+$/.test(h);
 }
 
 function isIpLiteral(host: string): boolean {
@@ -111,80 +110,27 @@ type DnsLookupCb = typeof dnsLookupCb;
  * the address we validate IS the one the socket connects to — closing the
  * DNS-rebinding / TOCTOU gap that a separate pre-validation lookup leaves open
  * (an attacker-controlled name answering public for the check and private for
- * the connect). Uses the same `isNonPublicHost` predicate as
- * `assertPublicBrandUrl` so the connect-time and pre-check block sets can't
- * drift. Exported so the guard can be unit-tested without a live server.
+ * the connect). It is the egress guard's `public` lookup, so the connect-time
+ * and pre-check block sets (both `classifyIp`) can't drift. Exported so the
+ * guard can be unit-tested without a live server.
  */
 export function createValidatingLookup(lookupImpl: DnsLookupCb = dnsLookupCb): LookupFunction {
-  const validatingLookup = (
-    hostname: string,
-    options: unknown,
-    callback?: (err: Error | null, address?: unknown, family?: number) => void,
-  ): void => {
-    const cb = (typeof options === 'function' ? options : callback) as (
-      err: Error | null,
-      address?: unknown,
-      family?: number,
-    ) => void;
-    const opts = (typeof options === 'function' ? {} : (options ?? {})) as Record<string, unknown>;
-    (lookupImpl as unknown as (
-      h: string,
-      o: unknown,
-      c: (e: Error | null, a?: unknown, f?: number) => void,
-    ) => void)(hostname, opts, (err, address, family) => {
-      if (err) return cb(err);
-      const list = Array.isArray(address) ? address : [{ address, family }];
-      for (const entry of list) {
-        const addr = typeof entry === 'string' ? entry : (entry as { address: string }).address;
-        if (isNonPublicHost(String(addr))) {
-          return cb(new Error(`brand asset host resolves to a non-public address: ${addr}`));
-        }
-      }
-      return cb(null, address, family);
-    });
-  };
-  return validatingLookup as unknown as LookupFunction;
+  return createGuardedLookup('public', lookupImpl);
 }
 
 const MAX_BRAND_REDIRECTS = 5;
 
-// Pin SSRF validation to the actual outbound connection: the Agent resolves each
-// host once at connect time and refuses the socket if that exact address is
-// non-public. This is what defeats DNS rebinding — there is no separate
-// pre-validation resolve to race. A single long-lived dispatcher (like
-// plugins/plugin-asset-cache.ts) is reused across calls: it must NOT be closed
-// per-request, since closing an undici Agent waits for the in-flight request,
-// which only finishes once the caller has consumed the returned response body.
-const brandAssetDispatcher = new Agent({
-  connect: { lookup: createValidatingLookup() },
-});
-
+/**
+ * Fetch a brand URL through the egress guard (`public`, redirects followed and
+ * re-checked per hop, at most 5, DNS answers pinned at connect time).
+ */
 export async function fetchExternalBrandAsset(
   url: string,
   init: RequestInit = {},
 ): Promise<Response> {
-  let target = url;
-  for (let hop = 0; ; hop += 1) {
-    // Re-validate every hop's host (initial URL and each redirect target) before
-    // the request, so a public site can't 3xx us into private space. The real
-    // SSRF stop is the pinned dispatcher below; this is a cheap URL-level
-    // pre-check (protocol, literal private IPs, redirect target).
-    await assertPublicBrandUrl(target);
-    const res = await fetch(target, {
-      ...init,
-      redirect: 'manual',
-      dispatcher: brandAssetDispatcher as unknown as NonNullable<RequestInit['dispatcher']>,
-    });
-    const location =
-      res.status >= 300 && res.status < 400 ? res.headers.get('location') : null;
-    if (!location) return res;
-    // Drain the redirect response body before following it or bailing out.
-    if (res.body) await res.body.cancel().catch(() => {});
-    if (hop >= MAX_BRAND_REDIRECTS) {
-      throw new Error(`too many brand asset redirects (> ${MAX_BRAND_REDIRECTS})`);
-    }
-    // Resolve a possibly-relative Location; the next loop re-validates it and the
-    // same pinned dispatcher re-binds the new connection.
-    target = new URL(location, target).toString();
-  }
+  return guardedFetch(url, init, {
+    policy: 'public',
+    redirects: 'follow-checked',
+    maxRedirects: MAX_BRAND_REDIRECTS,
+  });
 }

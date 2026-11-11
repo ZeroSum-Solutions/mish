@@ -727,6 +727,7 @@ import {
 import {
   beginAuth,
   exchangeCodeForToken,
+  mcpOAuthFetch,
   PendingAuthCache,
   refreshAccessToken,
 } from './mcp-oauth.js';
@@ -1699,7 +1700,8 @@ async function refreshAndPersistToken(dataDir, serverId, serverUrl, current) {
       refreshToken: stored.refreshToken!,
       scope: stored.scope,
       resource: stored.resourceUrl,
-    }),
+      serverOrigin: serverUrl,
+    }, mcpOAuthFetch(serverUrl)),
   );
   return refreshed && mcpTokenMatchesEndpoint(refreshed, serverUrl) ? refreshed : null;
 }

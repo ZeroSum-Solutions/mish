@@ -19,15 +19,27 @@
 //     `registry.json` index URL is also accepted when an item is selected
 //     with a `#<item>` fragment.
 //
-// Network safety: every URL we contact is validated against an egress policy
-// (see `assertFetchableUrl`) — `http://` is allowed only for loopback hosts,
-// and private / link-local / non-routable IP literals are refused for both
-// schemes. Redirects are disabled, every fetch is size- and time-bounded, and
-// the whole import shares one overall request/time budget.
+// Network safety: every URL we contact goes through the daemon egress guard
+// (see `assertShadcnUrl` and `http/egress-guard.ts`). The entry URL is the
+// user's own endpoint only when it is a typed loopback host; every include,
+// item and file URL keeps that policy only on the entry's origin and is
+// `public` otherwise. `http://` is allowed only for loopback hosts, names are
+// DNS-checked and pinned at connect time, redirects are refused, every fetch
+// is size- and time-bounded, and the whole import shares one overall
+// request/time budget.
 
+import type { lookup as dnsLookupCb } from 'node:dns';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { isIP } from 'node:net';
 import path from 'node:path';
+
+import {
+  assertFetchableUrl,
+  EgressRefusedError,
+  guardedFetch,
+  isTypedLoopbackHost,
+  policyForLinkedUrl,
+  type EgressPolicy,
+} from '../http/egress-guard.js';
 
 import {
   LocalDesignSystemImportError,
@@ -74,8 +86,10 @@ export type ShadcnDesignSystemImportOptions = Pick<
   LocalDesignSystemImportOptions,
   'craftApplies' | 'importMode' | 'name' | 'now' | 'reservedIds'
 > & {
-  /** Injectable fetch for tests / self-hosted registries. Defaults to global fetch. */
+  /** Injectable fetch for tests / self-hosted registries. Defaults to the egress-guarded fetch. */
   fetchImpl?: ShadcnFetch;
+  /** Resolver for the default fetch's connect-time DNS check (tests). */
+  lookupImpl?: typeof dnsLookupCb;
 };
 
 export type ParsedShadcnReference =
@@ -145,8 +159,8 @@ export async function importShadcnDesignSystemProject(
   // One shared budget across every fetch this import makes (resolution +
   // include recursion + file fetches): a request count cap and a wall-clock
   // deadline, layered on top of the per-request timeout.
-  const fetchImpl = withFetchBudget(options.fetchImpl ?? defaultShadcnFetch());
   const parsed = parseShadcnReference(reference);
+  const fetchImpl = shadcnFetchFor(parsed, options);
   const importedAt = (options.now ?? new Date()).toISOString();
   const resolved = await resolveShadcnItem(parsed, fetchImpl);
   const item = resolved.item;
@@ -205,7 +219,7 @@ export function parseShadcnReference(input: string): ParsedShadcnReference {
     } catch {
       throw badReference('reference is not a valid URL');
     }
-    assertFetchableUrl(url);
+    assertShadcnUrl(url, url);
     let fragment = '';
     if (url.hash) {
       // decodeURIComponent throws URIError on malformed percent-encoding (e.g.
@@ -251,76 +265,73 @@ export function parseShadcnReference(input: string): ParsedShadcnReference {
 // Egress policy (SSRF protection)
 // ---------------------------------------------------------------------------
 
-type HostClass = 'loopback' | 'blocked' | 'public';
-
-// Allow loopback over http or https (self-hosted local registry / tests).
-// Refuse private, link-local, ULA, and non-routable internal addresses for
-// both schemes. Require https for any other (public) host.
-function assertFetchableUrl(url: URL): void {
+/**
+ * Check one URL the importer is about to contact, against the import's entry
+ * URL. Returns the egress policy the fetch must run under.
+ *
+ * Invariant: the entry URL is `user-endpoint` only when its host is a typed
+ * loopback host (`isTypedLoopbackHost`); any other URL keeps that policy only
+ * on the entry's origin (`policyForLinkedUrl`) and is `public` otherwise. The
+ * URL must pass the egress guard's `assertFetchableUrl` under that policy, and
+ * `http://` is allowed only for a loopback host under `user-endpoint`. Every
+ * refusal is a BAD_REQUEST.
+ */
+function assertShadcnUrl(url: URL, entryUrl: URL | string): EgressPolicy {
   const protocol = url.protocol.toLowerCase();
   if (protocol !== 'http:' && protocol !== 'https:') {
     throw badReference('only http(s) registry URLs are supported');
   }
-  const hostClass = classifyHost(url.hostname);
-  if (hostClass === 'blocked') {
-    throw badReference(
-      `refusing to fetch "${url.hostname}": private, loopback-internal, link-local, and other non-routable addresses are not allowed`,
-    );
+  const policy = policyForLinkedUrl(url, entryUrl, entryPolicyFor(entryUrl));
+  try {
+    assertFetchableUrl(url, policy);
+  } catch (err) {
+    if (err instanceof EgressRefusedError) {
+      throw badReference(
+        `${err.message}: private, loopback-internal, link-local, and other non-routable addresses are not allowed`,
+      );
+    }
+    throw err;
   }
-  if (hostClass === 'loopback') return;
-  if (protocol !== 'https:') {
+  if (protocol !== 'https:' && !(policy === 'user-endpoint' && isTypedLoopbackHost(url.hostname))) {
     throw badReference(
       'only https:// is allowed for non-loopback registry hosts (http:// is allowed for localhost only)',
     );
   }
+  return policy;
 }
 
-function classifyHost(rawHost: string): HostClass {
-  let host = rawHost.trim().toLowerCase();
-  if (!host) return 'blocked';
-  if (host.startsWith('[') && host.endsWith(']')) host = host.slice(1, -1);
-
-  if (host === 'localhost' || host.endsWith('.localhost')) return 'loopback';
-  // Pure-decimal or hex hosts are obfuscated IP encodings, never real registry
-  // hostnames — refuse them rather than let the resolver normalize a bypass.
-  if (/^\d+$/.test(host) || /^0x[0-9a-f]+$/.test(host)) return 'blocked';
-
-  const kind = isIP(host);
-  if (kind === 4) return classifyIpv4(host);
-  if (kind === 6) return classifyIpv6(host);
-  // A DNS hostname we can't classify statically. redirect:'error' plus the
-  // IP-literal denials above cover the common SSRF vectors; closing DNS
-  // rebinding fully would require socket-level IP pinning.
-  return 'public';
-}
-
-function classifyIpv4(ip: string): HostClass {
-  const parts = ip.split('.').map((part) => Number(part));
-  if (parts.length !== 4 || parts.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) {
-    return 'blocked';
+/** `user-endpoint` only for a typed loopback entry host; otherwise `public`. */
+function entryPolicyFor(entryUrl: URL | string): EgressPolicy {
+  try {
+    const url = typeof entryUrl === 'string' ? new URL(entryUrl) : entryUrl;
+    return isTypedLoopbackHost(url.hostname) ? 'user-endpoint' : 'public';
+  } catch {
+    return 'public';
   }
-  const a = parts[0] as number;
-  const b = parts[1] as number;
-  if (a === 127) return 'loopback';
-  if (a === 0) return 'blocked'; // 0.0.0.0/8 "this host"
-  if (a === 10) return 'blocked'; // 10.0.0.0/8
-  if (a === 172 && b >= 16 && b <= 31) return 'blocked'; // 172.16.0.0/12
-  if (a === 192 && b === 168) return 'blocked'; // 192.168.0.0/16
-  if (a === 169 && b === 254) return 'blocked'; // 169.254.0.0/16 (incl. cloud metadata)
-  if (a === 100 && b >= 64 && b <= 127) return 'blocked'; // 100.64.0.0/10 (CGNAT)
-  return 'public';
 }
 
-function classifyIpv6(ip: string): HostClass {
-  const host = ip.toLowerCase();
-  if (host === '::1') return 'loopback';
-  if (host === '::') return 'blocked'; // unspecified
-  const mapped = /^::ffff:(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.exec(host);
-  if (mapped && mapped[1]) return classifyIpv4(mapped[1]);
-  const head = host.split(':')[0] ?? '';
-  if (head.startsWith('fc') || head.startsWith('fd')) return 'blocked'; // fc00::/7 ULA
-  if (/^fe[89ab]/.test(head)) return 'blocked'; // fe80::/10 link-local
-  return 'public';
+/**
+ * The fetch one import uses: the shared budget around the egress check around
+ * the caller's fetch (or the guarded default). Every URL is checked against
+ * the entry URL before any fetch implementation sees it.
+ */
+function shadcnFetchFor(
+  parsed: ParsedShadcnReference,
+  options: { fetchImpl?: ShadcnFetch; lookupImpl?: typeof dnsLookupCb },
+): ShadcnFetch {
+  // A GitHub shorthand has no user-typed host: everything it reaches is public.
+  const entryUrl = parsed.kind === 'url' ? parsed.url : 'https://raw.githubusercontent.com/';
+  const base = options.fetchImpl ?? defaultShadcnFetch(entryUrl, options.lookupImpl);
+  return withFetchBudget((url, init) => {
+    let parsedUrl: URL;
+    try {
+      parsedUrl = new URL(url);
+    } catch {
+      throw badReference(`invalid registry URL: ${url}`);
+    }
+    assertShadcnUrl(parsedUrl, entryUrl);
+    return base(url, init);
+  });
 }
 
 function isShadcnSegment(value: string): boolean {
@@ -483,18 +494,9 @@ async function fetchJsonDocument(url: string, fetchImpl: ShadcnFetch): Promise<u
 }
 
 async function fetchText(url: string, fetchImpl: ShadcnFetch): Promise<string> {
-  // Defense in depth: validate every URL we actually contact — not just the
-  // user-supplied entry point, but raw GitHub URLs, `include` targets, and raw
-  // file URLs too. Combined with redirect:'error' in defaultShadcnFetch, this
-  // closes redirect- and include-based SSRF paths to disallowed hosts.
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(url);
-  } catch {
-    throw badReference(`invalid registry URL: ${url}`);
-  }
-  assertFetchableUrl(parsedUrl);
-
+  // `fetchImpl` is always the `shadcnFetchFor` wrapper, so every URL we
+  // contact — the entry point, raw GitHub URLs, `include` targets and raw file
+  // URLs — is checked by `assertShadcnUrl` before any request is made.
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
   try {
@@ -810,10 +812,11 @@ export type ShadcnRegistryItemSource = {
  */
 export async function resolveShadcnRegistryItem(
   reference: string,
-  options: { fetchImpl?: ShadcnFetch } = {},
+  options: { fetchImpl?: ShadcnFetch; lookupImpl?: typeof dnsLookupCb } = {},
 ): Promise<ShadcnRegistryItemSource> {
-  const fetchImpl = withFetchBudget(options.fetchImpl ?? defaultShadcnFetch());
-  const resolved = await resolveShadcnItem(parseShadcnReference(reference), fetchImpl);
+  const parsed = parseShadcnReference(reference);
+  const fetchImpl = shadcnFetchFor(parsed, options);
+  const resolved = await resolveShadcnItem(parsed, fetchImpl);
   const item = resolved.item;
   return {
     ...(typeof item.name === 'string' ? { name: item.name } : {}),
@@ -882,14 +885,19 @@ function withFetchBudget(fetchImpl: ShadcnFetch): ShadcnFetch {
   };
 }
 
-function defaultShadcnFetch(): ShadcnFetch {
+function defaultShadcnFetch(entryUrl: string, lookupImpl?: typeof dnsLookupCb): ShadcnFetch {
   if (typeof fetch !== 'function') {
     throw new LocalDesignSystemImportError('INTERNAL_ERROR', 'global fetch is not available in this runtime');
   }
-  // redirect:'error' blocks redirect-based SSRF — a validated https registry URL
-  // cannot bounce the daemon to a disallowed internal http target (e.g.
-  // 169.254.169.254). Every hop is re-checked by fetchText's host validation.
-  return (url, init) => fetch(url, { ...init, redirect: 'error' });
+  // The egress guard refuses every 3xx (a validated registry URL cannot bounce
+  // the daemon to 169.254.169.254) and pins each connection to a DNS lookup
+  // that refuses non-public answers for the URL's policy.
+  return (url, init) =>
+    guardedFetch(url, { ...init }, {
+      policy: policyForLinkedUrl(url, entryUrl, entryPolicyFor(entryUrl)),
+      redirects: 'error',
+      ...(lookupImpl ? { lookupImpl } : {}),
+    });
 }
 
 function isAbortError(err: unknown): boolean {

@@ -11,6 +11,7 @@ import { mkdir, stat, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 import { resolveCodexPetsRoot } from './codex-pets.js';
+import { guardedFetch } from './http/egress-guard.js';
 
 const PETSHARE_BASE = 'https://ihzwckyzfcuktrljwpha.supabase.co/functions/v1/petshare';
 const HATCHERY_LIST = 'https://j20.nz/hatchery/api/pets.json';
@@ -106,13 +107,25 @@ async function pathExists(p: string): Promise<boolean> {
   }
 }
 
+/**
+ * Fetch a catalog list page or a spritesheet.
+ *
+ * Invariant: catalog JSON is remote data, so every URL it names (and every
+ * redirect hop) is `public` under the daemon egress guard: a listing cannot
+ * point the daemon at loopback, private or metadata addresses, and a
+ * catalog host name is DNS-checked and pinned at connect time.
+ */
+function fetchCatalogUrl(url: string): Promise<Response> {
+  return guardedFetch(url, {}, { policy: 'public', redirects: 'follow-checked' });
+}
+
 async function listPetSharePets(limit: number | null): Promise<PetTask[]> {
   const tasks: PetTask[] = [];
   let page = 1;
   const pageSize = 24;
   for (;;) {
     const url = `${PETSHARE_BASE}/api/pets?page=${page}&pageSize=${pageSize}`;
-    const resp = await fetch(url);
+    const resp = await fetchCatalogUrl(url);
     if (!resp.ok) {
       throw new Error(`petshare list page ${page} failed: ${resp.status} ${resp.statusText}`);
     }
@@ -149,7 +162,7 @@ async function listPetSharePets(limit: number | null): Promise<PetTask[]> {
 }
 
 async function listHatcheryPets(limit: number | null): Promise<PetTask[]> {
-  const resp = await fetch(HATCHERY_LIST);
+  const resp = await fetchCatalogUrl(HATCHERY_LIST);
   if (!resp.ok) {
     throw new Error(`hatchery list failed: ${resp.status} ${resp.statusText}`);
   }
@@ -181,7 +194,7 @@ async function listHatcheryPets(limit: number | null): Promise<PetTask[]> {
 }
 
 async function downloadBinary(url: string): Promise<Buffer> {
-  const resp = await fetch(url);
+  const resp = await fetchCatalogUrl(url);
   if (!resp.ok) {
     throw new Error(`download ${url} failed: ${resp.status} ${resp.statusText}`);
   }
@@ -200,7 +213,6 @@ async function writePet(
   if (!force && (await pathExists(sheetPath)) && (await pathExists(manifestPath))) {
     return 'skipped';
   }
-  await mkdir(dir, { recursive: true });
   const bytes = await downloadBinary(task.spritesheetUrl);
   if (bytes.length < 16) {
     throw new Error(`${task.folder}: spritesheet too small (${bytes.length} bytes)`);
@@ -214,6 +226,9 @@ async function writePet(
   if (!isWebp && !isPng && !isGif) {
     throw new Error(`${task.folder}: spritesheet is not webp/png/gif`);
   }
+  // Create the folder only once the download is valid, so a refused or broken
+  // download leaves nothing behind.
+  await mkdir(dir, { recursive: true });
   await writeFile(sheetPath, bytes);
   await writeFile(manifestPath, JSON.stringify(task.manifest, null, 2) + '\n', 'utf8');
   return 'wrote';

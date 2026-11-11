@@ -6,7 +6,7 @@ import { SIDECAR_ENV } from '@mish/sidecar-proto';
 import { buildMcpInstallPayload, type McpInstallPayload } from './mcp-install-info.js';
 import { installCodexMcp, probeCodexInstall, uninstallCodexMcp } from './codex-cli.js';
 import { MCP_TEMPLATES, buildAcpMcpServers, buildClaudeMcpJson, isManagedProjectCwd, readMcpConfig, writeMcpConfig } from './mcp-config.js';
-import { beginAuth, exchangeCodeForToken, McpOAuthError } from './mcp-oauth.js';
+import { beginAuth, exchangeCodeForToken, McpOAuthError, mcpOAuthFetch } from './mcp-oauth.js';
 import { clearToken, getToken, isTokenExpired, readAllTokens, setToken } from './mcp-tokens.js';
 import { McpCredentialFileError, McpCredentialResetError, resetUnsafeMcpOAuthStore } from './mcp-private-file.js';
 import { maskMcpServers, McpSecretMaskError, restoreMcpSecrets } from './mcp-secrets.js';
@@ -248,7 +248,7 @@ export function registerMcpRoutes(app: Express, ctx: RegisterMcpRoutesDeps) {
         serverUrl: server.url,
         redirectUri,
         dataDir: RUNTIME_DATA_DIR,
-        fetchImpl: fetch,
+        fetchImpl: mcpOAuthFetch(server.url),
       });
       pendingAuth.put(result.state, result.pending);
       console.log(
@@ -309,7 +309,8 @@ export function registerMcpRoutes(app: Express, ctx: RegisterMcpRoutesDeps) {
         code,
         codeVerifier: pending.codeVerifier,
         resource: pending.resourceUrl,
-      });
+        serverOrigin: current.url,
+      }, mcpOAuthFetch(current.url!));
       const stored: any = {
         accessToken: tokenResp.access_token,
         refreshToken: tokenResp.refresh_token,
