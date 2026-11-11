@@ -375,6 +375,10 @@ function familyPackageDir(family: string): string {
 
 function buildFamilySectionEntries(overrides: Overrides, usedOverrides: Set<string>): SectionCatalogEntry[] {
   const registry = readJson<FamilyRegistry>(familyRegistryPath);
+  // Family sections are an owned renderer over vendored HyperUI blocks; cite the same pin the
+  // hyperui rows cite, read from the vendored manifest so the string cannot drift from it.
+  const hyperui = readJson<HyperuiManifest>(path.join(hyperuiRoot, 'manifest.json')).upstream;
+  const hyperuiPin = `${hyperui.repo}@${hyperui.commit.slice(0, 12)}`;
   const entries: SectionCatalogEntry[] = [];
 
   for (const { family, spine } of registry.families) {
@@ -402,7 +406,7 @@ function buildFamilySectionEntries(overrides: Overrides, usedOverrides: Set<stri
         rights: {
           license: 'project-specific',
           decision: 'same-family-only',
-          evidence: `plugins/_official/examples/agency-${family}/README.md#rights — private reconstruction, not commercial clearance; selectable only within the ${family} family (design doc §1, §2)`,
+          evidence: `owned renderer over MIT HyperUI blocks pinned at ${hyperuiPin} (plugins/_official/shared/ui-kits/hyperui/LICENSE), fictional fixtures, see NOTICE; not a commercial clearance for any real business's name, copy or imagery; selectable only within the ${family} family (design doc §1, §2)`,
         },
         access: 'local',
         // Design doc §2: "Family sections remain selectable only through their own family's
