@@ -26,20 +26,22 @@
  * shape and archive rules only; the blob rule applies everywhere, so a fixture can
  * never be a real licensed blob.
  *
- * Not registered in `pnpm guard` since 2026-10-08 (owner decision: Mishh-
- * Mashh-2 stays private, with no public release, so Phase 1 item 8 — strip
- * the licensed content and flip this check to enforce — is cancelled and
- * will not run). Run it on demand instead:
- * `pnpm exec tsx scripts/check-licensed-pack-content.ts`.
+ * Reviewed public stubs (LICENSED_PACK_REVIEWED_STUBS) are exempt from every
+ * rule, but only as an exact (path, git blob id) pair: the same path with
+ * any other bytes, or the same bytes at any other path, is checked as usual.
  *
- * Mode: LICENSED_PACK_GUARD_MODE unset (or `warn`) prints every violation
- * and passes without failing the run; `enforce` fails on any violation. Warn
- * is this check's permanent mode now that P1-8 is cancelled.
+ * The repository is public. `pnpm guard` runs this check as "licensed pack
+ * content" in enforce mode, so any violation fails the guard whatever
+ * LICENSED_PACK_GUARD_MODE says. Licensed content belongs in a private pack
+ * (docs/packs.md).
+ *
+ * Mode for the stand-alone run: LICENSED_PACK_GUARD_MODE unset (or `warn`)
+ * prints every violation and passes; `enforce` fails on any violation.
  *
  * Push-protection custom patterns are not available on the
  * ZeroSum-Solutions plan (Team, no Advanced Security).
  *
- * Run on demand: `pnpm exec tsx scripts/check-licensed-pack-content.ts`
+ * Run alone: `LICENSED_PACK_GUARD_MODE=enforce node scripts/check-licensed-pack-content.ts`
  * ─────────────────────────────────────────────────────────────────────── */
 
 import { execFile } from "node:child_process";
@@ -55,10 +57,10 @@ const execFileAsync = promisify(execFile);
 export type LicensedPackGuardMode = "warn" | "enforce";
 
 /**
- * P1-8 (strip the licensed content and flip this to "enforce") is cancelled
- * (2026-10-08: the repo stays private, with no public release), so this
- * stays "warn" permanently. The check is no longer registered in `pnpm
- * guard`; run it on demand when auditing tracked licensed pack content.
+ * Default for a stand-alone run (`node scripts/check-licensed-pack-content.ts`)
+ * with LICENSED_PACK_GUARD_MODE unset: report and pass, so a local audit of a
+ * work-in-progress tree prints every hit. `pnpm guard` does not use this
+ * default: it passes `mode: "enforce"` explicitly (scripts/guard.ts).
  */
 export const DEFAULT_LICENSED_PACK_GUARD_MODE: LicensedPackGuardMode = "warn";
 
@@ -96,11 +98,11 @@ type PathRule = {
 const CULT_UI_CATALOG = "packages/cult-ui-catalog/";
 
 /**
- * The six genui ports derived from licensed Cult UI Pro source, cross-checked
- * against packages/genui-catalog/NOTICE, "Cult UI Pro (licensed, 2026-09-25)".
- * Flagged by path and blob like the rest of the Cult content (lane decision
- * 2026-10-07: MIT attribution covers code taken from the upstream release, not
- * these in-repo ports).
+ * The six genui ports once derived from licensed Cult UI Pro source. They are
+ * not in the public tree; they live in the private pack. Flagged by path and
+ * blob like the rest of the Cult content so they cannot come back (lane
+ * decision 2026-10-07: MIT attribution covers code taken from the upstream
+ * release, not these ports).
  */
 export const GENUI_CULT_PORT_IDS = [
   "organic-button",
@@ -158,6 +160,44 @@ export const LICENSED_PACK_FIXTURE_ROOTS = ["apps/daemon/tests/fixtures/licensed
 
 export function isLicensedPackFixturePath(repositoryPath: string): boolean {
   return LICENSED_PACK_FIXTURE_ROOTS.some((root) => repositoryPath.startsWith(root));
+}
+
+// ── Reviewed public stubs ────────────────────────────────────────────────
+
+export type ReviewedStub = { path: string; oid: string };
+
+/**
+ * Public stubs under a licensed path rule, each pinned to the exact git blob
+ * id that was reviewed (`git ls-files -s` at 637f14c, 2026-11-11). The Cult
+ * UI Pro data moved to the private pack; these files keep the
+ * packages/cult-ui-catalog build working and hold no Cult content: empty
+ * `rows`, `items`, `relations`, `replacements` and `overrides`, an empty
+ * adapter registry, and a re-export of the shared SectionAdapter contract.
+ *
+ * Invariant: a file is exempt only when both its path and its blob id match
+ * one entry. Any edit gives a new blob id and the path rule fires again, so a
+ * change must be reviewed and its new id recorded here. The same bytes at
+ * another path get no exemption (the section-adapter.ts blob stays on the
+ * denylist). Do not key an entry on a path alone.
+ */
+export const LICENSED_PACK_REVIEWED_STUBS: readonly ReviewedStub[] = [
+  { path: `${CULT_UI_CATALOG}catalog-copy-refinements.json`, oid: "d97aff2e8cc6d1a18abc9409bfde905da955bba4" },
+  { path: `${CULT_UI_CATALOG}catalog-curation.json`, oid: "f9687cfdc809aedaadef317a2f29bebb45e6c7b8" },
+  { path: `${CULT_UI_CATALOG}catalog.json`, oid: "0e5d377cd521091677f143e15955cdf06986b931" },
+  { path: `${CULT_UI_CATALOG}generated/index.ts`, oid: "a16c92ff4507491db5eff22030a9a9b58a289c70" },
+  { path: `${CULT_UI_CATALOG}generated/public-names.json`, oid: "104c58ec3b4c10d1c71118ef334a06f8b173fe52" },
+  { path: `${CULT_UI_CATALOG}generated/section-adapter.ts`, oid: "780c27ae27df4e40b2eb4604ba32552e7768a09a" },
+  { path: `${CULT_UI_CATALOG}generated/slugs.json`, oid: "333cfc46de995a3e801d60c3cef36ace83dd016e" },
+  { path: `${CULT_UI_CATALOG}generated/thumbnails.json`, oid: "422d6307f28ff4037db6c2dee6dade73cceb22d8" },
+  { path: `${CULT_UI_CATALOG}reviewed-overrides.json`, oid: "a91654134eb317c7d4fc641728c4fa405f21b595" },
+];
+
+/** True only for an exact (path, blob id) pair in LICENSED_PACK_REVIEWED_STUBS. */
+export function isReviewedLicensedPackStub(
+  file: TrackedFile,
+  stubs: readonly ReviewedStub[] = LICENSED_PACK_REVIEWED_STUBS,
+): boolean {
+  return stubs.some((stub) => stub.path === file.path && stub.oid === file.oid);
 }
 
 // ── Archive rule ─────────────────────────────────────────────────────────
@@ -344,8 +384,10 @@ export async function findLicensedPackContentViolations(input: {
   readText: ReadRepositoryText;
   deniedBlobs: ReadonlySet<string>;
   rules?: LicensedPackRuleSwitches;
+  reviewedStubs?: readonly ReviewedStub[];
 }): Promise<LicensedPackViolation[]> {
   const switches = input.rules ?? LICENSED_PACK_RULE_SWITCHES;
+  const reviewedStubs = input.reviewedStubs ?? LICENSED_PACK_REVIEWED_STUBS;
   const pathMatches = await findLicensedPackPathMatches(
     input.files.map((file) => file.path),
     input.readText,
@@ -354,6 +396,7 @@ export async function findLicensedPackContentViolations(input: {
 
   const violations: LicensedPackViolation[] = [];
   for (const file of input.files) {
+    if (isReviewedLicensedPackStub(file, reviewedStubs)) continue;
     const reasons = [...(pathMatches.get(file.path) ?? [])];
     if (isForbiddenTrackedArchive(file.path)) reasons.push(`path:${TRACKED_ARCHIVE_RULE_ID}`);
     if (input.deniedBlobs.has(file.oid)) reasons.push("blob");
@@ -410,8 +453,8 @@ export function resolveLicensedPackGuardMode(
 
 type GuardLog = { error: (line: string) => void; log: (line: string) => void };
 
-// Warn mode is permanent (P1-8 is cancelled; see the file header), so this
-// reads as a plain advisory label, not a reference to a pending phase.
+// Label for warn-mode output from a stand-alone run; `pnpm guard` always
+// runs in enforce mode and never prints it.
 const ADVISORY_PREFIX = "advisory (on-demand check)";
 
 /** Prints the violations and returns the check result for the mode. */

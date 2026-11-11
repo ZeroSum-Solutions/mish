@@ -294,9 +294,10 @@ the same list.
 The daemon copies an installed licensed pack to `<RUNTIME_DATA_DIR>/packs/<id>/`,
 under its own data root (see "Daemon data directory contract" in `AGENTS.md`).
 Mish packs install to `<RUNTIME_DATA_DIR>/mish-packs/<id>/`. Do not edit files
-in either folder, and never commit a pack to this repository. `pnpm guard` does
-not look for pack files; run `pnpm exec tsx scripts/check-licensed-pack-content.ts`
-to check a tree on demand (it only warns). Keep your pack in its own folder,
+in either folder, and never commit a pack to this repository. `pnpm guard` runs
+the "licensed pack content" check in enforce mode and fails on pack files. Run
+`LICENSED_PACK_GUARD_MODE=enforce node scripts/check-licensed-pack-content.ts`
+to check a tree by itself (without the variable it only warns). Keep your pack in its own folder,
 `.zip`, `.tgz` file or private GitHub repository.
 
 ## Read the component ledger

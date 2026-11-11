@@ -10,6 +10,8 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 import {
   LICENSED_PACK_BLOB_LIST_MIN_IDS,
   LICENSED_PACK_BLOB_LIST_PATH,
+  LICENSED_PACK_PATH_RULES,
+  LICENSED_PACK_REVIEWED_STUBS,
   MOTIONSITES_AUTHOR_NAMES,
   checkLicensedPackContent,
   findLicensedPackContentViolations,
@@ -17,6 +19,7 @@ import {
   reportLicensedPackViolations,
   resolveLicensedPackGuardMode,
   type LicensedPackViolation,
+  type ReviewedStub,
   type TrackedFile,
 } from "../../../scripts/check-licensed-pack-content.ts";
 import {
@@ -65,6 +68,7 @@ async function violationsFor(
   options: {
     deniedBlobs?: readonly string[];
     sectionCatalogCultProRule?: boolean;
+    reviewedStubs?: readonly ReviewedStub[];
   } = {},
 ): Promise<LicensedPackViolation[]> {
   const byPath = new Map(files.map((file) => [file.path, file.text]));
@@ -76,6 +80,7 @@ async function violationsFor(
     rules: {
       sectionCatalogCultProRule: options.sectionCatalogCultProRule ?? false,
     },
+    ...(options.reviewedStubs ? { reviewedStubs: options.reviewedStubs } : {}),
   });
 }
 
@@ -358,6 +363,55 @@ describe("licensed pack content matcher", () => {
     );
     expect(flaggedPaths(violations)).toEqual(["apps/web/src/x.ts"]);
     expect(reasonsFor(violations, "apps/web/src/x.ts")).toEqual(["blob"]);
+  });
+
+  test("a reviewed stub passes only as its exact (path, blob id) pair: changed bytes or another path are flagged", async () => {
+    const stubPath = "packages/cult-ui-catalog/catalog.json";
+    const stubText = '{\n  "rows": [],\n  "schema": "synthetic-stub/1"\n}\n';
+    const stubs: ReviewedStub[] = [{ path: stubPath, oid: oidFor(stubText) }];
+
+    // The pinned pair passes the path rule and, when its bytes are denied, the blob rule too.
+    expect(await violationsFor([{ path: stubPath, text: stubText }], { reviewedStubs: stubs })).toEqual([]);
+    expect(
+      await violationsFor([{ path: stubPath, text: stubText }], { reviewedStubs: stubs, deniedBlobs: [oidFor(stubText)] }),
+    ).toEqual([]);
+
+    // One changed byte gives a new blob id, so the path rule fires again.
+    const changed = await violationsFor([{ path: stubPath, text: `${stubText} ` }], { reviewedStubs: stubs });
+    expect(reasonsFor(changed, stubPath)).toEqual(["path:cult-ui-catalog-data"]);
+
+    // The same bytes at another licensed path, or a denied copy elsewhere, get no exemption.
+    const moved = await violationsFor(
+      [
+        { path: "packages/cult-ui-catalog/reviewed-overrides.json", text: stubText },
+        { path: "apps/web/src/copied.json", text: stubText },
+      ],
+      { reviewedStubs: stubs, deniedBlobs: [oidFor(stubText)] },
+    );
+    expect(reasonsFor(moved, "packages/cult-ui-catalog/reviewed-overrides.json")).toEqual([
+      "path:cult-ui-catalog-data",
+      "blob",
+    ]);
+    expect(reasonsFor(moved, "apps/web/src/copied.json")).toEqual(["blob"]);
+  });
+
+  test("the committed reviewed stubs are the nine cult-ui-catalog data files, each under a path rule and pinned to a full blob id", () => {
+    const cultData = LICENSED_PACK_PATH_RULES.find((rule) => rule.id === "cult-ui-catalog-data");
+    expect(LICENSED_PACK_REVIEWED_STUBS.map((stub) => stub.path)).toEqual([
+      "packages/cult-ui-catalog/catalog-copy-refinements.json",
+      "packages/cult-ui-catalog/catalog-curation.json",
+      "packages/cult-ui-catalog/catalog.json",
+      "packages/cult-ui-catalog/generated/index.ts",
+      "packages/cult-ui-catalog/generated/public-names.json",
+      "packages/cult-ui-catalog/generated/section-adapter.ts",
+      "packages/cult-ui-catalog/generated/slugs.json",
+      "packages/cult-ui-catalog/generated/thumbnails.json",
+      "packages/cult-ui-catalog/reviewed-overrides.json",
+    ]);
+    for (const stub of LICENSED_PACK_REVIEWED_STUBS) {
+      expect(stub.oid).toMatch(/^[0-9a-f]{40}$/);
+      expect(cultData?.exact).toContain(stub.path);
+    }
   });
 
   test('a pack.json with "format": "mishh-pack@1" is flagged at any path outside the fixture roots (apps/daemon/tests/fixtures/licensed-pack/), and inside them is not flagged by shape but still by blob', async () => {
@@ -745,10 +799,34 @@ describe("licensed pack guard wrapper", () => {
     await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
   });
 
-  test("the check is not registered in the public guard entrypoint", () => {
-    // Not registered since 2026-10-08 (the repo stays private, so P1-8's
-    // enforce flip is cancelled); run it on demand instead — see the file
-    // header of scripts/check-licensed-pack-content.ts.
+  test("in real git, the committed stub bytes pass enforce mode and one changed stub fails it", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    const errors: string[] = [];
+    vi.spyOn(console, "error").mockImplementation((line: unknown) => {
+      errors.push(String(line));
+    });
+    const repoRoot = path.resolve(import.meta.dirname, "../../..");
+    const stubFiles: Record<string, string> = {};
+    for (const stub of LICENSED_PACK_REVIEWED_STUBS) {
+      stubFiles[stub.path] = await readFile(path.join(repoRoot, stub.path), "utf8");
+    }
+    const blobList = `${"e".repeat(40)}\n`;
+    const clean = await scratchRepo({ [LICENSED_PACK_BLOB_LIST_PATH]: blobList, ...stubFiles });
+    await expect(checkLicensedPackContent({ repoRoot: clean }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(true);
+    expect(errors).toEqual([]);
+
+    const changedPath = "packages/cult-ui-catalog/catalog.json";
+    const changed = await scratchRepo({
+      [LICENSED_PACK_BLOB_LIST_PATH]: blobList,
+      ...stubFiles,
+      [changedPath]: `${stubFiles[changedPath]}\n`,
+    });
+    await expect(checkLicensedPackContent({ repoRoot: changed }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
+    expect(errors.join("\n")).toContain(`${changedPath} [path:cult-ui-catalog-data]`);
+  });
+
+  test("the check is registered in the public guard entrypoint", () => {
+    // `pnpm guard` runs it in enforce mode (scripts/guard.ts); the repository is public.
     const repoRoot = path.resolve(import.meta.dirname, "../../..");
     const names = execFileSync("pnpm", ["--silent", "guard", "--list-checks"], {
       cwd: repoRoot,
@@ -756,7 +834,7 @@ describe("licensed pack guard wrapper", () => {
     })
       .trim()
       .split("\n");
-    expect(names).not.toContain("licensed pack content");
+    expect(names).toContain("licensed pack content");
   });
 
   test("the guard's own sources and this spec do not match its rules", async () => {
