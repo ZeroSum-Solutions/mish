@@ -7,8 +7,8 @@
   "description": "Spec example plugin for producing an investor-ready HTML pitch deck artifact.",
   "license": "MIT",
   "author": {
-    "name": "Mishh Mashh Spec Examples",
-    "url": "https://github.com/ZeroSum-Solutions/mish"
+    "name": "Open Design contributors; modified by ZeroSum Solutions",
+    "url": "https://github.com/nexu-io/open-design"
   },
   "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/spec/examples/create-slides-pitch",
   "tags": ["create", "deck", "slides", "pitch"],

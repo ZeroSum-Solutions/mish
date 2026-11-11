@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-23T23:56:26Z",
   "description": "A static publication or media page kind: masthead, lead story, topics, latest stories, running series, archive, optional contributors, newsletter sign-up and membership. Fits magazines, newsletters, independent media and blogs. Composed from ten vendored HyperUI blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

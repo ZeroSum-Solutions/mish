@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-25T00:00:00Z",
   "description": "A static local clinical or appointment practice page kind: hero with a book call, services or treatments, provider credentials, what to expect at a visit, a book step whose destination is honestly classified from a supplied URL, phone or email, optional patient or client reviews, optional insurance or pricing, optional FAQ, and optional hours and location (text only, no map). Fits a dentist, veterinarian, medical specialist, physiotherapist or aesthetics/med-spa practice. Composed from twelve vendored HyperUI blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-22T17:45:00Z",
   "description": "A static CRM dashboard page kind: four KPIs, a five-row pipeline table, a six-item activity feed, one contact card, owner and stage filters, and one inline-SVG chart. Fits a sales or service team that wants a mock of its working screen. Composed from six vendored HyperUI application blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",
