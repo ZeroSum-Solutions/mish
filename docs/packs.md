@@ -297,7 +297,8 @@ Mish packs install to `<RUNTIME_DATA_DIR>/mish-packs/<id>/`. Do not edit files
 in either folder, and never commit a pack to this repository. `pnpm guard` runs
 the "licensed pack content" check in enforce mode and fails on pack files. Run
 `LICENSED_PACK_GUARD_MODE=enforce node scripts/check-licensed-pack-content.ts`
-to check a tree by itself (without the variable it only warns). Keep your pack in its own folder,
+to check a Git checkout by itself (without the variable it only warns). The check lists files with
+`git ls-files`, so it needs a Git checkout; a source tarball without `.git` fails with a clear error. Keep your pack in its own folder,
 `.zip`, `.tgz` file or private GitHub repository.
 
 ## Read the component ledger

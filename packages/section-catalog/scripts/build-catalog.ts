@@ -205,7 +205,7 @@ function buildHyperuiEntries(overrides: Overrides, usedOverrides: Set<string>): 
       rights: {
         license: 'MIT',
         decision: 'bundle',
-        evidence: `HyperUI (${manifest.upstream.repo}@${commit}) — plugins/_official/shared/ui-kits/hyperui/LICENSE, UPSTREAM.json; see NOTICE`,
+        evidence: `HyperUI (${manifest.upstream.repo}@${commit}) — plugins/_official/shared/ui-kits/hyperui/LICENSE, UPSTREAM.json; HyperUI notice in the root NOTICE file`,
       },
       access: 'local',
       // v1 scope limit (design doc §1): only the three reviewed marketing blocks are insertable;
@@ -406,7 +406,7 @@ function buildFamilySectionEntries(overrides: Overrides, usedOverrides: Set<stri
         rights: {
           license: 'project-specific',
           decision: 'same-family-only',
-          evidence: `owned renderer over MIT HyperUI blocks pinned at ${hyperuiPin} (plugins/_official/shared/ui-kits/hyperui/LICENSE), fictional fixtures, see NOTICE; not a commercial clearance for any real business's name, copy or imagery; selectable only within the ${family} family (design doc §1, §2)`,
+          evidence: `owned renderer over MIT HyperUI blocks pinned at ${hyperuiPin} (plugins/_official/shared/ui-kits/hyperui/LICENSE), fictional fixtures, HyperUI notice in the root NOTICE file; not a commercial clearance for any real business's name, copy or imagery; selectable only within the ${family} family`,
         },
         access: 'local',
         // Design doc §2: "Family sections remain selectable only through their own family's
