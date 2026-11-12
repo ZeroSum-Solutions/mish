@@ -6,11 +6,11 @@ import { assertOwnerAcceptedPrincipal, LOCAL_OWNER_PRINCIPAL } from './source-re
  *
  * Devin's owner decision of 2026-10-09 (relayed by the Mishh Orchestrator session to the
  * captain) admits Aceternity operations without waiting on a licence answer, under the
- * `owner-accepted-private-use` basis with that dated citation. The basis: each item is an
- * end-user project fetch from Aceternity's public registry, or from the user's own account,
- * to build the user's end product (https://ui.aceternity.com/licence). Mish ships and
- * redistributes no Aceternity source; a fetched copy stays in the user's own local data.
- * Public redistribution of a unit stays blocked. The
+ * `owner-accepted-private-use` basis with that dated citation. The decision states no
+ * further reason; the entry records two facts beside it: each item is fetched into the
+ * user's own project from Aceternity's public registry, and Mish ships and redistributes no
+ * Aceternity source (a fetched copy stays in the user's own local data). Redistribution of
+ * a unit is not admitted and stays blocked. The
  * licence, terms and pricing-FAQ clauses retrieved on 2026-10-09 stay attached as
  * metadata (exact licence digest, clause IDs), so a later licence review starts from
  * them. The grant runs to the local owner principal only. New item bytes or a repaired
@@ -22,7 +22,7 @@ export const ACETERNITY_RIGHTS_EVIDENCE = 'docs/plans/2026-10-02-design-workbenc
 export const OWNER_DECISION_EVIDENCE = 'owner-decision-2026-10-09:private-use';
 export const ACETERNITY_OWNER_DECISION = Object.freeze({
   decidedAt: '2026-10-09', decidedBy: 'owner',
-  citation: 'Devin\'s owner decision of 2026-10-09, relayed by the Mishh Orchestrator session to the captain: Aceternity operations are admitted without waiting on a licence answer. Each item is an end-user project fetch from Aceternity\'s public registry or the user\'s own account, for the user\'s end product (https://ui.aceternity.com/licence); Mish ships and redistributes no Aceternity source.',
+  citation: 'Devin\'s owner decision of 2026-10-09, relayed by the Mishh Orchestrator session to the captain: Aceternity operations are admitted without waiting on a licence answer. Facts recorded with it: each item is fetched into the user\'s own project from Aceternity\'s public registry (licence: https://ui.aceternity.com/licence); Mish ships and redistributes no Aceternity source.',
 });
 
 const LICENCE_SHA256 = 'd0f63e88cade96e1619944762903c465813f23da0a851de088e85c3e33276088';
@@ -34,7 +34,7 @@ type Scope = OperationRight['scope'];
 const scope = (projectScope: Scope['projectScope'], visibility: Scope['visibility']): Scope => ({
   projectScope, targetScope: 'any', principalId: PRINCIPAL, projectIds: [], targetProfileIds: [], visibility,
 });
-const OWNER = 'Admitted under owner decision 2026-10-09 (end-user project fetch for an end product, https://ui.aceternity.com/licence; Mish ships and redistributes no Aceternity source).';
+const OWNER = 'Admitted under owner decision 2026-10-09. Facts: each item is fetched into the user\'s own project from Aceternity\'s public registry; Mish ships and redistributes no Aceternity source.';
 const allowed = (operation: OperationRight['operation'], projectScope: Scope['projectScope'], visibility: Scope['visibility'], metadata: string): OperationRight => ({
   operation, decision: 'allowed', scope: scope(projectScope, visibility), evidenceRefs: [OWNER_DECISION_EVIDENCE], obligations: [],
   reason: `${OWNER} Published-licence metadata: ${metadata}`,
@@ -47,7 +47,7 @@ function operationRights(): OperationRight[] {
     allowed('export-application', 'any-authorized', 'finished-application', 'end products may be distributed (licence#permitted.distribution; licence#sample-end-products; pricing#faq.commercial-projects), not as a template product (licence#prohibited.template-creation).'),
     {
       operation: 'redistribute-unit', decision: 'blocked', scope: scope('unbound', 'reusable-distribution'), evidenceRefs: [OWNER_DECISION_EVIDENCE], obligations: [],
-      reason: 'Redistributing a unit is outside owner decision 2026-10-09, which covers end-user project fetches only; Mish redistributes no Aceternity source. Published-licence metadata: no re-distribution of source files (licence#prohibited.re-distribution), no marketplace distribution (licence#prohibited.marketplace), no competing component library (pricing#faq.commercial-projects), site terms forbid redistribution (terms#you-must-not).',
+      reason: 'Blocked: owner decision 2026-10-09 admits no redistribution, and Mish redistributes no Aceternity source. Published-licence metadata: no re-distribution of source files (licence#prohibited.re-distribution), no marketplace distribution (licence#prohibited.marketplace), no competing component library (pricing#faq.commercial-projects), site terms forbid redistribution (terms#you-must-not).',
     },
     allowed('save-private-unit', 'unbound', 'private', 'multi-use in projects (licence#permitted.multi-use); site terms restrict copying (terms#you-must-not).'),
     allowed('reuse-private-project', 'any-authorized', 'private', 'multi-use in various projects (licence#permitted.multi-use; licence#permitted.create-end-products).'),

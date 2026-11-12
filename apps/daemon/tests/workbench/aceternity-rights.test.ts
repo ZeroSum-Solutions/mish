@@ -6,10 +6,10 @@ import { ACETERNITY_FREE_RIGHTS_ASSESSMENTS, ACETERNITY_RIGHTS_EVIDENCE, OWNER_D
 import { ACETERNITY_ITEMS } from '../../src/workbench/reference-sources.js';
 
 /**
- * AC-R18.6 / G38: the Aceternity RightsAssessment. Owner decision 2026-10-09: each item is
- * an end-user project fetch for the user's end product, and Mish redistributes no Aceternity
- * source, so every private operation is
- * admitted under the `owner-accepted-private-use` basis with that dated citation. The
+ * AC-R18.6 / G38: the Aceternity RightsAssessment. Owner decision 2026-10-09: nothing waits on
+ * a licence answer, so every private operation is admitted under the
+ * `owner-accepted-private-use` basis with that dated citation. The entry records two facts
+ * beside it (a per-project fetch from the public registry; no Aceternity source shipped). The
  * retrieved licence, terms and pricing-FAQ clauses stay attached as metadata. Public
  * redistribution is outside private use and stays blocked. Nothing is purchased.
  */
@@ -40,7 +40,7 @@ describe('Aceternity free-tier RightsAssessment (AC-R18.6, G38)', () => {
       expect(record.acquisitionMode).toBe('project-fetch');
       expect(record.evaluator).toMatchObject({ role: 'source-curator', basis: 'owner-accepted-private-use' });
       expect(record.ownerDecision).toMatchObject({ decidedAt: '2026-10-09', decidedBy: 'owner' });
-      expect(record.ownerDecision!.citation).toMatch(/end-user project fetch/);
+      expect(record.ownerDecision!.citation).toMatch(/fetched into the user's own project/);
       expect(record.ownerDecision!.citation).toMatch(/redistributes no Aceternity source/);
       expect(record.ownerDecision!.citation).toContain('https://ui.aceternity.com/licence');
       expect(record.ownerDecision!.citation).not.toMatch(/licences are ignored|repository is private/);
