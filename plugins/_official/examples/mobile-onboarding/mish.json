@@ -44,7 +44,7 @@
     "uk": "Багатоекранний потік мобільного онбордінгу у вигляді трьох телефонних фреймів поруч — заставка, ціннісна пропозиція, вхід. Статус-бар, індикатори свайпу, основний CTA. Використовуйте при згадці 'мобільний онбордінг', 'iOS онбордінг', 'реєстрація на телефоні' або '移动端引导'.",
     "en": "A multi-screen mobile onboarding flow rendered as three phone frames side by side — splash, value-prop, sign-in. Status bar, swipe dots, primary CTA. Use when the brief mentions \"mobile onboarding\", \"iOS onboarding\", \"phone signup\", or \"移动端引导\"."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

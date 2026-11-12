@@ -5,7 +5,7 @@
   "title": "Video Storyboard",
   "version": "0.1.0",
   "description": "Create a video storyboard, shot list, and render-ready prompt pack.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["create", "video", "storyboard", "marketing"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

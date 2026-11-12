@@ -5,7 +5,7 @@
   "title": "Share as GitHub PR",
   "version": "0.1.0",
   "description": "Package an accepted artifact or plugin folder as a GitHub pull request.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["share", "github-pr", "pull-request", "spec-plugin"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

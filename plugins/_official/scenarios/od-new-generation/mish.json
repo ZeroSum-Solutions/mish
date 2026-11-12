@@ -44,7 +44,7 @@
     "tr": "new-generation taskKind için varsayılan referans pipeline.",
     "uk": "Типовий референс-конвеєр для taskKind new-generation."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

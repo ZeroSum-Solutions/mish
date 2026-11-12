@@ -5,7 +5,7 @@
   "title": "Example Pitch Slides",
   "version": "0.1.0",
   "description": "Spec example plugin for producing an investor-ready HTML pitch deck artifact.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

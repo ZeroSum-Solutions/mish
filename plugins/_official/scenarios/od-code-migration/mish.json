@@ -44,7 +44,7 @@
     "tr": "code-migration taskKind için varsayılan referans pipeline; patch-edit ↔ build-test devloop ve diff-review devri ile.",
     "uk": "Типовий референс-конвеєр для taskKind code-migration з devloop patch-edit ↔ build-test і передачею diff-review."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

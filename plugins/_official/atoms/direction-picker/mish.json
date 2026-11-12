@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "publishedAt": "2026-05-09T13:00:27Z",
   "description": "Resolves the visual direction at the plan stage from the brief and design system, without asking the user.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

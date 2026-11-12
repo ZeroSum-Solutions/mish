@@ -5,7 +5,7 @@
   "title": "Example Live Ops Artifact",
   "version": "0.1.0",
   "description": "Spec example plugin for a refreshable live operations artifact with seeded data fallback.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

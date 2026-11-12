@@ -6,7 +6,7 @@
   "version": "2.0.5",
   "publishedAt": "2026-08-14T10:44:00Z",
   "description": "Bundled, inactive OD Next planning and Build strategy content.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

@@ -5,7 +5,7 @@
   "title": "Image Campaign",
   "version": "0.1.0",
   "description": "Generate image campaign assets and prompts from a structured creative brief.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["create", "image", "campaign", "marketing"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

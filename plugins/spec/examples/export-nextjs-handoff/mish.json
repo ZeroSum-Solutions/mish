@@ -5,7 +5,7 @@
   "title": "Next.js Handoff",
   "version": "0.1.0",
   "description": "Export an accepted artifact into a Next.js App Router handoff.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["export", "nextjs", "react", "handoff", "downstream-export"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

@@ -5,7 +5,7 @@
   "title": "Deploy To Vercel",
   "version": "0.1.0",
   "description": "Deploy an accepted static artifact to Vercel or prepare a deployment handoff.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["deploy", "vercel", "static", "deployment"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

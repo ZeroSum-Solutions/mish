@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "publishedAt": "2026-05-09T14:22:18Z",
   "description": "Apply one rewrite-plan step at a time as small reviewable file edits.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

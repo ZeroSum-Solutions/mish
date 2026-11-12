@@ -44,7 +44,7 @@
     "uk": "Однокадрова композиція motion-дизайну із зацикленими CSS-анімаціями — обертове текстове кільце, анімований глобус, таймер, parallax-мітки. Рендериться як постер hero-відео для motion tools або будь-якого експортера на основі ключових кадрів. Підходить для motion-дизайну, анімованих hero-секцій, циклічного відео та титульних карток.",
     "en": "A single-frame motion-design composition with looping CSS animations — rotating type ring, animated globe, ticking timer, parallax labels. Renders as a hero video poster you can hand straight to motion tools or any keyframe-based exporter. Use when the brief asks for \"motion design\", \"animated hero\", \"loop\", \"video poster\", \"title card\", or pairs Open Claude Design with motion tools for a kinetic export."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

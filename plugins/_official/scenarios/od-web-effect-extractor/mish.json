@@ -14,7 +14,7 @@
     "en": "Extract visual effects, Canvas/WebGL/Shader behavior, and interaction details from a reference website, then rebuild them as an editable Mishh Mashh artifact.",
     "zh-CN": "从参考网站提取视觉特效、Canvas/WebGL/Shader 行为与交互细节，并复刻为可编辑的 Mishh Mashh 产物。"
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

@@ -44,7 +44,7 @@
     "uk": "Сторінка протоколу зустрічі — заголовок з учасниками, чек-ліст порядку денного, блок рішень, таблиця завдань з відповідальними та датами, футер для наступної зустрічі. Використовується для запитів 'протокол зустрічі', 'minutes', 'нотатки 1:1', 'підсумки загальної зустрічі' або '会议纪要'.",
     "en": "Meeting notes page — title bar with attendees, agenda checklist, decisions block, action items table with owners + dates, and a \"next meeting\" footer. Use when the brief mentions \"meeting notes\", \"minutes\", \"1:1 notes\", \"all-hands recap\", or \"会议纪要\"."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

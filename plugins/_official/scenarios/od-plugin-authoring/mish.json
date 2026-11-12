@@ -44,7 +44,7 @@
     "tr": "My plugins'e eklenebilen yerel bir Mishh Mashh eklenti klasörü oluşturmak için rehberli senaryo.",
     "uk": "Покроковий сценарій створення локальної теки плагіна Mishh Mashh, яку можна додати до My plugins."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

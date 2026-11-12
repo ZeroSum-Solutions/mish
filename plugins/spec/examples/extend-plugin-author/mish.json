@@ -5,7 +5,7 @@
   "title": "Plugin Author",
   "version": "0.1.0",
   "description": "Guide an agent through creating, validating, and preparing a Mishh Mashh plugin contribution.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["extend", "plugin-authoring", "create-plugin", "spec-plugin", "marketplace"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

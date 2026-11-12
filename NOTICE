@@ -11,7 +11,10 @@ repository starts from a snapshot of ZeroSum's private working repository
 (Mishh Mashh 2, commit 354ec9a700); many files were modified after the
 upstream pin. Changes include the
 product name, the removal of upstream community and support links, and
-upstream network services turned off by default.
+upstream network services turned off by default. The plugin manifests adapted from
+Open Design (under plugins/_official and plugins/spec, except the web-clone example, which is MIT) state
+Apache-2.0: upstream's own manifests say MIT, but its repository licence is Apache-2.0 and
+those plugin directories carry no separate licence file.
 
 "Open Design", "OpenDesign" and related names and logos belong to their
 owners. This product is not affiliated with or endorsed by the Open Design

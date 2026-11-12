@@ -44,7 +44,7 @@
     "tr": "Görsel, video ve ses projeleri için varsayılan senaryo eklentisi. Proje türüne göre media-* atomlarına yönlendirir ve sonucu canlı çıktıya sarar.",
     "uk": "Типовий плагін сценарію для проєктів зображень, відео та аудіо. Маршрутизує через media-* atoms залежно від типу проєкту та обгортає результат у живий артефакт."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

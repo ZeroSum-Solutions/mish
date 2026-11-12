@@ -44,7 +44,7 @@
     "uk": "Дослідження громадських настроїв у X/Twitter щодо ринків, компаній, продуктів або спільнот. Використовуйте для аналізу суспільної думки, експертних публікацій або соціальних реакцій на акції, сектори, компанії, продукти або ринкові події.",
     "en": "X/Twitter public sentiment research for recent market, company, product, or community discourse. Use when the brief asks what people are saying on X, Twitter sentiment, CT sentiment, public opinion, expert posts, or social reaction around a stock, sector, company, product, or market event."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

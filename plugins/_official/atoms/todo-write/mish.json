@@ -6,7 +6,7 @@
   "version": "0.1.0",
   "publishedAt": "2026-05-09T13:00:27Z",
   "description": "TodoWrite-driven plan that the agent commits to before generation.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"

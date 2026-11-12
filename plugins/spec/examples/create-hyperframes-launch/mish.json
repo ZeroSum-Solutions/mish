@@ -5,7 +5,7 @@
   "title": "HyperFrames Launch",
   "version": "0.1.0",
   "description": "Create a HyperFrames-ready motion composition for product launches and social video.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["create", "video", "hyperframes", "motion"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

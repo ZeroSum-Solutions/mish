@@ -99,7 +99,7 @@ list here.
 
 ## Attribution
 
-Craft content is adapted from the MIT-licensed
+`color.md`, `typography.md` and `anti-ai-slop.md` are adapted from the MIT-licensed
 [refero_skill](https://github.com/referodesign/refero_skill) project
 (Copyright (c) 2026 Refero; licence text in
 [`LICENSE-refero_skill.txt`](LICENSE-refero_skill.txt)), with edits to fit Mishh Mashh's house style and link

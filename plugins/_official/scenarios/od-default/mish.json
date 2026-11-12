@@ -44,7 +44,7 @@
     "tr": "Home'daki serbest promptlar için gizli yedek senaryo. Görev türünü çıkarır ve yalnızca güvenilir biçimde yönlendiremediğinde sorar.",
     "uk": "Прихований резервний сценарій для вільних промтів Home. Визначає тип задачі й запитує лише тоді, коли не може надійно її спрямувати."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
     "name": "Open Design contributors; modified by ZeroSum Solutions",
     "url": "https://github.com/nexu-io/open-design"
