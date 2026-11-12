@@ -32,6 +32,7 @@ import { isIP } from 'node:net';
 import type { LookupFunction } from 'node:net';
 
 import { Agent } from 'undici';
+import { classifyIp } from '@mish/contracts/api/ip-policy';
 import { findRealElementRange, findRealTagEnd, HTML_TAG_PATTERNS } from '@mish/contracts/runtime/html-injection-points';
 
 export const MAX_REDIRECT_HOPS = 5;
@@ -195,85 +196,18 @@ export function sameDeploymentOwner(host: string, deploymentHost: string): boole
   return tenant !== null && providerTenantHost(a) === tenant;
 }
 
-function ipv4Forbidden(address: string): boolean {
-  const parts = address.split('.').map(Number);
-  if (parts.length !== 4 || parts.some((part) => !Number.isInteger(part) || part < 0 || part > 255)) return true;
-  const [a, b] = parts as [number, number, number, number];
-  return a === 0
-    || a === 10
-    || a === 127
-    || (a === 100 && b >= 64 && b <= 127)
-    || (a === 169 && b === 254)
-    || (a === 172 && b >= 16 && b <= 31)
-    || (a === 192 && b === 168)
-    || (a === 192 && b === 0)
-    || (a === 198 && (b === 18 || b === 19))
-    || a >= 224;
-}
-
-/** The eight 16-bit groups of a valid IPv6 address (no zone id), or null. */
-function ipv6Groups(address: string): number[] | null {
-  let text = address;
-  const tail: number[] = [];
-  const dotted = /^(.*:)(\d{1,3}(?:\.\d{1,3}){3})$/.exec(text);
-  if (dotted) {
-    const parts = dotted[2]!.split('.').map(Number);
-    if (parts.some((part) => part > 255)) return null;
-    tail.push((parts[0]! << 8) | parts[1]!, (parts[2]! << 8) | parts[3]!);
-    text = dotted[1]!.endsWith('::') ? dotted[1]! : dotted[1]!.slice(0, -1);
-  }
-  const halves = text.split('::');
-  if (halves.length > 2) return null;
-  const parse = (part: string) => (part ? part.split(':').map((group) => (/^[0-9a-f]{1,4}$/.test(group) ? parseInt(group, 16) : NaN)) : []);
-  const head = parse(halves[0]!);
-  const rest = halves.length === 2 ? parse(halves[1]!) : [];
-  const known = head.length + rest.length + tail.length;
-  if ([...head, ...rest].some(Number.isNaN)) return null;
-  if (halves.length === 1 ? known !== 8 : known > 7) return null;
-  return [...head, ...new Array<number>(8 - known).fill(0), ...rest, ...tail];
-}
-
-function embeddedIpv4(high: number, low: number): string {
-  return `${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`;
-}
-
-function ipv6Forbidden(groups: number[]): boolean {
-  const [g0, g1, g2, g3, g4, g5, g6, g7] = groups as [number, number, number, number, number, number, number, number];
-  const firstFiveZero = g0 === 0 && g1 === 0 && g2 === 0 && g3 === 0 && g4 === 0;
-  // ::/128, ::1, IPv4-compatible ::a.b.c.d (deprecated) and IPv4-mapped
-  // ::ffff:a.b.c.d: forbidden when the embedded IPv4 is, and :: / ::1 always.
-  if (firstFiveZero && g5 === 0) return (g6 === 0 && g7 <= 1) || ipv4Forbidden(embeddedIpv4(g6, g7));
-  if (firstFiveZero && g5 === 0xffff) return ipv4Forbidden(embeddedIpv4(g6, g7));
-  // NAT64 well-known prefix 64:ff9b::/96 and local-use 64:ff9b:1::/48: a
-  // translator on the path can reach any IPv4, loopback included.
-  if (g0 === 0x64 && g1 === 0xff9b) return true;
-  // 6to4 2002::/16 carries an IPv4 in groups 1-2.
-  if (g0 === 0x2002) return ipv4Forbidden(embeddedIpv4(g1, g2));
-  // Teredo 2001::/32, discard 100::/64, documentation 2001:db8::/32.
-  if (g0 === 0x2001 && (g1 === 0 || g1 === 0xdb8)) return true;
-  if (g0 === 0x100 && g1 === 0 && g2 === 0 && g3 === 0) return true;
-  // ULA fc00::/7 (includes fd00:ec2::254 metadata), link-local fe80::/10,
-  // site-local fec0::/10, multicast ff00::/8.
-  return (g0 & 0xfe00) === 0xfc00
-    || (g0 & 0xffc0) === 0xfe80
-    || (g0 & 0xffc0) === 0xfec0
-    || (g0 & 0xff00) === 0xff00;
-}
-
 /**
- * Loopback, private, link-local, CGNAT, metadata, multicast or reserved, as
- * IPv4 or any IPv6 form: mapped, compatible, NAT64 (`64:ff9b::/96`), 6to4
- * with a forbidden embedded IPv4, Teredo, ULA, link-local, multicast. A
- * scoped (`%zone`) or unparsable address is forbidden too.
+ * True for any address the public-page probe must never dial.
+ *
+ * Invariant: a scoped (`%zone`) address is forbidden; otherwise this is
+ * exactly `classifyIp(address) !== 'public'` — loopback, private, link-local,
+ * CGNAT, metadata, multicast, reserved, every IPv6 transition form (compat,
+ * NAT64, 6to4, Teredo, SIIT) and anything unparsable. An IPv4-mapped address
+ * takes the class of its IPv4.
  */
 export function isForbiddenProbeAddress(address: string): boolean {
-  const bare = address.replace(/^\[|\]$/g, '').toLowerCase();
-  if (bare.includes('%')) return true;
-  const family = isIP(bare);
-  if (family === 4) return ipv4Forbidden(bare);
-  if (family !== 6) return true;
-  const groups = ipv6Groups(bare);
-  return groups === null || ipv6Forbidden(groups);
+  if (address.includes('%')) return true;
+  return classifyIp(address) !== 'public';
 }
 
 type ResolveHost = (host: string) => Promise<string[]>;

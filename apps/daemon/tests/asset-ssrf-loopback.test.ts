@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   assertExternalAssetUrl,
   assertAndFetchExternalAsset,
@@ -35,7 +35,8 @@ describe('assertExternalAssetUrl — loopback rejection (issue #5478)', () => {
   });
 
   it('accepts https asset URLs with paths (IP literal)', async () => {
-    const result = await assertExternalAssetUrl('https://198.51.100.1/v1/assets/abc123.png');
+    // A routable address: 198.51.100.0/24 (TEST-NET-2) is refused by classifyIp.
+    const result = await assertExternalAssetUrl('https://104.16.0.1/v1/assets/abc123.png');
     expect(result.ok).toBe(true);
   });
 
@@ -368,7 +369,7 @@ describe('assertAndFetchExternalAsset — TOCTOU with injectable lookup (issue #
     // The dispatcher must be present so production fetch uses the validating Agent
     expect(capturedInit).toBeDefined();
     expect((capturedInit as { dispatcher?: unknown }).dispatcher).toBeDefined();
-    expect(capturedInit?.redirect).toBe('error');
+    expect(capturedInit?.redirect).toBe('manual');
   });
 
   it('rejects without invoking fetch when validation lookup throws', async () => {
@@ -399,7 +400,7 @@ describe('assertAndFetchExternalAsset — TOCTOU with injectable lookup (issue #
     let fetchCalled = false;
     const stubFetch = async (_url: string, init?: RequestInit) => {
       fetchCalled = true;
-      expect(init?.redirect).toBe('error');
+      expect(init?.redirect).toBe('manual');
       return new Response('ok', { status: 200 });
     };
 
@@ -411,5 +412,16 @@ describe('assertAndFetchExternalAsset — TOCTOU with injectable lookup (issue #
     );
     expect(fetchCalled).toBe(true);
     expect(resp.ok).toBe(true);
+  });
+});
+
+// IPv6 forms that embed or translate an IPv4 (compat, NAT64, 6to4) reach the
+// metadata address on hosts that route them. fetch is injected to succeed, so
+// only the URL check can refuse them, and it must do so before any request.
+describe('assertAndFetchExternalAsset refuses IPv6 transition forms', () => {
+  it.each(['http://[::a9fe:a9fe]/', 'http://[64:ff9b::a9fe:a9fe]/', 'http://[2002:a9fe:a9fe::]/'])('refuses %s', async (url) => {
+    const fetchImpl = vi.fn(async () => new Response('leak', { status: 200 }));
+    await expect(assertAndFetchExternalAsset(url, {}, undefined, fetchImpl as unknown as typeof fetch)).rejects.toThrow();
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 });

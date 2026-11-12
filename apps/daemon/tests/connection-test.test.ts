@@ -674,7 +674,8 @@ describe('POST /api/provider/models', () => {
     const dnsSpy = vi
       .spyOn(dnsPromises, 'lookup')
       .mockImplementation((async () => [
-        { address: '203.0.113.10', family: 4 },
+        // A routable address: 203.0.113.0/24 (TEST-NET-3) is refused by classifyIp.
+        { address: '93.184.216.34', family: 4 },
       ]) as unknown as typeof dnsPromises.lookup);
     vi.useFakeTimers();
     vi.stubGlobal(

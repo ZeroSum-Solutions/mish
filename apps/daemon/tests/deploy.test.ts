@@ -3340,11 +3340,14 @@ describe('deploy link access', () => {
       'fe80::1%lo0',
       '::',
       '::1',
+      // 6to4 is refused outright, whatever IPv4 it embeds; SIIT likewise.
+      '2002:5db8:d822::1',
+      '::ffff:0:7f00:1',
     ])('forbids %s', (address) => {
       expect(isForbiddenProbeAddress(address)).toBe(true);
     });
 
-    it.each(['2606:4700:4700::1111', '2002:5db8:d822::1', '::ffff:93.184.216.34', '2a00:1450:4001:80b::200e'])('allows %s', (address) => {
+    it.each(['2606:4700:4700::1111', '::ffff:93.184.216.34', '2a00:1450:4001:80b::200e'])('allows %s', (address) => {
       expect(isForbiddenProbeAddress(address)).toBe(false);
     });
 

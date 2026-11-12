@@ -18,6 +18,10 @@
       "types": "./dist/api/connectionTest.d.ts",
       "default": "./dist/api/connectionTest.mjs"
     },
+    "./api/ip-policy": {
+      "types": "./dist/api/ip-policy.d.ts",
+      "default": "./dist/api/ip-policy.mjs"
+    },
     "./api/amrWallet": {
       "types": "./dist/api/amrWallet.d.ts",
       "default": "./dist/api/amrWallet.mjs"

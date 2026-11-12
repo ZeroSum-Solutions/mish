@@ -81,6 +81,7 @@ import {
   modelsForSurface,
 } from './models.js';
 import { assertAndFetchExternalAsset } from '../connectionTest.js';
+import { guardedFetch, policyForLinkedUrl } from '../http/egress-guard.js';
 import {
   resolveModelAlias,
   resolveProviderConfig,
@@ -991,6 +992,23 @@ const openAIImageDispatcher = new UndiciAgent({
   bodyTimeout: OPENAI_IMAGE_BODY_TIMEOUT_MS,
 });
 
+/**
+ * Download a vendor-returned asset URL (an image or video the provider
+ * hosts). The URL comes from a remote response, so it runs through the egress
+ * guard: `user-endpoint` only on the configured API origin (a local gateway
+ * keeps working), `public` everywhere else, and every redirect hop checked
+ * with credential headers dropped across origins. The user's proxy dispatcher
+ * in `requestInit`, when set, is kept.
+ */
+function fetchVendorAsset(assetUrl: string, apiBase: string, init: RequestInit = {}): Promise<Response> {
+  const { dispatcher, ...rest } = init as RequestInit & { dispatcher?: RequestInit['dispatcher'] };
+  return guardedFetch(assetUrl, rest, {
+    policy: policyForLinkedUrl(assetUrl, apiBase, 'user-endpoint'),
+    redirects: 'follow-checked',
+    proxyDispatcher: dispatcher,
+  });
+}
+
 function withMediaRequestInit(
   ctx: Pick<MediaContext, 'requestInit'>,
   init: RequestInit = {},
@@ -1080,7 +1098,7 @@ async function renderOpenAIImage(ctx: MediaContext, credentials: ProviderConfig)
   if (entry.b64_json) {
     bytes = Buffer.from(entry.b64_json, 'base64');
   } else if (entry.url) {
-    const imgResp = await fetch(entry.url, withMediaRequestInit(ctx));
+    const imgResp = await fetchVendorAsset(entry.url, url, withMediaRequestInit(ctx));
     if (!imgResp.ok) throw new Error(`openai image fetch ${imgResp.status}`);
     const arr = await imgResp.arrayBuffer();
     bytes = Buffer.from(arr);
@@ -1123,7 +1141,7 @@ async function renderImageRouterImage(ctx: MediaContext, credentials: ProviderCo
     body: JSON.stringify(body),
   }));
   const data = await parseOpenAICompatibleJson(resp, 'imagerouter image');
-  const bytes = await bytesFromOpenAICompatibleData(data, 'imagerouter image', ctx.requestInit);
+  const bytes = await bytesFromOpenAICompatibleData(data, 'imagerouter image', url, ctx.requestInit);
   return {
     bytes,
     providerNote: `imagerouter/${wireModel} · ${imageRouterSizeFor(ctx.aspect, 'image')} · ${bytes.length} bytes`,
@@ -1158,7 +1176,7 @@ async function renderImageRouterVideo(ctx: MediaContext, credentials: ProviderCo
     body: JSON.stringify(body),
   }));
   const data = await parseOpenAICompatibleJson(resp, 'imagerouter video');
-  const bytes = await bytesFromOpenAICompatibleData(data, 'imagerouter video', ctx.requestInit);
+  const bytes = await bytesFromOpenAICompatibleData(data, 'imagerouter video', url, ctx.requestInit);
   return {
     bytes,
     providerNote: `imagerouter/${wireModel} · ${imageRouterSizeFor(ctx.aspect, 'video')} · ${seconds === 'auto' ? 'auto' : `${seconds}s`} · ${bytes.length} bytes`,
@@ -1220,7 +1238,7 @@ async function renderCustomOpenAIImage(ctx: MediaContext, credentials: ProviderC
     }),
   );
   const data = await parseOpenAICompatibleJson(resp, 'custom image');
-  const bytes = await bytesFromOpenAICompatibleData(data, 'custom image', ctx.requestInit);
+  const bytes = await bytesFromOpenAICompatibleData(data, 'custom image', url, ctx.requestInit);
   return {
     bytes,
     providerNote: `custom-image/${wireModel} · ${body.size} · ${bytes.length} bytes`,
@@ -1250,7 +1268,7 @@ async function parseOpenAICompatibleJson(resp: Response, providerTag: string): P
   }
 }
 
-async function bytesFromOpenAICompatibleData(data: any, providerTag: string, requestInit: MediaRequestInit = {}): Promise<Buffer> {
+async function bytesFromOpenAICompatibleData(data: any, providerTag: string, apiBase: string, requestInit: MediaRequestInit = {}): Promise<Buffer> {
   const entry = data && Array.isArray(data.data) ? data.data[0] : null;
   if (!entry) throw new Error(`${providerTag} response had no data[0]`);
   if (typeof entry.b64_json === 'string' && entry.b64_json) {
@@ -1260,7 +1278,7 @@ async function bytesFromOpenAICompatibleData(data: any, providerTag: string, req
     return Buffer.from(raw, 'base64');
   }
   if (typeof entry.url === 'string' && entry.url) {
-    const mediaResp = await fetch(entry.url, requestInit);
+    const mediaResp = await fetchVendorAsset(entry.url, apiBase, requestInit);
     if (!mediaResp.ok) {
       throw new Error(`${providerTag} media fetch ${mediaResp.status}`);
     }
@@ -1631,7 +1649,7 @@ async function renderVolcengineVideo(ctx: MediaContext, credentials: ProviderCon
     throw new Error(`volcengine task did not finish in time (last status: ${lastStatus || 'unknown'})`);
   }
 
-  const dlResp = await fetch(videoUrl, withMediaRequestInit(ctx));
+  const dlResp = await fetchVendorAsset(videoUrl, baseUrl, withMediaRequestInit(ctx));
   if (!dlResp.ok) throw new Error(`volcengine video fetch ${dlResp.status}`);
   const arr = await dlResp.arrayBuffer();
   const bytes = Buffer.from(arr);
@@ -1694,7 +1712,7 @@ async function renderVolcengineImage(ctx: MediaContext, credentials: ProviderCon
   if (entry.b64_json) {
     bytes = Buffer.from(entry.b64_json, 'base64');
   } else if (entry.url) {
-    const imgResp = await fetch(entry.url, withMediaRequestInit(ctx));
+    const imgResp = await fetchVendorAsset(entry.url, baseUrl, withMediaRequestInit(ctx));
     if (!imgResp.ok) throw new Error(`volcengine image fetch ${imgResp.status}`);
     bytes = Buffer.from(await imgResp.arrayBuffer());
   } else {
@@ -1765,7 +1783,7 @@ async function renderGrokImage(ctx: MediaContext, credentials: ProviderConfig): 
   if (entry.b64_json) {
     bytes = Buffer.from(entry.b64_json, 'base64');
   } else if (entry.url) {
-    const imgResp = await fetch(entry.url, withMediaRequestInit(ctx));
+    const imgResp = await fetchVendorAsset(entry.url, baseUrl, withMediaRequestInit(ctx));
     if (!imgResp.ok) throw new Error(`grok image fetch ${imgResp.status}`);
     bytes = Buffer.from(await imgResp.arrayBuffer());
   } else {
@@ -2256,7 +2274,7 @@ async function renderOpenRouterVideo(
     dlHeaders['authorization'] = `Bearer ${credentials.apiKey}`;
   }
 
-  const dlResp = await fetch(contentUrl, withMediaRequestInit(ctx, { headers: dlHeaders }));
+  const dlResp = await fetchVendorAsset(contentUrl, baseUrl, withMediaRequestInit(ctx, { headers: dlHeaders }));
   if (!dlResp.ok) {
     throw new Error(`openrouter video download ${dlResp.status}`);
   }
@@ -2400,7 +2418,7 @@ async function renderLeonardoImage(ctx: MediaContext, credentials: ProviderConfi
   }
   
   // Fetch the generated image
-  const imgResp = await fetch(imageUrl, withMediaRequestInit(ctx));
+  const imgResp = await fetchVendorAsset(imageUrl, baseUrl, withMediaRequestInit(ctx));
   if (!imgResp.ok) {
     throw new Error(`leonardo.ai image fetch ${imgResp.status}`);
   }
@@ -2538,7 +2556,7 @@ async function renderGrokVideo(ctx: MediaContext, credentials: ProviderConfig, o
     );
   }
 
-  const dlResp = await fetch(videoUrl, withMediaRequestInit(ctx));
+  const dlResp = await fetchVendorAsset(videoUrl, baseUrl, withMediaRequestInit(ctx));
   if (!dlResp.ok) throw new Error(`grok video fetch ${dlResp.status}`);
   const arr = await dlResp.arrayBuffer();
   const bytes = Buffer.from(arr);
@@ -3250,8 +3268,8 @@ async function renderSenseAudioImage(ctx: MediaContext, credentials: ProviderCon
   }
   // The gateway-returned `url` is attacker-controllable inside a successful
   // response. assertAndFetchExternalAsset DNS-resolves it and refuses loopback /
-  // RFC1918 / metadata-service hosts, and pins `redirect: 'error'` so a 3xx hop
-  // from a validated public URL into private space is blocked too.
+  // RFC1918 / metadata-service hosts, and refuses any 3xx so a hop from a
+  // validated public URL into private space is blocked too.
   const imgResp = await assertAndFetchExternalAsset(url, withMediaRequestInit(ctx));
   if (!imgResp.ok) {
     throw new Error(`senseaudio image fetch ${imgResp.status}`);
@@ -3898,7 +3916,7 @@ async function renderFalVideo(ctx: MediaContext, credentials: ProviderConfig, on
   if (!videoUrl) {
     throw new Error(`fal video missing video.url: ${truncate(JSON.stringify(result), 200)}`);
   }
-  const dlResp = await fetch(videoUrl);
+  const dlResp = await fetchVendorAsset(videoUrl, queueBase);
   if (!dlResp.ok) throw new Error(`fal video download ${dlResp.status}`);
   const bytes = Buffer.from(await dlResp.arrayBuffer());
   const durationPart = effectiveDurationLabel ? ` · ${effectiveDurationLabel}${durationSnappedNote}` : '';

@@ -99,6 +99,7 @@ async function refreshStoredToken(dataDir: string, endpoint: string, stored: Sto
         ...(current.clientSecret !== undefined ? { clientSecret: current.clientSecret } : {}),
         ...(current.scope !== undefined ? { scope: current.scope } : {}),
         ...(current.resourceUrl !== undefined ? { resource: current.resourceUrl } : {}),
+        serverOrigin: endpoint,
       },
       fetchImpl,
     ));

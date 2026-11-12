@@ -64,6 +64,7 @@ import type { AgentCliEnvPrefs } from './app-config.js';
 import type { RuntimeAgentDef } from './runtimes/types.js';
 import { preparePromptFileForAgent, type PreparedPromptFile } from './runtimes/prompt-file.js';
 import { configuredAllowedInternalHosts } from './origin-validation.js';
+import { createGuardedLookup, egressDispatcher, guardedFetch } from './http/egress-guard.js';
 import {
   isAllowlistedInternalHost,
   isBlockedExternalApiHostname,
@@ -288,29 +289,11 @@ export async function assertExternalAssetUrl(
 export function createAssetValidatingLookup(
   lookupImpl: typeof dnsLookupCb = dnsLookupCb,
 ): (hostname: string, options: unknown, callback: (...args: unknown[]) => void) => void {
-  return (
+  return createGuardedLookup('public', lookupImpl) as unknown as (
     hostname: string,
     options: unknown,
     callback: (...args: unknown[]) => void,
-  ): void => {
-    const cb = (typeof options === 'function' ? options : callback) as (
-      err: Error | null,
-      address?: unknown,
-      family?: number,
-    ) => void;
-    const opts = (typeof options === 'function' ? {} : (options ?? {})) as Record<string, unknown>;
-    lookupImpl(hostname, opts as never, (err, address, family) => {
-      if (err) return cb(err);
-      const list = Array.isArray(address) ? address : [{ address, family }];
-      for (const entry of list) {
-        const addr = typeof entry === 'string' ? entry : (entry as { address: string }).address;
-        if (isLoopbackApiHost(String(addr)) || isBlockedExternalApiHostname(String(addr))) {
-          return cb(new Error(`asset host resolves to non-public address: ${addr}`));
-        }
-      }
-      return cb(null, address, family);
-    });
-  };
+  ) => void;
 }
 
 // Long-lived dispatcher reused across calls. A per-request Agent leaks
@@ -319,9 +302,8 @@ export function createAssetValidatingLookup(
 // Used by `createAssetValidatingLookup` consumers in production; the default
 // fetch in `assertAndFetchExternalAsset` is `globalThis.fetch` so test stubs
 // still intercept.
-const assetDispatcher = new Agent({
-  connect: { lookup: createAssetValidatingLookup() as never },
-});
+// The egress guard's shared `public` dispatcher (src/http/egress-guard.ts).
+const assetDispatcher = egressDispatcher('public');
 
 /**
  * Test-visible accessor for the shared asset-validating dispatcher attached by
@@ -387,9 +369,7 @@ export async function assertAndFetchExternalAsset(
   // can ignore dispatcher, while production globalThis.fetch (Node/undici)
   // uses it to refuse a connect-time rebind to loopback/metadata (issue #5478).
   // Same pattern as plugins/plugin-asset-cache.ts safeExternalFetch.
-  const requestInit: RequestInit = { ...init, redirect: 'error' };
-  (requestInit as { dispatcher?: unknown }).dispatcher = assetDispatcher;
-  return fetchImpl(url, requestInit);
+  return guardedFetch(url, init, { policy: 'public', redirects: 'error', fetchImpl });
 }
 
 // Aggressive but not punitive — happy paths usually return in under 2 s.

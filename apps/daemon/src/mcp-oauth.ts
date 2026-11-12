@@ -25,6 +25,8 @@ import { readPrivateMcpFile, withPrivateMcpFileLock, writePrivateMcpFile } from 
 import { createHash, randomBytes } from 'node:crypto';
 import path from 'node:path';
 
+import { assertFetchableUrl, configuredEndpointPolicy, egressRefusalOf, guardedFetch, policyForLinkedUrl, type EgressPolicy, type EgressRedirectMode } from './http/egress-guard.js';
+
 // ───────────────────────────────────────────────────────────────────────
 // Types — narrow subsets of the relevant RFC payloads.
 // ───────────────────────────────────────────────────────────────────────
@@ -125,6 +127,7 @@ export function generateState(): string {
 export async function discoverProtectedResource(
   resourceUrl: string,
   fetchImpl: typeof fetch = fetch,
+  serverOrigin: string = resourceUrl,
 ): Promise<ProtectedResourceMetadata | null> {
   let parsed: URL;
   try {
@@ -142,7 +145,7 @@ export async function discoverProtectedResource(
     `${parsed.origin}${parsed.pathname.replace(/\/+$/u, '')}/.well-known/oauth-protected-resource`,
   ];
   for (const url of new Set(candidates)) {
-    const json = await fetchJson<unknown>(url, fetchImpl);
+    const json = await fetchJson<unknown>(url, fetchImpl, serverOrigin);
     if (isProtectedResourceMetadata(json)) return json;
   }
   return null;
@@ -156,6 +159,7 @@ export async function discoverProtectedResource(
 export async function discoverAuthServer(
   issuer: string,
   fetchImpl: typeof fetch = fetch,
+  serverOrigin?: string,
 ): Promise<AuthorizationServerMetadata | null> {
   let parsed: URL;
   try {
@@ -175,7 +179,7 @@ export async function discoverAuthServer(
     `${base}/.well-known/openid-configuration`,
   ];
   for (const url of new Set(candidates)) {
-    const json = await fetchJson<unknown>(url, fetchImpl);
+    const json = await fetchJson<unknown>(url, fetchImpl, serverOrigin);
     if (isAuthorizationServerMetadata(json)) {
       // Spread first so the explicit issuer wins (otherwise duplicate-key
       // assignments under exactOptionalPropertyTypes complain).
@@ -220,21 +224,111 @@ function isAuthorizationServerMetadata(value: unknown): value is AuthorizationSe
       .every((key) => value[key] === undefined || isStringArray(value[key]));
 }
 
+/**
+ * Throw `McpOAuthError('MCP_OAUTH_URL_REFUSED')` unless the OAuth module may
+ * contact `url`. Called before every network call, whatever `fetchImpl` the
+ * caller injected; `fetchJson` rethrows a refusal so it is never mistaken for
+ * "no metadata here".
+ *
+ * Invariant: a URL on the MCP server's own origin (`serverOrigin`, the URL the
+ * user configured) is the user's endpoint (`user-endpoint`) only when that
+ * host is typed loopback or listed in `OD_ALLOWED_INTERNAL_HOSTS`; a public
+ * name stays `public`, so a DNS answer of 127.0.0.1 cannot unlock loopback.
+ * Every other URL — an auth server,
+ * a registration or token endpoint learned from remote metadata — is `public`,
+ * and so is every URL when no `serverOrigin` is known.
+ */
+function oauthPolicy(url: string, serverOrigin: string | undefined): EgressPolicy {
+  return serverOrigin ? policyForLinkedUrl(url, serverOrigin, configuredEndpointPolicy(serverOrigin)) : 'public';
+}
+
+function refusedError(err: unknown): McpOAuthError | null {
+  const refusal = egressRefusalOf(err);
+  return refusal ? new McpOAuthError('MCP_OAUTH_URL_REFUSED', `OAuth endpoint refused: ${refusal.message}. Reconnect this server.`) : null;
+}
+
+function assertOAuthUrl(url: string, serverOrigin: string | undefined): void {
+  try {
+    assertFetchableUrl(url, oauthPolicy(url, serverOrigin));
+  } catch (err) {
+    throw refusedError(err) ?? err;
+  }
+}
+
+/**
+ * Every OAuth network call goes through here, whatever `fetchImpl` the caller
+ * injected (a MotionSites or MCP-binding refresh passes the global `fetch`).
+ *
+ * Invariant: the request runs through `guardedFetch` under the
+ * `assertOAuthUrl` policy, so a DNS name is pinned at connect time and any 3xx
+ * is refused (a token POST is never re-sent elsewhere). A refusal — at URL
+ * level, at connect time (wrapped in fetch's `TypeError` cause) or on a
+ * redirect — surfaces as `MCP_OAUTH_URL_REFUSED`.
+ */
+async function oauthFetch(url: string, init: RequestInit, fetchImpl: typeof fetch, serverOrigin: string | undefined): Promise<Response> {
+  assertOAuthUrl(url, serverOrigin);
+  try {
+    return await guardedOAuthFetch(url, init, fetchImpl, serverOrigin);
+  } catch (err) {
+    throw refusedError(err) ?? err;
+  }
+}
+
+/** `guardedFetch` under the OAuth policy; refusals stay `EgressRefusedError`. */
+function guardedOAuthFetch(
+  url: string,
+  init: RequestInit,
+  fetchImpl: typeof fetch,
+  serverOrigin: string | undefined,
+  redirects: EgressRedirectMode = 'error',
+): Promise<Response> {
+  return guardedFetch(url, init, { policy: oauthPolicy(url, serverOrigin), redirects, fetchImpl, maxRedirects: 5 });
+}
+
+/**
+ * The production `fetchImpl` for OAuth calls about the MCP server at
+ * `serverUrl`.
+ *
+ * Invariant: each request runs through `guardedFetch` with the same policy
+ * `assertOAuthUrl` uses (`user-endpoint` on the server's own origin, `public`
+ * elsewhere), so a DNS name is checked and pinned at connect time under that
+ * policy, and any 3xx is refused (a token POST is never re-sent elsewhere).
+ */
+export function mcpOAuthFetch(serverUrl: string): typeof fetch {
+  return ((input: Parameters<typeof fetch>[0], init?: RequestInit) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    return guardedFetch(url, init ?? {}, {
+      policy: policyForLinkedUrl(url, serverUrl, configuredEndpointPolicy(serverUrl)),
+      redirects: 'error',
+    });
+  }) as typeof fetch;
+}
+
 /** Upper bound for every OAuth network call so a stalled auth server cannot hang a start. */
 const OAUTH_FETCH_TIMEOUT_MS = 10_000;
 
 async function fetchJson<T>(
   url: string,
   fetchImpl: typeof fetch,
+  serverOrigin: string | undefined,
 ): Promise<T | null> {
+  assertOAuthUrl(url, serverOrigin);
   try {
-    const res = await fetchImpl(url, {
+    // Discovery is a credential-free GET, so a redirect (a trailing-slash 301,
+    // a canonical path) is followed with every hop checked. Registration and
+    // token POSTs carry secrets and refuse every 3xx.
+    const res = await guardedOAuthFetch(url, {
       headers: { accept: 'application/json' },
       signal: AbortSignal.timeout(OAUTH_FETCH_TIMEOUT_MS),
-    });
+    }, fetchImpl, serverOrigin, 'follow-checked');
     if (!res.ok) return null;
     return (await res.json()) as T;
-  } catch {
+  } catch (err) {
+    // A refused host (the URL, its DNS answer or a redirect target) is a
+    // policy answer, not "no metadata here". A redirect-limit refusal is a
+    // miss, and the next candidate still gets its turn.
+    const refusal = egressRefusalOf(err);
+    if (refusal && refusal.reason !== 'redirect') throw refusedError(refusal)!;
     return null;
   }
 }
@@ -291,6 +385,7 @@ export async function registerClient(
   registrationEndpoint: string,
   redirectUri: string,
   fetchImpl: typeof fetch = fetch,
+  serverOrigin?: string,
 ): Promise<{ clientId: string; clientSecret?: string }> {
   const body = {
     redirect_uris: [redirectUri],
@@ -300,7 +395,7 @@ export async function registerClient(
     client_name: 'Mishh Mashh',
     application_type: 'web',
   };
-  const res = await fetchImpl(registrationEndpoint, {
+  const res = await oauthFetch(registrationEndpoint, {
     method: 'POST',
     headers: {
       'content-type': 'application/json',
@@ -308,7 +403,7 @@ export async function registerClient(
     },
     body: JSON.stringify(body),
     signal: AbortSignal.timeout(OAUTH_FETCH_TIMEOUT_MS),
-  });
+  }, fetchImpl, serverOrigin);
   if (!res.ok) {
     throw new McpOAuthError('MCP_OAUTH_REGISTRATION_FAILED', `OAuth client registration failed (HTTP ${res.status}). Reconnect this server.`);
   }
@@ -331,6 +426,7 @@ export async function getOrRegisterClient(
   authServer: AuthorizationServerMetadata,
   redirectUri: string,
   fetchImpl: typeof fetch = fetch,
+  serverOrigin?: string,
 ): Promise<RegisteredClient> {
   const findCached = (cache: { clients: RegisteredClient[] }) =>
     cache.clients.find(
@@ -351,6 +447,7 @@ export async function getOrRegisterClient(
     authServer.registration_endpoint,
     redirectUri,
     fetchImpl,
+    serverOrigin,
   );
   return withPrivateMcpFileLock(clientsFile(dataDir), async () => {
     const cache = await readClientCache(dataDir);
@@ -412,6 +509,8 @@ export interface ExchangeCodeInput {
   code: string;
   codeVerifier: string;
   resource?: string;
+  /** The MCP server URL the user configured; only its origin may be loopback or internal. */
+  serverOrigin?: string | undefined;
 }
 
 export async function exchangeCodeForToken(
@@ -425,7 +524,7 @@ export async function exchangeCodeForToken(
   form.set('client_id', input.clientId);
   form.set('code_verifier', input.codeVerifier);
   if (input.resource) form.set('resource', input.resource);
-  return tokenRequest(input.tokenEndpoint, form, input.clientSecret, fetchImpl);
+  return tokenRequest(input.tokenEndpoint, form, input.clientSecret, fetchImpl, input.serverOrigin);
 }
 
 export interface RefreshTokenInput {
@@ -435,6 +534,8 @@ export interface RefreshTokenInput {
   refreshToken: string;
   scope?: string;
   resource?: string;
+  /** The MCP server URL the user configured; only its origin may be loopback or internal. */
+  serverOrigin?: string | undefined;
 }
 
 export async function refreshAccessToken(
@@ -447,7 +548,7 @@ export async function refreshAccessToken(
   form.set('client_id', input.clientId);
   if (input.scope) form.set('scope', input.scope);
   if (input.resource) form.set('resource', input.resource);
-  return tokenRequest(input.tokenEndpoint, form, input.clientSecret, fetchImpl);
+  return tokenRequest(input.tokenEndpoint, form, input.clientSecret, fetchImpl, input.serverOrigin);
 }
 
 async function tokenRequest(
@@ -455,6 +556,7 @@ async function tokenRequest(
   form: URLSearchParams,
   clientSecret: string | undefined,
   fetchImpl: typeof fetch,
+  serverOrigin: string | undefined,
 ): Promise<OAuthTokenResponse> {
   const headers: Record<string, string> = {
     'content-type': 'application/x-www-form-urlencoded',
@@ -467,13 +569,12 @@ async function tokenRequest(
     const basic = Buffer.from(`${form.get('client_id')}:${clientSecret}`).toString('base64');
     headers['authorization'] = `Basic ${basic}`;
   }
-  const res = await fetchImpl(tokenEndpoint, {
+  const res = await oauthFetch(tokenEndpoint, {
     method: 'POST',
     headers,
     body: form.toString(),
-    redirect: 'error',
     signal: AbortSignal.timeout(OAUTH_FETCH_TIMEOUT_MS),
-  });
+  }, fetchImpl, serverOrigin);
   if (!res.ok) {
     throw new McpOAuthError('MCP_OAUTH_TOKEN_REJECTED', `OAuth token request failed (HTTP ${res.status}). Reconnect this server.`);
   }
@@ -590,7 +691,7 @@ export async function beginAuth(
   // doesn't publish protected-resource metadata, fall back to assuming
   // the resource origin IS the auth server — most "stand-alone" MCP
   // providers (Higgsfield etc.) host both at the same host.
-  const prm = await discoverProtectedResource(input.serverUrl, fetchImpl);
+  const prm = await discoverProtectedResource(input.serverUrl, fetchImpl, input.serverUrl);
   // Fail before registration or authorization: unknown query fields can also hold credentials.
   const resource = prm?.resource ?? input.serverUrl;
   if (!isPublicMcpResource(resource) || (!prm?.resource && new URL(resource).pathname !== '/')) {
@@ -600,7 +701,7 @@ export async function beginAuth(
   const issuer = issuerHint ?? new URL(input.serverUrl).origin;
 
   // Step 2: discovery on the auth server.
-  const authServer = await discoverAuthServer(issuer, fetchImpl);
+  const authServer = await discoverAuthServer(issuer, fetchImpl, input.serverUrl);
   if (!authServer) {
     throw new Error(`could not discover OAuth metadata for ${issuer}`);
   }
@@ -611,6 +712,7 @@ export async function beginAuth(
     authServer,
     input.redirectUri,
     fetchImpl,
+    input.serverUrl,
   );
 
   // Step 4: PKCE + state.

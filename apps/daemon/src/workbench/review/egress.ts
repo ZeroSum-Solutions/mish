@@ -18,7 +18,8 @@ import { createHash } from 'node:crypto';
 import { Resolver } from 'node:dns/promises';
 import http from 'node:http';
 import https from 'node:https';
-import { BlockList, isIP } from 'node:net';
+import { isIP } from 'node:net';
+import { classifyIp } from '@mish/contracts/api/ip-policy';
 import { addressParam, ev, evidenceLocation, evidenceUrl, evidenceVocabulary, hostParam, pageEnum, PageText, readPageText, RESOURCE_TYPES, type EvidenceContext, type EvidenceParam, type EvidenceText } from './evidence.js';
 import { reviewEgressPolicySchema, WORKBENCH_REVIEW_EGRESS_LIMITS, WORKBENCH_REVIEW_EGRESS_SCHEMA, WORKBENCH_REVIEW_PREVIEW_HOST, type ReviewEgressEvidence, type ReviewEgressFetch, type StoredReviewEgressEvidence } from '@mish/contracts';
 
@@ -56,40 +57,19 @@ export interface EgressSummary {
   exhausted: EvidenceText | null;
 }
 
-// One list per family: Node's BlockList also matches an IPv4 query against IPv6
-// rules through its v4-mapped form, so a shared list with ::ffff:0:0/96 would
-// refuse every IPv4 address.
-const REFUSED_V4 = new BlockList();
-const REFUSED_V6 = new BlockList();
-for (const [network, prefix] of [
-  ['0.0.0.0', 8], ['10.0.0.0', 8], ['100.64.0.0', 10], ['127.0.0.0', 8], ['169.254.0.0', 16], ['172.16.0.0', 12],
-  ['192.0.0.0', 24], ['192.0.2.0', 24], ['192.88.99.0', 24], ['192.168.0.0', 16], ['198.18.0.0', 15], ['198.51.100.0', 24],
-  ['203.0.113.0', 24], ['224.0.0.0', 4], ['240.0.0.0', 4],
-] as const) REFUSED_V4.addSubnet(network, prefix, 'ipv4');
-for (const [network, prefix] of [
-  // Unspecified/loopback/IPv4-compatible, IPv4-mapped, NAT64, discard, Teredo, documentation, 6to4, ULA, link-local, site-local, multicast.
-  ['::', 96], ['::ffff:0:0', 96], ['::ffff:0:0:0', 96], ['64:ff9b::', 96], ['64:ff9b:1::', 48], ['100::', 64], ['2001::', 32], ['2001:2::', 48],
-  ['2001:10::', 28], ['2001:20::', 28], ['2001:db8::', 32], ['2002::', 16], ['3fff::', 20], ['5f00::', 16], ['fc00::', 7], ['fe80::', 10], ['fec0::', 10], ['ff00::', 8],
-] as const) REFUSED_V6.addSubnet(network, prefix, 'ipv6');
-/** IPv6 is allow-listed: only global unicast (2000::/3) is ever dialled, minus the refused ranges above. */
-const GLOBAL_V6 = new BlockList();
-GLOBAL_V6.addSubnet('2000::', 3, 'ipv6');
-
 /**
- * Invariant: only globally routable unicast addresses are dialled. Anything
- * private, loopback, link-local, CGNAT, multicast, unspecified, reserved, an
- * IPv6 ULA/link-local, or a v6 form that embeds a v4 address is refused, as
- * is any string that is not an IP address.
+ * Invariant: only globally routable unicast addresses are dialled. A scoped
+ * (zone-id) address is refused; otherwise this is exactly
+ * `classifyIp(address) !== 'public'` — private, loopback, link-local, CGNAT,
+ * multicast, unspecified, reserved, IPv6 ULA/link-local, every IPv6 form that
+ * embeds or translates an IPv4 (compat, NAT64, 6to4, Teredo, SIIT), and any
+ * string that is not an IP address. An IPv4-mapped address takes its IPv4's
+ * class.
  */
 export function isRefusedAddress(address: string): boolean {
   // A scoped (zone-id) IPv6 address is link-local by construction.
   if (address.includes('%')) return true;
-  try {
-    const family = isIP(address);
-    if (family === 4) return REFUSED_V4.check(address, 'ipv4');
-    if (family === 6) return !GLOBAL_V6.check(address, 'ipv6') || REFUSED_V6.check(address, 'ipv6');
-  } catch { /* unparseable: refused below */ }
-  return true;
+  return classifyIp(address) !== 'public';
 }
 
 /** Egress fetches in flight at once per run; with the per-response cap this bounds buffered bytes. */

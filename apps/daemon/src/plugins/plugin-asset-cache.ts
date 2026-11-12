@@ -14,20 +14,27 @@
 // stored content-addressably on disk, and replayed instantly afterwards.
 //
 // SSRF is the load-bearing risk here: the route fetches a caller-supplied URL.
-// `assertSafePublicUrl` rejects non-http(s) schemes, embedded credentials,
-// localhost, and literal private IPs up-front. The authoritative guard against
-// DNS rebinding / TOCTOU is `createValidatingLookup`: it is installed as the
-// undici Agent's connection-time `lookup`, so the address that is *validated*
-// is the exact address the socket *connects to* — there is no separate
-// validation lookup a rebinding resolver could diverge from.
+// Every fetch goes through the daemon egress guard (`http/egress-guard.ts`,
+// policy `public`): `assertSafePublicUrl` rejects non-http(s) schemes, embedded
+// credentials, localhost and literal non-public IPs up front; the guard checks
+// every redirect hop at URL level and pins each connection to a validating DNS
+// lookup, so the address that is *validated* is the exact address the socket
+// *connects to*. The address table is the shared `classifyIp`.
 
 import { createHash } from 'node:crypto';
 import { lookup as dnsLookupCb } from 'node:dns';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
-import { isIP, type LookupFunction } from 'node:net';
 import path from 'node:path';
 
-import { Agent } from 'undici';
+import { classifyIp } from '@mish/contracts/api/ip-policy';
+
+import {
+  assertFetchableUrl,
+  createGuardedLookup,
+  EgressRefusedError,
+  guardedFetch,
+  type EgressRedirectMode,
+} from '../http/egress-guard.js';
 
 /** Media extensions we are willing to cache + proxy. Anything else (HTML,
  *  CSS, JS, fonts) is intentionally left alone so this surface never becomes a
@@ -78,126 +85,73 @@ export class AssetCacheError extends Error {
   }
 }
 
-/** Expand an IPv6 literal (with `::` compression and/or an embedded dotted
- *  IPv4 tail) into its eight 16-bit groups, or null if it does not parse.
- *  Node's URL parser normalizes mapped literals to hex (`::ffff:127.0.0.1` →
- *  `::ffff:7f00:1`), so a string regex can't reliably spot the mapped range —
- *  we have to canonicalize. */
-function expandIpv6(addr: string): number[] | null {
-  let s = addr.toLowerCase().split('%')[0] ?? '';
-  if (!s.includes(':')) return null;
-  // Fold a trailing dotted IPv4 (`…:1.2.3.4`) into two hex groups.
-  const v4 = /^(.*:)(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$/.exec(s);
-  if (v4) {
-    const o = (v4[2] ?? '').split('.').map((n) => Number(n));
-    if (o.length !== 4 || o.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) return null;
-    const hi = (((o[0] ?? 0) << 8) | (o[1] ?? 0)).toString(16);
-    const lo = (((o[2] ?? 0) << 8) | (o[3] ?? 0)).toString(16);
-    s = `${v4[1]}${hi}:${lo}`;
-  }
-  const halves = s.split('::');
-  if (halves.length > 2) return null;
-  const parse = (p: string): number[] =>
-    p === '' ? [] : p.split(':').map((g) => (/^[0-9a-f]{1,4}$/.test(g) ? parseInt(g, 16) : Number.NaN));
-  const left = parse(halves[0] ?? '');
-  let groups: number[];
-  if (halves.length === 1) {
-    groups = left;
-  } else {
-    const right = parse(halves[1] ?? '');
-    const fill = 8 - left.length - right.length;
-    if (fill < 1) return null;
-    groups = [...left, ...new Array(fill).fill(0), ...right];
-  }
-  if (groups.length !== 8 || groups.some((g) => Number.isNaN(g) || g < 0 || g > 0xffff)) return null;
-  return groups;
-}
-
-/** True for any address an external CDN must never resolve to: loopback,
- *  link-local, private, CGNAT, ULA, multicast, or unspecified. An unparseable
- *  input is treated as unsafe. */
+/**
+ * True for any address an external CDN must never resolve to.
+ *
+ * Invariant: this is exactly `classifyIp(addr) !== 'public'` — loopback,
+ * private, link-local, CGNAT, ULA, multicast, unspecified, every IPv6
+ * transition form, and anything that is not an IP literal.
+ */
 export function isPrivateAddress(addr: string): boolean {
-  const fam = isIP(addr);
-  if (fam === 4) {
-    const o = addr.split('.').map((n) => Number(n));
-    if (o.length !== 4 || o.some((n) => !Number.isInteger(n) || n < 0 || n > 255)) {
-      return true;
-    }
-    const a = o[0] ?? -1;
-    const b = o[1] ?? -1;
-    if (a === 0) return true; // "this" network / unspecified
-    if (a === 10) return true; // private
-    if (a === 127) return true; // loopback
-    if (a === 169 && b === 254) return true; // link-local
-    if (a === 172 && b >= 16 && b <= 31) return true; // private
-    if (a === 192 && b === 168) return true; // private
-    if (a === 100 && b >= 64 && b <= 127) return true; // CGNAT
-    if (a >= 224) return true; // multicast + reserved
-    return false;
-  }
-  if (fam === 6) {
-    const groups = expandIpv6(addr);
-    if (!groups) return true; // can't canonicalize a "valid" v6 → refuse
-    // IPv4-mapped (`::ffff:0:0/96`) and the deprecated IPv4-compatible
-    // (`::0:0/96`, excluding :: / ::1) carry an embedded IPv4 — classify it by
-    // its real v4 range so `::ffff:7f00:1` (== 127.0.0.1) is caught.
-    const topZero = groups.slice(0, 5).every((g) => g === 0);
-    if (topZero && (groups[5] === 0xffff || groups[5] === 0)) {
-      const a = (groups[6] ?? 0) >> 8;
-      const b = (groups[6] ?? 0) & 0xff;
-      const c = (groups[7] ?? 0) >> 8;
-      const d = (groups[7] ?? 0) & 0xff;
-      if (groups[5] === 0xffff || a !== 0 || b !== 0) {
-        return isPrivateAddress(`${a}.${b}.${c}.${d}`);
-      }
-    }
-    if (groups.every((g) => g === 0)) return true; // ::  (unspecified)
-    if (groups.slice(0, 7).every((g) => g === 0) && groups[7] === 1) return true; // ::1 loopback
-    const first = groups[0] ?? 0;
-    if ((first & 0xffc0) === 0xfe80) return true; // link-local fe80::/10 (fe80–febf)
-    if ((first & 0xfe00) === 0xfc00) return true; // unique-local fc00::/7
-    if ((first & 0xff00) === 0xff00) return true; // multicast ff00::/8
-    return false;
-  }
-  return true; // not a literal IP — caller must resolve before trusting it
+  return classifyIp(addr) !== 'public';
 }
 
-/** Cheap up-front rejection: enforce http(s), no embedded credentials, no
- *  localhost, and no *literal* private IP. This is NOT the DNS-rebinding guard
- *  (that is `createValidatingLookup`, applied at connection time) — it only
- *  fast-fails the obvious cases before any socket is opened. */
+/**
+ * Cheap up-front rejection: http(s) only, no embedded credentials, no
+ * localhost, and no *literal* non-public IP. This is NOT the DNS-rebinding
+ * guard (that is the connect-time lookup the egress guard pins) — it only
+ * fast-fails the obvious cases before any socket is opened.
+ *
+ * Invariant: a URL passes only if `assertFetchableUrl(url, 'public')` passes;
+ * every refusal is an `AssetCacheError(400)`.
+ */
 export function assertSafePublicUrl(raw: string): URL {
-  let url: URL;
   try {
-    url = new URL(raw);
-  } catch {
-    throw new AssetCacheError(400, 'invalid url');
+    return assertFetchableUrl(raw, 'public');
+  } catch (err) {
+    if (err instanceof EgressRefusedError) throw new AssetCacheError(400, assetCacheRefusalMessage(err, raw));
+    throw err;
   }
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-    throw new AssetCacheError(400, 'unsupported url scheme');
+}
+
+/** Keep this module's established refusal wording (callers surface it to users). */
+function assetCacheRefusalMessage(err: EgressRefusedError, raw: string): string {
+  switch (err.reason) {
+    case 'invalid-url':
+      return 'invalid url';
+    case 'scheme':
+      return 'unsupported url scheme';
+    case 'credentials':
+      return 'url credentials are not allowed';
+    case 'non-public-host': {
+      let host = '';
+      try {
+        host = new URL(raw).hostname.toLowerCase();
+      } catch {
+        // unreachable: the guard parsed it
+      }
+      return host === 'localhost' || host.endsWith('.localhost') ? 'localhost is not allowed' : 'url points at a private address';
+    }
+    default:
+      return err.message;
   }
-  if (url.username || url.password) {
-    throw new AssetCacheError(400, 'url credentials are not allowed');
-  }
-  const host = url.hostname.replace(/^\[|\]$/g, '');
-  const lowerHost = host.toLowerCase();
-  if (lowerHost === 'localhost' || lowerHost.endsWith('.localhost')) {
-    throw new AssetCacheError(400, 'localhost is not allowed');
-  }
-  if (isIP(host) && isPrivateAddress(host)) {
-    throw new AssetCacheError(400, 'url points at a private address');
-  }
-  return url;
 }
 
 type DnsLookupCb = typeof dnsLookupCb;
 
-/** Wrap a `dns.lookup`-shaped resolver so the resolved address is rejected when
- *  it is private. Installed as the undici Agent's connection-time `lookup`, so
- *  the validated address IS the one the socket connects to — closing the
- *  DNS-rebinding / TOCTOU gap a separate pre-validation lookup would leave open.
- *  Exported so the guard can be unit-tested without standing up a server. */
+/**
+ * Wrap a `dns.lookup`-shaped resolver so a non-public answer is refused.
+ * Exported so the guard can be unit-tested without standing up a server.
+ *
+ * Invariant: this is the egress guard's `createGuardedLookup('public')`; its
+ * refusal is surfaced as `AssetCacheError(400)`.
+ */
 export function createValidatingLookup(lookupImpl: DnsLookupCb = dnsLookupCb) {
+  const guarded = createGuardedLookup('public', lookupImpl) as unknown as (
+    h: string,
+    o: unknown,
+    c: (err: Error | null, address?: unknown, family?: number) => void,
+  ) => void;
   return function validatingLookup(
     hostname: string,
     options: unknown,
@@ -208,22 +162,12 @@ export function createValidatingLookup(lookupImpl: DnsLookupCb = dnsLookupCb) {
       address?: unknown,
       family?: number,
     ) => void;
-    const opts = (typeof options === 'function' ? {} : (options ?? {})) as Record<string, unknown>;
-    (lookupImpl as unknown as (h: string, o: unknown, c: (e: Error | null, a?: unknown, f?: number) => void) => void)(
-      hostname,
-      opts,
-      (err, address, family) => {
-        if (err) return cb(err);
-        const list = Array.isArray(address) ? address : [{ address, family }];
-        for (const entry of list) {
-          const addr = typeof entry === 'string' ? entry : (entry as { address: string }).address;
-          if (isPrivateAddress(addr)) {
-            return cb(new AssetCacheError(400, 'host resolves to a private address'));
-          }
-        }
-        return cb(null, address, family);
-      },
-    );
+    const opts = typeof options === 'function' ? {} : (options ?? {});
+    guarded(hostname, opts, (err, address, family) => {
+      if (err instanceof EgressRefusedError) return cb(new AssetCacheError(400, err.message));
+      if (err) return cb(err);
+      return cb(null, address, family);
+    });
   };
 }
 
@@ -249,18 +193,25 @@ export interface PluginAssetCache {
   get(rawUrl: string): Promise<AssetCacheResult>;
 }
 
-let sharedSsrfDispatcher: Agent | undefined;
+/** Map a caller's `init.redirect` onto the egress guard's redirect modes. */
+function redirectModeFor(redirect: RequestInit['redirect']): EgressRedirectMode {
+  if (redirect === 'manual') return 'return';
+  if (redirect === 'error') return 'error';
+  return 'follow-checked';
+}
 
 /**
- * Fetch a user-influenced external URL with SSRF protection. Rejects
- * private/loopback/link-local/metadata hosts, bad schemes, and embedded
- * credentials up front (`assertSafePublicUrl`), and pins every outbound
- * connection — including redirect hops, since `follow` re-connects per hop —
- * to a validating DNS lookup so a hostname cannot rebind to a private address.
+ * Fetch a user-influenced external URL with SSRF protection.
  *
- * Every daemon fetch of a user-supplied URL must route through this instead of
- * a bare `fetch(url, { redirect: 'follow' })`, so no single call site can
- * silently reopen the SSRF hole.
+ * Invariant: every hop goes through `guardedFetch` with policy `public`. The
+ * entry URL and every redirect `Location` are checked at URL level (Node never
+ * runs the connect-time lookup for an IP literal) and every connection is
+ * pinned to the validating DNS lookup. `init.redirect` maps to: `manual` →
+ * the 3xx is returned (the caller re-enters this function per hop), `error` →
+ * a 3xx is refused, anything else → the guard follows checked hops.
+ *
+ * Every daemon fetch of a user-supplied URL must route through this (or
+ * `guardedFetch`) instead of a bare `fetch` that follows redirects unchecked.
  */
 export async function safeExternalFetch(
   rawUrl: string,
@@ -268,16 +219,11 @@ export async function safeExternalFetch(
   fetchImpl: typeof fetch = fetch,
 ): Promise<Response> {
   assertSafePublicUrl(rawUrl);
-  if (!sharedSsrfDispatcher) {
-    sharedSsrfDispatcher = new Agent({
-      connect: { lookup: createValidatingLookup() as unknown as LookupFunction },
-    });
-  }
-  // `dispatcher` is an undici extension of RequestInit; attach at runtime to
-  // dodge the undici-types vs undici@7 skew (same pattern as the asset cache).
-  const withGuard: RequestInit = { redirect: 'follow', ...init };
-  (withGuard as { dispatcher?: unknown }).dispatcher = sharedSsrfDispatcher;
-  return fetchImpl(rawUrl, withGuard);
+  return guardedFetch(rawUrl, init, {
+    policy: 'public',
+    redirects: redirectModeFor(init.redirect),
+    fetchImpl,
+  });
 }
 
 /** Build a disk-backed cache for external preview media. Concurrent requests
@@ -288,12 +234,6 @@ export function createPluginAssetCache(opts: PluginAssetCacheOptions): PluginAss
   const maxBytes = opts.maxBytes ?? 64 * 1024 * 1024;
   const timeoutMs = opts.fetchTimeoutMs ?? 15_000;
   const fetchImpl = opts.fetchImpl ?? fetch;
-  // Pin SSRF validation to the actual outbound connection: the Agent resolves
-  // the host once, and `validatingLookup` rejects the connection if that exact
-  // address is private. No separate pre-validation lookup to rebind around.
-  const dispatcher = new Agent({
-    connect: { lookup: createValidatingLookup(opts.lookupImpl) as unknown as LookupFunction },
-  });
   const inflight = new Map<string, Promise<AssetCacheResult>>();
 
   function keyFor(rawUrl: string): string {
@@ -375,13 +315,14 @@ export function createPluginAssetCache(opts: PluginAssetCacheOptions): PluginAss
     try {
       let response: Response;
       try {
-        // `dispatcher` carries the connection-time SSRF guard. It is an undici
-        // extension of RequestInit; attach it at runtime to avoid the
-        // undici-types (bundled with @types/node) vs undici@7 Dispatcher version
-        // skew that a typed field would trip over.
-        const init: RequestInit = { redirect: 'error', signal: controller.signal };
-        (init as { dispatcher?: unknown }).dispatcher = dispatcher;
-        response = await fetchImpl(url, init);
+        // The egress guard pins the connection-time DNS check and refuses any
+        // 3xx, so a validated public URL cannot redirect into private space.
+        response = await guardedFetch(url, { signal: controller.signal }, {
+          policy: 'public',
+          redirects: 'error',
+          fetchImpl,
+          lookupImpl: opts.lookupImpl,
+        });
       } catch (err) {
         throw new AssetCacheError(502, `fetch failed: ${err instanceof Error ? err.message : String(err)}`);
       }
