@@ -25,7 +25,7 @@ import { readPrivateMcpFile, withPrivateMcpFileLock, writePrivateMcpFile } from 
 import { createHash, randomBytes } from 'node:crypto';
 import path from 'node:path';
 
-import { assertFetchableUrl, egressRefusalOf, guardedFetch, policyForLinkedUrl, type EgressPolicy } from './http/egress-guard.js';
+import { assertFetchableUrl, configuredEndpointPolicy, egressRefusalOf, guardedFetch, policyForLinkedUrl, type EgressPolicy, type EgressRedirectMode } from './http/egress-guard.js';
 
 // ───────────────────────────────────────────────────────────────────────
 // Types — narrow subsets of the relevant RFC payloads.
@@ -231,13 +231,15 @@ function isAuthorizationServerMetadata(value: unknown): value is AuthorizationSe
  * "no metadata here".
  *
  * Invariant: a URL on the MCP server's own origin (`serverOrigin`, the URL the
- * user configured) is the user's endpoint (`user-endpoint`: loopback and
- * `OD_ALLOWED_INTERNAL_HOSTS` stay allowed). Every other URL — an auth server,
+ * user configured) is the user's endpoint (`user-endpoint`) only when that
+ * host is typed loopback or listed in `OD_ALLOWED_INTERNAL_HOSTS`; a public
+ * name stays `public`, so a DNS answer of 127.0.0.1 cannot unlock loopback.
+ * Every other URL — an auth server,
  * a registration or token endpoint learned from remote metadata — is `public`,
  * and so is every URL when no `serverOrigin` is known.
  */
 function oauthPolicy(url: string, serverOrigin: string | undefined): EgressPolicy {
-  return serverOrigin ? policyForLinkedUrl(url, serverOrigin, 'user-endpoint') : 'public';
+  return serverOrigin ? policyForLinkedUrl(url, serverOrigin, configuredEndpointPolicy(serverOrigin)) : 'public';
 }
 
 function refusedError(err: unknown): McpOAuthError | null {
@@ -273,8 +275,14 @@ async function oauthFetch(url: string, init: RequestInit, fetchImpl: typeof fetc
 }
 
 /** `guardedFetch` under the OAuth policy; refusals stay `EgressRefusedError`. */
-function guardedOAuthFetch(url: string, init: RequestInit, fetchImpl: typeof fetch, serverOrigin: string | undefined): Promise<Response> {
-  return guardedFetch(url, init, { policy: oauthPolicy(url, serverOrigin), redirects: 'error', fetchImpl });
+function guardedOAuthFetch(
+  url: string,
+  init: RequestInit,
+  fetchImpl: typeof fetch,
+  serverOrigin: string | undefined,
+  redirects: EgressRedirectMode = 'error',
+): Promise<Response> {
+  return guardedFetch(url, init, { policy: oauthPolicy(url, serverOrigin), redirects, fetchImpl, maxRedirects: 5 });
 }
 
 /**
@@ -290,7 +298,7 @@ export function mcpOAuthFetch(serverUrl: string): typeof fetch {
   return ((input: Parameters<typeof fetch>[0], init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     return guardedFetch(url, init ?? {}, {
-      policy: policyForLinkedUrl(url, serverUrl, 'user-endpoint'),
+      policy: policyForLinkedUrl(url, serverUrl, configuredEndpointPolicy(serverUrl)),
       redirects: 'error',
     });
   }) as typeof fetch;
@@ -306,17 +314,19 @@ async function fetchJson<T>(
 ): Promise<T | null> {
   assertOAuthUrl(url, serverOrigin);
   try {
+    // Discovery is a credential-free GET, so a redirect (a trailing-slash 301,
+    // a canonical path) is followed with every hop checked. Registration and
+    // token POSTs carry secrets and refuse every 3xx.
     const res = await guardedOAuthFetch(url, {
       headers: { accept: 'application/json' },
       signal: AbortSignal.timeout(OAUTH_FETCH_TIMEOUT_MS),
-    }, fetchImpl, serverOrigin);
+    }, fetchImpl, serverOrigin, 'follow-checked');
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch (err) {
-    // A refused host is a policy answer, not "no metadata here". A refused
-    // redirect is a miss: servers often send unknown well-known paths to a
-    // login page, nothing was fetched from the target, and the next candidate
-    // still gets its turn.
+    // A refused host (the URL, its DNS answer or a redirect target) is a
+    // policy answer, not "no metadata here". A redirect-limit refusal is a
+    // miss, and the next candidate still gets its turn.
     const refusal = egressRefusalOf(err);
     if (refusal && refusal.reason !== 'redirect') throw refusedError(refusal)!;
     return null;

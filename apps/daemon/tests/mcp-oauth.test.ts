@@ -350,15 +350,41 @@ describe('OAuth discovery refusals', () => {
     expect(calls).toBe(1);
   });
 
-  it('never follows a discovery redirect, even when the caller injects plain fetch, and tries the next candidate', async () => {
+  it('refuses a discovery redirect into an internal address, even when the caller injects plain fetch', async () => {
     const urls: string[] = [];
     const redirecting = (async (input: FetchInput) => {
       urls.push(String(input));
       return new Response(null, { status: 302, headers: { location: 'http://169.254.169.254/latest/meta-data/' } });
     }) as typeof fetch;
-    await expect(discoverAuthServer('https://auth.example.com', redirecting)).resolves.toBeNull();
-    expect(urls.length).toBeGreaterThan(1);
-    expect(urls.every((url) => url.startsWith('https://auth.example.com/'))).toBe(true);
+    await expect(discoverAuthServer('https://auth.example.com', redirecting)).rejects.toMatchObject({ code: 'MCP_OAUTH_URL_REFUSED' });
+    expect(urls).toHaveLength(1);
+  });
+
+  it('follows a same-origin discovery redirect (trailing slash)', async () => {
+    const urls: string[] = [];
+    const metadata = { authorization_endpoint: 'https://auth.example.com/authorize', token_endpoint: 'https://auth.example.com/token' };
+    const fetchImpl = (async (input: FetchInput) => {
+      const url = String(input);
+      urls.push(url);
+      if (url === 'https://auth.example.com/.well-known/oauth-authorization-server') {
+        return new Response(null, { status: 301, headers: { location: '/.well-known/oauth-authorization-server/' } });
+      }
+      if (url === 'https://auth.example.com/.well-known/oauth-authorization-server/') {
+        return new Response(JSON.stringify(metadata), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response('not found', { status: 404 });
+    }) as typeof fetch;
+    await expect(discoverAuthServer('https://auth.example.com', fetchImpl)).resolves.toMatchObject(metadata);
+    expect(urls.at(-1)).toBe('https://auth.example.com/.well-known/oauth-authorization-server/');
+  });
+
+  it('a configured public host name gets no loopback allowance (only typed loopback does)', async () => {
+    const { configuredEndpointPolicy } = await import('../src/http/egress-guard.js');
+    expect(configuredEndpointPolicy('https://attacker.example:11434/mcp')).toBe('public');
+    expect(configuredEndpointPolicy('http://127.0.0.1:3333/mcp')).toBe('user-endpoint');
+    expect(configuredEndpointPolicy('http://localhost:3333/mcp')).toBe('user-endpoint');
+    expect(configuredEndpointPolicy('http://[::1]:3333/mcp')).toBe('user-endpoint');
+    expect(configuredEndpointPolicy('not a url')).toBe('public');
   });
 });
 

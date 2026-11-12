@@ -87,6 +87,21 @@ function isAllowlisted(...hosts: Array<string | undefined>): boolean {
   return hosts.some((host) => typeof host === 'string' && host !== '' && isAllowlistedInternalHost(host, allowed));
 }
 
+/**
+ * The policy for a URL the user configured (an MCP server, a registry).
+ * `user-endpoint` only when the host is typed loopback (`localhost`,
+ * `127.x`, `::1`) or listed in `OD_ALLOWED_INTERNAL_HOSTS`; any other name is
+ * `public`, so a public name whose DNS answer is loopback cannot reach it.
+ */
+export function configuredEndpointPolicy(url: string | URL): EgressPolicy {
+  try {
+    const host = (typeof url === 'string' ? new URL(url) : url).hostname;
+    return isTypedLoopbackHost(host) || isAllowlisted(normalizeHost(host)) ? 'user-endpoint' : 'public';
+  } catch {
+    return 'public';
+  }
+}
+
 /** True when `policy` may dial an address of class `cls` (for `host`, the URL or DNS name). */
 function classAllowed(cls: IpClass, policy: EgressPolicy, ...hosts: Array<string | undefined>): boolean {
   if (cls === 'public') return true;
@@ -245,7 +260,8 @@ function replayableBody(body: RequestInit['body']): boolean {
  */
 export async function guardedFetch(url: string | URL, init: RequestInit = {}, options: GuardedFetchOptions): Promise<Response> {
   const fetchImpl = options.fetchImpl ?? globalThis.fetch;
-  const maxRedirects = options.maxRedirects ?? 5;
+  // 20 is the fetch spec's own limit, so no chain that native fetch followed breaks.
+  const maxRedirects = options.maxRedirects ?? 20;
   const entry = assertFetchableUrl(url, options.policy);
   let target = entry;
   let policy = options.policy;

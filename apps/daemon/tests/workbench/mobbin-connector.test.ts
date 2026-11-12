@@ -132,7 +132,10 @@ describe('Mobbin through the read-only connector proxy (G29, AC-R12.2)', () => {
     const resource = (await imageProxy.search('mobbin', screens)).results[0]!;
     await setToken(dataDir, 'mobbin', { ...stored, expiresAt: 1, refreshToken, clientId: 'fixture-client', tokenEndpoint: `${tokenServer.url}/token` });
     const result = await imageProxy.select('mobbin', { itemId: resource.itemId, capturedAt: resource.capturedAt }).then(value => value, error => error);
-    expect(refreshRequests).toBe(1);
+    // The stored token endpoint is loopback while the server is public, so the
+    // egress guard refuses the refresh before any request (the redirect half of
+    // this contract is covered against a loopback server in mcp-oauth.test.ts).
+    expect(refreshRequests).toBe(0);
     expect(receivedBodies).toEqual([]);
     expect(result).toMatchObject({ code: 'connector-needs-sign-in' });
     expect(imageRequests).toBe(0);
