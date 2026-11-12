@@ -193,7 +193,10 @@ export function createGuardedLookup(policy: EgressPolicy, lookupImpl: DnsLookupC
   return guardedLookup as unknown as LookupFunction;
 }
 
-type Dispatcher = NonNullable<RequestInit['dispatcher']>;
+// The undici Agent itself: the e2e workspace typechecks this file with a DOM
+// `RequestInit` that has no `dispatcher` field, and undici's types differ from
+// Node's bundled ones, so callers cast at the `RequestInit` boundary.
+type Dispatcher = Agent;
 
 // One long-lived Agent per policy (and per injected resolver in tests). A
 // per-request Agent leaks keep-alive sockets; closing one per request would
@@ -234,7 +237,7 @@ export interface GuardedFetchOptions {
    * The proxy resolves names, so the connect-time DNS check cannot run; every
    * hop's URL is still checked. Omit it unless the user configured a proxy.
    */
-  proxyDispatcher?: RequestInit['dispatcher'] | undefined;
+  proxyDispatcher?: unknown;
 }
 
 /**
