@@ -20,6 +20,7 @@ Follow the root `AGENTS.md` first. This file only records module-level boundarie
 - `packages/sidecar-proto`: Mishh Mashh sidecar business protocol. Owns business action names and DTO/status shapes; it does not own process identity, private transport, or lifecycle mechanics.
 - `packages/sidecar`: complete business-agnostic sidecar client boundary and protocol implementation. Owns the five-field identity, private transport and endpoint derivation, resource ownership, generation fencing, and lifecycle atomics; it must not hard-code Mishh Mashh app keys or IPC business messages.
 - `packages/standalone`: shell-neutral exact distribution protocol and runtime. It owns signed metadata validation, canonical digests, content-addressed materialization, namespace bindings, generation state, required/lazy resolution, and fossil-to-versioned launcher handoff. It must not depend on a product app or shell.
+- `packages/integrations`: business integrations for client sites. Owns the standard `lead.created` / `booking.created` / `order.paid` event shapes, sources that produce them and destinations (Klaviyo first) that act on them. Each destination takes an injected API client and must be safe to run twice for one event; event storage, delivery and retries belong to the host, not here.
 - `packages/platform`: generic OS process primitives only. Includes generic process-contract serialization, command parsing, process matching/search, and well-known user-toolchain bin discovery; it must not own sidecar stamp fields or hard-code `--od-stamp-*` details. The toolchain helper is the single source of truth shared by the daemon runtime executable resolver (`apps/daemon/src/runtimes/executables.ts`) and the packaged sidecar PATH builder (`apps/packaged/src/sidecars.ts`) so neither layer can drift the search list.
 
 ## Removed directories
@@ -49,6 +50,8 @@ pnpm --filter @mish/download typecheck
 pnpm --filter @mish/download test
 pnpm --filter @mish/host typecheck
 pnpm --filter @mish/host test
+pnpm --filter @mish/integrations typecheck
+pnpm --filter @mish/integrations test
 pnpm --filter @mish/launcher-proto typecheck
 pnpm --filter @mish/launcher-proto test
 pnpm --filter @mish/metatool typecheck
