@@ -21,7 +21,7 @@
  * shared blob can be a leak rather than boilerplate.
  *
  * The result is merged with the existing list (a union), because the licensed
- * paths disappear once P1-8 deletes them; `--replace` starts from empty. The
+ * licensed paths disappear once their files are deleted; `--replace` starts from empty. The
  * output is deterministic, so a second run is byte-identical. After a
  * regeneration, raise LICENSED_PACK_BLOB_LIST_MIN_IDS to the new count.
  *
@@ -42,6 +42,7 @@ import {
   formatLicensedPackBlobList,
   gitBlobId,
   isLicensedPackFixturePath,
+  isReviewedLicensedPackStub,
   parseLicensedPackBlobList,
 } from "./check-licensed-pack-content.ts";
 
@@ -228,7 +229,7 @@ export async function generateLicensedPackBlobList(options: {
   const { blobs: tree, gitlinks } = await listTreeBlobs(options.repoRoot, ref);
   const oidByPath = new Map(tree.map((blob) => [blob.path, blob.oid]));
   const manifestOids = tree
-    .filter((blob) => blob.path.startsWith("plugins/") && blob.path.endsWith("/mish.json"))
+    .filter((blob) => blob.path.toLowerCase().startsWith("plugins/") && blob.path.toLowerCase().endsWith("/mish.json"))
     .map((blob) => blob.oid);
   const manifests = await readBlobs(options.repoRoot, manifestOids);
   const pathMatches = await findLicensedPackPathMatches(
@@ -238,7 +239,15 @@ export async function generateLicensedPackBlobList(options: {
       return oid === undefined ? undefined : manifests.get(oid)?.toString("utf8");
     },
   );
-  const licensedPaths = new Set(pathMatches.keys());
+  // A reviewed public stub holds no licensed content (its exact path and blob
+  // id were reviewed), so it adds nothing to the denylist: an empty-rows JSON
+  // would otherwise flag every identical file elsewhere.
+  const licensedPaths = new Set(
+    [...pathMatches.keys()].filter((repositoryPath) => {
+      const oid = oidByPath.get(repositoryPath);
+      return oid === undefined || !isReviewedLicensedPackStub({ path: repositoryPath, oid });
+    }),
+  );
 
   const licensedJson = tree.filter((blob) => licensedPaths.has(blob.path) && blob.path.endsWith(".json"));
   const jsonBodies = await readBlobs(

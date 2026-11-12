@@ -1,6 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, rm, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
@@ -14,6 +14,7 @@ import {
   LICENSED_PACK_REVIEWED_STUBS,
   MOTIONSITES_AUTHOR_NAMES,
   checkLicensedPackContent,
+  decodeRepositoryContent,
   findLicensedPackContentViolations,
   gitBlobId,
   reportLicensedPackViolations,
@@ -22,6 +23,7 @@ import {
   type ReviewedStub,
   type TrackedFile,
 } from "../../../scripts/check-licensed-pack-content.ts";
+import { licensedPackGuardCheck } from "../../../scripts/guard.ts";
 import {
   generateLicensedPackBlobList,
   selectLicensedPackBlobs,
@@ -61,7 +63,18 @@ function oidFor(text: string): string {
   return gitBlobId(Buffer.from(text, "utf8"));
 }
 
-type SyntheticFile = { path: string; text: string };
+type SyntheticFile = {
+  path: string;
+  text?: string;
+  /** Raw bytes instead of text (UTF-16, archive signatures). */
+  bytes?: Buffer;
+  kind?: TrackedFile["kind"];
+  tree?: TrackedFile["tree"];
+};
+
+function bytesOf(file: SyntheticFile): Buffer {
+  return file.bytes ?? Buffer.from(file.text ?? "", "utf8");
+}
 
 async function violationsFor(
   files: readonly SyntheticFile[],
@@ -71,11 +84,19 @@ async function violationsFor(
     reviewedStubs?: readonly ReviewedStub[];
   } = {},
 ): Promise<LicensedPackViolation[]> {
-  const byPath = new Map(files.map((file) => [file.path, file.text]));
-  const tracked: TrackedFile[] = files.map((file) => ({ path: file.path, oid: oidFor(file.text) }));
+  const tracked: TrackedFile[] = files.map((file) => ({
+    path: file.path,
+    oid: gitBlobId(bytesOf(file)),
+    ...(file.kind ? { kind: file.kind } : {}),
+    ...(file.tree ? { tree: file.tree } : {}),
+  }));
   return findLicensedPackContentViolations({
     files: tracked,
-    readText: async (repositoryPath) => byPath.get(repositoryPath),
+    // The view's path and tree pick the synthetic file; the same path may hold two views.
+    readContent: async (view) => {
+      const file = files.find((entry) => entry.path === view.path && (entry.tree ?? "index") === (view.tree ?? "index"));
+      return file === undefined ? undefined : decodeRepositoryContent(file.path, bytesOf(file));
+    },
     deniedBlobs: new Set(options.deniedBlobs ?? []),
     rules: {
       sectionCatalogCultProRule: options.sectionCatalogCultProRule ?? false,
@@ -337,7 +358,7 @@ describe("licensed pack content matcher", () => {
     ]);
   });
 
-  test('the section-catalog sourceKind "cult-pro" sub-rule stays off until P1-8 activates it', async () => {
+  test('the section-catalog sourceKind "cult-pro" sub-rule is off by default and switches on through the sectionCatalogCultProRule option', async () => {
     const files = [
       {
         path: "packages/section-catalog/catalog.json",
@@ -470,6 +491,190 @@ describe("licensed pack content matcher", () => {
     ]);
     expect(reasonsFor(violations, "packages/21st-catalog/generated/pack.tgz")).toEqual(["path:tracked-archive"]);
   });
+
+  test("a case alias of a protected path is flagged, while the stub exemption stays exact", async () => {
+    const stubText = '{\n  "rows": []\n}\n';
+    const stubs: ReviewedStub[] = [{ path: "packages/cult-ui-catalog/catalog.json", oid: oidFor(stubText) }];
+    const violations = await violationsFor(
+      [
+        // The exact reviewed pair passes.
+        { path: "packages/cult-ui-catalog/catalog.json", text: stubText },
+        // Case aliases of exact and prefix rules fail, even with the reviewed stub's bytes.
+        { path: "packages/cult-ui-catalog/Catalog.json", text: stubText },
+        { path: "Packages/Cult-UI-Catalog/CATALOG.JSON", text: "{}" },
+        { path: "Data/Component-Kits/Cult-UI-Pro/registry/foo.json", text: "{}" },
+        { path: "packages/genui-catalog/components/Organic-Button/meta.json", text: "{}" },
+        // A fixture root is matched exactly: an alias of it is no fixture.
+        { path: "apps/daemon/tests/fixtures/Licensed-Pack/basic/pack.json", text: JSON.stringify({ format: "mishh-pack@1" }) },
+        { path: "apps/daemon/tests/fixtures/licensed-pack/basic/pack.json", text: JSON.stringify({ format: "mishh-pack@1" }) },
+      ],
+      { reviewedStubs: stubs },
+    );
+    expect(flaggedPaths(violations)).toEqual([
+      "Data/Component-Kits/Cult-UI-Pro/registry/foo.json",
+      "Packages/Cult-UI-Catalog/CATALOG.JSON",
+      "apps/daemon/tests/fixtures/Licensed-Pack/basic/pack.json",
+      "packages/cult-ui-catalog/Catalog.json",
+      "packages/genui-catalog/components/Organic-Button/meta.json",
+    ]);
+    expect(reasonsFor(violations, "packages/cult-ui-catalog/Catalog.json")).toEqual(["path:cult-ui-catalog-data"]);
+  });
+
+  test("a MotionSites folder is found through a case alias of its manifest path", async () => {
+    const manifest = JSON.stringify({ homepage: "https://motionsites.ai/sections" });
+    const violations = await violationsFor([
+      { path: "Plugins/_official/examples/aliased/MISH.json", text: manifest },
+      { path: "plugins/_official/examples/aliased/SKILL.md", text: "# unrelated" },
+    ]);
+    expect(flaggedPaths(violations)).toEqual([
+      "Plugins/_official/examples/aliased/MISH.json",
+      "plugins/_official/examples/aliased/SKILL.md",
+    ]);
+  });
+
+  test("JSON shape rules key on the content, so a renamed or re-cased manifest is still flagged", async () => {
+    const motionSites = JSON.stringify({ homepage: "https://motionsites.ai/sections", name: "synthetic" });
+    const packManifest = JSON.stringify({ format: "mishh-pack@1", id: "synthetic-pack" });
+    const genuiSeed = JSON.stringify({ rows: [{ Source: "Cult UI Pro" }] });
+    const violations = await violationsFor([
+      { path: "vendor/template.txt", text: motionSites },
+      { path: "vendor/template.JSON", text: motionSites },
+      { path: "vendor/template.Json.GZ", bytes: gzipSync(Buffer.from(motionSites)) },
+      { path: "vendor/not-named-pack.dat", text: packManifest },
+      { path: "vendor/seed.txt", text: genuiSeed },
+      // Prose that merely quotes the same strings does not open with a JSON value.
+      { path: "docs/quote.md", text: `Example: ${packManifest}` },
+    ]);
+    expect(flaggedPaths(violations)).toEqual([
+      "vendor/not-named-pack.dat",
+      "vendor/seed.txt",
+      "vendor/template.JSON",
+      "vendor/template.Json.GZ",
+      "vendor/template.txt",
+    ]);
+    expect(reasonsFor(violations, "vendor/template.txt")).toEqual(["shape:motionsites-manifest"]);
+    expect(reasonsFor(violations, "vendor/not-named-pack.dat")).toEqual(["shape:pack-manifest"]);
+  });
+
+  test("UTF-16 and BOM-marked text is decoded before the shape rules, so a re-encoded registry item is flagged", async () => {
+    const item = `{"name":"example","author":"${CULT_PRO}","files":[]}`;
+    const utf16le = Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from(item, "utf16le")]);
+    const utf16be = Buffer.concat([Buffer.from([0xfe, 0xff]), Buffer.from(item, "utf16le").swap16()]);
+    const utf16leNoBom = Buffer.from(item, "utf16le");
+    const utf16beNoBom = Buffer.from(item, "utf16le").swap16();
+    const utf8Bom = Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from(item, "utf8")]);
+    const violations = await violationsFor([
+      { path: "apps/web/public/a.json", bytes: utf16le },
+      { path: "apps/web/public/b.json", bytes: utf16be },
+      { path: "apps/web/public/c.json", bytes: utf16leNoBom },
+      { path: "apps/web/public/d.json", bytes: utf16beNoBom },
+      { path: "apps/web/public/e.json", bytes: utf8Bom },
+      // Real binary with NUL bytes and no archive signature stays unread.
+      { path: "apps/web/public/f.json", bytes: Buffer.from([0x00, 0x01, 0x02, 0x00, 0x03, 0x00, 0x00, 0x04]) },
+      { path: "apps/web/public/clean-utf16.json", bytes: Buffer.concat([Buffer.from([0xff, 0xfe]), Buffer.from('{"a":1}', "utf16le")]) },
+    ]);
+    expect(flaggedPaths(violations)).toEqual([
+      "apps/web/public/a.json",
+      "apps/web/public/b.json",
+      "apps/web/public/c.json",
+      "apps/web/public/d.json",
+      "apps/web/public/e.json",
+    ]);
+    expect(reasonsFor(violations, "apps/web/public/a.json")).toEqual(["shape:cult-registry-author"]);
+  });
+
+  test("an archive is recognised by its first bytes whatever the file is called", async () => {
+    const pad = (head: number[], offset = 0) => Buffer.concat([Buffer.alloc(offset), Buffer.from(head), Buffer.alloc(300)]);
+    const tarBlock = Buffer.alloc(512);
+    tarBlock.write("ustar", 257, "latin1");
+    const violations = await violationsFor([
+      { path: "team-pack.bin", bytes: pad([0x50, 0x4b, 0x03, 0x04]) },
+      { path: "team-pack.dat", bytes: pad([0x37, 0x7a, 0xbc, 0xaf, 0x27, 0x1c]) },
+      { path: "pack.xz", bytes: pad([0xfd, 0x37, 0x7a, 0x58, 0x5a, 0x00]) },
+      { path: "pack.noext", bytes: pad([0x42, 0x5a, 0x68, 0x39, 0x31, 0x41, 0x59, 0x26, 0x53, 0x59]) },
+      { path: "pack.zst-renamed.png", bytes: pad([0x28, 0xb5, 0x2f, 0xfd]) },
+      { path: "pack.tar-renamed.txt", bytes: tarBlock },
+      { path: "pack.gz-of-tar.dat", bytes: gzipSync(tarBlock) },
+      { path: "pack.broken-gzip.dat", bytes: pad([0x1f, 0x8b, 0x08]) },
+      // Gzip that holds text is not an archive; its content goes to the shape rules.
+      { path: "data/legit.js.gz", bytes: gzipSync(Buffer.from("export const ok = true;\n")) },
+      // Ordinary binaries and text.
+      { path: "assets/logo.png", bytes: Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]) },
+      { path: "docs/notes.md", text: "PK is a prefix in prose, not a signature" },
+      // The fixture roots stay exempt from the archive rules.
+      { path: "apps/daemon/tests/fixtures/licensed-pack/basic.bin", bytes: pad([0x50, 0x4b, 0x03, 0x04]) },
+    ]);
+    expect(flaggedPaths(violations)).toEqual([
+      "pack.broken-gzip.dat",
+      "pack.gz-of-tar.dat",
+      "pack.noext",
+      "pack.tar-renamed.txt",
+      "pack.xz",
+      "pack.zst-renamed.png",
+      "team-pack.bin",
+      "team-pack.dat",
+    ]);
+    expect(reasonsFor(violations, "team-pack.bin")).toEqual(["archive:zip"]);
+    expect(reasonsFor(violations, "pack.gz-of-tar.dat")).toEqual(["archive:gzip+tar"]);
+    expect(reasonsFor(violations, "pack.zst-renamed.png")).toEqual(["archive:zstd"]);
+  });
+
+  test("a gitlink under a protected path is flagged by path and one elsewhere is not; a symlink gets the path rules without a content read", async () => {
+    const violations = await violationsFor([
+      { path: "data/component-kits/cult-ui-pro/vendor", kind: "gitlink", text: "" },
+      { path: "plugins/_official/examples/synthetic-landing/mish.json", text: JSON.stringify({ homepage: "https://motionsites.ai/x" }) },
+      { path: "plugins/_official/examples/synthetic-landing/sub", kind: "gitlink", text: "" },
+      { path: "third_party/lib", kind: "gitlink", text: "" },
+      { path: "packages/cult-ui-catalog/generated/adapters/link.ts", kind: "symlink", text: "../../../../elsewhere" },
+      // A link's content is its target text: not scanned, not fetched through the link.
+      { path: "apps/web/src/link.ts", kind: "symlink", text: `{"author":"${CULT_PRO}"}` },
+    ]);
+    expect(flaggedPaths(violations)).toEqual([
+      "data/component-kits/cult-ui-pro/vendor",
+      "packages/cult-ui-catalog/generated/adapters/link.ts",
+      "plugins/_official/examples/synthetic-landing/mish.json",
+      "plugins/_official/examples/synthetic-landing/sub",
+    ]);
+    expect(reasonsFor(violations, "data/component-kits/cult-ui-pro/vendor")).toEqual(["path:cult-ui-pro-kit"]);
+  });
+
+  test("each rule sees the index view and the working-tree view of a path", async () => {
+    const clean = "export const ok = true;\n";
+    const dirtyItem = `{"name":"example","author":"${CULT_PRO}"}`;
+    const stubText = '{\n  "rows": []\n}\n';
+    const stubs: ReviewedStub[] = [{ path: "packages/cult-ui-catalog/catalog.json", oid: oidFor(stubText) }];
+    const violations = await violationsFor(
+      [
+        // Staged clean, working copy replaced with licensed content (and the reverse).
+        { path: "apps/web/src/a.json", text: clean },
+        { path: "apps/web/src/a.json", text: dirtyItem, tree: "worktree" },
+        { path: "apps/web/src/b.json", text: dirtyItem },
+        { path: "apps/web/src/b.json", text: clean, tree: "worktree" },
+        // Blob rule on the working-tree view.
+        { path: "apps/web/src/c.ts", text: clean },
+        { path: "apps/web/src/c.ts", text: "export const denied = 'denied bytes, long enough to matter';\n", tree: "worktree" },
+        // Reviewed stub in the index, other bytes on disk: the working view is no stub.
+        { path: "packages/cult-ui-catalog/catalog.json", text: stubText },
+        { path: "packages/cult-ui-catalog/catalog.json", text: `${stubText} `, tree: "worktree" },
+        // Both views the reviewed stub: exempt.
+        { path: "packages/cult-ui-catalog/reviewed-overrides.json", text: stubText },
+      ],
+      {
+        reviewedStubs: [...stubs, { path: "packages/cult-ui-catalog/reviewed-overrides.json", oid: oidFor(stubText) }],
+        deniedBlobs: [oidFor("export const denied = 'denied bytes, long enough to matter';\n")],
+      },
+    );
+    expect(flaggedPaths(violations)).toEqual([
+      "apps/web/src/a.json",
+      "apps/web/src/b.json",
+      "apps/web/src/c.ts",
+      "packages/cult-ui-catalog/catalog.json",
+    ]);
+    expect(reasonsFor(violations, "apps/web/src/a.json")).toEqual(["shape:cult-registry-author@worktree"]);
+    expect(reasonsFor(violations, "apps/web/src/b.json")).toEqual(["shape:cult-registry-author"]);
+    expect(reasonsFor(violations, "apps/web/src/c.ts")).toEqual(["blob@worktree"]);
+    expect(reasonsFor(violations, "packages/cult-ui-catalog/catalog.json")).toEqual(["path:cult-ui-catalog-data"]);
+  });
 });
 
 describe("licensed pack guard mode", () => {
@@ -509,7 +714,7 @@ describe("licensed pack guard mode", () => {
 // for real against synthetic content.
 const scratchRoots: string[] = [];
 
-async function scratchRepo(files: Record<string, string>): Promise<string> {
+async function scratchRepo(files: Record<string, string>, config: readonly string[] = []): Promise<string> {
   const root = await mkdtemp(path.join(tmpdir(), "licensed-pack-guard-"));
   scratchRoots.push(root);
   for (const [repositoryPath, text] of Object.entries(files)) {
@@ -522,6 +727,7 @@ async function scratchRepo(files: Record<string, string>): Promise<string> {
       stdio: "pipe",
     });
   git("init", "--quiet");
+  for (const entry of config) git("config", ...entry.split("=", 2));
   git("add", "--all");
   git("commit", "--quiet", "--no-gpg-sign", "-m", "fixture");
   return root;
@@ -649,6 +855,20 @@ describe("licensed pack blob generator", () => {
     ).rejects.toThrow(/does not match pack.json/);
   });
 
+  test("the generator leaves the reviewed stubs out of the denylist but still lists other licensed blobs", async () => {
+    const repoRoot = path.resolve(import.meta.dirname, "../../..");
+    const stubFiles: Record<string, string> = {};
+    for (const stub of LICENSED_PACK_REVIEWED_STUBS) stubFiles[stub.path] = await readFile(path.join(repoRoot, stub.path), "utf8");
+    const root = await scratchRepo({
+      ...stubFiles,
+      "data/component-kits/cult-ui-pro/registry/real.json": LONG_LICENSED_TEXT + "real\n",
+    });
+    const result = await generateLicensedPackBlobList({ repoRoot: root, ref: "HEAD", existing: "" });
+    const ids = new Set(result.text.trimEnd().split("\n"));
+    for (const stub of LICENSED_PACK_REVIEWED_STUBS) expect(ids.has(stub.oid)).toBe(false);
+    expect(ids.has(oidFor(LONG_LICENSED_TEXT + "real\n"))).toBe(true);
+  });
+
   test("selectLicensedPackBlobs is pure over a tree listing", () => {
     const { ids, droppedShared } = selectLicensedPackBlobs({
       tree: [
@@ -768,7 +988,37 @@ describe("licensed pack guard wrapper", () => {
     }
   });
 
-  test("enforce mode fails when a tracked file cannot be read, and gitlinks are reported", async () => {
+  test("a tracked file deleted from the working tree gives one clear result: its index blob is scanned, and nothing contradicts that", async () => {
+    const logs: string[] = [];
+    vi.spyOn(console, "log").mockImplementation((line: unknown) => {
+      logs.push(String(line));
+    });
+    const errors: string[] = [];
+    vi.spyOn(console, "error").mockImplementation((line: unknown) => {
+      errors.push(String(line));
+    });
+    const denied = LONG_LICENSED_TEXT;
+    const root = await scratchRepo({
+      [LICENSED_PACK_BLOB_LIST_PATH]: `${oidFor(denied)}\n`,
+      "apps/web/src/gone.ts": "export const gone = true;\n",
+      "apps/web/src/moved.ts": denied,
+    });
+    await rm(path.join(root, "apps/web/src/gone.ts"));
+    // A deleted clean file passes in enforce mode and says so once.
+    await rm(path.join(root, "apps/web/src/moved.ts"));
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
+    // The deleted file with licensed bytes is still flagged through its index blob, with no read error beside it.
+    expect(errors.join("\n")).toContain("apps/web/src/moved.ts [blob]");
+    expect(errors.join("\n")).not.toContain("could not be read");
+    expect(logs.join("\n")).toContain("2 tracked file(s) are deleted in the working tree");
+
+    errors.length = 0;
+    execFileSync("git", ["rm", "--quiet", "--cached", "apps/web/src/moved.ts"], { cwd: root });
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  test("a gitlink under a protected path fails enforce mode; one elsewhere is reported but passes", async () => {
     vi.spyOn(console, "log").mockImplementation(() => {});
     const errors: string[] = [];
     vi.spyOn(console, "error").mockImplementation((line: unknown) => {
@@ -776,14 +1026,91 @@ describe("licensed pack guard wrapper", () => {
     });
     const root = await scratchRepo({
       [LICENSED_PACK_BLOB_LIST_PATH]: `${"e".repeat(40)}\n`,
-      "apps/web/src/gone.ts": "export const gone = true;\n",
+      "apps/web/src/index.ts": "export const ok = true;\n",
     });
-    await rm(path.join(root, "apps/web/src/gone.ts"));
     execFileSync("git", ["update-index", "--add", "--cacheinfo", `160000,${"a".repeat(40)},vendor/sub`], { cwd: root });
-    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
-    expect(errors.join("\n")).toContain("apps/web/src/gone.ts");
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(true);
     expect(errors.join("\n")).toContain("gitlink (submodule) vendor/sub");
+
+    execFileSync(
+      "git",
+      ["update-index", "--add", "--cacheinfo", `160000,${"b".repeat(40)},data/component-kits/cult-ui-pro/vendor`],
+      { cwd: root },
+    );
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
+    expect(errors.join("\n")).toContain("data/component-kits/cult-ui-pro/vendor [path:cult-ui-pro-kit]");
     await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "warn", minBlobIds: 1 })).resolves.toBe(true);
+  });
+
+  test("in real git, a symlink is never followed: a link to /dev/zero returns at once, and a link under a protected path is flagged", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    const errors: string[] = [];
+    vi.spyOn(console, "error").mockImplementation((line: unknown) => {
+      errors.push(String(line));
+    });
+    const root = await scratchRepo({
+      [LICENSED_PACK_BLOB_LIST_PATH]: `${"e".repeat(40)}\n`,
+      "apps/web/src/index.ts": "export const ok = true;\n",
+    });
+    await mkdir(path.join(root, "vendor"), { recursive: true });
+    await symlink("/dev/zero", path.join(root, "vendor/link.ts"));
+    execFileSync("git", ["add", "vendor/link.ts"], { cwd: root });
+    expect(execFileSync("git", ["ls-files", "-s", "vendor/link.ts"], { cwd: root, encoding: "utf8" })).toMatch(/^120000 /);
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(true);
+    expect(errors).toEqual([]);
+
+    // The working tree swaps a tracked file for a link to /dev/zero: still not read through the link.
+    await rm(path.join(root, "apps/web/src/index.ts"));
+    await symlink("/dev/zero", path.join(root, "apps/web/src/index.ts"));
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(true);
+
+    await mkdir(path.join(root, "data/component-kits/cult-ui-pro"), { recursive: true });
+    await symlink("../elsewhere", path.join(root, "data/component-kits/cult-ui-pro/link"));
+    execFileSync("git", ["add", "data/component-kits/cult-ui-pro/link"], { cwd: root });
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
+    expect(errors.join("\n")).toContain("data/component-kits/cult-ui-pro/link [path:cult-ui-pro-kit]");
+  });
+
+  test("in real git, staged and working-tree bytes are both scanned", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    const errors: string[] = [];
+    vi.spyOn(console, "error").mockImplementation((line: unknown) => {
+      errors.push(String(line));
+    });
+    const licensedItem = `{"name":"example","author":"${CULT_PRO}","files":[]}\n`;
+    const root = await scratchRepo({
+      [LICENSED_PACK_BLOB_LIST_PATH]: `${"e".repeat(40)}\n`,
+      "apps/web/public/registry/staged.json": "{}\n",
+      "apps/web/public/registry/unstaged.json": licensedItem,
+    });
+    // Staged with licensed content, then overwritten with clean bytes: the commit would still hold it.
+    await writeFile(path.join(root, "apps/web/public/registry/staged.json"), licensedItem, "utf8");
+    execFileSync("git", ["add", "apps/web/public/registry/staged.json"], { cwd: root });
+    await writeFile(path.join(root, "apps/web/public/registry/staged.json"), "{}\n", "utf8");
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
+    expect(errors.join("\n")).toContain("apps/web/public/registry/staged.json [shape:cult-registry-author]");
+    // Committed licensed content with a clean working copy is flagged by the index blob too.
+    expect(errors.join("\n")).toContain("apps/web/public/registry/unstaged.json [shape:cult-registry-author]");
+  });
+
+  test("in real git, an unstaged working-tree change that adds licensed content is flagged", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    const errors: string[] = [];
+    vi.spyOn(console, "error").mockImplementation((line: unknown) => {
+      errors.push(String(line));
+    });
+    const root = await scratchRepo({
+      [LICENSED_PACK_BLOB_LIST_PATH]: `${"e".repeat(40)}\n`,
+      "apps/web/public/registry/item.json": "{}\n",
+    });
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(true);
+    await writeFile(
+      path.join(root, "apps/web/public/registry/item.json"),
+      `{"name":"example","author":"${CULT_PRO}"}\n`,
+      "utf8",
+    );
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
+    expect(errors.join("\n")).toContain("apps/web/public/registry/item.json [shape:cult-registry-author@worktree]");
   });
 
   test("gzip files are unpacked for the shape rules", async () => {
@@ -844,6 +1171,34 @@ describe("licensed pack guard wrapper", () => {
     expect(errors.join("\n")).toContain(`${overwritten} [path:cult-ui-catalog-data]`);
   });
 
+  test("with core.autocrlf=true a clean checkout (CRLF working files) still passes: the working bytes are compared after git's clean filter", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    const errors: string[] = [];
+    vi.spyOn(console, "error").mockImplementation((line: unknown) => {
+      errors.push(String(line));
+    });
+    const repoRoot = path.resolve(import.meta.dirname, "../../..");
+    const stubFiles: Record<string, string> = {};
+    for (const stub of LICENSED_PACK_REVIEWED_STUBS) {
+      stubFiles[stub.path] = await readFile(path.join(repoRoot, stub.path), "utf8");
+    }
+    const root = await scratchRepo({ [LICENSED_PACK_BLOB_LIST_PATH]: `${"e".repeat(40)}\n`, ...stubFiles }, [
+      "core.autocrlf=true",
+    ]);
+    // The index holds the reviewed LF blobs; a Windows checkout writes CRLF.
+    for (const [repositoryPath, text] of Object.entries(stubFiles)) {
+      await writeFile(path.join(root, repositoryPath), text.replace(/\r?\n/g, "\r\n"), "utf8");
+    }
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(true);
+    expect(errors).toEqual([]);
+
+    // A real change on top of the CRLF checkout is still caught.
+    const changed = "packages/cult-ui-catalog/catalog.json";
+    await writeFile(path.join(root, changed), stubFiles[changed]!.replace(/\r?\n/g, "\r\n") + "\r\n", "utf8");
+    await expect(checkLicensedPackContent({ repoRoot: root }, { mode: "enforce", minBlobIds: 1 })).resolves.toBe(false);
+    expect(errors.join("\n")).toContain(`${changed} [path:cult-ui-catalog-data]`);
+  });
+
   test("the check is registered in the public guard entrypoint", () => {
     // `pnpm guard` runs it in enforce mode (scripts/guard.ts); the repository is public.
     const repoRoot = path.resolve(import.meta.dirname, "../../..");
@@ -853,7 +1208,39 @@ describe("licensed pack guard wrapper", () => {
     })
       .trim()
       .split("\n");
-    expect(names).toContain("licensed pack content");
+    expect(names).toContain(licensedPackGuardCheck.name);
+    expect(names.filter((name) => name === licensedPackGuardCheck.name)).toHaveLength(1);
+  });
+
+  test("the registered guard check enforces whatever LICENSED_PACK_GUARD_MODE says", async () => {
+    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    // The registered check uses the committed minimum id count, so the scratch denylist is padded to it:
+    // the dirty tree then fails because of its violation, not because the list looks truncated.
+    const padding = Array.from({ length: LICENSED_PACK_BLOB_LIST_MIN_IDS }, (_, index) => `${index.toString(16).padStart(40, "0")}\n`).join("");
+    const dirty = await scratchRepo({
+      [LICENSED_PACK_BLOB_LIST_PATH]: `${padding}${oidFor(LONG_LICENSED_TEXT)}\n`,
+      "apps/web/src/moved.ts": LONG_LICENSED_TEXT,
+    });
+    const clean = await scratchRepo({
+      [LICENSED_PACK_BLOB_LIST_PATH]: padding,
+      "apps/web/src/index.ts": "export const ok = true;\n",
+    });
+    try {
+      for (const value of ["warn", "", "enforce"]) {
+        vi.stubEnv("LICENSED_PACK_GUARD_MODE", value);
+        await expect(licensedPackGuardCheck.run({ repoRoot: dirty })).resolves.toBe(false);
+        await expect(licensedPackGuardCheck.run({ repoRoot: clean })).resolves.toBe(true);
+      }
+      // The stand-alone default is advisory: the same dirty tree passes there.
+      vi.stubEnv("LICENSED_PACK_GUARD_MODE", "warn");
+      await expect(checkLicensedPackContent({ repoRoot: dirty })).resolves.toBe(true);
+    } finally {
+      vi.unstubAllEnvs();
+    }
+    // The registry holds this very check, not a copy that could drop the mode.
+    const guardSource = await readFile(path.resolve(import.meta.dirname, "../../../scripts/guard.ts"), "utf8");
+    expect(guardSource).toMatch(/const checks: GuardCheck\[\] = \[[\s\S]*\n  licensedPackGuardCheck,\n/);
   });
 
   test("the guard's own sources and this spec do not match its rules", async () => {
@@ -867,7 +1254,7 @@ describe("licensed pack guard wrapper", () => {
     for (const repositoryPath of own) texts.set(repositoryPath, await readFile(path.join(repoRoot, repositoryPath), "utf8"));
     const violations = await findLicensedPackContentViolations({
       files: own.map((repositoryPath) => ({ path: repositoryPath, oid: "0".repeat(40) })),
-      readText: async (repositoryPath) => texts.get(repositoryPath),
+      readContent: async (file) => decodeRepositoryContent(file.path, Buffer.from(texts.get(file.path) ?? "", "utf8")),
       deniedBlobs: new Set(),
       rules: { sectionCatalogCultProRule: true },
     });
