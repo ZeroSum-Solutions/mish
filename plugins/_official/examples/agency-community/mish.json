@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-24T00:00:00Z",
   "description": "A members' studio, club, coworking space or professional-community page kind: hero with a join call, member benefits, membership tiers, how joining works, upcoming events, optional member voices, an FAQ and a join step. Fits a shared studio, maker space, coworking space, club or professional community that gives members standing access to a space and each other. An authored poster layout with responsive typography and an inline stylesheet. Membership actions use native contact links; an email supplied by the brief enables a CSP-hashed details-to-review-to-email-draft journey without claiming that an application was sent.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

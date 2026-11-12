@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-24T00:00:00Z",
   "description": "A static developer documentation hub or knowledge base page kind: header with a labelled search field, hero, quick-start steps, a guides grid, optional API/reference entry points, one static code sample, an optional changelog and optional community/support links, and a footer. Fits product docs sites, developer portals and help centers. Composed from ten vendored HyperUI blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

@@ -44,10 +44,10 @@
     "uk": "Універсальний веб-прототип для десктопа. Автономний HTML-файл створюється копіюванням `assets/template.html` та вставкою макетів з `references/layouts.md`. За замовчуванням для посадкових, маркетингових, документаційних або SaaS-сторінок.",
     "en": "General-purpose desktop web prototype. Single self-contained HTML file built by copying the seed `assets/template.html` and pasting section layouts from `references/layouts.md`. Default for any landing / marketing / docs / SaaS page when no more specific skill matches."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
-    "name": "Mishh Mashh",
-    "url": "https://github.com/ZeroSum-Solutions"
+    "name": "Open Design contributors; modified by ZeroSum Solutions",
+    "url": "https://github.com/nexu-io/open-design"
   },
   "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/web-prototype",
   "tags": [

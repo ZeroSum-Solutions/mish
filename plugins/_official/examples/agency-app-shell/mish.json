@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-22T17:43:04Z",
   "description": "A static web-app shell page kind: top nav, grouped side nav, an empty state, one five-row list view, one detail view and a settings page. Fits a team that wants the working frame of an internal tool, not a dashboard of numbers. Composed from six vendored HyperUI application blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

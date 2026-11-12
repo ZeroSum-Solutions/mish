@@ -5,7 +5,7 @@
   "title": "Screenshot To Prototype",
   "version": "0.1.0",
   "description": "Rebuild a screenshot as an editable Mishh Mashh prototype.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["import", "screenshot-import", "image-import", "prototype"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]

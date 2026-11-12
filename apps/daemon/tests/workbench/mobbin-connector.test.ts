@@ -211,7 +211,7 @@ describe('Mobbin through the read-only connector proxy (G29, AC-R12.2)', () => {
     expect(first.rights.status).toBe('restricted');
     expect(first.rights.operations.map(item => item.operation).sort()).toEqual([...SOURCE_OPERATIONS].sort());
     expect(decision('host-preview')).toMatchObject({ decision: 'allowed', evidenceRefs: [MOBBIN_EVIDENCE.rightsAssessment] });
-    // Owner decision 2026-10-09: private repository, licences ignored for now. Clause readings stay as metadata.
+    // Owner decision 2026-10-09: nothing waits on a licence answer. Facts beside it: fetches go through the user's own account; Mish redistributes no Mobbin content. Clause readings stay as metadata.
     for (const operation of ['cache-source-content', 'save-private-unit', 'private-backup', 'derive-from-reference', 'incorporate-project', 'reuse-private-project', 'export-application']) {
       expect(decision(operation)).toMatchObject({ decision: 'allowed', evidenceRefs: [MOBBIN_EVIDENCE.rightsAssessment] });
       expect(decision(operation).reason).toMatch(/owner decision 2026-10-09/i);

@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-26T00:00:00Z",
   "description": "A static one-destination guide page kind: a masthead naming the place, an opening chapter, a chapter list of two to six further chapters, optional practical facts (getting there, best time to visit, currency, language), optional places to see, an optional typographic gallery of place cards (pure CSS, no photographs), an optional plan-a-visit link to a single supplied URL, and a footer. Fits a city, region, trail or island told as chapters for a visitor deciding whether to go. Composed from nine vendored HyperUI blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

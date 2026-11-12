@@ -30,6 +30,7 @@ import { checkCraftReferences } from "./lint-craft-references.ts";
 import { checkWhatsNewDocument } from "./check-whats-new-document.ts";
 import { checkWhatsNewPublishWorkflow } from "./check-whats-new-publish-workflow.ts";
 import { checkWebNextEnv } from "./check-web-next-env.ts";
+import { checkLicensedPackContent } from "./check-licensed-pack-content.ts";
 import { collectCssHardcodedColorMatches, cssWideAndSpecialColorKeywords, realNamedColors } from "./style-policy.ts";
 import { checkScriptsLibraryArchitecture } from "./lib/guard/architecture.ts";
 import { runGuardChecks, type GuardCheck, type GuardContext } from "./lib/guard/core.ts";
@@ -1607,11 +1608,21 @@ async function checkRunStartChokePoint(): Promise<boolean> {
   return true;
 }
 
+/**
+ * Enforce is explicit so LICENSED_PACK_GUARD_MODE cannot weaken the guard; the
+ * repository is public. Exported so the e2e spec can run the registered check.
+ */
+export const licensedPackGuardCheck: GuardCheck = {
+  name: "licensed pack content",
+  run: (context) => checkLicensedPackContent(context, { mode: "enforce" }),
+};
+
 const checks: GuardCheck[] = [
   { name: "residual JavaScript", run: checkResidualJavaScript },
   { name: "root package-manager lockfile", run: ({ repoRoot: root }) => checkRootPackageManagerLockfiles(root) },
   { name: "package dependency specs", run: checkPackageDependencySpecs },
   { name: "product neutrality", run: checkProductNeutrality },
+  licensedPackGuardCheck,
   { name: "cross-app imports", run: checkCrossAppImportsOnce },
   { name: "HTML structural boundaries", run: checkHtmlBoundaryLookups },
   { name: "@ts-nocheck import resolution", run: checkTsNocheckImports },

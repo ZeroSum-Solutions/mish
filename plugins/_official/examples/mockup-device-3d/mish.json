@@ -44,10 +44,10 @@
     "tr": "Ekranlara gömülü gerçek HTML, cam lens kırılması ve 360 derece döner tabla kompozisyonu ile statik iPhone ve MacBook 3D tarzı vitrin.",
     "uk": "Статична 3D-вітрина iPhone та MacBook з вбудованим HTML на екранах, заломленням скляної лінзи та обертальною композицією на 360 градусів."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
-    "name": "Mishh Mashh",
-    "url": "https://github.com/ZeroSum-Solutions"
+    "name": "Open Design contributors; modified by ZeroSum Solutions",
+    "url": "https://github.com/nexu-io/open-design"
   },
   "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/mockup-device-3d",
   "tags": [

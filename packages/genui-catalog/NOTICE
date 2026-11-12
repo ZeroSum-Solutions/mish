@@ -1,7 +1,6 @@
 @mish/genui-catalog — third-party notices
 
-Every component in components/ except the Cult UI Pro ports listed in their own section at the
-end of this file is a clean-room implementation written from the behaviour
+Every component in components/ is a clean-room implementation written from the behaviour
 descriptions in the catalog's component specs (the effect name and the one-line "What it does"
 column of data/source-csv-snapshot.csv). No React Bits, 21st.dev or Kokonut UI implementation source code or component
 documentation was read, copied or recalled to write them (one incidental usage example appeared
@@ -62,21 +61,6 @@ soft-aurora — clean-room implementation of the effect named "SoftAurora" (http
 liquid-chrome — clean-room implementation of the effect named "LiquidChrome" (https://reactbits.dev/backgrounds/liquid-chrome); no upstream code.
 molten-metal — clean-room implementation of the effect named "MoltenMetal" (https://reactbits.dev/backgrounds/molten-metal); no upstream code.
 
-## Cult UI Pro (licensed, 2026-09-25)
-Cult UI Pro (https://pro.cult-ui.com), used under the owner's Cult UI Pro lifetime licence, which
-permits bundling and derivative use in Mishh Mashh and the sites it builds (owner decision of
-2026-09-25, recorded in docs/legal/cult-ui-pro-rights.md). These components are derivatives ported
-directly from the licensed Cult UI Pro source (React/Tailwind, rewritten as framework-free ESM and
-CSS); they are not clean-room. catalog.json records them as source.name "cult-ui-pro",
-licenceDecision "licensed". The faithful source stays in the private mm-source-kits snapshot and is
-not redistributed here.
-organic-button — ported from Cult UI Pro "organic-button" (copy bundled in the licensed "organic" page item).
-organic-card — ported from Cult UI Pro "organic-card" (copy bundled in the licensed "organic" page item).
-organic-card-small — ported from Cult UI Pro "organic-card-small" (copy bundled in the licensed "organic" page item).
-shadow-card — ported from Cult UI Pro "shadow-card" (copy bundled in the licensed "sass-colorful" page item).
-texture-card — ported from Cult UI Pro TextureCard (bundled in the licensed "marketing-bento-texture" and "marketing-blog-texture" section items).
-texture-button — ported from Cult UI Pro TextureButton (bundled in the licensed "marketing-bento-texture" and "marketing-blog-texture" section items).
-
 ## Harvest 2026-10-08 (clean-room, public index names only)
 gradient-text — clean-room implementation of the effect named "Gradient Text" (https://reactbits.dev/text-animations/gradient-text); no upstream code.
 count-up — clean-room implementation of the effect named "Count Up" (https://reactbits.dev/text-animations/count-up); no upstream code.
@@ -92,3 +76,27 @@ waves — clean-room implementation of the effect named "Waves" (https://reactbi
 animated-list — clean-room implementation of the effect named "Animated List" (https://reactbits.dev/components/animated-list); no upstream code.
 text-type — clean-room implementation of the effect named "Text Type" (https://reactbits.dev/text-animations/text-type); no upstream code.
 pixel-transition — clean-room implementation of the effect named "Pixel Transition" (https://reactbits.dev/animations/pixel-transition); no upstream code.
+
+## Recorded 2026-11-11 (clean-room ports that predate their NOTICE line)
+glare-hover — clean-room implementation of the effect named "GlareHover" (https://reactbits.dev/animations/glare-hover); no upstream code.
+glass-surface — clean-room implementation of the effect named "GlassSurface" (https://reactbits.dev/components/glass-surface); no upstream code.
+liquid-glass-card — clean-room implementation of the effect named "LiquidGlassCard" (https://kokonutui.com/docs/components/liquid-glass-card); no upstream code.
+reflective-card — clean-room implementation of the effect named "ReflectiveCard" (https://reactbits.dev/components/reflective-card); no upstream code.
+accordion-gallery — clean-room implementation of the effect named "AccordionGallery" (https://reactbits.dev/components/accordion-gallery); no upstream code.
+scroll-reveal — clean-room implementation of the effect named "ScrollReveal" (https://reactbits.dev/text-animations/scroll-reveal); no upstream code.
+split-text — clean-room implementation of the effect named "SplitText" (https://reactbits.dev/text-animations/split-text); no upstream code.
+masked-heading — clean-room implementation of the effect named "MaskedHeading" (https://reactbits.dev/text-animations/masked-heading); no upstream code.
+scroll-locked-video-hero — clean-room implementation of the effect named "scroll-locked-video-hero" (https://21st.dev/); no upstream code.
+chroma-grid — clean-room implementation of the effect named "ChromaGrid" (https://reactbits.dev/components/chroma-grid); no upstream code.
+decay-card — clean-room implementation of the effect named "DecayCard" (https://reactbits.dev/components/decay-card); no upstream code.
+ripple-distortion — clean-room implementation of the effect named "RippleDistortion" (https://reactbits.dev/animations/ripple-distortion); no upstream code.
+masonry — clean-room implementation of the effect named "Masonry" (https://reactbits.dev/components/masonry); no upstream code.
+shiny-text — clean-room implementation of the effect named "ShinyText" (https://reactbits.dev/text-animations/shiny-text); no upstream code.
+spotlight-card — clean-room implementation of the effect named "SpotlightCard" (https://reactbits.dev/components/spotlight-card); no upstream code.
+tilted-card — clean-room implementation of the effect named "TiltedCard" (https://reactbits.dev/components/tilted-card); no upstream code.
+stack — clean-room implementation of the effect named "Stack" (https://reactbits.dev/components/stack); no upstream code.
+card-swap — clean-room implementation of the effect named "CardSwap" (https://reactbits.dev/components/card-swap); no upstream code.
+scroll-choreography — clean-room implementation of the effect named "scroll-choreography" (https://21st.dev/); no upstream code.
+glyph-portal — clean-room implementation of the effect named "glyph-portal" (https://21st.dev/); no upstream code.
+handwriting-svg — clean-room implementation of the effect named "handwriting-svg" (https://21st.dev/); no upstream code.
+ai-chat-input — clean-room implementation of the effect named "ai-chat-input" (https://21st.dev/); no upstream code.

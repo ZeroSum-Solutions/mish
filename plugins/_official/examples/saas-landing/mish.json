@@ -44,10 +44,10 @@
     "uk": "Односторінковий лендінг SaaS з hero-секцією, можливостями, соціальними доказами, цінами та CTA. Відповідає активним токенам кольору/типографіки/макета з DESIGN.md. Ключові слова: \"saas landing\", \"marketing page\", \"product landing\".",
     "en": "Single-page SaaS landing with hero, features, social proof, pricing, and CTA. Respects the active DESIGN.md color/typography/layout tokens. Trigger keywords: \"saas landing\", \"marketing page\", \"product landing\"."
   },
-  "license": "MIT",
+  "license": "Apache-2.0",
   "author": {
-    "name": "Mishh Mashh",
-    "url": "https://github.com/ZeroSum-Solutions"
+    "name": "Open Design contributors; modified by ZeroSum Solutions",
+    "url": "https://github.com/nexu-io/open-design"
   },
   "homepage": "https://github.com/ZeroSum-Solutions/mish/tree/main/plugins/_official/examples/saas-landing",
   "tags": [

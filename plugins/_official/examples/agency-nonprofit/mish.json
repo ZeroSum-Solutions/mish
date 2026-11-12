@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-23T23:56:26Z",
   "description": "A static nonprofit or charity page kind: what is at stake, mission, programmes, optional impact figures, stories, accountability facts, events, ways to give and a volunteer call. Fits charities, foundations and cause organisations. Composed from twelve vendored HyperUI blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

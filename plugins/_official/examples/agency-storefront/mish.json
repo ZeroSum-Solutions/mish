@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-25T00:00:00Z",
   "description": "A static retail storefront page kind: hero, one featured product, an optional short collection grid, optional product details, a required buy-or-preorder step whose destination is honest to the brief (a supplied URL, else phone, else email, else plain text), optional shipping and returns, optional reviews, optional story or about, and a footer. Fits a fashion label, single-SKU shop, hardware preorder or digital drop sold as goods. Composed from eleven vendored HyperUI blocks with Tailwind compiled once and inlined; no page kind JavaScript beyond the two reviewed GenUI effect placements.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

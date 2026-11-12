@@ -6,6 +6,10 @@
   "version": "0.1.0",
   "publishedAt": "2026-09-22T17:43:04Z",
   "description": "A static marketing site page kind: a hero, three features, three testimonials, three pricing tiers, one call to action and a footer. Fits a software or subscription product that sells itself from one page. Composed from six vendored HyperUI marketing blocks with Tailwind compiled once and inlined; no page kind JavaScript.",
+  "license": "Apache-2.0",
+  "author": {
+    "name": "ZeroSum Solutions"
+  },
   "tags": [
     "example",
     "first-party",

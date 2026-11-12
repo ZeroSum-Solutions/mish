@@ -5,7 +5,7 @@
   "title": "Critique And Refine",
   "version": "0.1.0",
   "description": "Review, patch, and improve an existing Mishh Mashh artifact.",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "tags": ["refine", "critique", "review", "patch-edit", "tune-collab"],
   "compat": {
     "agentSkills": [{ "path": "./SKILL.md" }]
