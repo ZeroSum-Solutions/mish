@@ -240,7 +240,8 @@ describe('senseaudio media generation', () => {
       // Asset download goes through assertAndFetchExternalAsset which replaces
       // the caller's dispatcher with a validating one (issue #5478).
       expect(init?.dispatcher).toBeDefined();
-      expect(init?.redirect).toBe('error');
+      // The guard reads every 3xx itself (manual) and refuses it in error mode.
+      expect(init?.redirect).toBe('manual');
       return new Response(Buffer.from([0x89, 0x50, 0x4e, 0x47]));
     });
     vi.stubGlobal('fetch', fetchMock);

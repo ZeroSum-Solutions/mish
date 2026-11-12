@@ -369,7 +369,7 @@ describe('assertAndFetchExternalAsset — TOCTOU with injectable lookup (issue #
     // The dispatcher must be present so production fetch uses the validating Agent
     expect(capturedInit).toBeDefined();
     expect((capturedInit as { dispatcher?: unknown }).dispatcher).toBeDefined();
-    expect(capturedInit?.redirect).toBe('error');
+    expect(capturedInit?.redirect).toBe('manual');
   });
 
   it('rejects without invoking fetch when validation lookup throws', async () => {
@@ -400,7 +400,7 @@ describe('assertAndFetchExternalAsset — TOCTOU with injectable lookup (issue #
     let fetchCalled = false;
     const stubFetch = async (_url: string, init?: RequestInit) => {
       fetchCalled = true;
-      expect(init?.redirect).toBe('error');
+      expect(init?.redirect).toBe('manual');
       return new Response('ok', { status: 200 });
     };
 

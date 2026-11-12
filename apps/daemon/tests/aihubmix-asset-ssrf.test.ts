@@ -12,7 +12,7 @@ import {
 // Regression guard for the BLOCKING SSRF reviews on PR #3583: every AIHubMix
 // asset download (chat video / chat image / media image / media video) routes
 // the upstream-controlled URL through `assertAndFetchExternalAsset`, which
-// validates the literal host AND pins `redirect: 'error'`. Without the pinned
+// validates the literal host AND refuses every 3xx in the guard. Without that
 // redirect, a validated public URL could 302 the daemon into 169.254.169.254 /
 // RFC1918 space (and leak our Bearer/APP-Code to the hop target). These tests
 // lock both halves of that invariant.
@@ -36,7 +36,7 @@ describe('assertAndFetchExternalAsset', () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it('pins redirect:"error" and overrides any caller-supplied redirect', async () => {
+  it('sends redirect:"manual" (the guard reads every 3xx) and overrides any caller-supplied redirect', async () => {
     const fetchMock = vi.fn(
       async (_input: unknown, _init?: RequestInit) => new Response('ok', { status: 200 }),
     );
@@ -52,9 +52,18 @@ describe('assertAndFetchExternalAsset', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const init = fetchMock.mock.calls[0]![1]!;
-    expect(init.redirect).toBe('error');
+    expect(init.redirect).toBe('manual');
     // Other caller init is preserved.
     expect(init.headers).toMatchObject({ 'x-test': '1' });
+  });
+
+  it('refuses a 3xx from the asset URL and never requests the Location', async () => {
+    const fetchMock = vi.fn(
+      async () => new Response(null, { status: 302, headers: { location: 'http://169.254.169.254/latest/meta-data/' } }),
+    );
+    vi.stubGlobal('fetch', fetchMock);
+    await expect(assertAndFetchExternalAsset('http://8.8.8.8/asset.png', {})).rejects.toThrow(/redirect/);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -85,7 +94,7 @@ describe('AIHubMix asset downloads pin redirect:"error"', () => {
     videoPollIntervalMs: 1,
   });
 
-  it('chat video download (executeAIHubMixGenerateVideo) sets redirect:"error"', async () => {
+  it('chat video download (executeAIHubMixGenerateVideo) hands redirects to the guard (redirect:"manual")', async () => {
     const mp4Bytes = Buffer.from([0x00, 0x00, 0x00, 0x18]);
     let downloadInit: RequestInit | undefined;
     const fetchMock = vi.fn(async (input: unknown, init?: RequestInit) => {
@@ -118,10 +127,10 @@ describe('AIHubMix asset downloads pin redirect:"error"', () => {
 
     const result = await executeAIHubMixGenerateVideo({ prompt: 'clip' }, baseCtx());
     expect(result.ok).toBe(true);
-    expect(downloadInit?.redirect).toBe('error');
+    expect(downloadInit?.redirect).toBe('manual');
   });
 
-  it('chat image download (executeAIHubMixGenerateImage) sets redirect:"error"', async () => {
+  it('chat image download (executeAIHubMixGenerateImage) hands redirects to the guard (redirect:"manual")', async () => {
     const pngBytes = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
     let downloadInit: RequestInit | undefined;
     const fetchMock = vi.fn(async (input: unknown, init?: RequestInit) => {
@@ -150,6 +159,6 @@ describe('AIHubMix asset downloads pin redirect:"error"', () => {
       baseCtx(),
     );
     expect(result.ok).toBe(true);
-    expect(downloadInit?.redirect).toBe('error');
+    expect(downloadInit?.redirect).toBe('manual');
   });
 });

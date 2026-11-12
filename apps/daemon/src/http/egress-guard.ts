@@ -45,6 +45,20 @@ export class EgressRefusedError extends Error {
   }
 }
 
+/**
+ * The refusal behind an error, if any. A connect-time refusal from the guarded
+ * lookup reaches the caller as fetch's `TypeError('fetch failed')` with the
+ * refusal as `cause`, so a catch-all that only checks the top error misses it.
+ */
+export function egressRefusalOf(err: unknown): EgressRefusedError | null {
+  let current: unknown = err;
+  for (let depth = 0; depth < 4 && current; depth += 1) {
+    if (current instanceof EgressRefusedError) return current;
+    current = (current as { cause?: unknown }).cause;
+  }
+  return null;
+}
+
 function normalizeHost(hostname: string): string {
   let host = String(hostname).trim().toLowerCase();
   if (host.startsWith('[') && host.endsWith(']')) host = host.slice(1, -1);
@@ -200,9 +214,22 @@ export interface GuardedFetchOptions {
   lookupImpl?: DnsLookupCb | undefined;
   /** Defaults to the global `fetch`, read at call time so test stubs apply. */
   fetchImpl?: typeof fetch | undefined;
+  /**
+   * The user's configured HTTP proxy, used in place of the pinned dispatcher.
+   * The proxy resolves names, so the connect-time DNS check cannot run; every
+   * hop's URL is still checked. Omit it unless the user configured a proxy.
+   */
+  proxyDispatcher?: RequestInit['dispatcher'] | undefined;
 }
 
-const REDIRECT_STATUSES = new Set([301, 302, 303, 307, 308]);
+/**
+ * Every 3xx except 304 (Not Modified, a cache answer, not a hop) counts as a
+ * redirect, so 300 and the unused 305/306 cannot slip past `error` mode or reach
+ * a custom `fetchImpl` that follows them unchecked.
+ */
+function isRedirectStatus(status: number): boolean {
+  return status >= 300 && status < 400 && status !== 304;
+}
 /** Headers that carry the caller's credentials; never sent to another origin. */
 const CROSS_ORIGIN_DROPPED_HEADERS = ['authorization', 'cookie', 'x-api-key', 'proxy-authorization'];
 
@@ -232,15 +259,16 @@ export async function guardedFetch(url: string | URL, init: RequestInit = {}, op
       ...(method === undefined ? {} : { method }),
       ...(headers === undefined ? {} : { headers }),
       ...(body === undefined ? {} : { body }),
-      // The native `error` mode refuses a 3xx before any body is read; the
-      // status check below covers fetch implementations that ignore it.
-      redirect: options.redirects === 'error' ? 'error' : 'manual',
+      // Always `manual`: the guard sees every 3xx itself, so `error` mode
+      // raises an `EgressRefusedError` (reason `redirect`) rather than the
+      // native TypeError, and no fetch implementation follows a hop unchecked.
+      redirect: 'manual',
     };
     if (headers === undefined) delete (requestInit as { headers?: unknown }).headers;
     if (body === undefined) delete (requestInit as { body?: unknown }).body;
-    (requestInit as { dispatcher?: unknown }).dispatcher = egressDispatcher(policy, options.lookupImpl);
+    (requestInit as { dispatcher?: unknown }).dispatcher = options.proxyDispatcher ?? egressDispatcher(policy, options.lookupImpl);
     const res = await fetchImpl(target.href, requestInit);
-    if (!REDIRECT_STATUSES.has(res.status)) return res;
+    if (!isRedirectStatus(res.status)) return res;
     if (options.redirects === 'return') return res;
     if (res.body) await res.body.cancel().catch(() => {});
     if (options.redirects === 'error') {

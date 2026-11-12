@@ -82,7 +82,38 @@ describe('guardedFetch redirect modes', () => {
       guardedFetch('https://cdn.example.com/', {}, { policy: 'public', redirects: 'error', fetchImpl: impl }),
     ).rejects.toThrow(/redirect refused/);
     expect(calls).toHaveLength(1);
-    expect(calls[0]!.init.redirect).toBe('error');
+    expect(calls[0]!.init.redirect).toBe('manual');
+  });
+
+  it('error mode also rejects 300, 305 and 306, and passes 304 through', async () => {
+    const { guardedFetch, EgressRefusedError } = await loadGuard();
+    for (const status of [300, 305, 306]) {
+      const { impl } = chain([redirectTo('http://127.0.0.1:9/', status)]);
+      const err = await guardedFetch('https://cdn.example.com/', {}, { policy: 'public', redirects: 'error', fetchImpl: impl }).catch((e: unknown) => e);
+      expect(err, String(status)).toBeInstanceOf(EgressRefusedError);
+      expect((err as InstanceType<typeof EgressRefusedError>).reason).toBe('redirect');
+    }
+    const { impl } = chain([() => new Response(null, { status: 304 })]);
+    const res = await guardedFetch('https://cdn.example.com/', {}, { policy: 'public', redirects: 'error', fetchImpl: impl });
+    expect(res.status).toBe(304);
+  });
+
+  it('follow-checked checks a 300 Location like any other hop', async () => {
+    const { guardedFetch } = await loadGuard();
+    const { impl, calls } = chain([redirectTo('http://169.254.169.254/latest/meta-data/', 300)]);
+    await expect(
+      guardedFetch('https://cdn.example.com/', {}, { policy: 'public', redirects: 'follow-checked', fetchImpl: impl }),
+    ).rejects.toThrow(/non-public/);
+    expect(calls).toHaveLength(1);
+  });
+
+  it('egressRefusalOf finds a refusal wrapped in a fetch TypeError cause', async () => {
+    const { egressRefusalOf, EgressRefusedError } = await loadGuard();
+    const refusal = new EgressRefusedError('host resolves to a non-public address', 'non-public-host');
+    expect(egressRefusalOf(refusal)).toBe(refusal);
+    expect(egressRefusalOf(new TypeError('fetch failed', { cause: refusal }))).toBe(refusal);
+    expect(egressRefusalOf(new TypeError('fetch failed', { cause: new Error('ECONNRESET') }))).toBeNull();
+    expect(egressRefusalOf('nope')).toBeNull();
   });
 
   it('return mode hands back the 3xx untouched', async () => {

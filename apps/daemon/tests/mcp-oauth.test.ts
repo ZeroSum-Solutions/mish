@@ -338,6 +338,30 @@ describe('client registration cache', () => {
   });
 });
 
+describe('OAuth discovery refusals', () => {
+  it('reports a connect-time egress refusal instead of "no metadata here"', async () => {
+    const { EgressRefusedError } = await import('../src/http/egress-guard.js');
+    let calls = 0;
+    const refusing = (async () => {
+      calls += 1;
+      throw new TypeError('fetch failed', { cause: new EgressRefusedError('host resolves to a non-public address: mcp.example.com -> 10.0.0.5', 'non-public-host') });
+    }) as typeof fetch;
+    await expect(discoverProtectedResource('https://mcp.example.com/mcp', refusing)).rejects.toMatchObject({ code: 'MCP_OAUTH_URL_REFUSED' });
+    expect(calls).toBe(1);
+  });
+
+  it('never follows a discovery redirect, even when the caller injects plain fetch, and tries the next candidate', async () => {
+    const urls: string[] = [];
+    const redirecting = (async (input: FetchInput) => {
+      urls.push(String(input));
+      return new Response(null, { status: 302, headers: { location: 'http://169.254.169.254/latest/meta-data/' } });
+    }) as typeof fetch;
+    await expect(discoverAuthServer('https://auth.example.com', redirecting)).resolves.toBeNull();
+    expect(urls.length).toBeGreaterThan(1);
+    expect(urls.every((url) => url.startsWith('https://auth.example.com/'))).toBe(true);
+  });
+});
+
 describe('exchangeCodeForToken / refreshAccessToken', () => {
   it.each([
     { status: 307, flow: 'exchange' }, { status: 308, flow: 'exchange' },
@@ -376,7 +400,8 @@ describe('exchangeCodeForToken / refreshAccessToken', () => {
       expect(sent.get(flow === 'exchange' ? 'code' : 'refresh_token')).toBe(flow === 'exchange' ? 'fixture-authorization-code' : 'fixture-refresh-token');
       if (flow === 'exchange') expect(sent.get('code_verifier')).toBe('fixture-pkce-verifier');
       expect(destinationBodies).toEqual([]);
-      expect(error).toBeInstanceOf(TypeError);
+      // The guard sees the 3xx itself and refuses it as a typed policy error.
+      expect(error).toMatchObject({ code: 'MCP_OAUTH_URL_REFUSED' });
     } finally {
       await Promise.all(servers.map(server => new Promise<void>(resolve => server.close(() => resolve()))));
     }

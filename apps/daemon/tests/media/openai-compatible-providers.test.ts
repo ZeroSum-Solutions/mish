@@ -247,6 +247,69 @@ describe('OpenAI-compatible media providers', () => {
     expect(fetchMock).toHaveBeenCalledTimes(2);
   });
 
+  it('refuses a vendor asset URL that points at an internal address and never requests it', async () => {
+    await writeConfig({
+      providers: {
+        'custom-image': {
+          baseUrl: 'https://images.example.test/v1',
+          model: 'acme-image-model',
+        },
+      },
+    });
+    const fetchMock = vi.fn(async (input: unknown) => {
+      if (String(input) === 'https://images.example.test/v1/images/generations') {
+        return new Response(JSON.stringify({
+          data: [{ url: 'http://169.254.169.254/latest/meta-data/' }],
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      throw new Error(`unexpected fetch to ${String(input)}`);
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(generateMedia({
+      projectRoot,
+      projectsRoot,
+      projectId: 'project-1',
+      surface: 'image',
+      model: 'custom-image',
+      prompt: 'A product render on white seamless paper',
+      output: 'custom-internal-asset.png',
+    })).rejects.toThrow(/non-public/);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('still downloads an asset from a local gateway on the configured API origin', async () => {
+    await writeConfig({
+      providers: {
+        'custom-image': {
+          baseUrl: 'http://127.0.0.1:4000/v1',
+          model: 'acme-image-model',
+        },
+      },
+    });
+    const fetchMock = vi.fn(async (input: unknown) => {
+      if (String(input) === 'http://127.0.0.1:4000/v1/images/generations') {
+        return new Response(JSON.stringify({
+          data: [{ url: 'http://127.0.0.1:4000/files/generated.png' }],
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      expect(String(input)).toBe('http://127.0.0.1:4000/files/generated.png');
+      return new Response(Buffer.from(PNG_BASE64, 'base64'));
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    await generateMedia({
+      projectRoot,
+      projectsRoot,
+      projectId: 'project-1',
+      surface: 'image',
+      model: 'custom-image',
+      prompt: 'A product render on white seamless paper',
+      output: 'custom-local-gateway.png',
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it('does not resubmit custom-image generation when the returned asset download fails', async () => {
     await writeConfig({
       providers: {
